@@ -3,105 +3,715 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Game - Multijoueur</title>
+    <title>Anime Game - Devine la note</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #1a1a2e;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
+        :root {
+            --bg-color: #0b0b10;
+            --panel-color: #161622;
+            --accent-pink: #ff2a5f;
+            --accent-cyan: #00f0ff;
+            --accent-yellow: #ffe600;
+            --text-color: #ffffff;
+            --text-muted: #a0a0b0;
+        }
+
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
         }
-        h1 {
-            color: #e94560;
-            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 20%, #1a1a2e 0%, var(--bg-color) 80%);
+            min-height: 100vh;
         }
-        #game-container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #16213e;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background: rgba(22, 22, 34, 0.9);
+            border-bottom: 3px solid var(--accent-pink);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(255, 42, 95, 0.3);
         }
-        #status {
-            font-weight: bold;
-            margin-bottom: 15px;
+
+        .logo {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            color: var(--accent-yellow);
+            text-shadow: 3px 3px 0px var(--accent-pink), -1px -1px 0px #000;
         }
-        .connected { color: #00ff88; }
-        .disconnected { color: #ff4757; }
-        #logs {
-            background: #0f3460;
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+        }
+
+        nav button {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 8px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        nav button:hover, nav button.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        nav.locked button {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px 5%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-family: 'Bangers', cursive;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: var(--accent-yellow);
+            text-shadow: 2px 2px 0px var(--accent-pink);
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .grid-modes {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--panel-color);
+            border: 2px solid #2a2a40;
             border-radius: 8px;
-            padding: 10px;
-            height: 150px;
-            overflow-y: auto;
-            text-align: left;
-            font-family: monospace;
-            font-size: 14px;
-            margin-top: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: 0.3s;
         }
-        button {
-            background-color: #e94560;
+
+        .card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.15);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--panel-color);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #2a2a40;
+            font-size: 0.9rem;
+        }
+
+        .rank-table th, .rank-table td {
+            padding: 12px 10px;
+            text-align: left;
+        }
+
+        .rank-table th {
+            background: #222238;
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .rank-table tr:not(:last-child) td {
+            border-bottom: 1px solid #2a2a40;
+        }
+
+        .options-group {
+            background: var(--panel-color);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #2a2a40;
+        }
+
+        .option-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-item input[type="text"] {
+            background: #0b0b10;
+            border: 1px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-pink);
+        }
+
+        .btn-action {
+            background: var(--accent-pink);
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
+            padding: 10px;
+            font-weight: bold;
             cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
             margin-top: 10px;
             transition: 0.2s;
         }
-        button:hover {
-            background-color: #ff6b81;
+
+        .btn-action:hover {
+            background: #e01a4f;
+            box-shadow: 0 0 10px var(--accent-pink);
+        }
+
+        .btn-action:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .game-panel {
+            text-align: center;
+            background: var(--panel-color);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
+            display: none;
+        }
+
+        .room-code-box {
+            background: #0b0b10;
+            border: 2px dashed var(--accent-yellow);
+            padding: 15px;
+            font-size: 1.8rem;
+            font-family: 'Bangers', cursive;
+            color: var(--accent-yellow);
+            letter-spacing: 4px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .player-list {
+            list-style: none;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .player-list li {
+            background: #11111a;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid var(--accent-pink);
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .secret-word-card {
+            background: #0b0b10;
+            border: 2px solid var(--accent-pink);
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .secret-word-card .word {
+            font-family: 'Bangers', cursive;
+            font-size: 2.2rem;
+            color: var(--accent-yellow);
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        .chat-input-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-input-box input {
+            flex: 1;
+            background: #0b0b10;
+            border: 1px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .vote-btn {
+            background: #222238;
+            border: 1px solid var(--accent-cyan);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .vote-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            border-color: var(--text-color);
+            color: var(--text-color);
         }
     </style>
 </head>
 <body>
 
-    <h1>Anime Game Multijoueur</h1>
-    
-    <div id="game-container">
-        <div id="status" class="disconnected">Statut : Connexion au serveur en cours...</div>
-        <p>Bienvenue dans ton arène en ligne !</p>
-        <button id="action-btn">Envoyer une action au serveur</button>
-        
-        <div id="logs"></div>
-    </div>
+    <header>
+        <div class="logo">ANIME GAME</div>
+        <nav id="main-nav">
+            <ul>
+                <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Mode</button></li>
+                <li><button onclick="switchTab('ranked')" id="btn-ranked">Ranked</button></li>
+                <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
+            </ul>
+        </nav>
+    </header>
 
-    <!-- Script Socket.io -->
+    <!-- ONGLET MODE -->
+    <section id="mode" class="tab-content active">
+        
+        <!-- Sélection des modes -->
+        <div id="mode-selection" class="game-panel" style="display: block; border: none; box-shadow: none; background: transparent; padding: 0;">
+            <h2>Choisis ton mode de jeu</h2>
+            <p>Sélectionne l'activité à lancer.</p>
+            
+            <div class="grid-modes">
+                <div class="card">
+                    <h3>Mode Undercover 👥</h3>
+                    <p>Démasque l'imposteur caché parmi les membres du groupe.</p>
+                    <button class="btn-action" onclick="openModeLobby('undercover')">Jouer</button>
+                </div>
+                <div class="card">
+                    <h3>Devine la note 💯</h3>
+                    <p>Devine qui n’a pas la même note que le groupe par rapport au thème proposé</p>
+                    <button class="btn-action" onclick="openModeLobby('note')">Jouer</button>
+                </div>
+                <div class="card">
+                    <h3>Enchère 💰</h3>
+                    <p>Mise tes points pour remporter les cartes et objets rares.</p>
+                    <button class="btn-action" disabled>À venir (sortira plus tard)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salle d'attente -->
+        <div id="waiting-room" class="game-panel">
+            <h2 id="waiting-title">Salle d'attente</h2>
+            <p>Partage ce code à tes amis virtuels !</p>
+            
+            <div class="room-code-box" id="display-room-code">#---</div>
+
+            <p style="margin-bottom: 5px; color: var(--text-color);">Joueurs dans la salle :</p>
+            <ul class="player-list" id="current-player-list"></ul>
+
+            <button class="btn-action" style="max-width: 300px;" onclick="startThemeSelectionOrRound()">Lancer la partie</button>
+            <br>
+            <button class="btn-back" onclick="quitGameToMenu()">Retour aux modes</button>
+        </div>
+
+        <!-- Étape de Saisie du Thème en rotation -->
+        <div id="theme-input-screen" class="game-panel">
+            <h2>Choix du Thème</h2>
+            <p id="theme-master-prompt" style="color: var(--accent-cyan); font-weight: bold;"></p>
+            
+            <div class="chat-input-box" style="margin-top: 20px;">
+                <input type="text" id="custom-theme-input" placeholder="Ex: One Piece, Naruto...">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitCustomTheme()">Valider le thème</button>
+            </div>
+        </div>
+
+        <!-- Étape Révélation (5 secondes) -->
+        <div id="reveal-screen" class="game-panel">
+            <h2>Préparation de la manche</h2>
+            <p id="current-active-theme" style="color: var(--accent-cyan); font-weight: bold; font-size: 1.2rem;"></p>
+            
+            <div class="secret-word-card">
+                <h3>Ta note secrète :</h3>
+                <div class="word" id="assigned-secret">---</div>
+            </div>
+            <p style="color: var(--accent-yellow); font-weight: bold;" id="countdown-text">Début dans 5 secondes...</p>
+        </div>
+
+        <!-- Tour de parole / Indices -->
+        <div id="gameplay-screen" class="game-panel">
+            <h2>Tour de parole</h2>
+            <p id="turn-indicator">C'est au tour de : <span id="current-turn-player" style="color: var(--accent-cyan); font-weight: bold;"></span></p>
+
+            <ul class="player-list" id="gameplay-player-list"></ul>
+
+            <div class="chat-input-box">
+                <input type="text" id="player-clue-input" placeholder="Tape ton indice ici...">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Suivant</button>
+            </div>
+        </div>
+
+        <!-- Choix post-tour : Prochain thème ou Voter -->
+        <div id="choice-screen" class="game-panel">
+            <h2>Fin du tour d'indices</h2>
+            <p>Que souhaitez-vous faire ?</p>
+            
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <button class="btn-action" style="background: var(--accent-cyan); color: #000;" onclick="startThemeSelectionOrRound()">Prochain thème ➡️</button>
+                <button class="btn-action" onclick="startVotingPhase()">Voter 🗳️</button>
+            </div>
+        </div>
+
+        <!-- Phase de Vote -->
+        <div id="voting-screen" class="game-panel">
+            <h2>Phase de Vote</h2>
+            <p>Qui est l'imposteur ? Clique sur le joueur suspect.</p>
+
+            <ul class="player-list" id="voting-player-list"></ul>
+        </div>
+
+        <!-- Écran de Résultats -->
+        <div id="result-screen" class="game-panel">
+            <h2>Résultat du vote</h2>
+            <div class="secret-word-card">
+                <h3 id="eliminated-announcement">Le joueur éliminé est :</h3>
+                <div class="word" id="eliminated-role-reveal" style="font-size: 1.5rem;">---</div>
+            </div>
+            <button class="btn-action" style="max-width: 300px;" onclick="openModeLobby(activeModeType)">Recommencer une partie</button>
+            <br>
+            <button class="btn-back" onclick="quitGameToMenu()">Quitter au menu</button>
+        </div>
+
+    </section>
+
+    <!-- ONGLET RANKED -->
+    <section id="ranked" class="tab-content">
+        <h2>Classement</h2>
+        <p>Les joueurs les plus gradés.</p>
+        <table class="rank-table">
+            <thead>
+                <tr><th>Rang</th><th>Nom</th><th>Score</th><th>Niveau</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>#1</td><td>Saitama_99</td><td>14,200</td><td>S-Rank</td></tr>
+                <tr><td>#2</td><td>NamiSwans</td><td>11,500</td><td>A-Rank</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ONGLET OPTIONS -->
+    <section id="options" class="tab-content">
+        <h2>Options</h2>
+        <p>Paramètres du système.</p>
+        <div class="options-group">
+            <div class="option-item">
+                <span>Ton Pseudo</span>
+                <input type="text" id="username-input" value="OtakuGamer" oninput="updateUsername(this.value)">
+            </div>
+            <hr style="border: 0; border-top: 1px solid #2a2a40; margin: 15px 0;">
+            <div class="option-item">
+                <span>Mode Sombre OLED</span>
+                <input type="checkbox" checked>
+            </div>
+        </div>
+    </section>
+
+    <!-- Script Socket.io connecté au serveur Render -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-        const logsDiv = document.getElementById('logs');
-        const statusDiv = document.getElementById('status');
-        const actionBtn = document.getElementById('action-btn');
-
-        function logMessage(msg) {
-            logsDiv.innerHTML += `> ${msg}<br>`;
-            logsDiv.scrollTop = logsDiv.scrollHeight;
-        }
-
         // Connexion au serveur Render
         const socket = io('https://anime-game-server.onrender.com');
 
         socket.on('connect', () => {
-            statusDiv.textContent = 'Statut : Connecté au serveur !';
-            statusDiv.className = 'connected';
-            logMessage("Connecté avec succès avec l'ID : " + socket.id);
+            console.log("Connecté au serveur avec l'ID : " + socket.id);
         });
 
-        socket.on('disconnect', () => {
-            statusDiv.textContent = 'Statut : Déconnecté';
-            statusDiv.className = 'disconnected';
-            logMessage("Déconnecté du serveur.");
-        });
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
 
-        actionBtn.addEventListener('click', () => {
-            // Exemple d'envoi d'événement au serveur
-            socket. दुसre ? socket.emit('player_action', { action: 'attaque' }) : null;
-            logMessage("Action envoyée au serveur !");
-        });
+        let myUsername = "OtakuGamer";
+        function updateUsername(newVal) {
+            myUsername = newVal.trim() === "" ? "Anonyme" : newVal;
+        }
+
+        let activeModeType = ""; 
+        let gamePlayers = [];
+        let currentTurnIndex = 0;
+        let themeMasterIndex = -1;
+        let currentThemeMaster = null;
+        let currentChosenTheme = "";
+
+        const undercoverPairs = [
+            ["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], ["Rasen Shuriken", "Rasengan"],
+            ["Yuji", "Sukuna"], ["Peter Parker", "Miles Morales"], ["Inoxtag", "Luffy"], ["Kakashi", "Gojo"],
+            ["Superman", "All Might"], ["Meruem", "Cell"], ["Pain", "Nagato"], ["Maki", "Toji"],
+            ["Aokiji", "Brook"], ["Pokeball", "Dragon Ball"], ["Madara", "Itachi"], ["Ener", "Luxus"]
+        ];
+
+        function hideAllPanels() {
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('theme-input-screen').style.display = 'none';
+            document.getElementById('reveal-screen').style.display = 'none';
+            document.getElementById('gameplay-screen').style.display = 'none';
+            document.getElementById('choice-screen').style.display = 'none';
+            document.getElementById('voting-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+        }
+
+        function openModeLobby(mode) {
+            activeModeType = mode;
+            document.getElementById('main-nav').classList.add('locked');
+
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let randomCode = "";
+            for (let i = 0; i < 4; i++) randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            document.getElementById('display-room-code').innerText = "#" + randomCode;
+
+            document.getElementById('waiting-title').innerText = mode === 'undercover' ? "Salle d'attente : Undercover" : "Salle d'attente : Devine la note";
+
+            gamePlayers = [
+                { name: myUsername, role: '', clue: '', isImpostor: false },
+                { name: "SasukeFan", role: '', clue: '', isImpostor: false },
+                { name: "LuffyKing", role: '', clue: '', isImpostor: false },
+                { name: "NezukoChan", role: '', clue: '', isImpostor: false },
+                { name: "ZoroSwords", role: '', clue: '', isImpostor: false }
+            ];
+
+            themeMasterIndex = -1;
+
+            updatePlayerListUI('current-player-list');
+            hideAllPanels();
+            document.getElementById('waiting-room').style.display = 'block';
+        }
+
+        function updatePlayerListUI(elementId) {
+            const listUI = document.getElementById(elementId);
+            listUI.innerHTML = "";
+            gamePlayers.forEach(p => {
+                listUI.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">Prêt</span></li>`;
+            });
+        }
+
+        function quitGameToMenu() {
+            document.getElementById('main-nav').classList.remove('locked');
+            hideAllPanels();
+            document.getElementById('mode-selection').style.display = 'block';
+        }
+
+        function startThemeSelectionOrRound() {
+            gamePlayers.forEach(p => p.clue = "");
+
+            if (activeModeType === 'note') {
+                themeMasterIndex = (themeMasterIndex + 1) % gamePlayers.length;
+                currentThemeMaster = gamePlayers[themeMasterIndex];
+                
+                hideAllPanels();
+                document.getElementById('theme-input-screen').style.display = 'block';
+                
+                if (currentThemeMaster.name === myUsername) {
+                    document.getElementById('theme-master-prompt').innerText = "C'est ton tour de choisir ! Écris le nom de l'anime ou manga :";
+                    document.getElementById('custom-theme-input').value = "";
+                    document.getElementById('custom-theme-input').style.display = "block";
+                } else {
+                    document.getElementById('theme-master-prompt').innerText = `${currentThemeMaster.name} est en train de choisir le thème... Patientez.`;
+                    setTimeout(() => {
+                        const botThemes = ["Naruto", "One Piece", "Attack on Titan", "Demon Slayer", "Bleach", "Hunter x Hunter"];
+                        currentChosenTheme = botThemes[Math.floor(Math.random() * botThemes.length)];
+                        launchRevealPhase();
+                    }, 2000);
+                }
+            } else {
+                launchRevealPhase();
+            }
+        }
+
+        function submitCustomTheme() {
+            const inputVal = document.getElementById('custom-theme-input').value.trim();
+            if (inputVal === "") return;
+            currentChosenTheme = inputVal;
+            launchRevealPhase();
+        }
+
+        function launchRevealPhase() {
+            let impostorCount = gamePlayers.length >= 5 ? 2 : 1;
+            gamePlayers.forEach(p => p.isImpostor = false);
+
+            let assignedIndexes = [];
+            while(assignedIndexes.length < impostorCount) {
+                let randomIndex = Math.floor(Math.random() * gamePlayers.length);
+                if(!assignedIndexes.includes(randomIndex)) {
+                    assignedIndexes.push(randomIndex);
+                    gamePlayers[randomIndex].isImpostor = true;
+                }
+            }
+
+            if (activeModeType === 'undercover') {
+                const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
+                gamePlayers.forEach(p => {
+                    p.secretData = p.isImpostor ? pair[1] : pair[0];
+                });
+                document.getElementById('current-active-theme').innerText = "";
+            } else if (activeModeType === 'note') {
+                const realScore = Math.floor(Math.random() * 3) + 8; // Entre 8 et 10
+                let fakeScore = Math.floor(Math.random() * 5) + 2;   // Entre 2 et 6
+                if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
+
+                document.getElementById('current-active-theme').innerText = `Thème : ${currentChosenTheme} (Proposé par ${currentThemeMaster.name})`;
+                gamePlayers.forEach(p => {
+                    p.secretData = p.isImpostor ? fakeScore : realScore;
+                });
+            }
+
+            document.getElementById('assigned-secret').innerText = gamePlayers[0].secretData;
+
+            hideAllPanels();
+            document.getElementById('reveal-screen').style.display = 'block';
+
+            let timeLeft = 5;
+            const countdownEl = document.getElementById('countdown-text');
+            countdownEl.innerText = `Début dans ${timeLeft} secondes...`;
+
+            let timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = `Début dans ${timeLeft} secondes...`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    startGameplayTurn();
+                }
+            }, 1000);
+        }
+
+        function startGameplayTurn() {
+            currentTurnIndex = 0;
+            hideAllPanels();
+            document.getElementById('gameplay-screen').style.display = 'block';
+            updateGameplayUI();
+        }
+
+        function updateGameplayUI() {
+            document.getElementById('current-turn-player').innerText = gamePlayers[currentTurnIndex].name;
+            const listUI = document.getElementById('gameplay-player-list');
+            listUI.innerHTML = "";
+            gamePlayers.forEach((p, idx) => {
+                let status = p.clue ? `💬 "${p.clue}"` : (idx === currentTurnIndex ? "⏳ En train d'écrire..." : "En attente");
+                let color = p.clue ? "var(--accent-cyan)" : "var(--text-muted)";
+                listUI.innerHTML += `<li><span>${p.name}</span> <span style="color:${color}">${status}</span></li>`;
+            });
+        }
+
+        function submitClue() {
+            const input = document.getElementById('player-clue-input');
+            if (input.value.trim() === "") return;
+
+            gamePlayers[currentTurnIndex].clue = input.value;
+            input.value = "";
+
+            currentTurnIndex++;
+            if (currentTurnIndex < gamePlayers.length) {
+                updateGameplayUI();
+            } else {
+                if (activeModeType === 'note') {
+                    hideAllPanels();
+                    document.getElementById('choice-screen').style.display = 'block';
+                } else {
+                    startVotingPhase();
+                }
+            }
+        }
+
+        function startVotingPhase() {
+            hideAllPanels();
+            document.getElementById('voting-screen').style.display = 'block';
+            
+            const listUI = document.getElementById('voting-player-list');
+            listUI.innerHTML = "";
+            gamePlayers.forEach((p, idx) => {
+                listUI.innerHTML += `<li>
+                    <span>${p.name} (Indice : <b>${p.clue}</b>)</span> 
+                    <button class="vote-btn" onclick="castVote(${idx})">Voter</button>
+                </li>`;
+            });
+        }
+
+        function castVote(targetIndex) {
+            const eliminatedPlayer = gamePlayers[targetIndex];
+
+            hideAllPanels();
+            document.getElementById('result-screen').style.display = 'block';
+
+            document.getElementById('eliminated-announcement').innerText = `Le joueur éliminé est ${eliminatedPlayer.name} !`;
+            
+            if (eliminatedPlayer.isImpostor) {
+                document.getElementById('eliminated-role-reveal').innerHTML = `<span style="color:var(--accent-pink)">C'ÉTAIT UN IMPOSTEUR ! 🎯</span><br><span style="font-size:1.1rem; color:var(--text-muted)">Valeur secrète : ${eliminatedPlayer.secretData}</span>`;
+            } else {
+                document.getElementById('eliminated-role-reveal').innerHTML = `<span style="color:var(--accent-cyan)">C'était un Innocent... 😇</span><br><span style="font-size:1.1rem; color:var(--text-muted)">Valeur secrète : ${eliminatedPlayer.secretData}</span>`;
+            }
+        }
     </script>
 </body>
 </html>
