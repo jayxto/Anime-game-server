@@ -35,25 +35,40 @@ const undercoverPairs = [
 io.on('connection', (socket) => {
     console.log(`Un joueur s'est connecté : ${socket.id}`);
 
-    socket.on('join_room', ({ roomCode, username, mode }) => {
+    // Créer une salle
+    socket.on('create_room', ({ roomCode, username, mode }) => {
         socket.join(roomCode);
+        rooms[roomCode] = {
+            code: roomCode,
+            mode: mode || 'undercover',
+            host: socket.id,
+            players: [{
+                id: socket.id,
+                name: username,
+                clue: '',
+                isImpostor: false,
+                isAlive: true,
+                secretData: null
+            }],
+            status: 'waiting', 
+            currentThemeMasterId: null,
+            currentTheme: '',
+            currentTurnIndex: 0,
+            votes: {},
+            themeChangeVotes: []
+        };
+        io.to(roomCode).emit('update_room', rooms[roomCode]);
+    });
 
-        if (!rooms[roomCode]) {
-            rooms[roomCode] = {
-                code: roomCode,
-                mode: mode || 'undercover',
-                host: socket.id,
-                players: [],
-                status: 'waiting', 
-                currentThemeMasterId: null,
-                currentTheme: '',
-                currentTurnIndex: 0,
-                votes: {},
-                themeChangeVotes: []
-            };
+    // Rejoindre une salle existante via le code
+    socket.on('join_room_code', ({ roomCode, username }) => {
+        const room = rooms[roomCode];
+        if (!room) {
+            socket.emit('room_error', "Cette salle n'existe pas ! Vérifie le code.");
+            return;
         }
 
-        const room = rooms[roomCode];
+        socket.join(roomCode);
         let existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -124,7 +139,6 @@ io.on('connection', (socket) => {
         }
     }
 
-    // Vote majoritaire pour changer de thème
     socket.on('vote_change_theme', (roomCode) => {
         const room = rooms[roomCode];
         if (room && room.status === 'choose_theme') {
@@ -133,10 +147,9 @@ io.on('connection', (socket) => {
             }
 
             let totalPlayers = room.players.length;
-            let neededVotes = Math.ceil(totalPlayers / 2); // Majorité absolue
+            let neededVotes = Math.ceil(totalPlayers / 2);
 
             if (room.themeChangeVotes.length >= neededVotes) {
-                // Changement validé par la majorité : on tire un nouveau maître au sort
                 room.themeChangeVotes = [];
                 let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
                 room.currentThemeMasterId = randomMaster.id;
@@ -165,7 +178,7 @@ io.on('connection', (socket) => {
             });
 
             room.status = 'reveal';
-            io.to(roomCode).emit('launch_reveal', room);
+            io.to(room.code).emit('launch_reveal', room);
         }
     });
 
