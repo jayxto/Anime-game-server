@@ -131,8 +131,23 @@ io.on('connection', (socket) => {
         if (room && room.players[room.currentThemeMasterIndex].id === socket.id) {
             room.currentTheme = theme;
             room.status = 'reveal';
-            io.to(room.code).emit('theme_chosen', room);
-            io.to(room.code).emit('launch_reveal', room);
+            io.to(roomCode).emit('theme_chosen', room);
+            io.to(roomCode).emit('launch_reveal', room);
+        }
+    });
+
+    // Option pour changer de thème au milieu du tour (Mode Note uniquement)
+    socket.on('change_theme_mid_game', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (room && room.mode === 'note') {
+            room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
+            room.status = 'choose_theme';
+            room.players.forEach(p => p.clue = '');
+
+            io.to(room.code).emit('prompt_theme_choice', {
+                room: room,
+                themeMasterId: room.players[room.currentThemeMasterIndex].id
+            });
         }
     });
 
@@ -148,9 +163,22 @@ io.on('connection', (socket) => {
             if (room.currentTurnIndex < room.players.length) {
                 io.to(roomCode).emit('update_gameplay', room);
             } else {
-                room.status = 'voting';
-                io.to(roomCode).emit('start_voting', room);
+                if (room.mode === 'note') {
+                    room.status = 'end_clues_note';
+                    io.to(roomCode).emit('prompt_end_clue_options', room);
+                } else {
+                    room.status = 'voting';
+                    io.to(roomCode).emit('start_voting', room);
+                }
             }
+        }
+    });
+
+    socket.on('force_start_voting', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (room) {
+            room.status = 'voting';
+            io.to(roomCode).emit('start_voting', room);
         }
     });
 
