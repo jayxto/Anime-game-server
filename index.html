@@ -190,7 +190,7 @@
             <p id="game-info-text">Indice ou Action</p>
 
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p style="margin: 0; color: var(--text-muted);">Ton secret / Rôle :</p>
+                <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
             </div>
 
@@ -203,6 +203,11 @@
 
             <div id="pass-vote-container" style="display:none; margin-top: 15px;">
                 <button class="btn-action" style="background: var(--text-muted);" onclick="castVote('pass')">Passer mon vote</button>
+            </div>
+
+            <div id="end-game-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer (Nouvelle manche)</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
         </div>
     </section>
@@ -235,6 +240,7 @@
             document.getElementById('menu-selection').style.display = 'none';
             document.getElementById('waiting-room').style.display = 'none';
             document.getElementById('gameplay-room').style.display = 'none';
+            document.getElementById('end-game-buttons').style.display = 'none';
         }
 
         function createRoom(mode) {
@@ -278,19 +284,11 @@
             socket.emit('start_game', currentRoomCode);
         }
 
-        socket.on('game_started', (room) => {
-            if (socket.id === room.players[room.currentThemeMasterIndex].id && room.mode === 'note') {
-                let theme = prompt("Entre le thème / anime :", "Anime Général");
-                socket.emit('submit_theme', { roomCode: room.code, theme: theme || "Anime" });
-            } else if (room.mode === 'undercover') {
-                socket.emit('submit_theme', { roomCode: room.code, theme: "Univers Anime" });
-            }
-        });
-
         socket.on('launch_reveal', (room) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
             document.getElementById('pass-vote-container').style.display = 'none';
+            document.getElementById('end-game-buttons').style.display = 'none';
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
@@ -303,6 +301,19 @@
             updateGameplayUI(room);
         });
 
+        socket.on('resume_gameplay', (room) => {
+            hideAllPanels();
+            document.getElementById('gameplay-room').style.display = 'block';
+            document.getElementById('pass-vote-container').style.display = 'none';
+            document.getElementById('end-game-buttons').style.display = 'none';
+            
+            const me = room.players.find(p => p.id === socket.id);
+            if (me) {
+                document.getElementById('my-secret-display').innerText = me.secretData;
+            }
+            updateGameplayUI(room);
+        });
+
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             const currentTurnPlayer = room.players[room.currentTurnIndex];
@@ -311,6 +322,7 @@
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
             room.players.forEach((p, idx) => {
+                if (!p.isAlive) return;
                 let status = p.clue ? `💬 "${p.clue}"` : (idx === room.currentTurnIndex ? "En train d'écrire..." : "En attente");
                 list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
             });
@@ -329,10 +341,6 @@
             document.getElementById('clue-input').value = "";
         }
 
-        socket.on('end_clues', (room) => {
-            socket.emit('go_to_vote', currentRoomCode);
-        });
-
         socket.on('start_voting', (room) => {
             document.getElementById('game-phase-title').innerText = "Phase de Vote";
             document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
@@ -342,6 +350,7 @@
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
             room.players.forEach(p => {
+                if (!p.isAlive) return;
                 let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
                 if (p.id !== socket.id) {
                     list.innerHTML += `<li>
@@ -367,27 +376,31 @@
             socket.emit('cast_vote', { roomCode: currentRoomCode, targetId: targetId });
             document.getElementById('game-info-text').innerText = "Vote enregistré ! En attente des autres joueurs...";
             document.getElementById('pass-vote-container').style.display = 'none';
-            // Désactiver les boutons de vote pour éviter les doubles clics
             document.querySelectorAll('.player-list button').forEach(b => b.disabled = true);
         }
 
         socket.on('show_results', (data) => {
-            document.getElementById('game-phase-title').innerText = "Résultats de la partie";
+            document.getElementById('game-phase-title').innerText = data.gameOver ? "Fin de la Partie" : "Résultats du Tour";
             document.getElementById('pass-vote-container').style.display = 'none';
+            document.getElementById('clue-input-container').style.display = 'none';
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
-                resultMessage += `Joueur éliminé par la majorité : <strong>${data.eliminatedPlayer.name}</strong><br><br>`;
+                let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
+                resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote passé : Aucun joueur éliminé.<br><br>`;
             }
 
-            // Affichage pour savoir si l'imposteur a été trouvé
-            let impostorNames = data.impostors.map(imp => imp.name).join(", ");
-            if (data.impostorCaught) {
-                resultMessage += `<span style="color: #00ff88; font-size: 1.2rem;">🎉 Victoire ! L'imposteur (${impostorNames}) a bien été éliminé !</span>`;
+            if (data.gameOver) {
+                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
+                // Affichage explicite des boutons Rejouer et Menu à la fin de la partie
+                document.getElementById('end-game-buttons').style.display = 'flex';
             } else {
-                resultMessage += `<span style="color: var(--accent-pink); font-size: 1.2rem;">❌ Raté ! L'imposteur était : ${impostorNames}.</span>`;
+                resultMessage += `<span style="color: var(--accent-cyan);">La partie continue... Prochain tour dans 4 secondes.</span>`;
+                setTimeout(() => {
+                    socket.emit('next_step_game', currentRoomCode);
+                }, 4000);
             }
 
             document.getElementById('game-info-text').innerHTML = resultMessage;
@@ -395,11 +408,20 @@
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
             data.room.players.forEach(p => {
-                let roleColor = p.isImpostor ? "var(--accent-pink)" : "#00ff88";
-                let roleText = p.isImpostor ? "Imposteur" : "Innocent";
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:${roleColor}">${roleText} (Secret: ${p.secretData})</span></li>`;
+                let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
+                let statusText = p.isAlive ? "En vie" : "Éliminé";
+                let roleText = p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]";
+                list.innerHTML += `<li><span>${p.name}${roleText}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
+
+        function nextStepGame() {
+            socket.emit('next_step_game', currentRoomCode);
+        }
+
+        function backToMenu() {
+            socket.emit('back_to_menu', currentRoomCode);
+        }
     </script>
 </body>
 </html>
