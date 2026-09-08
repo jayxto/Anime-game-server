@@ -149,7 +149,6 @@
         </nav>
     </header>
 
-    <!-- ACCUEIL / SELECTION -->
     <section id="mode" class="tab-content active">
         <div id="menu-selection" style="max-width: 600px; margin: 0 auto; text-align: center;">
             <h2>Mode Multijoueur</h2>
@@ -175,7 +174,6 @@
             </div>
         </div>
 
-        <!-- SALLE D'ATTENTE -->
         <div id="waiting-room" class="game-panel">
             <h2>Salon d'attente</h2>
             <p>Donne ce code à tes amis :</p>
@@ -187,7 +185,6 @@
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
-        <!-- PHASE DE JEU / TOUR PAR TOUR & VOTE -->
         <div id="gameplay-room" class="game-panel">
             <h2 id="game-phase-title">Partie en cours</h2>
             <p id="game-info-text">Indice ou Action</p>
@@ -199,15 +196,17 @@
 
             <ul class="player-list" id="gameplay-players-list"></ul>
 
-            <!-- Zone de saisie d'indice -->
             <div class="chat-input-box" id="clue-input-container" style="display:none;">
                 <input type="text" id="clue-input" placeholder="Écris ton indice...">
                 <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
             </div>
+
+            <div id="pass-vote-container" style="display:none; margin-top: 15px;">
+                <button class="btn-action" style="background: var(--text-muted);" onclick="castVote('pass')">Passer mon vote</button>
+            </div>
         </div>
     </section>
 
-    <!-- OPTIONS -->
     <section id="options" class="tab-content">
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
             <h2>Options</h2>
@@ -291,6 +290,7 @@
         socket.on('launch_reveal', (room) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
+            document.getElementById('pass-vote-container').style.display = 'none';
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
@@ -333,38 +333,72 @@
             socket.emit('go_to_vote', currentRoomCode);
         });
 
-        // Gestion de la phase de vote interactive
         socket.on('start_voting', (room) => {
             document.getElementById('game-phase-title').innerText = "Phase de Vote";
-            document.getElementById('game-info-text').innerText = "Clique sur le joueur suspect pour voter contre lui !";
+            document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
             document.getElementById('clue-input-container').style.display = 'none';
+            document.getElementById('pass-vote-container').style.display = 'block';
 
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
             room.players.forEach(p => {
+                let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
                 if (p.id !== socket.id) {
                     list.innerHTML += `<li>
-                        <span>${p.name}</span> 
+                        <div>
+                            <strong>${p.name}</strong><br>
+                            <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
+                        </div>
                         <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
                     </li>`;
                 } else {
-                    list.innerHTML += `<li><span>${p.name} (Toi)</span> <span style="color:var(--text-muted)">Ne peut pas voter pour soi</span></li>`;
+                    list.innerHTML += `<li>
+                        <div>
+                            <strong>${p.name} (Toi)</strong><br>
+                            <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
+                        </div>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">Toi</span>
+                    </li>`;
                 }
             });
         });
 
         function castVote(targetId) {
             socket.emit('cast_vote', { roomCode: currentRoomCode, targetId: targetId });
+            document.getElementById('game-info-text').innerText = "Vote enregistré ! En attente des autres joueurs...";
+            document.getElementById('pass-vote-container').style.display = 'none';
+            // Désactiver les boutons de vote pour éviter les doubles clics
+            document.querySelectorAll('.player-list button').forEach(b => b.disabled = true);
         }
 
         socket.on('show_results', (data) => {
-            document.getElementById('game-phase-title').innerText = "Résultats du Vote";
+            document.getElementById('game-phase-title').innerText = "Résultats de la partie";
+            document.getElementById('pass-vote-container').style.display = 'none';
+            
+            let resultMessage = "";
             if (data.eliminatedPlayer) {
-                document.getElementById('game-info-text').innerText = `Le joueur éliminé est : ${data.eliminatedPlayer.name}`;
+                resultMessage += `Joueur éliminé par la majorité : <strong>${data.eliminatedPlayer.name}</strong><br><br>`;
             } else {
-                document.getElementById('game-info-text').innerText = `Fin de la manche.`;
+                resultMessage += `Égalité ou vote passé : Aucun joueur éliminé.<br><br>`;
             }
-            document.getElementById('gameplay-players-list').innerHTML = "";
+
+            // Affichage pour savoir si l'imposteur a été trouvé
+            let impostorNames = data.impostors.map(imp => imp.name).join(", ");
+            if (data.impostorCaught) {
+                resultMessage += `<span style="color: #00ff88; font-size: 1.2rem;">🎉 Victoire ! L'imposteur (${impostorNames}) a bien été éliminé !</span>`;
+            } else {
+                resultMessage += `<span style="color: var(--accent-pink); font-size: 1.2rem;">❌ Raté ! L'imposteur était : ${impostorNames}.</span>`;
+            }
+
+            document.getElementById('game-info-text').innerHTML = resultMessage;
+            
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            data.room.players.forEach(p => {
+                let roleColor = p.isImpostor ? "var(--accent-pink)" : "#00ff88";
+                let roleText = p.isImpostor ? "Imposteur" : "Innocent";
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:${roleColor}">${roleText} (Secret: ${p.secretData})</span></li>`;
+            });
         });
     </script>
 </body>
