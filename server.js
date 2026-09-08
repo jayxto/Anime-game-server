@@ -10,13 +10,11 @@ app.get('/', (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Stockage des salons de jeux actifs
 const rooms = {};
 
 io.on('connection', (socket) => {
     console.log(`Un joueur s'est connecté : ${socket.id}`);
 
-    // Créer ou rejoindre un salon
     socket.on('join_room', ({ roomCode, username, mode }) => {
         socket.join(roomCode);
 
@@ -29,12 +27,12 @@ io.on('connection', (socket) => {
                 status: 'waiting', 
                 currentThemeMasterIndex: 0,
                 currentTheme: '',
-                currentTurnIndex: 0
+                currentTurnIndex: 0,
+                votes: {} // Stocke les votes de chacun { voterId: targetId }
             };
         }
 
         const room = rooms[roomCode];
-        
         let existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -49,7 +47,6 @@ io.on('connection', (socket) => {
         io.to(roomCode).emit('update_room', room);
     });
 
-    // Lancer la partie depuis le salon d'attente
     socket.on('start_game', (roomCode) => {
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
@@ -59,11 +56,11 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Le maître du jeu soumet le thème (Mode Note) ou passage direct
     socket.on('submit_theme', ({ roomCode, theme }) => {
         const room = rooms[roomCode];
         if (room) {
             room.currentTheme = theme;
+            room.votes = {};
             
             let impostorCount = room.players.length >= 5 ? 2 : 1;
             room.players.forEach(p => p.isImpostor = false);
@@ -78,8 +75,8 @@ io.on('connection', (socket) => {
             }
 
             if (room.mode === 'note') {
-                const realScore = Math.floor(Math.random() * 3) + 8; // 8, 9 ou 10
-                let fakeScore = Math.floor(Math.random() * 5) + 2;   // 2 à 6
+                const realScore = Math.floor(Math.random() * 3) + 8;
+                let fakeScore = Math.floor(Math.random() * 5) + 2;
                 if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
 
                 room.players.forEach(p => {
@@ -98,7 +95,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Soumettre un indice pendant le tour de parole
     socket.on('submit_clue', ({ roomCode, clue }) => {
         const room = rooms[roomCode];
         if (room) {
@@ -108,13 +104,12 @@ io.on('connection', (socket) => {
             if (room.currentTurnIndex < room.players.length) {
                 io.to(roomCode).emit('update_gameplay', room);
             } else {
-                room.status = room.mode === 'note' ? 'choice' : 'voting';
-                io.to(roomCode).emit('end_clues', room);
+                room.status = 'voting';
+                io.to(roomCode).emit('start_voting', room);
             }
         }
     });
 
-    // Passer à la phase de vote
     socket.on('go_to_vote', (roomCode) => {
         const room = rooms[roomCode];
         if (room) {
@@ -123,17 +118,56 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Voter contre un joueur
+    // Enregistrement des votes de chaque joueur
     socket.on('cast_vote', ({ roomCode, targetId }) => {
         const room = rooms[roomCode];
-        if (room) {
-            const eliminatedPlayer = room.players.find(p => p.id === targetId);
+        if (!room) return;
+
+        room.votes[socket.id] = targetId; // targetId peut être un id de joueur ou 'pass'
+
+        // Si tout le monde a voté, on calcule les résultats
+        if (Object.keys(room.votes).length >= room.players.length) {
+            let voteCounts = {};
+            room.players.forEach(p => voteCounts[p.id] = 0);
+
+            for (let voter in room.votes) {
+                let target = room.votes[voter];
+                if (target !== 'pass' && voteCounts[target] !== undefined) {
+                    voteCounts[target]++;
+                }
+            }
+
+            // Trouver celui qui a le plus de votes
+            let maxVotes = -1;
+            let eliminatedPlayerId = null;
+            let isTie = false;
+
+            for (let playerId in voteCounts) {
+                if (voteCounts[playerId] > maxVotes) {
+                    maxVotes = voteCounts[playerId];
+                    eliminatedPlayerId = playerId;
+                    isTie = false;
+                } else if (voteCounts[playerId] === maxVotes && maxVotes > 0) {
+                    isTie = true;
+                }
+            }
+
+            let eliminatedPlayer = isTie ? null : room.players.find(p => p.id === eliminatedPlayerId);
+            
+            // Vérifier si l'imposteur a été éliminé
+            let impostors = room.players.filter(p => p.isImpostor);
+            let impostorCaught = eliminatedPlayer ? eliminatedPlayer.isImpostor : false;
+
             room.status = 'result';
-            io.to(roomCode).emit('show_results', { room, eliminatedPlayer });
+            io.to(roomCode).emit('show_results', { 
+                room, 
+                eliminatedPlayer, 
+                impostors, 
+                impostorCaught 
+            });
         }
     });
 
-    // Déconnexion d'un joueur
     socket.on('disconnect', () => {
         console.log(`Un joueur est parti : ${socket.id}`);
         for (let roomCode in rooms) {
