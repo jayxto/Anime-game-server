@@ -12,11 +12,25 @@ const io = new Server(server);
 
 const rooms = {};
 
-// Listes de mots pour le mode Undercover
+// Ta liste complète et exacte de duos pour le mode Undercover
 const undercoverPairs = [
     ["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], 
-    ["Yuji", "Sukuna"], ["Naruto", "Sasuke"], ["Goku", "Vegeta"], 
-    ["Luffy", "Zoro"], ["Tanjiro", "Nezuko"], ["Eren", "Reiner"]
+    ["Rasen shuriken", "Rasengan"], ["Yuji", "Sukuna"], ["Peter Parker", "Miles Morales"], 
+    ["Inoxtag", "Luffy"], ["Kakashi", "Gojo"], ["Superman", "All Might"], 
+    ["Meruem", "Cell"], ["Pain", "Nagato"], ["Maki", "Toji"], 
+    ["Aokiji", "Brook"], ["Pokeball", "Dragon Ball"], ["Madara", "Itachi"], 
+    ["Ener", "Luxus"], ["Kamehameha", "Genkidama"], ["Jubidara", "Jubito"], 
+    ["Muzan", "Imu"], ["Amaterasu", "Katon"], ["Rinnegan", "Sharingan"], 
+    ["Hinata (Haikyu)", "Messi"], ["Loki", "Kaido"], ["Sukuna", "Meguna"], 
+    ["Obito", "Tobi"], ["Denji", "Yuji"], ["Gogeta", "Vegeto"], 
+    ["Sharingan", "Mangekyou"], ["Gon enfant", "Gon adulte"], ["Escanor", "Cannicule"], 
+    ["Brigade fantôme", "Akatsuki"], ["Netero", "Barbe Blanche"], ["Yoriichi", "Tanjiro"], 
+    ["Yamato", "Hashirama"], ["Ace", "Sabo"], ["Ban", "Hisoka"], 
+    ["Pikachu", "Zenitsu"], ["Vegeta", "Sasuke"], ["Broly", "Hulk"], 
+    ["Obito", "Kakashi"], ["Trunks", "Trunks futur"], ["Goten", "Gohan"], 
+    ["Hisoka", "Orochimaru"], ["Naruto", "Minato"], ["Goku", "Black Goku"], 
+    ["Gildarts", "Shanks"], ["Clan Kuruta", "Clan Uchiwa"], ["Nen", "Chakra"], 
+    ["Crocodile", "Gaara"], ["Hidan", "Ban"]
 ];
 
 io.on('connection', (socket) => {
@@ -63,20 +77,16 @@ io.on('connection', (socket) => {
     });
 
     function launchNewRound(room) {
-        room.status = 'theme_selection';
+        room.status = 'reveal';
         room.votes = {};
         room.currentTurnIndex = 0;
 
-        // Réinitialiser les indices et l'état vivant des joueurs pour une nouvelle partie
         room.players.forEach(p => {
             p.clue = '';
             p.isAlive = true;
             p.isImpostor = false;
             p.secretData = null;
         });
-
-        // Rotation du maître du jeu (si mode note)
-        room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
 
         let impostorCount = room.players.length >= 5 ? 2 : 1;
         let assignedIndexes = [];
@@ -96,33 +106,22 @@ io.on('connection', (socket) => {
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? fakeScore : realScore;
             });
-            room.currentTheme = "Anime Général";
-            room.status = 'reveal';
-            io.to(room.code).emit('launch_reveal', room);
+            room.currentTheme = "Devine la note";
         } else if (room.mode === 'undercover') {
             const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? pair[1] : pair[0];
             });
-            room.currentTheme = "Univers Anime";
-            room.status = 'reveal';
-            io.to(room.code).emit('launch_reveal', room);
+            room.currentTheme = "Undercover";
         }
-    }
 
-    socket.on('submit_theme', ({ roomCode, theme }) => {
-        const room = rooms[roomCode];
-        if (room) {
-            room.currentTheme = theme;
-            room.status = 'reveal';
-            io.to(roomCode).emit('launch_reveal', room);
-        }
-    });
+        // Envoi de l'événement de révélation à TOUS les joueurs de la room
+        io.to(room.code).emit('launch_reveal', room);
+    }
 
     socket.on('submit_clue', ({ roomCode, clue }) => {
         const room = rooms[roomCode];
         if (room) {
-            // Trouver le prochain joueur vivant pour le tour
             room.players[room.currentTurnIndex].clue = clue;
             
             do {
@@ -135,14 +134,6 @@ io.on('connection', (socket) => {
                 room.status = 'voting';
                 io.to(roomCode).emit('start_voting', room);
             }
-        }
-    });
-
-    socket.on('go_to_vote', (roomCode) => {
-        const room = rooms[roomCode];
-        if (room) {
-            room.status = 'voting';
-            io.to(roomCode).emit('start_voting', room);
         }
     });
 
@@ -185,7 +176,6 @@ io.on('connection', (socket) => {
                 eliminatedPlayer.isAlive = false;
             }
 
-            // Vérifier les conditions de fin de partie
             let remainingAlive = room.players.filter(p => p.isAlive);
             let aliveImpostors = remainingAlive.filter(p => p.isImpostor);
             let aliveCivilians = remainingAlive.filter(p => !p.isImpostor);
@@ -212,7 +202,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Passer au tour de vote suivant ou relancer une nouvelle partie complète
     socket.on('next_step_game', (roomCode) => {
         const room = rooms[roomCode];
         if (room) {
@@ -221,15 +210,11 @@ io.on('connection', (socket) => {
             let aliveCivilians = remainingAlive.filter(p => !p.isImpostor);
 
             if (aliveImpostors.length === 0 || aliveImpostors.length >= aliveCivilians.length) {
-                // Partie finie, on relance une nouvelle partie complète
                 launchNewRound(room);
             } else {
-                // Continuer la partie (tour de parole suivant avec les joueurs restants)
                 room.status = 'gameplay';
                 room.votes = {};
                 room.players.forEach(p => p.clue = '');
-                
-                // Trouver le premier joueur vivant
                 room.currentTurnIndex = room.players.findIndex(p => p.isAlive);
                 io.to(roomCode).emit('resume_gameplay', room);
             }
