@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
                 mode: mode,
                 host: socket.id,
                 players: [],
-                status: 'waiting', // waiting, choosing, reveal, gameplay, voting, result
+                status: 'waiting', 
                 currentThemeMasterIndex: 0,
                 currentTheme: '',
                 currentTurnIndex: 0
@@ -35,7 +35,6 @@ io.on('connection', (socket) => {
 
         const room = rooms[roomCode];
         
-        // Vérifier si le joueur n'est pas déjà dans la liste
         let existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -47,7 +46,6 @@ io.on('connection', (socket) => {
             });
         }
 
-        // Informer tout le monde dans le salon
         io.to(roomCode).emit('update_room', room);
     });
 
@@ -67,7 +65,6 @@ io.on('connection', (socket) => {
         if (room) {
             room.currentTheme = theme;
             
-            // Attribution des rôles et des notes secrètes
             let impostorCount = room.players.length >= 5 ? 2 : 1;
             room.players.forEach(p => p.isImpostor = false);
 
@@ -89,7 +86,6 @@ io.on('connection', (socket) => {
                     p.secretData = p.isImpostor ? fakeScore : realScore;
                 });
             } else if (room.mode === 'undercover') {
-                // Paires Undercover basiques
                 const pairs = [["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], ["Yuji", "Sukuna"]];
                 const pair = pairs[Math.floor(Math.random() * pairs.length)];
                 room.players.forEach(p => {
