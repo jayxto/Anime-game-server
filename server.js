@@ -48,7 +48,8 @@ io.on('connection', (socket) => {
                 currentThemeMasterId: null,
                 currentTheme: '',
                 currentTurnIndex: 0,
-                votes: {}
+                votes: {},
+                themeChangeVotes: []
             };
         }
 
@@ -64,13 +65,12 @@ io.on('connection', (socket) => {
                 secretData: null
             });
         } else {
-            existingPlayer.name = username; // Met à jour le pseudo si changé
+            existingPlayer.name = username;
         }
 
         io.to(roomCode).emit('update_room', room);
     });
 
-    // Permettre à l'hôte de changer le mode de jeu depuis le salon d'attente
     socket.on('change_mode', ({ roomCode, mode }) => {
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
@@ -88,6 +88,7 @@ io.on('connection', (socket) => {
 
     function launchNewRound(room) {
         room.votes = {};
+        room.themeChangeVotes = [];
         room.currentTurnIndex = 0;
 
         room.players.forEach(p => {
@@ -108,13 +109,11 @@ io.on('connection', (socket) => {
         }
 
         if (room.mode === 'note') {
-            // Choisir un joueur random pour être le maître du thème
             let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
             room.currentThemeMasterId = randomMaster.id;
             room.status = 'choose_theme';
             io.to(room.code).emit('start_theme_choice', room);
         } else {
-            // Mode Undercover direct
             const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? pair[1] : pair[0];
@@ -125,24 +124,40 @@ io.on('connection', (socket) => {
         }
     }
 
-    // Changement de maître du thème par un autre joueur aléatoire
-    socket.on('change_theme_master', (roomCode) => {
+    // Vote majoritaire pour changer de thème
+    socket.on('vote_change_theme', (roomCode) => {
         const room = rooms[roomCode];
-        if (room) {
-            let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
-            room.currentThemeMasterId = randomMaster.id;
-            io.to(roomCode).emit('start_theme_choice', room);
+        if (room && room.status === 'choose_theme') {
+            if (!room.themeChangeVotes.includes(socket.id)) {
+                room.themeChangeVotes.push(socket.id);
+            }
+
+            let totalPlayers = room.players.length;
+            let neededVotes = Math.ceil(totalPlayers / 2); // Majorité absolue
+
+            if (room.themeChangeVotes.length >= neededVotes) {
+                // Changement validé par la majorité : on tire un nouveau maître au sort
+                room.themeChangeVotes = [];
+                let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
+                room.currentThemeMasterId = randomMaster.id;
+                io.to(roomCode).emit('start_theme_choice', room);
+            } else {
+                io.to(roomCode).emit('update_theme_votes', {
+                    currentVotes: room.themeChangeVotes.length,
+                    neededVotes: neededVotes
+                });
+            }
         }
     });
 
-    // Soumission du thème par le maître désigné, puis attribution des notes secrètes
     socket.on('submit_theme', ({ roomCode, theme }) => {
         const room = rooms[roomCode];
         if (room) {
             room.currentTheme = theme;
+            room.themeChangeVotes = [];
 
-            const realScore = (Math.floor(Math.random() * 3) + 8); // ex: entre 8 et 10
-            let fakeScore = Math.floor(Math.random() * 5) + 2;     // ex: entre 2 et 6
+            const realScore = (Math.floor(Math.random() * 3) + 8);
+            let fakeScore = Math.floor(Math.random() * 5) + 2;
             if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
 
             room.players.forEach(p => {
