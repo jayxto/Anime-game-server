@@ -12,7 +12,6 @@ const io = new Server(server);
 
 const rooms = {};
 
-// Ta liste complète et exacte de duos pour le mode Undercover
 const undercoverPairs = [
     ["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], 
     ["Rasen shuriken", "Rasengan"], ["Yuji", "Sukuna"], ["Peter Parker", "Miles Morales"], 
@@ -42,11 +41,11 @@ io.on('connection', (socket) => {
         if (!rooms[roomCode]) {
             rooms[roomCode] = {
                 code: roomCode,
-                mode: mode,
+                mode: mode || 'undercover',
                 host: socket.id,
                 players: [],
                 status: 'waiting', 
-                currentThemeMasterIndex: 0,
+                currentThemeMasterId: null,
                 currentTheme: '',
                 currentTurnIndex: 0,
                 votes: {}
@@ -64,9 +63,20 @@ io.on('connection', (socket) => {
                 isAlive: true,
                 secretData: null
             });
+        } else {
+            existingPlayer.name = username; // Met à jour le pseudo si changé
         }
 
         io.to(roomCode).emit('update_room', room);
+    });
+
+    // Permettre à l'hôte de changer le mode de jeu depuis le salon d'attente
+    socket.on('change_mode', ({ roomCode, mode }) => {
+        const room = rooms[roomCode];
+        if (room && room.host === socket.id) {
+            room.mode = mode;
+            io.to(roomCode).emit('update_room', room);
+        }
     });
 
     socket.on('start_game', (roomCode) => {
@@ -77,7 +87,6 @@ io.on('connection', (socket) => {
     });
 
     function launchNewRound(room) {
-        room.status = 'reveal';
         room.votes = {};
         room.currentTurnIndex = 0;
 
@@ -99,25 +108,51 @@ io.on('connection', (socket) => {
         }
 
         if (room.mode === 'note') {
-            const realScore = Math.floor(Math.random() * 3) + 8;
-            let fakeScore = Math.floor(Math.random() * 5) + 2;
-            if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
-
-            room.players.forEach(p => {
-                p.secretData = p.isImpostor ? fakeScore : realScore;
-            });
-            room.currentTheme = "Devine la note";
-        } else if (room.mode === 'undercover') {
+            // Choisir un joueur random pour être le maître du thème
+            let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
+            room.currentThemeMasterId = randomMaster.id;
+            room.status = 'choose_theme';
+            io.to(room.code).emit('start_theme_choice', room);
+        } else {
+            // Mode Undercover direct
             const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? pair[1] : pair[0];
             });
             room.currentTheme = "Undercover";
+            room.status = 'reveal';
+            io.to(room.code).emit('launch_reveal', room);
         }
-
-        // Envoi de l'événement de révélation à TOUS les joueurs de la room
-        io.to(room.code).emit('launch_reveal', room);
     }
+
+    // Changement de maître du thème par un autre joueur aléatoire
+    socket.on('change_theme_master', (roomCode) => {
+        const room = rooms[roomCode];
+        if (room) {
+            let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
+            room.currentThemeMasterId = randomMaster.id;
+            io.to(roomCode).emit('start_theme_choice', room);
+        }
+    });
+
+    // Soumission du thème par le maître désigné, puis attribution des notes secrètes
+    socket.on('submit_theme', ({ roomCode, theme }) => {
+        const room = rooms[roomCode];
+        if (room) {
+            room.currentTheme = theme;
+
+            const realScore = (Math.floor(Math.random() * 3) + 8); // ex: entre 8 et 10
+            let fakeScore = Math.floor(Math.random() * 5) + 2;     // ex: entre 2 et 6
+            if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
+
+            room.players.forEach(p => {
+                p.secretData = p.isImpostor ? `${fakeScore}/10` : `${realScore}/10`;
+            });
+
+            room.status = 'reveal';
+            io.to(roomCode).emit('launch_reveal', room);
+        }
+    });
 
     socket.on('submit_clue', ({ roomCode, clue }) => {
         const room = rooms[roomCode];
@@ -142,7 +177,6 @@ io.on('connection', (socket) => {
         if (!room) return;
 
         room.votes[socket.id] = targetId;
-
         let alivePlayers = room.players.filter(p => p.isAlive);
 
         if (Object.keys(room.votes).length >= alivePlayers.length) {
@@ -171,7 +205,6 @@ io.on('connection', (socket) => {
             }
 
             let eliminatedPlayer = isTie ? null : room.players.find(p => p.id === eliminatedPlayerId);
-            
             if (eliminatedPlayer) {
                 eliminatedPlayer.isAlive = false;
             }
