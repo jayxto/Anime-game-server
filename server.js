@@ -12,7 +12,6 @@ const io = new Server(server);
 
 const rooms = {};
 
-// Liste des duos pour le mode Undercover
 const undercoverPairs = [
     ["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], 
     ["Rasen shuriken", "Rasengan"], ["Yuji", "Sukuna"], ["Peter Parker", "Miles Morales"], 
@@ -106,7 +105,6 @@ io.on('connection', (socket) => {
                 p.secretData = p.isImpostor ? fakeScore : realScore;
             });
 
-            // Rotation du maître du thème
             room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
             room.status = 'choose_theme';
 
@@ -125,7 +123,6 @@ io.on('connection', (socket) => {
         }
     }
 
-    // Réception du thème personnalisé choisi par le joueur désigné
     socket.on('submit_custom_theme', ({ roomCode, theme }) => {
         const room = rooms[roomCode];
         if (room && room.players[room.currentThemeMasterIndex].id === socket.id) {
@@ -136,7 +133,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Option pour changer de thème au milieu du tour (Mode Note uniquement)
     socket.on('change_theme_mid_game', ({ roomCode }) => {
         const room = rooms[roomCode];
         if (room && room.mode === 'note') {
