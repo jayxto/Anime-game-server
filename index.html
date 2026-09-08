@@ -193,7 +193,7 @@
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
-        <!-- Panneau de choix du thème (Spécifique Devine la note) -->
+        <!-- Panneau de choix du thème (Devine la note) -->
         <div id="theme-choice-room" class="game-panel">
             <h2>Choix du Thème</h2>
             <p id="theme-master-info">Un joueur choisit le thème secret...</p>
@@ -203,7 +203,12 @@
                     <input type="text" id="theme-input" placeholder="Ex: Personnages de Naruto, Épisodes de One Piece...">
                     <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitTheme()">Valider</button>
                 </div>
-                <button class="btn-action" style="background: var(--text-muted); margin-top: 15px;" onclick="changeThemeMaster()">Changer de joueur (Passer)</button>
+            </div>
+
+            <!-- Bouton pour voter le changement de thème (disponible pour tous) -->
+            <div id="change-theme-vote-container" style="margin-top: 20px;">
+                <button class="btn-action" style="background: var(--accent-cyan); color: black;" onclick="voteChangeTheme()">Changer de thème (voter)</button>
+                <p id="theme-vote-status" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">Votes pour changer : 0</p>
             </div>
         </div>
 
@@ -248,7 +253,6 @@
         const socket = io();
         let currentRoomCode = "";
 
-        // Sauvegarde automatique du pseudo dans le navigateur pour qu'il reste permanent
         window.addEventListener('DOMContentLoaded', () => {
             const savedName = localStorage.getItem('anime_game_username');
             if (savedName) {
@@ -308,7 +312,6 @@
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
-
             document.getElementById('room-mode-select').value = room.mode;
 
             const list = document.getElementById('waiting-players-list');
@@ -330,10 +333,10 @@
             socket.emit('start_game', currentRoomCode);
         }
 
-        // Événement pour la phase de choix du thème (Devine la note)
         socket.on('start_theme_choice', (room) => {
             hideAllPanels();
             document.getElementById('theme-choice-room').style.display = 'block';
+            document.getElementById('theme-vote-status').innerText = `Votes pour changer : 0`;
 
             const master = room.players.find(p => p.id === room.currentThemeMasterId);
             if (master) {
@@ -357,9 +360,13 @@
             document.getElementById('theme-input').value = "";
         }
 
-        function changeThemeMaster() {
-            socket.emit('change_theme_master', currentRoomCode);
+        function voteChangeTheme() {
+            socket.emit('vote_change_theme', currentRoomCode);
         }
+
+        socket.on('update_theme_votes', (data) => {
+            document.getElementById('theme-vote-status').innerText = `Votes pour changer : ${data.currentVotes} / ${data.neededVotes} requis`;
+        });
 
         socket.on('launch_reveal', (room) => {
             hideAllPanels();
@@ -470,7 +477,7 @@
             }
 
             if (data.gameOver) {
-                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
+                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>";
                 document.getElementById('end-game-buttons').style.display = 'flex';
             } else {
                 resultMessage += `<span style="color: var(--accent-cyan);">La partie continue... Prochain tour dans 4 secondes.</span>`;
