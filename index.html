@@ -2,14 +2,106 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Anime Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Game - Multijoueur</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #e94560;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+        #game-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #16213e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        #status {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .connected { color: #00ff88; }
+        .disconnected { color: #ff4757; }
+        #logs {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            font-family: monospace;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #ff6b81;
+        }
+    </style>
 </head>
 <body>
-    <h1>Mon Jeu Multijoueur</h1>
+
+    <h1>Anime Game Multijoueur</h1>
+    
+    <div id="game-container">
+        <div id="status" class="disconnected">Statut : Connexion au serveur en cours...</div>
+        <p>Bienvenue dans ton arène en ligne !</p>
+        <button id="action-btn">Envoyer une action au serveur</button>
+        
+        <div id="logs"></div>
+    </div>
+
+    <!-- Script Socket.io -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
+        const logsDiv = document.getElementById('logs');
+        const statusDiv = document.getElementById('status');
+        const actionBtn = document.getElementById('action-btn');
+
+        function logMessage(msg) {
+            logsDiv.innerHTML += `> ${msg}<br>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        // Connexion au serveur Render
         const socket = io('https://anime-game-server.onrender.com');
-        console.log("Connecté au serveur !");
+
+        socket.on('connect', () => {
+            statusDiv.textContent = 'Statut : Connecté au serveur !';
+            statusDiv.className = 'connected';
+            logMessage("Connecté avec succès avec l'ID : " + socket.id);
+        });
+
+        socket.on('disconnect', () => {
+            statusDiv.textContent = 'Statut : Déconnecté';
+            statusDiv.className = 'disconnected';
+            logMessage("Déconnecté du serveur.");
+        });
+
+        actionBtn.addEventListener('click', () => {
+            // Exemple d'envoi d'événement au serveur
+            socket. दुसre ? socket.emit('player_action', { action: 'attaque' }) : null;
+            logMessage("Action envoyée au serveur !");
+        });
     </script>
 </body>
 </html>
