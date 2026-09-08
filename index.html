@@ -210,6 +210,12 @@
                 <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
             </div>
 
+            <!-- Options à la fin des indices (Mode Note : Changer de thème ou passer au vote) -->
+            <div id="end-clues-options" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestChangeTheme()">🔄 Changer de thème (Un autre joueur choisit)</button>
+                <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVote()">⚖️ Passer au vote</button>
+            </div>
+
             <div id="pass-vote-container" style="display:none; margin-top: 15px;">
                 <button class="btn-action" style="background: var(--text-muted);" onclick="castVote('pass')">Passer mon vote</button>
             </div>
@@ -251,6 +257,8 @@
             document.getElementById('waiting-room').style.display = 'none';
             document.getElementById('gameplay-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
         }
 
@@ -295,7 +303,6 @@
             socket.emit('start_game', currentRoomCode);
         }
 
-        // Étape intermédiaire : Demander au joueur choisi de saisir le thème
         socket.on('prompt_theme_choice', (data) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
@@ -334,9 +341,6 @@
         socket.on('launch_reveal', (room) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
-            document.getElementById('theme-selection-container').style.display = 'none';
-            document.getElementById('pass-vote-container').style.display = 'none';
-            document.getElementById('end-game-buttons').style.display = 'none';
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
@@ -352,9 +356,6 @@
         socket.on('resume_gameplay', (room) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
-            document.getElementById('theme-selection-container').style.display = 'none';
-            document.getElementById('pass-vote-container').style.display = 'none';
-            document.getElementById('end-game-buttons').style.display = 'none';
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
@@ -390,10 +391,37 @@
             document.getElementById('clue-input').value = "";
         }
 
+        // Événement déclenché quand tout le monde a donné son indice en mode Note
+        socket.on('prompt_end_clue_options', (room) => {
+            document.getElementById('game-phase-title').innerText = "Fin des indices";
+            document.getElementById('game-info-text').innerText = `Tous les indices ont été donnés pour le thème : "${room.currentTheme}". Que voulez-vous faire ?`;
+            document.getElementById('clue-input-container').style.display = 'none';
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (!p.isAlive) return;
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+            });
+
+            document.getElementById('end-clues-options').style.display = 'flex';
+        });
+
+        function requestChangeTheme() {
+            document.getElementById('end-clues-options').style.display = 'none';
+            socket.emit('change_theme_mid_game', { roomCode: currentRoomCode });
+        }
+
+        function proceedToVote() {
+            document.getElementById('end-clues-options').style.display = 'none';
+            socket.emit('force_start_voting', { roomCode: currentRoomCode });
+        }
+
         socket.on('start_voting', (room) => {
             document.getElementById('game-phase-title').innerText = "Phase de Vote";
             document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
             document.getElementById('clue-input-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('pass-vote-container').style.display = 'block';
 
             const list = document.getElementById('gameplay-players-list');
@@ -432,6 +460,7 @@
             document.getElementById('game-phase-title').innerText = data.gameOver ? "Fin de la Partie" : "Résultats du Tour";
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('clue-input-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
