@@ -179,18 +179,41 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
+            <div id="mode-selector-container" style="margin-bottom: 15px; display:none;">
+                <p style="margin-bottom: 5px;">Mode de jeu :</p>
+                <select id="room-mode-select" onchange="changeRoomMode()" style="background:#0b0b10; color:white; padding:8px; border-radius:4px; border:1px solid var(--accent-cyan);">
+                    <option value="undercover">Undercover (Mots cachés)</option>
+                    <option value="note">Devine la note</option>
+                </select>
+            </div>
+
             <p>Joueurs connectés :</p>
             <ul class="player-list" id="waiting-players-list"></ul>
 
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
+        <!-- Panneau de choix du thème (Spécifique Devine la note) -->
+        <div id="theme-choice-room" class="game-panel">
+            <h2>Choix du Thème</h2>
+            <p id="theme-master-info">Un joueur choisit le thème secret...</p>
+            
+            <div id="theme-input-box" style="display:none; margin-top:20px;">
+                <div class="chat-input-box">
+                    <input type="text" id="theme-input" placeholder="Ex: Personnages de Naruto, Épisodes de One Piece...">
+                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitTheme()">Valider</button>
+                </div>
+                <button class="btn-action" style="background: var(--text-muted); margin-top: 15px;" onclick="changeThemeMaster()">Changer de joueur (Passer)</button>
+            </div>
+        </div>
+
+        <!-- Panneau de Gameplay global -->
         <div id="gameplay-room" class="game-panel">
             <h2 id="game-phase-title">Partie en cours</h2>
             <p id="game-info-text">Indice ou Action</p>
 
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
+                <p style="margin: 0; color: var(--text-muted);">Ton secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
             </div>
 
@@ -216,7 +239,7 @@
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
             <h2>Options</h2>
             <p>Ton Pseudo :</p>
-            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
+            <input type="text" id="username-input" value="OtakuGamer" oninput="saveUsername()" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
         </div>
     </section>
 
@@ -224,6 +247,19 @@
     <script>
         const socket = io();
         let currentRoomCode = "";
+
+        // Sauvegarde automatique du pseudo dans le navigateur pour qu'il reste permanent
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('anime_game_username');
+            if (savedName) {
+                document.getElementById('username-input').value = savedName;
+            }
+        });
+
+        function saveUsername() {
+            const name = document.getElementById('username-input').value.trim();
+            localStorage.setItem('anime_game_username', name);
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -239,6 +275,7 @@
         function hideAllPanels() {
             document.getElementById('menu-selection').style.display = 'none';
             document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('theme-choice-room').style.display = 'none';
             document.getElementById('gameplay-room').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
         }
@@ -262,10 +299,17 @@
             socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover' });
         }
 
+        function changeRoomMode() {
+            const newMode = document.getElementById('room-mode-select').value;
+            socket.emit('change_mode', { roomCode: currentRoomCode, mode: newMode });
+        }
+
         socket.on('update_room', (room) => {
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
+
+            document.getElementById('room-mode-select').value = room.mode;
 
             const list = document.getElementById('waiting-players-list');
             list.innerHTML = "";
@@ -275,13 +319,46 @@
 
             if (room.host === socket.id) {
                 document.getElementById('btn-start-game').style.display = 'block';
+                document.getElementById('mode-selector-container').style.display = 'block';
             } else {
                 document.getElementById('btn-start-game').style.display = 'none';
+                document.getElementById('mode-selector-container').style.display = 'none';
             }
         });
 
         function startGame() {
             socket.emit('start_game', currentRoomCode);
+        }
+
+        // Événement pour la phase de choix du thème (Devine la note)
+        socket.on('start_theme_choice', (room) => {
+            hideAllPanels();
+            document.getElementById('theme-choice-room').style.display = 'block';
+
+            const master = room.players.find(p => p.id === room.currentThemeMasterId);
+            if (master) {
+                if (master.id === socket.id) {
+                    document.getElementById('theme-master-info').innerText = "C'est toi qui choisis le thème secret de cette manche !";
+                    document.getElementById('theme-input-box').style.display = 'block';
+                } else {
+                    document.getElementById('theme-master-info').innerText = `${master.name} est en train de choisir le thème secret...`;
+                    document.getElementById('theme-input-box').style.display = 'none';
+                }
+            }
+        });
+
+        function submitTheme() {
+            const theme = document.getElementById('theme-input').value.trim();
+            if (!theme) {
+                alert("Entre un thème valide !");
+                return;
+            }
+            socket.emit('submit_theme', { roomCode: currentRoomCode, theme: theme });
+            document.getElementById('theme-input').value = "";
+        }
+
+        function changeThemeMaster() {
+            socket.emit('change_theme_master', currentRoomCode);
         }
 
         socket.on('launch_reveal', (room) => {
@@ -292,7 +369,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
-                document.getElementById('my-secret-display').innerText = me.secretData;
+                document.getElementById('my-secret-display').innerText = room.currentTheme + " ➔ " + me.secretData;
             }
             updateGameplayUI(room);
         });
@@ -309,7 +386,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
-                document.getElementById('my-secret-display').innerText = me.secretData;
+                document.getElementById('my-secret-display').innerText = room.currentTheme + " ➔ " + me.secretData;
             }
             updateGameplayUI(room);
         });
@@ -317,7 +394,7 @@
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             const currentTurnPlayer = room.players[room.currentTurnIndex];
-            document.getElementById('game-info-text').innerText = `C'est au tour de : ${currentTurnPlayer.name}`;
+            document.getElementById('game-info-text').innerText = `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer.name}`;
 
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
@@ -394,7 +471,6 @@
 
             if (data.gameOver) {
                 resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
-                // Affichage explicite des boutons Rejouer et Menu à la fin de la partie
                 document.getElementById('end-game-buttons').style.display = 'flex';
             } else {
                 resultMessage += `<span style="color: var(--accent-cyan);">La partie continue... Prochain tour dans 4 secondes.</span>`;
