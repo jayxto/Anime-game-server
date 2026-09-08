@@ -287,7 +287,7 @@
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             
             currentRoomCode = code;
-            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: mode });
+            socket.emit('create_room', { roomCode: code, username: getUsername(), mode: mode });
         }
 
         function joinRoomByCode() {
@@ -297,8 +297,12 @@
                 return;
             }
             currentRoomCode = code;
-            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover' });
+            socket.emit('join_room_code', { roomCode: code, username: getUsername() });
         }
+
+        socket.on('room_error', (msg) => {
+            alert(msg);
+        });
 
         function changeRoomMode() {
             const newMode = document.getElementById('room-mode-select').value;
@@ -467,7 +471,7 @@
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
-                let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
+                let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88">C'était un Innocent !</span>";
                 resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote passé : Aucun joueur éliminé.<br><br>`;
