@@ -12,6 +12,7 @@ const io = new Server(server);
 
 const rooms = {};
 
+// Liste des duos pour le mode Undercover
 const undercoverPairs = [
     ["Kenjaku", "Geto"], ["Tengen", "Kakashi"], ["Kisame", "Requin"], 
     ["Rasen shuriken", "Rasengan"], ["Yuji", "Sukuna"], ["Peter Parker", "Miles Morales"], 
@@ -35,40 +36,24 @@ const undercoverPairs = [
 io.on('connection', (socket) => {
     console.log(`Un joueur s'est connecté : ${socket.id}`);
 
-    // Créer une salle
-    socket.on('create_room', ({ roomCode, username, mode }) => {
+    socket.on('join_room', ({ roomCode, username, mode }) => {
         socket.join(roomCode);
-        rooms[roomCode] = {
-            code: roomCode,
-            mode: mode || 'undercover',
-            host: socket.id,
-            players: [{
-                id: socket.id,
-                name: username,
-                clue: '',
-                isImpostor: false,
-                isAlive: true,
-                secretData: null
-            }],
-            status: 'waiting', 
-            currentThemeMasterId: null,
-            currentTheme: '',
-            currentTurnIndex: 0,
-            votes: {},
-            themeChangeVotes: []
-        };
-        io.to(roomCode).emit('update_room', rooms[roomCode]);
-    });
 
-    // Rejoindre une salle existante via le code
-    socket.on('join_room_code', ({ roomCode, username }) => {
-        const room = rooms[roomCode];
-        if (!room) {
-            socket.emit('room_error', "Cette salle n'existe pas ! Vérifie le code.");
-            return;
+        if (!rooms[roomCode]) {
+            rooms[roomCode] = {
+                code: roomCode,
+                mode: mode,
+                host: socket.id,
+                players: [],
+                status: 'waiting', 
+                currentThemeMasterIndex: 0,
+                currentTheme: '',
+                currentTurnIndex: 0,
+                votes: {}
+            };
         }
 
-        socket.join(roomCode);
+        const room = rooms[roomCode];
         let existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -79,19 +64,9 @@ io.on('connection', (socket) => {
                 isAlive: true,
                 secretData: null
             });
-        } else {
-            existingPlayer.name = username;
         }
 
         io.to(roomCode).emit('update_room', room);
-    });
-
-    socket.on('change_mode', ({ roomCode, mode }) => {
-        const room = rooms[roomCode];
-        if (room && room.host === socket.id) {
-            room.mode = mode;
-            io.to(roomCode).emit('update_room', room);
-        }
     });
 
     socket.on('start_game', (roomCode) => {
@@ -103,7 +78,6 @@ io.on('connection', (socket) => {
 
     function launchNewRound(room) {
         room.votes = {};
-        room.themeChangeVotes = [];
         room.currentTurnIndex = 0;
 
         room.players.forEach(p => {
@@ -124,11 +98,23 @@ io.on('connection', (socket) => {
         }
 
         if (room.mode === 'note') {
-            let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
-            room.currentThemeMasterId = randomMaster.id;
+            const realScore = Math.floor(Math.random() * 3) + 8;
+            let fakeScore = Math.floor(Math.random() * 5) + 2;
+            if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
+
+            room.players.forEach(p => {
+                p.secretData = p.isImpostor ? fakeScore : realScore;
+            });
+
+            // Rotation du maître du thème
+            room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
             room.status = 'choose_theme';
-            io.to(room.code).emit('start_theme_choice', room);
-        } else {
+
+            io.to(room.code).emit('prompt_theme_choice', {
+                room: room,
+                themeMasterId: room.players[room.currentThemeMasterIndex].id
+            });
+        } else if (room.mode === 'undercover') {
             const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? pair[1] : pair[0];
@@ -139,45 +125,13 @@ io.on('connection', (socket) => {
         }
     }
 
-    socket.on('vote_change_theme', (roomCode) => {
+    // Réception du thème personnalisé choisi par le joueur désigné
+    socket.on('submit_custom_theme', ({ roomCode, theme }) => {
         const room = rooms[roomCode];
-        if (room && room.status === 'choose_theme') {
-            if (!room.themeChangeVotes.includes(socket.id)) {
-                room.themeChangeVotes.push(socket.id);
-            }
-
-            let totalPlayers = room.players.length;
-            let neededVotes = Math.ceil(totalPlayers / 2);
-
-            if (room.themeChangeVotes.length >= neededVotes) {
-                room.themeChangeVotes = [];
-                let randomMaster = room.players[Math.floor(Math.random() * room.players.length)];
-                room.currentThemeMasterId = randomMaster.id;
-                io.to(roomCode).emit('start_theme_choice', room);
-            } else {
-                io.to(roomCode).emit('update_theme_votes', {
-                    currentVotes: room.themeChangeVotes.length,
-                    neededVotes: neededVotes
-                });
-            }
-        }
-    });
-
-    socket.on('submit_theme', ({ roomCode, theme }) => {
-        const room = rooms[roomCode];
-        if (room) {
+        if (room && room.players[room.currentThemeMasterIndex].id === socket.id) {
             room.currentTheme = theme;
-            room.themeChangeVotes = [];
-
-            const realScore = (Math.floor(Math.random() * 3) + 8);
-            let fakeScore = Math.floor(Math.random() * 5) + 2;
-            if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
-
-            room.players.forEach(p => {
-                p.secretData = p.isImpostor ? `${fakeScore}/10` : `${realScore}/10`;
-            });
-
             room.status = 'reveal';
+            io.to(room.code).emit('theme_chosen', room);
             io.to(room.code).emit('launch_reveal', room);
         }
     });
@@ -205,6 +159,7 @@ io.on('connection', (socket) => {
         if (!room) return;
 
         room.votes[socket.id] = targetId;
+
         let alivePlayers = room.players.filter(p => p.isAlive);
 
         if (Object.keys(room.votes).length >= alivePlayers.length) {
@@ -233,6 +188,7 @@ io.on('connection', (socket) => {
             }
 
             let eliminatedPlayer = isTie ? null : room.players.find(p => p.id === eliminatedPlayerId);
+            
             if (eliminatedPlayer) {
                 eliminatedPlayer.isAlive = false;
             }
