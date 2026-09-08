@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Game - Multijoueur Réel</title>
+    <title>Anime Game - Multijoueur</title>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,19 +16,14 @@
             --text-muted: #a0a0b0;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Poppins', sans-serif;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 20%, #1a1a2e 0%, var(--bg-color) 80%);
             min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 20%, #1a1a2e 0%, var(--bg-color) 80%);
         }
 
         header {
@@ -38,26 +33,16 @@
             padding: 15px 5%;
             background: rgba(22, 22, 34, 0.9);
             border-bottom: 3px solid var(--accent-pink);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(255, 42, 95, 0.3);
         }
 
         .logo {
             font-family: 'Bangers', cursive;
             font-size: 2rem;
-            letter-spacing: 2px;
             color: var(--accent-yellow);
-            text-shadow: 3px 3px 0px var(--accent-pink), -1px -1px 0px #000;
+            text-shadow: 3px 3px 0px var(--accent-pink);
         }
 
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 10px;
-        }
-
+        nav ul { display: flex; list-style: none; gap: 10px; }
         nav button {
             background: transparent;
             border: 2px solid var(--text-muted);
@@ -65,89 +50,34 @@
             padding: 8px 12px;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-transform: uppercase;
         }
+        nav button.active { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 240, 255, 0.05); }
 
-        nav button:hover, nav button.active {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
-            background: rgba(0, 240, 255, 0.05);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 30px 5%;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; padding: 30px 5%; }
+        .tab-content.active { display: block; }
 
         h2 {
             font-family: 'Bangers', cursive;
             font-size: 2.2rem;
-            letter-spacing: 2px;
             margin-bottom: 10px;
             color: var(--accent-yellow);
             text-shadow: 2px 2px 0px var(--accent-pink);
         }
 
-        p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-
-        .grid-modes {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--panel-color);
-            border: 2px solid #2a2a40;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .card:hover {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.15);
-        }
-
-        .btn-action {
-            background: var(--accent-pink);
-            color: white;
-            border: none;
-            padding: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            width: 100%;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-
-        .btn-action:hover {
-            background: #e01a4f;
-            box-shadow: 0 0 10px var(--accent-pink);
-        }
+        p { color: var(--text-muted); margin-bottom: 20px; }
 
         .game-panel {
-            text-align: center;
             background: var(--panel-color);
             border: 2px solid var(--accent-cyan);
             border-radius: 12px;
             padding: 30px 20px;
             box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
             display: none;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
         }
 
         .room-code-box {
@@ -166,9 +96,6 @@
             list-style: none;
             margin: 20px 0;
             text-align: left;
-            max-width: 350px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .player-list li {
@@ -177,17 +104,28 @@
             margin-bottom: 8px;
             border-radius: 4px;
             border-left: 4px solid var(--accent-pink);
-            font-size: 0.95rem;
             display: flex;
             justify-content: space-between;
         }
+
+        .btn-action {
+            background: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-action:hover { background: #e01a4f; }
 
         .chat-input-box {
             display: flex;
             gap: 10px;
             margin-top: 15px;
         }
-
         .chat-input-box input {
             flex: 1;
             background: #0b0b10;
@@ -196,123 +134,92 @@
             padding: 10px;
             border-radius: 4px;
         }
-
-        .btn-back {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-muted);
-            padding: 8px 16px;
-            margin-top: 15px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .btn-back:hover {
-            border-color: var(--text-color);
-            color: var(--text-color);
-        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">ANIME GAME</div>
-        <nav id="main-nav">
+        <nav>
             <ul>
-                <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Mode</button></li>
+                <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
                 <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
             </ul>
         </nav>
     </header>
 
-    <!-- ONGLET MODE -->
+    <!-- ACCUEIL / SELECTION -->
     <section id="mode" class="tab-content active">
-        
-        <!-- Sélection des modes et Rejoindre -->
-        <div id="mode-selection" class="game-panel" style="display: block; border: none; box-shadow: none; background: transparent; padding: 0;">
-            <h2>Choisis ton mode de jeu</h2>
-            <p>Crée une salle ou rejoins tes amis avec un code.</p>
+        <div id="menu-selection" style="max-width: 600px; margin: 0 auto; text-align: center;">
+            <h2>Mode Multijoueur</h2>
+            <p>Crée ou rejoins une salle avec tes amis.</p>
             
             <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #2a2a40;">
                 <h3 style="margin-bottom: 10px; color: var(--accent-cyan);">Rejoindre une salle</h3>
                 <div class="chat-input-box">
-                    <input type="text" id="join-code-input" placeholder="Entre le code (ex: AB12)..." style="text-transform: uppercase;">
-                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoomByCode()">Rejoindre</button>
+                    <input type="text" id="join-code-input" placeholder="Code de salle (ex: AB12)" style="text-transform: uppercase;">
+                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoom('undercover')">Rejoindre</button>
                 </div>
             </div>
 
-            <div class="grid-modes">
-                <div class="card">
-                    <h3>Mode Undercover 👥</h3>
-                    <p>Démasque l'imposteur en multijoueur.</p>
-                    <button class="btn-action" onclick="createRoom('undercover')">Créer une salle Undercover</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40;">
+                    <h3 style="color: var(--accent-yellow);">Undercover</h3>
+                    <button class="btn-action" onclick="createAndJoinRoom('undercover')">Créer</button>
                 </div>
-                <div class="card">
-                    <h3>Devine la note 💯</h3>
-                    <p>Devine qui n’a pas la même note que le groupe.</p>
-                    <button class="btn-action" onclick="createRoom('note')">Créer une salle Devine la note</button>
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40;">
+                    <h3 style="color: var(--accent-yellow);">Devine la note</h3>
+                    <button class="btn-action" onclick="createAndJoinRoom('note')">Créer</button>
                 </div>
             </div>
         </div>
 
-        <!-- Salle d'attente -->
+        <!-- SALLE D'ATTENTE -->
         <div id="waiting-room" class="game-panel">
-            <h2 id="waiting-title">Salle d'attente</h2>
-            <p>Partage ce code à tes amis pour qu'ils rejoignent !</p>
+            <h2>Salon d'attente</h2>
+            <p>Donne ce code à tes amis :</p>
+            <div class="room-code-box" id="display-room-code">#----</div>
             
-            <div class="room-code-box" id="display-room-code">#---</div>
+            <p>Joueurs dans le salon :</p>
+            <ul class="player-list" id="waiting-players-list"></ul>
 
-            <p style="margin-bottom: 5px; color: var(--text-color);">Joueurs connectés dans la salle :</p>
-            <ul class="player-list" id="current-player-list"></ul>
-
-            <button class="btn-action" style="max-width: 300px;" onclick="requestStartGame()">Lancer la partie</button>
-            <br>
-            <button class="btn-back" onclick="quitGameToMenu()">Retour</button>
+            <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
-        <!-- Tour de parole / Tour par tour -->
-        <div id="gameplay-screen" class="game-panel">
-            <h2>Tour par tour</h2>
-            <p id="turn-indicator">C'est au tour de : <span id="current-turn-player" style="color: var(--accent-cyan); font-weight: bold;"></span></p>
-
-            <div class="secret-word-card" style="background:#0b0b10; border:2px solid var(--accent-pink); padding:15px; border-radius:8px; margin:15px 0;">
-                <h3 style="font-size:1rem; color:var(--text-muted);">Ton information secrète :</h3>
-                <div class="word" id="assigned-secret" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-yellow);">---</div>
+        <!-- PHASE DE JEU / TOUR PAR TOUR -->
+        <div id="gameplay-room" class="game-panel">
+            <h2 id="game-mode-title">Partie en cours</h2>
+            <p>Thème : <span id="current-theme" style="color: var(--accent-yellow); font-weight: bold;">---</span></p>
+            
+            <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p style="margin: 0; color: var(--text-muted);">Ton secret / Rôle :</p>
+                <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
             </div>
 
-            <ul class="player-list" id="gameplay-player-list"></ul>
+            <p id="turn-indicator" style="font-weight: bold; color: var(--accent-yellow);">Tour de : ---</p>
 
-            <div class="chat-input-box" id="action-input-container">
-                <input type="text" id="player-action-input" placeholder="Tape ton indice ou ton action...">
-                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitMyTurnAction()">Valider mon tour</button>
+            <ul class="player-list" id="gameplay-players-list"></ul>
+
+            <div class="chat-input-box" id="clue-input-container" style="display:none;">
+                <input type="text" id="clue-input" placeholder="Écris ton indice...">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
             </div>
         </div>
-
     </section>
 
-    <!-- ONGLET OPTIONS -->
+    <!-- OPTIONS -->
     <section id="options" class="tab-content">
-        <h2>Options</h2>
-        <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span>Ton Pseudo</span>
-                <input type="text" id="username-input" value="OtakuGamer" oninput="updateUsername(this.value)" style="background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 8px; border-radius: 4px;">
-            </div>
+        <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
+            <h2>Options</h2>
+            <p>Ton Pseudo :</p>
+            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
         </div>
     </section>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io('https://anime-game-server.onrender.com');
-
-        let myUsername = "OtakuGamer";
+        const socket = io();
         let currentRoomCode = "";
-        let myRoleData = null;
-
-        function updateUsername(val) {
-            myUsername = val.trim() === "" ? "Anonyme" : val.trim();
-        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -321,110 +228,110 @@
             document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        function hideAllPanels() {
-            document.getElementById('mode-selection').style.display = 'none';
-            document.getElementById('waiting-room').style.display = 'none';
-            document.getElementById('gameplay-screen').style.display = 'none';
+        function getUsername() {
+            return document.getElementById('username-input').value.trim() || "Anonyme";
         }
 
-        function createRoom(mode) {
+        function createAndJoinRoom(mode) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let code = "";
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             
             currentRoomCode = code;
-            document.getElementById('display-room-code').innerText = "#" + code;
-            document.getElementById('waiting-title').innerText = `Salle : ${mode.toUpperCase()}`;
-
-            // Envoi au serveur de la création de salon
-            socket.emit('create_room', { roomCode: code, username: myUsername, mode: mode });
-
-            hideAllPanels();
-            document.getElementById('waiting-room').style.display = 'block';
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: mode });
         }
 
-        function joinRoomByCode() {
-            const codeInput = document.getElementById('join-code-input').value.trim().toUpperCase();
-            if (codeInput.length < 4) {
-                alert("Entre un code de salle valide à 4 caractères.");
+        function joinRoom() {
+            const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+            if (code.length < 4) {
+                alert("Entre un code valide !");
                 return;
             }
-
-            currentRoomCode = codeInput;
-            socket.emit('join_room', { roomCode: codeInput, username: myUsername });
+            currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover' });
         }
 
-        socket.on('room_joined_success', (data) => {
-            document.getElementById('display-room-code').innerText = "#" + currentRoomCode;
-            hideAllPanels();
+        socket.on('update_room', (room) => {
+            document.getElementById('menu-selection').style.display = 'none';
             document.getElementById('waiting-room').style.display = 'block';
-            updateRoomPlayersList(data.players);
-        });
-
-        socket.on('update_players', (players) => {
-            updateRoomPlayersList(players);
-        });
-
-        function updateRoomPlayersList(players) {
-            const listUI = document.getElementById('current-player-list');
-            listUI.innerHTML = "";
-            players.forEach(p => {
-                listUI.innerHTML += `<li><span>${p.username}</span> <span style="color:#00ff88">Prêt</span></li>`;
-            });
-        }
-
-        function requestStartGame() {
-            socket.emit('start_game', { roomCode: currentRoomCode });
-        }
-
-        socket.on('game_started', (gameState) => {
-            hideAllPanels();
-            document.getElementById('gameplay-screen').style.display = 'block';
             
-            // Affichage de la donnée secrète attribuée par le serveur
-            const me = gameState.players.find(p => p.id === socket.id);
+            document.getElementById('display-room-code').innerText = "#" + room.code;
+
+            const list = document.getElementById('waiting-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:#00ff88">Prêt</span></li>`;
+            });
+
+            // Afficher le bouton "Lancer" seulement si on est l'hôte
+            if (room.host === socket.id) {
+                document.getElementById('btn-start-game').style.display = 'block';
+            }
+        });
+
+        function startGame() {
+            socket.emit('start_game', currentRoomCode);
+        }
+
+        socket.on('game_started', (room) => {
+            // Si le mode est 'note', on demande un thème au maître du jeu, sinon on passe direct
+            if (socket.id === room.players[room.currentThemeMasterIndex].id && room.mode === 'note') {
+                let theme = prompt("Entre le thème/anime pour Devine la note :");
+                if (!theme) theme = "Anime Général";
+                socket.emit('submit_theme', { roomCode: room.code, theme: theme });
+            } else if (room.mode === 'undercover') {
+                socket.emit('submit_theme', { roomCode: room.code, theme: "Univers Anime" });
+            }
+        });
+
+        socket.on('launch_reveal', (room) => {
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('gameplay-room').style.display = 'block';
+            
+            document.getElementById('current-theme').innerText = room.currentTheme;
+
+            const me = room.players.find(p => p.id === socket.id);
             if (me) {
-                document.getElementById('assigned-secret').innerText = me.secret;
+                document.getElementById('my-secret-display').innerText = me.secretData;
             }
-            updateGameplayTurnUI(gameState);
+
+            updateGameplayUI(room);
         });
 
-        function updateGameplayTurnUI(gameState) {
-            document.getElementById('current-turn-player').innerText = gameState.currentTurnPlayerName;
-            
-            const listUI = document.getElementById('gameplay-player-list');
-            listUI.innerHTML = "";
-            gameState.players.forEach(p => {
-                let statusInfo = p.actionText ? `💬 "${p.actionText}"` : "En attente...";
-                listUI.innerHTML += `<li><span>${p.username}</span> <span style="color:var(--text-muted)">${statusInfo}</span></li>`;
+        socket.on('update_gameplay', (room) => {
+            updateGameplayUI(room);
+        });
+
+        function updateGameplayUI(room) {
+            const currentTurnPlayer = room.players[room.currentTurnIndex];
+            document.getElementById('turn-indicator').innerText = `C'est au tour de : ${currentTurnPlayer.name}`;
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach((p, idx) => {
+                let status = p.clue ? `💬 "${p.clue}"` : (idx === room.currentTurnIndex ? "En train d'écrire..." : "En attente");
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
             });
 
-            // Gérer le tour par tour : Activer ou bloquer l'input selon si c'est notre tour
-            const inputContainer = document.getElementById('action-input-container');
-            if (gameState.currentTurnPlayerId === socket.id) {
-                inputContainer.style.display = 'flex';
+            // Activer l'input si c'est notre tour
+            if (currentTurnPlayer.id === socket.id) {
+                document.getElementById('clue-input-container').style.display = 'flex';
             } else {
-                inputContainer.style.display = 'none';
+                document.getElementById('clue-input-container').style.display = 'none';
             }
         }
 
-        function submitMyTurnAction() {
-            const actionInput = document.getElementById('player-action-input');
-            const text = actionInput.value.trim();
-            if (text === "") return;
-
-            socket.emit('player_turn_action', { roomCode: currentRoomCode, actionText: text });
-            actionInput.value = "";
+        function submitClue() {
+            const clue = document.getElementById('clue-input').value.trim();
+            if (!clue) return;
+            socket.emit('submit_clue', { roomCode: currentRoomCode, clue: clue });
+            document.getElementById('clue-input').value = "";
         }
 
-        socket.on('next_turn_update', (gameState) => {
-            updateGameplayTurnUI(gameState);
+        socket.on('end_clues', (room) => {
+            alert("Tous les indices ont été donnés ! Passage au vote.");
+            socket.emit('go_to_vote', currentRoomCode);
         });
-
-        function quitGameToMenu() {
-            hideAllPanels();
-            document.getElementById('mode-selection').style.display = 'block';
-        }
     </script>
 </body>
 </html>
