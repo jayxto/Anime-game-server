@@ -106,6 +106,7 @@
             border-left: 4px solid var(--accent-pink);
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .btn-action {
@@ -157,19 +158,19 @@
             <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #2a2a40;">
                 <h3 style="margin-bottom: 10px; color: var(--accent-cyan);">Rejoindre une salle</h3>
                 <div class="chat-input-box">
-                    <input type="text" id="join-code-input" placeholder="Code de salle (ex: AB12)" style="text-transform: uppercase;">
-                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoom('undercover')">Rejoindre</button>
+                    <input type="text" id="join-code-input" placeholder="Code (ex: AB12)" style="text-transform: uppercase;">
+                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoomByCode()">Rejoindre</button>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40;">
                     <h3 style="color: var(--accent-yellow);">Undercover</h3>
-                    <button class="btn-action" onclick="createAndJoinRoom('undercover')">Créer</button>
+                    <button class="btn-action" onclick="createRoom('undercover')">Créer</button>
                 </div>
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40;">
                     <h3 style="color: var(--accent-yellow);">Devine la note</h3>
-                    <button class="btn-action" onclick="createAndJoinRoom('note')">Créer</button>
+                    <button class="btn-action" onclick="createRoom('note')">Créer</button>
                 </div>
             </div>
         </div>
@@ -180,26 +181,25 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
-            <p>Joueurs dans le salon :</p>
+            <p>Joueurs connectés :</p>
             <ul class="player-list" id="waiting-players-list"></ul>
 
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
-        <!-- PHASE DE JEU / TOUR PAR TOUR -->
+        <!-- PHASE DE JEU / TOUR PAR TOUR & VOTE -->
         <div id="gameplay-room" class="game-panel">
-            <h2 id="game-mode-title">Partie en cours</h2>
-            <p>Thème : <span id="current-theme" style="color: var(--accent-yellow); font-weight: bold;">---</span></p>
-            
+            <h2 id="game-phase-title">Partie en cours</h2>
+            <p id="game-info-text">Indice ou Action</p>
+
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 0; color: var(--text-muted);">Ton secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
             </div>
 
-            <p id="turn-indicator" style="font-weight: bold; color: var(--accent-yellow);">Tour de : ---</p>
-
             <ul class="player-list" id="gameplay-players-list"></ul>
 
+            <!-- Zone de saisie d'indice -->
             <div class="chat-input-box" id="clue-input-container" style="display:none;">
                 <input type="text" id="clue-input" placeholder="Écris ton indice...">
                 <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
@@ -216,7 +216,7 @@
         </div>
     </section>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
         const socket = io();
         let currentRoomCode = "";
@@ -232,7 +232,13 @@
             return document.getElementById('username-input').value.trim() || "Anonyme";
         }
 
-        function createAndJoinRoom(mode) {
+        function hideAllPanels() {
+            document.getElementById('menu-selection').style.display = 'none';
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('gameplay-room').style.display = 'none';
+        }
+
+        function createRoom(mode) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let code = "";
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -241,10 +247,10 @@
             socket.emit('join_room', { roomCode: code, username: getUsername(), mode: mode });
         }
 
-        function joinRoom() {
+        function joinRoomByCode() {
             const code = document.getElementById('join-code-input').value.trim().toUpperCase();
             if (code.length < 4) {
-                alert("Entre un code valide !");
+                alert("Entre un code valide à 4 caractères !");
                 return;
             }
             currentRoomCode = code;
@@ -252,9 +258,8 @@
         }
 
         socket.on('update_room', (room) => {
-            document.getElementById('menu-selection').style.display = 'none';
+            hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
-            
             document.getElementById('display-room-code').innerText = "#" + room.code;
 
             const list = document.getElementById('waiting-players-list');
@@ -263,9 +268,10 @@
                 list.innerHTML += `<li><span>${p.name}</span> <span style="color:#00ff88">Prêt</span></li>`;
             });
 
-            // Afficher le bouton "Lancer" seulement si on est l'hôte
             if (room.host === socket.id) {
                 document.getElementById('btn-start-game').style.display = 'block';
+            } else {
+                document.getElementById('btn-start-game').style.display = 'none';
             }
         });
 
@@ -274,27 +280,22 @@
         }
 
         socket.on('game_started', (room) => {
-            // Si le mode est 'note', on demande un thème au maître du jeu, sinon on passe direct
             if (socket.id === room.players[room.currentThemeMasterIndex].id && room.mode === 'note') {
-                let theme = prompt("Entre le thème/anime pour Devine la note :");
-                if (!theme) theme = "Anime Général";
-                socket.emit('submit_theme', { roomCode: room.code, theme: theme });
+                let theme = prompt("Entre le thème / anime :", "Anime Général");
+                socket.emit('submit_theme', { roomCode: room.code, theme: theme || "Anime" });
             } else if (room.mode === 'undercover') {
                 socket.emit('submit_theme', { roomCode: room.code, theme: "Univers Anime" });
             }
         });
 
         socket.on('launch_reveal', (room) => {
-            document.getElementById('waiting-room').style.display = 'none';
+            hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
             
-            document.getElementById('current-theme').innerText = room.currentTheme;
-
             const me = room.players.find(p => p.id === socket.id);
             if (me) {
                 document.getElementById('my-secret-display').innerText = me.secretData;
             }
-
             updateGameplayUI(room);
         });
 
@@ -303,8 +304,9 @@
         });
 
         function updateGameplayUI(room) {
+            document.getElementById('game-phase-title').innerText = "Tour de parole";
             const currentTurnPlayer = room.players[room.currentTurnIndex];
-            document.getElementById('turn-indicator').innerText = `C'est au tour de : ${currentTurnPlayer.name}`;
+            document.getElementById('game-info-text').innerText = `C'est au tour de : ${currentTurnPlayer.name}`;
 
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
@@ -313,7 +315,6 @@
                 list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
             });
 
-            // Activer l'input si c'est notre tour
             if (currentTurnPlayer.id === socket.id) {
                 document.getElementById('clue-input-container').style.display = 'flex';
             } else {
@@ -329,8 +330,41 @@
         }
 
         socket.on('end_clues', (room) => {
-            alert("Tous les indices ont été donnés ! Passage au vote.");
             socket.emit('go_to_vote', currentRoomCode);
+        });
+
+        // Gestion de la phase de vote interactive
+        socket.on('start_voting', (room) => {
+            document.getElementById('game-phase-title').innerText = "Phase de Vote";
+            document.getElementById('game-info-text').innerText = "Clique sur le joueur suspect pour voter contre lui !";
+            document.getElementById('clue-input-container').style.display = 'none';
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (p.id !== socket.id) {
+                    list.innerHTML += `<li>
+                        <span>${p.name}</span> 
+                        <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
+                    </li>`;
+                } else {
+                    list.innerHTML += `<li><span>${p.name} (Toi)</span> <span style="color:var(--text-muted)">Ne peut pas voter pour soi</span></li>`;
+                }
+            });
+        });
+
+        function castVote(targetId) {
+            socket.emit('cast_vote', { roomCode: currentRoomCode, targetId: targetId });
+        }
+
+        socket.on('show_results', (data) => {
+            document.getElementById('game-phase-title').innerText = "Résultats du Vote";
+            if (data.eliminatedPlayer) {
+                document.getElementById('game-info-text').innerText = `Le joueur éliminé est : ${data.eliminatedPlayer.name}`;
+            } else {
+                document.getElementById('game-info-text').innerText = `Fin de la manche.`;
+            }
+            document.getElementById('gameplay-players-list').innerHTML = "";
         });
     </script>
 </body>
