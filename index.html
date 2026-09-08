@@ -193,7 +193,6 @@
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
 
-        <!-- Panneau de choix du thème (Devine la note) -->
         <div id="theme-choice-room" class="game-panel">
             <h2>Choix du Thème</h2>
             <p id="theme-master-info">Un joueur choisit le thème secret...</p>
@@ -205,14 +204,12 @@
                 </div>
             </div>
 
-            <!-- Bouton pour voter le changement de thème (disponible pour tous) -->
             <div id="change-theme-vote-container" style="margin-top: 20px;">
                 <button class="btn-action" style="background: var(--accent-cyan); color: black;" onclick="voteChangeTheme()">Changer de thème (voter)</button>
                 <p id="theme-vote-status" style="margin-top: 8px; font-size: 0.9rem; color: var(--text-muted);">Votes pour changer : 0</p>
             </div>
         </div>
 
-        <!-- Panneau de Gameplay global -->
         <div id="gameplay-room" class="game-panel">
             <h2 id="game-phase-title">Partie en cours</h2>
             <p id="game-info-text">Indice ou Action</p>
@@ -477,7 +474,7 @@
             }
 
             if (data.gameOver) {
-                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>";
+                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
                 document.getElementById('end-game-buttons').style.display = 'flex';
             } else {
                 resultMessage += `<span style="color: var(--accent-cyan);">La partie continue... Prochain tour dans 4 secondes.</span>`;
