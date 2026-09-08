@@ -189,7 +189,6 @@
             <h2 id="game-phase-title">Partie en cours</h2>
             <p id="game-info-text">Indice ou Action</p>
 
-            <!-- Input pour le choix du thème personnalisé (Mode Devine la note) -->
             <div id="theme-selection-container" style="display:none; margin: 15px 0; background: #11111a; padding: 15px; border-radius: 8px; border: 1px solid var(--accent-yellow); text-align: left;">
                 <p style="color: var(--accent-yellow); margin-bottom: 8px;" id="theme-master-prompt">C'est à toi de choisir le thème de ce tour !</p>
                 <div class="chat-input-box" style="margin-top:0;">
@@ -210,7 +209,6 @@
                 <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
             </div>
 
-            <!-- Options à la fin des indices (Mode Note : Changer de thème ou passer au vote) -->
             <div id="end-clues-options" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
                 <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestChangeTheme()">🔄 Changer de thème (Un autre joueur choisit)</button>
                 <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVote()">⚖️ Passer au vote</button>
@@ -391,7 +389,6 @@
             document.getElementById('clue-input').value = "";
         }
 
-        // Événement déclenché quand tout le monde a donné son indice en mode Note
         socket.on('prompt_end_clue_options', (room) => {
             document.getElementById('game-phase-title').innerText = "Fin des indices";
             document.getElementById('game-info-text').innerText = `Tous les indices ont été donnés pour le thème : "${room.currentTheme}". Que voulez-vous faire ?`;
@@ -464,7 +461,13 @@
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
-                let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
+                // MODIFICATION : On ne révèle pas si c'était un imposteur lors des votes intermédiaires
+                let roleInfo = "";
+                if (data.gameOver) {
+                    roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
+                } else {
+                    roleInfo = "<span style='color:var(--text-muted)'>Rôle secret jusqu'à la fin de la partie</span>";
+                }
                 resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote passé : Aucun joueur éliminé.<br><br>`;
@@ -487,7 +490,13 @@
             data.room.players.forEach(p => {
                 let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
-                let roleText = p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]";
+                
+                // CORRECTION PRINCIPALE : On n'affiche le rôle textuel [IMPOSTEUR] ou [CIVIL] que si data.gameOver est vrai
+                let roleText = "";
+                if (data.gameOver) {
+                    roleText = p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]";
+                }
+                
                 list.innerHTML += `<li><span>${p.name}${roleText}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
