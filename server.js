@@ -33,22 +33,21 @@ const undercoverPairs = [
 ];
 
 const HARDCORE_CHARACTERS = [
-    // Naruto
-    "Naruto Uzumaki (Naruto)", "Sasuke Uchiwa (Naruto)", "Sakura Haruno (Naruto)", "Kakashi Hatake (Naruto)", "Itachi Uchiwa (Naruto)", "Gaara (Naruto)", "Jiraya (Naruto)", "Hinata Hyûga (Naruto)", "Madara Uchiwa (Naruto)", "Orochimaru (Naruto)", "Pain (Naruto)", "Minato Namikaze (Naruto)", "Obito Uchiwa (Naruto)",
-    // One Piece
-    "Monkey D. Luffy (One Piece)", "Roronoa Zoro (One Piece)", "Nami (One Piece)", "Sanji (One Piece)", "Tony Tony Chopper (One Piece)", "Nico Robin (One Piece)", "Trafalgar Law (One Piece)", "Portgas D. Ace (One Piece)", "Shanks (One Piece)", "Dracule Mihawk (One Piece)", "Marshall D. Teach (One Piece)",
-    // Bleach
-    "Ichigo Kurosaki (Bleach)", "Rukia Kuchiki (Bleach)", "Sosuke Aizen (Bleach)", "Kenpachi Zaraki (Bleach)", "Toshiro Hitsugaya (Bleach)",
-    // Black Clover / SDS / Fairy Tail
-    "Asta (Black Clover)", "Yuno (Black Clover)", "Meliodas (Seven Deadly Sins)", "Ban (Seven Deadly Sins)", "Escanor (Seven Deadly Sins)", "Natsu Dragneel (Fairy Tail)", "Lucy Heartfilia (Fairy Tail)", "Erza Scarlet (Fairy Tail)",
-    // Death Note / SAO / MHA
-    "Light Yagami (Death Note)", "L (Death Note)", "Kirito (SAO)", "Asuna Yuuki (SAO)", "Izuku Midoriya (MHA)", "Katsuki Bakugo (MHA)", "Shoto Todoroki (MHA)", "All Might (MHA)",
-    // SNK / Solo Leveling / Demon Slayer
-    "Eren Jäger (SNK)", "Mikasa Ackerman (SNK)", "Levi Ackerman (SNK)", "Sung Jin-Woo (Solo Leveling)", "Tanjiro Kamado (Demon Slayer)", "Nezuko Kamado (Demon Slayer)", "Muzan Kibutsuji (Demon Slayer)",
-    // JJK / Hunter x Hunter / OPM
-    "Satoru Gojo (JJK)", "Yuji Itadori (JJK)", "Ryomen Sukuna (JJK)", "Gon Freecss (Hunter x Hunter)", "Killua Zoldyck (Hunter x Hunter)", "Hisoka Morow (Hunter x Hunter)", "Saitama (One Punch Man)", "Genos (One Punch Man)",
-    // Chainsaw Man / Tokyo Ghoul
-    "Denji (Chainsaw Man)", "Makima (Chainsaw Man)", "Ken Kaneki (Tokyo Ghoul)"
+    { name: "Naruto Uzumaki (Naruto)", img: "https://i.imgur.com/83592h9.png" },
+    { name: "Sasuke Uchiwa (Naruto)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Monkey D. Luffy (One Piece)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Roronoa Zoro (One Piece)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Ichigo Kurosaki (Bleach)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Satoru Gojo (JJK)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Tanjiro Kamado (Demon Slayer)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Light Yagami (Death Note)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Eren Jäger (SNK)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Levi Ackerman (SNK)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Izuku Midoriya (MHA)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Saitama (One Punch Man)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Denji (Chainsaw Man)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Ken Kaneki (Tokyo Ghoul)", img: "https://i.imgur.com/2Y5mF58.png" },
+    { name: "Gon Freecss (Hunter x Hunter)", img: "https://i.imgur.com/2Y5mF58.png" }
 ];
 
 io.on('connection', (socket) => {
@@ -138,15 +137,13 @@ io.on('connection', (socket) => {
             if (room.subMode === 'hardcore') {
                 const scenario = Math.random();
                 if (scenario < 0.25) {
-                    // Option 1 : Aucun imposteur
                     room.noImpostor = true;
                     const sharedPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
                     room.players.forEach(p => { p.secretData = sharedPerso; p.isImpostor = false; });
                 } else if (scenario < 0.55) {
-                    // Option 2 : Tout le monde a le même perso sauf un imposteur
                     const sharedPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
                     const impIdx = Math.floor(Math.random() * room.players.length);
-                    const diffPerso = HARDCORE_CHARACTERS.filter(c => c !== sharedPerso)[Math.floor(Math.random() * (HARDCORE_CHARACTERS.length - 1))];
+                    const diffPerso = HARDCORE_CHARACTERS.filter(c => c.name !== sharedPerso.name)[Math.floor(Math.random() * (HARDCORE_CHARACTERS.length - 1))];
                     
                     room.players.forEach((p, idx) => {
                         if (idx === impIdx) {
@@ -158,9 +155,8 @@ io.on('connection', (socket) => {
                         }
                     });
                 } else {
-                    // Option 3 : Classique hardcore (2 persos de la super-liste)
                     let civilPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
-                    let otherPersos = HARDCORE_CHARACTERS.filter(c => c !== civilPerso);
+                    let otherPersos = HARDCORE_CHARACTERS.filter(c => c.name !== civilPerso.name);
                     let undercoverPerso = otherPersos[Math.floor(Math.random() * otherPersos.length)];
 
                     let impCount = room.players.length >= 5 ? 2 : 1;
@@ -178,7 +174,6 @@ io.on('connection', (socket) => {
                     });
                 }
             } else {
-                // Mode Normal (Paires d'animes)
                 const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
                 let impCount = room.players.length >= 5 ? 2 : 1;
                 let assignedIndexes = [];
