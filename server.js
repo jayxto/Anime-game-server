@@ -97,9 +97,14 @@ io.on('connection', (socket) => {
         }
 
         if (room.mode === 'note') {
-            const realScore = Math.floor(Math.random() * 3) + 8;
-            let fakeScore = Math.floor(Math.random() * 5) + 2;
-            if (fakeScore === realScore) fakeScore = realScore > 5 ? realScore - 3 : realScore + 3;
+            // Note réelle entre 1 et 10
+            const realScore = Math.floor(Math.random() * 8) + 2; // entre 2 et 9 pour éviter les bords
+            // Écart maximum de 3, tout en restant entre 1 et 10
+            let offset = (Math.floor(Math.random() * 3) + 1) * (Math.random() < 0.5 ? 1 : -1);
+            let fakeScore = realScore + offset;
+            if (fakeScore < 1) fakeScore = 1;
+            if (fakeScore > 10) fakeScore = 10;
+            if (fakeScore === realScore) fakeScore = realScore === 10 ? realScore - 1 : realScore + 1;
 
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? fakeScore : realScore;
@@ -127,7 +132,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (room && room.players[room.currentThemeMasterIndex].id === socket.id) {
             room.currentTheme = theme;
-            room.status = 'reveal';
+            room.status = 'gameplay'; // Corrigé pour repasser bien en gameplay
             io.to(roomCode).emit('theme_chosen', room);
             io.to(roomCode).emit('launch_reveal', room);
         }
