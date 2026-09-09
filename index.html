@@ -242,7 +242,7 @@
         </div>
     </section>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         let currentRoomCode = "";
@@ -380,7 +380,6 @@
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             
-            // Sécurité robuste : s'assure qu'on pointe sur un joueur vivant valide
             if (room.currentTurnIndex >= room.players.length || !room.players[room.currentTurnIndex].isAlive) {
                 let firstAlive = room.players.findIndex(p => p.isAlive);
                 if (firstAlive !== -1) room.currentTurnIndex = firstAlive;
@@ -398,7 +397,7 @@
             });
 
             const me = room.players.find(p => p.id === socket.id);
-            if (currentTurnPlayer && currentTurnPlayer.id === socket.id && me && me.isAlive && room.status === 'gameplay') {
+            if (currentTurnPlayer && currentTurnPlayer.id === socket.id && me && me.isAlive) {
                 document.getElementById('clue-input-container').style.display = 'flex';
             } else {
                 document.getElementById('clue-input-container').style.display = 'none';
