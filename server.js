@@ -98,6 +98,10 @@ io.on('connection', (socket) => {
             p.secretData = null;
         });
 
+        // Trouve le premier joueur vivant pour commencer le tour proprement
+        let firstAlive = room.players.findIndex(p => p.isAlive);
+        room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
+
         if (room.mode === 'note') {
             const realScore = Math.floor(Math.random() * 8) + 2;
             let offset = (Math.floor(Math.random() * 3) + 1) * (Math.random() < 0.5 ? 1 : -1);
@@ -202,7 +206,8 @@ io.on('connection', (socket) => {
             room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
             room.status = 'choose_theme';
             room.players.forEach(p => p.clue = '');
-            room.currentTurnIndex = 0;
+            let firstAlive = room.players.findIndex(p => p.isAlive);
+            room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
             io.to(room.code).emit('prompt_theme_choice', { room: room, themeMasterId: room.players[room.currentThemeMasterIndex].id });
         }
     });
@@ -213,7 +218,9 @@ io.on('connection', (socket) => {
             const sender = room.players.find(p => p.id === socket.id);
             if (sender && !sender.isAlive) return;
 
-            room.players[room.currentTurnIndex].clue = clue;
+            if (room.players[room.currentTurnIndex]) {
+                room.players[room.currentTurnIndex].clue = clue;
+            }
             
             do {
                 room.currentTurnIndex++;
@@ -236,7 +243,8 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (room && room.mode === 'undercover') {
             room.players.forEach(p => p.clue = '');
-            room.currentTurnIndex = room.players.findIndex(p => p.isAlive);
+            let firstAlive = room.players.findIndex(p => p.isAlive);
+            room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
             room.status = 'gameplay';
             io.to(roomCode).emit('resume_gameplay', room);
         }
