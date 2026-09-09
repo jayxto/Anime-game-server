@@ -10,7 +10,6 @@ app.use(express.static(__dirname));
 
 const rooms = {};
 
-// Banques de mots / paires pour Undercover
 const undercoverPairs = [
     ["Naruto Uzumaki", "Sasuke Uchiha"],
     ["Goku", "Vegeta"],
@@ -24,15 +23,6 @@ const undercoverPairs = [
     ["Ichigo Kurosaki", "Rukia Kuchiki"]
 ];
 
-const hardcoreThemesList = [
-    "Personnages de Naruto",
-    "Personnages de One Piece",
-    "Personnages de Dragon Ball",
-    "Personnages de Demon Slayer",
-    "Personnages d'Attaque des Titans",
-    "Personnages de Jujutsu Kaisen"
-];
-
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -42,10 +32,10 @@ io.on('connection', (socket) => {
         if (!rooms[roomCode]) {
             rooms[roomCode] = {
                 code: roomCode,
-                mode: mode,       // 'undercover' ou 'note'
-                subMode: subMode, // 'normal' ou 'hardcore'
+                mode: mode,
+                subMode: subMode,
                 host: socket.id,
-                status: 'waiting', // waiting, choosing_theme, reveal, gameplay, end_clues, voting, results
+                status: 'waiting',
                 players: [],
                 currentTheme: '',
                 currentTurnIndex: 0,
@@ -56,7 +46,6 @@ io.on('connection', (socket) => {
 
         const room = rooms[roomCode];
         
-        // Empêcher les doublons d'ID
         const existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -69,7 +58,6 @@ io.on('connection', (socket) => {
             });
         }
 
-        // Si le premier joueur quitte ou autre, s'assurer qu'il y a un hôte valide
         if (!room.players.some(p => p.id === room.host)) {
             room.host = room.players[0].id;
         }
@@ -82,8 +70,6 @@ io.on('connection', (socket) => {
         if (!room || room.host !== socket.id) return;
 
         room.status = 'choosing_theme';
-        
-        // Déterminer le maître du thème (le premier joueur de la liste)
         const themeMasterId = room.players[0].id;
 
         io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
@@ -96,7 +82,6 @@ io.on('connection', (socket) => {
         room.currentTheme = theme;
         io.to(roomCode).emit('theme_chosen', room);
 
-        // Lancer la distribution des rôles/mots secrets
         distributeSecretsAndStart(room, roomCode);
     });
 
@@ -106,7 +91,6 @@ io.on('connection', (socket) => {
 
         if (room.mode === 'undercover') {
             if (room.subMode === 'hardcore') {
-                // Mode hardcore : 20% de chance qu'il n'y ait aucun imposteur
                 const randChance = Math.random();
                 if (randChance < 0.25) {
                     room.noImpostor = true;
@@ -116,21 +100,18 @@ io.on('connection', (socket) => {
                         p.secretData = defaultWord;
                     });
                 } else {
-                    // Attribuer des mots normaux avec imposteur
                     assignUndercoverWords(room);
                 }
             } else {
                 assignUndercoverWords(room);
             }
         } else if (room.mode === 'note') {
-            // Mode note : attribuer une note secrète aléatoire entre 1 et 10 ou autre
             room.players.forEach(p => {
                 p.secretData = Math.floor(Math.random() * 10) + 1 + "/10";
                 p.isImpostor = false;
             });
         }
 
-        // Réinitialiser les indices et états de vie pour la manche
         room.players.forEach(p => {
             p.clue = '';
         });
@@ -144,7 +125,6 @@ io.on('connection', (socket) => {
         const civilWord = pair[0];
         const undercoverWord = pair[1];
 
-        // Choisir un imposteur aléatoire parmi les joueurs vivants
         const alivePlayers = room.players.filter(p => p.isAlive);
         const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
 
@@ -167,7 +147,6 @@ io.on('connection', (socket) => {
         if (currentPlayer && currentPlayer.id === socket.id) {
             currentPlayer.clue = clue;
 
-            // Trouver le prochain joueur vivant
             let nextIndex = room.currentTurnIndex + 1;
             while (nextIndex < room.players.length && !room.players[nextIndex].isAlive) {
                 nextIndex++;
@@ -177,7 +156,6 @@ io.on('connection', (socket) => {
                 room.currentTurnIndex = nextIndex;
                 io.to(roomCode).emit('update_gameplay', room);
             } else {
-                // Tous les joueurs ont donné leur indice -> Fin du tour d'indices
                 room.status = 'end_clues';
                 if (room.mode === 'undercover') {
                     io.to(roomCode).emit('prompt_end_clue_options_undercover', room);
@@ -223,8 +201,6 @@ io.on('connection', (socket) => {
         room.votes[socket.id] = targetId;
 
         const alivePlayers = room.players.filter(p => p.isAlive);
-        
-        // Vérifier si tous les joueurs vivants ont voté
         if (Object.keys(room.votes).length >= alivePlayers.length) {
             resolveVotes(room, roomCode);
         }
@@ -254,7 +230,6 @@ io.on('connection', (socket) => {
             }
         }
 
-        // Vérification des conditions de victoire
         let gameOver = false;
         let winnerMessage = "";
 
@@ -273,7 +248,6 @@ io.on('connection', (socket) => {
                 winnerMessage = "🚨 Victoire des Imposteurs ! Ils sont en nombre égal ou supérieur aux innocents.";
             }
         } else if (room.mode === 'note') {
-            // Fin de partie simple après un cycle de vote pour le mode note
             gameOver = true;
             winnerMessage = "✨ Fin de la partie 'Devine la note' ! Merci d'avoir joué.";
         }
@@ -291,7 +265,6 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
-        // Relancer un tour de jeu / une nouvelle manche
         room.status = 'choosing_theme';
         room.currentTurnIndex = 0;
         room.players.forEach(p => p.clue = '');
