@@ -1,37 +1,3 @@
-// Liste Roland-Garros (Paires Tennis)
-const undercoverPairsRoland = [
-    ["Djokovic", "Nadal"],
-    ["Federer", "Djokovic"],
-    ["Alcaraz", "Sinner"],
-    ["Terre battue", "Gazon"],
-    ["Roland-Garros", "Wimbledon"],
-    ["Ace", "Smash"],
-    ["Service", "Volée"],
-    ["Djokovic", "Medvedev"],
-    ["Nadal", "Thiem"],
-    ["Federer", "Wawrinka"],
-    ["Tie-break", "Avantage"],
-    ["Djokovic", "Alcaraz"],
-    ["Balle de match", "Balle de break"],
-    ["Medvedev", "Tsitsipas"],
-    ["Rublev", "Ruud"],
-    ["Zverev", "Thiem"],
-    ["Swiatek", "Sabalenka"],
-    ["Gauff", "Rybakina"],
-    ["Jabeur", "Pegula"],
-    ["Garbine Muguruza", "Maria Sharapova"],
-    ["Serena Williams", "Venus Williams"],
-    ["Osaka", "Raducanu"],
-    ["Monfils", "Tsonga"],
-    ["Gasquet", "Simon"],
-    ["Wawrinka", "Ferrer"],
-    ["Djokovic", "Kyrgios"],
-    ["Berdych", "Del Potro"],
-    ["Raonic", "Isner"],
-    ["Cilic", "Nishikori"],
-    ["Muster", "Kuerten"]
-];
-
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -189,9 +155,6 @@ io.on('connection', (socket) => {
         if (room.mode === 'undercover') {
             room.currentTheme = room.subMode === 'hardcore' ? "Undercover Hardcore (Multi-animes)" : "Undercover Normal";
             distributeSecretsAndStart(room, roomCode);
-        } else if (room.mode === 'roland') {
-            room.currentTheme = "Roland-Garros (Tennis)";
-            distributeSecretsAndStart(room, roomCode);
         } else if (room.mode === 'note') {
             room.status = 'choosing_theme';
             const themeMasterId = room.players[0].id;
@@ -213,7 +176,7 @@ io.on('connection', (socket) => {
         room.status = 'reveal';
         room.noImpostor = false;
 
-        if (room.mode === 'undercover' || room.mode === 'roland') {
+        if (room.mode === 'undercover') {
             if (room.subMode === 'hardcore') {
                 const randChance = Math.random();
                 if (randChance < 0.25) {
@@ -227,8 +190,6 @@ io.on('connection', (socket) => {
                 } else {
                     assignUndercoverHardcoreWords(room);
                 }
-            } else if (room.mode === 'roland') {
-                assignRolandWords(room);
             } else {
                 assignUndercoverNormalWords(room);
             }
@@ -249,25 +210,6 @@ io.on('connection', (socket) => {
 
     function assignUndercoverNormalWords(room) {
         const pair = undercoverPairsNormal[Math.floor(Math.random() * undercoverPairsNormal.length)];
-        const civilWord = pair[0];
-        const undercoverWord = pair[1];
-
-        const alivePlayers = room.players.filter(p => p.isAlive);
-        const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
-
-        room.players.forEach(p => {
-            if (p.id === alivePlayers[impostorIndex].id) {
-                p.isImpostor = true;
-                p.secretData = undercoverWord;
-            } else {
-                p.isImpostor = false;
-                p.secretData = civilWord;
-            }
-        });
-    }
-
-    function assignRolandWords(room) {
-        const pair = undercoverPairsRoland[Math.floor(Math.random() * undercoverPairsRoland.length)];
         const civilWord = pair[0];
         const undercoverWord = pair[1];
 
@@ -328,7 +270,7 @@ io.on('connection', (socket) => {
                 io.to(roomCode).emit('update_gameplay', room);
             } else {
                 room.status = 'end_clues';
-                if (room.mode === 'undercover' || room.mode === 'roland') {
+                if (room.mode === 'undercover') {
                     io.to(roomCode).emit('prompt_end_clue_options_undercover', room);
                 } else {
                     io.to(roomCode).emit('prompt_end_clue_options', room);
@@ -407,7 +349,7 @@ io.on('connection', (socket) => {
         if (room.noImpostor && eliminatedTargetId === 'no_impostor') {
             gameOver = true;
             winnerMessage = "🎉 Les innocents ont gagné ! Ils ont deviné qu'il n'y avait aucun imposteur.";
-        } else if (room.mode === 'undercover' || room.mode === 'roland') {
+        } else if (room.mode === 'undercover') {
             const impostorsAlive = room.players.filter(p => p.isAlive && p.isImpostor);
             const civilsAlive = room.players.filter(p => p.isAlive && !p.isImpostor);
 
@@ -436,7 +378,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
-        if (room.mode === 'undercover' || room.mode === 'roland') {
+        if (room.mode === 'undercover') {
             distributeSecretsAndStart(room, roomCode);
         } else {
             room.status = 'choosing_theme';
