@@ -32,27 +32,48 @@ const undercoverPairs = [
     ["Crocodile", "Gaara"], ["Hidan", "Ban"]
 ];
 
-io.on('connection', (socket) => {
-    console.log(`Un joueur s'est connecté : ${socket.id}`);
+const HARDCORE_CHARACTERS = [
+    // Naruto
+    "Naruto Uzumaki (Naruto)", "Sasuke Uchiwa (Naruto)", "Sakura Haruno (Naruto)", "Kakashi Hatake (Naruto)", "Itachi Uchiwa (Naruto)", "Gaara (Naruto)", "Jiraya (Naruto)", "Hinata Hyûga (Naruto)", "Madara Uchiwa (Naruto)", "Orochimaru (Naruto)", "Pain (Naruto)", "Minato Namikaze (Naruto)", "Obito Uchiwa (Naruto)",
+    // One Piece
+    "Monkey D. Luffy (One Piece)", "Roronoa Zoro (One Piece)", "Nami (One Piece)", "Sanji (One Piece)", "Tony Tony Chopper (One Piece)", "Nico Robin (One Piece)", "Trafalgar Law (One Piece)", "Portgas D. Ace (One Piece)", "Shanks (One Piece)", "Dracule Mihawk (One Piece)", "Marshall D. Teach (One Piece)",
+    // Bleach
+    "Ichigo Kurosaki (Bleach)", "Rukia Kuchiki (Bleach)", "Sosuke Aizen (Bleach)", "Kenpachi Zaraki (Bleach)", "Toshiro Hitsugaya (Bleach)",
+    // Black Clover / SDS / Fairy Tail
+    "Asta (Black Clover)", "Yuno (Black Clover)", "Meliodas (Seven Deadly Sins)", "Ban (Seven Deadly Sins)", "Escanor (Seven Deadly Sins)", "Natsu Dragneel (Fairy Tail)", "Lucy Heartfilia (Fairy Tail)", "Erza Scarlet (Fairy Tail)",
+    // Death Note / SAO / MHA
+    "Light Yagami (Death Note)", "L (Death Note)", "Kirito (SAO)", "Asuna Yuuki (SAO)", "Izuku Midoriya (MHA)", "Katsuki Bakugo (MHA)", "Shoto Todoroki (MHA)", "All Might (MHA)",
+    // SNK / Solo Leveling / Demon Slayer
+    "Eren Jäger (SNK)", "Mikasa Ackerman (SNK)", "Levi Ackerman (SNK)", "Sung Jin-Woo (Solo Leveling)", "Tanjiro Kamado (Demon Slayer)", "Nezuko Kamado (Demon Slayer)", "Muzan Kibutsuji (Demon Slayer)",
+    // JJK / Hunter x Hunter / OPM
+    "Satoru Gojo (JJK)", "Yuji Itadori (JJK)", "Ryomen Sukuna (JJK)", "Gon Freecss (Hunter x Hunter)", "Killua Zoldyck (Hunter x Hunter)", "Hisoka Morow (Hunter x Hunter)", "Saitama (One Punch Man)", "Genos (One Punch Man)",
+    // Chainsaw Man / Tokyo Ghoul
+    "Denji (Chainsaw Man)", "Makima (Chainsaw Man)", "Ken Kaneki (Tokyo Ghoul)"
+];
 
-    socket.on('join_room', ({ roomCode, username, mode }) => {
+io.on('connection', (socket) => {
+    socket.on('join_room', ({ roomCode, username, mode, subMode }) => {
         socket.join(roomCode);
 
         if (!rooms[roomCode]) {
             rooms[roomCode] = {
                 code: roomCode,
                 mode: mode,
+                subMode: subMode || 'normal',
                 host: socket.id,
                 players: [],
                 status: 'waiting', 
                 currentThemeMasterIndex: 0,
                 currentTheme: '',
                 currentTurnIndex: 0,
-                votes: {}
+                votes: {},
+                noImpostor: false
             };
         }
 
         const room = rooms[roomCode];
+        room.subMode = subMode || room.subMode;
+        
         let existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             room.players.push({
@@ -78,6 +99,7 @@ io.on('connection', (socket) => {
     function launchNewRound(room) {
         room.votes = {};
         room.currentTurnIndex = 0;
+        room.noImpostor = false;
 
         room.players.forEach(p => {
             p.clue = '';
@@ -86,25 +108,23 @@ io.on('connection', (socket) => {
             p.secretData = null;
         });
 
-        let impostorCount = room.players.length >= 5 ? 2 : 1;
-        let assignedIndexes = [];
-        while(assignedIndexes.length < impostorCount) {
-            let randomIndex = Math.floor(Math.random() * room.players.length);
-            if(!assignedIndexes.includes(randomIndex)) {
-                assignedIndexes.push(randomIndex);
-                room.players[randomIndex].isImpostor = true;
-            }
-        }
-
         if (room.mode === 'note') {
-            // Note réelle entre 1 et 10
-            const realScore = Math.floor(Math.random() * 8) + 2; // entre 2 et 9 pour éviter les bords
-            // Écart maximum de 3, tout en restant entre 1 et 10
+            const realScore = Math.floor(Math.random() * 8) + 2;
             let offset = (Math.floor(Math.random() * 3) + 1) * (Math.random() < 0.5 ? 1 : -1);
             let fakeScore = realScore + offset;
             if (fakeScore < 1) fakeScore = 1;
             if (fakeScore > 10) fakeScore = 10;
             if (fakeScore === realScore) fakeScore = realScore === 10 ? realScore - 1 : realScore + 1;
+
+            let impostorCount = room.players.length >= 5 ? 2 : 1;
+            let assignedIndexes = [];
+            while(assignedIndexes.length < impostorCount) {
+                let idx = Math.floor(Math.random() * room.players.length);
+                if(!assignedIndexes.includes(idx)) {
+                    assignedIndexes.push(idx);
+                    room.players[idx].isImpostor = true;
+                }
+            }
 
             room.players.forEach(p => {
                 p.secretData = p.isImpostor ? fakeScore : realScore;
@@ -112,16 +132,68 @@ io.on('connection', (socket) => {
 
             room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
             room.status = 'choose_theme';
+            io.to(room.code).emit('prompt_theme_choice', { room: room, themeMasterId: room.players[room.currentThemeMasterIndex].id });
 
-            io.to(room.code).emit('prompt_theme_choice', {
-                room: room,
-                themeMasterId: room.players[room.currentThemeMasterIndex].id
-            });
         } else if (room.mode === 'undercover') {
-            const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
-            room.players.forEach(p => {
-                p.secretData = p.isImpostor ? pair[1] : pair[0];
-            });
+            if (room.subMode === 'hardcore') {
+                const scenario = Math.random();
+                if (scenario < 0.25) {
+                    // Option 1 : Aucun imposteur
+                    room.noImpostor = true;
+                    const sharedPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
+                    room.players.forEach(p => { p.secretData = sharedPerso; p.isImpostor = false; });
+                } else if (scenario < 0.55) {
+                    // Option 2 : Tout le monde a le même perso sauf un imposteur
+                    const sharedPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
+                    const impIdx = Math.floor(Math.random() * room.players.length);
+                    const diffPerso = HARDCORE_CHARACTERS.filter(c => c !== sharedPerso)[Math.floor(Math.random() * (HARDCORE_CHARACTERS.length - 1))];
+                    
+                    room.players.forEach((p, idx) => {
+                        if (idx === impIdx) {
+                            p.isImpostor = true;
+                            p.secretData = diffPerso;
+                        } else {
+                            p.isImpostor = false;
+                            p.secretData = sharedPerso;
+                        }
+                    });
+                } else {
+                    // Option 3 : Classique hardcore (2 persos de la super-liste)
+                    let civilPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
+                    let otherPersos = HARDCORE_CHARACTERS.filter(c => c !== civilPerso);
+                    let undercoverPerso = otherPersos[Math.floor(Math.random() * otherPersos.length)];
+
+                    let impCount = room.players.length >= 5 ? 2 : 1;
+                    let assignedIndexes = [];
+                    while(assignedIndexes.length < impCount) {
+                        let idx = Math.floor(Math.random() * room.players.length);
+                        if(!assignedIndexes.includes(idx)) {
+                            assignedIndexes.push(idx);
+                            room.players[idx].isImpostor = true;
+                        }
+                    }
+
+                    room.players.forEach((p, idx) => {
+                        p.secretData = p.isImpostor ? undercoverPerso : civilPerso;
+                    });
+                }
+            } else {
+                // Mode Normal (Paires d'animes)
+                const pair = undercoverPairs[Math.floor(Math.random() * undercoverPairs.length)];
+                let impCount = room.players.length >= 5 ? 2 : 1;
+                let assignedIndexes = [];
+                while(assignedIndexes.length < impCount) {
+                    let idx = Math.floor(Math.random() * room.players.length);
+                    if(!assignedIndexes.includes(idx)) {
+                        assignedIndexes.push(idx);
+                        room.players[idx].isImpostor = true;
+                    }
+                }
+                room.players.forEach(p => {
+                    p.secretData = p.isImpostor ? pair[1] : pair[0];
+                });
+            }
+
             room.currentTheme = "Undercover";
             room.status = 'reveal';
             io.to(room.code).emit('launch_reveal', room);
@@ -132,7 +204,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (room && room.players[room.currentThemeMasterIndex].id === socket.id) {
             room.currentTheme = theme;
-            room.status = 'gameplay'; // Corrigé pour repasser bien en gameplay
+            room.status = 'gameplay';
             io.to(roomCode).emit('theme_chosen', room);
             io.to(roomCode).emit('launch_reveal', room);
         }
@@ -145,11 +217,7 @@ io.on('connection', (socket) => {
             room.status = 'choose_theme';
             room.players.forEach(p => p.clue = '');
             room.currentTurnIndex = 0;
-
-            io.to(room.code).emit('prompt_theme_choice', {
-                room: room,
-                themeMasterId: room.players[room.currentThemeMasterIndex].id
-            });
+            io.to(room.code).emit('prompt_theme_choice', { room: room, themeMasterId: room.players[room.currentThemeMasterIndex].id });
         }
     });
 
@@ -168,11 +236,10 @@ io.on('connection', (socket) => {
             if (room.currentTurnIndex < room.players.length) {
                 io.to(roomCode).emit('update_gameplay', room);
             } else {
+                room.status = room.mode === 'note' ? 'end_clues_note' : 'end_clues_undercover';
                 if (room.mode === 'note') {
-                    room.status = 'end_clues_note';
                     io.to(roomCode).emit('prompt_end_clue_options', room);
                 } else {
-                    room.status = 'end_clues_undercover';
                     io.to(roomCode).emit('prompt_end_clue_options_undercover', room);
                 }
             }
@@ -205,63 +272,67 @@ io.on('connection', (socket) => {
         if (voterPlayer && !voterPlayer.isAlive) return;
 
         room.votes[socket.id] = targetId;
-
         let alivePlayers = room.players.filter(p => p.isAlive);
 
         if (Object.keys(room.votes).length >= alivePlayers.length) {
+            let noImpostorVotes = 0;
             let voteCounts = {};
             room.players.forEach(p => voteCounts[p.id] = 0);
 
             for (let voter in room.votes) {
                 let target = room.votes[voter];
-                if (target !== 'pass' && voteCounts[target] !== undefined) {
+                if (target === 'no_impostor') {
+                    noImpostorVotes++;
+                } else if (target !== 'pass' && voteCounts[target] !== undefined) {
                     voteCounts[target]++;
                 }
             }
 
-            let maxVotes = -1;
-            let eliminatedPlayerId = null;
-            let isTie = false;
+            let gameOver = false;
+            let winnerMessage = "";
+            let eliminatedPlayer = null;
 
-            for (let playerId in voteCounts) {
-                if (voteCounts[playerId] > maxVotes) {
-                    maxVotes = voteCounts[playerId];
-                    eliminatedPlayerId = playerId;
-                    isTie = false;
-                } else if (voteCounts[playerId] === maxVotes && maxVotes > 0) {
-                    isTie = true;
+            if (room.noImpostor && noImpostorVotes > (alivePlayers.length / 2)) {
+                gameOver = true;
+                winnerMessage = "🎉 Victoire générale ! Les joueurs ont deviné qu'il n'y avait aucun imposteur.";
+            } else {
+                let maxVotes = -1;
+                let eliminatedId = null;
+                let isTie = false;
+
+                for (let playerId in voteCounts) {
+                    if (voteCounts[playerId] > maxVotes) {
+                        maxVotes = voteCounts[playerId];
+                        eliminatedId = playerId;
+                        isTie = false;
+                    } else if (voteCounts[playerId] === maxVotes && maxVotes > 0) {
+                        isTie = true;
+                    }
+                }
+
+                if (!isTie && maxVotes > 0) {
+                    eliminatedPlayer = room.players.find(p => p.id === eliminatedId);
+                    if (eliminatedPlayer) eliminatedPlayer.isAlive = false;
+                }
+
+                let remainingAlive = room.players.filter(p => p.isAlive);
+                let aliveImpostors = remainingAlive.filter(p => p.isImpostor);
+                let aliveCivilians = remainingAlive.filter(p => !p.isImpostor);
+
+                if (room.noImpostor && eliminatedPlayer) {
+                    gameOver = true;
+                    winnerMessage = "💥 Défaite ! Vous avez éliminé quelqu'un alors qu'il n'y avait aucun imposteur.";
+                } else if (aliveImpostors.length === 0) {
+                    gameOver = true;
+                    winnerMessage = "🎉 Victoire des Civils ! Tous les imposteurs ont été éliminés.";
+                } else if (aliveImpostors.length >= aliveCivilians.length) {
+                    gameOver = true;
+                    winnerMessage = "💥 Victoire des Imposteurs !";
                 }
             }
 
-            let eliminatedPlayer = isTie ? null : room.players.find(p => p.id === eliminatedPlayerId);
-            
-            if (eliminatedPlayer) {
-                eliminatedPlayer.isAlive = false;
-            }
-
-            let remainingAlive = room.players.filter(p => p.isAlive);
-            let aliveImpostors = remainingAlive.filter(p => p.isImpostor);
-            let aliveCivilians = remainingAlive.filter(p => !p.isImpostor);
-
-            let gameOver = false;
-            let winnerMessage = "";
-
-            if (aliveImpostors.length === 0) {
-                gameOver = true;
-                winnerMessage = "🎉 Victoire des Civils ! Tous les imposteurs ont été éliminés.";
-            } else if (aliveImpostors.length >= aliveCivilians.length) {
-                gameOver = true;
-                winnerMessage = "💥 Victoire des Imposteurs ! Ils sont désormais aussi nombreux ou plus nombreux que les civils.";
-            }
-
             room.status = gameOver ? 'game_over' : 'round_result';
-            
-            io.to(roomCode).emit('show_results', { 
-                room, 
-                eliminatedPlayer, 
-                gameOver,
-                winnerMessage
-            });
+            io.to(roomCode).emit('show_results', { room, eliminatedPlayer, gameOver, winnerMessage });
         }
     });
 
@@ -272,7 +343,7 @@ io.on('connection', (socket) => {
             let aliveImpostors = remainingAlive.filter(p => p.isImpostor);
             let aliveCivilians = remainingAlive.filter(p => !p.isImpostor);
 
-            if (aliveImpostors.length === 0 || aliveImpostors.length >= aliveCivilians.length) {
+            if (room.noImpostor || aliveImpostors.length === 0 || aliveImpostors.length >= aliveCivilians.length) {
                 launchNewRound(room);
             } else {
                 room.status = 'gameplay';
@@ -293,7 +364,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(`Un joueur est parti : ${socket.id}`);
         for (let roomCode in rooms) {
             let room = rooms[roomCode];
             room.players = room.players.filter(p => p.id !== socket.id);
