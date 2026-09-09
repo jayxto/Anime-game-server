@@ -98,7 +98,6 @@ io.on('connection', (socket) => {
             p.secretData = null;
         });
 
-        // Trouve le premier joueur vivant pour commencer le tour proprement
         let firstAlive = room.players.findIndex(p => p.isAlive);
         room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
 
