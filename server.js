@@ -139,6 +139,7 @@ io.on('connection', (socket) => {
             room.currentThemeMasterIndex = (room.currentThemeMasterIndex + 1) % room.players.length;
             room.status = 'choose_theme';
             room.players.forEach(p => p.clue = '');
+            room.currentTurnIndex = 0;
 
             io.to(room.code).emit('prompt_theme_choice', {
                 room: room,
@@ -150,6 +151,9 @@ io.on('connection', (socket) => {
     socket.on('submit_clue', ({ roomCode, clue }) => {
         const room = rooms[roomCode];
         if (room) {
+            const sender = room.players.find(p => p.id === socket.id);
+            if (sender && !sender.isAlive) return;
+
             room.players[room.currentTurnIndex].clue = clue;
             
             do {
@@ -163,10 +167,20 @@ io.on('connection', (socket) => {
                     room.status = 'end_clues_note';
                     io.to(roomCode).emit('prompt_end_clue_options', room);
                 } else {
-                    room.status = 'voting';
-                    io.to(roomCode).emit('start_voting', room);
+                    room.status = 'end_clues_undercover';
+                    io.to(roomCode).emit('prompt_end_clue_options_undercover', room);
                 }
             }
+        }
+    });
+
+    socket.on('restart_clues_undercover', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (room && room.mode === 'undercover') {
+            room.players.forEach(p => p.clue = '');
+            room.currentTurnIndex = room.players.findIndex(p => p.isAlive);
+            room.status = 'gameplay';
+            io.to(roomCode).emit('resume_gameplay', room);
         }
     });
 
@@ -181,6 +195,9 @@ io.on('connection', (socket) => {
     socket.on('cast_vote', ({ roomCode, targetId }) => {
         const room = rooms[roomCode];
         if (!room) return;
+
+        const voterPlayer = room.players.find(p => p.id === socket.id);
+        if (voterPlayer && !voterPlayer.isAlive) return;
 
         room.votes[socket.id] = targetId;
 
