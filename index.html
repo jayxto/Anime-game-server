@@ -384,7 +384,7 @@
             });
 
             const me = room.players.find(p => p.id === socket.id);
-            // Si le joueur est mort ou en phase de choix de thème, il ne peut pas écrire
+            // Corrigé : Vérifie explicitement si on est en phase 'gameplay' et que le joueur est bien vivant
             if (currentTurnPlayer.id === socket.id && me && me.isAlive && room.status === 'gameplay') {
                 document.getElementById('clue-input-container').style.display = 'flex';
             } else {
