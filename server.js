@@ -33,21 +33,12 @@ const undercoverPairs = [
 ];
 
 const HARDCORE_CHARACTERS = [
-    { name: "Naruto Uzumaki (Naruto)", img: "https://i.imgur.com/83592h9.png" },
-    { name: "Sasuke Uchiwa (Naruto)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Monkey D. Luffy (One Piece)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Roronoa Zoro (One Piece)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Ichigo Kurosaki (Bleach)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Satoru Gojo (JJK)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Tanjiro Kamado (Demon Slayer)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Light Yagami (Death Note)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Eren Jäger (SNK)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Levi Ackerman (SNK)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Izuku Midoriya (MHA)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Saitama (One Punch Man)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Denji (Chainsaw Man)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Ken Kaneki (Tokyo Ghoul)", img: "https://i.imgur.com/2Y5mF58.png" },
-    { name: "Gon Freecss (Hunter x Hunter)", img: "https://i.imgur.com/2Y5mF58.png" }
+    "Naruto Uzumaki", "Sasuke Uchiwa", "Sakura Haruno", "Kakashi Hatake", "Itachi Uchiwa", 
+    "Monkey D. Luffy", "Roronoa Zoro", "Nami", "Sanji", "Trafalgar Law", 
+    "Ichigo Kurosaki", "Rukia Kuchiki", "Sosuke Aizen", "Satoru Gojo", "Yuji Itadori", 
+    "Ryomen Sukuna", "Tanjiro Kamado", "Nezuko Kamado", "Muzan Kibutsuji", "Light Yagami", 
+    "Eren Jäger", "Levi Ackerman", "Izuku Midoriya", "Katsuki Bakugo", "Saitama", 
+    "Denji", "Makima", "Ken Kaneki", "Gon Freecss", "Killua Zoldyck"
 ];
 
 io.on('connection', (socket) => {
@@ -143,7 +134,7 @@ io.on('connection', (socket) => {
                 } else if (scenario < 0.55) {
                     const sharedPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
                     const impIdx = Math.floor(Math.random() * room.players.length);
-                    const diffPerso = HARDCORE_CHARACTERS.filter(c => c.name !== sharedPerso.name)[Math.floor(Math.random() * (HARDCORE_CHARACTERS.length - 1))];
+                    const diffPerso = HARDCORE_CHARACTERS.filter(c => c !== sharedPerso)[Math.floor(Math.random() * (HARDCORE_CHARACTERS.length - 1))];
                     
                     room.players.forEach((p, idx) => {
                         if (idx === impIdx) {
@@ -156,7 +147,7 @@ io.on('connection', (socket) => {
                     });
                 } else {
                     let civilPerso = HARDCORE_CHARACTERS[Math.floor(Math.random() * HARDCORE_CHARACTERS.length)];
-                    let otherPersos = HARDCORE_CHARACTERS.filter(c => c.name !== civilPerso.name);
+                    let otherPersos = HARDCORE_CHARACTERS.filter(c => c !== civilPerso);
                     let undercoverPerso = otherPersos[Math.floor(Math.random() * otherPersos.length)];
 
                     let impCount = room.players.length >= 5 ? 2 : 1;
@@ -344,7 +335,8 @@ io.on('connection', (socket) => {
                 room.status = 'gameplay';
                 room.votes = {};
                 room.players.forEach(p => p.clue = '');
-                room.currentTurnIndex = room.players.findIndex(p => p.isAlive);
+                let firstAlive = room.players.findIndex(p => p.isAlive);
+                room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
                 io.to(roomCode).emit('resume_gameplay', room);
             }
         }
