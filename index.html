@@ -325,9 +325,7 @@
             currentThemeMasterId = data.themeMasterId;
             const me = data.room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                let txt = typeof me.secretData === 'object' ? me.secretData.name : me.secretData;
-                let img = typeof me.secretData === 'object' && me.secretData.img ? `<br><img src="${me.secretData.img}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--accent-cyan);">` : '';
-                document.getElementById('my-secret-display').innerHTML = `Note attribuée : <strong>${txt}</strong>${img}`;
+                document.getElementById('my-secret-display').innerText = `Note attribuée : ${me.secretData}`;
             }
 
             if (socket.id === currentThemeMasterId) {
@@ -359,9 +357,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                let txt = typeof me.secretData === 'object' ? me.secretData.name : me.secretData;
-                let img = typeof me.secretData === 'object' && me.secretData.img ? `<br><img src="${me.secretData.img}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--accent-cyan);">` : '';
-                document.getElementById('my-secret-display').innerHTML = `${room.currentTheme} ➔ <strong>${txt}</strong>${img}`;
+                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
             }
             updateGameplayUI(room);
         });
@@ -376,9 +372,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                let txt = typeof me.secretData === 'object' ? me.secretData.name : me.secretData;
-                let img = typeof me.secretData === 'object' && me.secretData.img ? `<br><img src="${me.secretData.img}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--accent-cyan);">` : '';
-                document.getElementById('my-secret-display').innerHTML = `${room.currentTheme} ➔ <strong>${txt}</strong>${img}`;
+                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
             }
             updateGameplayUI(room);
         });
@@ -386,8 +380,10 @@
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             
-            if (room.currentTurnIndex >= room.players.length) {
-                room.currentTurnIndex = room.players.findIndex(p => p.isAlive);
+            // Sécurité robuste : s'assure qu'on pointe sur un joueur vivant valide
+            if (room.currentTurnIndex >= room.players.length || !room.players[room.currentTurnIndex].isAlive) {
+                let firstAlive = room.players.findIndex(p => p.isAlive);
+                if (firstAlive !== -1) room.currentTurnIndex = firstAlive;
             }
 
             const currentTurnPlayer = room.players[room.currentTurnIndex];
@@ -551,9 +547,8 @@
                 let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
                 let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
-                let secretTxt = p.secretData && typeof p.secretData === 'object' ? ` - ${p.secretData.name}` : '';
-                let secretImg = p.secretData && typeof p.secretData === 'object' && p.secretData.img ? `<img src="${p.secretData.img}" style="width:25px; height:25px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-left:8px;">` : '';
-                list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}${secretImg}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
+                let secretTxt = p.secretData ? ` (${p.secretData})` : '';
+                list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
 
