@@ -176,12 +176,13 @@ io.on('connection', (socket) => {
         room.status = 'reveal';
         room.noImpostor = false;
 
+        const totalPlayers = room.players.length;
+
         if (room.mode === 'undercover') {
             if (room.subMode === 'hardcore') {
                 const randChance = Math.random();
-                if (randChance < 0.25) {
+                if (randChance < 0.05) { // 5% de chance
                     room.noImpostor = true;
-                    // Pioche un perso aléatoire dans le pool hardcore pour tout le monde
                     const defaultWord = undercoverHardcorePool[Math.floor(Math.random() * undercoverHardcorePool.length)];
                     room.players.forEach(p => {
                         p.isImpostor = false;
@@ -194,9 +195,28 @@ io.on('connection', (socket) => {
                 assignUndercoverNormalWords(room);
             }
         } else if (room.mode === 'note') {
-            room.players.forEach(p => {
-                p.secretData = Math.floor(Math.random() * 10) + 1 + "/10";
-                p.isImpostor = false;
+            // Logique de notes adaptée pour 3 ou 5 joueurs
+            const baseNote = Math.floor(Math.random() * 8) + 1; // Note civils entre 1 et 8
+            const differentNote = baseNote + (Math.random() > 0.5 ? 2 : -2); // Note différente
+            const safeDifferentNote = Math.max(1, Math.min(10, differentNote));
+
+            // Mélanger les indices des joueurs
+            const shuffledIndices = [...Array(totalPlayers).keys()].sort(() => Math.random() - 0.5);
+
+            let impostorCount = 1;
+            if (totalPlayers >= 5) {
+                impostorCount = 2; // 2 personnes avec la note différente si 5 joueurs ou plus
+            }
+
+            const impostorIndices = shuffledIndices.slice(0, impostorCount);
+
+            room.players.forEach((p, idx) => {
+                p.isImpostor = impostorIndices.includes(idx);
+                if (p.isImpostor) {
+                    p.secretData = safeDifferentNote + "/10";
+                } else {
+                    p.secretData = baseNote + "/10";
+                }
             });
         }
 
@@ -228,7 +248,6 @@ io.on('connection', (socket) => {
     }
 
     function assignUndercoverHardcoreWords(room) {
-        // En hardcore, on prend 2 persos différents au hasard dans la liste globale
         let idx1 = Math.floor(Math.random() * undercoverHardcorePool.length);
         let idx2 = Math.floor(Math.random() * undercoverHardcorePool.length);
         while (idx2 === idx1) {
@@ -346,14 +365,22 @@ io.on('connection', (socket) => {
         let gameOver = false;
         let winnerMessage = "";
 
-        if (room.noImpostor && eliminatedTargetId === 'no_impostor') {
+        // Règle Undercover Hardcore : si 3 joueurs, la partie se termine dès qu'on vote
+        if (room.subMode === 'hardcore' && room.players.length === 3) {
+            gameOver = true;
+            winnerMessage = "🏁 Fin de la partie Undercover Hardcore (3 joueurs) ! Le vote est tombé.";
+        } else if (room.noImpostor && eliminatedTargetId === 'no_impostor') {
             gameOver = true;
             winnerMessage = "🎉 Les innocents ont gagné ! Ils ont deviné qu'il n'y avait aucun imposteur.";
         } else if (room.mode === 'undercover') {
             const impostorsAlive = room.players.filter(p => p.isAlive && p.isImpostor);
             const civilsAlive = room.players.filter(p => p.isAlive && !p.isImpostor);
 
-            if (impostorsAlive.length === 0) {
+            // Règle : si 5 joueurs, la partie se termine dès que les 2 imposteurs sont morts
+            if (room.players.length >= 5 && impostorsAlive.length === 0) {
+                gameOver = true;
+                winnerMessage = "🎉 Victoire des Innocents ! Les 2 imposteurs ont été éliminés.";
+            } else if (impostorsAlive.length === 0) {
                 gameOver = true;
                 winnerMessage = "🎉 Victoire des Innocents ! L'imposteur a été éliminé.";
             } else if (impostorsAlive.length >= civilsAlive.length) {
