@@ -3,250 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Game</title>
+    <title>Anime Game - Multijoueur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0b0b10;
+            --panel-color: #161622;
+            --accent-pink: #ff2a5f;
+            --accent-cyan: #00f0ff;
+            --accent-yellow: #ffe600;
+            --text-color: #ffffff;
+            --text-muted: #a0a0b0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background-color: #0f0f13;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 20%, #1a1a2e 0%, var(--bg-color) 80%);
+        }
+
+        header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            padding: 15px 5%;
+            background: rgba(22, 22, 34, 0.9);
+            border-bottom: 3px solid var(--accent-pink);
         }
-        h1 {
-            color: #ffcc00;
-            font-style: italic;
-            margin-bottom: 5px;
+
+        .logo {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            color: var(--accent-yellow);
+            text-shadow: 3px 3px 0px var(--accent-pink);
         }
-        .subtitle {
-            color: #aaa;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 14px;
-        }
-        .main-container {
-            width: 100%;
-            max-width: 450px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .card {
-            background: #181824;
-            border: 2px solid #28283d;
-            border-radius: 12px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .card h2 {
-            color: #ffcc00;
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 15px;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        input {
-            background: #232333;
-            color: white;
-            border: 1px solid #3a3a55;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        input::placeholder {
-            color: #777799;
-        }
-        .btn-join {
-            background: #ff4757;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+
+        nav ul { display: flex; list-style: none; gap: 10px; }
+        nav button {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 8px 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
-            width: 100%;
+            text-transform: uppercase;
         }
-        .btn-join:hover {
-            background: #ff6b81;
+        nav button.active { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 240, 255, 0.05); }
+
+        .tab-content { display: none; padding: 30px 5%; }
+        .tab-content.active { display: block; }
+
+        h2 {
+            font-family: 'Bangers', cursive;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--accent-yellow);
+            text-shadow: 2px 2px 0px var(--accent-pink);
         }
-        .modes-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+
+        p { color: var(--text-muted); margin-bottom: 20px; }
+
+        .game-panel {
+            background: var(--panel-color);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
+            display: none;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
         }
-        .mode-card {
-            background: #212130;
-            border: 1px solid #33334d;
-            border-radius: 10px;
+
+        .room-code-box {
+            background: #0b0b10;
+            border: 2px dashed var(--accent-yellow);
             padding: 15px;
+            font-size: 1.8rem;
+            font-family: 'Bangers', cursive;
+            color: var(--accent-yellow);
+            letter-spacing: 4px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .player-list {
+            list-style: none;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .player-list li {
+            background: #11111a;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-left: 4px solid var(--accent-pink);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .mode-info h3 {
-            margin: 0 0 5px 0;
-            color: #fff;
-            font-size: 16px;
-        }
-        .mode-info p {
-            margin: 0;
-            color: #8888aa;
-            font-size: 12px;
-        }
-        .btn-create {
-            background: #ff4757;
+
+        .btn-action {
+            background: var(--accent-pink);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 12px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 10px;
         }
-        .btn-create:hover {
-            background: #ff6b81;
+        .btn-action:hover { background: #e01a4f; }
+
+        .chat-input-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
-        .hidden {
-            display: none !important;
+        .chat-input-box input {
+            flex: 1;
+            background: #0b0b10;
+            border: 1px solid var(--text-muted);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
-    <h1>ANIME GAME</h1>
-    <div class="subtitle">Crée ou rejoins une salle avec tes amis.</div>
+    <header>
+        <div class="logo">ANIME GAME</div>
+        <nav>
+            <ul>
+                <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
+                <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
+            </ul>
+        </nav>
+    </header>
 
-    <div class="main-container" id="menuContainer">
-        <!-- Bloc Rejoindre une salle (avec pseudo en dessous du code comme tu le souhaites) -->
-        <div class="card">
-            <h2>Rejoindre une salle</h2>
-            <div class="input-group">
-                <input type="text" id="roomCodeInput" placeholder="CODE (EX: AB12)">
-                <input type="text" id="usernameInput" placeholder="Ton pseudo">
-                <button class="btn-join" onclick="joinExistingRoom()">Rejoindre</button>
+    <section id="mode" class="tab-content active">
+        <div id="menu-selection" style="max-width: 600px; margin: 0 auto; text-align: center;">
+            <h2>Mode Multijoueur</h2>
+            <p>Crée ou rejoins une salle avec tes amis.</p>
+            
+            <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #2a2a40;">
+                <h3 style="margin-bottom: 10px; color: var(--accent-cyan);">Rejoindre une salle</h3>
+                <div class="chat-input-box">
+                    <input type="text" id="join-code-input" placeholder="Code (ex: AB12)" style="text-transform: uppercase;">
+                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoomByCode()">Rejoindre</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Bloc Création des modes séparés -->
-        <div class="card">
-            <h2>Créer une partie</h2>
-            <div class="modes-grid">
+            <!-- Grille des modes séparés -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                 <!-- Undercover Normal -->
-                <div class="mode-card">
-                    <div class="mode-info">
-                        <h3>Undercover</h3>
-                        <p>Normal (Paires classiques)</p>
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Undercover Normal</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Paires classiques</p>
                     </div>
-                    <button class="btn-create" onclick="createNewRoom('undercover', 'normal')">Créer</button>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('undercover', 'normal')">Créer</button>
                 </div>
 
                 <!-- Undercover Hardcore -->
-                <div class="mode-card">
-                    <div class="mode-info">
-                        <h3>Undercover</h3>
-                        <p>Hardcore (Multi-animes + Sans imposteur)</p>
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Undercover Hardcore</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Multi-animes + Sans imposteur</p>
                     </div>
-                    <button class="btn-create" onclick="createNewRoom('undercover', 'hardcore')">Créer</button>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('undercover', 'hardcore')">Créer</button>
                 </div>
 
                 <!-- Devine la note -->
-                <div class="mode-card">
-                    <div class="mode-info">
-                        <h3>Devine la note</h3>
-                        <p>Mode classique</p>
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Devine la note</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Mode classique</p>
                     </div>
-                    <button class="btn-create" onclick="createNewRoom('note', 'normal')">Créer</button>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('note', 'normal')">Créer</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Conteneur du salon d'attente (jeu) -->
-    <div id="gameContainer" class="hidden" style="width: 100%; max-width: 450px;">
-        <div class="card" style="text-align: center;">
-            <h2 id="roomDisplayCode"></h2>
-            <div id="playerList" style="margin: 15px 0; text-align: left;"></div>
-            <button id="startGameBtn" class="btn-join hidden" onclick="startGame()">Lancer la partie</button>
+        <div id="waiting-room" class="game-panel">
+            <h2>Salon d'attente</h2>
+            <p>Donne ce code à tes amis :</p>
+            <div class="room-code-box" id="display-room-code">#----</div>
+            
+            <p>Joueurs connectés :</p>
+            <ul class="player-list" id="waiting-players-list"></ul>
+
+            <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
         </div>
-    </div>
 
-    <!-- Script Socket.io -->
+        <div id="gameplay-room" class="game-panel">
+            <h2 id="game-phase-title">Partie en cours</h2>
+            <p id="game-info-text">Indice ou Action</p>
+
+            <div id="theme-selection-container" style="display:none; margin: 15px 0; background: #11111a; padding: 15px; border-radius: 8px; border: 1px solid var(--accent-yellow); text-align: left;">
+                <p style="color: var(--accent-yellow); margin-bottom: 8px;" id="theme-master-prompt">C'est à toi de choisir le thème de ce tour !</p>
+                <div class="chat-input-box" style="margin-top:0;">
+                    <input type="text" id="custom-theme-input" placeholder="Ex: Personnages de Naruto, Arc Marineford...">
+                    <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitCustomTheme()">Valider</button>
+                </div>
+            </div>
+
+            <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
+                <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
+            </div>
+
+            <ul class="player-list" id="gameplay-players-list"></ul>
+
+            <div class="chat-input-box" id="clue-input-container" style="display:none;">
+                <input type="text" id="clue-input" placeholder="Écris ton indice...">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
+            </div>
+
+            <div id="end-clues-options" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestChangeTheme()">🔄 Changer de thème</button>
+                <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVote()">⚖️ Passer au vote</button>
+            </div>
+
+            <div id="end-clues-options-undercover" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestRestartClues()">🔄 Réécrire un mot</button>
+                <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVoteFromUndercover()">⚖️ Passer au vote</button>
+            </div>
+
+            <div id="pass-vote-container" style="display:none; margin-top: 15px;">
+                <button class="btn-action" style="background: var(--text-muted);" onclick="castVote('pass')">Passer mon vote</button>
+            </div>
+
+            <div id="end-game-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer (Nouvelle manche)</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="options" class="tab-content">
+        <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
+            <h2>Options</h2>
+            <p>Ton Pseudo :</p>
+            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
+        </div>
+    </section>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let currentRoomData = null;
+        let currentRoomCode = "";
+        let currentThemeMasterId = "";
 
-        function createNewRoom(mode, subMode) {
-            let username = document.getElementById('usernameInput').value.trim();
-            if (!username) {
-                alert("Entre ton pseudo avant de créer une salle !");
-                return;
-            }
-            // Génère un code aléatoire si aucun code n'est saisi dans l'input du haut
-            let roomCode = document.getElementById('roomCodeInput').value.trim();
-            if (!roomCode) {
-                roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-                document.getElementById('roomCodeInput').value = roomCode;
-            }
-
-            socket.emit('join_room', { roomCode, username, mode, subMode });
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        function joinExistingRoom() {
-            let username = document.getElementById('usernameInput').value.trim();
-            let roomCode = document.getElementById('roomCodeInput').value.trim();
-            if (!username || !roomCode) {
-                alert("Entre ton pseudo et un code de salle !");
-                return;
-            }
-            socket.emit('join_room', { roomCode, username, mode: 'undercover', subMode: 'normal' });
+        function getUsername() {
+            return document.getElementById('username-input').value.trim() || "Anonyme";
         }
 
-        function startGame() {
-            if (currentRoomData) {
-                socket.emit('start_game', currentRoomData.code);
+        function hideAllPanels() {
+            document.getElementById('menu-selection').style.display = 'none';
+            document.getElementById('waiting-room').style.display = 'none';
+            document.getElementById('gameplay-room').style.display = 'none';
+            document.getElementById('theme-selection-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            document.getElementById('pass-vote-container').style.display = 'none';
+            document.getElementById('end-game-buttons').style.display = 'none';
+        }
+
+        function createRoom(mode, subMode = 'normal') {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let code = "";
+            for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            
+            currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: mode, subMode: subMode });
+        }
+
+        function joinRoomByCode() {
+            const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+            if (code.length < 4) {
+                alert("Entre un code valide à 4 caractères !");
+                return;
             }
+            currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover', subMode: 'normal' });
         }
 
         socket.on('update_room', (room) => {
-            currentRoomData = room;
-            document.getElementById('menuContainer').classList.add('hidden');
-            document.getElementById('gameContainer').classList.remove('hidden');
-            document.getElementById('roomDisplayCode').innerText = `Salle : ${room.code}`;
+            hideAllPanels();
+            document.getElementById('waiting-room').style.display = 'block';
+            document.getElementById('display-room-code').innerText = "#" + room.code;
 
-            let listHtml = '<strong>Joueurs connectés :</strong><ul style="padding-left: 20px; margin-top: 5px;">';
+            const list = document.getElementById('waiting-players-list');
+            list.innerHTML = "";
             room.players.forEach(p => {
-                listHtml += `<li>${p.name} ${p.id === room.host ? '👑' : ''}</li>`;
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:#00ff88">Prêt</span></li>`;
             });
-            listHtml += '</ul>';
-            document.getElementById('playerList').innerHTML = listHtml;
 
-            if (room.host === socket.id && room.status === 'waiting') {
-                document.getElementById('startGameBtn').classList.remove('hidden');
+            if (room.host === socket.id) {
+                document.getElementById('btn-start-game').style.display = 'block';
             } else {
-                document.getElementById('startGameBtn').classList.add('hidden');
+                document.getElementById('btn-start-game').style.display = 'none';
             }
         });
 
-        socket.on('launch_reveal', (room) => {
-            alert("La partie est lancée !");
+        function startGame() {
+            socket.emit('start_game', currentRoomCode);
+        }
+
+        socket.on('prompt_theme_choice', (data) => {
+            hideAllPanels();
+            document.getElementById('gameplay-room').style.display = 'block';
+            document.getElementById('game-phase-title').innerText = "Choix du Thème";
+            
+            currentThemeMasterId = data.themeMasterId;
+            const me = data.room.players.find(p => p.id === socket.id);
+            if (me && me.secretData) {
+                document.getElementById('my-secret-display').innerText = `Note attribuée : ${me.secretData}`;
+            }
+
+            if (socket.id === currentThemeMasterId) {
+                document.getElementById('game-info-text').innerText = "C'est à ton tour de choisir le sujet à noter !";
+                document.getElementById('theme-selection-container').style.display = 'block';
+            } else {
+                const master = data.room.players.find(p => p.id === currentThemeMasterId);
+                document.getElementById('game-info-text').innerText = `En attente du choix de thème par : ${master ? master.name : 'un joueur'}`;
+            }
         });
+
+        function submitCustomTheme() {
+            const themeText = document.getElementById('custom-theme-input').value.trim();
+            if (!themeText) {
+                alert("Entre un thème valide !");
+                return;
+            }
+            socket.emit('submit_custom_theme', { roomCode: currentRoomCode, theme: themeText });
+            document.getElementById('custom-theme-input').value = "";
+        }
+
+        socket.on('theme_chosen', () => {
+            document.getElementById('theme-selection-container').style.display = 'none';
+        });
+
+        socket.on('launch_reveal', (room) => {
+            hideAllPanels();
+            document.getElementById('gameplay-room').style.display = 'block';
+            
+            const me = room.players.find(p => p.id === socket.id);
+            if (me && me.secretData) {
+                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+            }
+            updateGameplayUI(room);
+        });
+
+        socket.on('update_gameplay', (room) => {
+            updateGameplayUI(room);
+        });
+
+        socket.on('resume_gameplay', (room) => {
+            hideAllPanels();
+            document.getElementById('gameplay-room').style.display = 'block';
+            
+            const me = room.players.find(p => p.id === socket.id);
+            if (me && me.secretData) {
+                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+            }
+            updateGameplayUI(room);
+        });
+
+        function updateGameplayUI(room) {
+            document.getElementById('game-phase-title').innerText = "Tour de parole";
+            
+            if (room.currentTurnIndex >= room.players.length || !room.players[room.currentTurnIndex].isAlive) {
+                let firstAlive = room.players.findIndex(p => p.isAlive);
+                if (firstAlive !== -1) room.currentTurnIndex = firstAlive;
+            }
+
+            const currentTurnPlayer = room.players[room.currentTurnIndex];
+            document.getElementById('game-info-text').innerText = `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}`;
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach((p, idx) => {
+                if (!p.isAlive) return;
+                let status = p.clue ? `💬 "${p.clue}"` : (idx === room.currentTurnIndex ? "En train d'écrire..." : "En attente");
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
+            });
+
+            const me = room.players.find(p => p.id === socket.id);
+            if (currentTurnPlayer && currentTurnPlayer.id === socket.id && me && me.isAlive) {
+                document.getElementById('clue-input-container').style.display = 'flex';
+            } else {
+                document.getElementById('clue-input-container').style.display = 'none';
+            }
+        }
+
+        function submitClue() {
+            const clue = document.getElementById('clue-input').value.trim();
+            if (!clue) return;
+            socket.emit('submit_clue', { roomCode: currentRoomCode, clue: clue });
+            document.getElementById('clue-input').value = "";
+        }
+
+        socket.on('prompt_end_clue_options', (room) => {
+            document.getElementById('game-phase-title').innerText = "Fin des indices";
+            document.getElementById('game-info-text').innerText = `Tous les indices ont été donnés. Que voulez-vous faire ?`;
+            document.getElementById('clue-input-container').style.display = 'none';
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (!p.isAlive) return;
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+            });
+
+            document.getElementById('end-clues-options').style.display = 'flex';
+        });
+
+        socket.on('prompt_end_clue_options_undercover', (room) => {
+            document.getElementById('game-phase-title').innerText = "Fin des indices";
+            document.getElementById('game-info-text').innerText = `Tous les indices ont été donnés. Que voulez-vous faire ?`;
+            document.getElementById('clue-input-container').style.display = 'none';
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (!p.isAlive) return;
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+            });
+
+            document.getElementById('end-clues-options-undercover').style.display = 'flex';
+        });
+
+        function requestChangeTheme() {
+            document.getElementById('end-clues-options').style.display = 'none';
+            socket.emit('change_theme_mid_game', { roomCode: currentRoomCode });
+        }
+
+        function proceedToVote() {
+            document.getElementById('end-clues-options').style.display = 'none';
+            socket.emit('force_start_voting', { roomCode: currentRoomCode });
+        }
+
+        function requestRestartClues() {
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            socket.emit('restart_clues_undercover', { roomCode: currentRoomCode });
+        }
+
+        function proceedToVoteFromUndercover() {
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            socket.emit('force_start_voting', { roomCode: currentRoomCode });
+        }
+
+        socket.on('start_voting', (room) => {
+            document.getElementById('game-phase-title').innerText = "Phase de Vote";
+            document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
+            document.getElementById('clue-input-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+
+            const me = room.players.find(p => p.id === socket.id);
+            if (me && me.isAlive) {
+                document.getElementById('pass-vote-container').style.display = 'block';
+            } else {
+                document.getElementById('pass-vote-container').style.display = 'none';
+            }
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (!p.isAlive) return;
+                let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
+                
+                if (p.id !== socket.id && me && me.isAlive) {
+                    list.innerHTML += `<li>
+                        <div>
+                            <strong>${p.name}</strong><br>
+                            <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
+                        </div>
+                        <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
+                    </li>`;
+                } else {
+                    list.innerHTML += `<li>
+                        <div>
+                            <strong>${p.name} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
+                            <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
+                        </div>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">${!me.isAlive ? 'Éliminé' : 'Toi'}</span>
+                    </li>`;
+                }
+            });
+
+            if (room.mode === 'undercover' && room.subMode === 'hardcore' && me && me.isAlive) {
+                list.innerHTML += `<li style="border-left-color: var(--accent-yellow);">
+                    <div><strong>🕵️ Option Hardcore</strong><br><span style="color:var(--accent-yellow); font-size:0.85rem;">Tout le monde a le même perso / Pas d'imposteur</span></div>
+                    <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-yellow); color:black;" onclick="castVote('no_impostor')">Pas d'imposteur</button>
+                </li>`;
+            }
+        });
+
+        function castVote(targetId) {
+            socket.emit('cast_vote', { roomCode: currentRoomCode, targetId: targetId });
+            document.getElementById('game-info-text').innerText = "Vote enregistré ! En attente des autres joueurs...";
+            document.getElementById('pass-vote-container').style.display = 'none';
+            document.querySelectorAll('.player-list button').forEach(b => b.disabled = true);
+        }
+
+        socket.on('show_results', (data) => {
+            document.getElementById('game-phase-title').innerText = data.gameOver ? "Fin de la Partie" : "Résultats du Tour";
+            document.getElementById('pass-vote-container').style.display = 'none';
+            document.getElementById('clue-input-container').style.display = 'none';
+            document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            
+            let resultMessage = "";
+            if (data.eliminatedPlayer) {
+                let roleInfo = data.gameOver ? (data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>") : "<span style='color:var(--text-muted)'>Rôle secret masqué</span>";
+                resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
+            } else {
+                resultMessage += `Égalité ou vote « Pas d'imposteur » validé.<br><br>`;
+            }
+
+            if (data.gameOver) {
+                resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
+                document.getElementById('end-game-buttons').style.display = 'flex';
+            } else {
+                resultMessage += `<span style="color: var(--accent-cyan);">Prochain tour dans 4 secondes...</span>`;
+                setTimeout(() => { socket.emit('next_step_game', currentRoomCode); }, 4000);
+            }
+
+            document.getElementById('game-info-text').innerHTML = resultMessage;
+            
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            data.room.players.forEach(p => {
+                let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
+                let statusText = p.isAlive ? "En vie" : "Éliminé";
+                let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
+                let secretTxt = p.secretData ? ` (${p.secretData})` : '';
+                list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
+            });
+        });
+
+        function nextStepGame() { socket.emit('next_step_game', currentRoomCode); }
+        function backToMenu() { socket.emit('back_to_menu', currentRoomCode); }
     </script>
 </body>
 </html>
