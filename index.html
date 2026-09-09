@@ -165,14 +165,6 @@
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
-                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Roland-Garros 🎾</h3>
-                        <p style="margin: 0; font-size: 0.85rem;">Mode Undercover spécial Tennis</p>
-                    </div>
-                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px; background: #ff7700;" onclick="createRoom('roland', 'normal')">Créer</button>
-                </div>
-
-                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
-                    <div>
                         <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Undercover Normal</h3>
                         <p style="margin: 0; font-size: 0.85rem;">Paires classiques</p>
                     </div>
@@ -370,7 +362,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                if (room.mode === 'undercover' || room.mode === 'roland') {
+                if (room.mode === 'undercover') {
                     document.getElementById('my-secret-display').innerText = `${me.secretData}`;
                 } else {
                     document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
@@ -389,7 +381,7 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                if (room.mode === 'undercover' || room.mode === 'roland') {
+                if (room.mode === 'undercover') {
                     document.getElementById('my-secret-display').innerText = `${me.secretData}`;
                 } else {
                     document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
@@ -407,7 +399,7 @@
             }
 
             const currentTurnPlayer = room.players[room.currentTurnIndex];
-            let displayHeader = (room.mode === 'undercover' || room.mode === 'roland') ? `C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}` : `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}`;
+            let displayHeader = room.mode === 'undercover' ? `C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}` : `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}`;
             document.getElementById('game-info-text').innerText = displayHeader;
 
             const list = document.getElementById('gameplay-players-list');
