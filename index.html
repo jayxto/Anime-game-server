@@ -209,9 +209,16 @@
                 <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitClue()">Valider</button>
             </div>
 
+            <!-- Options à la fin des indices (Mode Note) -->
             <div id="end-clues-options" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
-                <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestChangeTheme()">🔄 Changer de thème (Un autre joueur choisit)</button>
+                <button class="btn-action" id="btn-change-theme" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestChangeTheme()">🔄 Changer de thème (Un autre joueur choisit)</button>
                 <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVote()">⚖️ Passer au vote</button>
+            </div>
+
+            <!-- Options à la fin des indices (Mode Undercover) -->
+            <div id="end-clues-options-undercover" style="display:none; margin-top: 15px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: var(--accent-yellow); color: black; margin-top:0;" onclick="requestRestartClues()">🔄 Réécrire un mot</button>
+                <button class="btn-action" style="background: var(--accent-pink); margin-top:0;" onclick="proceedToVoteFromUndercover()">⚖️ Passer au vote</button>
             </div>
 
             <div id="pass-vote-container" style="display:none; margin-top: 15px;">
@@ -256,6 +263,7 @@
             document.getElementById('gameplay-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
         }
@@ -375,7 +383,9 @@
                 list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
             });
 
-            if (currentTurnPlayer.id === socket.id) {
+            const me = room.players.find(p => p.id === socket.id);
+            // Si le joueur est mort ou en phase de choix de thème, il ne peut pas écrire
+            if (currentTurnPlayer.id === socket.id && me && me.isAlive && room.status === 'gameplay') {
                 document.getElementById('clue-input-container').style.display = 'flex';
             } else {
                 document.getElementById('clue-input-container').style.display = 'none';
@@ -404,6 +414,21 @@
             document.getElementById('end-clues-options').style.display = 'flex';
         });
 
+        socket.on('prompt_end_clue_options_undercover', (room) => {
+            document.getElementById('game-phase-title').innerText = "Fin des indices";
+            document.getElementById('game-info-text').innerText = `Tous les indices ont été donnés pour l'Undercover. Que voulez-vous faire ?`;
+            document.getElementById('clue-input-container').style.display = 'none';
+
+            const list = document.getElementById('gameplay-players-list');
+            list.innerHTML = "";
+            room.players.forEach(p => {
+                if (!p.isAlive) return;
+                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+            });
+
+            document.getElementById('end-clues-options-undercover').style.display = 'flex';
+        });
+
         function requestChangeTheme() {
             document.getElementById('end-clues-options').style.display = 'none';
             socket.emit('change_theme_mid_game', { roomCode: currentRoomCode });
@@ -414,19 +439,37 @@
             socket.emit('force_start_voting', { roomCode: currentRoomCode });
         }
 
+        function requestRestartClues() {
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            socket.emit('restart_clues_undercover', { roomCode: currentRoomCode });
+        }
+
+        function proceedToVoteFromUndercover() {
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+            socket.emit('force_start_voting', { roomCode: currentRoomCode });
+        }
+
         socket.on('start_voting', (room) => {
             document.getElementById('game-phase-title').innerText = "Phase de Vote";
             document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
             document.getElementById('clue-input-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
-            document.getElementById('pass-vote-container').style.display = 'block';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
+
+            const me = room.players.find(p => p.id === socket.id);
+            if (me && me.isAlive) {
+                document.getElementById('pass-vote-container').style.display = 'block';
+            } else {
+                document.getElementById('pass-vote-container').style.display = 'none';
+            }
 
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
                 let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
-                if (p.id !== socket.id) {
+                
+                if (p.id !== socket.id && me && me.isAlive) {
                     list.innerHTML += `<li>
                         <div>
                             <strong>${p.name}</strong><br>
@@ -437,10 +480,10 @@
                 } else {
                     list.innerHTML += `<li>
                         <div>
-                            <strong>${p.name} (Toi)</strong><br>
+                            <strong>${p.name} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
                         </div>
-                        <span style="color:var(--text-muted); font-size:0.85rem;">Toi</span>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">${!me.isAlive ? 'Éliminé (Spectateur)' : 'Toi'}</span>
                     </li>`;
                 }
             });
@@ -458,10 +501,10 @@
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('clue-input-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
+            document.getElementById('end-clues-options-undercover').style.display = 'none';
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
-                // MODIFICATION : On ne révèle pas si c'était un imposteur lors des votes intermédiaires
                 let roleInfo = "";
                 if (data.gameOver) {
                     roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
@@ -490,13 +533,10 @@
             data.room.players.forEach(p => {
                 let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
-                
-                // CORRECTION PRINCIPALE : On n'affiche le rôle textuel [IMPOSTEUR] ou [CIVIL] que si data.gameOver est vrai
                 let roleText = "";
                 if (data.gameOver) {
                     roleText = p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]";
                 }
-                
                 list.innerHTML += `<li><span>${p.name}${roleText}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
