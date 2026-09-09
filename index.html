@@ -136,6 +136,49 @@
             border-radius: 4px;
         }
     </style>
+
+    <!-- SDK Firebase Client -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, OAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // ⚠️ Remplis avec ta configuration Firebase Web récupérée depuis ta console
+        const firebaseConfig = {
+            apiKey: "TA_API_KEY",
+            authDomain: "TON_PROJET.firebaseapp.com",
+            projectId: "TON_PROJET",
+            storageBucket: "TON_PROJET.appspot.com",
+            messagingSenderId: "ID_SENDER",
+            appId: "APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.loginWithGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch((error) => console.error(error));
+        };
+
+        window.loginWithApple = function() {
+            const provider = new OAuthProvider('apple.com');
+            signInWithPopup(auth, provider).catch((error) => console.error(error));
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const usernameInput = document.getElementById('username-input');
+                if (user.displayName && usernameInput.value === "OtakuGamer") {
+                    usernameInput.value = user.displayName;
+                }
+                window.firebaseUserToken = await user.getIdToken();
+                document.getElementById('auth-status-container').innerHTML = `Connecté : <b>${user.displayName || user.email}</b>`;
+            } else {
+                window.firebaseUserToken = null;
+                document.getElementById('auth-status-container').innerHTML = `Mode Invité (Non connecté)`;
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -144,7 +187,7 @@
         <nav>
             <ul>
                 <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
-                <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
+                <li><button onclick="switchTab('options')" id="btn-options">Profil & Compte</button></li>
             </ul>
         </nav>
     </header>
@@ -246,9 +289,16 @@
     </section>
 
     <section id="options" class="tab-content">
-        <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
-            <h2>Options</h2>
-            <p>Ton Pseudo :</p>
+        <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px; text-align: center;">
+            <h2>Mon Profil & Connexion</h2>
+            <p id="auth-status-container" style="margin-bottom: 15px; color: var(--accent-cyan);">Vérification...</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                <button class="btn-action" style="background: #db4437; margin-top:0;" onclick="loginWithGoogle()">Se connecter avec Google</button>
+                <button class="btn-action" style="background: #ffffff; color: black; margin-top:0;" onclick="loginWithApple()">Se connecter avec Apple</button>
+            </div>
+
+            <p style="text-align: left; margin-bottom: 5px;">Ton Pseudo en jeu :</p>
             <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
         </div>
     </section>
@@ -287,7 +337,13 @@
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             
             currentRoomCode = code;
-            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: mode, subMode: subMode });
+            socket.emit('join_room', { 
+                roomCode: code, 
+                username: getUsername(), 
+                mode: mode, 
+                subMode: subMode, 
+                firebaseToken: window.firebaseUserToken || null 
+            });
         }
 
         function joinRoomByCode() {
@@ -297,7 +353,13 @@
                 return;
             }
             currentRoomCode = code;
-            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover', subMode: 'normal' });
+            socket.emit('join_room', { 
+                roomCode: code, 
+                username: getUsername(), 
+                mode: 'undercover', 
+                subMode: 'normal', 
+                firebaseToken: window.firebaseUserToken || null 
+            });
         }
 
         socket.on('update_room', (room) => {
