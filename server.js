@@ -1,4 +1,4 @@
-const serverScriptContent = `const express = require('express');
+const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -147,7 +147,7 @@ io.on('connection', (socket) => {
             rooms[roomCode] = {
                 code: roomCode,
                 mode: mode,
-                    subMode: subMode || 'normal',
+                subMode: subMode || 'normal',
                 host: socket.id,
                 players: [],
                 status: 'waiting', 
@@ -343,7 +343,7 @@ io.on('connection', (socket) => {
             let firstAlive = room.players.findIndex(p => p.isAlive);
             room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
             room.status = 'gameplay';
-            io.to(roomCode).emit('resume_gameplay', room);
+            io.to(room.code).emit('resume_gameplay', room);
         }
     });
 
@@ -470,7 +470,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(\`Serveur Anime Game démarré sur le port \${PORT}\`);
-});`;
-
-console.log(serverScriptContent);
+    console.log(`Serveur Anime Game démarré sur le port ${PORT}`);
+});
