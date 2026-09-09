@@ -76,10 +76,10 @@ const HARDCORE_CHARACTERS = [
     "Tarmiel", "Monspeet", "Derieri", "Drole", "Gloxinia", 
     "Chandler", "Cusack", "Zaratras", "Hendrickson", "Dreyfus", 
     "Gilthunder", "Howzer", "Griamore", "Veronica Liones", "Margaret Liones", 
-    "Jericho", "Guila", "Helbram", "Elaine", "King Arthur", 
-    "Diane’s Matrona", "Gowther (Démon)", "Fraudrin", "Grayroad", "Galand", 
-    "Melascula", "Gray Demon", "Demon King", "Supreme Deity", "Cath", 
-    "Tristan Liones", "Percival", "Lancelot", "Donny",
+    "Jericho", "Guila", "Helbram", "Elaine", "Diane’s Matrona", 
+    "Gowther (Démon)", "Fraudrin", "Grayroad", "Galand", "Melascula", 
+    "Gray Demon", "Demon King", "Supreme Deity", "Cath", "Tristan Liones", 
+    "Percival", "Lancelot", "Donny",
     "Natsu Dragneel", "Lucy Heartfilia", "Erza Scarlet", "Gray Fullbuster", "Wendy Marvell", 
     "Happy", "Gajeel Redfox", "Juvia Lockser", "Mirajane Strauss", "Laxus Dreyar", 
     "Makarov Dreyar", "Zeref Dragneel", "Acnologia", "Gildarts Clive", "Cana Alberona", 
@@ -121,8 +121,7 @@ const HARDCORE_CHARACTERS = [
     "Panda", "Mei Mei", "Ui Ui", "Shoko Ieiri", "Masamichi Yaga",
     "Koro-sensei", "Nagisa Shiota", "Karma Akabane", "Kaede Kayano", "Tadaomi Karasuma", 
     "Irina Jelavić", "Gakushu Asano", "Manami Okuda", "Rio Nakamura",
-    "Kiyotaka Ayanokoji", "Suzune Horikita", "Kei Karuizawa", "Arisu Sakayanagi", "Kakeru Ryuen", 
-    "Honami Ichinose",
+    "Kiyotaka Ayanokoji", "Suzune Horikita", "Kei Karuizawa", "Arisu Sakayanagi", "Kakeru Ryuen", "Honami Ichinose",
     "Gon Freecss", "Killua Zoldyck", "Kurapika", "Leorio Paradinight", "Hisoka Morow", 
     "Chrollo Lucilfer", "Meruem", "Isaac Netero", "Illumi Zoldyck", "Biscuit Krueger", 
     "Ging Freecss", "Kite", "Feitan Portor", "Shalnark", "Machi Komacine", 
@@ -343,7 +342,7 @@ io.on('connection', (socket) => {
             let firstAlive = room.players.findIndex(p => p.isAlive);
             room.currentTurnIndex = firstAlive !== -1 ? firstAlive : 0;
             room.status = 'gameplay';
-            io.to(room.code).emit('resume_gameplay', room);
+            io.to(roomCode).emit('resume_gameplay', room);
         }
     });
 
