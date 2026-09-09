@@ -18,54 +18,108 @@
         h1 {
             color: #ffcc00;
             font-style: italic;
+            margin-bottom: 5px;
         }
-        .container {
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .main-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-        .section-box {
-            background: #1a1a24;
-            border: 2px solid #2a2a3d;
+        .card {
+            background: #181824;
+            border: 2px solid #28283d;
             border-radius: 12px;
             padding: 20px;
-            text-align: center;
-        }
-        .mode-card {
-            background: #222233;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #3a3a55;
-        }
-        .mode-card h3 {
-            margin-top: 0;
-            color: #ff4757;
-        }
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
             box-sizing: border-box;
         }
-        input {
-            background: #2f2f45;
-            color: white;
-            border: 1px solid #444466;
+        .card h2 {
+            color: #ffcc00;
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        button {
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input {
+            background: #232333;
+            color: white;
+            border: 1px solid #3a3a55;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input::placeholder {
+            color: #777799;
+        }
+        .btn-join {
             background: #ff4757;
             color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
+            width: 100%;
         }
-        button:hover {
+        .btn-join:hover {
+            background: #ff6b81;
+        }
+        .modes-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .mode-card {
+            background: #212130;
+            border: 1px solid #33334d;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mode-info h3 {
+            margin: 0 0 5px 0;
+            color: #fff;
+            font-size: 16px;
+        }
+        .mode-info p {
+            margin: 0;
+            color: #8888aa;
+            font-size: 12px;
+        }
+        .btn-create {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-create:hover {
             background: #ff6b81;
         }
         .hidden {
@@ -75,50 +129,60 @@
 </head>
 <body>
 
-    <h1 id="gameTitle">ANIME GAME</h1>
-    <p id="gameSubtitle">Crée ou rejoins une salle avec tes amis.</p>
+    <h1>ANIME GAME</h1>
+    <div class="subtitle">Crée ou rejoins une salle avec tes amis.</div>
 
-    <div class="container" id="menuContainer">
-        <!-- Section Rejoindre -->
-        <div class="section-box">
-            <h3>Rejoindre une salle</h3>
-            <input type="text" id="usernameInput" placeholder="Ton pseudo">
-            <input type="text" id="roomCodeInput" placeholder="CODE (EX: AB12)">
-            <button onclick="joinExistingRoom()">Rejoindre</button>
+    <div class="main-container" id="menuContainer">
+        <!-- Bloc Rejoindre une salle (avec pseudo en dessous du code comme tu le souhaites) -->
+        <div class="card">
+            <h2>Rejoindre une salle</h2>
+            <div class="input-group">
+                <input type="text" id="roomCodeInput" placeholder="CODE (EX: AB12)">
+                <input type="text" id="usernameInput" placeholder="Ton pseudo">
+                <button class="btn-join" onclick="joinExistingRoom()">Rejoindre</button>
+            </div>
         </div>
 
-        <!-- Section Modes de jeu séparés -->
-        <div class="section-box">
-            <h3>Mode Multijoueur</h3>
+        <!-- Bloc Création des modes séparés -->
+        <div class="card">
+            <h2>Créer une partie</h2>
+            <div class="modes-grid">
+                <!-- Undercover Normal -->
+                <div class="mode-card">
+                    <div class="mode-info">
+                        <h3>Undercover</h3>
+                        <p>Normal (Paires classiques)</p>
+                    </div>
+                    <button class="btn-create" onclick="createNewRoom('undercover', 'normal')">Créer</button>
+                </div>
 
-            <!-- 1. Undercover Normal -->
-            <div class="mode-card">
-                <h3>Undercover</h3>
-                <p style="font-size: 14px; color: #aaa;">Normal (Paires classiques)</p>
-                <button onclick="createNewRoom('undercover', 'normal')">Créer</button>
-            </div>
+                <!-- Undercover Hardcore -->
+                <div class="mode-card">
+                    <div class="mode-info">
+                        <h3>Undercover</h3>
+                        <p>Hardcore (Multi-animes + Sans imposteur)</p>
+                    </div>
+                    <button class="btn-create" onclick="createNewRoom('undercover', 'hardcore')">Créer</button>
+                </div>
 
-            <!-- 2. Undercover Hardcore -->
-            <div class="mode-card">
-                <h3>Undercover</h3>
-                <p style="font-size: 14px; color: #aaa;">Hardcore (Multi-animes + Sans imposteur)</p>
-                <button onclick="createNewRoom('undercover', 'hardcore')">Créer</button>
-            </div>
-
-            <!-- 3. Devine la note -->
-            <div class="mode-card">
-                <h3>Devine la note</h3>
-                <button onclick="createNewRoom('note', 'normal')">Créer</button>
+                <!-- Devine la note -->
+                <div class="mode-card">
+                    <div class="mode-info">
+                        <h3>Devine la note</h3>
+                        <p>Mode classique</p>
+                    </div>
+                    <button class="btn-create" onclick="createNewRoom('note', 'normal')">Créer</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Conteneur du jeu (pour afficher les écrans de salon / partie) -->
-    <div id="gameContainer" class="hidden" style="width: 100%; max-width: 500px;">
-        <div id="roomInfo" class="section-box">
+    <!-- Conteneur du salon d'attente (jeu) -->
+    <div id="gameContainer" class="hidden" style="width: 100%; max-width: 450px;">
+        <div class="card" style="text-align: center;">
             <h2 id="roomDisplayCode"></h2>
-            <div id="playerList"></div>
-            <button id="startGameBtn" class="hidden" onclick="startGame()">Lancer la partie</button>
+            <div id="playerList" style="margin: 15px 0; text-align: left;"></div>
+            <button id="startGameBtn" class="btn-join hidden" onclick="startGame()">Lancer la partie</button>
         </div>
     </div>
 
@@ -131,9 +195,10 @@
         function createNewRoom(mode, subMode) {
             let username = document.getElementById('usernameInput').value.trim();
             if (!username) {
-                alert("Entre un pseudo avant de créer une salle !");
+                alert("Entre ton pseudo avant de créer une salle !");
                 return;
             }
+            // Génère un code aléatoire si aucun code n'est saisi dans l'input du haut
             let roomCode = document.getElementById('roomCodeInput').value.trim();
             if (!roomCode) {
                 roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -163,16 +228,15 @@
             currentRoomData = room;
             document.getElementById('menuContainer').classList.add('hidden');
             document.getElementById('gameContainer').classList.remove('hidden');
-            document.getElementById('roomDisplayCode').innerText = `Salle : ${room.code} (${room.mode} - ${room.subMode})`;
+            document.getElementById('roomDisplayCode').innerText = `Salle : ${room.code}`;
 
-            let listHtml = '<h4>Joueurs connectés :</h4><ul>';
+            let listHtml = '<strong>Joueurs connectés :</strong><ul style="padding-left: 20px; margin-top: 5px;">';
             room.players.forEach(p => {
                 listHtml += `<li>${p.name} ${p.id === room.host ? '👑' : ''}</li>`;
             });
             listHtml += '</ul>';
             document.getElementById('playerList').innerHTML = listHtml;
 
-            // Afficher le bouton lancer si on est l'hôte
             if (room.host === socket.id && room.status === 'waiting') {
                 document.getElementById('startGameBtn').classList.remove('hidden');
             } else {
@@ -181,7 +245,7 @@
         });
 
         socket.on('launch_reveal', (room) => {
-            alert("La partie commence ! Rôle et mots attribués.");
+            alert("La partie est lancée !");
         });
     </script>
 </body>
