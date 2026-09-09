@@ -362,7 +362,11 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                if (room.mode === 'undercover') {
+                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                } else {
+                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                }
             }
             updateGameplayUI(room);
         });
@@ -377,7 +381,11 @@
             
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                if (room.mode === 'undercover') {
+                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                } else {
+                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                }
             }
             updateGameplayUI(room);
         });
@@ -391,7 +399,8 @@
             }
 
             const currentTurnPlayer = room.players[room.currentTurnIndex];
-            document.getElementById('game-info-text').innerText = `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}`;
+            let displayHeader = room.mode === 'undercover' ? `C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}` : `Thème : ${room.currentTheme} | C'est au tour de : ${currentTurnPlayer ? currentTurnPlayer.name : 'Inconnu'}`;
+            document.getElementById('game-info-text').innerText = displayHeader;
 
             const list = document.getElementById('gameplay-players-list');
             list.innerHTML = "";
