@@ -52,29 +52,27 @@
             font-weight: 600;
             cursor: pointer;
             text-transform: uppercase;
-            border-radius: 4px;
         }
         nav button.active { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0, 240, 255, 0.05); }
 
-        .tab-content { display: none; padding: 20px 5%; }
+        .tab-content { display: none; padding: 30px 5%; }
         .tab-content.active { display: block; }
 
         h2 {
             font-family: 'Bangers', cursive;
             font-size: 2.2rem;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             color: var(--accent-yellow);
             text-shadow: 2px 2px 0px var(--accent-pink);
-            text-align: center;
         }
 
-        p { color: var(--text-muted); margin-bottom: 15px; text-align: center; font-size: 0.9rem; }
+        p { color: var(--text-muted); margin-bottom: 20px; }
 
         .game-panel {
             background: var(--panel-color);
             border: 2px solid var(--accent-cyan);
             border-radius: 12px;
-            padding: 20px 15px;
+            padding: 30px 20px;
             box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
             display: none;
             max-width: 600px;
@@ -90,13 +88,13 @@
             font-family: 'Bangers', cursive;
             color: var(--accent-yellow);
             letter-spacing: 4px;
-            margin: 15px 0;
+            margin: 20px 0;
             border-radius: 6px;
         }
 
         .player-list {
             list-style: none;
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: left;
         }
 
@@ -109,7 +107,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
         }
 
         .btn-action {
@@ -122,8 +119,6 @@
             border-radius: 4px;
             width: 100%;
             margin-top: 10px;
-            font-family: 'Poppins', sans-serif;
-            text-transform: uppercase;
         }
         .btn-action:hover { background: #e01a4f; }
 
@@ -139,55 +134,7 @@
             color: var(--text-color);
             padding: 10px;
             border-radius: 4px;
-            font-family: 'Poppins', sans-serif;
         }
-
-        /* Styles spécifiques pour correspondre à l'image du mode de sélection en colonnes/grille */
-        .modes-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        @media(max-width: 650px) {
-            .modes-grid { grid-template-columns: 1fr; }
-        }
-
-        .card-mode {
-            background: var(--panel-color);
-            padding: 20px 15px;
-            border-radius: 8px;
-            border: 2px solid #2a2a40;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-mode h3 {
-            color: var(--accent-yellow);
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-            font-family: 'Bangers', cursive;
-            letter-spacing: 1px;
-        }
-
-        .radio-group {
-            margin: 12px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .radio-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            color: var(--text-color);
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-        .radio-label input { accent-color: var(--accent-cyan); margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -203,45 +150,41 @@
     </header>
 
     <section id="mode" class="tab-content active">
-        <div id="menu-selection" style="max-width: 650px; margin: 0 auto;">
+        <div id="menu-selection" style="max-width: 600px; margin: 0 auto; text-align: center;">
             <h2>Mode Multijoueur</h2>
             <p>Crée ou rejoins une salle avec tes amis.</p>
             
-            <div style="background: var(--panel-color); padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #2a2a40;">
-                <h3 style="margin-bottom: 8px; color: var(--accent-cyan); font-size: 1rem; text-transform: uppercase; font-weight:600;">Rejoindre une salle</h3>
-                <div class="chat-input-box" style="margin-top:0;">
-                    <input type="text" id="join-code-input" placeholder="CODE (EX: AB12)" style="text-transform: uppercase;">
+            <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #2a2a40;">
+                <h3 style="margin-bottom: 10px; color: var(--accent-cyan);">Rejoindre une salle</h3>
+                <div class="chat-input-box">
+                    <input type="text" id="join-code-input" placeholder="Code (ex: AB12)" style="text-transform: uppercase;">
                     <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoomByCode()">Rejoindre</button>
                 </div>
             </div>
 
-            <!-- Grille des 2 cartes (Undercover & Devine la note) -->
-            <div class="modes-grid">
-                <!-- Carte Undercover -->
-                <div class="card-mode">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
-                        <h3>Undercover</h3>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="undercover-submode" value="normal" checked>
-                                Normal
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="undercover-submode" value="hardcore">
-                                <span>Hardcore<br><span style="color:var(--text-muted); font-size:0.75rem;">(Multi-animes + Sans imposteur)</span></span>
-                            </label>
-                        </div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Undercover Normal</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Paires classiques</p>
                     </div>
-                    <button class="btn-action" onclick="createUndercoverRoom()">Créer</button>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('undercover', 'normal')">Créer</button>
                 </div>
 
-                <!-- Carte Devine la note -->
-                <div class="card-mode">
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
-                        <h3>Devine la note</h3>
-                        <p style="text-align: left; font-size: 0.85rem; margin-top: 10px; color: var(--text-muted);">Attribue des notes secrètes et devine les choix des autres.</p>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Undercover Hardcore</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Multi-animes + Sans imposteur</p>
                     </div>
-                    <button class="btn-action" onclick="createNoteRoom()">Créer</button>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('undercover', 'hardcore')">Créer</button>
+                </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Devine la note</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Mode classique</p>
+                    </div>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('note', 'normal')">Créer</button>
                 </div>
             </div>
         </div>
@@ -251,7 +194,7 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
-            <p style="text-align: left; margin-bottom: 5px;">Joueurs connectés :</p>
+            <p>Joueurs connectés :</p>
             <ul class="player-list" id="waiting-players-list"></ul>
 
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
@@ -259,10 +202,10 @@
 
         <div id="gameplay-room" class="game-panel">
             <h2 id="game-phase-title">Partie en cours</h2>
-            <p id="game-info-text" style="text-align: center;">Indice ou Action</p>
+            <p id="game-info-text">Indice ou Action</p>
 
             <div id="theme-selection-container" style="display:none; margin: 15px 0; background: #11111a; padding: 15px; border-radius: 8px; border: 1px solid var(--accent-yellow); text-align: left;">
-                <p style="color: var(--accent-yellow); margin-bottom: 8px; text-align: left;" id="theme-master-prompt">C'est à toi de choisir le thème de ce tour !</p>
+                <p style="color: var(--accent-yellow); margin-bottom: 8px;" id="theme-master-prompt">C'est à toi de choisir le thème de ce tour !</p>
                 <div class="chat-input-box" style="margin-top:0;">
                     <input type="text" id="custom-theme-input" placeholder="Ex: Personnages de Naruto, Arc Marineford...">
                     <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitCustomTheme()">Valider</button>
@@ -270,8 +213,8 @@
             </div>
 
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p style="margin: 0; color: var(--text-muted); text-align: center;">Ton mot secret / Rôle :</p>
-                <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan); text-align: center;">---</div>
+                <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
+                <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
             </div>
 
             <ul class="player-list" id="gameplay-players-list"></ul>
@@ -305,8 +248,8 @@
     <section id="options" class="tab-content">
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
             <h2>Options</h2>
-            <p style="text-align: left;">Ton Pseudo :</p>
-            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px; font-family: 'Poppins', sans-serif;">
+            <p>Ton Pseudo :</p>
+            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
         </div>
     </section>
 
@@ -338,17 +281,7 @@
             document.getElementById('end-game-buttons').style.display = 'none';
         }
 
-        function createUndercoverRoom() {
-            const subModeInput = document.querySelector('input[name="undercover-submode"]:checked');
-            const subMode = subModeInput ? subModeInput.value : 'normal';
-            generateAndJoinRoom('undercover', subMode);
-        }
-
-        function createNoteRoom() {
-            generateAndJoinRoom('note', 'normal');
-        }
-
-        function generateAndJoinRoom(mode, subMode) {
+        function createRoom(mode, subMode) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let code = "";
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
