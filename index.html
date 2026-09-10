@@ -127,13 +127,49 @@
             gap: 10px;
             margin-top: 15px;
         }
-        .chat-input-box input {
+        .chat-input-box input, .chat-input-box select {
             flex: 1;
             background: #0b0b10;
             border: 1px solid var(--text-muted);
             color: var(--text-color);
             padding: 10px;
             border-radius: 4px;
+        }
+
+        .rg-stat-row { display: flex; gap: 10px; margin: 15px 0; }
+        .rg-stat {
+            flex: 1;
+            background: #0b0b10;
+            border: 2px solid var(--accent-pink);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .rg-stat.cyan { border-color: var(--accent-cyan); }
+        .rg-stat-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.05em; }
+        .rg-stat-value { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 1px; }
+
+        .rg-timer-wrap {
+            height: 8px;
+            background: #0b0b10;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #2a2a40;
+        }
+        .rg-timer-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--accent-cyan);
+            transition: width 1s linear, background .3s;
+        }
+
+        .rg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; text-align: left; }
+        .rg-chip {
+            background: #11111a;
+            border: 1px solid #2a2a40;
+            border-radius: 99px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -185,6 +221,23 @@
                         <p style="margin: 0; font-size: 0.85rem;">Mode classique</p>
                     </div>
                     <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('note', 'normal')">Créer</button>
+                </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
+                    <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Rolland Garos</h3>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Trouvez un max de persos à tour de rôle — 10s chrono, 2 vies pour l'équipe</p>
+                    <div class="chat-input-box" style="margin-top:0;">
+                        <select id="rg-universe-picker">
+                            <option value="naruto">Naruto</option>
+                            <option value="onepiece">One Piece</option>
+                            <option value="bleach">Bleach</option>
+                            <option value="sds">Seven Deadly Sins</option>
+                            <option value="mha">My Hero Academia</option>
+                            <option value="fairy">Fairy Tail</option>
+                            <option value="clover">Black Clover</option>
+                        </select>
+                        <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('rollandgaros', document.getElementById('rg-universe-picker').value)">Créer</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -243,6 +296,46 @@
                 <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
         </div>
+
+        <div id="rg-room" class="game-panel">
+            <h2>Rolland Garos</h2>
+            <p id="rg-universe-label">Univers : ---</p>
+
+            <div class="rg-stat-row">
+                <div class="rg-stat">
+                    <div class="rg-stat-label">SCORE</div>
+                    <div class="rg-stat-value" id="rg-score" style="color: var(--accent-yellow);">0</div>
+                </div>
+                <div class="rg-stat">
+                    <div class="rg-stat-label">VIES</div>
+                    <div class="rg-stat-value" id="rg-lives">❤️❤️</div>
+                </div>
+                <div class="rg-stat cyan">
+                    <div class="rg-stat-label">TEMPS</div>
+                    <div class="rg-stat-value" id="rg-timer" style="color: var(--accent-cyan);">10</div>
+                </div>
+            </div>
+
+            <div class="rg-timer-wrap"><div class="rg-timer-fill" id="rg-timer-fill"></div></div>
+
+            <p id="rg-turn-info" style="color: var(--accent-yellow); font-weight: 600;">En attente…</p>
+
+            <div class="chat-input-box" id="rg-input-container" style="display:none;">
+                <input type="text" id="rg-answer-input" placeholder="Nom du personnage…" autocomplete="off">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitRgAnswer()">Go</button>
+            </div>
+            <p id="rg-feedback" style="min-height: 20px; font-size: 0.85rem; font-weight: 600;"></p>
+
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin: 15px 0 8px; text-align:left;">Personnages trouvés (<span id="rg-found-count">0</span>)</p>
+            <div class="rg-chips" id="rg-found-chips"></div>
+
+            <ul class="player-list" id="rg-players-list"></ul>
+
+            <div id="rg-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
     </section>
 
     <section id="options" class="tab-content">
@@ -274,11 +367,13 @@
             document.getElementById('menu-selection').style.display = 'none';
             document.getElementById('waiting-room').style.display = 'none';
             document.getElementById('gameplay-room').style.display = 'none';
+            document.getElementById('rg-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
+            document.getElementById('rg-end-buttons').style.display = 'none';
         }
 
         function createRoom(mode, subMode) {
@@ -567,6 +662,89 @@
 
         function nextStepGame() { socket.emit('next_step_game', currentRoomCode); }
         function backToMenu() { socket.emit('back_to_menu', currentRoomCode); }
+
+        /* ---------------- Rolland Garos ---------------- */
+
+        function submitRgAnswer() {
+            const input = document.getElementById('rg-answer-input');
+            const val = input.value.trim();
+            if (!val) return;
+            socket.emit('rg_submit_answer', { roomCode: currentRoomCode, answer: val });
+            input.value = "";
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'rg-answer-input') {
+                submitRgAnswer();
+            }
+        });
+
+        socket.on('rg_state', (room) => {
+            hideAllPanels();
+            document.getElementById('rg-room').style.display = 'block';
+            renderRgState(room);
+        });
+
+        socket.on('rg_tick', (data) => {
+            const t = Math.max(data.timeLeft, 0);
+            document.getElementById('rg-timer').innerText = t;
+            const fill = document.getElementById('rg-timer-fill');
+            fill.style.width = (t * 10) + '%';
+            fill.style.background = t <= 3 ? 'var(--accent-pink)' : 'var(--accent-cyan)';
+        });
+
+        socket.on('rg_feedback', (data) => {
+            const fb = document.getElementById('rg-feedback');
+            fb.innerText = data.message;
+            fb.style.color = data.ok ? '#00ff88' : 'var(--accent-pink)';
+        });
+
+        socket.on('rg_game_over', (data) => {
+            renderRgState(data.room);
+            document.getElementById('rg-turn-info').innerText = "Partie terminée !";
+            document.getElementById('rg-input-container').style.display = 'none';
+            document.getElementById('rg-end-buttons').style.display = 'flex';
+            const fb = document.getElementById('rg-feedback');
+            fb.innerText = `Score final : ${data.room.rg.score} personnage(s) trouvé(s) !`;
+            fb.style.color = 'var(--accent-yellow)';
+        });
+
+        function renderRgState(room) {
+            const rg = room.rg;
+            if (!rg) return;
+
+            document.getElementById('rg-universe-label').innerText = "Univers : " + rg.universeName;
+            document.getElementById('rg-score').innerText = rg.score;
+            document.getElementById('rg-lives').innerText = '❤️'.repeat(rg.lives) + '🖤'.repeat(Math.max(2 - rg.lives, 0));
+            document.getElementById('rg-timer').innerText = rg.timeLeft;
+            document.getElementById('rg-found-count').innerText = rg.found.length;
+
+            const chips = document.getElementById('rg-found-chips');
+            chips.innerHTML = "";
+            rg.found.forEach(name => {
+                chips.innerHTML += `<span class="rg-chip">${name}</span>`;
+            });
+
+            const currentPlayer = room.players[rg.turnIndex];
+
+            const list = document.getElementById('rg-players-list');
+            list.innerHTML = "";
+            room.players.forEach((p, idx) => {
+                let status = idx === rg.turnIndex ? "✏️ En train de chercher…" : "En attente";
+                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
+            });
+
+            if (rg.lives > 0) {
+                document.getElementById('rg-turn-info').innerText = currentPlayer ? `Au tour de : ${currentPlayer.name}` : '';
+                document.getElementById('rg-end-buttons').style.display = 'none';
+                if (currentPlayer && currentPlayer.id === socket.id) {
+                    document.getElementById('rg-input-container').style.display = 'flex';
+                    setTimeout(() => document.getElementById('rg-answer-input').focus(), 30);
+                } else {
+                    document.getElementById('rg-input-container').style.display = 'none';
+                }
+            }
+        }
     </script>
 </body>
 </html>
