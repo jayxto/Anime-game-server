@@ -1316,6 +1316,10 @@ io.on('connection', (socket) => {
     function distributeSecretsAndStart(room, roomCode) {
         room.status = 'reveal';
         room.noImpostor = false;
+        room.votes = {};
+
+        // Système de relance propre : tout le monde repart en vie à chaque nouvelle manche
+        room.players.forEach(p => { p.isAlive = true; });
 
         if (room.mode === 'undercover') {
             if (room.subMode === 'hardcore') {
@@ -1335,10 +1339,7 @@ io.on('connection', (socket) => {
                 assignUndercoverNormalWords(room);
             }
         } else if (room.mode === 'note') {
-            room.players.forEach(p => {
-                p.secretData = Math.floor(Math.random() * 10) + 1 + "/10";
-                p.isImpostor = false;
-            });
+            assignNoteWords(room);
         }
 
         room.players.forEach(p => {
@@ -1389,6 +1390,28 @@ io.on('connection', (socket) => {
             } else {
                 p.isImpostor = false;
                 p.secretData = civilWord;
+            }
+        });
+    }
+
+    function assignNoteWords(room) {
+        // Tous les civils reçoivent la même note, l'undercover reçoit une note différente
+        let civilNote = Math.floor(Math.random() * 10) + 1;
+        let impostorNote = Math.floor(Math.random() * 10) + 1;
+        while (impostorNote === civilNote) {
+            impostorNote = Math.floor(Math.random() * 10) + 1;
+        }
+
+        const alivePlayers = room.players.filter(p => p.isAlive);
+        const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
+
+        room.players.forEach(p => {
+            if (p.id === alivePlayers[impostorIndex].id) {
+                p.isImpostor = true;
+                p.secretData = impostorNote + "/10";
+            } else {
+                p.isImpostor = false;
+                p.secretData = civilNote + "/10";
             }
         });
     }
@@ -1490,20 +1513,17 @@ io.on('connection', (socket) => {
         if (room.noImpostor && eliminatedTargetId === 'no_impostor') {
             gameOver = true;
             winnerMessage = "🎉 Les innocents ont gagné ! Ils ont deviné qu'il n'y avait aucun imposteur.";
-        } else if (room.mode === 'undercover') {
+        } else if (room.mode === 'undercover' || room.mode === 'note') {
             const impostorsAlive = room.players.filter(p => p.isAlive && p.isImpostor);
             const civilsAlive = room.players.filter(p => p.isAlive && !p.isImpostor);
 
             if (impostorsAlive.length === 0) {
                 gameOver = true;
-                winnerMessage = "🎉 Victoire des Innocents ! L'imposteur a été éliminé.";
+                winnerMessage = "🎉 Victoire des Civils ! L'imposteur a été démasqué.";
             } else if (impostorsAlive.length >= civilsAlive.length) {
                 gameOver = true;
-                winnerMessage = "🚨 Victoire des Imposteurs ! Ils sont en nombre égal ou supérieur aux innocents.";
+                winnerMessage = "🚨 Victoire de l'Imposteur ! Il est en nombre égal ou supérieur aux civils.";
             }
-        } else if (room.mode === 'note') {
-            gameOver = true;
-            winnerMessage = "✨ Fin de la partie 'Devine la note' ! Merci d'avoir joué.";
         }
 
         room.status = 'results';
