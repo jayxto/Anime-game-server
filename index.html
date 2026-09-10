@@ -307,8 +307,8 @@
                     <div class="rg-stat-value" id="rg-score" style="color: var(--accent-yellow);">0</div>
                 </div>
                 <div class="rg-stat">
-                    <div class="rg-stat-label">VIES</div>
-                    <div class="rg-stat-value" id="rg-lives">❤️❤️</div>
+                    <div class="rg-stat-label">EN VIE</div>
+                    <div class="rg-stat-value" id="rg-lives">-/-</div>
                 </div>
                 <div class="rg-stat cyan">
                     <div class="rg-stat-label">TEMPS</div>
@@ -705,7 +705,10 @@
             document.getElementById('rg-input-container').style.display = 'none';
             document.getElementById('rg-end-buttons').style.display = 'flex';
             const fb = document.getElementById('rg-feedback');
-            fb.innerText = `Score final : ${data.room.rg.score} personnage(s) trouvé(s) !`;
+            const winner = data.room.rg.winnerName;
+            fb.innerText = winner
+                ? `🏆 ${winner} gagne ! (${data.room.rg.score} perso(s) trouvé(s) au total)`
+                : `Score final : ${data.room.rg.score} personnage(s) trouvé(s) !`;
             fb.style.color = 'var(--accent-yellow)';
         });
 
@@ -715,7 +718,9 @@
 
             document.getElementById('rg-universe-label').innerText = "Univers : " + rg.universeName;
             document.getElementById('rg-score').innerText = rg.score;
-            document.getElementById('rg-lives').innerText = '❤️'.repeat(rg.lives) + '🖤'.repeat(Math.max(2 - rg.lives, 0));
+
+            const aliveCount = room.players.filter(p => p.rgAlive).length;
+            document.getElementById('rg-lives').innerText = `${aliveCount}/${room.players.length}`;
             document.getElementById('rg-timer').innerText = rg.timeLeft;
             document.getElementById('rg-found-count').innerText = rg.found.length;
 
@@ -730,14 +735,18 @@
             const list = document.getElementById('rg-players-list');
             list.innerHTML = "";
             room.players.forEach((p, idx) => {
-                let status = idx === rg.turnIndex ? "✏️ En train de chercher…" : "En attente";
-                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
+                const lives = typeof p.rgLives === 'number' ? p.rgLives : 2;
+                const hearts = p.rgAlive === false
+                    ? '💀 Éliminé'
+                    : '❤️'.repeat(Math.max(lives, 0)) + '🖤'.repeat(Math.max(2 - lives, 0));
+                let status = p.rgAlive === false ? "" : (idx === rg.turnIndex ? "✏️ En train de chercher…" : "En attente");
+                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> <span style="color:var(--text-muted)">${hearts}${status ? ' · ' + status : ''}</span></li>`;
             });
 
-            if (rg.lives > 0) {
-                document.getElementById('rg-turn-info').innerText = currentPlayer ? `Au tour de : ${currentPlayer.name}` : '';
-                document.getElementById('rg-end-buttons').style.display = 'none';
-                if (currentPlayer && currentPlayer.id === socket.id) {
+            document.getElementById('rg-end-buttons').style.display = 'none';
+            if (currentPlayer && currentPlayer.rgAlive !== false) {
+                document.getElementById('rg-turn-info').innerText = `Au tour de : ${currentPlayer.name}`;
+                if (currentPlayer.id === socket.id) {
                     document.getElementById('rg-input-container').style.display = 'flex';
                     setTimeout(() => document.getElementById('rg-answer-input').focus(), 30);
                 } else {
