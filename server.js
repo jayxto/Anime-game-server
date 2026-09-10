@@ -1158,15 +1158,21 @@ function startRollandGaros(room, roomCode) {
 
     rgPools[roomCode] = { pool, usedNorm: new Set() };
 
+    // Vies individuelles : chaque joueur a ses 2 propres vies
+    room.players.forEach(p => {
+        p.rgLives = 2;
+        p.rgAlive = true;
+    });
+
     room.status = 'rg_playing';
     room.rg = {
         universeKey: key,
         universeName: universe.name,
         score: 0,
-        lives: 2,
         turnIndex: 0,
         timeLeft: 10,
-        found: []
+        found: [],
+        winnerName: null
     };
 
     io.to(roomCode).emit('rg_state', room);
@@ -1190,30 +1196,52 @@ function startRgTimer(room, roomCode) {
     }, 1000);
 }
 
+function rgAlivePlayers(room) {
+    return room.players.filter(p => p.rgAlive);
+}
+
 function rgAdvanceTurn(room) {
     if (room.players.length === 0) return;
-    room.rg.turnIndex = (room.rg.turnIndex + 1) % room.players.length;
+    if (rgAlivePlayers(room).length === 0) return;
+    let idx = room.rg.turnIndex;
+    let guard = 0;
+    do {
+        idx = (idx + 1) % room.players.length;
+        guard++;
+    } while (!room.players[idx].rgAlive && guard <= room.players.length);
+    room.rg.turnIndex = idx;
 }
 
-function rgLoseLife(room, roomCode, message) {
-    room.rg.lives--;
+function rgLoseLife(room, roomCode, reason) {
+    const player = room.players[room.rg.turnIndex];
+    if (!player) return;
+
+    player.rgLives = Math.max((player.rgLives || 0) - 1, 0);
+    let message = `${reason} — ${player.name} perd une vie.`;
+    if (player.rgLives <= 0) {
+        player.rgAlive = false;
+        message = `${reason} — 💀 ${player.name} est éliminé !`;
+    }
     io.to(roomCode).emit('rg_feedback', { ok: false, message });
 
-    if (room.rg.lives <= 0) {
-        rgEndGame(room, roomCode);
-    } else {
-        rgAdvanceTurn(room);
-        io.to(roomCode).emit('rg_state', room);
-        startRgTimer(room, roomCode);
+    const alive = rgAlivePlayers(room);
+    if (alive.length <= 1) {
+        rgEndGame(room, roomCode, alive[0] || null);
+        return;
     }
+
+    rgAdvanceTurn(room);
+    io.to(roomCode).emit('rg_state', room);
+    startRgTimer(room, roomCode);
 }
 
-function rgEndGame(room, roomCode) {
+function rgEndGame(room, roomCode, winner) {
     if (rgTimers[roomCode]) {
         clearInterval(rgTimers[roomCode]);
         delete rgTimers[roomCode];
     }
     room.status = 'rg_over';
+    room.rg.winnerName = winner ? winner.name : null;
     io.to(roomCode).emit('rg_game_over', { room });
 }
 
@@ -1489,7 +1517,7 @@ io.on('connection', (socket) => {
 
     socket.on('rg_submit_answer', ({ roomCode, answer }) => {
         const room = rooms[roomCode];
-        if (!room || !room.rg || room.rg.lives <= 0) return;
+        if (!room || !room.rg || room.status !== 'rg_playing') return;
         const poolData = rgPools[roomCode];
         if (!poolData) return;
 
@@ -1589,10 +1617,18 @@ io.on('connection', (socket) => {
                 room.host = room.players[0].id;
             }
 
-            if (room.rg && room.rg.lives > 0) {
+            if (room.rg && room.status === 'rg_playing') {
                 if (room.rg.turnIndex >= room.players.length) room.rg.turnIndex = 0;
-                io.to(roomCode).emit('rg_state', room);
-                if (hadTurn) startRgTimer(room, roomCode);
+                const alive = rgAlivePlayers(room);
+                if (alive.length <= 1) {
+                    rgEndGame(room, roomCode, alive[0] || null);
+                } else {
+                    if (!room.players[room.rg.turnIndex] || !room.players[room.rg.turnIndex].rgAlive || hadTurn) {
+                        rgAdvanceTurn(room);
+                    }
+                    io.to(roomCode).emit('rg_state', room);
+                    if (hadTurn) startRgTimer(room, roomCode);
+                }
             } else {
                 io.to(roomCode).emit('update_room', room);
             }
