@@ -251,10 +251,14 @@
             <ul class="player-list" id="waiting-players-list"></ul>
 
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
+            <button class="btn-action" style="background: var(--text-muted);" onclick="goToMenuSelection()">Retour au menu</button>
         </div>
 
         <div id="gameplay-room" class="game-panel">
-            <h2 id="game-phase-title">Partie en cours</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                <h2 id="game-phase-title" style="margin-bottom:0;">Partie en cours</h2>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:0.75rem; cursor:pointer;">🔙 Menu</button>
+            </div>
             <p id="game-info-text">Indice ou Action</p>
 
             <div id="theme-selection-container" style="display:none; margin: 15px 0; background: #11111a; padding: 15px; border-radius: 8px; border: 1px solid var(--accent-yellow); text-align: left;">
@@ -298,7 +302,10 @@
         </div>
 
         <div id="rg-room" class="game-panel">
-            <h2>Rolland Garos</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                <h2 style="margin-bottom:0;">Rolland Garos</h2>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:0.75rem; cursor:pointer;">🔙 Menu</button>
+            </div>
             <p id="rg-universe-label">Univers : ---</p>
 
             <div class="rg-stat-row">
@@ -374,6 +381,11 @@
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
             document.getElementById('rg-end-buttons').style.display = 'none';
+        }
+
+        function goToMenuSelection() {
+            hideAllPanels();
+            document.getElementById('menu-selection').style.display = 'block';
         }
 
         function createRoom(mode, subMode) {
