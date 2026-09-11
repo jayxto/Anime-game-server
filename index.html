@@ -266,6 +266,14 @@
                         <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('rollandgaros', document.getElementById('rg-universe-picker').value)">Créer</button>
                     </div>
                 </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Enchère</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">1v1 — 50M chacun, construisez la meilleure équipe de 4 persos</p>
+                    </div>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('enchere', null)">Créer</button>
+                </div>
             </div>
         </div>
 
@@ -366,6 +374,54 @@
             <ul class="player-list" id="rg-players-list"></ul>
 
             <div id="rg-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
+
+        <div id="enchere-room" class="game-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                <h2 style="margin-bottom:0;">Enchère</h2>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:0.75rem; cursor:pointer;">🔙 Menu</button>
+            </div>
+
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <div style="flex:1; background:#0b0b10; border:2px solid var(--accent-cyan); border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:0.7rem; color:var(--text-muted);">TOI</div>
+                    <div id="enchere-my-budget" style="font-family:'Bangers'; font-size:1.4rem; color:var(--accent-yellow);">50M</div>
+                </div>
+                <div style="flex:1; background:#0b0b10; border:2px solid var(--accent-pink); border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:0.7rem; color:var(--text-muted);" id="enchere-opp-name">ADVERSAIRE</div>
+                    <div id="enchere-opp-budget" style="font-family:'Bangers'; font-size:1.4rem; color:var(--accent-yellow);">50M</div>
+                </div>
+            </div>
+
+            <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin-bottom:15px;">
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">PERSONNAGE EN VENTE</div>
+                <div id="enchere-char-name" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin: 4px 0 10px;" id="enchere-char-value">Valeur : -- pts</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Enchère actuelle</div>
+                <div id="enchere-current-bid" style="font-family:'Bangers'; font-size:2rem; color:var(--accent-yellow);">0M</div>
+                <div id="enchere-bid-holder" style="font-size:0.8rem; color: var(--text-muted);"></div>
+            </div>
+
+            <p id="enchere-turn-info" style="text-align:center; color: var(--accent-yellow); font-weight:600;">En attente…</p>
+
+            <div id="enchere-bid-buttons" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                <button class="btn-action" id="enchere-bid-1" style="width:auto; flex:1; margin-top:0;" onclick="enchereBid(1)">+1M</button>
+                <button class="btn-action" id="enchere-bid-3" style="width:auto; flex:1; margin-top:0;" onclick="enchereBid(3)">+3M</button>
+                <button class="btn-action" id="enchere-bid-5" style="width:auto; flex:1; margin-top:0;" onclick="enchereBid(5)">+5M</button>
+                <button class="btn-action" id="enchere-bid-10" style="width:auto; flex:1; margin-top:0;" onclick="enchereBid(10)">+10M</button>
+            </div>
+            <button class="btn-action" id="enchere-pass-btn" style="display:none; background: var(--text-muted);" onclick="enchereLaisser()">Laisser</button>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin: 15px 0 6px; text-align:left;">Ton équipe</p>
+            <div class="rg-chips" id="enchere-my-team"></div>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin: 10px 0 6px; text-align:left;">Équipe adverse</p>
+            <div class="rg-chips" id="enchere-opp-team"></div>
+
+            <div id="enchere-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
                 <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                 <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
@@ -547,12 +603,14 @@
             document.getElementById('waiting-room').style.display = 'none';
             document.getElementById('gameplay-room').style.display = 'none';
             document.getElementById('rg-room').style.display = 'none';
+            document.getElementById('enchere-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
             document.getElementById('pass-vote-container').style.display = 'none';
             document.getElementById('end-game-buttons').style.display = 'none';
             document.getElementById('rg-end-buttons').style.display = 'none';
+            document.getElementById('enchere-end-buttons').style.display = 'none';
         }
 
         function goToMenuSelection() {
@@ -936,6 +994,92 @@
                 } else {
                     document.getElementById('rg-input-container').style.display = 'none';
                 }
+            }
+        }
+
+        /* ---------------- Enchère (mode indépendant) ---------------- */
+
+        function enchereBid(amount) {
+            socket.emit('enchere_bid', { roomCode: currentRoomCode, amount });
+        }
+
+        function enchereLaisser() {
+            socket.emit('enchere_pass', { roomCode: currentRoomCode });
+        }
+
+        socket.on('enchere_error', (data) => {
+            alert(data.message);
+        });
+
+        socket.on('enchere_state', (room) => {
+            hideAllPanels();
+            document.getElementById('enchere-room').style.display = 'block';
+            renderEnchereState(room);
+        });
+
+        socket.on('enchere_game_over', (data) => {
+            renderEnchereState(data.room);
+            document.getElementById('enchere-bid-buttons').style.display = 'none';
+            document.getElementById('enchere-pass-btn').style.display = 'none';
+            document.getElementById('enchere-turn-info').innerText = data.message;
+            document.getElementById('enchere-end-buttons').style.display = 'flex';
+        });
+
+        function renderEnchereState(room) {
+            const e = room.enchere;
+            if (!e) return;
+
+            const me = room.players.find(p => p.id === socket.id);
+            const opp = room.players.find(p => p.id !== socket.id);
+
+            document.getElementById('enchere-opp-name').innerText = opp ? opp.name.toUpperCase() : 'ADVERSAIRE';
+            document.getElementById('enchere-my-budget').innerText = (e.budgets[socket.id] ?? 50) + 'M';
+            document.getElementById('enchere-opp-budget').innerText = (opp ? (e.budgets[opp.id] ?? 50) : 50) + 'M';
+
+            if (e.currentCharacter) {
+                document.getElementById('enchere-char-name').innerText = e.currentCharacter.name;
+                document.getElementById('enchere-char-value').innerText = `Valeur : ${e.currentCharacter.value} pts`;
+            } else {
+                document.getElementById('enchere-char-name').innerText = '---';
+                document.getElementById('enchere-char-value').innerText = '';
+            }
+
+            document.getElementById('enchere-current-bid').innerText = e.currentBid + 'M';
+            const holder = room.players.find(p => p.id === e.currentBidderId);
+            document.getElementById('enchere-bid-holder').innerText = holder
+                ? `Enchère de : ${holder.name}${holder.id === socket.id ? ' (toi)' : ''}`
+                : 'Aucune enchère pour le moment';
+
+            const myTeamDiv = document.getElementById('enchere-my-team');
+            myTeamDiv.innerHTML = '';
+            (e.teams[socket.id] || []).forEach(c => {
+                myTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
+            });
+
+            const oppTeamDiv = document.getElementById('enchere-opp-team');
+            oppTeamDiv.innerHTML = '';
+            if (opp) {
+                (e.teams[opp.id] || []).forEach(c => {
+                    oppTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
+                });
+            }
+
+            document.getElementById('enchere-end-buttons').style.display = 'none';
+
+            const isMyTurn = e.turnPlayerId === socket.id;
+            if (isMyTurn) {
+                document.getElementById('enchere-turn-info').innerText = "À toi de jouer !";
+                document.getElementById('enchere-bid-buttons').style.display = 'flex';
+                document.getElementById('enchere-pass-btn').style.display = 'block';
+                const myBudget = e.budgets[socket.id] ?? 0;
+                [1, 3, 5, 10].forEach(amount => {
+                    const btn = document.getElementById('enchere-bid-' + amount);
+                    if (btn) btn.disabled = (e.currentBid + amount) > myBudget;
+                });
+            } else {
+                document.getElementById('enchere-turn-info').innerText = opp ? `En attente de ${opp.name}…` : 'En attente…';
+                document.getElementById('enchere-bid-buttons').style.display = 'none';
+                document.getElementById('enchere-pass-btn').style.display = 'none';
             }
         }
 
