@@ -262,7 +262,27 @@ app.get('/api/me', async (req, res) => {
 
 // Chaque connexion Socket.io doit présenter un token JWT valide (envoyé par le client via socket.auth)
 io.use(async (socket, next) => {
-    const token = socket.handshake.auth && socket.handshake.auth.token;
+    const auth = socket.handshake.auth || {};
+
+    // Mode invité : pas de compte, pas de persistance, pas de ranked (userId reste null partout)
+    if (auth.guest) {
+        const pseudo = String(auth.pseudo || '').trim().slice(0, 20);
+        if (!pseudo) return next(new Error('unauthorized'));
+
+        socket.user = {
+            id: null,
+            pseudo,
+            email: null,
+            rating: null,
+            wins: 0,
+            losses: 0,
+            rank: null,
+            isGuest: true
+        };
+        return next();
+    }
+
+    const token = auth.token;
     if (!token) return next(new Error('unauthorized'));
 
     const payload = verifyToken(token);
@@ -2116,6 +2136,11 @@ io.on('connection', (socket) => {
     socket.on('start_game', (roomCode) => {
         const room = rooms[roomCode];
         if (!room || room.host !== socket.id) return;
+
+        if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length < 3) {
+            socket.emit('game_error', { message: "Il faut au moins 3 joueurs dans le salon pour lancer cette partie." });
+            return;
+        }
 
         if (room.mode === 'undercover') {
             room.currentTheme = room.subMode === 'hardcore' ? "Undercover Hardcore (Multi-animes)" : "Undercover Normal";
