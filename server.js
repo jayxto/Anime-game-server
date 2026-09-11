@@ -2090,6 +2090,199 @@ function endEnchere(room, roomCode) {
     io.to(roomCode).emit('enchere_game_over', { room, message });
 }
 
+/* ================= Enchère à l'aveugle : logique de partie (mode indépendant) ================= */
+// Même principe que l'Enchère normale (mêmes univers/persos/valeurs), mais à chaque tour un seul
+// des deux joueurs voit le personnage tiré (le "voyant"), l'autre mise à l'aveugle. Le rôle de voyant
+// alterne à chaque manche. Impossible de "Laisser" tant qu'aucune mise n'a été posée (minimum 1 mise).
+
+function startEnchereAveugle(room, roomCode) {
+    const key = ENCHERE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
+    const universe = ENCHERE_UNIVERSES[key];
+
+    room.status = 'enchereaveugle_playing';
+    const budgets = {};
+    const teams = {};
+    room.players.forEach(p => {
+        budgets[p.id] = 50;
+        teams[p.id] = [];
+    });
+
+    room.enchereAveugle = {
+        universeKey: key,
+        universeName: universe.name,
+        pool: shuffleEnchereDeck(universe.characters),
+        budgets,
+        teams,
+        currentCharacter: null,
+        currentBid: 0,
+        currentBidderId: null,
+        turnPlayerId: null,
+        seerId: null,
+        starterIndex: 0
+    };
+
+    startEnchereAveugleRound(room, roomCode);
+}
+
+function enchereAveugleActivePlayers(room) {
+    return room.players.filter(p => (room.enchereAveugle.teams[p.id] || []).length < 4);
+}
+
+function enchereAveugleSnapshotFor(room, revealAll) {
+    const ea = room.enchereAveugle;
+    return function (viewerId) {
+        const isSeer = revealAll || ea.seerId === viewerId;
+        const currentCharacter = ea.currentCharacter
+            ? (isSeer ? ea.currentCharacter : { name: '??? Mystère', value: null, hidden: true })
+            : null;
+
+        return {
+            code: room.code,
+            players: room.players.map(p => ({ id: p.id, name: p.name })),
+            enchereAveugle: {
+                universeKey: ea.universeKey,
+                universeName: ea.universeName,
+                budgets: ea.budgets,
+                teams: ea.teams,
+                currentCharacter,
+                currentBid: ea.currentBid,
+                currentBidderId: ea.currentBidderId,
+                turnPlayerId: ea.turnPlayerId,
+                seerId: revealAll ? null : ea.seerId,
+                totals: ea.totals || null,
+                winnerId: ea.winnerId || null
+            }
+        };
+    };
+}
+
+function emitEnchereAveugleState(room, roomCode) {
+    const buildSnapshot = enchereAveugleSnapshotFor(room, false);
+    room.players.forEach(p => {
+        io.to(p.id).emit('enchereaveugle_state', buildSnapshot(p.id));
+    });
+}
+
+function startEnchereAveugleRound(room, roomCode) {
+    const ea = room.enchereAveugle;
+
+    if (room.players.length > 0 && room.players.every(p => (ea.teams[p.id] || []).length >= 4)) {
+        return endEnchereAveugle(room, roomCode);
+    }
+
+    const active = enchereAveugleActivePlayers(room);
+    if (active.length === 0 || ea.pool.length === 0) {
+        return endEnchereAveugle(room, roomCode);
+    }
+
+    if (active.length === 1) {
+        // Un seul joueur a encore de la place libre : il récupère le perso suivant direct, révélé, sans enchère
+        const freePlayer = active[0];
+        const character = ea.pool.pop();
+        ea.teams[freePlayer.id].push(character);
+        emitEnchereAveugleState(room, roomCode);
+        return startEnchereAveugleRound(room, roomCode);
+    }
+
+    const character = ea.pool.pop();
+    ea.currentCharacter = character;
+    ea.currentBid = 0;
+    ea.currentBidderId = null;
+
+    const seer = active[ea.starterIndex % active.length];
+    const blindPlayer = active.find(p => p.id !== seer.id);
+    ea.starterIndex++;
+
+    ea.seerId = seer.id;
+    ea.turnPlayerId = blindPlayer ? blindPlayer.id : seer.id; // le joueur à l'aveugle mise en premier
+
+    emitEnchereAveugleState(room, roomCode);
+    maybeAutoResolveEnchereAveugleTurn(room, roomCode);
+}
+
+function maybeAutoResolveEnchereAveugleTurn(room, roomCode) {
+    const ea = room.enchereAveugle;
+    if (!ea.turnPlayerId) return;
+    const budget = ea.budgets[ea.turnPlayerId] ?? 0;
+
+    if (budget >= ea.currentBid + 1) return; // il peut encore agir normalement
+
+    if (ea.currentBid > 0) {
+        // Une mise existe déjà : impossible d'enchérir plus, équivalent à un "Laisser" forcé
+        resolveEnchereAveuglePass(room, roomCode, ea.turnPlayerId, true);
+    } else {
+        // Aucune mise possible dès le départ (0 budget) : cas limite, le perso part gratuitement à l'autre
+        const opponent = room.players.find(p => p.id !== ea.turnPlayerId);
+        if (opponent) {
+            ea.teams[opponent.id] = ea.teams[opponent.id] || [];
+            ea.teams[opponent.id].push(ea.currentCharacter);
+        }
+        ea.currentCharacter = null;
+        ea.currentBid = 0;
+        ea.currentBidderId = null;
+        ea.turnPlayerId = null;
+        ea.seerId = null;
+        startEnchereAveugleRound(room, roomCode);
+    }
+}
+
+function resolveEnchereAveuglePass(room, roomCode, passingPlayerId, forced) {
+    const ea = room.enchereAveugle;
+
+    // Règle du mode : impossible de laisser tant qu'aucune mise n'a été posée
+    if (ea.currentBid <= 0 && !forced) return;
+
+    const winnerId = ea.currentBidderId;
+    const finalBid = ea.currentBid;
+
+    if (winnerId) {
+        ea.budgets[winnerId] = Math.max((ea.budgets[winnerId] ?? 0) - finalBid, 0);
+        ea.teams[winnerId] = ea.teams[winnerId] || [];
+        ea.teams[winnerId].push(ea.currentCharacter);
+    }
+
+    ea.currentCharacter = null;
+    ea.currentBid = 0;
+    ea.currentBidderId = null;
+    ea.turnPlayerId = null;
+    ea.seerId = null;
+
+    startEnchereAveugleRound(room, roomCode);
+}
+
+function endEnchereAveugle(room, roomCode) {
+    room.status = 'enchereaveugle_over';
+    const ea = room.enchereAveugle;
+
+    const totals = {};
+    room.players.forEach(p => {
+        totals[p.id] = (ea.teams[p.id] || []).reduce((sum, c) => sum + c.value, 0);
+    });
+
+    let winnerId = null;
+    let message = "Égalité parfaite !";
+
+    if (room.players.length === 2) {
+        const [p1, p2] = room.players;
+        if (totals[p1.id] > totals[p2.id]) {
+            winnerId = p1.id;
+            message = `🏆 ${p1.name} remporte l'enchère à l'aveugle avec ${totals[p1.id]} pts !`;
+        } else if (totals[p2.id] > totals[p1.id]) {
+            winnerId = p2.id;
+            message = `🏆 ${p2.name} remporte l'enchère à l'aveugle avec ${totals[p2.id]} pts !`;
+        }
+    }
+
+    ea.totals = totals;
+    ea.winnerId = winnerId;
+
+    // Fin de partie : tout est révélé pour tout le monde
+    const buildSnapshot = enchereAveugleSnapshotFor(room, true);
+    room.players.forEach(p => {
+        io.to(p.id).emit('enchereaveugle_game_over', { room: buildSnapshot(p.id), message });
+    });
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -2158,6 +2351,12 @@ io.on('connection', (socket) => {
                 return;
             }
             startEnchere(room, roomCode);
+        } else if (room.mode === 'enchereaveugle') {
+            if (room.players.length !== 2) {
+                socket.emit('enchere_error', { message: "Il faut exactement 2 joueurs dans le salon pour lancer une Enchère à l'aveugle." });
+                return;
+            }
+            startEnchereAveugle(room, roomCode);
         }
     });
 
@@ -2486,6 +2685,37 @@ io.on('connection', (socket) => {
         resolveEncherePass(room, roomCode, socket.id);
     });
 
+    socket.on('enchereaveugle_bid', ({ roomCode, amount }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.enchereAveugle || room.status !== 'enchereaveugle_playing') return;
+        const ea = room.enchereAveugle;
+        if (ea.turnPlayerId !== socket.id) return;
+        if (![1, 3, 5, 10].includes(amount)) return;
+
+        const newBid = ea.currentBid + amount;
+        const budget = ea.budgets[socket.id] ?? 0;
+        if (newBid > budget) return; // pas les moyens : ignoré
+
+        ea.currentBid = newBid;
+        ea.currentBidderId = socket.id;
+
+        const opponent = room.players.find(p => p.id !== socket.id);
+        ea.turnPlayerId = opponent ? opponent.id : null;
+
+        emitEnchereAveugleState(room, roomCode);
+        if (opponent) maybeAutoResolveEnchereAveugleTurn(room, roomCode);
+    });
+
+    socket.on('enchereaveugle_pass', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.enchereAveugle || room.status !== 'enchereaveugle_playing') return;
+        const ea = room.enchereAveugle;
+        if (ea.turnPlayerId !== socket.id) return;
+        if (ea.currentBid <= 0) return; // minimum 1 mise avant de pouvoir laisser
+
+        resolveEnchereAveuglePass(room, roomCode, socket.id, false);
+    });
+
     socket.on('next_step_game', (roomCode) => {
         const room = rooms[roomCode];
         if (!room) return;
@@ -2496,6 +2726,8 @@ io.on('connection', (socket) => {
             startRollandGaros(room, roomCode);
         } else if (room.mode === 'enchere') {
             startEnchere(room, roomCode);
+        } else if (room.mode === 'enchereaveugle') {
+            startEnchereAveugle(room, roomCode);
         } else {
             room.status = 'choosing_theme';
             room.pendingFreshStart = true; // nouvelle manche : nouvelles notes / nouveau rôle
@@ -2516,6 +2748,7 @@ io.on('connection', (socket) => {
             delete rgPools[roomCode];
             delete room.rg;
             delete room.enchere;
+            delete room.enchereAveugle;
             room.status = 'waiting';
             room.players.forEach(p => {
                 p.isAlive = true;
