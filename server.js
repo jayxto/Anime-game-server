@@ -1296,7 +1296,8 @@ io.on('connection', (socket) => {
             distributeSecretsAndStart(room, roomCode);
         } else if (room.mode === 'note') {
             room.status = 'choosing_theme';
-            const themeMasterId = room.players[0].id;
+            room.pendingFreshStart = true; // premier lancement : on tire de nouvelles notes
+            const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
             io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
         } else if (room.mode === 'rollandgaros') {
             startRollandGaros(room, roomCode);
@@ -1310,7 +1311,16 @@ io.on('connection', (socket) => {
         room.currentTheme = theme;
         io.to(roomCode).emit('theme_chosen', room);
 
-        distributeSecretsAndStart(room, roomCode);
+        if (room.mode === 'note' && !room.pendingFreshStart) {
+            // Simple changement de thème en cours de manche : on garde les mêmes notes / le même imposteur
+            room.status = 'gameplay';
+            room.currentTurnIndex = 0;
+            room.players.forEach(p => { p.clue = ''; });
+            io.to(roomCode).emit('resume_gameplay', room);
+        } else {
+            room.pendingFreshStart = false;
+            distributeSecretsAndStart(room, roomCode);
+        }
     });
 
     function distributeSecretsAndStart(room, roomCode) {
@@ -1324,7 +1334,7 @@ io.on('connection', (socket) => {
         if (room.mode === 'undercover') {
             if (room.subMode === 'hardcore') {
                 const randChance = Math.random();
-                if (randChance < 0.25) {
+                if (randChance < 0.02) {
                     room.noImpostor = true;
                     // Pioche un perso aléatoire dans le pool hardcore pour tout le monde
                     const defaultWord = undercoverHardcorePool[Math.floor(Math.random() * undercoverHardcorePool.length)];
@@ -1458,7 +1468,8 @@ io.on('connection', (socket) => {
         if (!room) return;
 
         room.status = 'choosing_theme';
-        const themeMasterId = room.players[0].id;
+        room.pendingFreshStart = false; // on change juste le thème, pas les notes/rôles
+        const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
         io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
     });
 
@@ -1590,9 +1601,10 @@ io.on('connection', (socket) => {
             startRollandGaros(room, roomCode);
         } else {
             room.status = 'choosing_theme';
+            room.pendingFreshStart = true; // nouvelle manche : nouvelles notes / nouveau rôle
             room.currentTurnIndex = 0;
             room.players.forEach(p => p.clue = '');
-            const themeMasterId = room.players[0].id;
+            const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
             io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
         }
     });
