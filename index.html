@@ -175,6 +175,33 @@
 </head>
 <body>
 
+    <div id="auth-screen" style="max-width:400px; margin: 60px auto; padding: 0 20px;">
+        <div class="logo" style="text-align:center; margin-bottom: 20px;">ANIME GAME</div>
+        <div style="background: var(--panel-color); border: 2px solid var(--accent-cyan); border-radius: 12px; padding: 25px 20px; box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);">
+            <h2 id="auth-title" style="text-align:center;">Connexion</h2>
+            <div id="auth-error" style="color: var(--accent-pink); font-size:0.85rem; margin-bottom:10px; min-height:18px; text-align:center;"></div>
+
+            <div id="auth-register-fields" style="display:none;">
+                <p style="margin-bottom:5px;">Pseudo</p>
+                <input type="text" id="reg-pseudo" style="width:100%; background:#0b0b10; border:1px solid var(--text-muted); color:var(--text-color); padding:10px; border-radius:4px; margin-bottom:12px;">
+            </div>
+
+            <p style="margin-bottom:5px;">Email</p>
+            <input type="email" id="auth-email" style="width:100%; background:#0b0b10; border:1px solid var(--text-muted); color:var(--text-color); padding:10px; border-radius:4px; margin-bottom:12px;">
+
+            <p style="margin-bottom:5px;">Mot de passe</p>
+            <input type="password" id="auth-password" style="width:100%; background:#0b0b10; border:1px solid var(--text-muted); color:var(--text-color); padding:10px; border-radius:4px; margin-bottom:16px;">
+
+            <button class="btn-action" id="auth-submit-btn" onclick="submitAuth()">Se connecter</button>
+
+            <p style="text-align:center; margin-top:15px; font-size:0.85rem;">
+                <span id="auth-switch-text">Pas de compte ?</span>
+                <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--accent-cyan); text-decoration:none; font-weight:600;" id="auth-switch-link">Créer un compte</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="app-root" style="display:none;">
     <header>
         <div class="logo">ANIME GAME</div>
         <nav>
@@ -347,15 +374,40 @@
 
     <section id="options" class="tab-content">
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
-            <h2>Options</h2>
-            <p>Ton Pseudo :</p>
-            <input type="text" id="username-input" value="OtakuGamer" style="width: 100%; background: #0b0b10; border: 1px solid var(--text-muted); color: var(--text-color); padding: 10px; border-radius: 4px;">
+            <h2>Mon compte</h2>
+            <p style="margin-bottom: 4px;">Pseudo</p>
+            <div id="profile-pseudo" style="font-family:'Bangers'; font-size:1.5rem; color: var(--accent-cyan); margin-bottom: 20px;">---</div>
+
+            <div class="rg-stat-row">
+                <div class="rg-stat">
+                    <div class="rg-stat-label">RATING</div>
+                    <div class="rg-stat-value" id="profile-rating" style="color: var(--accent-yellow);">1000</div>
+                </div>
+                <div class="rg-stat">
+                    <div class="rg-stat-label">VICTOIRES</div>
+                    <div class="rg-stat-value" id="profile-wins" style="color: #00ff88;">0</div>
+                </div>
+                <div class="rg-stat cyan">
+                    <div class="rg-stat-label">DÉFAITES</div>
+                    <div class="rg-stat-value" id="profile-losses">0</div>
+                </div>
+            </div>
+
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Le système de classement (ranked) arrive bientôt — ton rating est déjà suivi en base.</p>
+
+            <button class="btn-action" style="background: var(--text-muted); margin-top: 15px;" onclick="logout()">Se déconnecter</button>
         </div>
     </section>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const AUTH_TOKEN_KEY = 'rg_auth_token';
+        let authToken = localStorage.getItem(AUTH_TOKEN_KEY) || null;
+        let currentUser = null;
+        let authMode = 'login';
+
+        const socket = io({ autoConnect: false });
         let currentRoomCode = "";
         let currentThemeMasterId = "";
 
@@ -367,7 +419,113 @@
         }
 
         function getUsername() {
-            return document.getElementById('username-input').value.trim() || "Anonyme";
+            return currentUser ? currentUser.pseudo : "Anonyme";
+        }
+
+        /* ---------------- Authentification ---------------- */
+
+        function connectSocket() {
+            socket.auth = { token: authToken };
+            socket.connect();
+        }
+
+        function showAuthScreen() {
+            document.getElementById('auth-screen').style.display = 'block';
+            document.getElementById('app-root').style.display = 'none';
+        }
+
+        function showApp() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-root').style.display = 'block';
+            document.getElementById('profile-pseudo').innerText = currentUser.pseudo;
+            document.getElementById('profile-rating').innerText = currentUser.rating;
+            document.getElementById('profile-wins').innerText = currentUser.wins;
+            document.getElementById('profile-losses').innerText = currentUser.losses;
+        }
+
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            document.getElementById('auth-register-fields').style.display = authMode === 'register' ? 'block' : 'none';
+            document.getElementById('auth-title').innerText = authMode === 'register' ? 'Créer un compte' : 'Connexion';
+            document.getElementById('auth-submit-btn').innerText = authMode === 'register' ? "S'inscrire" : 'Se connecter';
+            document.getElementById('auth-switch-text').innerText = authMode === 'register' ? 'Déjà un compte ?' : 'Pas de compte ?';
+            document.getElementById('auth-switch-link').innerText = authMode === 'register' ? 'Se connecter' : 'Créer un compte';
+            document.getElementById('auth-error').innerText = '';
+        }
+
+        async function submitAuth() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const errBox = document.getElementById('auth-error');
+            errBox.innerText = '';
+
+            if (!email || !password) {
+                errBox.innerText = 'Email et mot de passe requis.';
+                return;
+            }
+
+            let body = { email, password };
+            let url = '/api/login';
+
+            if (authMode === 'register') {
+                const pseudo = document.getElementById('reg-pseudo').value.trim();
+                if (!pseudo) {
+                    errBox.innerText = 'Choisis un pseudo.';
+                    return;
+                }
+                body.pseudo = pseudo;
+                url = '/api/register';
+            }
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    errBox.innerText = data.error || 'Une erreur est survenue.';
+                    return;
+                }
+                authToken = data.token;
+                localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+                currentUser = data.user;
+                showApp();
+                connectSocket();
+            } catch (e) {
+                errBox.innerText = 'Impossible de contacter le serveur.';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            authToken = null;
+            currentUser = null;
+            currentRoomCode = "";
+            if (socket.connected) socket.disconnect();
+            document.getElementById('auth-email').value = '';
+            document.getElementById('auth-password').value = '';
+            showAuthScreen();
+        }
+
+        async function tryAutoLogin() {
+            if (!authToken) {
+                showAuthScreen();
+                return;
+            }
+            try {
+                const res = await fetch('/api/me', { headers: { Authorization: 'Bearer ' + authToken } });
+                if (!res.ok) throw new Error('invalid token');
+                const data = await res.json();
+                currentUser = data.user;
+                showApp();
+                connectSocket();
+            } catch (e) {
+                localStorage.removeItem(AUTH_TOKEN_KEY);
+                authToken = null;
+                showAuthScreen();
+            }
         }
 
         function hideAllPanels() {
@@ -766,6 +924,8 @@
                 }
             }
         }
+
+        tryAutoLogin();
     </script>
 </body>
 </html>
