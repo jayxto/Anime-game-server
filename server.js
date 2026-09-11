@@ -1,12 +1,138 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const Database = require('better-sqlite3');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+app.use(express.json());
 app.use(express.static(__dirname));
+
+/* ================= Comptes utilisateurs (SQLite + JWT) ================= */
+
+const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+const JWT_EXPIRES_IN = '30d';
+
+const db = new Database(path.join(__dirname, 'anime-game.db'));
+db.pragma('journal_mode = WAL');
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pseudo TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        rating INTEGER NOT NULL DEFAULT 1000,
+        wins INTEGER NOT NULL DEFAULT 0,
+        losses INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+`);
+
+function publicUser(row) {
+    return {
+        id: row.id,
+        pseudo: row.pseudo,
+        email: row.email,
+        rating: row.rating,
+        wins: row.wins,
+        losses: row.losses
+    };
+}
+
+function signToken(userId) {
+    return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+}
+
+function verifyToken(token) {
+    try {
+        return jwt.verify(token, JWT_SECRET);
+    } catch (e) {
+        return null;
+    }
+}
+
+app.post('/api/register', (req, res) => {
+    const { pseudo, email, password } = req.body || {};
+
+    if (!pseudo || !email || !password) {
+        return res.status(400).json({ error: 'Pseudo, email et mot de passe sont requis.' });
+    }
+    const cleanPseudo = String(pseudo).trim();
+    const cleanEmail = String(email).trim().toLowerCase();
+
+    if (cleanPseudo.length < 3 || cleanPseudo.length > 20) {
+        return res.status(400).json({ error: 'Le pseudo doit faire entre 3 et 20 caractères.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+        return res.status(400).json({ error: 'Email invalide.' });
+    }
+    if (String(password).length < 6) {
+        return res.status(400).json({ error: 'Le mot de passe doit faire au moins 6 caractères.' });
+    }
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? OR pseudo = ?').get(cleanEmail, cleanPseudo);
+    if (existing) {
+        return res.status(409).json({ error: 'Ce pseudo ou cet email est déjà utilisé.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(String(password), 10);
+    const info = db.prepare('INSERT INTO users (pseudo, email, password_hash) VALUES (?, ?, ?)').run(cleanPseudo, cleanEmail, passwordHash);
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+
+    const token = signToken(user.id);
+    res.json({ token, user: publicUser(user) });
+});
+
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body || {};
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email et mot de passe requis.' });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
+    if (!user || !bcrypt.compareSync(String(password), user.password_hash)) {
+        return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
+    }
+
+    const token = signToken(user.id);
+    res.json({ token, user: publicUser(user) });
+});
+
+app.get('/api/me', (req, res) => {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    if (!token) return res.status(401).json({ error: 'Non authentifié.' });
+
+    const payload = verifyToken(token);
+    if (!payload) return res.status(401).json({ error: 'Session invalide ou expirée.' });
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
+    if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
+
+    res.json({ user: publicUser(user) });
+});
+
+// Chaque connexion Socket.io doit présenter un token JWT valide (envoyé par le client via socket.auth)
+io.use((socket, next) => {
+    const token = socket.handshake.auth && socket.handshake.auth.token;
+    if (!token) return next(new Error('unauthorized'));
+
+    const payload = verifyToken(token);
+    if (!payload) return next(new Error('unauthorized'));
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
+    if (!user) return next(new Error('unauthorized'));
+
+    socket.user = publicUser(user);
+    next();
+});
 
 const rooms = {};
 
@@ -1248,7 +1374,7 @@ function rgEndGame(room, roomCode, winner) {
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
-    socket.on('join_room', ({ roomCode, username, mode, subMode }) => {
+    socket.on('join_room', ({ roomCode, mode, subMode }) => {
         socket.join(roomCode);
 
         if (!rooms[roomCode]) {
@@ -1272,7 +1398,8 @@ io.on('connection', (socket) => {
         if (!existingPlayer) {
             room.players.push({
                 id: socket.id,
-                name: username,
+                name: socket.user.pseudo, // pseudo lié au compte, jamais celui envoyé par le client
+                userId: socket.user.id,
                 isAlive: true,
                 isImpostor: false,
                 secretData: '',
