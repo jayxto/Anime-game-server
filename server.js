@@ -1,10 +1,9 @@
 const express = require('express');
 const http = require('http');
-const path = require('path');
 const { Server } = require('socket.io');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const Database = require('better-sqlite3');
+const { Pool } = require('pg');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,26 +12,146 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.static(__dirname));
 
-/* ================= Comptes utilisateurs (SQLite + JWT) ================= */
+/* ================= Comptes utilisateurs (Postgres + JWT) ================= */
+// La base vit en dehors de Render (Neon / Supabase / etc.) via DATABASE_URL,
+// donc les comptes et le rating survivent aux redéploiements et aux mises en veille.
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
 const JWT_EXPIRES_IN = '30d';
 
-const db = new Database(path.join(__dirname, 'anime-game.db'));
-db.pragma('journal_mode = WAL');
+if (!process.env.DATABASE_URL) {
+    console.warn("⚠️  Aucune variable DATABASE_URL définie : configure-la avec ta connection string Postgres (Neon/Supabase) pour que les comptes soient persistés.");
+}
 
-db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pseudo TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        rating INTEGER NOT NULL DEFAULT 1000,
-        wins INTEGER NOT NULL DEFAULT 0,
-        losses INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-`);
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+});
+
+async function initDb() {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            pseudo TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            rating INTEGER NOT NULL DEFAULT 1000,
+            wins INTEGER NOT NULL DEFAULT 0,
+            losses INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        );
+    `);
+}
+
+initDb()
+    .then(() => console.log("Base de données prête (table 'users' OK)."))
+    .catch(err => {
+        console.error("Erreur d'initialisation de la base de données :", err);
+    });
+
+/* ================= Système de rangs & ELO ================= */
+
+const RANK_TIERS = [
+    { name: 'Bronze',  division: 1, min: -Infinity, max: 1099 },
+    { name: 'Bronze',  division: 2, min: 1100, max: 1199 },
+    { name: 'Bronze',  division: 3, min: 1200, max: 1299 },
+    { name: 'Argent',  division: 1, min: 1300, max: 1399 },
+    { name: 'Argent',  division: 2, min: 1400, max: 1499 },
+    { name: 'Argent',  division: 3, min: 1500, max: 1599 },
+    { name: 'Or',      division: 1, min: 1600, max: 1699 },
+    { name: 'Or',      division: 2, min: 1700, max: 1799 },
+    { name: 'Or',      division: 3, min: 1800, max: 1899 },
+    { name: 'Platine', division: 1, min: 1900, max: 1999 },
+    { name: 'Platine', division: 2, min: 2000, max: 2099 },
+    { name: 'Platine', division: 3, min: 2100, max: 2199 },
+    { name: 'Diamant', division: 1, min: 2200, max: 2299 },
+    { name: 'Diamant', division: 2, min: 2300, max: 2399 },
+    { name: 'Diamant', division: 3, min: 2400, max: 2499 }
+];
+
+function getRankLabel(rating) {
+    for (const tier of RANK_TIERS) {
+        if (rating >= tier.min && rating <= tier.max) {
+            return `${tier.name} ${tier.division}`;
+        }
+    }
+    return 'Élite'; // au-dessus de 2499 : classement pur à l'ELO, plus de divisions
+}
+
+// Barème ELO
+const ELO = {
+    normal: { winCivil: 12, winImpostor: 14, loss: 17 },
+    hardcore: { winCivil: 10, winImpostor: 17, loss: 17 },
+    rollandgaros: { win: 12, loss: 17 }
+};
+
+async function recordMatchResult(userId, won, eloDelta) {
+    if (!userId) return;
+    try {
+        await pool.query(
+            `UPDATE users SET
+                rating = GREATEST(rating + $1, 0),
+                wins = wins + $2,
+                losses = losses + $3
+             WHERE id = $4`,
+            [eloDelta, won ? 1 : 0, won ? 0 : 1, userId]
+        );
+    } catch (err) {
+        console.error('Erreur mise à jour ELO :', err);
+    }
+}
+
+async function notifyProfileUpdate(socketId, userId) {
+    if (!userId) return;
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        const user = result.rows[0];
+        if (user) {
+            io.to(socketId).emit('profile_updated', { user: publicUser(user) });
+        }
+    } catch (err) {
+        console.error('Erreur notifyProfileUpdate :', err);
+    }
+}
+
+// Undercover Normal/Hardcore + Devine la note (même mécanique imposteur/civils)
+async function applyImpostorModeRanking(room, { impostorsWin, noImpostorRoundWin }) {
+    const scale = (room.mode === 'undercover' && room.subMode === 'hardcore') ? ELO.hardcore : ELO.normal;
+
+    for (const p of room.players) {
+        if (!p.userId) continue;
+        let won;
+        let eloDelta;
+
+        if (noImpostorRoundWin) {
+            won = true;
+            eloDelta = scale.winCivil;
+        } else if (p.isImpostor) {
+            won = impostorsWin;
+            eloDelta = won ? scale.winImpostor : -scale.loss;
+        } else {
+            won = !impostorsWin;
+            eloDelta = won ? scale.winCivil : -scale.loss;
+        }
+
+        await recordMatchResult(p.userId, won, eloDelta);
+        notifyProfileUpdate(p.id, p.userId);
+    }
+}
+
+// Rolland Garos : un seul gagnant (dernier en vie), tous les autres perdent
+async function applyRollandGarosRanking(room, winner) {
+    if (!winner) return;
+
+    for (const p of room.players) {
+        if (!p.userId) continue;
+        const won = p.id === winner.id;
+        const eloDelta = won ? ELO.rollandgaros.win : -ELO.rollandgaros.loss;
+
+        await recordMatchResult(p.userId, won, eloDelta);
+        notifyProfileUpdate(p.id, p.userId);
+    }
+}
 
 function publicUser(row) {
     return {
@@ -41,7 +160,8 @@ function publicUser(row) {
         email: row.email,
         rating: row.rating,
         wins: row.wins,
-        losses: row.losses
+        losses: row.losses,
+        rank: getRankLabel(row.rating)
     };
 }
 
@@ -57,7 +177,7 @@ function verifyToken(token) {
     }
 }
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { pseudo, email, password } = req.body || {};
 
     if (!pseudo || !email || !password) {
@@ -76,36 +196,51 @@ app.post('/api/register', (req, res) => {
         return res.status(400).json({ error: 'Le mot de passe doit faire au moins 6 caractères.' });
     }
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ? OR pseudo = ?').get(cleanEmail, cleanPseudo);
-    if (existing) {
-        return res.status(409).json({ error: 'Ce pseudo ou cet email est déjà utilisé.' });
+    try {
+        const existing = await pool.query('SELECT id FROM users WHERE email = $1 OR pseudo = $2', [cleanEmail, cleanPseudo]);
+        if (existing.rows.length > 0) {
+            return res.status(409).json({ error: 'Ce pseudo ou cet email est déjà utilisé.' });
+        }
+
+        const passwordHash = bcrypt.hashSync(String(password), 10);
+        const insert = await pool.query(
+            'INSERT INTO users (pseudo, email, password_hash) VALUES ($1, $2, $3) RETURNING *',
+            [cleanPseudo, cleanEmail, passwordHash]
+        );
+        const user = insert.rows[0];
+
+        const token = signToken(user.id);
+        res.json({ token, user: publicUser(user) });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur, réessaie plus tard." });
     }
-
-    const passwordHash = bcrypt.hashSync(String(password), 10);
-    const info = db.prepare('INSERT INTO users (pseudo, email, password_hash) VALUES (?, ?, ?)').run(cleanPseudo, cleanEmail, passwordHash);
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
-
-    const token = signToken(user.id);
-    res.json({ token, user: publicUser(user) });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body || {};
     if (!email || !password) {
         return res.status(400).json({ error: 'Email et mot de passe requis.' });
     }
 
     const cleanEmail = String(email).trim().toLowerCase();
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
-    if (!user || !bcrypt.compareSync(String(password), user.password_hash)) {
-        return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
-    }
 
-    const token = signToken(user.id);
-    res.json({ token, user: publicUser(user) });
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+        const user = result.rows[0];
+        if (!user || !bcrypt.compareSync(String(password), user.password_hash)) {
+            return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
+        }
+
+        const token = signToken(user.id);
+        res.json({ token, user: publicUser(user) });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur, réessaie plus tard." });
+    }
 });
 
-app.get('/api/me', (req, res) => {
+app.get('/api/me', async (req, res) => {
     const authHeader = req.headers.authorization || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
     if (!token) return res.status(401).json({ error: 'Non authentifié.' });
@@ -113,25 +248,36 @@ app.get('/api/me', (req, res) => {
     const payload = verifyToken(token);
     if (!payload) return res.status(401).json({ error: 'Session invalide ou expirée.' });
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
-    if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE id = $1', [payload.sub]);
+        const user = result.rows[0];
+        if (!user) return res.status(401).json({ error: 'Utilisateur introuvable.' });
 
-    res.json({ user: publicUser(user) });
+        res.json({ user: publicUser(user) });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Erreur serveur." });
+    }
 });
 
 // Chaque connexion Socket.io doit présenter un token JWT valide (envoyé par le client via socket.auth)
-io.use((socket, next) => {
+io.use(async (socket, next) => {
     const token = socket.handshake.auth && socket.handshake.auth.token;
     if (!token) return next(new Error('unauthorized'));
 
     const payload = verifyToken(token);
     if (!payload) return next(new Error('unauthorized'));
 
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
-    if (!user) return next(new Error('unauthorized'));
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE id = $1', [payload.sub]);
+        const user = result.rows[0];
+        if (!user) return next(new Error('unauthorized'));
 
-    socket.user = publicUser(user);
-    next();
+        socket.user = publicUser(user);
+        next();
+    } catch (err) {
+        next(new Error('unauthorized'));
+    }
 });
 
 const rooms = {};
@@ -1368,6 +1514,7 @@ function rgEndGame(room, roomCode, winner) {
     }
     room.status = 'rg_over';
     room.rg.winnerName = winner ? winner.name : null;
+    applyRollandGarosRanking(room, winner);
     io.to(roomCode).emit('rg_game_over', { room });
 }
 
@@ -1647,9 +1794,12 @@ io.on('connection', (socket) => {
 
         let gameOver = false;
         let winnerMessage = "";
+        let impostorsWin = false;
+        let noImpostorRoundWin = false;
 
         if (room.noImpostor && eliminatedTargetId === 'no_impostor') {
             gameOver = true;
+            noImpostorRoundWin = true;
             winnerMessage = "🎉 Les innocents ont gagné ! Ils ont deviné qu'il n'y avait aucun imposteur.";
         } else if (room.mode === 'undercover' || room.mode === 'note') {
             const impostorsAlive = room.players.filter(p => p.isAlive && p.isImpostor);
@@ -1660,8 +1810,13 @@ io.on('connection', (socket) => {
                 winnerMessage = "🎉 Victoire des Civils ! L'imposteur a été démasqué.";
             } else if (impostorsAlive.length >= civilsAlive.length) {
                 gameOver = true;
+                impostorsWin = true;
                 winnerMessage = "🚨 Victoire de l'Imposteur ! Il est en nombre égal ou supérieur aux civils.";
             }
+        }
+
+        if (gameOver && (room.mode === 'undercover' || room.mode === 'note')) {
+            applyImpostorModeRanking(room, { impostorsWin, noImpostorRoundWin });
         }
 
         room.status = 'results';
