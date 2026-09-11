@@ -1600,7 +1600,8 @@ function startEnchere(room, roomCode) {
         currentBid: 0,
         currentBidderId: null,
         turnPlayerId: null,
-        starterIndex: 0
+        starterIndex: 0,
+        declinedPlayers: []
     };
 
     startEnchereRound(room, roomCode);
@@ -1635,6 +1636,7 @@ function startEnchereRound(room, roomCode) {
     e.currentCharacter = character;
     e.currentBid = 0;
     e.currentBidderId = null;
+    e.declinedPlayers = [];
 
     const starter = active[e.starterIndex % active.length];
     e.starterIndex++;
@@ -1649,39 +1651,62 @@ function maybeAutoResolveEnchereTurn(room, roomCode) {
     if (!e.turnPlayerId) return;
     const budget = e.budgets[e.turnPlayerId] ?? 0;
 
-    // Si le joueur dont c'est le tour ne peut même pas mettre +1M de plus, le perso part direct à l'autre
+    // Si le joueur dont c'est le tour ne peut même pas mettre +1M de plus, il est traité comme s'il laissait
     if (budget < e.currentBid + 1) {
         resolveEncherePass(room, roomCode, e.turnPlayerId);
     }
+}
+
+function discardCurrentEnchereCharacter(room, roomCode) {
+    const e = room.enchere;
+    e.currentCharacter = null;
+    e.currentBid = 0;
+    e.currentBidderId = null;
+    e.turnPlayerId = null;
+    e.declinedPlayers = [];
+    startEnchereRound(room, roomCode);
 }
 
 function resolveEncherePass(room, roomCode, passingPlayerId) {
     const e = room.enchere;
     const opponent = room.players.find(p => p.id !== passingPlayerId);
 
-    let winnerId;
-    let finalBid;
-
+    // Cas 1 : quelqu'un avait déjà enchéri sur ce perso — l'autre laisse, le perso part au dernier
+    // enchérisseur au prix de sa dernière enchère.
     if (e.currentBidderId) {
-        winnerId = e.currentBidderId;
-        finalBid = e.currentBid;
-    } else {
-        winnerId = opponent ? opponent.id : null;
-        finalBid = 0;
-    }
+        const winnerId = e.currentBidderId;
+        const finalBid = e.currentBid;
 
-    if (winnerId) {
         e.budgets[winnerId] = Math.max((e.budgets[winnerId] ?? 0) - finalBid, 0);
         e.teams[winnerId] = e.teams[winnerId] || [];
         e.teams[winnerId].push(e.currentCharacter);
+
+        e.currentCharacter = null;
+        e.currentBid = 0;
+        e.currentBidderId = null;
+        e.turnPlayerId = null;
+        e.declinedPlayers = [];
+        return startEnchereRound(room, roomCode);
     }
 
-    e.currentCharacter = null;
-    e.currentBid = 0;
-    e.currentBidderId = null;
-    e.turnPlayerId = null;
+    // Cas 2 : personne n'a encore misé sur ce perso.
+    e.declinedPlayers = e.declinedPlayers || [];
+    if (!e.declinedPlayers.includes(passingPlayerId)) {
+        e.declinedPlayers.push(passingPlayerId);
+    }
 
-    startEnchereRound(room, roomCode);
+    const activeIds = enchereActivePlayers(room).map(p => p.id);
+    const everyoneDeclined = activeIds.length > 0 && activeIds.every(id => e.declinedPlayers.includes(id));
+
+    if (everyoneDeclined || !opponent) {
+        // Personne n'en veut : le perso est écarté (donné à personne), on en tire un nouveau
+        return discardCurrentEnchereCharacter(room, roomCode);
+    }
+
+    // On laisse sa chance à l'autre joueur de miser dessus
+    e.turnPlayerId = opponent.id;
+    io.to(roomCode).emit('enchere_state', room);
+    maybeAutoResolveEnchereTurn(room, roomCode);
 }
 
 function endEnchere(room, roomCode) {
