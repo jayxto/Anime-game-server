@@ -198,6 +198,16 @@
                 <span id="auth-switch-text">Pas de compte ?</span>
                 <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--accent-cyan); text-decoration:none; font-weight:600;" id="auth-switch-link">Créer un compte</a>
             </p>
+
+            <p style="text-align:center; margin-top:10px; font-size:0.8rem;">
+                <a href="#" onclick="toggleGuestMode(); return false;" style="color: var(--text-muted); text-decoration:none;">Jouer en invité</a>
+            </p>
+
+            <div id="guest-fields" style="display:none; margin-top: 12px; border-top: 1px solid #2a2a40; padding-top: 15px;">
+                <p style="margin-bottom:5px;">Pseudo (invité, pas de compte)</p>
+                <input type="text" id="guest-pseudo" maxlength="20" style="width:100%; background:#0b0b10; border:1px solid var(--text-muted); color:var(--text-color); padding:10px; border-radius:4px; margin-bottom:12px;">
+                <button class="btn-action" style="background: var(--text-muted);" onclick="playAsGuest()">Jouer en invité</button>
+            </div>
         </div>
     </div>
 
@@ -498,6 +508,11 @@
             socket.connect();
         }
 
+        function connectSocketAsGuest(pseudo) {
+            socket.auth = { guest: true, pseudo };
+            socket.connect();
+        }
+
         function showAuthScreen() {
             document.getElementById('auth-screen').style.display = 'block';
             document.getElementById('app-root').style.display = 'none';
@@ -511,11 +526,18 @@
 
         function updateProfileDisplay() {
             if (!currentUser) return;
-            document.getElementById('profile-pseudo').innerText = currentUser.pseudo;
-            document.getElementById('profile-rank').innerText = currentUser.rank;
-            document.getElementById('profile-rating').innerText = currentUser.rating;
-            document.getElementById('profile-wins').innerText = currentUser.wins;
-            document.getElementById('profile-losses').innerText = currentUser.losses;
+            document.getElementById('profile-pseudo').innerText = currentUser.pseudo + (currentUser.isGuest ? ' (invité)' : '');
+            if (currentUser.isGuest) {
+                document.getElementById('profile-rank').innerText = '—';
+                document.getElementById('profile-rating').innerText = '—';
+                document.getElementById('profile-wins').innerText = '—';
+                document.getElementById('profile-losses').innerText = '—';
+            } else {
+                document.getElementById('profile-rank').innerText = currentUser.rank;
+                document.getElementById('profile-rating').innerText = currentUser.rating;
+                document.getElementById('profile-wins').innerText = currentUser.wins;
+                document.getElementById('profile-losses').innerText = currentUser.losses;
+            }
         }
 
         socket.on('profile_updated', (data) => {
@@ -531,6 +553,27 @@
             document.getElementById('auth-switch-text').innerText = authMode === 'register' ? 'Déjà un compte ?' : 'Pas de compte ?';
             document.getElementById('auth-switch-link').innerText = authMode === 'register' ? 'Se connecter' : 'Créer un compte';
             document.getElementById('auth-error').innerText = '';
+        }
+
+        function toggleGuestMode() {
+            const fields = document.getElementById('guest-fields');
+            fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function playAsGuest() {
+            const pseudo = document.getElementById('guest-pseudo').value.trim();
+            const errBox = document.getElementById('auth-error');
+            errBox.innerText = '';
+
+            if (!pseudo) {
+                errBox.innerText = 'Choisis un pseudo pour jouer en invité.';
+                return;
+            }
+
+            authToken = null;
+            currentUser = { pseudo, isGuest: true, rating: null, wins: 0, losses: 0, rank: null };
+            showApp();
+            connectSocketAsGuest(pseudo);
         }
 
         async function submitAuth() {
@@ -1018,6 +1061,10 @@
         }
 
         socket.on('enchere_error', (data) => {
+            alert(data.message);
+        });
+
+        socket.on('game_error', (data) => {
             alert(data.message);
         });
 
