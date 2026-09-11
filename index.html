@@ -398,6 +398,7 @@
 
             <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin-bottom:15px;">
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">PERSONNAGE EN VENTE</div>
+                <img id="enchere-char-image" style="display:none; width:110px; height:110px; object-fit:cover; border-radius:10px; border:2px solid var(--accent-pink); margin-bottom:10px;">
                 <div id="enchere-char-name" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
                 <div style="font-size:0.8rem; color:var(--text-muted); margin: 4px 0 10px;" id="enchere-char-value">Valeur : -- pts</div>
                 <div style="font-size:0.75rem; color:var(--text-muted);">Enchère actuelle</div>
@@ -1025,7 +1026,77 @@
             document.getElementById('enchere-end-buttons').style.display = 'flex';
         });
 
+        // Cache des images trouvées pour chaque perso, pour ne jamais re-chercher deux fois la même.
+        const enchereImageCache = {};
+        let lastEnchereRoom = null;
+        let enchereImageRequestToken = 0;
+
+        // Cherche la photo du perso via l'API publique Jikan (MyAnimeList). Pas d'image trouvée = pas de blocage.
+        async function getEnchereCharacterImage(name) {
+            if (Object.prototype.hasOwnProperty.call(enchereImageCache, name)) {
+                return enchereImageCache[name];
+            }
+            const cleanName = name.split('—')[0].replace(/\([^)]*\)/g, '').trim();
+            if (!cleanName) { enchereImageCache[name] = null; return null; }
+            try {
+                const res = await fetch(`https://api.jikan.moe/v4/characters?q=${encodeURIComponent(cleanName)}&limit=1`);
+                if (!res.ok) { enchereImageCache[name] = null; return null; }
+                const data = await res.json();
+                const match = data.data && data.data[0];
+                const url = match && match.images && match.images.jpg ? match.images.jpg.image_url : null;
+                enchereImageCache[name] = url;
+                return url;
+            } catch (err) {
+                enchereImageCache[name] = null;
+                return null;
+            }
+        }
+
+        async function updateEnchereCharacterImage(name) {
+            const token = ++enchereImageRequestToken;
+            const imgEl = document.getElementById('enchere-char-image');
+            imgEl.style.display = 'none';
+
+            const url = await getEnchereCharacterImage(name);
+            if (token !== enchereImageRequestToken) return; // le perso en vente a déjà changé
+            if (url) {
+                imgEl.src = url;
+                imgEl.style.display = 'inline-block';
+            }
+        }
+
+        function renderEnchereTeamChips(containerId, characters) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            characters.forEach(c => {
+                const chip = document.createElement('span');
+                chip.className = 'rg-chip';
+                chip.style.display = 'inline-flex';
+                chip.style.alignItems = 'center';
+                chip.style.gap = '6px';
+
+                if (Object.prototype.hasOwnProperty.call(enchereImageCache, c.name) && enchereImageCache[c.name]) {
+                    const img = document.createElement('img');
+                    img.src = enchereImageCache[c.name];
+                    img.style.cssText = 'width:20px; height:20px; border-radius:50%; object-fit:cover;';
+                    chip.appendChild(img);
+                } else if (!Object.prototype.hasOwnProperty.call(enchereImageCache, c.name)) {
+                    getEnchereCharacterImage(c.name).then(url => {
+                        if (url && lastEnchereRoom) renderEnchereState(lastEnchereRoom);
+                    });
+                }
+
+                const label = document.createElement('span');
+                label.innerText = `${c.name} (${c.value})`;
+                chip.appendChild(label);
+
+                container.appendChild(chip);
+            });
+        }
+
         function renderEnchereState(room) {
+            lastEnchereRoom = room;
             const e = room.enchere;
             if (!e) return;
 
@@ -1039,9 +1110,11 @@
             if (e.currentCharacter) {
                 document.getElementById('enchere-char-name').innerText = e.currentCharacter.name;
                 document.getElementById('enchere-char-value').innerText = `Valeur : ${e.currentCharacter.value} pts`;
+                updateEnchereCharacterImage(e.currentCharacter.name);
             } else {
                 document.getElementById('enchere-char-name').innerText = '---';
                 document.getElementById('enchere-char-value').innerText = '';
+                document.getElementById('enchere-char-image').style.display = 'none';
             }
 
             document.getElementById('enchere-current-bid').innerText = e.currentBid + 'M';
@@ -1050,19 +1123,8 @@
                 ? `Enchère de : ${holder.name}${holder.id === socket.id ? ' (toi)' : ''}`
                 : 'Aucune enchère pour le moment';
 
-            const myTeamDiv = document.getElementById('enchere-my-team');
-            myTeamDiv.innerHTML = '';
-            (e.teams[socket.id] || []).forEach(c => {
-                myTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
-            });
-
-            const oppTeamDiv = document.getElementById('enchere-opp-team');
-            oppTeamDiv.innerHTML = '';
-            if (opp) {
-                (e.teams[opp.id] || []).forEach(c => {
-                    oppTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
-                });
-            }
+            renderEnchereTeamChips('enchere-my-team', e.teams[socket.id] || []);
+            renderEnchereTeamChips('enchere-opp-team', opp ? (e.teams[opp.id] || []) : []);
 
             document.getElementById('enchere-end-buttons').style.display = 'none';
 
