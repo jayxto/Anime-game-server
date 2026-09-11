@@ -2190,11 +2190,10 @@ function startEnchereAveugleRound(room, roomCode) {
     ea.currentBidderId = null;
 
     const seer = active[ea.starterIndex % active.length];
-    const blindPlayer = active.find(p => p.id !== seer.id);
     ea.starterIndex++;
 
     ea.seerId = seer.id;
-    ea.turnPlayerId = blindPlayer ? blindPlayer.id : seer.id; // le joueur à l'aveugle mise en premier
+    ea.turnPlayerId = seer.id; // le voyant mise en premier, l'aveugle répond ensuite
 
     emitEnchereAveugleState(room, roomCode);
     maybeAutoResolveEnchereAveugleTurn(room, roomCode);
