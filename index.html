@@ -293,6 +293,23 @@
                         <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('enchere', document.getElementById('enchere-universe-picker').value)">Créer</button>
                     </div>
                 </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
+                    <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Enchère à l'aveugle</h3>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">1v1 — un seul voit le perso à chaque tour, l'autre mise à l'aveugle. Minimum 1 mise pour pouvoir laisser.</p>
+                    <div class="chat-input-box" style="margin-top:0;">
+                        <select id="ea-universe-picker">
+                            <option value="naruto">Naruto</option>
+                            <option value="onepiece">One Piece</option>
+                            <option value="bleach">Bleach</option>
+                            <option value="sds">Seven Deadly Sins</option>
+                            <option value="mha">My Hero Academia</option>
+                            <option value="clover">Black Clover</option>
+                            <option value="fairy">Fairy Tail</option>
+                        </select>
+                        <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('enchereaveugle', document.getElementById('ea-universe-picker').value)">Créer</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -442,6 +459,56 @@
             <div class="rg-chips" id="enchere-opp-team"></div>
 
             <div id="enchere-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
+
+        <div id="enchereaveugle-room" class="game-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                <h2 style="margin-bottom:0;">Enchère à l'aveugle</h2>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:0.75rem; cursor:pointer;">🔙 Menu</button>
+            </div>
+            <p id="ea-universe-label" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">Univers : ---</p>
+
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <div style="flex:1; background:#0b0b10; border:2px solid var(--accent-cyan); border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:0.7rem; color:var(--text-muted);">TOI</div>
+                    <div id="ea-my-budget" style="font-family:'Bangers'; font-size:1.4rem; color:var(--accent-yellow);">50M</div>
+                </div>
+                <div style="flex:1; background:#0b0b10; border:2px solid var(--accent-pink); border-radius:8px; padding:10px; text-align:center;">
+                    <div style="font-size:0.7rem; color:var(--text-muted);" id="ea-opp-name">ADVERSAIRE</div>
+                    <div id="ea-opp-budget" style="font-family:'Bangers'; font-size:1.4rem; color:var(--accent-yellow);">50M</div>
+                </div>
+            </div>
+
+            <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin-bottom:15px;">
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">PERSONNAGE EN VENTE</div>
+                <div id="ea-char-name" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin: 4px 0 6px;" id="ea-char-value">Valeur : -- pts</div>
+                <div style="font-size:0.75rem; color: var(--accent-pink); margin-bottom: 10px; font-weight:600;" id="ea-vision-label"></div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Enchère actuelle</div>
+                <div id="ea-current-bid" style="font-family:'Bangers'; font-size:2rem; color:var(--accent-yellow);">0M</div>
+                <div id="ea-bid-holder" style="font-size:0.8rem; color: var(--text-muted);"></div>
+            </div>
+
+            <p id="ea-turn-info" style="text-align:center; color: var(--accent-yellow); font-weight:600;">En attente…</p>
+
+            <div id="ea-bid-buttons" style="display:none; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                <button class="btn-action" id="ea-bid-1" style="width:auto; flex:1; margin-top:0;" onclick="enchereAveugleBid(1)">+1M</button>
+                <button class="btn-action" id="ea-bid-3" style="width:auto; flex:1; margin-top:0;" onclick="enchereAveugleBid(3)">+3M</button>
+                <button class="btn-action" id="ea-bid-5" style="width:auto; flex:1; margin-top:0;" onclick="enchereAveugleBid(5)">+5M</button>
+                <button class="btn-action" id="ea-bid-10" style="width:auto; flex:1; margin-top:0;" onclick="enchereAveugleBid(10)">+10M</button>
+            </div>
+            <button class="btn-action" id="ea-pass-btn" style="display:none; background: var(--text-muted);" onclick="enchereAveugleLaisser()">Laisser</button>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin: 15px 0 6px; text-align:left;">Ton équipe</p>
+            <div class="rg-chips" id="ea-my-team"></div>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin: 10px 0 6px; text-align:left;">Équipe adverse</p>
+            <div class="rg-chips" id="ea-opp-team"></div>
+
+            <div id="ea-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
                 <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                 <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
@@ -657,6 +724,7 @@
             document.getElementById('gameplay-room').style.display = 'none';
             document.getElementById('rg-room').style.display = 'none';
             document.getElementById('enchere-room').style.display = 'none';
+            document.getElementById('enchereaveugle-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -664,6 +732,7 @@
             document.getElementById('end-game-buttons').style.display = 'none';
             document.getElementById('rg-end-buttons').style.display = 'none';
             document.getElementById('enchere-end-buttons').style.display = 'none';
+            document.getElementById('ea-end-buttons').style.display = 'none';
         }
 
         function goToMenuSelection() {
@@ -1138,6 +1207,99 @@
                 document.getElementById('enchere-turn-info').innerText = opp ? `En attente de ${opp.name}…` : 'En attente…';
                 document.getElementById('enchere-bid-buttons').style.display = 'none';
                 document.getElementById('enchere-pass-btn').style.display = 'none';
+            }
+        }
+
+        /* ---------------- Enchère à l'aveugle (mode indépendant) ---------------- */
+
+        function enchereAveugleBid(amount) {
+            socket.emit('enchereaveugle_bid', { roomCode: currentRoomCode, amount });
+        }
+
+        function enchereAveugleLaisser() {
+            socket.emit('enchereaveugle_pass', { roomCode: currentRoomCode });
+        }
+
+        socket.on('enchereaveugle_state', (room) => {
+            hideAllPanels();
+            document.getElementById('enchereaveugle-room').style.display = 'block';
+            renderEnchereAveugleState(room);
+        });
+
+        socket.on('enchereaveugle_game_over', (data) => {
+            renderEnchereAveugleState(data.room);
+            document.getElementById('ea-bid-buttons').style.display = 'none';
+            document.getElementById('ea-pass-btn').style.display = 'none';
+            document.getElementById('ea-turn-info').innerText = data.message;
+            document.getElementById('ea-end-buttons').style.display = 'flex';
+        });
+
+        function renderEnchereAveugleState(room) {
+            const ea = room.enchereAveugle;
+            if (!ea) return;
+
+            const opp = room.players.find(p => p.id !== socket.id);
+
+            document.getElementById('ea-universe-label').innerText = 'Univers : ' + (ea.universeName || '---');
+            document.getElementById('ea-opp-name').innerText = opp ? opp.name.toUpperCase() : 'ADVERSAIRE';
+            document.getElementById('ea-my-budget').innerText = (ea.budgets[socket.id] ?? 50) + 'M';
+            document.getElementById('ea-opp-budget').innerText = (opp ? (ea.budgets[opp.id] ?? 50) : 50) + 'M';
+
+            const isSeer = ea.seerId === socket.id;
+
+            if (ea.currentCharacter) {
+                if (isSeer) {
+                    document.getElementById('ea-char-name').innerText = ea.currentCharacter.name;
+                    document.getElementById('ea-char-value').innerText = `Valeur : ${ea.currentCharacter.value} pts`;
+                    document.getElementById('ea-vision-label').innerText = "👁️ Tu vois ce perso, l'adversaire mise à l'aveugle !";
+                } else {
+                    document.getElementById('ea-char-name').innerText = '??? Mystère';
+                    document.getElementById('ea-char-value').innerText = 'Tu ne sais pas qui c\'est';
+                    document.getElementById('ea-vision-label').innerText = "🙈 Tu enchéris à l'aveugle sur ce perso.";
+                }
+            } else {
+                document.getElementById('ea-char-name').innerText = '---';
+                document.getElementById('ea-char-value').innerText = '';
+                document.getElementById('ea-vision-label').innerText = '';
+            }
+
+            document.getElementById('ea-current-bid').innerText = ea.currentBid + 'M';
+            const holder = room.players.find(p => p.id === ea.currentBidderId);
+            document.getElementById('ea-bid-holder').innerText = holder
+                ? `Enchère de : ${holder.name}${holder.id === socket.id ? ' (toi)' : ''}`
+                : 'Aucune enchère pour le moment';
+
+            const myTeamDiv = document.getElementById('ea-my-team');
+            myTeamDiv.innerHTML = '';
+            (ea.teams[socket.id] || []).forEach(c => {
+                myTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
+            });
+
+            const oppTeamDiv = document.getElementById('ea-opp-team');
+            oppTeamDiv.innerHTML = '';
+            if (opp) {
+                (ea.teams[opp.id] || []).forEach(c => {
+                    oppTeamDiv.innerHTML += `<span class="rg-chip">${c.name} (${c.value})</span>`;
+                });
+            }
+
+            document.getElementById('ea-end-buttons').style.display = 'none';
+
+            const isMyTurn = ea.turnPlayerId === socket.id;
+            if (isMyTurn) {
+                document.getElementById('ea-turn-info').innerText = "À toi de jouer !";
+                document.getElementById('ea-bid-buttons').style.display = 'flex';
+                const myBudget = ea.budgets[socket.id] ?? 0;
+                [1, 3, 5, 10].forEach(amount => {
+                    const btn = document.getElementById('ea-bid-' + amount);
+                    if (btn) btn.disabled = (ea.currentBid + amount) > myBudget;
+                });
+                // Minimum 1 mise avant de pouvoir laisser
+                document.getElementById('ea-pass-btn').style.display = ea.currentBid > 0 ? 'block' : 'none';
+            } else {
+                document.getElementById('ea-turn-info').innerText = opp ? `En attente de ${opp.name}…` : 'En attente…';
+                document.getElementById('ea-bid-buttons').style.display = 'none';
+                document.getElementById('ea-pass-btn').style.display = 'none';
             }
         }
 
