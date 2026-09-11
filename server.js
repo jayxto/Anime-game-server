@@ -1518,6 +1518,201 @@ function rgEndGame(room, roomCode, winner) {
     io.to(roomCode).emit('rg_game_over', { room });
 }
 
+/* ================= Enchère : logique de partie (mode indépendant) ================= */
+// Nouveau mode 1v1 : chacun a 50M pour construire une équipe de 4 persos via des enchères tour par tour.
+
+const ENCHERE_CHARACTERS = [
+    { name: 'Kaguya Ōtsutsuki', value: 110 },
+    { name: 'Hagoromo Ōtsutsuki', value: 109 },
+    { name: 'Naruto — Mode Baryon', value: 108 },
+    { name: 'Madara — Jinchūriki du Jûbi', value: 107 },
+    { name: 'Sasuke — Rinnegan', value: 105 },
+    { name: 'Kakashi — Double Mangekyō', value: 104 },
+    { name: 'Obito — Jinchūriki du Jûbi', value: 103 },
+    { name: 'Hamura Ōtsutsuki', value: 102 },
+    { name: 'Indra Ōtsutsuki', value: 100 },
+    { name: 'Ashura Ōtsutsuki', value: 99 },
+    { name: 'Might Guy — 8e porte', value: 98 },
+    { name: 'Toneri Ōtsutsuki', value: 97 },
+    { name: 'Hashirama Senju', value: 95 },
+    { name: 'Minato Namikaze', value: 93 },
+    { name: 'Tobirama Senju', value: 90 },
+    { name: 'Itachi Uchiha', value: 89 },
+    { name: 'Nagato Uzumaki', value: 88 },
+    { name: 'Kabuto — Mode Ermite', value: 87 },
+    { name: 'Orochimaru', value: 85 },
+    { name: 'Killer B', value: 84 },
+    { name: '3e Raikage', value: 83 },
+    { name: 'Mû', value: 81 },
+    { name: 'Gengetsu Hōzuki', value: 80 },
+    { name: 'Ōnoki', value: 79 },
+    { name: 'Jiraiya — Mode Ermite', value: 78 },
+    { name: 'Hiruzen Sarutobi', value: 77 },
+    { name: 'Kisame Hoshigaki', value: 75 },
+    { name: 'Gaara', value: 73 },
+    { name: 'Kakashi', value: 72 },
+    { name: 'Deidara', value: 71 },
+    { name: 'Sasori', value: 70 },
+    { name: 'Konan', value: 67 },
+    { name: 'Darui', value: 65 },
+    { name: 'Rock Lee', value: 64 },
+    { name: 'Shikamaru', value: 60 },
+    { name: 'Neji', value: 59 },
+    { name: 'Temari', value: 58 },
+    { name: 'Kankurō', value: 56 },
+    { name: 'Sai', value: 55 },
+    { name: 'Chōji', value: 54 },
+    { name: 'Yamato', value: 53 },
+    { name: 'Shino', value: 52 },
+    { name: 'Kiba', value: 50 },
+    { name: 'Hinata', value: 49 },
+    { name: 'Tenten', value: 44 },
+    { name: 'Ino', value: 43 },
+    { name: 'Sakura — début Shippuden', value: 42 },
+    { name: 'Iruka', value: 25 },
+    { name: 'Konohamaru — début Shippuden', value: 22 },
+    { name: 'Mizuki', value: 12 }
+];
+
+function shuffleEnchereDeck(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startEnchere(room, roomCode) {
+    room.status = 'enchere_playing';
+    const budgets = {};
+    const teams = {};
+    room.players.forEach(p => {
+        budgets[p.id] = 50;
+        teams[p.id] = [];
+    });
+
+    room.enchere = {
+        pool: shuffleEnchereDeck(ENCHERE_CHARACTERS),
+        budgets,
+        teams,
+        currentCharacter: null,
+        currentBid: 0,
+        currentBidderId: null,
+        turnPlayerId: null,
+        starterIndex: 0
+    };
+
+    startEnchereRound(room, roomCode);
+}
+
+function enchereActivePlayers(room) {
+    return room.players.filter(p => (room.enchere.teams[p.id] || []).length < 4);
+}
+
+function startEnchereRound(room, roomCode) {
+    const e = room.enchere;
+
+    if (room.players.length > 0 && room.players.every(p => (e.teams[p.id] || []).length >= 4)) {
+        return endEnchere(room, roomCode);
+    }
+
+    const active = enchereActivePlayers(room);
+    if (active.length === 0 || e.pool.length === 0) {
+        return endEnchere(room, roomCode);
+    }
+
+    if (active.length === 1) {
+        // Un seul joueur a encore de la place libre : il récupère le perso suivant direct, sans enchère
+        const freePlayer = active[0];
+        const character = e.pool.pop();
+        e.teams[freePlayer.id].push(character);
+        io.to(roomCode).emit('enchere_state', room);
+        return startEnchereRound(room, roomCode);
+    }
+
+    const character = e.pool.pop();
+    e.currentCharacter = character;
+    e.currentBid = 0;
+    e.currentBidderId = null;
+
+    const starter = active[e.starterIndex % active.length];
+    e.starterIndex++;
+    e.turnPlayerId = starter.id;
+
+    io.to(roomCode).emit('enchere_state', room);
+    maybeAutoResolveEnchereTurn(room, roomCode);
+}
+
+function maybeAutoResolveEnchereTurn(room, roomCode) {
+    const e = room.enchere;
+    if (!e.turnPlayerId) return;
+    const budget = e.budgets[e.turnPlayerId] ?? 0;
+
+    // Si le joueur dont c'est le tour ne peut même pas mettre +1M de plus, le perso part direct à l'autre
+    if (budget < e.currentBid + 1) {
+        resolveEncherePass(room, roomCode, e.turnPlayerId);
+    }
+}
+
+function resolveEncherePass(room, roomCode, passingPlayerId) {
+    const e = room.enchere;
+    const opponent = room.players.find(p => p.id !== passingPlayerId);
+
+    let winnerId;
+    let finalBid;
+
+    if (e.currentBidderId) {
+        winnerId = e.currentBidderId;
+        finalBid = e.currentBid;
+    } else {
+        winnerId = opponent ? opponent.id : null;
+        finalBid = 0;
+    }
+
+    if (winnerId) {
+        e.budgets[winnerId] = Math.max((e.budgets[winnerId] ?? 0) - finalBid, 0);
+        e.teams[winnerId] = e.teams[winnerId] || [];
+        e.teams[winnerId].push(e.currentCharacter);
+    }
+
+    e.currentCharacter = null;
+    e.currentBid = 0;
+    e.currentBidderId = null;
+    e.turnPlayerId = null;
+
+    startEnchereRound(room, roomCode);
+}
+
+function endEnchere(room, roomCode) {
+    room.status = 'enchere_over';
+    const e = room.enchere;
+
+    const totals = {};
+    room.players.forEach(p => {
+        totals[p.id] = (e.teams[p.id] || []).reduce((sum, c) => sum + c.value, 0);
+    });
+
+    let winnerId = null;
+    let message = "Égalité parfaite !";
+
+    if (room.players.length === 2) {
+        const [p1, p2] = room.players;
+        if (totals[p1.id] > totals[p2.id]) {
+            winnerId = p1.id;
+            message = `🏆 ${p1.name} remporte l'enchère avec ${totals[p1.id]} pts !`;
+        } else if (totals[p2.id] > totals[p1.id]) {
+            winnerId = p2.id;
+            message = `🏆 ${p2.name} remporte l'enchère avec ${totals[p2.id]} pts !`;
+        }
+    }
+
+    e.totals = totals;
+    e.winnerId = winnerId;
+
+    io.to(roomCode).emit('enchere_game_over', { room, message });
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -1575,6 +1770,12 @@ io.on('connection', (socket) => {
             io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
         } else if (room.mode === 'rollandgaros') {
             startRollandGaros(room, roomCode);
+        } else if (room.mode === 'enchere') {
+            if (room.players.length !== 2) {
+                socket.emit('enchere_error', { message: "Il faut exactement 2 joueurs dans le salon pour lancer une Enchère." });
+                return;
+            }
+            startEnchere(room, roomCode);
         }
     });
 
@@ -1873,6 +2074,36 @@ io.on('connection', (socket) => {
         rgLoseLife(room, roomCode, `✗ Pas dans l'univers ${room.rg.universeName}.`);
     });
 
+    socket.on('enchere_bid', ({ roomCode, amount }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.enchere || room.status !== 'enchere_playing') return;
+        const e = room.enchere;
+        if (e.turnPlayerId !== socket.id) return;
+        if (![1, 3, 5, 10].includes(amount)) return;
+
+        const newBid = e.currentBid + amount;
+        const budget = e.budgets[socket.id] ?? 0;
+        if (newBid > budget) return; // pas les moyens : ignoré
+
+        e.currentBid = newBid;
+        e.currentBidderId = socket.id;
+
+        const opponent = room.players.find(p => p.id !== socket.id);
+        e.turnPlayerId = opponent ? opponent.id : null;
+
+        io.to(roomCode).emit('enchere_state', room);
+        if (opponent) maybeAutoResolveEnchereTurn(room, roomCode);
+    });
+
+    socket.on('enchere_pass', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.enchere || room.status !== 'enchere_playing') return;
+        const e = room.enchere;
+        if (e.turnPlayerId !== socket.id) return;
+
+        resolveEncherePass(room, roomCode, socket.id);
+    });
+
     socket.on('next_step_game', (roomCode) => {
         const room = rooms[roomCode];
         if (!room) return;
@@ -1881,6 +2112,8 @@ io.on('connection', (socket) => {
             distributeSecretsAndStart(room, roomCode);
         } else if (room.mode === 'rollandgaros') {
             startRollandGaros(room, roomCode);
+        } else if (room.mode === 'enchere') {
+            startEnchere(room, roomCode);
         } else {
             room.status = 'choosing_theme';
             room.pendingFreshStart = true; // nouvelle manche : nouvelles notes / nouveau rôle
@@ -1900,6 +2133,7 @@ io.on('connection', (socket) => {
             }
             delete rgPools[roomCode];
             delete room.rg;
+            delete room.enchere;
             room.status = 'waiting';
             room.players.forEach(p => {
                 p.isAlive = true;
