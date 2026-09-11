@@ -299,6 +299,7 @@
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
+                <div id="my-secret-image-container" style="display:none; text-align:center; margin-top:10px;"></div>
             </div>
 
             <ul class="player-list" id="gameplay-players-list"></ul>
@@ -642,9 +643,9 @@
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
                 if (room.mode === 'undercover') {
-                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                    displaySecretWithImage(me.secretData, room.mode, room.subMode);
                 } else {
-                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                    displaySecretWithImage(`${room.currentTheme} ➔ ${me.secretData}`, room.mode, room.subMode);
                 }
             }
             updateGameplayUI(room);
@@ -661,13 +662,46 @@
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
                 if (room.mode === 'undercover') {
-                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                    displaySecretWithImage(me.secretData, room.mode, room.subMode);
                 } else {
-                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                    displaySecretWithImage(`${room.currentTheme} ➔ ${me.secretData}`, room.mode, room.subMode);
                 }
             }
             updateGameplayUI(room);
         });
+
+        // Cherche automatiquement la photo du perso (Undercover Hardcore uniquement)
+        // via l'API publique Jikan (MyAnimeList) - pas d'image = juste le texte, jamais de blocage.
+        let secretImageRequestId = 0;
+        async function displaySecretWithImage(secretText, mode, subMode) {
+            document.getElementById('my-secret-display').innerText = secretText;
+
+            const imgContainer = document.getElementById('my-secret-image-container');
+            imgContainer.style.display = 'none';
+            imgContainer.innerHTML = '';
+
+            if (mode !== 'undercover' || subMode !== 'hardcore') return;
+
+            const cleanName = secretText.replace(/\s*\([^)]*\)\s*$/, '').trim();
+            if (!cleanName) return;
+
+            const requestId = ++secretImageRequestId;
+            try {
+                const res = await fetch(`https://api.jikan.moe/v4/characters?q=${encodeURIComponent(cleanName)}&limit=1`);
+                if (!res.ok) return;
+                const data = await res.json();
+                const match = data.data && data.data[0];
+                const imageUrl = match && match.images && match.images.jpg ? match.images.jpg.image_url : null;
+
+                // Ignore une réponse tardive si le mot secret a déjà changé entre-temps
+                if (requestId !== secretImageRequestId || !imageUrl) return;
+
+                imgContainer.innerHTML = `<img src="${imageUrl}" alt="${cleanName}" style="width:90px; height:90px; object-fit:cover; border-radius:10px; border:2px solid var(--accent-pink);">`;
+                imgContainer.style.display = 'block';
+            } catch (e) {
+                // Pas d'image dispo : on garde juste le texte, aucun blocage
+            }
+        }
 
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
