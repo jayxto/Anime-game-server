@@ -376,7 +376,10 @@
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
             <h2>Mon compte</h2>
             <p style="margin-bottom: 4px;">Pseudo</p>
-            <div id="profile-pseudo" style="font-family:'Bangers'; font-size:1.5rem; color: var(--accent-cyan); margin-bottom: 20px;">---</div>
+            <div id="profile-pseudo" style="font-family:'Bangers'; font-size:1.5rem; color: var(--accent-cyan); margin-bottom: 6px;">---</div>
+
+            <p style="margin-bottom: 4px;">Rang</p>
+            <div id="profile-rank" style="font-family:'Bangers'; font-size:1.8rem; color: var(--accent-pink); margin-bottom: 20px;">Bronze 1</div>
 
             <div class="rg-stat-row">
                 <div class="rg-stat">
@@ -393,7 +396,7 @@
                 </div>
             </div>
 
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Le système de classement (ranked) arrive bientôt — ton rating est déjà suivi en base.</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Ton rang évolue après chaque partie classée : Bronze → Argent → Or → Platine → Diamant, puis un classement pur à l'ELO au-delà.</p>
 
             <button class="btn-action" style="background: var(--text-muted); margin-top: 15px;" onclick="logout()">Se déconnecter</button>
         </div>
@@ -437,11 +440,22 @@
         function showApp() {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-root').style.display = 'block';
+            updateProfileDisplay();
+        }
+
+        function updateProfileDisplay() {
+            if (!currentUser) return;
             document.getElementById('profile-pseudo').innerText = currentUser.pseudo;
+            document.getElementById('profile-rank').innerText = currentUser.rank;
             document.getElementById('profile-rating').innerText = currentUser.rating;
             document.getElementById('profile-wins').innerText = currentUser.wins;
             document.getElementById('profile-losses').innerText = currentUser.losses;
         }
+
+        socket.on('profile_updated', (data) => {
+            currentUser = data.user;
+            updateProfileDisplay();
+        });
 
         function toggleAuthMode() {
             authMode = authMode === 'login' ? 'register' : 'login';
