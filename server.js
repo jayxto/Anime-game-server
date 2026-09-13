@@ -2282,6 +2282,86 @@ function endEnchereAveugle(room, roomCode) {
     });
 }
 
+/* ================= Jeu de connexion : logique de partie (mode indépendant) ================= */
+// Chaque joueur écrit un mot en secret. Quand tout le monde a écrit, les mots sont révélés.
+// Si tout le monde a écrit le même mot -> victoire commune. Sinon on repart pour un tour.
+
+function normalizeConnexionWord(s) {
+    return String(s)
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '')
+        .replace(/s$/, ''); // tolère le pluriel simple
+}
+
+function startConnexion(room, roomCode) {
+    room.status = 'connexion_playing';
+    room.connexion = {
+        round: 1,
+        words: {},          // playerId -> mot du tour en cours (secret)
+        history: [],        // [{ round, entries: [{name, word}] }]
+        revealed: false
+    };
+    emitConnexionState(room, roomCode);
+}
+
+function connexionSnapshot(room, viewerId) {
+    const c = room.connexion;
+    return {
+        code: room.code,
+        players: room.players.map(p => ({
+            id: p.id,
+            name: p.name,
+            hasSubmitted: Object.prototype.hasOwnProperty.call(c.words, p.id)
+        })),
+        connexion: {
+            round: c.round,
+            myWord: c.words[viewerId] || null,
+            submittedCount: Object.keys(c.words).length,
+            totalPlayers: room.players.length,
+            history: c.history,
+            revealed: c.revealed
+        }
+    };
+}
+
+function emitConnexionState(room, roomCode) {
+    room.players.forEach(p => {
+        io.to(p.id).emit('connexion_state', connexionSnapshot(room, p.id));
+    });
+}
+
+function resolveConnexionRound(room, roomCode) {
+    const c = room.connexion;
+
+    const entries = room.players.map(p => ({
+        name: p.name,
+        word: c.words[p.id] || ''
+    }));
+
+    const normalized = room.players.map(p => normalizeConnexionWord(c.words[p.id] || ''));
+    const allMatch = normalized.length > 1 && normalized.every(w => w && w === normalized[0]);
+
+    c.history.unshift({ round: c.round, entries, matched: allMatch });
+
+    if (allMatch) {
+        room.status = 'connexion_over';
+        const finalWord = entries[0].word;
+        room.players.forEach(p => {
+            io.to(p.id).emit('connexion_game_over', {
+                room: connexionSnapshot(room, p.id),
+                message: `🎉 Connexion établie sur « ${finalWord} » au tour ${c.round} !`
+            });
+        });
+        return;
+    }
+
+    // Pas de convergence : on repart pour un tour
+    c.round++;
+    c.words = {};
+    emitConnexionState(room, roomCode);
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -2356,6 +2436,12 @@ io.on('connection', (socket) => {
                 return;
             }
             startEnchereAveugle(room, roomCode);
+        } else if (room.mode === 'connexion') {
+            if (room.players.length < 2) {
+                socket.emit('game_error', { message: "Il faut au moins 2 joueurs dans le salon pour lancer le Jeu de connexion." });
+                return;
+            }
+            startConnexion(room, roomCode);
         }
     });
 
@@ -2705,6 +2791,25 @@ io.on('connection', (socket) => {
         if (opponent) maybeAutoResolveEnchereAveugleTurn(room, roomCode);
     });
 
+    socket.on('connexion_submit_word', ({ roomCode, word }) => {
+        const room = rooms[roomCode];
+        if (!room || !room.connexion || room.status !== 'connexion_playing') return;
+        const c = room.connexion;
+
+        const clean = String(word || '').trim().slice(0, 40);
+        if (!clean) return;
+        if (Object.prototype.hasOwnProperty.call(c.words, socket.id)) return; // déjà écrit ce tour
+
+        c.words[socket.id] = clean;
+
+        // Tout le monde a écrit -> révélation
+        if (Object.keys(c.words).length >= room.players.length) {
+            resolveConnexionRound(room, roomCode);
+        } else {
+            emitConnexionState(room, roomCode);
+        }
+    });
+
     socket.on('enchereaveugle_pass', ({ roomCode }) => {
         const room = rooms[roomCode];
         if (!room || !room.enchereAveugle || room.status !== 'enchereaveugle_playing') return;
@@ -2727,6 +2832,8 @@ io.on('connection', (socket) => {
             startEnchere(room, roomCode);
         } else if (room.mode === 'enchereaveugle') {
             startEnchereAveugle(room, roomCode);
+        } else if (room.mode === 'connexion') {
+            startConnexion(room, roomCode);
         } else {
             room.status = 'choosing_theme';
             room.pendingFreshStart = true; // nouvelle manche : nouvelles notes / nouveau rôle
@@ -2748,6 +2855,7 @@ io.on('connection', (socket) => {
             delete room.rg;
             delete room.enchere;
             delete room.enchereAveugle;
+            delete room.connexion;
             room.status = 'waiting';
             room.players.forEach(p => {
                 p.isAlive = true;
