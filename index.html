@@ -310,6 +310,14 @@
                         <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('enchereaveugle', document.getElementById('ea-universe-picker').value)">Créer</button>
                     </div>
                 </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Jeu de connexion</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">2 joueurs min — écrivez le même mot pour gagner</p>
+                    </div>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('connexion', null)">Créer</button>
+                </div>
             </div>
         </div>
 
@@ -509,6 +517,41 @@
             <div class="rg-chips" id="ea-opp-team"></div>
 
             <div id="ea-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
+                <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
+
+        <div id="connexion-room" class="game-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                <h2 style="margin-bottom:0;">Jeu de connexion</h2>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:0.75rem; cursor:pointer;">🔙 Menu</button>
+            </div>
+
+            <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin: 15px 0;">
+                <div style="font-size:0.75rem; color:var(--text-muted);">TOUR</div>
+                <div id="cx-round" style="font-family:'Bangers'; font-size:2.2rem; color:var(--accent-yellow);">1</div>
+                <div id="cx-progress" style="font-size:0.85rem; color:var(--text-muted);">0 / 0 ont écrit</div>
+            </div>
+
+            <p id="cx-info" style="text-align:center; color: var(--accent-cyan); font-weight:600;">Écris ton mot !</p>
+
+            <div class="chat-input-box" id="cx-input-container">
+                <input type="text" id="cx-word-input" placeholder="Ton mot…" autocomplete="off" maxlength="40">
+                <button class="btn-action" style="width: auto; margin-top:0;" onclick="submitConnexionWord()">Valider</button>
+            </div>
+
+            <div id="cx-my-word" style="display:none; text-align:center; background:#0b0b10; border:2px solid var(--accent-cyan); border-radius:8px; padding:12px; margin-top:10px;">
+                <div style="font-size:0.7rem; color:var(--text-muted);">TON MOT (secret)</div>
+                <div id="cx-my-word-value" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
+            </div>
+
+            <ul class="player-list" id="cx-players-list" style="margin-top:15px;"></ul>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin: 15px 0 6px; text-align:left;">Historique des tours</p>
+            <div id="cx-history"></div>
+
+            <div id="cx-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
                 <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                 <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
@@ -725,6 +768,7 @@
             document.getElementById('rg-room').style.display = 'none';
             document.getElementById('enchere-room').style.display = 'none';
             document.getElementById('enchereaveugle-room').style.display = 'none';
+            document.getElementById('connexion-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -733,6 +777,7 @@
             document.getElementById('rg-end-buttons').style.display = 'none';
             document.getElementById('enchere-end-buttons').style.display = 'none';
             document.getElementById('ea-end-buttons').style.display = 'none';
+            document.getElementById('cx-end-buttons').style.display = 'none';
         }
 
         function goToMenuSelection() {
@@ -1301,6 +1346,81 @@
                 document.getElementById('ea-bid-buttons').style.display = 'none';
                 document.getElementById('ea-pass-btn').style.display = 'none';
             }
+        }
+
+        /* ---------------- Jeu de connexion (mode indépendant) ---------------- */
+
+        function submitConnexionWord() {
+            const input = document.getElementById('cx-word-input');
+            const word = input.value.trim();
+            if (!word) return;
+            socket.emit('connexion_submit_word', { roomCode: currentRoomCode, word });
+            input.value = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'cx-word-input') {
+                submitConnexionWord();
+            }
+        });
+
+        socket.on('connexion_state', (room) => {
+            hideAllPanels();
+            document.getElementById('connexion-room').style.display = 'block';
+            renderConnexionState(room);
+        });
+
+        socket.on('connexion_game_over', (data) => {
+            renderConnexionState(data.room);
+            document.getElementById('cx-input-container').style.display = 'none';
+            document.getElementById('cx-info').innerText = data.message;
+            document.getElementById('cx-info').style.color = '#00ff88';
+            document.getElementById('cx-end-buttons').style.display = 'flex';
+        });
+
+        function renderConnexionState(room) {
+            const c = room.connexion;
+            if (!c) return;
+
+            document.getElementById('cx-round').innerText = c.round;
+            document.getElementById('cx-progress').innerText = `${c.submittedCount} / ${c.totalPlayers} ont écrit`;
+
+            const hasSubmitted = !!c.myWord;
+            const infoEl = document.getElementById('cx-info');
+
+            if (hasSubmitted) {
+                document.getElementById('cx-input-container').style.display = 'none';
+                document.getElementById('cx-my-word').style.display = 'block';
+                document.getElementById('cx-my-word-value').innerText = c.myWord;
+                infoEl.innerText = "En attente des autres joueurs…";
+                infoEl.style.color = 'var(--text-muted)';
+            } else {
+                document.getElementById('cx-input-container').style.display = 'flex';
+                document.getElementById('cx-my-word').style.display = 'none';
+                infoEl.innerText = c.round === 1 ? "Écris un mot, n'importe lequel !" : "Écris un nouveau mot pour vous rapprocher !";
+                infoEl.style.color = 'var(--accent-cyan)';
+            }
+
+            const list = document.getElementById('cx-players-list');
+            list.innerHTML = '';
+            room.players.forEach(p => {
+                const status = p.hasSubmitted ? '<span style="color:#00ff88">✓ A écrit</span>' : '<span style="color:var(--text-muted)">✏️ Réfléchit…</span>';
+                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> ${status}</li>`;
+            });
+
+            const histDiv = document.getElementById('cx-history');
+            histDiv.innerHTML = '';
+            (c.history || []).forEach(h => {
+                const words = h.entries.map(e => `<span class="rg-chip">${e.name} : ${e.word}</span>`).join(' ');
+                const border = h.matched ? '#00ff88' : '#2a2a40';
+                histDiv.innerHTML += `
+                    <div style="background:#11111a; border-left:4px solid ${border}; border-radius:6px; padding:10px; margin-bottom:8px; text-align:left;">
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:6px;">TOUR ${h.round}${h.matched ? ' — ✅ CONNEXION !' : ''}</div>
+                        <div class="rg-chips" style="margin-bottom:0;">${words}</div>
+                    </div>`;
+            });
+
+            document.getElementById('cx-end-buttons').style.display = 'none';
         }
 
         tryAutoLogin();
