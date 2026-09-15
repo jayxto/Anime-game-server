@@ -351,6 +351,8 @@
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
+                <div id="my-secret-hidden" style="display:none; font-family:'Bangers'; font-size:1.8rem; color:var(--text-muted); letter-spacing:4px;">● ● ● ● ●</div>
+                <button id="toggle-secret-btn" onclick="toggleSecretVisibility()" style="margin-top:10px; background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">🙈 Cacher</button>
             </div>
 
             <ul class="player-list" id="gameplay-players-list"></ul>
@@ -826,6 +828,26 @@
             socket.emit('start_game', currentRoomCode);
         }
 
+        let secretHidden = false;
+
+        function toggleSecretVisibility() {
+            secretHidden = !secretHidden;
+            applySecretVisibility();
+        }
+
+        function applySecretVisibility() {
+            document.getElementById('my-secret-display').style.display = secretHidden ? 'none' : 'block';
+            document.getElementById('my-secret-hidden').style.display = secretHidden ? 'block' : 'none';
+            document.getElementById('toggle-secret-btn').innerText = secretHidden ? '👁️ Afficher' : '🙈 Cacher';
+        }
+
+        // À chaque nouveau mot/note attribué, on repart en mode visible
+        function setSecretText(text) {
+            document.getElementById('my-secret-display').innerText = text;
+            secretHidden = false;
+            applySecretVisibility();
+        }
+
         socket.on('prompt_theme_choice', (data) => {
             hideAllPanels();
             document.getElementById('gameplay-room').style.display = 'block';
@@ -834,7 +856,7 @@
             currentThemeMasterId = data.themeMasterId;
             const me = data.room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
-                document.getElementById('my-secret-display').innerText = `Note attribuée : ${me.secretData}`;
+                setSecretText(`Note attribuée : ${me.secretData}`);
             }
 
             if (socket.id === currentThemeMasterId) {
@@ -867,9 +889,9 @@
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
                 if (room.mode === 'undercover') {
-                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                    setSecretText(`${me.secretData}`);
                 } else {
-                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                    setSecretText(`${room.currentTheme} ➔ ${me.secretData}`);
                 }
             }
             updateGameplayUI(room);
@@ -886,9 +908,9 @@
             const me = room.players.find(p => p.id === socket.id);
             if (me && me.secretData) {
                 if (room.mode === 'undercover') {
-                    document.getElementById('my-secret-display').innerText = `${me.secretData}`;
+                    setSecretText(`${me.secretData}`);
                 } else {
-                    document.getElementById('my-secret-display').innerText = `${room.currentTheme} ➔ ${me.secretData}`;
+                    setSecretText(`${room.currentTheme} ➔ ${me.secretData}`);
                 }
             }
             updateGameplayUI(room);
