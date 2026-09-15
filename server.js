@@ -2387,6 +2387,13 @@ io.on('connection', (socket) => {
         
         const existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
+            // Limite d'effectif : 10 joueurs max pour Undercover et Devine la note
+            if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length >= 10) {
+                socket.leave(roomCode);
+                socket.emit('game_error', { message: "Ce salon est complet (10 joueurs maximum)." });
+                return;
+            }
+
             room.players.push({
                 id: socket.id,
                 name: socket.user.pseudo, // pseudo lié au compte, jamais celui envoyé par le client
@@ -2411,6 +2418,11 @@ io.on('connection', (socket) => {
 
         if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length < 3) {
             socket.emit('game_error', { message: "Il faut au moins 3 joueurs dans le salon pour lancer cette partie." });
+            return;
+        }
+
+        if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length > 10) {
+            socket.emit('game_error', { message: "10 joueurs maximum pour cette partie." });
             return;
         }
 
@@ -2501,23 +2513,40 @@ io.on('connection', (socket) => {
         io.to(roomCode).emit('launch_reveal', room);
     }
 
-    function assignUndercoverNormalWords(room) {
-        const pair = undercoverPairsNormal[Math.floor(Math.random() * undercoverPairsNormal.length)];
-        const civilWord = pair[0];
-        const undercoverWord = pair[1];
+    // Nombre d'imposteurs selon l'effectif : 3-4 → 1, 5-6 → 2, 7-8 → 3, 9-10 → 4
+    function getImpostorCount(playerCount) {
+        if (playerCount <= 4) return 1;
+        if (playerCount <= 6) return 2;
+        if (playerCount <= 8) return 3;
+        return 4;
+    }
 
+    // Tire au sort les imposteurs et distribue les secrets (civils d'un côté, imposteurs de l'autre)
+    function assignRolesAndSecrets(room, civilSecret, impostorSecret) {
         const alivePlayers = room.players.filter(p => p.isAlive);
-        const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
+        const impostorCount = Math.min(getImpostorCount(alivePlayers.length), Math.max(alivePlayers.length - 1, 1));
+
+        const shuffled = alivePlayers.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        const impostorIds = new Set(shuffled.slice(0, impostorCount).map(p => p.id));
 
         room.players.forEach(p => {
-            if (p.id === alivePlayers[impostorIndex].id) {
+            if (impostorIds.has(p.id)) {
                 p.isImpostor = true;
-                p.secretData = undercoverWord;
+                p.secretData = impostorSecret;
             } else {
                 p.isImpostor = false;
-                p.secretData = civilWord;
+                p.secretData = civilSecret;
             }
         });
+    }
+
+    function assignUndercoverNormalWords(room) {
+        const pair = undercoverPairsNormal[Math.floor(Math.random() * undercoverPairsNormal.length)];
+        assignRolesAndSecrets(room, pair[0], pair[1]);
     }
 
     function assignUndercoverHardcoreWords(room) {
@@ -2528,43 +2557,18 @@ io.on('connection', (socket) => {
             idx2 = Math.floor(Math.random() * undercoverHardcorePool.length);
         }
 
-        const civilWord = undercoverHardcorePool[idx1];
-        const undercoverWord = undercoverHardcorePool[idx2];
-
-        const alivePlayers = room.players.filter(p => p.isAlive);
-        const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
-
-        room.players.forEach(p => {
-            if (p.id === alivePlayers[impostorIndex].id) {
-                p.isImpostor = true;
-                p.secretData = undercoverWord;
-            } else {
-                p.isImpostor = false;
-                p.secretData = civilWord;
-            }
-        });
+        assignRolesAndSecrets(room, undercoverHardcorePool[idx1], undercoverHardcorePool[idx2]);
     }
 
     function assignNoteWords(room) {
-        // Tous les civils reçoivent la même note, l'undercover reçoit une note différente
+        // Tous les civils reçoivent la même note, les imposteurs une autre note commune
         let civilNote = Math.floor(Math.random() * 10) + 1;
         let impostorNote = Math.floor(Math.random() * 10) + 1;
         while (impostorNote === civilNote) {
             impostorNote = Math.floor(Math.random() * 10) + 1;
         }
 
-        const alivePlayers = room.players.filter(p => p.isAlive);
-        const impostorIndex = Math.floor(Math.random() * alivePlayers.length);
-
-        room.players.forEach(p => {
-            if (p.id === alivePlayers[impostorIndex].id) {
-                p.isImpostor = true;
-                p.secretData = impostorNote + "/10";
-            } else {
-                p.isImpostor = false;
-                p.secretData = civilNote + "/10";
-            }
-        });
+        assignRolesAndSecrets(room, civilNote + "/10", impostorNote + "/10");
     }
 
     // Chat de salon : purement social, n'impacte aucune mécanique de jeu
