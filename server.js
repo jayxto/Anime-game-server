@@ -2567,6 +2567,25 @@ io.on('connection', (socket) => {
         });
     }
 
+    // Chat de salon : purement social, n'impacte aucune mécanique de jeu
+    socket.on('chat_message', ({ roomCode, message }) => {
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+        if (!player) return; // seuls les joueurs du salon peuvent écrire
+
+        const clean = String(message || '').trim().slice(0, 300);
+        if (!clean) return;
+
+        io.to(roomCode).emit('chat_message', {
+            authorId: socket.id,
+            author: player.name,
+            message: clean,
+            at: Date.now()
+        });
+    });
+
     socket.on('submit_clue', ({ roomCode, clue }) => {
         const room = rooms[roomCode];
         if (!room) return;
