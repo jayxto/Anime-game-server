@@ -302,6 +302,10 @@ io.use(async (socket, next) => {
 
 const rooms = {};
 
+// Reconnexion : délai pendant lequel on garde la place d'un joueur déconnecté
+const RECONNECT_GRACE_MS = 90000; // 90 secondes
+const graceTimers = {}; // socketId -> timeout de retrait définitif
+
 // Timers et pools de la manche Rolland Garos, tenus à part de `rooms`
 // pour ne jamais envoyer d'objets non serialisables (Set, Timeout) aux clients.
 const rgTimers = {};   // roomCode -> interval id
@@ -3815,17 +3819,128 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Reconnexion après une coupure : on récupère la place gardée et on remappe l'identité
+    socket.on('rejoin_room', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        if (!room) {
+            socket.emit('rejoin_failed');
+            return;
+        }
+
+        // On retrouve le joueur par son compte (ou son pseudo pour les invités)
+        const ancien = room.players.find(p => p.disconnected && (
+            (socket.user.id && p.userId === socket.user.id) ||
+            (!socket.user.id && p.name === socket.user.pseudo)
+        ));
+
+        if (!ancien) {
+            socket.emit('rejoin_failed');
+            return;
+        }
+
+        const ancienId = ancien.id;
+        if (graceTimers[ancienId]) {
+            clearTimeout(graceTimers[ancienId]);
+            delete graceTimers[ancienId];
+        }
+
+        socket.join(roomCode);
+        ancien.id = socket.id;
+        delete ancien.disconnected;
+        delete ancien.disconnectedAt;
+        if (room.host === ancienId) room.host = socket.id;
+
+        // Report de l'ancien identifiant vers le nouveau dans toutes les structures de jeu
+        const remap = (obj) => {
+            if (obj && Object.prototype.hasOwnProperty.call(obj, ancienId)) {
+                obj[socket.id] = obj[ancienId];
+                delete obj[ancienId];
+            }
+        };
+
+        remap(room.votes);
+        if (room.enchere) {
+            remap(room.enchere.budgets);
+            remap(room.enchere.teams);
+            if (room.enchere.turnPlayerId === ancienId) room.enchere.turnPlayerId = socket.id;
+            if (room.enchere.currentBidderId === ancienId) room.enchere.currentBidderId = socket.id;
+            if (Array.isArray(room.enchere.declinedPlayers)) {
+                room.enchere.declinedPlayers = room.enchere.declinedPlayers.map(id => id === ancienId ? socket.id : id);
+            }
+        }
+        if (room.enchereAveugle) {
+            remap(room.enchereAveugle.budgets);
+            remap(room.enchereAveugle.teams);
+            if (room.enchereAveugle.turnPlayerId === ancienId) room.enchereAveugle.turnPlayerId = socket.id;
+            if (room.enchereAveugle.currentBidderId === ancienId) room.enchereAveugle.currentBidderId = socket.id;
+            if (room.enchereAveugle.seerId === ancienId) room.enchereAveugle.seerId = socket.id;
+        }
+        if (room.connexion) remap(room.connexion.words);
+
+        io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: true });
+
+        // On renvoie l'écran correspondant à la phase en cours
+        if (room.status === 'waiting') {
+            io.to(roomCode).emit('update_room', room);
+        } else if (room.status === 'rg_playing') {
+            socket.emit('rg_state', room);
+        } else if (room.status === 'rg_over') {
+            socket.emit('rg_game_over', { room });
+        } else if (room.status === 'enchere_playing') {
+            socket.emit('enchere_state', room);
+        } else if (room.status === 'enchereaveugle_playing') {
+            emitEnchereAveugleState(room, roomCode);
+        } else if (room.status === 'connexion_playing') {
+            emitConnexionState(room, roomCode);
+        } else if (room.status === 'voting') {
+            socket.emit('start_voting', room);
+        } else if (room.status === 'choosing_theme') {
+            socket.emit('prompt_theme_choice', { room, themeMasterId: room.players[0].id });
+        } else {
+            socket.emit('resume_gameplay', room);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log(`Utilisateur déconnecté : ${socket.id}`);
         for (const roomCode in rooms) {
             const room = rooms[roomCode];
-            if (!room.players.some(p => p.id === socket.id)) continue; // pas dans ce salon
+            const joueur = room.players.find(p => p.id === socket.id);
+            if (!joueur) continue; // pas dans ce salon
 
-            const hadTurn = room.rg && room.players[room.rg.turnIndex] && room.players[room.rg.turnIndex].id === socket.id;
-            const etaitSonTourEnchere = room.enchere && room.enchere.turnPlayerId === socket.id;
-            const etaitSonTourAveugle = room.enchereAveugle && room.enchereAveugle.turnPlayerId === socket.id;
+            // Coupure réseau / mise en veille : on garde sa place pendant un court délai
+            // au lieu de le sortir tout de suite, pour qu'il puisse revenir dans SA partie.
+            if (room.status !== 'waiting') {
+                joueur.disconnected = true;
+                joueur.disconnectedAt = Date.now();
+                if (graceTimers[socket.id]) clearTimeout(graceTimers[socket.id]);
+                graceTimers[socket.id] = setTimeout(() => {
+                    delete graceTimers[socket.id];
+                    const r = rooms[roomCode];
+                    if (!r) return;
+                    const encoreLa = r.players.find(p => p.id === socket.id);
+                    if (!encoreLa || !encoreLa.disconnected) return; // il est revenu
+                    retirerJoueurDuSalon(r, roomCode, socket.id);
+                }, RECONNECT_GRACE_MS);
+                io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: false });
+                continue;
+            }
 
-            room.players = room.players.filter(p => p.id !== socket.id);
+            retirerJoueurDuSalon(room, roomCode, socket.id);
+        }
+    });
+});
+
+// Retire définitivement un joueur et fait continuer la partie sans lui.
+function retirerJoueurDuSalon(room, roomCode, socketId) {
+        {
+            if (!room.players.some(p => p.id === socketId)) return;
+
+            const hadTurn = room.rg && room.players[room.rg.turnIndex] && room.players[room.rg.turnIndex].id === socketId;
+            const etaitSonTourEnchere = room.enchere && room.enchere.turnPlayerId === socketId;
+            const etaitSonTourAveugle = room.enchereAveugle && room.enchereAveugle.turnPlayerId === socketId;
+
+            room.players = room.players.filter(p => p.id !== socketId);
 
             if (room.players.length === 0) {
                 if (rgTimers[roomCode]) {
@@ -3834,10 +3949,10 @@ io.on('connection', (socket) => {
                 }
                 delete rgPools[roomCode];
                 delete rooms[roomCode];
-                continue;
+                return;
             }
 
-            if (room.host === socket.id) {
+            if (room.host === socketId) {
                 room.host = room.players[0].id;
             }
 
@@ -3845,7 +3960,7 @@ io.on('connection', (socket) => {
             if (room.status === 'waiting' || room.status === 'results' || room.status === 'rg_over'
                 || room.status === 'enchere_over' || room.status === 'enchereaveugle_over' || room.status === 'connexion_over') {
                 io.to(roomCode).emit('update_room', room);
-                continue;
+                return;
             }
 
             // --- Partie en cours : on ne renvoie JAMAIS tout le monde au salon ---
@@ -3862,7 +3977,7 @@ io.on('connection', (socket) => {
                     io.to(roomCode).emit('rg_state', room);
                     if (hadTurn) startRgTimer(room, roomCode);
                 }
-                continue;
+                return;
             }
 
             // Enchère / Enchère à l'aveugle : à 2 joueurs, le départ d'un joueur clôt la partie
@@ -3873,7 +3988,7 @@ io.on('connection', (socket) => {
                     if (etaitSonTourEnchere) room.enchere.turnPlayerId = room.players[0].id;
                     io.to(roomCode).emit('enchere_state', room);
                 }
-                continue;
+                return;
             }
 
             if (room.status === 'enchereaveugle_playing') {
@@ -3883,48 +3998,47 @@ io.on('connection', (socket) => {
                     if (etaitSonTourAveugle) room.enchereAveugle.turnPlayerId = room.players[0].id;
                     emitEnchereAveugleState(room, roomCode);
                 }
-                continue;
+                return;
             }
 
             // Jeu de connexion : le tour peut se débloquer si le partant était le dernier attendu
             if (room.status === 'connexion_playing' && room.connexion) {
-                delete room.connexion.words[socket.id];
+                delete room.connexion.words[socketId];
                 if (room.players.length >= 2 && Object.keys(room.connexion.words).length >= room.players.length) {
                     resolveConnexionRound(room, roomCode);
                 } else {
                     emitConnexionState(room, roomCode);
                 }
-                continue;
+                return;
             }
 
             // Undercover / Devine la note : la partie continue sans le joueur parti
             if (room.status === 'voting') {
-                delete room.votes[socket.id];
+                delete room.votes[socketId];
                 const alivePlayers = room.players.filter(p => p.isAlive);
                 if (alivePlayers.length > 0 && Object.keys(room.votes).length >= alivePlayers.length) {
                     resolveVotes(room, roomCode);
                 } else {
                     io.to(roomCode).emit('start_voting', room);
                 }
-                continue;
+                return;
             }
 
             if (room.status === 'gameplay' || room.status === 'reveal' || room.status === 'end_clues') {
                 if (room.currentTurnIndex >= room.players.length) room.currentTurnIndex = 0;
                 io.to(roomCode).emit('update_gameplay', room);
-                continue;
+                return;
             }
 
             if (room.status === 'choosing_theme') {
                 const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
                 io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
-                continue;
+                return;
             }
 
             io.to(roomCode).emit('update_gameplay', room);
         }
-    });
-});
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
