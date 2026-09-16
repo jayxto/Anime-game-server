@@ -608,39 +608,16 @@
         </div>
 
         <div style="max-width: 400px; margin: 20px auto 0; background: var(--panel-color); padding: 20px; border-radius: 8px;">
-            <h2>Musique</h2>
+            <h2>Sons</h2>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0; padding-bottom:15px; border-bottom:1px solid #2a2a40;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0;">
                 <span style="font-size:0.9rem;">Effets sonores (Rolland Garos)</span>
                 <button id="sfx-toggle-btn" onclick="toggleSfx()" style="background:#00ff88; color:#000; border:none; border-radius:6px; padding:8px 16px; font-weight:700; cursor:pointer;">🔊 Activés</button>
             </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0;">
-                <span style="font-size:0.9rem;">Musique de fond</span>
-                <button id="music-toggle-btn" onclick="toggleMusic()" style="background:var(--accent-pink); color:#fff; border:none; border-radius:6px; padding:8px 16px; font-weight:700; cursor:pointer;">Activer</button>
-            </div>
-
-            <p style="margin-bottom:6px; font-size:0.85rem;">Volume</p>
-            <input type="range" id="music-volume" min="0" max="100" value="35" oninput="setMusicVolume(this.value)" style="width:100%; accent-color: var(--accent-pink);">
-
-            <div style="background:#0b0b10; border:1px solid #2a2a40; border-radius:6px; padding:10px; margin-top:12px;">
-                <div style="font-size:0.7rem; color:var(--text-muted);">EN LECTURE</div>
-                <div id="music-track-name" style="font-family:'Bangers'; font-size:1.1rem; color:var(--accent-cyan);">—</div>
-            </div>
-
-            <div style="display:flex; gap:8px; margin-top:10px;">
-                <button class="btn-action" style="margin-top:0;" onclick="prevTrack()">⏮ Précédent</button>
-                <button class="btn-action" style="margin-top:0;" onclick="nextTrack()">Suivant ⏭</button>
-            </div>
-
-            <p id="music-empty-note" style="font-size:0.75rem; color:var(--text-muted); margin-top:12px;">
-                Aucune piste n'est encore configurée. Ajoute tes fichiers audio dans la liste <code>PLAYLIST</code> du fichier index.html.
-            </p>
         </div>
     </section>
     </div>
 
-    <audio id="bg-music" loop></audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -1182,8 +1159,8 @@
             return audioCtx;
         }
 
-        // Joue une note simple : fréquence, durée, forme d'onde, volume
-        function bip(freq, duree, type = 'square', vol = 0.15, delai = 0) {
+        // Note douce : sinus, attaque et extinction progressives (pas d'effet arcade)
+        function bip(freq, duree, vol = 0.09, delai = 0, type = 'sine') {
             if (!sfxOn) return;
             const c = ctx();
             if (!c) return;
@@ -1193,57 +1170,56 @@
             osc.type = type;
             osc.frequency.setValueAtTime(freq, t0);
             gain.gain.setValueAtTime(0, t0);
-            gain.gain.linearRampToValueAtTime(vol, t0 + 0.008);
+            gain.gain.linearRampToValueAtTime(vol, t0 + 0.03);
             gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duree);
             osc.connect(gain); gain.connect(c.destination);
-            osc.start(t0); osc.stop(t0 + duree + 0.02);
+            osc.start(t0); osc.stop(t0 + duree + 0.05);
         }
 
-        // Petit clic sec de clavier (bruit filtré)
+        // Frappe clavier : un simple tap feutré, très court et discret
         function sfxTouche() {
             if (!sfxOn) return;
             const c = ctx();
             if (!c) return;
-            const n = 0.03, buf = c.createBuffer(1, c.sampleRate * n, c.sampleRate);
-            const d = buf.getChannelData(0);
-            for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
-            const src = c.createBufferSource(); src.buffer = buf;
-            const filtre = c.createBiquadFilter(); filtre.type = 'bandpass';
-            filtre.frequency.value = 1800; filtre.Q.value = 1.2;
-            const gain = c.createGain(); gain.gain.value = 0.07;
-            src.connect(filtre); filtre.connect(gain); gain.connect(c.destination);
-            src.start();
+            const t0 = c.currentTime;
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(320, t0);
+            osc.frequency.exponentialRampToValueAtTime(180, t0 + 0.04);
+            gain.gain.setValueAtTime(0.035, t0);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.05);
+            osc.connect(gain); gain.connect(c.destination);
+            osc.start(t0); osc.stop(t0 + 0.07);
         }
 
-        function sfxValide() {   // perso trouvé : petit arpège montant
-            bip(660, 0.09, 'triangle', 0.18, 0);
-            bip(880, 0.09, 'triangle', 0.18, 0.07);
-            bip(1175, 0.16, 'triangle', 0.16, 0.14);
+        function sfxValide() {   // perso trouvé : deux notes douces, montantes
+            bip(587, 0.18, 0.09, 0);
+            bip(880, 0.3, 0.075, 0.1);
         }
 
-        function sfxErreur() {   // mauvaise réponse : deux notes graves descendantes
-            bip(196, 0.14, 'sawtooth', 0.14, 0);
-            bip(147, 0.26, 'sawtooth', 0.14, 0.12);
+        function sfxErreur() {   // mauvaise réponse : note grave et sourde
+            bip(220, 0.28, 0.085, 0);
+            bip(165, 0.36, 0.07, 0.1);
         }
 
-        function sfxDejaCite() { // déjà cité : bip neutre
-            bip(392, 0.12, 'square', 0.10, 0);
+        function sfxDejaCite() { // déjà cité : simple note neutre
+            bip(392, 0.2, 0.06, 0);
         }
 
-        function sfxTicTac() {   // décompte des 3 dernières secondes
-            bip(1050, 0.05, 'square', 0.09, 0);
+        function sfxTicTac() {   // décompte : tic discret et grave
+            bip(520, 0.07, 0.045, 0);
         }
 
-        function sfxTempsEcoule() { // temps écoulé : buzzer
-            bip(233, 0.18, 'sawtooth', 0.16, 0);
-            bip(175, 0.34, 'sawtooth', 0.16, 0.16);
+        function sfxTempsEcoule() { // temps écoulé : descente douce
+            bip(330, 0.22, 0.08, 0);
+            bip(220, 0.45, 0.075, 0.16);
         }
 
-        function sfxFinPartie() { // fin de partie
-            bip(523, 0.13, 'triangle', 0.17, 0);
-            bip(659, 0.13, 'triangle', 0.17, 0.12);
-            bip(784, 0.13, 'triangle', 0.17, 0.24);
-            bip(1046, 0.3, 'triangle', 0.15, 0.36);
+        function sfxFinPartie() { // fin de partie : petit accord posé
+            bip(523, 0.35, 0.075, 0);
+            bip(659, 0.35, 0.065, 0.04);
+            bip(784, 0.5, 0.06, 0.08);
         }
 
         function toggleSfx() {
@@ -1668,91 +1644,6 @@
             box.scrollTop = box.scrollHeight;
         });
 
-        /* ---------------- Musique de fond ---------------- */
-
-        // ▼▼▼ AJOUTE TES PISTES ICI ▼▼▼
-        // Mets tes fichiers .mp3 dans le dossier de ton projet (à côté de index.html),
-        // puis ajoute une ligne par morceau. Exemple :
-        //   { titre: "Mon thème", src: "musiques/theme1.mp3" },
-        const PLAYLIST = [
-            // { titre: "Nom du morceau", src: "musiques/fichier.mp3" },
-        ];
-        // ▲▲▲ FIN DE LA PLAYLIST ▲▲▲
-
-        const MUSIC_ON_KEY = 'rg_music_on';
-        const MUSIC_VOL_KEY = 'rg_music_volume';
-        const audio = document.getElementById('bg-music');
-        let trackIndex = 0;
-        let musicOn = localStorage.getItem(MUSIC_ON_KEY) === '1';
-
-        function initMusic() {
-            const vol = parseInt(localStorage.getItem(MUSIC_VOL_KEY) || '35', 10);
-            document.getElementById('music-volume').value = vol;
-            audio.volume = vol / 100;
-            audio.loop = PLAYLIST.length === 1;
-            audio.addEventListener('ended', nextTrack);
-
-            if (PLAYLIST.length === 0) {
-                document.getElementById('music-toggle-btn').disabled = true;
-                document.getElementById('music-toggle-btn').style.opacity = '0.4';
-            } else {
-                document.getElementById('music-empty-note').style.display = 'none';
-                loadTrack(0);
-                // Les navigateurs bloquent la lecture auto : on démarre au premier clic
-                if (musicOn) {
-                    document.addEventListener('click', demarrerApresInteraction, { once: true });
-                }
-            }
-            majBoutonMusique();
-            majBoutonSfx();
-        }
-
-        function demarrerApresInteraction() {
-            if (musicOn) audio.play().catch(() => {});
-        }
-
-        function loadTrack(i) {
-            if (PLAYLIST.length === 0) return;
-            trackIndex = (i + PLAYLIST.length) % PLAYLIST.length;
-            audio.src = PLAYLIST[trackIndex].src;
-            document.getElementById('music-track-name').innerText = PLAYLIST[trackIndex].titre;
-        }
-
-        function toggleMusic() {
-            if (PLAYLIST.length === 0) return;
-            musicOn = !musicOn;
-            localStorage.setItem(MUSIC_ON_KEY, musicOn ? '1' : '0');
-            if (musicOn) {
-                audio.play().catch(() => {});
-            } else {
-                audio.pause();
-            }
-            majBoutonMusique();
-        }
-
-        function majBoutonMusique() {
-            const btn = document.getElementById('music-toggle-btn');
-            btn.innerText = musicOn ? '🔊 Activée' : '🔇 Désactivée';
-            btn.style.background = musicOn ? '#00ff88' : 'var(--text-muted)';
-            btn.style.color = musicOn ? '#000' : '#fff';
-        }
-
-        function setMusicVolume(v) {
-            audio.volume = v / 100;
-            localStorage.setItem(MUSIC_VOL_KEY, v);
-        }
-
-        function nextTrack() {
-            loadTrack(trackIndex + 1);
-            if (musicOn) audio.play().catch(() => {});
-        }
-
-        function prevTrack() {
-            loadTrack(trackIndex - 1);
-            if (musicOn) audio.play().catch(() => {});
-        }
-
-        initMusic();
 
         tryAutoLogin();
     </script>
