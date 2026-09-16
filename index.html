@@ -818,6 +818,8 @@
         }
 
         socket.on('update_room', (room) => {
+            // Sécurité : si une partie est en cours, on ne bascule jamais vers le salon d'attente
+            if (room.status && room.status !== 'waiting') return;
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
