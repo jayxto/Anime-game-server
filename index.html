@@ -798,8 +798,24 @@
             if (chatBox) chatBox.innerHTML = '';
         }
 
-        function createRoom(mode, subMode) {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        // Reconnexion automatique après une coupure réseau / mise en veille du téléphone
+        socket.on('connect', () => {
+            if (currentRoomCode) {
+                socket.emit('rejoin_room', { roomCode: currentRoomCode });
+            }
+        });
+
+        socket.on('rejoin_failed', () => {
+            // La place n'a pas pu être récupérée (partie finie ou délai dépassé)
+            currentRoomCode = "";
+            goToMenuSelection();
+        });
+
+        socket.on('player_connection_changed', () => {
+            // Simple information de présence, aucun changement d'écran
+        });
+
+        function createRoom(mode, subMode) {            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let code = "";
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             
