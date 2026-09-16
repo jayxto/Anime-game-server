@@ -420,198 +420,436 @@ function normalizeRG(s) {
 }
 
 const NARUTO_RAW = `1. Naruto Uzumaki
-2. Sasuke Uchiha
-3. Sakura Haruno
-4. Kakashi Hatake
-5. Sai
+2. Sakura Haruno
+3. Sasuke Uchiwa
+4. Saï
+5. Kakashi Hatake
 6. Yamato
-7. Shikamaru Nara
-8. Ino Yamanaka
-9. Choji Akimichi
-10. Hinata Hyuga
-11. Kiba Inuzuka
-12. Shino Aburame
-13. Neji Hyuga
-14. Rock Lee
-15. Tenten
-16. Might Guy
-17. Konohamaru Sarutobi
-18. Moegi Kazamatsuri
-19. Udon Ise
-20. Iruka Umino
-21. Hiruzen Sarutobi
-22. Asuma Sarutobi
-23. Kurenai Yuhi
-24. Minato Namikaze
-25. Kushina Uzumaki
-26. Jiraiya
-27. Tsunade
-28. Orochimaru
-29. Kabuto Yakushi
-30. Shizune
-31. Anko Mitarashi
-32. Ebisu
-33. Mizuki
-34. Ibiki Morino
-35. Genma Shiranui
-36. Hayate Gekko
-37. Kotetsu Hagane
-38. Izumo Kamizuki
-39. Aoba Yamashiro
-40. Raidō Namiashi
-41. Iwashi Tatami
-42. Hiashi Hyuga
-43. Hizashi Hyuga
-44. Hanabi Hyuga
-45. Ko Hyuga
-46. Shikaku Nara
-47. Yoshino Nara
-48. Inoichi Yamanaka
-49. Choza Akimichi
-50. Fugaku Uchiha
-51. Mikoto Uchiha
-52. Itachi Uchiha
-53. Shisui Uchiha
-54. Obito Uchiha
-55. Madara Uchiha
-56. Izuna Uchiha
-57. Kagami Uchiha
-58. Sasuke Sarutobi
-59. Danzo Shimura
-60. Torune Aburame
-61. Fu Yamanaka
-62. Sakumo Hatake
-63. Rin Nohara
-64. Dan Kato
-65. Nawaki
-66. Mito Uzumaki
-67. Hashirama Senju
-68. Tobirama Senju
-69. Koharu Utatane
-70. Homura Mitokado
-71. Gengetsu Hozuki
-72. Mu
-73. Onoki
-74. Kurotsuchi
-75. Akatsuchi
-76. Kitsuchi
-77. Deidara
-78. Sasori
-79. Gaara
-80. Temari
-81. Kankuro
-82. Rasa
-83. Karura
-84. Yashamaru
-85. Baki
-86. Chiyo
-87. Ebizo
-88. Pakura
-89. Zabuza Momochi
-90. Haku
-91. Gato
-92. Mei Terumi
-93. Chojuro
-94. Ao
-95. Yagura
-96. Mangetsu Hozuki
-97. Suigetsu Hozuki
-98. Kisame Hoshigaki
-99. Raiga Kurosuki
-100. Ameyuri Ringo
-101. A
-102. Darui
-103. Killer B
-104. Yugito Nii
-105. Mabui
-106. Samui
-107. Atsui
-108. Omoi
-109. Karui
-110. Kinkaku
-111. Ginkaku
-112. Han
-113. Roshi
-114. Utakata
-115. Fuu
-116. Son Goku
-117. Shukaku
-118. Matatabi
-119. Isobu
-120. Kokuo
-121. Saiken
-122. Chomei
-123. Gyuki
-124. Kurama
-125. Juubi
-126. Nagato
-127. Yahiko
-128. Konan
-129. Hanzo
-130. Mifune
-131. Karin
-132. Jugo
-133. Kimimaro
-134. Jirobo
-135. Kidomaru
-136. Sakon
-137. Ukon
-138. Tayuya
-139. Dosu Kinuta
-140. Zaku Abumi
-141. Kin Tsuchi
-142. Guren
-143. Akamaru
-144. Pakkun
-145. Gamabunta
-146. Gamakichi
-147. Fukasaku
-148. Shima
-149. Katsuyu
-150. Manda
-151. Enma
-152. Tonton
-153. Kaguya Otsutsuki
-154. Hagoromo Otsutsuki
-155. Hamura Otsutsuki
-156. Indra Otsutsuki
-157. Asura Otsutsuki
-158. Toneri Otsutsuki
-159. Momoshiki Otsutsuki
-160. Kinshiki Otsutsuki
-161. Urashiki Otsutsuki
-162. Isshiki Otsutsuki
-163. Black Zetsu
-164. White Zetsu
-165. Tobi
-166. Shin Uchiha
-167. Kashin Koji
-168. Code
-169. Eida
-170. Daemon
-171. Kawaki
-172. Mitsuki
-173. Boruto Uzumaki
-174. Sarada Uchiha
-175. Himawari Uzumaki
-176. Shikadai Nara
-177. Inojin Yamanaka
-178. Chocho Akimichi
-179. Metal Lee
-180. Iwabee Yuino
-181. Denki Kaminarimon
-182. Sumire Kakei
-183. Wasabi Izuno
-184. Namida Suzumeno
-185. Mirai Sarutobi
-186. Katasuke Tono
-187. Victor
-188. Deepa
-189. Delta
-190. Boro
-191. Jigen
-192. Amado
-193. Nue`;
+7. Tenzô
+8. Shikamaru Nara
+9. Ino Yamanaka
+10. Chôji Akimichi
+11. Asuma Sarutobi
+12. Hinata Hyûga
+13. Kiba Inuzuka
+14. Shino Aburame
+15. Kurenaï Yûhi
+16. Rock Lee
+17. Neji Hyûga
+18. Tenten
+19. Gaï Maito
+20. Konohamaru Sarutobi
+21. Moegi
+22. Udon
+23. Ebisu
+24. Hiruzen Sarutobi
+25. Homura Mitokado
+26. Koharu Utatane
+27. Minato Namikaze
+28. Obito Uchiwa
+29. Rin Nohara
+30. Kushina Uzumaki
+31. Mito Uzumaki
+32. Ashina Uzumaki
+33. Hashirama Senju
+34. Tobirama Senju
+35. Tsunade
+36. Jiraya
+37. Orochimaru
+38. Shizune
+39. Dan Katô
+40. Nawaki
+41. Ayame
+42. Teuchi
+43. Matsu
+44. Nishi
+45. Madame Shijimi
+46. Genzô
+47. Hanabi Hyûga
+48. Hiashi Hyûga
+49. Hizashi Hyûga
+50. Kô Hyûga
+51. Hoheto Hyûga
+52. Tokuma Hyûga
+53. Manabu Akado
+54. Tsubaki
+55. Daikoku Funeno
+56. Hana Inuzuka
+57. Iwashi Tatami
+58. Izumo Kamizuki
+59. Kotetsu Hagane
+60. Mozuku
+61. Namida Suzume
+62. Shimon Hijiri
+63. Tonbo Tobitake
+64. Tenga
+65. Iruka Umino
+66. Mizuki Tôji
+67. Anko Mitarashi
+68. Aoba Yamashiro
+69. Genma Shiranui
+70. Hayate Gekkô
+71. Ibiki Morino
+72. Raidô Namiashi
+73. Muta Aburame
+74. Shibi Aburame
+75. Shikuro Aburame
+76. Ranka
+77. Yûgao Uzuki
+78. Komachi
+79. Towa
+80. Danzô Shimura
+81. Torune
+82. Fû
+83. Shin
+84. Hyô
+85. Dajimu
+86. Teraï
+87. Chôza Akimichi
+88. Shikaku Nara
+89. Yoshino Nara
+90. Inoichi Yamanaka
+91. Fugaku Uchiwa
+92. Mikoto Uchiwa
+93. Itachi Uchiwa
+94. Shisui Uchiwa
+95. Madara Uchiwa
+96. Izuna Uchiwa
+97. Inabi Uchiwa
+98. Yashiro Uchiwa
+99. Teyaki Uchiwa
+100. Uruchi Uchiwa
+101. Kagami Uchiwa
+102. Sakumo Hatake
+103. Chiriku
+104. Sora
+105. Kazuma
+106. Suzume
+107. Tamaki
+108. Nekobaa
+109. Ami
+110. Akamaru
+111. Byakuren
+112. Gengetsu Hôzuki
+113. Yagura
+114. Meï Terumi
+115. Chôjûrô
+116. Tsuguri
+117. Harusame
+118. Ao
+119. Chûkichi
+120. Gôzu
+121. Meizu
+122. Haku
+123. Zabuza Momochi
+124. Kisame Hoshigaki
+125. Suigetsu Hôzuki
+126. Mangetsu Hôzuki
+127. Utakata
+128. Raïga Kurosuki
+129. Ranmaru
+130. Ameyuri Ringo
+131. Jinin Akebino
+132. Jinpachi Munashi
+133. Kushimaru Kuriarare
+134. Fuguki Suikazan
+135. A
+136. Darui
+137. Samui
+138. Omoï
+139. Karui
+140. J
+141. C
+142. Atsui
+143. Dodaï
+144. Motoi
+145. Killer Bee
+146. Yugito Nii
+147. Mabui
+148. Kinkaku
+149. Ginkaku
+150. Agari
+151. Ageha
+152. Gatô
+153. Giichi
+154. Inari
+155. Kaiza
+156. Kaji
+157. Tazuna
+158. Tsunami
+159. Waraji
+160. Zôri
+161. Dosu Kinuta
+162. Kin Tsuchi
+163. Zaku Abumi
+164. Misumi Tsurugi
+165. Yoroï Akadô
+166. Jirôbô
+167. Kidômaru
+168. Sakon
+169. Ukon
+170. Tayuya
+171. Kimimaro Kaguya
+172. Kabuto Yakushi
+173. Karin
+174. Jûgo
+175. Sasame Fûma
+176. Arashi Fûma
+177. Kagerô Fûma
+178. Kotohime
+179. Hanzaki
+180. Jigumo
+181. Kamikiri
+182. Guren
+183. Yûkimaru
+184. Rinji
+185. Kihô
+186. Kigiri
+187. Nurari
+188. Shiin
+189. Menma
+190. Gaara
+191. Temari
+192. Kankurô
+193. Chiyo
+194. Ebizô
+195. Bunpuku
+196. Mukade
+197. Sasori
+198. Yûra
+199. Ittetsu
+200. Sari
+201. Saya
+202. Mamushi
+203. Sana
+204. Matsuri
+205. Yukata
+206. Yashamaru
+207. Reto
+208. Shamon
+209. Rasa
+210. Karura
+211. Shira
+212. Yome
+213. Sen
+214. Mikoshi
+215. Baki
+216. Pakura
+217. Maki
+218. Monzaemon Chikamatsu
+219. Ishikawa
+220. Mû
+221. Onoki
+222. Kurotsuchi
+223. Akatsuchi
+224. Gari
+225. Ittan
+226. Kakkou
+227. Kitsuchi
+228. Mahiru
+229. Shibito Azuma
+230. Sumashi
+231. Taiseki
+232. Deidara
+233. Rôshi
+234. Han
+235. Jibachi Kamizuru
+236. Kurobachi Kamizuru
+237. Suzumebachi Kamizuru
+238. Hanzô
+239. Pain
+240. Tendô
+241. Shurado
+242. Ningendo
+243. Chikushôdô
+244. Gakidô
+245. Jigokudô
+246. Konan
+247. Nagato Uzumaki
+248. Yahiko
+249. Baïu
+250. Kagari
+251. Midare
+252. Mubi
+253. Oboro
+254. Shigure
+255. Ajisaï
+256. Aoi Rokushô
+257. Fukusuke Hiashira
+258. Idate Morino
+259. Jirocho
+260. Kandachi
+261. Kanpachi
+262. Karashi
+263. Kirisame
+264. Murasame
+265. Shiore
+266. Kakuzu
+267. Hidan
+268. Suika
+269. Fuu
+270. Kogen
+271. Yoro
+272. Shibuki
+273. Suien
+274. Sandayuu Azama
+275. Fubuki Kakuyoku
+276. Mizore Fuyukuma
+277. Nadare Rôga
+278. Dotô Kazahana
+279. Sôtetsu Kazahana
+280. Koyuki Kazahana
+281. Seimei
+282. Hôki
+283. Kujaku
+284. Ryûgan
+285. Suiko
+286. Akahoshi
+287. Hokuto
+288. Mizura
+289. Sumaru
+290. Hotarubi
+291. Natsuhi
+292. Shisou
+293. Yotaka
+294. Mifune
+295. Okisuke
+296. Urakaku
+297. Tatewaki
+298. Gennô
+299. Hanare
+300. Gantetsu
+301. Shura
+302. Monju
+303. Todoroki
+304. Akio
+305. Amachi
+306. Isaribi
+307. Umibôzu
+308. Haruna
+309. Gengo
+310. Komori
+311. Minoichi
+312. Shinnô
+313. Amaru
+314. Princesse Fuku
+315. Tsukino
+316. Tenji
+317. Hotaru
+318. En no Gyôja
+319. Shiranami
+320. Akaboshi
+321. Benten
+322. Chûshin
+323. Nangô
+324. Yurinojô
+325. Kikunojô
+326. Zetsu
+327. Zetsu Noir
+328. Zetsu Blanc
+329. Tobi
+330. Guruguru
+331. Shin Uchiwa
+332. Toneri Ôtsutsuki
+333. Momoshiki Ôtsutsuki
+334. Kinshiki Ôtsutsuki
+335. Urashiki Ôtsutsuki
+336. Kaguya Ôtsutsuki
+337. Isshiki Ôtsutsuki
+338. Indra Ôtsutsuki
+339. Hamura Ôtsutsuki
+340. Hagoromo Ôtsutsuki
+341. Ashura Ôtsutsuki
+342. Shibai Ôtsutsuki
+343. Shukaku
+344. Matatabi
+345. Isobu
+346. Son Gokû
+347. Kokuô
+348. Saiken
+349. Chômei
+350. Gyûki
+351. Kurama
+352. Jûbi
+353. Akino
+354. Biscuit
+355. Bull
+356. Denka
+357. Doki
+358. Enma
+359. Fukasaku
+360. Gama
+361. Gamabunta
+362. Gamahiro
+363. Gamaken
+364. Gamakichi
+365. Gamariki
+366. Gamatabi
+367. Gamatatsu
+368. Gerotora
+369. Gulko
+370. Hina
+371. Kamatari
+372. Katsuyu
+373. Kôsuke Maruboshi
+374. Kyodaigumo
+375. Kyodaija
+376. Manda
+377. Ningame
+378. Oogama Sennin
+379. Pakkun
+380. Shiba
+381. Shima
+382. U-hei
+383. Ulshi
+384. Aoda
+385. Garaga
+386. Ibuse
+387. Tonton
+388. Fûjin
+389. Raijin
+390. Fûka
+391. Fudo
+392. Fuen
+393. Fugai
+394. Haido
+395. Ranke
+396. Watari Nagare
+397. Yakumo Kurama
+398. Boruto Uzumaki
+399. Sarada Uchiwa
+400. Himawari Uzumaki
+401. Mitsuki
+402. Kawaki
+403. Shikadai Nara
+404. Inojin Yamanaka
+405. Chôchô Akimichi
+406. Metal Lee
+407. Iwabee Yuino
+408. Denki Kaminarimon
+409. Sumire Kakei
+410. Wasabi Izuno
+411. Namida Suzumeno
+412. Mirai Sarutobi
+413. Katasuke Tôno
+414. Delta
+415. Boro
+416. Jigen
+417. Amado
+418. Code
+419. Eida
+420. Daemon
+421. Koji Kashin
+422. Victor
+423. Deepa
+424. Mugino
+425. Nue
+426. Urashiki
+427. Tsubaki Kurogane
+428. Houki Taketori
+429. Enko Onikuma
+430. Doshu Goetsu
+431. Hako Kuroi`;
 
 const ONEPIECE_RAW = `1. Monkey D. Luffy
 2. Roronoa Zoro
@@ -624,339 +862,673 @@ const ONEPIECE_RAW = `1. Monkey D. Luffy
 9. Brook
 10. Jinbe
 11. Gol D. Roger
-12. Portgas D. Ace
-13. Sabo
-14. Monkey D. Dragon
-15. Monkey D. Garp
-16. Shanks
-17. Benn Beckman
-18. Lucky Roux
-19. Yasopp
-20. Rockstar
-21. Edward Newgate
-22. Marco
-23. Jozu
-24. Vista
-25. Izo
+12. Silvers Rayleigh
+13. Scopper Gaban
+14. Crocus
+15. Shanks
+16. Benn Beckman
+17. Lucky Roux
+18. Yasopp
+19. Rockstar
+20. Uta
+21. Gordon
+22. Edward Newgate
+23. Marco
+24. Portgas D. Ace
+25. Jozu
 26. Thatch
-27. Namur
-28. Kaido
-29. King
-30. Queen
-31. Jack
-32. Who's-Who
-33. Sasaki
-34. Black Maria
-35. Ulti
-36. Page One
-37. X Drake
-38. Yamato
-39. Charlotte Linlin
-40. Katakuri
-41. Smoothie
-42. Cracker
-43. Perospero
-44. Oven
-45. Daifuku
-46. Compote
-47. Brûlée
-48. Pudding
-49. Pekoms
-50. Tamago
-51. Streusen
-52. Capone Bege
-53. Marshall D. Teach
-54. Shiryu
-55. Jesus Burgess
-56. Van Augur
-57. Doc Q
-58. Catarina Devon
-59. Avalo Pizarro
-60. Vasco Shot
-61. Sanjuan Wolf
-62. Lafitte
-63. Kuzan
-64. Sakazuki
-65. Borsalino
-66. Issho
-67. Sengoku
-68. Tsuru
-69. Kong
-70. Hina
-71. Smoker
-72. Tashigi
-73. Koby
-74. Helmeppo
-75. Sentomaru
-76. Vergo
-77. Fullbody
-78. Morgan
-79. Arlong
-80. Hatchan
-81. Kuroobi
-82. Chew
-83. Fisher Tiger
-84. Koala
-85. Aladine
-86. Wadatsumi
-87. Hody Jones
-88. Vander Decken IX
-89. Fukaboshi
-90. Neptune
-91. Shirahoshi
-92. Otohime
-93. Don Krieg
-94. Gin
-95. Kuro
-96. Django
-97. Kaya
-98. Merry
-99. Zeff
-100. Patty
-101. Carne
-102. Johnny
-103. Yosaku
-104. Genzo
-105. Nojiko
-106. Bell-mère
-107. Kurozumi Orochi
-108. Kaidou
-109. Kanjuro
-110. Kin'emon
-111. Momonosuke
-112. Hiyori
-113. Oden Kozuki
-114. Toki
-115. Denjiro
-116. Raizo
-117. Kikunojo
-118. Kawamatsu
-119. Ashura Doji
-120. Inuarashi
-121. Nekomamushi
-122. Shinobu
-123. Tama
-124. Hyogoro
-125. Bepo
-126. Trafalgar D. Water Law
-127. Penguin
-128. Shachi
-129. Jean Bart
-130. Eustass Kid
-131. Killer
-132. Scratchmen Apoo
-133. Basil Hawkins
-134. Urouge
-135. Jewelry Bonney
-136. Cavendish
-137. Bartolomeo
-138. Sai
-139. Don Chinjao
-140. Baby 5
-141. Donquixote Doflamingo
-142. Rosinante
-143. Trebol
-144. Diamante
-145. Pica
-146. Senor Pink
-147. Gladius
-148. Sugar
-149. Machvise
-150. Dellinger
-151. Buffalo
-152. Monet
-153. Caesar Clown
-154. Crocodile
-155. Daz Bonez
-156. Bentham
-157. Nefertari Vivi
-158. Nefertari Cobra
-159. Pell
-160. Chaka
-161. Wapol
-162. Dr. Kureha
-163. Dr. Hogback
-164. Laboon
-165. Crocus
-166. Vivi
-167. Bon Clay
-168. Emporio Ivankov
-169. Inazuma
-170. Bartholomew Kuma
-171. Gecko Moria
-172. Perona
-173. Absalom
-174. Ryuma
-175. Oars
-176. Dracule Mihawk
-177. Buggy
-178. Alvida
-179. Foxy
-180. Blueno
-181. Kalifa
-182. Kaku
-183. Rob Lucci
-184. Jabra
-185. Kumadori
-186. Spandam
-187. Paulie
-188. Iceburg
-189. Tom
-190. Franky
-191. Brook
-192. Silvers Rayleigh
-193. Scopper Gaban
-194. Saint Charlos
-195. Imu
-196. Vegapunk
-197. Shaka
-198. Lilith
-199. York
-200. Stussy
-201. Boa Hancock
-202. Boa Sandersonia
-203. Boa Marigold
-204. Magellan
-205. Domino
-206. Edward Weevil
-207. Rocks D. Xebec
-208. Kozuki Oden
-209. Komurasaki
-210. Uta
-211. Douglas Bullet
-212. Enel
-213. Wyper
-214. Gan Fall
-215. Conis
-216. Rebecca
-217. Kyros
-218. Riku Doldo III
-219. Viola
-220. Hack
-221. Fisher Tiger`;
+27. Vista
+28. Blamenco
+29. Rakuyo
+30. Namur
+31. Blenheim
+32. Curiel
+33. Kingdew
+34. Haruta
+35. Atmos
+36. Speed Jill
+37. Fossa
+38. Izo
+39. Doma
+40. Squardo
+41. Whitey Bay
+42. McGuy
+43. Little Oars Jr.
+44. Edward Weevil
+45. Bakkin
+46. Marshall D. Teach
+47. Jesus Burgess
+48. Shiryu
+49. Van Augur
+50. Avalo Pizarro
+51. Catarina Devon
+52. Sanjuan Wolf
+53. Vasco Shot
+54. Doc Q
+55. Stronger
+56. Lafitte
+57. Kuzan
+58. Charlotte Linlin
+59. Charlotte Katakuri
+60. Charlotte Smoothie
+61. Charlotte Cracker
+62. Charlotte Perospero
+63. Charlotte Oven
+64. Charlotte Daifuku
+65. Charlotte Compote
+66. Charlotte Mont-d'Or
+67. Charlotte Brûlée
+68. Charlotte Galette
+69. Charlotte Flampe
+70. Charlotte Pudding
+71. Charlotte Chiffon
+72. Charlotte Lola
+73. Charlotte Praline
+74. Charlotte Amande
+75. Charlotte Opera
+76. Charlotte Mascarpone
+77. Charlotte Joscarpone
+78. Charlotte Anana
+79. Charlotte Dolce
+80. Charlotte Dragée
+81. Charlotte Nusstorte
+82. Charlotte Moscato
+83. Charlotte Snack
+84. Pekoms
+85. Tamago
+86. Streusen
+87. Bobbin
+88. Prométhée
+89. Napoléon
+90. Zeus
+91. Héra
+92. Kaido
+93. King
+94. Queen
+95. Jack
+96. Who's-Who
+97. Sasaki
+98. Black Maria
+99. Ulti
+100. Page One
+101. X Drake
+102. Yamato
+103. Basil Hawkins
+104. Scratchmen Apoo
+105. Holdem
+106. Speed
+107. Babanuki
+108. Daifugo
+109. Dobon
+110. Solitaire
+111. Bao Huang
+112. Ginrummy
+113. Batman
+114. Gazelleman
+115. Mouseman
+116. Snakeman
+117. Rabbitman
+118. Alpacaman
+119. Sarahebi
+120. Sheepshead
+121. Kurozumi Orochi
+122. Kurozumi Higurashi
+123. Fukurokuju
+124. Hanzo
+125. Sarutobi
+126. Daikoku
+127. Raizo
+128. Kin'emon
+129. Denjiro
+130. Kikunojo
+131. Kawamatsu
+132. Ashura Doji
+133. Inuarashi
+134. Nekomamushi
+135. Shinobu
+136. Kozuki Oden
+137. Kozuki Toki
+138. Kozuki Momonosuke
+139. Kozuki Hiyori
+140. Kozuki Sukiyaki
+141. Shimotsuki Yasuie
+142. Hyogoro
+143. Tenguyama Hitetsu
+144. O-Tama
+145. Toko
+146. Komurasaki
+147. Onimaru
+148. Komachiyo
+149. Carrot
+150. Wanda
+151. Pedro
+152. Miyagi
+153. Tristan
+154. Sicilian
+155. Blackback
+156. Roddy
+157. Bariete
+158. Sakazuki
+159. Borsalino
+160. Issho
+161. Aramaki
+162. Sengoku
+163. Tsuru
+164. Kong
+165. Monkey D. Garp
+166. Momonga
+167. Onigumo
+168. Doberman
+169. Dalmatian
+170. Strawberry
+171. Bastille
+172. Maynard
+173. Smoker
+174. Tashigi
+175. Hina
+176. Koby
+177. Helmeppo
+178. Sentomaru
+179. Brannew
+180. Vergo
+181. Fullbody
+182. Django
+183. T-Bone
+184. Nezumi
+185. Morgan
+186. Jonathan
+187. Drake
+188. Monkey D. Dragon
+189. Sabo
+190. Emporio Ivankov
+191. Inazuma
+192. Bartholomew Kuma
+193. Belo Betty
+194. Morley
+195. Karasu
+196. Lindbergh
+197. Koala
+198. Hack
+199. Ginny
+200. Nefertari Vivi
+201. Nefertari Cobra
+202. Igaram
+203. Pell
+204. Chaka
+205. Karoo
+206. Toto
+207. Koza
+208. Terracotta
+209. Crocodile
+210. Nico Olvia
+211. Daz Bones
+212. Bentham
+213. Galdino
+214. Miss Doublefinger
+215. Miss Goldenweek
+216. Miss Merry Christmas
+217. Miss Valentine
+218. Miss Monday
+219. Mr. 4
+220. Mr. 5
+221. Mr. 7
+222. Mr. 9
+223. Mr. 13
+224. Miss Friday
+225. Rob Lucci
+226. Kaku
+227. Blueno
+228. Jabra
+229. Kumadori
+230. Fukurou
+231. Kalifa
+232. Spandam
+233. Spandine
+234. Nero
+235. Stussy
+236. Who's Who
+237. Iceburg
+238. Paulie
+239. Tilestone
+240. Lulu
+241. Tom
+242. Kokoro
+243. Chimney
+244. Gonbe
+245. Yokozuna
+246. Arlong
+247. Hatchan
+248. Kuroobi
+249. Chew
+250. Fisher Tiger
+251. Aladine
+252. Macro
+253. Gyaro
+254. Tansui
+255. Neptune
+256. Fukaboshi
+257. Ryuboshi
+258. Manboshi
+259. Shirahoshi
+260. Otohime
+261. Hody Jones
+262. Vander Decken IX
+263. Wadatsumi
+264. Hammond
+265. Dosun
+266. Ikaros Much
+267. Daruma
+268. Zeo
+269. Hyouzou
+270. Den
+271. Camie
+272. Pappag
+273. Duval
+274. Enel
+275. Gan Fall
+276. Conis
+277. Pagaya
+278. Wyper
+279. Aisa
+280. Raki
+281. Laki
+282. Ohm
+283. Shura
+284. Satori
+285. Gedatsu
+286. Hotori
+287. Kotori
+288. Yama
+289. McKinley
+290. Mont Blanc Cricket
+291. Mont Blanc Noland
+292. Calgara
+293. Masira
+294. Shoujou
+295. Bellamy
+296. Sarquiss
+297. Donquixote Doflamingo
+298. Donquixote Rosinante
+299. Trebol
+300. Diamante
+301. Pica
+302. Lao G
+303. Senor Pink
+304. Gladius
+305. Sugar
+306. Machvise
+307. Dellinger
+308. Buffalo
+309. Baby 5
+310. Monet
+311. Caesar Clown
+312. Jora
+313. Giolla
+314. Rebecca
+315. Kyros
+316. Riku Doldo III
+317. Viola
+318. Scarlett
+319. Tank Lepanto
+320. Dagama
+321. Elizabello II
+322. Cavendish
+323. Bartolomeo
+324. Gambia
+325. Sai
+326. Don Chinjao
+327. Boo
+328. Leo
+329. Ideo
+330. Hajrudin
+331. Orlumbus
+332. Blue Gilly
+333. Abdullah
+334. Jeet
+335. Suleiman
+336. Trafalgar D. Water Law
+337. Bepo
+338. Penguin
+339. Shachi
+340. Jean Bart
+341. Eustass Kid
+342. Killer
+343. Heat
+344. Wire
+345. Urouge
+346. Jewelry Bonney
+347. Capone Bege
+348. Vito
+349. Gotti
+350. Gecko Moria
+351. Perona
+352. Absalom
+353. Hogback
+354. Ryuma
+355. Oars
+356. Cindry
+357. Hildon
+358. Tararan
+359. Kumashi
+360. Dracule Mihawk
+361. Boa Hancock
+362. Boa Sandersonia
+363. Boa Marigold
+364. Gloriosa
+365. Marguerite
+366. Aphelandra
+367. Sweet Pea
+368. Magellan
+369. Hannyabal
+370. Domino
+371. Saldeath
+372. Sadi
+373. Shiliew
+374. Buggy
+375. Alvida
+376. Mohji
+377. Cabaji
+378. Richie
+379. Don Krieg
+380. Gin
+381. Pearl
+382. Zeff
+383. Patty
+384. Carne
+385. Kuro
+386. Sham
+387. Buchi
+388. Kaya
+389. Merry
+390. Johnny
+391. Yosaku
+392. Genzo
+393. Nojiko
+394. Bell-mère
+395. Dr. Kureha
+396. Dr. Hiriluk
+397. Wapol
+398. Chess
+399. Kuromarimo
+400. Dalton
+401. Foxy
+402. Porche
+403. Hamburg
+404. Itomimizu
+405. Laboon
+406. Dorry
+407. Broggy
+408. Oimo
+409. Kashii
+410. Imu
+411. Jaygarcia Saturn
+412. Marcus Mars
+413. Topman Warcury
+414. Ethanbaron V. Nusjuro
+415. Shepherd Ju Peter
+416. Charlos
+417. Rosward
+418. Shalria
+419. Mjosgard
+420. Donquixote Homing
+421. Vegapunk
+422. Shaka
+423. Lilith
+424. Edison
+425. Pythagoras
+426. Atlas
+427. York
+428. S-Bear
+429. S-Hawk
+430. S-Snake
+431. S-Shark
+432. S-Flamingo
+433. S-Bat
+434. Rocks D. Xebec
+435. Shiki
+436. John
+437. Ochoku
+438. Silver Axe
+439. Indigo
+440. Douglas Bullet
+441. Tesoro
+442. Carina
+443. Baccarat
+444. Zephyr
+445. Ain
+446. Binz
+447. Gasparde
+448. Saga
+449. Vinsmoke Judge
+450. Vinsmoke Reiju
+451. Vinsmoke Ichiji
+452. Vinsmoke Niji
+453. Vinsmoke Yonji
+454. Caribou
+455. Coribou
+456. Demaro Black
+457. Jaguar D. Saul
+458. Kuina
+459. Koushirou
+460. Dracule Perona
+461. Rayleigh Shakky
+462. Shakuyaku
+463. Disco
+464. Roshio
+465. Bonney
+466. Gaban`;
 
 const BLEACH_RAW = `1. Ichigo Kurosaki
 2. Rukia Kuchiki
 3. Orihime Inoue
 4. Uryu Ishida
 5. Yasutora Sado
-6. Kisuke Urahara
-7. Yoruichi Shihōin
-8. Isshin Kurosaki
+6. Kon
+7. Isshin Kurosaki
+8. Masaki Kurosaki
 9. Karin Kurosaki
 10. Yuzu Kurosaki
-11. Kon
-12. Don Kanonji
-13. Tatsuki Arisawa
-14. Keigo Asano
-15. Mizuiro Kojima
-16. Ururu Tsumugiya
-17. Jinta Hanakari
-18. Tessai Tsukabishi
-19. Ryuken Ishida
-20. Grand Fisher
-21. Shukuro Tsukishima
-22. Kugo Ginjō
-23. Riruka Dokugamine
-24. Yukio Hans Vorarlberna
-25. Jackie Tristan
-26. Giriko Kutsuzawa
-27. Moe Shishigawara
-28. Byakuya Kuchiki
-29. Renji Abarai
-30. Toshiro Hitsugaya
-31. Kenpachi Zaraki
-32. Shunsui Kyoraku
-33. Jushiro Ukitake
-34. Sajin Komamura
-35. Soi Fon
-36. Mayuri Kurotsuchi
-37. Retsu Unohana
-38. Isane Kotetsu
-39. Ikkaku Madarame
-40. Yumichika Ayasegawa
-41. Rangiku Matsumoto
-42. Momo Hinamori
-43. Izuru Kira
-44. Shuhei Hisagi
-45. Kensei Muguruma
-46. Rojuro Otoribashi
-47. Shinji Hirako
-48. Love Aikawa
-49. Hiyori Sarugaki
-50. Lisa Yadomaru
-51. Hachigen Ushoda
-52. Mashiro Kuna
-53. Nanao Ise
-54. Genryusai Shigekuni Yamamoto
-55. Chojiro Sasakibe
-56. Marechiyo Omaeda
-57. Nemu Kurotsuchi
-58. Hanataro Yamada
-59. Kiyone Kotetsu
-60. Sentaro Kotsubaki
-61. Kaien Shiba
-62. Kukaku Shiba
-63. Ganju Shiba
-64. Sojun Kuchiki
-65. Ginrei Kuchiki
-66. Hisana Kuchiki
-67. Sosuke Aizen
-68. Gin Ichimaru
-69. Kaname Tosen
-70. Wonderweiss Margela
-71. Coyote Starrk
-72. Lilynette Gingerback
-73. Baraggan Louisenbairn
-74. Tier Harribel
-75. Ulquiorra Cifer
-76. Nnoitra Gilga
-77. Grimmjow Jaegerjaquez
-78. Zommari Rureaux
-79. Szayelaporro Granz
-80. Aaroniero Arruruerie
-81. Yammy Llargo
-82. Luppi Antenor
-83. Nelliel Tu Odelschwanck
-84. Cirucci Sanderwicci
-85. Pesche Guatiche
-86. Dondochakka Bilstin
-87. Emilou Apacci
-88. Franceska Mila Rose
-89. Cyan Sung-Sun
-90. Shawlong Koufang
-91. Zangetsu
-92. Yhwach
-93. Jugram Haschwalth
-94. Bazz-B
-95. As Nodt
-96. Bambietta Basterbine
-97. Candice Catnipp
-98. Meninas McAllon
-99. Liltotto Lamperd
-100. Giselle Gewelle
-101. Gremmy Thoumeaux
-102. Lille Barro
-103. Gerard Valkyrie
-104. Pernida Parnkgjas
-105. Askin Nakk Le Vaar
-106. Mask De Masculine
-107. Quilge Opie
-108. Driscoll Berci
-109. Cang Du
-110. BG9
-111. Loyd Lloyd
-112. Ichibe Hyosube
-113. Oetsu Nimaiya
-114. Tenjiro Kirinji
-115. Senjumaru Shutara
-116. Kirio Hikifune
-117. Soul King
-118. Mimihagi
-119. Tokinada Tsunayashiro
-120. Yachiru Kusajishi
-121. Tetsuzaemon Iba
-122. Koga Kuchiki`;
+11. Tatsuki Arisawa
+12. Keigo Asano
+13. Mizuiro Kojima
+14. Chizuru Honsho
+15. Michiru Ogawa
+16. Ryo Kunieda
+17. Mahana Natsui
+18. Don Kanonji
+19. Ikumi Unagiya
+20. Kisuke Urahara
+21. Yoruichi Shihoin
+22. Tessai Tsukabishi
+23. Jinta Hanakari
+24. Ururu Tsumugiya
+25. Ryuken Ishida
+26. Soken Ishida
+27. Kanae Katagiri
+28. Genryusai Shigekuni Yamamoto
+29. Chojiro Sasakibe
+30. Soi Fon
+31. Marechiyo Omaeda
+32. Rose Otoribashi
+33. Izuru Kira
+34. Retsu Unohana
+35. Isane Kotetsu
+36. Kiyone Kotetsu
+37. Shinji Hirako
+38. Momo Hinamori
+39. Byakuya Kuchiki
+40. Renji Abarai
+41. Sajin Komamura
+42. Tetsuzaemon Iba
+43. Shunsui Kyoraku
+44. Nanao Ise
+45. Genshiro Okikiba
+46. Kensei Muguruma
+47. Mashiro Kuna
+48. Shuhei Hisagi
+49. Toshiro Hitsugaya
+50. Rangiku Matsumoto
+51. Kenpachi Zaraki
+52. Yachiru Kusajishi
+53. Ikkaku Madarame
+54. Yumichika Ayasegawa
+55. Mayuri Kurotsuchi
+56. Nemu Kurotsuchi
+57. Akon
+58. Hiyosu
+59. Rin Tsubokura
+60. Jushiro Ukitake
+61. Sentaro Kotsubaki
+62. Hanataro Yamada
+63. Seinosuke Yamada
+64. Love Aikawa
+65. Lisa Yadomaru
+66. Hachigen Ushoda
+67. Hiyori Sarugaki
+68. Jidanbo Ikkanzaka
+69. Kaien Shiba
+70. Miyako Shiba
+71. Kukaku Shiba
+72. Ganju Shiba
+73. Ginrei Kuchiki
+74. Sojun Kuchiki
+75. Hisana Kuchiki
+76. Rukongai Rukia
+77. Yachiru Unohana
+78. Kirio Hikifune
+79. Ichibe Hyosube
+80. Oetsu Nimaiya
+81. Tenjiro Kirinji
+82. Senjumaru Shutara
+83. Sosuke Aizen
+84. Gin Ichimaru
+85. Kaname Tosen
+86. Wonderweiss Margela
+87. Coyote Starrk
+88. Lilynette Gingerbuck
+89. Baraggan Louisenbairn
+90. Tier Harribel
+91. Ulquiorra Cifer
+92. Nnoitra Gilga
+93. Grimmjow Jaegerjaquez
+94. Zommari Rureaux
+95. Szayelaporro Granz
+96. Aaroniero Arruruerie
+97. Yammy Llargo
+98. Luppi Antenor
+99. Nelliel Tu Odelschwanck
+100. Dordoni Alessandro Del Socaccio
+101. Cirucci Sanderwicci
+102. Gantenbainne Mosqueda
+103. Pesche Guatiche
+104. Dondochakka Bilstin
+105. Bawabawa
+106. Rudbornn Chelute
+107. Emilou Apacci
+108. Franceska Mila Rose
+109. Cyan Sung-Sun
+110. Tesla Lindocruz
+111. Shawlong Koufang
+112. Edrad Liones
+113. Yylfordt Granz
+114. Nakeem Grindina
+115. Di Roy Rinker
+116. Charlotte Chuhlhourne
+117. Findorr Calius
+118. Ggio Vega
+119. Choe Neng Poww
+120. Nirgge Parduoc
+121. Abirama Redder
+122. Poww
+123. Menis
+124. Ashido Kano
+125. Sora Inoue
+126. Grand Fisher
+127. Shrieker
+128. Fishbone D
+129. Acidwire
+130. Hexapodus
+131. Numb Chandelier
+132. White
+133. Zangetsu
+134. Tensa Zangetsu
+135. Yhwach
+136. Jugram Haschwalth
+137. Bazz-B
+138. As Nodt
+139. Bambietta Basterbine
+140. Candice Catnipp
+141. Meninas McAllon
+142. Liltotto Lamperd
+143. Giselle Gewelle
+144. Gremmy Thoumeaux
+145. Lille Barro
+146. Gerard Valkyrie
+147. Pernida Parnkgjas
+148. Askin Nakk Le Vaar
+149. Mask De Masculine
+150. James
+151. Quilge Opie
+152. Driscoll Berci
+153. Cang Du
+154. BG9
+155. Robert Accutrone
+156. Nianzol Weizol
+157. Pepe Waccabrada
+158. NaNaNa Najahkoop
+159. Guenael Lee
+160. Loyd Lloyd
+161. Royd Lloyd
+162. Jerome Guizbatt
+163. Berenice Gabrielli
+164. Shaz Domino
+165. Asguiaro Ebern
+166. Uryu Quincy
+167. Soul King
+168. Mimihagi
+169. Kugo Ginjo
+170. Shukuro Tsukishima
+171. Riruka Dokugamine
+172. Yukio Hans Vorarlberna
+173. Jackie Tristan
+174. Giriko Kutsuzawa
+175. Moe Shishigawara
+176. Aura Michibane
+177. Tokinada Tsunayashiro
+178. Hikone Ubuginu
+179. Makoto Kibune
+180. Koga Kuchiki
+181. Muramasa
+182. Senna
+183. Homura
+184. Shizuku
+185. Sojiro Kusaka
+186. Kokuto
+187. Shuren
+188. Garogai
+189. Gunjo
+190. Taikon
+191. Nozomi Kujo
+192. Kageroza Inaba
+193. Ouko Yushima
+194. Shusuke Amagai
+195. Kumoi
+196. Ryusei Kenzaki
+197. Rurichiyo Kasumioji
+198. Enryu
+199. Kenryu
+200. Hanza Nukui
+201. Baishin
+202. Riyan
+203. Jinnai Doko
+204. Ganryu
+205. Bonnie
+206. Nanao
+207. Tsukishima
+208. Hisagi
+209. Hachi
+210. Kaien
+211. Kensei`;
 
 const SDS_RAW = `1. Meliodas
 2. Elizabeth Liones
@@ -1001,35 +1573,140 @@ const SDS_RAW = `1. Meliodas
 41. Margaret Liones
 42. Bartra Liones
 43. Denzel Liones
-44. Vivian
-45. Cain Barzad
-46. Twigo
-47. Golgius
-48. Friesia
-49. Zaratras
-50. Nadja Liones
-51. Cath
-52. Oslo
-53. Modred
-54. Donny
-55. Gerheade
-56. Dahlia
-57. Tristan Liones
-58. Lancelot
-59. Percival
-60. Nasiens
-61. Anne
-62. Isolde
-63. Ironside
-64. Pellegarde
-65. Talisker
-66. Macduff
-67. Guinevere
-68. Kay
-69. Chaos
-70. Cath Palug`;
+44. Deathpierce
+45. Dogedo
+46. Waillo
+47. Slader
+48. Simon
+49. Gustaf
+50. Vivian
+51. Cain Barzad
+52. Twigo
+53. Golgius
+54. Ruin
+55. Friesia
+56. Jude
+57. Dale
+58. Matrona
+59. Zaratras
+60. Nadja Liones
+61. Cath Palug
+62. Oslo
+63. Orlondi
+64. Zhivago
+65. Mod
+66. Donny
+67. Pelliot
+68. Arden
+69. Deldry
+70. Bellion
+71. Liz
+72. Dana
+73. Dolor
+74. Gerheade
+75. Rou
+76. Dahlia
+77. Dubs
+78. Nanashi
+79. Wild
+80. The Sinner
+81. Tristan Liones
+82. Lancelot
+83. Percival
+84. Nasiens
+85. Anne
+86. Isolde
+87. Chion
+88. Jade
+89. Varghese
+90. Ironside
+91. Pellegarde
+92. Talisker
+93. Macduff
+94. Guinevere
+95. Kay
+96. Teaninich
+97. Ordo
+98. Mortlach
+99. Jenny
+100. Gawain
+101. Sin
+102. Doronach
+103. Burgie
+104. Weinheidt
+105. Hauser
+106. Marmas
+107. Aldrich
+108. Fiddich
+109. Edlin
+110. Sennett
+111. Threader
+112. Lyonesse
+113. Rosa
+114. Elizabeth's mother
+115. Caulifla
+116. Zoria
+117. Nerobasta
+118. Denzel
+119. Dahaka
+120. Ren
+121. Gannon
+122. Baltra
+123. Gerharde
+124. Elaine's brother
+125. Hendrickson's father
+126. Hugo
+127. Jenna
+128. Zaneri
+129. Old Fart
+130. Aranak
+131. Gara
+132. Galla
+133. Atra
+134. Pelio
+135. Mild
+136. Selion
+137. Solaad
+138. Ellatte
+139. Dalmally
+140. Ban's father
+141. Zhivago's son
+142. Pelliot's father
+143. Tarmiel's brother
+144. Cusack's apprentice
+145. Sariel's follower
+146. Fraudrin's host
+147. Grayroad's larvae
+148. Galand's petrification
+149. Melascula's soul
+150. Escanor's brother
+151. Daz
+152. Bartra's daughter
+153. Veronica's guard
+154. Guila's brother
+155. Griamore's father
+156. Howzer's niece
+157. Elizabeth reincarnation
+158. Meliodas young
+159. Diane young
+160. King young
+161. Ban young
+162. Elaine young
+163. Jericho young
+164. Gowther doll
+165. Merlin's father
+166. Arthur's sword
+167. Chaos
+168. Chaos Arthur
+169. Lady of the Lake
+170. Percival's grandfather
+171. Percival's mother
+172. Lancelot's mother
+173. Camelot Knight
+174. Vivian's master
+175. Zaratras' brother`;
 
-const MHA_RAW = `1. Izuku Midoriya (Deku)
+const MHA_RAW = `1. Izuku Midoriya
 2. Katsuki Bakugo
 3. Shoto Todoroki
 4. Ochaco Uraraka
@@ -1049,134 +1726,213 @@ const MHA_RAW = `1. Izuku Midoriya (Deku)
 18. Koji Koda
 19. Toru Hagakure
 20. Hanta Sero
-21. Shota Aizawa
-22. All Might
-23. Present Mic
-24. Midnight
-25. Cementoss
-26. Ectoplasm
-27. Snipe
-28. Thirteen
-29. Power Loader
-30. Hound Dog
-31. Recovery Girl
-32. Nezu
-33. Vlad King
-34. Sekijiro Kan
-35. Gran Torino
-36. Sir Nighteye
-37. Mirio Togata
-38. Tamaki Amajiki
-39. Nejire Hado
-40. Fat Gum
-41. Ryukyu
-42. Mt. Lady
-43. Kamui Woods
-44. Edgeshot
-45. Best Jeanist
-46. Hawks
-47. Endeavor
-48. Mirko
-49. Crust
-50. Gang Orca
-51. Pixie-Bob
-52. Tiger
-53. Mandalay
-54. Ragdoll
-55. Ms. Joke
-56. Inasa Yoarashi
-57. Camie Utsushimi
-58. Mei Hatsume
-59. Melissa Shield
-60. David Shield
-61. Eri
-62. Kota Izumi
-63. Inko Midoriya
-64. Rei Todoroki
-65. Enji Todoroki
-66. Fuyumi Todoroki
-67. Natsuo Todoroki
-68. Toya Todoroki (Dabi)
-69. Keigo Takami (Hawks)
-70. Nana Shimura
-71. Tenko Shimura
-72. Yoichi Shigaraki
-73. All For One
-74. Tomura Shigaraki
-75. Kurogiri
-76. Dabi
-77. Himiko Toga
-78. Twice
-79. Mr. Compress
-80. Spinner
-81. Magne
-82. Mustard
-83. Moonfish
-84. Muscular
-85. Nomu
-86. Gigantomachia
-87. Doctor Kyudai Garaki
-88. Giran
-89. Re-Destro
-90. Geten
-91. Trumpet
-92. Curious
-93. Skeptic
-94. Nine
-95. Slice
-96. Chimera
-97. Mummy
-98. Wolfram
-99. Rody Soul
-100. Gentle Criminal
-101. La Brava
-102. Overhaul (Kai Chisaki)
-103. Chronostasis
-104. Mimic
-105. Rappa
-106. Tengai
-107. Setsuno Toya
-108. Hojo
-109. Tabe
-110. Monoma Neito
-111. Itsuka Kendo
-112. Tetsutetsu Tetsutetsu
-113. Juzo Honenuki
-114. Setsuna Tokage
-115. Ibara Shiozaki
-116. Yosetsu Awase
-117. Sen Kaibara
-118. Pony Tsunotori
-119. Manga Fukidashi
-120. Kosei Tsuburaba
-121. Shishida Jurota
-122. Reiko Yanagi
-123. Hiryu Rin
-124. Kojiro Bondo
-125. Togaru Kamakiri
-126. Kinoko Komori
-127. Shihai Kuroiro
-128. Yui Kodai
-129. Burnin
-130. Selkie
-131. Sirius
-132. Uwabami
-133. Death Arms
-134. Gunhead
-135. Fourth Kind
-136. Manual
-137. Rock Lock
-138. Centipeder
-139. Bubble Girl
-140. Native
-141. Slidin' Go
-142. Majestic
-143. X-Less
-144. Star and Stripe
-145. Cathleen Bate
-146. Christopher Skyline
-147. Captain Celebrity
-148. Nagamasa Mora`;
+21. Neito Monoma
+22. Itsuka Kendo
+23. Tetsutetsu Tetsutetsu
+24. Juzo Honenuki
+25. Setsuna Tokage
+26. Ibara Shiozaki
+27. Yosetsu Awase
+28. Sen Kaibara
+29. Pony Tsunotori
+30. Manga Fukidashi
+31. Kosei Tsuburaba
+32. Jurota Shishida
+33. Nirengeki Shoda
+34. Reiko Yanagi
+35. Hiryu Rin
+36. Kojiro Bondo
+37. Togaru Kamakiri
+38. Kinoko Komori
+39. Shihai Kuroiro
+40. Yui Kodai
+41. Kinoko
+42. Shota Aizawa
+43. All Might
+44. Present Mic
+45. Midnight
+46. Cementoss
+47. Ectoplasm
+48. Snipe
+49. Thirteen
+50. Power Loader
+51. Hound Dog
+52. Recovery Girl
+53. Nezu
+54. Vlad King
+55. Gran Torino
+56. Sir Nighteye
+57. Mirio Togata
+58. Tamaki Amajiki
+59. Nejire Hado
+60. Fat Gum
+61. Ryukyu
+62. Mt. Lady
+63. Kamui Woods
+64. Edgeshot
+65. Best Jeanist
+66. Hawks
+67. Endeavor
+68. Mirko
+69. Crust
+70. Wash
+71. Yoroi Musha
+72. Gang Orca
+73. Pixie-Bob
+74. Tiger
+75. Mandalay
+76. Ragdoll
+77. Ms. Joke
+78. Inasa Yoarashi
+79. Camie Utsushimi
+80. Seiji Shishikura
+81. Yo Shindo
+82. Tatami Nakagame
+83. Nagamasa Mora
+84. Shikkui Makabe
+85. Itejiro Toteki
+86. Mei Hatsume
+87. Melissa Shield
+88. David Shield
+89. Eri
+90. Kota Izumi
+91. Inko Midoriya
+92. Hisashi Midoriya
+93. Mitsuki Bakugo
+94. Masaru Bakugo
+95. Rei Todoroki
+96. Fuyumi Todoroki
+97. Natsuo Todoroki
+98. Toya Todoroki
+99. Keigo Takami
+100. Nana Shimura
+101. Kotaro Shimura
+102. Nao Shimura
+103. Hana Shimura
+104. Tenko Shimura
+105. Yoichi Shigaraki
+106. All For One
+107. Tomura Shigaraki
+108. Kurogiri
+109. Dabi
+110. Himiko Toga
+111. Twice
+112. Mr. Compress
+113. Spinner
+114. Magne
+115. Mustard
+116. Moonfish
+117. Muscular
+118. Nomu
+119. Gigantomachia
+120. Kyudai Garaki
+121. Giran
+122. Re-Destro
+123. Geten
+124. Trumpet
+125. Curious
+126. Skeptic
+127. Chitose Kizuki
+128. Stain
+129. Lady Nagant
+130. Overhaul
+131. Chronostasis
+132. Mimic
+133. Kendo Rappa
+134. Hekiji Tengai
+135. Shin Nemoto
+136. Deidoro Sakaki
+137. Toya Setsuno
+138. Yu Hojo
+139. Soramitsu Tabe
+140. Katsukame
+141. Nine
+142. Slice
+143. Chimera
+144. Mummy
+145. Flect Turn
+146. Beros
+147. Serpenters
+148. Wolfram
+149. Rody Soul
+150. Pino
+151. Anna Scervino
+152. Gentle Criminal
+153. La Brava
+154. Star and Stripe
+155. Burnin
+156. Kido
+157. Onima
+158. Tsukuyomi
+159. Moe Kamiji
+160. Selkie
+161. Sirius
+162. Uwabami
+163. Death Arms
+164. Gunhead
+165. Fourth Kind
+166. Manual
+167. Rock Lock
+168. Centipeder
+169. Bubble Girl
+170. Native
+171. Slidin' Go
+172. Majestic
+173. X-Less
+174. Backdraft
+175. Snatch
+176. Air Jet
+177. Kesagiriman
+178. Shishido
+179. Bee Hero
+180. Shindo
+181. Nighteye's agency
+182. Enji Todoroki
+183. Kai Chisaki
+184. Ending
+185. Tomoyasu Chikazoku
+186. Yotsubashi Rikiya
+187. Koku Hanabata
+188. Hanabata
+189. Sanctum
+190. Dictator
+191. Innsmouth
+192. Bombast
+193. Setsuno
+194. Hojo
+195. Tabe
+196. Kuin Hachisuka
+197. Johnny
+198. Larceny
+199. Ujiko
+200. Tartarus Warden
+201. Present Mic's agency
+202. Tsukauchi Naomasa
+203. Sansa Tamakawa
+204. Nedzu
+205. Aoyama's parents
+206. Yaoyorozu's butler
+207. Shinso Hitoshi
+208. Nirengeki
+209. Kamakiri
+210. Bondo
+211. Shiozaki
+212. Rin
+213. Kodai
+214. Awase
+215. Kaibara
+216. Tsunotori
+217. Fukidashi
+218. Tsuburaba
+219. Shishida
+220. Yanagi
+221. Komori
+222. Kuroiro
+223. Honenuki
+224. Tokage
+225. Tetsutetsu
+226. Kendo
+227. Monoma`;
 
 const FAIRY_RAW = `1. Natsu Dragneel
 2. Lucy Heartfilia
@@ -1185,138 +1941,227 @@ const FAIRY_RAW = `1. Natsu Dragneel
 5. Wendy Marvell
 6. Happy
 7. Carla
-8. Gajeel Redfox
-9. Juvia Lockser
-10. Mirajane Strauss
-11. Laxus Dreyar
-12. Makarov Dreyar
-13. Elfman Strauss
-14. Lisanna Strauss
-15. Cana Alberona
-16. Levy McGarden
-17. Jet
-18. Droy
-19. Freed Justine
-20. Bickslow
-21. Evergreen
-22. Alzack Connell
-23. Bisca Mulan
-24. Romeo Conbolt
-25. Macao Conbolt
-26. Wakaba Mine
-27. Max Alors
-28. Warren Rocko
-29. Nab Lasaro
-30. Reedus Jonah
-31. Asuka Connell
-32. Loke
-33. Mystogan
-34. Panther Lily
-35. Mest Gryder
-36. Gildarts Clive
-37. Porlyusica
-38. Hades
-39. Zeref Dragneel
-40. Mavis Vermillion
-41. Acnologia
-42. Igneel
-43. Grandeeney
-44. Metalicana
-45. Weisslogia
-46. Skiadrum
-47. Atlas Flame
-48. Motherglare
-49. Zirconis
-50. Belserion
-51. Irene Belserion
-52. August
-53. Larcade Dragneel
-54. God Serena
-55. Bloodman
-56. Dimaria Yesta
-57. Brandish μ
-58. Invel Yura
-59. Ajeel Raml
-60. Neinhart
-61. Wahl Icht
-62. Jacob Lessio
-63. Spriggan 12
-64. Duke Barbaroa
-65. Duke Oración Seis
-66. Cobra
-67. Midnight
-68. Angel
-69. Racer
-70. Brain
-71. Zero
-72. Hoteye
-73. Imitatia
-74. Jellal Fernandes
-75. Ultear Milkovich
-76. Meredy
-77. Simon
-78. Wally Buchanan
-79. Millianna
-80. Sho
-81. Richard Buchanan
-82. Erigor
-83. Kageyama
-84. Aria
-85. Vidaldus Taka
-86. Ikaruga
-87. Kain Hikaru
-88. Azuma
-89. Rustyrose
-90. Caprico
-91. Zancrow
-92. Bluenote Stinger
-93. Mard Geer
-94. Jackal
-95. Franmalth
-96. Torafuzar
-97. Kyôka
-98. Seilah
-99. Ezel
-100. Tempester
-101. Silver Fullbuster
-102. Keyes
-103. Keith
-104. Future Rogue
-105. Rogue Cheney
-106. Sting Eucliffe
-107. Frosch
-108. Lector
-109. Minerva Orland
-110. Yukino Agria
-111. Sorano Agria
-112. Rufus Lore
-113. Orga Nanagear
-114. Doranbalt
-115. Flare Corona
-116. Obra
-117. Jenny Realight
-118. Hibiki Lates
-119. Eve Tearm
-120. Ren Akatsuki
-121. Ichiya Vandalay Kotobuki
-122. Jura Neekis
-123. Lyon Vastia
-124. Sherry Blendy
-125. Toby Horhorta
-126. Yuka Suzuki
-127. Kagura Mikazuchi
-128. Risley Law
-129. Warrod Sequen
-130. Yuri Dreyar
-131. Precht Gaebolg
-132. Wolfheim
-133. Bob
-134. Hisui E. Fiore
-135. Arcadios
-136. Darton
-137. Chapati Lola
-138. Jason
-139. Toma E. Fiore`;
+8. Panther Lily
+9. Gajeel Redfox
+10. Juvia Lockser
+11. Mirajane Strauss
+12. Elfman Strauss
+13. Lisanna Strauss
+14. Laxus Dreyar
+15. Makarov Dreyar
+16. Cana Alberona
+17. Levy McGarden
+18. Jet
+19. Droy
+20. Freed Justine
+21. Bickslow
+22. Evergreen
+23. Alzack Connell
+24. Bisca Connell
+25. Asuka Connell
+26. Romeo Conbolt
+27. Macao Conbolt
+28. Wakaba Mine
+29. Max Alors
+30. Warren Rocko
+31. Nab Lasaro
+32. Reedus Jonah
+33. Laki Olietta
+34. Kinana
+35. Vijeeter Ecor
+36. Mirajane
+37. Loke
+38. Mystogan
+39. Mest Gryder
+40. Gildarts Clive
+41. Porlyusica
+42. First Master Mavis Vermillion
+43. Precht Gaebolg
+44. Yuri Dreyar
+45. Warrod Sequen
+46. Zeref Dragneel
+47. Acnologia
+48. Igneel
+49. Grandeeney
+50. Metalicana
+51. Weisslogia
+52. Skiadrum
+53. Atlas Flame
+54. Motherglare
+55. Zirconis
+56. Belserion
+57. Irene Belserion
+58. August
+59. Larcade Dragneel
+60. God Serena
+61. Bloodman
+62. Dimaria Yesta
+63. Brandish Mu
+64. Invel Yura
+65. Ajeel Raml
+66. Neinhart
+67. Wahl Icht
+68. Jacob Lessio
+69. Elefseria
+70. Mercphobia
+71. Ignia
+72. Selene
+73. Aldoron
+74. Viernes
+75. Dogramag
+76. Georg Reizen
+77. Duke Barbaroa
+78. Athena
+79. Faris
+80. Brain
+81. Cobra
+82. Midnight
+83. Angel
+84. Racer
+85. Hoteye
+86. Zero
+87. Imitatia
+88. Jellal Fernandes
+89. Ultear Milkovich
+90. Meredy
+91. Simon
+92. Wally Buchanan
+93. Millianna
+94. Sho
+95. Erigor
+96. Kageyama
+97. Aria
+98. Vidaldus Taka
+99. Ikaruga
+100. Kain Hikaru
+101. Azuma
+102. Rustyrose
+103. Caprico
+104. Zancrow
+105. Bluenote Stinger
+106. Hades
+107. Mard Geer
+108. Jackal
+109. Franmalth
+110. Torafuzar
+111. Kyoka
+112. Seilah
+113. Ezel
+114. Tempester
+115. Silver Fullbuster
+116. Keyes
+117. Sayla
+118. Future Rogue
+119. Rogue Cheney
+120. Sting Eucliffe
+121. Frosch
+122. Lector
+123. Minerva Orland
+124. Yukino Agria
+125. Sorano Agria
+126. Rufus Lore
+127. Orga Nanagear
+128. Jiemma
+129. Dobengal
+130. Doranbalt
+131. Flare Corona
+132. Obra
+133. Jenny Realight
+134. Hibiki Lates
+135. Eve Tearm
+136. Ren Akatsuki
+137. Ichiya Vandalay Kotobuki
+138. Jura Neekis
+139. Lyon Vastia
+140. Sherry Blendy
+141. Sherria Blendy
+142. Toby Horhorta
+143. Yuka Suzuki
+144. Ooba Babasaama
+145. Kagura Mikazuchi
+146. Risley Law
+147. Beth Vanderwood
+148. Arana Webb
+149. Bob
+150. Goldmine
+151. Wolfheim
+152. Hisui E. Fiore
+153. Arcadios
+154. Darton
+155. Michello
+156. Chapati Lola
+157. Jason
+158. Toma E. Fiore
+159. Yajima
+160. Org
+161. Leiji
+162. Belno
+163. Aquarius
+164. Virgo
+165. Scorpio
+166. Taurus
+167. Cancer
+168. Aries
+169. Gemini
+170. Libra
+171. Sagittarius
+172. Capricorn
+173. Ophiuchus
+174. Plue
+175. Horologium
+176. Lyra
+177. Crux
+178. Pyxis
+179. Deneb
+180. Polaris
+181. Edolas Natsu
+182. Edolas Lucy
+183. Edolas Gray
+184. Edolas Erza
+185. Edolas Wendy
+186. Faust
+187. Coco
+188. Hughes
+189. Sugarboy
+190. Byro
+191. Erza Knightwalker
+192. Pantherlily Edolas
+193. Zentopia
+194. Michelle Lobster
+195. Guttman
+196. Jackpot
+197. Samuel
+198. Blue Note
+199. Anna Heartfilia
+200. Layla Heartfilia
+201. Jude Heartfilia
+202. Silver
+203. Ur
+204. Deliora
+205. Ultear young
+206. Zera
+207. Precht
+208. Yury
+209. Mavis young
+210. Nichiya
+211. Karen Lilica
+212. Bora
+213. Everlue
+214. Kurohebi
+215. Nullpudding
+216. Chelia
+217. Rocker
+218. Semmes
+219. Kawazu
+220. Yomazu
+221. Hot Eye
+222. Angel Sorano
+223. Zoldeo
+224. Meldy
+225. Byro Cracy
+226. Extalia Queen
+227. Shagotte
+228. Nadi`;
 
 const CLOVER_RAW = `1. Asta
 2. Yuno Grinberryall
@@ -1334,102 +2179,176 @@ const CLOVER_RAW = `1. Asta
 14. Grey
 15. Henry Legolant
 16. Secre Swallowtail
-17. Julius Novachrono
-18. Fuegoleon Vermillion
-19. Mereoleona Vermillion
-20. Leopold Vermillion
-21. Nozel Silva
-22. Nebra Silva
-23. Solid Silva
-24. Kirsch Vermillion
-25. Klaus Lunettes
-26. William Vangeance
-27. Langris Vaude
-28. Charlotte Roselei
-29. Sol Marron
-30. Puli Angel
-31. En Ringard
-32. Jack the Ripper
-33. Sekke Bronzazza
-34. Kaiser Granvorka
-35. Gueldre Poizot
-36. Rill Boismortier
-37. Fragil Tormenta
-38. Alecdora Sandler
-39. David Swallow
-40. Xerx Lugner
-41. Hamon Caseus
-42. Randall Luftair
-43. Marx Francois
-44. Revchi Salik
-45. Heath Grice
-46. Sally
-47. Valtos
-48. Rades Spirito
-49. Baro
-50. Patolli
-51. Rhya
-52. Fana
-53. Vetto
-54. Zagred
-55. Licht
-56. Tetia
-57. Lumiere Silvamillion Clover
-58. Lemiel Silvamillion Clover
-59. Charla
-60. Ronne
-61. William Vangeance
-62. Dante Zogratis
-63. Vanica Zogratis
-64. Zenon Zogratis
-65. Lucifero
-66. Megicula
-67. Morris Libardirt
-68. Gaderois Godroc
-69. Foyal Migusteau
-70. Sivoir Snyle
-71. Adrammelech
-72. Lilith
-73. Naamah
+17. Zora Ideale
+18. Julius Novachrono
+19. Fuegoleon Vermillion
+20. Mereoleona Vermillion
+21. Leopold Vermillion
+22. Kirsch Vermillion
+23. Nozel Silva
+24. Nebra Silva
+25. Solid Silva
+26. Acier Silva
+27. Klaus Lunettes
+28. William Vangeance
+29. Langris Vaude
+30. Charlotte Roselei
+31. Sol Marron
+32. Puli Angel
+33. En Ringard
+34. Jack the Ripper
+35. Sekke Bronzazza
+36. Kaiser Granvorka
+37. Gueldre Poizot
+38. Rill Boismortier
+39. Fragil Tormenta
+40. Alecdora Sandler
+41. David Swallow
+42. Xerx Lugner
+43. Hamon Caseus
+44. Randall Luftair
+45. Marx Francois
+46. Owen
+47. Revchi Salik
+48. Heath Grice
+49. Sally
+50. Valtos
+51. Rades Spirito
+52. Catherine
+53. Baro
+54. Patolli
+55. Rhya
+56. Fana
+57. Vetto
+58. Zagred
+59. Licht
+60. Tetia
+61. Lumiere Silvamillion Clover
+62. Lemiel Silvamillion Clover
+63. Drowa
+64. Eclat
+65. Charla
+66. Ronne
+67. Kivn
+68. Patri
+69. Dante Zogratis
+70. Vanica Zogratis
+71. Zenon Zogratis
+72. Lucius Zogratis
+73. Lucifero
 74. Beelzebub
-75. Lucifugus
-76. Liebe
-77. Nacht's father
-78. Nacht's mother
-79. Ciel Grinberryall
-80. Loyce Grinberryall
-81. Ralph Nader
-82. Allen Fiarain
-83. Acier Silva
-84. Kahono
-85. Kiato
-86. Mars
-87. Ladros
-88. Lotus Whomalt
-89. Fanzell Kruger
-90. Dominante Code
-91. Mariella
-92. Gadjah
-93. Lolopechka
-94. Undine
-95. Dryad
-96. Dorthy Unsworth
-97. Damnatio Kira
-98. Sister Lily
-99. Father Orsi Orfai
-100. Rebecca Scarlet
-101. Marie Adlai
-102. Nathan Agrippa
-103. Ichika Yami
-104. Ryudo Ryuya
-105. Fujio
-106. Daizaemon O'oka
-107. Heath Grice
-108. Conrad Leto
-109. Jester Garandros
-110. Edward Avalaché
-111. Princia Funnybunny
-112. Milly Maxwell`;
+75. Megicula
+76. Adrammelech
+77. Lilith
+78. Naamah
+79. Lucifugus
+80. Liebe
+81. Gimodelo
+82. Slotos
+83. Plumede
+84. Walgner
+85. Morris Libardirt
+86. Gaderois Godroc
+87. Foyal Migusteau
+88. Sivoir Snyle
+89. Halbet Chevour
+90. Robero Ringert
+91. Svenkin Gatard
+92. Nacht's father
+93. Morgen Faust
+94. Ciel Grinberryall
+95. Loyce Grinberryall
+96. Ralph Niaflem
+97. Allen Fiarain
+98. Kahono
+99. Kiato
+100. Gifso
+101. Mars
+102. Ladros
+103. Lotus Whomalt
+104. Fanzell Kruger
+105. Dominante Code
+106. Mariella
+107. Broccos
+108. Ragus
+109. Yagos
+110. Gadjah
+111. Lolopechka
+112. Undine
+113. Floga
+114. Potrof
+115. Noze
+116. Siren Tium
+117. Neige
+118. Dryad
+119. Ecthel
+120. Dorothy Unsworth
+121. Damnatio Kira
+122. Sister Lily
+123. Father Orsi Orfai
+124. Nash
+125. Recca
+126. Aruru
+127. Hollo
+128. Sister Theresa Rapual
+129. Father Fuego
+130. Rebecca Scarlet
+131. Marie Adlai
+132. Nathan Agrippa
+133. Ichika Yami
+134. Ryudo Ryuya
+135. Fujio
+136. Daizaemon O'oka
+137. Ginnojomorifuyu Kezoukaku
+138. Komari Imari
+139. Mushogatake Yosuga
+140. Conrad Leto
+141. Jester Garandros
+142. Edward Avalache
+143. Princia Funnybunny
+144. Milly Maxwell
+145. Roland
+146. Sister Theresa
+147. Neige's mother
+148. Zenon's father
+149. Asta's parents
+150. Liebe's mother
+151. Richita
+152. Yuno's retainer
+153. Salim of Hapshass
+154. Kabwe Carillon
+155. Baro's gang
+156. Rill's squad
+157. Charlotte's squad
+158. Yami's squad
+159. Nozel's squad
+160. Fuegoleon's squad
+161. Magic Emperor
+162. Wizard King
+163. Sekke's rival
+164. Rufel
+165. Zagred's vessel
+166. Elf Patolli
+167. Elf Licht
+168. Elf Rhya
+169. Elf Vetto
+170. Elf Fana
+171. Elf Drowa
+172. Elf Eclat
+173. Elf Ronne
+174. Elf Charla
+175. Elf Kivn
+176. Devil Lucifero
+177. Devil Beelzebub
+178. Devil Megicula
+179. Devil Adrammelech
+180. Devil Lilith
+181. Devil Naamah
+182. Zogratis siblings
+183. Spade Kingdom Dark Triad
+184. Heart Kingdom Spirit Guardians
+185. Diamond Kingdom Shining Generals
+186. Clover Kingdom Magic Knights`;
 
 const RG_UNIVERSES = {
     naruto:   { name: 'Naruto',              raw: NARUTO_RAW },
@@ -2387,6 +3306,13 @@ io.on('connection', (socket) => {
         
         const existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
+            // Partie déjà lancée : on n'autorise pas l'entrée (sinon tout le salon est renvoyé au menu)
+            if (room.status !== 'waiting') {
+                socket.leave(roomCode);
+                socket.emit('game_error', { message: "Une partie est déjà en cours dans ce salon. Attends la fin de la manche." });
+                return;
+            }
+
             // Limite d'effectif : 10 joueurs max pour Undercover et Devine la note
             if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length >= 10) {
                 socket.leave(roomCode);
@@ -2893,7 +3819,12 @@ io.on('connection', (socket) => {
         console.log(`Utilisateur déconnecté : ${socket.id}`);
         for (const roomCode in rooms) {
             const room = rooms[roomCode];
+            if (!room.players.some(p => p.id === socket.id)) continue; // pas dans ce salon
+
             const hadTurn = room.rg && room.players[room.rg.turnIndex] && room.players[room.rg.turnIndex].id === socket.id;
+            const etaitSonTourEnchere = room.enchere && room.enchere.turnPlayerId === socket.id;
+            const etaitSonTourAveugle = room.enchereAveugle && room.enchereAveugle.turnPlayerId === socket.id;
+
             room.players = room.players.filter(p => p.id !== socket.id);
 
             if (room.players.length === 0) {
@@ -2910,6 +3841,15 @@ io.on('connection', (socket) => {
                 room.host = room.players[0].id;
             }
 
+            // Salon d'attente : mise à jour normale de la liste des joueurs
+            if (room.status === 'waiting' || room.status === 'results' || room.status === 'rg_over'
+                || room.status === 'enchere_over' || room.status === 'enchereaveugle_over' || room.status === 'connexion_over') {
+                io.to(roomCode).emit('update_room', room);
+                continue;
+            }
+
+            // --- Partie en cours : on ne renvoie JAMAIS tout le monde au salon ---
+
             if (room.rg && room.status === 'rg_playing') {
                 if (room.rg.turnIndex >= room.players.length) room.rg.turnIndex = 0;
                 const alive = rgAlivePlayers(room);
@@ -2922,9 +3862,66 @@ io.on('connection', (socket) => {
                     io.to(roomCode).emit('rg_state', room);
                     if (hadTurn) startRgTimer(room, roomCode);
                 }
-            } else {
-                io.to(roomCode).emit('update_room', room);
+                continue;
             }
+
+            // Enchère / Enchère à l'aveugle : à 2 joueurs, le départ d'un joueur clôt la partie
+            if (room.status === 'enchere_playing') {
+                if (room.players.length < 2) {
+                    endEnchere(room, roomCode);
+                } else {
+                    if (etaitSonTourEnchere) room.enchere.turnPlayerId = room.players[0].id;
+                    io.to(roomCode).emit('enchere_state', room);
+                }
+                continue;
+            }
+
+            if (room.status === 'enchereaveugle_playing') {
+                if (room.players.length < 2) {
+                    endEnchereAveugle(room, roomCode);
+                } else {
+                    if (etaitSonTourAveugle) room.enchereAveugle.turnPlayerId = room.players[0].id;
+                    emitEnchereAveugleState(room, roomCode);
+                }
+                continue;
+            }
+
+            // Jeu de connexion : le tour peut se débloquer si le partant était le dernier attendu
+            if (room.status === 'connexion_playing' && room.connexion) {
+                delete room.connexion.words[socket.id];
+                if (room.players.length >= 2 && Object.keys(room.connexion.words).length >= room.players.length) {
+                    resolveConnexionRound(room, roomCode);
+                } else {
+                    emitConnexionState(room, roomCode);
+                }
+                continue;
+            }
+
+            // Undercover / Devine la note : la partie continue sans le joueur parti
+            if (room.status === 'voting') {
+                delete room.votes[socket.id];
+                const alivePlayers = room.players.filter(p => p.isAlive);
+                if (alivePlayers.length > 0 && Object.keys(room.votes).length >= alivePlayers.length) {
+                    resolveVotes(room, roomCode);
+                } else {
+                    io.to(roomCode).emit('start_voting', room);
+                }
+                continue;
+            }
+
+            if (room.status === 'gameplay' || room.status === 'reveal' || room.status === 'end_clues') {
+                if (room.currentTurnIndex >= room.players.length) room.currentTurnIndex = 0;
+                io.to(roomCode).emit('update_gameplay', room);
+                continue;
+            }
+
+            if (room.status === 'choosing_theme') {
+                const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+                io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
+                continue;
+            }
+
+            io.to(roomCode).emit('update_gameplay', room);
         }
     });
 });
