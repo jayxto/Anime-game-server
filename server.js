@@ -2863,17 +2863,27 @@ function startRollandGaros(room, roomCode) {
 
 function startRgTimer(room, roomCode) {
     if (rgTimers[roomCode]) clearInterval(rgTimers[roomCode]);
+    if (!room.rg) return;
     room.rg.timeLeft = 10;
     rgTimers[roomCode] = setInterval(() => {
-        if (!rooms[roomCode] || !room.rg) {
+        try {
+            if (!rooms[roomCode] || !room.rg || room.status !== 'rg_playing') {
+                clearInterval(rgTimers[roomCode]);
+                delete rgTimers[roomCode];
+                return;
+            }
+            room.rg.timeLeft--;
+            io.to(roomCode).emit('rg_tick', { timeLeft: Math.max(room.rg.timeLeft, 0) });
+            if (room.rg.timeLeft <= 0) {
+                clearInterval(rgTimers[roomCode]);
+                delete rgTimers[roomCode];
+                rgLoseLife(room, roomCode, "⏱ Trop lent, un personnage manqué !");
+            }
+        } catch (e) {
+            // Une erreur dans le chrono ne doit jamais tuer le serveur
+            console.error('[chrono Rolland Garos]', e);
             clearInterval(rgTimers[roomCode]);
-            return;
-        }
-        room.rg.timeLeft--;
-        io.to(roomCode).emit('rg_tick', { timeLeft: Math.max(room.rg.timeLeft, 0) });
-        if (room.rg.timeLeft <= 0) {
-            clearInterval(rgTimers[roomCode]);
-            rgLoseLife(room, roomCode, "⏱ Trop lent, un personnage manqué !");
+            delete rgTimers[roomCode];
         }
     }, 1000);
 }
@@ -3755,6 +3765,21 @@ function resolveConnexionRound(room, roomCode) {
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
+    // Chaque handler est isolé : si l'un plante, l'erreur est journalisée et
+    // seule l'action concernée échoue — la partie et les autres joueurs continuent.
+    const brut = socket.on.bind(socket);
+    socket.on = (evenement, fn) => brut(evenement, function (...args) {
+        try {
+            const r = fn.apply(this, args);
+            if (r && typeof r.catch === 'function') {
+                r.catch(e => console.error(`[handler ${evenement}]`, e));
+            }
+            return r;
+        } catch (e) {
+            console.error(`[handler ${evenement}]`, e);
+        }
+    });
+
     socket.on('join_room', ({ roomCode, mode, subMode }) => {
         socket.join(roomCode);
 
@@ -4412,12 +4437,16 @@ io.on('connection', (socket) => {
                 joueur.disconnectedAt = Date.now();
                 if (graceTimers[socket.id]) clearTimeout(graceTimers[socket.id]);
                 graceTimers[socket.id] = setTimeout(() => {
-                    delete graceTimers[socket.id];
-                    const r = rooms[roomCode];
-                    if (!r) return;
-                    const encoreLa = r.players.find(p => p.id === socket.id);
-                    if (!encoreLa || !encoreLa.disconnected) return; // il est revenu
-                    retirerJoueurDuSalon(r, roomCode, socket.id);
+                    try {
+                        delete graceTimers[socket.id];
+                        const r = rooms[roomCode];
+                        if (!r) return;
+                        const encoreLa = r.players.find(p => p.id === socket.id);
+                        if (!encoreLa || !encoreLa.disconnected) return; // il est revenu
+                        retirerJoueurDuSalon(r, roomCode, socket.id);
+                    } catch (e) {
+                        console.error('[délai de reconnexion]', e);
+                    }
                 }, RECONNECT_GRACE_MS);
                 io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: false });
                 continue;
@@ -4538,6 +4567,18 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
 }
 
 const PORT = process.env.PORT || 3000;
+
+// --- Filet de sécurité global ---
+// Sans ça, la moindre erreur inattendue dans un handler tue le processus Node :
+// Render redémarre, toutes les parties en mémoire sont perdues et TOUS les joueurs
+// sont éjectés en même temps. On journalise et on continue de tourner.
+process.on('uncaughtException', (err) => {
+    console.error('[ERREUR NON RATTRAPÉE] le serveur continue malgré tout :', err);
+});
+
+process.on('unhandledRejection', (raison) => {
+    console.error('[PROMESSE REJETÉE] le serveur continue malgré tout :', raison);
+});
 server.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
