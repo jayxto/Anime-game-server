@@ -212,6 +212,9 @@
     </div>
 
     <div id="app-root" style="display:none;">
+    <div id="connection-banner" style="display:none; background:#ff2a5f; color:#fff; text-align:center; padding:10px; font-weight:700; font-size:0.85rem;">
+        ⚠️ Connexion perdue — reconnexion en cours…
+    </div>
     <header>
         <div class="logo">ANIME GAME</div>
         <nav>
@@ -825,9 +828,22 @@
         });
 
         socket.on('rejoin_failed', () => {
-            // La place n'a pas pu être récupérée (partie finie ou délai dépassé)
+            // La partie n'existe plus côté serveur (redémarrage ou délai dépassé)
             currentRoomCode = "";
             goToMenuSelection();
+            alert("La connexion au serveur a été réinitialisée et la partie n'a pas pu être retrouvée. Recrée ou rejoins un salon.");
+        });
+
+        socket.on('disconnect', (raison) => {
+            if (currentRoomCode && raison !== 'io client disconnect') {
+                const el = document.getElementById('connection-banner');
+                if (el) el.style.display = 'block';
+            }
+        });
+
+        socket.io.on('reconnect', () => {
+            const el = document.getElementById('connection-banner');
+            if (el) el.style.display = 'none';
         });
 
         socket.on('player_connection_changed', () => {
