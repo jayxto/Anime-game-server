@@ -180,6 +180,8 @@
         .dle-cell.good { background:rgba(0,255,136,.18); border-color:#00ff88; color:#baffd8; }
         .dle-cell.close { background:rgba(255,230,0,.14); border-color:var(--accent-yellow); color:#fff6a8; }
         .dle-cell.bad { background:rgba(255,42,95,.12); border-color:rgba(255,42,95,.7); color:#ffc1d0; }
+        .dle-cell.unknown { background:#101018; border-color:#303044; color:#6f6f82; }
+        .dle-pool-badge { display:inline-block; margin-left:7px; padding:2px 7px; border:1px solid var(--accent-cyan); border-radius:999px; color:var(--accent-cyan); font-size:.68rem; font-weight:800; }
         .dle-suggestions { position:absolute; z-index:30; left:0; right:0; top:100%; max-height:220px; overflow:auto; background:#0b0b10; border:1px solid var(--accent-cyan); border-radius:0 0 8px 8px; box-shadow:0 12px 28px rgba(0,0,0,.45); display:none; }
         .dle-suggestion { padding:9px 11px; cursor:pointer; text-align:left; font-size:.82rem; border-bottom:1px solid #202033; }
         .dle-suggestion:hover { background:#18182a; color:var(--accent-cyan); }
@@ -1815,29 +1817,55 @@
             input.value=''; document.getElementById('dle-suggestions').style.display='none';
         }
         function renderDleState(room){
-            if(!room?.dle)return; const d=room.dle; dleCandidates=d.candidates||[];
-            document.getElementById('dle-universe-label').innerText=`🎴 ${d.universeName}`;
-            const status=document.getElementById('dle-status'),winner=document.getElementById('dle-winner-box'),
-                  inputWrap=document.getElementById('dle-input-wrap'),end=document.getElementById('dle-end-buttons');
+            if(!room?.dle)return;
+            const d=room.dle;
+            dleCandidates=d.candidates||[];
+
+            document.getElementById('dle-universe-label').innerHTML =
+                `🎴 ${dleEsc(d.universeName)} <span class="dle-pool-badge">${d.poolSize || dleCandidates.length} persos</span>`;
+
+            const status=document.getElementById('dle-status'),
+                  winner=document.getElementById('dle-winner-box'),
+                  inputWrap=document.getElementById('dle-input-wrap'),
+                  end=document.getElementById('dle-end-buttons');
+
             if(d.finished){
-                status.innerText=`Personnage : ${d.targetName}`; winner.style.display='block';
+                status.innerText=`Personnage : ${d.targetName}`;
+                winner.style.display='block';
                 winner.innerText=`🏆 ${d.winnerName} a trouvé ${d.targetName} en ${d.winnerAttempts} essai${d.winnerAttempts>1?'s':''} !`;
-                inputWrap.style.display='none'; end.style.display=room.host===socket.id?'flex':'none';
+                inputWrap.style.display='none';
+                end.style.display=room.host===socket.id?'flex':'none';
             }else{
                 status.innerText=`Trouve le personnage mystère • ${d.guesses.length} essai${d.guesses.length>1?'s':''}`;
-                winner.style.display='none';inputWrap.style.display='block';end.style.display='none';
+                winner.style.display='none';
+                inputWrap.style.display='block';
+                end.style.display='none';
             }
+
             const grid=document.getElementById('dle-grid'),cats=d.categories||[];
-            grid.style.gridTemplateColumns=`1.45fr repeat(${cats.length}, minmax(115px,1fr))`;
-            grid.innerHTML=`<div class="dle-head">Personnage</div>`+cats.map(c=>`<div class="dle-head">${dleEsc(c.label)}</div>`).join('');
+            grid.style.gridTemplateColumns=`1.45fr repeat(${cats.length}, minmax(112px,1fr))`;
+            grid.innerHTML=`<div class="dle-head">Personnage</div>`+
+                cats.map(c=>`<div class="dle-head">${dleEsc(c.label)}</div>`).join('');
+
             [...d.guesses].reverse().forEach(g=>{
-                const first=document.createElement('div'); first.className=`dle-cell ${g.correct?'good':'bad'}`;
-                first.innerHTML=`${dleEsc(g.name)}<br><span style="font-size:.65rem;color:var(--text-muted)">${dleEsc(g.playerName)}</span>`; grid.appendChild(first);
-                cats.forEach(cat=>{const a=g.attrs?.[cat.key]||{value:'—',match:false},el=document.createElement('div');
-                    el.className=`dle-cell ${a.match?'good':'bad'}`;el.textContent=a.value;grid.appendChild(el);});
+                const first=document.createElement('div');
+                first.className=`dle-cell ${g.correct?'good':'bad'}`;
+                first.innerHTML=`${dleEsc(g.name)}<br><span style="font-size:.65rem;color:var(--text-muted)">${dleEsc(g.playerName)}</span>`;
+                grid.appendChild(first);
+
+                cats.forEach(cat=>{
+                    const a=g.attrs?.[cat.key]||{value:'?',known:false,match:false,close:false,direction:null};
+                    const el=document.createElement('div');
+                    el.className=`dle-cell ${!a.known?'unknown':a.match?'good':a.close?'close':'bad'}`;
+                    const arrow=a.direction==='up'?' ↑':a.direction==='down'?' ↓':'';
+                    el.textContent=`${a.value}${arrow}`;
+                    grid.appendChild(el);
+                });
             });
+
             setTimeout(()=>document.getElementById('dle-input')?.focus(),30);
         }
+
         socket.on('dle_state',room=>{hideAllPanels();document.getElementById('dle-room').style.display='block';renderDleState(room);});
         socket.on('dle_feedback',data=>{if(!data?.ok){const s=document.getElementById('dle-status');if(s){s.innerText=data?.message||'Personnage introuvable.';s.style.color='var(--accent-pink)';setTimeout(()=>s.style.color='var(--accent-cyan)',1200);}}});
 

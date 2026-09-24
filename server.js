@@ -7098,42 +7098,191 @@ function normalizeDle(s) {
     return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
-function dleUniverse(key) { return DLE_UNIVERSES[key] || DLE_UNIVERSES.naruto; }
+
+function dleBaseUniverse(key) {
+    return DLE_UNIVERSES[key] || DLE_UNIVERSES.naruto;
+}
+
+function dleNameMeta(name) {
+    const compact = String(name || '').replace(/[^A-Za-zÀ-ÿ0-9]/g, '');
+    const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+    const letters = [...compact];
+    return {
+        __initial: letters.length ? letters[0].toUpperCase() : '?',
+        __last: letters.length ? letters[letters.length - 1].toUpperCase() : '?',
+        __len: letters.length,
+        __words: words.length
+    };
+}
+
+function dleExpandedUniverse(key) {
+    const base = dleBaseUniverse(key);
+
+    // 4 indices toujours disponibles : ils gardent le DLE jouable même pour
+    // les personnages ultra-secondaires dont certains détails de lore ne sont
+    // pas renseignés dans la fiche thématique.
+    const metaCategories = [
+        { key:'__initial', label:'Initiale', type:'text', meta:true },
+        { key:'__last', label:'Dernière lettre', type:'text', meta:true },
+        { key:'__len', label:'Nb lettres', type:'number', meta:true },
+        { key:'__words', label:'Nb mots', type:'number', meta:true }
+    ];
+
+    const byNorm = new Map();
+
+    // Les fiches thématiques manuelles ont priorité.
+    for (const c of (base.characters || [])) {
+        const attrs = { ...(c.attrs || {}), ...dleNameMeta(c.name) };
+        byNorm.set(normalizeDle(c.name), {
+            name: c.name,
+            attrs,
+            profiled: true
+        });
+    }
+
+    // Injection de TOUT le pool Rolland Garos de l'univers.
+    // Cela transforme AnimeDLE en énorme base de personnages sans mélanger les univers.
+    const rg = RG_UNIVERSES[key];
+    const rgNames = rg ? parseRGList(rg.raw) : [];
+    for (const name of rgNames) {
+        const n = normalizeDle(name);
+        if (!n) continue;
+        if (byNorm.has(n)) continue;
+        byNorm.set(n, {
+            name,
+            attrs: dleNameMeta(name),
+            profiled: false
+        });
+    }
+
+    return {
+        name: base.name,
+        categories: [...(base.categories || []), ...metaCategories],
+        customCategoryCount: (base.categories || []).length,
+        characters: [...byNorm.values()]
+    };
+}
 
 function dlePublicRoom(room) {
-    const d=room.dle;
-    return {...room,dle:d?{
-        universeKey:d.universeKey, universeName:d.universeName, categories:d.categories,
-        guesses:d.guesses, finished:d.finished, winnerId:d.winnerId, winnerName:d.winnerName,
-        winnerAttempts:d.winnerAttempts, targetName:d.finished?d.target.name:null, candidates:d.candidates
-    }:null};
-}
-function emitDleState(room,roomCode){ io.to(roomCode).emit('dle_state',dlePublicRoom(room)); }
-
-function startDle(room,roomCode){
-    const universeKey=DLE_UNIVERSES[room.subMode]?room.subMode:'naruto';
-    const u=dleUniverse(universeKey);
-    const target=u.characters[Math.floor(Math.random()*u.characters.length)];
-    room.status='dle_playing';
-    room.dle={
-        universeKey, universeName:u.name, categories:u.categories, target, guesses:[],
-        attemptsByPlayer:{}, finished:false, winnerId:null, winnerName:null, winnerAttempts:0,
-        candidates:u.characters.map(c=>({label:c.name,name:c.name})).sort((a,b)=>a.label.localeCompare(b.label,'fr'))
+    const d = room.dle;
+    return {
+        ...room,
+        dle: d ? {
+            universeKey: d.universeKey,
+            universeName: d.universeName,
+            categories: d.categories,
+            poolSize: d.poolSize,
+            profiledSize: d.profiledSize,
+            guesses: d.guesses,
+            finished: d.finished,
+            winnerId: d.winnerId,
+            winnerName: d.winnerName,
+            winnerAttempts: d.winnerAttempts,
+            targetName: d.finished ? d.target.name : null,
+            candidates: d.candidates
+        } : null
     };
-    emitDleState(room,roomCode);
 }
-function resolveDleGuess(room,rawGuess){
-    const u=dleUniverse(room.dle.universeKey), n=normalizeDle(rawGuess);
-    return u.characters.find(c=>normalizeDle(c.name)===n)||null;
+
+function emitDleState(room, roomCode) {
+    io.to(roomCode).emit('dle_state', dlePublicRoom(room));
 }
-function makeDleComparison(character,target,player,categories){
-    const attrs={};
-    for(const cat of categories){
-        const mine=character.attrs[cat.key]??'—', wanted=target.attrs[cat.key]??'—';
-        attrs[cat.key]={value:mine,match:normalizeDle(mine)===normalizeDle(wanted)};
+
+function startDle(room, roomCode) {
+    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
+    const u = dleExpandedUniverse(universeKey);
+    if (!u.characters.length) {
+        io.to(roomCode).emit('game_error', { message:"Aucun personnage AnimeDLE pour cet univers." });
+        return;
     }
-    return {playerId:player.id,playerName:player.name,name:character.name,
-        correct:normalizeDle(character.name)===normalizeDle(target.name),attrs};
+
+    // Les personnages avec fiche complète sortent plus souvent pour garder
+    // les catégories thématiques utiles, mais TOUS les personnages du gros
+    // pool peuvent être tirés comme personnage mystère.
+    const profiled = u.characters.filter(c => c.profiled);
+    const chooseProfiled = profiled.length && Math.random() < 0.65;
+    const targetPool = chooseProfiled ? profiled : u.characters;
+    const target = targetPool[Math.floor(Math.random() * targetPool.length)];
+
+    room.status = 'dle_playing';
+    room.dle = {
+        universeKey,
+        universeName: u.name,
+        categories: u.categories,
+        target,
+        guesses: [],
+        attemptsByPlayer: {},
+        finished: false,
+        winnerId: null,
+        winnerName: null,
+        winnerAttempts: 0,
+        poolSize: u.characters.length,
+        profiledSize: profiled.length,
+        candidates: u.characters
+            .map(c => ({ label:c.name, name:c.name }))
+            .sort((a,b) => a.label.localeCompare(b.label, 'fr'))
+    };
+    emitDleState(room, roomCode);
+}
+
+function resolveDleGuess(room, rawGuess) {
+    const u = dleExpandedUniverse(room.dle.universeKey);
+    const n = normalizeDle(rawGuess);
+    return u.characters.find(c => normalizeDle(c.name) === n) || null;
+}
+
+function dleTokenSet(value) {
+    return String(value ?? '')
+        .split(/[\/,+&|]/)
+        .map(x => normalizeDle(x))
+        .filter(Boolean);
+}
+
+function makeDleComparison(character, target, player, categories) {
+    const attrs = {};
+    for (const cat of categories) {
+        const mine = character.attrs?.[cat.key];
+        const wanted = target.attrs?.[cat.key];
+
+        // Une donnée de lore absente n'est JAMAIS considérée comme un match.
+        const known = mine !== undefined && mine !== null && mine !== '' &&
+                      wanted !== undefined && wanted !== null && wanted !== '';
+
+        let match = false;
+        let close = false;
+        let direction = null;
+
+        if (known) {
+            if (cat.type === 'number') {
+                const a = Number(mine), b = Number(wanted);
+                match = Number.isFinite(a) && Number.isFinite(b) && a === b;
+                close = !match && Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 2;
+                if (!match && Number.isFinite(a) && Number.isFinite(b)) direction = a < b ? 'up' : 'down';
+            } else {
+                match = normalizeDle(mine) === normalizeDle(wanted);
+                if (!match && !cat.meta) {
+                    const a = dleTokenSet(mine), b = new Set(dleTokenSet(wanted));
+                    close = a.some(x => b.has(x));
+                }
+            }
+        }
+
+        attrs[cat.key] = {
+            value: known ? mine : '?',
+            known,
+            match,
+            close,
+            direction
+        };
+    }
+
+    return {
+        playerId: player.id,
+        playerName: player.name,
+        name: character.name,
+        correct: normalizeDle(character.name) === normalizeDle(target.name),
+        attrs
+    };
 }
 
 io.on('connection', (socket) => {
