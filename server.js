@@ -7115,49 +7115,320 @@ function dleNameMeta(name) {
     };
 }
 
+
+/* ================= AnimeDLE V5 — expansion massive =================
+   IMPORTANT :
+   - Les catégories thématiques de la V2 restent STRICTEMENT inchangées.
+   - On agrège les gros pools locaux + plusieurs sources publiques par univers.
+   - Aucun univers n'est mélangé avec un autre.
+   - Si Internet est indisponible, le jeu retombe proprement sur les pools locaux.
+===================================================================== */
+
+const DLE_LIVE_POOLS = Object.fromEntries(Object.keys(DLE_UNIVERSES).map(k => [k, new Set()]));
+let dleLiveExpansionReady = false;
+let dleLiveExpansionStarted = false;
+
+const DLE_FANDOM_SOURCES = {
+    naruto:          [{ host:'naruto.fandom.com', category:'Characters' }],
+    onepiece:        [{ host:'onepiece.fandom.com', category:'Characters' }],
+    bleach:          [{ host:'bleach.fandom.com', category:'Characters' }],
+    hxh:             [{ host:'hunterxhunter.fandom.com', category:'Characters' }],
+    snk:             [{ host:'attackontitan.fandom.com', category:'Characters' }],
+    sds:             [{ host:'nanatsu-no-taizai.fandom.com', category:'Characters' }],
+    deathnote:       [{ host:'deathnote.fandom.com', category:'Characters' }],
+    cote:            [{ host:'you-zitsu.fandom.com', category:'Characters' }],
+    solo:            [{ host:'solo-leveling.fandom.com', category:'Characters' }],
+    clover:          [{ host:'blackclover.fandom.com', category:'Characters' }],
+    fireforce:       [{ host:'fire-force.fandom.com', category:'Characters' }],
+    mushoku:         [{ host:'mushokutensei.fandom.com', category:'Characters' }],
+    rezero:          [{ host:'rezero.fandom.com', category:'Characters' }],
+    fairy:           [{ host:'fairytail.fandom.com', category:'Characters' }],
+    bluelock:        [{ host:'bluelock.fandom.com', category:'Characters' }],
+    fma:             [{ host:'fma.fandom.com', category:'Characters' }],
+    chainsaw:        [{ host:'chainsaw-man.fandom.com', category:'Characters' }],
+    wakfu:           [{ host:'wakfu.fandom.com', category:'Characters' }],
+    demonslayer:     [{ host:'kimetsu-no-yaiba.fandom.com', category:'Characters' }],
+    pokemon:         [
+        { host:'pokemon.fandom.com', category:'Characters' },
+        { host:'pokemon.fandom.com', category:'Pokémon' }
+    ],
+    dragonball:      [{ host:'dragonball.fandom.com', category:'Characters' }],
+    hellsparadise:   [{ host:'jigokuraku.fandom.com', category:'Characters' }],
+    gachiakuta:      [{ host:'gachiakuta.fandom.com', category:'Characters' }],
+    haikyuu:         [{ host:'haikyuu.fandom.com', category:'Characters' }],
+    jjk:             [{ host:'jujutsu-kaisen.fandom.com', category:'Characters' }],
+    jojo:            [{ host:'jojo.fandom.com', category:'Characters' }],
+    tensura:         [{ host:'tensura.fandom.com', category:'Characters' }],
+    opm:             [{ host:'onepunchman.fandom.com', category:'Characters' }],
+    sao:             [{ host:'swordartonline.fandom.com', category:'Characters' }],
+    tokyoghoul:      [{ host:'tokyoghoul.fandom.com', category:'Characters' }],
+    tokyorevengers:  [{ host:'tokyorevengers.fandom.com', category:'Characters' }]
+};
+
+// Titres de franchise reconnus dans la base MyAnimeList/Jikan publique.
+const DLE_FRANCHISE_PATTERNS = {
+    naruto: [/naruto/i, /boruto/i],
+    onepiece: [/one piece/i],
+    bleach: [/bleach/i],
+    hxh: [/hunter x hunter/i, /hunter × hunter/i],
+    snk: [/shingeki no kyojin/i, /attack on titan/i],
+    sds: [/nanatsu no taizai/i, /seven deadly sins/i],
+    deathnote: [/death note/i],
+    cote: [/youkoso jitsuryoku/i, /classroom of the elite/i],
+    solo: [/solo leveling/i, /ore dake level up/i],
+    clover: [/black clover/i],
+    fireforce: [/enen no shouboutai/i, /fire force/i],
+    mushoku: [/mushoku tensei/i],
+    rezero: [/re:?zero/i],
+    fairy: [/fairy tail/i],
+    bluelock: [/blue lock/i],
+    fma: [/fullmetal alchemist/i, /hagane no renkinjutsushi/i],
+    chainsaw: [/chainsaw man/i],
+    wakfu: [/wakfu/i],
+    demonslayer: [/kimetsu no yaiba/i, /demon slayer/i],
+    pokemon: [/pok[eé]mon/i, /pokemon/i],
+    dragonball: [/dragon ball/i],
+    hellsparadise: [/jigokuraku/i, /hell'?s paradise/i],
+    gachiakuta: [/gachiakuta/i],
+    haikyuu: [/haikyuu/i, /haikyuu!!/i],
+    jjk: [/jujutsu kaisen/i],
+    jojo: [/jojo/i, /jojo'?s bizarre adventure/i],
+    tensura: [/tensei shitara slime/i, /tensura/i, /that time i got reincarnated as a slime/i],
+    opm: [/one punch man/i],
+    sao: [/sword art online/i],
+    tokyoghoul: [/tokyo ghoul/i],
+    tokyorevengers: [/tokyo revengers/i]
+};
+
+function cleanDleExternalTitle(title) {
+    const s = String(title || '').trim()
+        .replace(/_/g, ' ')
+        .replace(/\s+/g, ' ');
+    if (!s) return null;
+    if (/^(category|file|template|portal|help|user|special|list of|chapter|episode|volume|arc|location|organization|technique|ability|item|weapon|soundtrack|gallery|timeline)\b/i.test(s)) return null;
+    if (s.length > 100) return null;
+    return s;
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 15000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+        const res = await fetch(url, {
+            signal: ctrl.signal,
+            headers: {
+                'User-Agent': 'AnimeGame-DLE/1.0 (+public-game-data)',
+                'Accept': 'application/json,text/plain;q=0.9,*/*;q=0.8'
+            }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function fetchFandomCategoryRecursive(host, rootCategory, opts = {}) {
+    const maxDepth = Number.isFinite(opts.maxDepth) ? opts.maxDepth : 3;
+    const maxNames = Number.isFinite(opts.maxNames) ? opts.maxNames : 2500;
+    const out = new Set();
+    const seenCats = new Set();
+    const queue = [{ cat: rootCategory, depth: 0 }];
+
+    while (queue.length && out.size < maxNames) {
+        const { cat, depth } = queue.shift();
+        const catKey = String(cat).toLowerCase();
+        if (seenCats.has(catKey)) continue;
+        seenCats.add(catKey);
+
+        let cont = null;
+        let pages = 0;
+
+        do {
+            const params = new URLSearchParams({
+                action: 'query',
+                list: 'categorymembers',
+                cmtitle: `Category:${cat}`,
+                cmlimit: '500',
+                cmnamespace: '0|14',
+                format: 'json',
+                origin: '*'
+            });
+            if (cont) params.set('cmcontinue', cont);
+
+            const url = `https://${host}/api.php?${params.toString()}`;
+            let data;
+            try {
+                data = await fetchJsonWithTimeout(url, 12000);
+            } catch (e) {
+                break;
+            }
+
+            const members = data?.query?.categorymembers || [];
+            for (const member of members) {
+                if (member.ns === 0) {
+                    const name = cleanDleExternalTitle(member.title);
+                    if (name) out.add(name);
+                } else if (member.ns === 14 && depth < maxDepth) {
+                    const sub = String(member.title || '').replace(/^Category:/i, '').trim();
+                    // On ne descend que dans des sous-catégories plausiblement liées aux personnages.
+                    if (sub && !/gallery|image|episode|chapter|volume|location|item|weapon|technique|ability|music|staff/i.test(sub)) {
+                        queue.push({ cat: sub, depth: depth + 1 });
+                    }
+                }
+                if (out.size >= maxNames) break;
+            }
+
+            cont = data?.continue?.cmcontinue || null;
+            pages++;
+        } while (cont && pages < 12 && out.size < maxNames);
+    }
+
+    return [...out];
+}
+
+async function loadGlobalOfflineCharacterDb() {
+    // Base publique dérivée de Jikan/MAL. La branche prod est la branche réellement publiée.
+    const url = 'https://raw.githubusercontent.com/arda-/anime-character-offline-database/prod/latest/characters.min.json';
+    try {
+        const db = await fetchJsonWithTimeout(url, 45000);
+        const rows = Array.isArray(db?.data) ? db.data : [];
+
+        for (const row of rows) {
+            const name = cleanDleExternalTitle(row?.name);
+            if (!name) continue;
+
+            const appearances = Array.isArray(row?.animeAppearances) ? row.animeAppearances : [];
+            const titles = appearances.map(a => String(a?.anime?.title || '')).filter(Boolean);
+            if (!titles.length) continue;
+
+            for (const [key, patterns] of Object.entries(DLE_FRANCHISE_PATTERNS)) {
+                if (titles.some(t => patterns.some(rx => rx.test(t)))) {
+                    DLE_LIVE_POOLS[key]?.add(name);
+                }
+            }
+        }
+
+        console.log(`[AnimeDLE] Base publique chargée : ${rows.length} personnages inspectés.`);
+    } catch (e) {
+        console.warn('[AnimeDLE] Base publique Jikan/MAL indisponible :', e.message);
+    }
+}
+
+async function loadFandomPools() {
+    const jobs = [];
+    for (const [key, sources] of Object.entries(DLE_FANDOM_SOURCES)) {
+        for (const source of sources) jobs.push({ key, ...source });
+    }
+
+    // Concurrence volontairement limitée pour ne pas marteler les wikis.
+    const concurrency = 4;
+    let cursor = 0;
+
+    async function worker() {
+        while (cursor < jobs.length) {
+            const job = jobs[cursor++];
+            try {
+                const names = await fetchFandomCategoryRecursive(job.host, job.category, {
+                    maxDepth: 3,
+                    maxNames: job.key === 'pokemon' ? 4500 : 2800
+                });
+                for (const name of names) DLE_LIVE_POOLS[job.key]?.add(name);
+                console.log(`[AnimeDLE] ${job.key}: +${names.length} depuis ${job.host}/${job.category}`);
+            } catch (e) {
+                console.warn(`[AnimeDLE] Source ${job.host} indisponible:`, e.message);
+            }
+        }
+    }
+
+    await Promise.all(Array.from({ length: concurrency }, () => worker()));
+}
+
+function getDleGlobalPoolStats() {
+    const perUniverse = {};
+    let total = 0;
+
+    for (const key of Object.keys(DLE_UNIVERSES)) {
+        const base = dleBaseUniverse(key);
+        const merged = new Set();
+
+        for (const c of (base.characters || [])) merged.add(normalizeDle(c.name));
+
+        const rg = RG_UNIVERSES[key];
+        if (rg) {
+            for (const n of parseRGList(rg.raw)) merged.add(normalizeDle(n));
+        }
+
+        for (const n of (DLE_LIVE_POOLS[key] || [])) merged.add(normalizeDle(n));
+
+        perUniverse[key] = merged.size;
+        total += merged.size;
+    }
+
+    return { total, perUniverse, ready: dleLiveExpansionReady };
+}
+
+async function startDleLiveExpansion() {
+    if (dleLiveExpansionStarted) return;
+    dleLiveExpansionStarted = true;
+
+    console.log('[AnimeDLE] Expansion massive démarrée…');
+
+    await Promise.allSettled([
+        loadGlobalOfflineCharacterDb(),
+        loadFandomPools()
+    ]);
+
+    dleLiveExpansionReady = true;
+    const stats = getDleGlobalPoolStats();
+    console.log(`[AnimeDLE] Expansion terminée : ${stats.total} entrées uniques réparties sur 31 univers.`);
+    if (stats.total < 12000) {
+        console.warn(`[AnimeDLE] Total inférieur à 12 000 (${stats.total}). Les sources externes n'ont pas toutes répondu ou ces univers contiennent moins d'entrées exploitables.`);
+    }
+}
+
 function dleExpandedUniverse(key) {
     const base = dleBaseUniverse(key);
-
-    // 4 indices toujours disponibles : ils gardent le DLE jouable même pour
-    // les personnages ultra-secondaires dont certains détails de lore ne sont
-    // pas renseignés dans la fiche thématique.
-    const metaCategories = [
-        { key:'__initial', label:'Initiale', type:'text', meta:true },
-        { key:'__last', label:'Dernière lettre', type:'text', meta:true },
-        { key:'__len', label:'Nb lettres', type:'number', meta:true },
-        { key:'__words', label:'Nb mots', type:'number', meta:true }
-    ];
-
     const byNorm = new Map();
 
-    // Les fiches thématiques manuelles ont priorité.
+    // Les fiches thématiques manuelles de la V2 ont priorité.
     for (const c of (base.characters || [])) {
-        const attrs = { ...(c.attrs || {}), ...dleNameMeta(c.name) };
         byNorm.set(normalizeDle(c.name), {
             name: c.name,
-            attrs,
+            attrs: { ...(c.attrs || {}) },
             profiled: true
         });
     }
 
-    // Injection de TOUT le pool Rolland Garos de l'univers.
-    // Cela transforme AnimeDLE en énorme base de personnages sans mélanger les univers.
+    // Gros pool local (Rolland Garos).
     const rg = RG_UNIVERSES[key];
     const rgNames = rg ? parseRGList(rg.raw) : [];
     for (const name of rgNames) {
         const n = normalizeDle(name);
-        if (!n) continue;
-        if (byNorm.has(n)) continue;
+        if (!n || byNorm.has(n)) continue;
         byNorm.set(n, {
             name,
-            attrs: dleNameMeta(name),
+            attrs: {},
+            profiled: false
+        });
+    }
+
+    // Expansion web massive : Fandom + base publique Jikan/MAL.
+    // Toujours dans l'univers sélectionné, jamais de mélange.
+    for (const rawName of (DLE_LIVE_POOLS[key] || [])) {
+        const name = cleanDleExternalTitle(rawName);
+        const n = normalizeDle(name);
+        if (!name || !n || byNorm.has(n)) continue;
+        byNorm.set(n, {
+            name,
+            attrs: {},
             profiled: false
         });
     }
 
     return {
         name: base.name,
-        categories: [...(base.categories || []), ...metaCategories],
+        categories: [...(base.categories || [])],
         customCategoryCount: (base.categories || []).length,
         characters: [...byNorm.values()]
     };
@@ -7196,12 +7467,11 @@ function startDle(room, roomCode) {
         return;
     }
 
-    // Les personnages avec fiche complète sortent plus souvent pour garder
-    // les catégories thématiques utiles, mais TOUS les personnages du gros
-    // pool peuvent être tirés comme personnage mystère.
+    // Le mystère est tiré parmi les personnages ayant une vraie fiche
+    // thématique, pour éviter des manches remplies de "?".
+    // Le gros pool reste entièrement disponible comme propositions.
     const profiled = u.characters.filter(c => c.profiled);
-    const chooseProfiled = profiled.length && Math.random() < 0.65;
-    const targetPool = chooseProfiled ? profiled : u.characters;
+    const targetPool = profiled.length ? profiled : u.characters;
     const target = targetPool[Math.floor(Math.random() * targetPool.length)];
 
     room.status = 'dle_playing';
@@ -7284,6 +7554,11 @@ function makeDleComparison(character, target, player, categories) {
         attrs
     };
 }
+
+
+app.get('/api/dle-pool-stats', (req, res) => {
+    res.json(getDleGlobalPoolStats());
+});
 
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
@@ -8143,5 +8418,6 @@ process.on('unhandledRejection', (raison) => {
     console.error('[PROMESSE REJETÉE] le serveur continue malgré tout :', raison);
 });
 server.listen(PORT, () => {
+    startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
