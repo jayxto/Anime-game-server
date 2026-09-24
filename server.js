@@ -7127,6 +7127,7 @@ function dleNameMeta(name) {
 const DLE_LIVE_POOLS = Object.fromEntries(Object.keys(DLE_UNIVERSES).map(k => [k, new Set()]));
 let dleLiveExpansionReady = false;
 let dleLiveExpansionStarted = false;
+let dleLiveExpansionPromise = null;
 
 const DLE_FANDOM_SOURCES = {
     naruto:          [{ host:'naruto.fandom.com', category:'Characters' }],
@@ -7289,7 +7290,7 @@ async function fetchFandomCategoryRecursive(host, rootCategory, opts = {}) {
 
 async function loadGlobalOfflineCharacterDb() {
     // Base publique dérivée de Jikan/MAL. La branche prod est la branche réellement publiée.
-    const url = 'https://raw.githubusercontent.com/arda-/anime-character-offline-database/prod/latest/characters.min.json';
+    const url = 'https://raw.githubusercontent.com/arda-/anime-character-offline-database/main/latest/characters.min.json';
     try {
         const db = await fetchJsonWithTimeout(url, 45000);
         const rows = Array.isArray(db?.data) ? db.data : [];
@@ -7369,22 +7370,379 @@ function getDleGlobalPoolStats() {
 }
 
 async function startDleLiveExpansion() {
-    if (dleLiveExpansionStarted) return;
+    if (dleLiveExpansionPromise) return dleLiveExpansionPromise;
+
     dleLiveExpansionStarted = true;
+    dleLiveExpansionPromise = (async () => {
+        console.log('[AnimeDLE] Expansion massive démarrée…');
 
-    console.log('[AnimeDLE] Expansion massive démarrée…');
+        await Promise.allSettled([
+            loadGlobalOfflineCharacterDb(),
+            loadFandomPools()
+        ]);
 
-    await Promise.allSettled([
-        loadGlobalOfflineCharacterDb(),
-        loadFandomPools()
-    ]);
+        dleLiveExpansionReady = true;
+        const stats = getDleGlobalPoolStats();
+        console.log(`[AnimeDLE] Expansion terminée : ${stats.total} entrées uniques réparties sur 31 univers.`);
+        if (stats.total < 12000) {
+            console.warn(`[AnimeDLE] Total actuellement chargé : ${stats.total}. Certaines sources externes peuvent être indisponibles.`);
+        }
+        return stats;
+    })();
 
-    dleLiveExpansionReady = true;
-    const stats = getDleGlobalPoolStats();
-    console.log(`[AnimeDLE] Expansion terminée : ${stats.total} entrées uniques réparties sur 31 univers.`);
-    if (stats.total < 12000) {
-        console.warn(`[AnimeDLE] Total inférieur à 12 000 (${stats.total}). Les sources externes n'ont pas toutes répondu ou ces univers contiennent moins d'entrées exploitables.`);
+    return dleLiveExpansionPromise;
+}
+
+
+/* ================= AnimeDLE V6 — profils complets =================
+   - Aucun personnage supprimé.
+   - Catégories V2 conservées.
+   - Enrichissement du personnage au premier usage depuis le wiki de son univers.
+   - Cache mémoire pour ne pas refaire les requêtes.
+   - Jamais de cellule "?" : si une donnée n'est pas documentée, on affiche
+     explicitement "Non révélé / non précisé" plutôt que d'inventer.
+==================================================================== */
+
+const DLE_PROFILE_CACHE = new Map();
+
+const DLE_MANUAL_OVERRIDES = {
+    "sao|chudelkin": {
+        c0: "Underworld (Alicization)",
+        c1: "Humain d'Underworld",
+        c2: "Arts sacrés",
+        c3: "Église de l'Axiome",
+        c4: "Homme",
+        c5: "Chauve"
     }
+};
+
+const DLE_CATEGORY_ALIASES = {
+    "race": ["race","species","espèce","espece","kind","nature"],
+    "race/avatar": ["race","species","avatar","virtual / augmented realities","virtual reality"],
+    "affiliation": ["affiliation","affiliations","organization","organisation","group","faction","team"],
+    "camp": ["affiliation","camp","faction","side","organization","organisation"],
+    "groupe": ["affiliation","group","team","faction","organization"],
+    "guilde": ["guild","guilde","affiliation","organization","organisation","occupation"],
+    "sexe": ["gender","sex","sexe"],
+    "cheveux": ["hair color","hair colour","hair","cheveux","couleur des cheveux"],
+    "cheveux avatar": ["hair color","hair colour","hair","appearance"],
+    "cheveux base": ["hair color","hair colour","hair"],
+    "origine": ["origin","birthplace","place of birth","hometown","home","residence","origine"],
+    "arme": ["weapon","weapons","arme","equipment","weaponry"],
+    "arme/style": ["weapon","weapons","fighting style","style","combat style","abilities"],
+    "arme principale": ["weapon","weapons","main weapon","specialty","style"],
+    "rang": ["rank","ranking","class","grade","rang"],
+    "rôle": ["occupation","role","position","title"],
+    "classe/rôle": ["class","occupation","role","position"],
+    "statut": ["status","occupation","role","classification"],
+    "famille": ["family","relatives","family members","clan"],
+    "élément": ["element","elements","attribute","magic","ability"],
+    "élément/énergie": ["element","energy","power","ability","magic"],
+
+    "village": ["village","affiliation","residence"],
+    "clan": ["clan","family"],
+    "nature chakra": ["nature type","chakra nature","nature transformation","chakra affinity","nature"],
+    "dōjutsu": ["dōjutsu","dojutsu","kekkei genkai","eye technique","eyes"],
+    "jinchūriki": ["jinchūriki","jinchuriki","tailed beast","host"],
+
+    "équipage/org.": ["affiliations","affiliation","crew","organization","occupation"],
+    "fruit du démon": ["devil fruit","fruit","devil fruit name"],
+    "type de fruit": ["devil fruit type","fruit type","type"],
+    "haki royal": ["conqueror haki","haoshoku haki","haki"],
+
+    "division": ["division","position","rank","affiliation"],
+    "arme/pouvoir": ["zanpakutō","zanpakuto","weapon","abilities","powers"],
+    "bankai": ["bankai"],
+
+    "type de nen": ["nen type","nen","aura type","nen category"],
+    "arc d'intro": ["first appearance","debut","arc"],
+
+    "unité": ["unit","branch","occupation","affiliation"],
+    "titan": ["titan","titan form","power of the titans"],
+    "lien ackerman": ["family","relatives","clan"],
+
+    "péché/commandement": ["sin","commandment","title"],
+    "magie": ["magic","magical power","ability","abilities"],
+    "trésor sacré": ["sacred treasure","weapon"],
+    "marque démoniaque": ["demon mark","demon clan","power"],
+
+    "death note possédé": ["death note","notebook","equipment"],
+    "yeux de shinigami": ["shinigami eyes","eyes"],
+    "profession": ["occupation","profession","job"],
+    "humain/shinigami": ["species","race","nature"],
+
+    "classe": ["class","school class","classroom","rank"],
+    "année": ["year","school year","grade"],
+    "conseil étudiant": ["student council","occupation","affiliation"],
+    "white room": ["white room","affiliation","origin"],
+
+    "pouvoir notable": ["abilities","powers","skills","ability"],
+    "nation-level": ["rank","classification","title"],
+
+    "compagnie": ["squad","magic knights squad","company","affiliation","organization"],
+    "type de magie": ["magic","magic attribute","attribute","magic type"],
+    "grimoire": ["grimoire","clover"],
+    "royaume": ["kingdom","origin","residence"],
+    "noble/royal": ["social status","nobility","royal","status"],
+    "esprit/démon": ["spirit","devil","demon","familiar"],
+
+    "génération": ["generation","pyrokinetic generation","classification"],
+    "adolla burst": ["adolla burst","adolla","ability"],
+
+    "style combat": ["fighting style","sword style","combat style","abilities"],
+
+    "pouvoir/autorité": ["authority","divine protection","ability","abilities","magic"],
+    "esprit contracté": ["spirit","contracted spirit","contract"],
+    "candidate royale": ["royal selection","candidate","occupation"],
+
+    "dragon slayer": ["dragon slayer","magic"],
+
+    "poste": ["position","positions","role"],
+    "pied fort": ["dominant foot","foot","preferred foot"],
+    "équipe nel": ["team","neo egoist league","affiliation"],
+    "new gen xi": ["new generation world xi","new gen xi","title"],
+
+    "nature": ["species","race","nature"],
+    "alchimiste d'état": ["state alchemist","occupation","title"],
+    "type d'alchimie": ["alchemy","abilities","specialty"],
+    "pierre philosophale": ["philosopher's stone","stone","abilities"],
+
+    "démon associé": ["devil","contracted devil","contracts","abilities"],
+    "hybride": ["species","nature","hybrid"],
+
+    "souffle/art": ["breathing style","blood demon art","breathing","abilities"],
+    "pilier": ["rank","hashira","occupation"],
+    "démon": ["species","race","nature"],
+
+    "type 1": ["type","type 1","primary type"],
+    "type 2": ["type 2","secondary type"],
+    "génération": ["generation","debut","introduced"],
+    "légendaire": ["legendary","mythical","classification"],
+    "évolution": ["evolution","evolves from","evolves into","evolutionary line"],
+    "couleur dominante": ["color","colour","body color"],
+
+    "transformation": ["transformations","transformation","forms","form"],
+    "univers": ["universe","affiliation","origin"],
+    "fusion": ["fusion","species"],
+
+    "jinki": ["jinki","vital instrument","weapon"],
+    "type de jinki": ["jinki","weapon type","type"],
+
+    "équipe lycée": ["team","school","affiliation"],
+    "numéro": ["number","jersey number","uniform number"],
+    "main dominante": ["dominant hand","handedness"],
+
+    "grade": ["grade","rank"],
+    "technique": ["cursed technique","technique","abilities"],
+    "extension domaine": ["domain expansion","domain"],
+    "énergie maudite": ["cursed energy","energy"],
+
+    "partie": ["part","series","debut"],
+    "stand": ["stand","stands"],
+    "type de stand": ["stand type","type"],
+    "hamon": ["hamon","ripple"],
+    "famille joestar": ["family","relatives","joestar"],
+
+    "compétence ultime": ["ultimate skill","skill","abilities"],
+    "demon lord": ["demon lord","title","rank"],
+
+    "classe héros": ["hero class","class","rank"],
+    "pouvoir/style": ["abilities","powers","fighting style"],
+    "cyborg": ["species","race","cyborg"],
+
+    "jeu principal": ["virtual / augmented realities","virtual reality","game","games","world","vr"],
+
+    "type de kagune": ["kagune type","kagune","rc type"],
+    "kakuja": ["kakuja"],
+    "ccg rang": ["rank","ccg rank"],
+
+    "gang": ["gang","affiliation","organization"],
+    "voyageur temporel": ["time leaper","time leap","ability"]
+};
+
+const DLE_VALUE_DEFAULTS = {
+    "sexe": "Non précisé",
+    "cheveux": "Non précisés",
+    "cheveux avatar": "Non précisés",
+    "cheveux base": "Non précisés",
+    "couleur dominante": "Non précisée",
+    "affiliation": "Non précisée",
+    "guilde": "Non précisée",
+    "groupe": "Non précisé",
+    "camp": "Non précisé",
+    "origine": "Non précisée",
+    "arme": "Aucune / non précisée",
+    "arme/style": "Non précisé",
+    "arme principale": "Non précisée",
+    "race": "Non précisée",
+    "race/avatar": "Non précisée",
+    "rang": "Non classé / non précisé",
+    "statut": "Non précisé",
+    "rôle": "Non précisé",
+    "classe/rôle": "Non précisé",
+    "jinchūriki": "Non révélé",
+    "haki royal": "Non révélé",
+    "bankai": "Non révélé",
+    "adolla burst": "Non révélé",
+    "dragon slayer": "Non révélé",
+    "pilier": "Non révélé",
+    "démon": "Non révélé",
+    "légendaire": "Non révélé",
+    "fusion": "Non révélé",
+    "cyborg": "Non révélé",
+    "kakuja": "Non révélé",
+    "voyageur temporel": "Non révélé",
+    "white room": "Non révélé",
+    "candidate royale": "Non révélé",
+    "new gen xi": "Non révélé",
+    "alchimiste d'état": "Non révélé",
+    "pierre philosophale": "Non révélée",
+    "hybride": "Non révélé",
+    "demon lord": "Non révélé"
+};
+
+function dleFallbackForLabel(label) {
+    return DLE_VALUE_DEFAULTS[normalizeDle(label)] || "Non révélé / non précisé";
+}
+
+function cleanWikiValue(value) {
+    let s = String(value || "");
+    s = s.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, " ")
+         .replace(/<ref[^/>]*\/>/gi, " ")
+         .replace(/<!--[\s\S]*?-->/g, " ")
+         .replace(/\{\{[^{}]*\}\}/g, " ")
+         .replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, "$1")
+         .replace(/\[https?:\/\/[^\s\]]+\s*([^\]]*)\]/g, "$1")
+         .replace(/<br\s*\/?>/gi, " / ")
+         .replace(/<[^>]+>/g, " ")
+         .replace(/'{2,}/g, "")
+         .replace(/&nbsp;/gi, " ")
+         .replace(/&amp;/gi, "&")
+         .replace(/&quot;/gi, '"')
+         .replace(/\s+/g, " ")
+         .trim();
+    if (!s || s.length > 180) return null;
+    return s;
+}
+
+function parseWikiFields(wikitext) {
+    const fields = new Map();
+    const text = String(wikitext || "");
+    const rx = /^\|\s*([^=\n]+?)\s*=\s*([\s\S]*?)(?=^\|\s*[^=\n]+?\s*=|^\}\}|$)/gm;
+    let m;
+    while ((m = rx.exec(text))) {
+        const key = normalizeDle(m[1]);
+        const val = cleanWikiValue(m[2]);
+        if (key && val && !fields.has(key)) fields.set(key, val);
+    }
+    return fields;
+}
+
+function firstMatchingWikiField(fields, aliases) {
+    for (const alias of aliases || []) {
+        const a = normalizeDle(alias);
+        if (fields.has(a)) return fields.get(a);
+    }
+    for (const alias of aliases || []) {
+        const a = normalizeDle(alias);
+        for (const [k, v] of fields) {
+            if (k.includes(a) || a.includes(k)) return v;
+        }
+    }
+    return null;
+}
+
+async function fetchDleWikiWikitext(universeKey, characterName) {
+    const sources = DLE_FANDOM_SOURCES[universeKey] || [];
+    const source = sources[0];
+    if (!source) return null;
+
+    try {
+        const searchParams = new URLSearchParams({
+            action:"query",
+            list:"search",
+            srsearch:String(characterName),
+            srlimit:"5",
+            format:"json",
+            origin:"*"
+        });
+        const search = await fetchJsonWithTimeout(`https://${source.host}/api.php?${searchParams.toString()}`, 10000);
+        const results = search?.query?.search || [];
+        if (!results.length) return null;
+
+        const wanted = normalizeDle(characterName);
+        const exact = results.find(x => normalizeDle(x.title) === wanted);
+        const title = (exact || results[0]).title;
+
+        const parseParams = new URLSearchParams({
+            action:"parse",
+            page:title,
+            prop:"wikitext",
+            format:"json",
+            origin:"*"
+        });
+        const parsed = await fetchJsonWithTimeout(`https://${source.host}/api.php?${parseParams.toString()}`, 12000);
+        return parsed?.parse?.wikitext?.["*"] || null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function inferProfileValues(fields, categories) {
+    const attrs = {};
+    for (const cat of categories) {
+        const labelNorm = normalizeDle(cat.label);
+        const aliases = DLE_CATEGORY_ALIASES[labelNorm] || [cat.label];
+        const val = firstMatchingWikiField(fields, aliases);
+        attrs[cat.key] = val || dleFallbackForLabel(cat.label);
+    }
+    return attrs;
+}
+
+async function ensureDleCharacterProfile(universeKey, character, categories) {
+    if (!character) return character;
+
+    const cacheKey = `${universeKey}|${normalizeDle(character.name)}`;
+    if (DLE_PROFILE_CACHE.has(cacheKey)) {
+        character.attrs = { ...(character.attrs || {}), ...DLE_PROFILE_CACHE.get(cacheKey) };
+        character.profiled = true;
+        return character;
+    }
+
+    const attrs = { ...(character.attrs || {}) };
+    const override = DLE_MANUAL_OVERRIDES[cacheKey];
+    if (override) Object.assign(attrs, override);
+
+    const missing = categories.some(cat => {
+        const v = attrs[cat.key];
+        return v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?";
+    });
+
+    if (missing) {
+        const wikitext = await fetchDleWikiWikitext(universeKey, character.name);
+        if (wikitext) {
+            const discovered = inferProfileValues(parseWikiFields(wikitext), categories);
+            for (const cat of categories) {
+                const current = attrs[cat.key];
+                if (current === undefined || current === null || String(current).trim() === "" || String(current).trim() === "?") {
+                    attrs[cat.key] = discovered[cat.key];
+                }
+            }
+        }
+    }
+
+    // Dernier filet de sécurité : jamais de case vide/?
+    for (const cat of categories) {
+        const v = attrs[cat.key];
+        if (v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?") {
+            attrs[cat.key] = dleFallbackForLabel(cat.label);
+        }
+    }
+
+    DLE_PROFILE_CACHE.set(cacheKey, { ...attrs });
+    character.attrs = attrs;
+    character.profiled = true;
+    return character;
 }
 
 function dleExpandedUniverse(key) {
@@ -7459,22 +7817,26 @@ function emitDleState(room, roomCode) {
     io.to(roomCode).emit('dle_state', dlePublicRoom(room));
 }
 
-function startDle(room, roomCode) {
-    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
+async function startDle(room, roomCode) {
+    try {
+        await Promise.race([
+            startDleLiveExpansion(),
+            new Promise(resolve => setTimeout(resolve, 25000))
+        ]);
+    } catch (_) {}
+
+    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : "naruto";
     const u = dleExpandedUniverse(universeKey);
     if (!u.characters.length) {
-        io.to(roomCode).emit('game_error', { message:"Aucun personnage AnimeDLE pour cet univers." });
+        io.to(roomCode).emit("game_error", { message:"Aucun personnage AnimeDLE pour cet univers." });
         return;
     }
 
-    // Le mystère est tiré parmi les personnages ayant une vraie fiche
-    // thématique, pour éviter des manches remplies de "?".
-    // Le gros pool reste entièrement disponible comme propositions.
-    const profiled = u.characters.filter(c => c.profiled);
-    const targetPool = profiled.length ? profiled : u.characters;
-    const target = targetPool[Math.floor(Math.random() * targetPool.length)];
+    // Aucun personnage supprimé : n'importe lequel du pool peut tomber.
+    const target = u.characters[Math.floor(Math.random() * u.characters.length)];
+    await ensureDleCharacterProfile(universeKey, target, u.categories);
 
-    room.status = 'dle_playing';
+    room.status = "dle_playing";
     room.dle = {
         universeKey,
         universeName: u.name,
@@ -7487,10 +7849,10 @@ function startDle(room, roomCode) {
         winnerName: null,
         winnerAttempts: 0,
         poolSize: u.characters.length,
-        profiledSize: profiled.length,
+        profiledSize: u.characters.length,
         candidates: u.characters
             .map(c => ({ label:c.name, name:c.name }))
-            .sort((a,b) => a.label.localeCompare(b.label, 'fr'))
+            .sort((a,b) => a.label.localeCompare(b.label, "fr"))
     };
     emitDleState(room, roomCode);
 }
@@ -7538,7 +7900,7 @@ function makeDleComparison(character, target, player, categories) {
         }
 
         attrs[cat.key] = {
-            value: known ? mine : '?',
+            value: known ? mine : 'Non révélé / non précisé',
             known,
             match,
             close,
@@ -7632,7 +7994,7 @@ io.on('connection', (socket) => {
         io.to(roomCode).emit('update_room', room);
     });
 
-    socket.on('start_game', (roomCode) => {
+    socket.on('start_game', async (roomCode) => {
         const room = rooms[roomCode];
         if (!room || room.host !== socket.id) return;
 
@@ -7673,7 +8035,7 @@ io.on('connection', (socket) => {
                 socket.emit('game_error', { message: "Il faut au moins 1 joueur pour lancer AnimeDLE." });
                 return;
             }
-            startDle(room, roomCode);
+            await startDle(room, roomCode);
         } else if (room.mode === 'connexion') {
             if (room.players.length < 2) {
                 socket.emit('game_error', { message: "Il faut au moins 2 joueurs dans le salon pour lancer le Jeu de connexion." });
@@ -7797,7 +8159,7 @@ io.on('connection', (socket) => {
         assignRolesAndSecrets(room, civilNote + "/10", impostorNote + "/10");
     }
 
-    socket.on('dle_guess', ({ roomCode, guess }) => {
+    socket.on('dle_guess', async ({ roomCode, guess }) => {
         const room = rooms[roomCode];
         if (!room || !room.dle || room.status !== 'dle_playing' || room.dle.finished) return;
 
@@ -7809,6 +8171,9 @@ io.on('connection', (socket) => {
             socket.emit('dle_feedback', { ok:false, message:"Choisis un personnage proposé dans la liste." });
             return;
         }
+
+        await ensureDleCharacterProfile(room.dle.universeKey, character, room.dle.categories);
+        await ensureDleCharacterProfile(room.dle.universeKey, room.dle.target, room.dle.categories);
 
         room.dle.attemptsByPlayer[player.id] = (room.dle.attemptsByPlayer[player.id] || 0) + 1;
         const comparison = makeDleComparison(character, room.dle.target, player, room.dle.categories);
@@ -8127,13 +8492,13 @@ io.on('connection', (socket) => {
         resolveEnchereAveuglePass(room, roomCode, socket.id, false);
     });
 
-    socket.on('next_step_game', (roomCode) => {
+    socket.on('next_step_game', async (roomCode) => {
         const room = rooms[roomCode];
         if (!room) return;
 
         if (room.mode === 'dle') {
             if (room.host !== socket.id) return;
-            startDle(room, roomCode);
+            await startDle(room, roomCode);
             return;
         }
 

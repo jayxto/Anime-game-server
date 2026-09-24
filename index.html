@@ -404,7 +404,7 @@
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid var(--accent-cyan); text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
-                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — catégories propres à chaque univers, énorme base de personnages.</p>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — catégories propres à chaque univers, énorme base, aucune fiche vide.</p>
                     <div class="chat-input-box" style="margin-top:0;">
                         <select id="dle-universe-picker">
                             <option value="naruto">Naruto</option>
@@ -1854,7 +1854,7 @@
                 grid.appendChild(first);
 
                 cats.forEach(cat=>{
-                    const a=g.attrs?.[cat.key]||{value:'?',known:false,match:false,close:false,direction:null};
+                    const a=g.attrs?.[cat.key]||{value:'Non révélé / non précisé',known:true,match:false,close:false,direction:null};
                     const el=document.createElement('div');
                     el.className=`dle-cell ${!a.known?'unknown':a.match?'good':a.close?'close':'bad'}`;
                     const arrow=a.direction==='up'?' ↑':a.direction==='down'?' ↓':'';
