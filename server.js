@@ -7369,6 +7369,34 @@ function getDleGlobalPoolStats() {
     return { total, perUniverse, ready: dleLiveExpansionReady };
 }
 
+
+const DLE_UNIVERSE_EXPANSION_PROMISES = new Map();
+
+async function ensureDleUniverseExpansion(universeKey) {
+    if (DLE_UNIVERSE_EXPANSION_PROMISES.has(universeKey)) {
+        return DLE_UNIVERSE_EXPANSION_PROMISES.get(universeKey);
+    }
+
+    const promise = (async () => {
+        const sources = DLE_FANDOM_SOURCES[universeKey] || [];
+
+        for (const source of sources) {
+            try {
+                const names = await fetchFandomCategoryRecursive(source.host, source.category, {
+                    maxDepth: 3,
+                    maxNames: universeKey === "pokemon" ? 5000 : 3000
+                });
+                for (const name of names) DLE_LIVE_POOLS[universeKey]?.add(name);
+            } catch (_) {}
+        }
+
+        return DLE_LIVE_POOLS[universeKey]?.size || 0;
+    })();
+
+    DLE_UNIVERSE_EXPANSION_PROMISES.set(universeKey, promise);
+    return promise;
+}
+
 async function startDleLiveExpansion() {
     if (dleLiveExpansionPromise) return dleLiveExpansionPromise;
 
@@ -7703,45 +7731,68 @@ async function ensureDleCharacterProfile(universeKey, character, categories) {
     if (!character) return character;
 
     const cacheKey = `${universeKey}|${normalizeDle(character.name)}`;
+
     if (DLE_PROFILE_CACHE.has(cacheKey)) {
-        character.attrs = { ...(character.attrs || {}), ...DLE_PROFILE_CACHE.get(cacheKey) };
-        character.profiled = true;
+        const cached = DLE_PROFILE_CACHE.get(cacheKey);
+        character.attrs = { ...(character.attrs || {}), ...(cached.attrs || {}) };
+        character.attrKnown = { ...(character.attrKnown || {}), ...(cached.attrKnown || {}) };
+        character.profiled = Object.values(character.attrKnown || {}).every(Boolean);
         return character;
     }
 
     const attrs = { ...(character.attrs || {}) };
-    const override = DLE_MANUAL_OVERRIDES[cacheKey];
-    if (override) Object.assign(attrs, override);
+    const attrKnown = {};
 
-    const missing = categories.some(cat => {
+    // Toute donnée présente dans les fiches V2 est considérée comme réelle.
+    for (const cat of categories) {
         const v = attrs[cat.key];
-        return v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?";
-    });
+        attrKnown[cat.key] = !(v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?");
+    }
 
-    if (missing) {
+    // Overrides vérifiés manuellement.
+    const override = DLE_MANUAL_OVERRIDES[cacheKey];
+    if (override) {
+        Object.assign(attrs, override);
+        for (const cat of categories) {
+            if (Object.prototype.hasOwnProperty.call(override, cat.key)) attrKnown[cat.key] = true;
+        }
+    }
+
+    const stillMissing = categories.some(cat => !attrKnown[cat.key]);
+
+    if (stillMissing) {
         const wikitext = await fetchDleWikiWikitext(universeKey, character.name);
         if (wikitext) {
-            const discovered = inferProfileValues(parseWikiFields(wikitext), categories);
+            const fields = parseWikiFields(wikitext);
+
             for (const cat of categories) {
-                const current = attrs[cat.key];
-                if (current === undefined || current === null || String(current).trim() === "" || String(current).trim() === "?") {
-                    attrs[cat.key] = discovered[cat.key];
+                if (attrKnown[cat.key]) continue;
+
+                const labelNorm = normalizeDle(cat.label);
+                const aliases = DLE_CATEGORY_ALIASES[labelNorm] || [cat.label];
+                const found = firstMatchingWikiField(fields, aliases);
+
+                if (found) {
+                    attrs[cat.key] = found;
+                    attrKnown[cat.key] = true;
                 }
             }
         }
     }
 
-    // Dernier filet de sécurité : jamais de case vide/?
+    // IMPORTANT : on ne transforme plus une absence de donnée en faux "match".
+    // On garde une phrase lisible, mais attrKnown=false.
     for (const cat of categories) {
-        const v = attrs[cat.key];
-        if (v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?") {
+        if (!attrKnown[cat.key]) {
             attrs[cat.key] = dleFallbackForLabel(cat.label);
+            attrKnown[cat.key] = false;
         }
     }
 
-    DLE_PROFILE_CACHE.set(cacheKey, { ...attrs });
+    DLE_PROFILE_CACHE.set(cacheKey, { attrs:{ ...attrs }, attrKnown:{ ...attrKnown } });
     character.attrs = attrs;
-    character.profiled = true;
+    character.attrKnown = attrKnown;
+    character.profiled = Object.values(attrKnown).every(Boolean);
     return character;
 }
 
@@ -7754,6 +7805,7 @@ function dleExpandedUniverse(key) {
         byNorm.set(normalizeDle(c.name), {
             name: c.name,
             attrs: { ...(c.attrs || {}) },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
             profiled: true
         });
     }
@@ -7767,6 +7819,7 @@ function dleExpandedUniverse(key) {
         byNorm.set(n, {
             name,
             attrs: {},
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, false])),
             profiled: false
         });
     }
@@ -7780,6 +7833,7 @@ function dleExpandedUniverse(key) {
         byNorm.set(n, {
             name,
             attrs: {},
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, false])),
             profiled: false
         });
     }
@@ -7818,22 +7872,29 @@ function emitDleState(room, roomCode) {
 }
 
 async function startDle(room, roomCode) {
+    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : "naruto";
+
+    // Priorité à l'univers choisi. Le gros chargement global continue en arrière-plan.
     try {
         await Promise.race([
-            startDleLiveExpansion(),
-            new Promise(resolve => setTimeout(resolve, 25000))
+            ensureDleUniverseExpansion(universeKey),
+            new Promise(resolve => setTimeout(resolve, 12000))
         ]);
     } catch (_) {}
 
-    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : "naruto";
+    startDleLiveExpansion().catch(() => {});
     const u = dleExpandedUniverse(universeKey);
     if (!u.characters.length) {
         io.to(roomCode).emit("game_error", { message:"Aucun personnage AnimeDLE pour cet univers." });
         return;
     }
 
-    // Aucun personnage supprimé : n'importe lequel du pool peut tomber.
-    const target = u.characters[Math.floor(Math.random() * u.characters.length)];
+    // Aucun personnage n'est supprimé du pool.
+    // Pour éviter une manche dont la réponse n'a aucune donnée exploitable,
+    // on préfère une fiche déjà complète quand elle existe.
+    const completeTargets = u.characters.filter(c => c.profiled);
+    const targetPool = completeTargets.length ? completeTargets : u.characters;
+    const target = targetPool[Math.floor(Math.random() * targetPool.length)];
     await ensureDleCharacterProfile(universeKey, target, u.categories);
 
     room.status = "dle_playing";
@@ -7872,35 +7933,41 @@ function dleTokenSet(value) {
 
 function makeDleComparison(character, target, player, categories) {
     const attrs = {};
+
     for (const cat of categories) {
         const mine = character.attrs?.[cat.key];
         const wanted = target.attrs?.[cat.key];
 
-        // Une donnée de lore absente n'est JAMAIS considérée comme un match.
-        const known = mine !== undefined && mine !== null && mine !== '' &&
-                      wanted !== undefined && wanted !== null && wanted !== '';
+        const mineKnown = character.attrKnown?.[cat.key] !== false &&
+                          mine !== undefined && mine !== null && String(mine).trim() !== "";
+        const targetKnown = target.attrKnown?.[cat.key] !== false &&
+                            wanted !== undefined && wanted !== null && String(wanted).trim() !== "";
+
+        const known = mineKnown && targetKnown;
 
         let match = false;
         let close = false;
         let direction = null;
 
         if (known) {
-            if (cat.type === 'number') {
+            if (cat.type === "number") {
                 const a = Number(mine), b = Number(wanted);
                 match = Number.isFinite(a) && Number.isFinite(b) && a === b;
                 close = !match && Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= 2;
-                if (!match && Number.isFinite(a) && Number.isFinite(b)) direction = a < b ? 'up' : 'down';
+                if (!match && Number.isFinite(a) && Number.isFinite(b)) direction = a < b ? "up" : "down";
             } else {
                 match = normalizeDle(mine) === normalizeDle(wanted);
+
                 if (!match && !cat.meta) {
-                    const a = dleTokenSet(mine), b = new Set(dleTokenSet(wanted));
+                    const a = dleTokenSet(mine);
+                    const b = new Set(dleTokenSet(wanted));
                     close = a.some(x => b.has(x));
                 }
             }
         }
 
         attrs[cat.key] = {
-            value: known ? mine : 'Non révélé / non précisé',
+            value: mine ?? dleFallbackForLabel(cat.label),
             known,
             match,
             close,
