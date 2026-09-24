@@ -313,56 +313,1454 @@ const rgPools = {};    // roomCode -> { pool: string[], usedNorm: Set<string> }
 
 // Liste Undercover Normal (Paires)
 const undercoverPairsNormal = [
-    ["Kenjaku", "Geto"],
-    ["Tengen", "Kakashi"],
-    ["Kisame", "Requin"],
-    ["Rasen Shuriken", "Rasengan"],
-    ["Yuji", "Sukuna"],
-    ["Peter Parker", "Miles Morales"],
-    ["Inoxtag", "Luffy"],
-    ["Kakashi", "Gojo"],
-    ["Superman", "All Might"],
-    ["Meruem", "Cell"],
-    ["Pain", "Nagato"],
-    ["Maki", "Toji"],
-    ["Aokiji", "Brook"],
-    ["Pokeball", "Dragon Ball"],
-    ["Madara", "Itachi"],
-    ["Ener", "Luxus"],
-    ["Kamehameha", "Genkidama"],
-    ["Jubidara", "Jubito"],
-    ["Muzan", "Imu"],
-    ["Amaterasu", "Katon"],
-    ["Rinnegan", "Sharingan"],
-    ["Hinata (Haikyu)", "Messi"],
-    ["Loki", "Kaido"],
-    ["Sukuna", "Meguna"],
-    ["Obito", "Tobi"],
-    ["Denji", "Yuji"],
-    ["Gogeta", "Vegeto"],
-    ["Sharingan", "Mangekyou"],
-    ["Gon enfant", "Gon adulte"],
-    ["Escanor", "Cannicule"],
-    ["Brigade fantôme", "Akatsuki"],
-    ["Netero", "Barbe Blanche"],
-    ["Yoriichi", "Tanjiro"],
-    ["Yamato", "Hashirama"],
-    ["Ace", "Sabo"],
-    ["Ban", "Hisoka"],
-    ["Pikachu", "Zenitsu"],
-    ["Vegeta", "Sasuke"],
-    ["Broly", "Hulk"],
-    ["Obito", "Kakashi"],
-    ["Trunks", "Trunks futur"],
-    ["Goten", "Gohan"],
-    ["Hisoka", "Orochimaru"],
-    ["Naruto", "Minato"],
-    ["Goku", "Black Goku"],
-    ["Gildarts", "Shanks"],
-    ["Clan Kuruta", "Clan Uchiwa"],
-    ["Nen", "Chakra"],
-    ["Crocodile", "Gaara"],
-    ["Hidan", "Ban"]
+    [
+        "Naruto",
+        "Minato"
+    ],
+    [
+        "Sasuke",
+        "Itachi"
+    ],
+    [
+        "Sakura",
+        "Tsunade"
+    ],
+    [
+        "Kakashi",
+        "Obito"
+    ],
+    [
+        "Jiraiya",
+        "Orochimaru"
+    ],
+    [
+        "Gaara",
+        "Sasori"
+    ],
+    [
+        "Madara",
+        "Hashirama"
+    ],
+    [
+        "Hinata",
+        "Neji"
+    ],
+    [
+        "Shikamaru",
+        "Shikaku"
+    ],
+    [
+        "Rock Lee",
+        "Might Guy"
+    ],
+    [
+        "Pain",
+        "Konan"
+    ],
+    [
+        "Deidara",
+        "Sasori"
+    ],
+    [
+        "Kisame",
+        "Zabuza"
+    ],
+    [
+        "Kurama",
+        "Shukaku"
+    ],
+    [
+        "Rasengan",
+        "Chidori"
+    ],
+    [
+        "Sharingan",
+        "Byakugan"
+    ],
+    [
+        "Amaterasu",
+        "Kamui"
+    ],
+    [
+        "Akatsuki",
+        "ANBU"
+    ],
+    [
+        "Konoha",
+        "Suna"
+    ],
+    [
+        "Hokage",
+        "Kazekage"
+    ],
+    [
+        "Luffy",
+        "Ace"
+    ],
+    [
+        "Zoro",
+        "Mihawk"
+    ],
+    [
+        "Sanji",
+        "Zeff"
+    ],
+    [
+        "Nami",
+        "Robin"
+    ],
+    [
+        "Usopp",
+        "Franky"
+    ],
+    [
+        "Shanks",
+        "Roger"
+    ],
+    [
+        "Garp",
+        "Sengoku"
+    ],
+    [
+        "Law",
+        "Kid"
+    ],
+    [
+        "Kaido",
+        "Big Mom"
+    ],
+    [
+        "Crocodile",
+        "Doflamingo"
+    ],
+    [
+        "Akainu",
+        "Aokiji"
+    ],
+    [
+        "Kizaru",
+        "Fujitora"
+    ],
+    [
+        "Sabo",
+        "Ace"
+    ],
+    [
+        "Chopper",
+        "Bepo"
+    ],
+    [
+        "Vivi",
+        "Rebecca"
+    ],
+    [
+        "Haki de l'armement",
+        "Haki de l'observation"
+    ],
+    [
+        "Gear 4",
+        "Gear 5"
+    ],
+    [
+        "Marine",
+        "Gouvernement Mondial"
+    ],
+    [
+        "Grand Line",
+        "Nouveau Monde"
+    ],
+    [
+        "Impel Down",
+        "Enies Lobby"
+    ],
+    [
+        "Ichigo",
+        "Uryu"
+    ],
+    [
+        "Rukia",
+        "Renji"
+    ],
+    [
+        "Byakuya",
+        "Toshiro"
+    ],
+    [
+        "Kenpachi",
+        "Unohana"
+    ],
+    [
+        "Aizen",
+        "Yhwach"
+    ],
+    [
+        "Gin",
+        "Tosen"
+    ],
+    [
+        "Grimmjow",
+        "Ulquiorra"
+    ],
+    [
+        "Orihime",
+        "Rangiku"
+    ],
+    [
+        "Chad",
+        "Ganju"
+    ],
+    [
+        "Kisuke",
+        "Mayuri"
+    ],
+    [
+        "Shinigami",
+        "Quincy"
+    ],
+    [
+        "Hollow",
+        "Arrancar"
+    ],
+    [
+        "Bankai",
+        "Shikai"
+    ],
+    [
+        "Soul Society",
+        "Hueco Mundo"
+    ],
+    [
+        "Gotei 13",
+        "Sternritter"
+    ],
+    [
+        "Gon",
+        "Killua"
+    ],
+    [
+        "Kurapika",
+        "Leorio"
+    ],
+    [
+        "Hisoka",
+        "Illumi"
+    ],
+    [
+        "Chrollo",
+        "Kurapika"
+    ],
+    [
+        "Meruem",
+        "Netero"
+    ],
+    [
+        "Pitou",
+        "Pouf"
+    ],
+    [
+        "Knuckle",
+        "Shoot"
+    ],
+    [
+        "Kite",
+        "Ging"
+    ],
+    [
+        "Biscuit",
+        "Wing"
+    ],
+    [
+        "Feitan",
+        "Phinks"
+    ],
+    [
+        "Zeno",
+        "Silva"
+    ],
+    [
+        "Nen",
+        "Ren"
+    ],
+    [
+        "Ten",
+        "Zetsu"
+    ],
+    [
+        "Hunter",
+        "Brigade Fantôme"
+    ],
+    [
+        "Eren",
+        "Reiner"
+    ],
+    [
+        "Mikasa",
+        "Annie"
+    ],
+    [
+        "Armin",
+        "Erwin"
+    ],
+    [
+        "Levi",
+        "Kenny"
+    ],
+    [
+        "Zeke",
+        "Grisha"
+    ],
+    [
+        "Jean",
+        "Connie"
+    ],
+    [
+        "Sasha",
+        "Historia"
+    ],
+    [
+        "Hansi",
+        "Erwin"
+    ],
+    [
+        "Gabi",
+        "Falco"
+    ],
+    [
+        "Porco",
+        "Reiner"
+    ],
+    [
+        "Titan Assaillant",
+        "Titan Cuirassé"
+    ],
+    [
+        "Titan Colossal",
+        "Titan Bestial"
+    ],
+    [
+        "Paradis",
+        "Marley"
+    ],
+    [
+        "Bataillon d'exploration",
+        "Brigades spéciales"
+    ],
+    [
+        "Meliodas",
+        "Zeldris"
+    ],
+    [
+        "Ban",
+        "Escanor"
+    ],
+    [
+        "King",
+        "Gowther"
+    ],
+    [
+        "Diane",
+        "Merlin"
+    ],
+    [
+        "Elizabeth",
+        "Elaine"
+    ],
+    [
+        "Estarossa",
+        "Zeldris"
+    ],
+    [
+        "Chandler",
+        "Cusack"
+    ],
+    [
+        "Mael",
+        "Ludociel"
+    ],
+    [
+        "Hawk",
+        "Wild"
+    ],
+    [
+        "Dreyfus",
+        "Hendrickson"
+    ],
+    [
+        "Démons",
+        "Déesses"
+    ],
+    [
+        "Dix Commandements",
+        "Seven Deadly Sins"
+    ],
+    [
+        "Full Counter",
+        "Revenge Counter"
+    ],
+    [
+        "Light",
+        "L"
+    ],
+    [
+        "Near",
+        "Mello"
+    ],
+    [
+        "Ryuk",
+        "Rem"
+    ],
+    [
+        "Misa",
+        "Kiyomi"
+    ],
+    [
+        "Soichiro",
+        "Matsuda"
+    ],
+    [
+        "Light",
+        "Mikami"
+    ],
+    [
+        "Death Note",
+        "Faux Death Note"
+    ],
+    [
+        "Kira",
+        "L"
+    ],
+    [
+        "Shinigami",
+        "Humain"
+    ],
+    [
+        "Ayanokoji",
+        "Koenji"
+    ],
+    [
+        "Horikita",
+        "Kushida"
+    ],
+    [
+        "Ryuen",
+        "Sakayanagi"
+    ],
+    [
+        "Ichinose",
+        "Horikita"
+    ],
+    [
+        "Manabu",
+        "Nagumo"
+    ],
+    [
+        "Kei",
+        "Kushida"
+    ],
+    [
+        "Sudo",
+        "Ike"
+    ],
+    [
+        "Classe A",
+        "Classe D"
+    ],
+    [
+        "Examen spécial",
+        "Examen écrit"
+    ],
+    [
+        "Jinwoo",
+        "Igris"
+    ],
+    [
+        "Jinwoo",
+        "Jinho"
+    ],
+    [
+        "Cha Hae-In",
+        "Lee Joohee"
+    ],
+    [
+        "Baek Yoonho",
+        "Choi Jong-In"
+    ],
+    [
+        "Thomas Andre",
+        "Liu Zhigang"
+    ],
+    [
+        "Beru",
+        "Igris"
+    ],
+    [
+        "Antares",
+        "Ashborn"
+    ],
+    [
+        "Monarque",
+        "Dirigeant"
+    ],
+    [
+        "Ombre",
+        "Chasseur"
+    ],
+    [
+        "Portail",
+        "Donjon"
+    ],
+    [
+        "Asta",
+        "Yuno"
+    ],
+    [
+        "Yami",
+        "Nacht"
+    ],
+    [
+        "Noelle",
+        "Mimosa"
+    ],
+    [
+        "Luck",
+        "Magna"
+    ],
+    [
+        "Finral",
+        "Langris"
+    ],
+    [
+        "Fuegoleon",
+        "Mereoleona"
+    ],
+    [
+        "Julius",
+        "Lumière"
+    ],
+    [
+        "Patry",
+        "Licht"
+    ],
+    [
+        "Dante",
+        "Zenon"
+    ],
+    [
+        "Vanessa",
+        "Grey"
+    ],
+    [
+        "Black Bulls",
+        "Golden Dawn"
+    ],
+    [
+        "Mana",
+        "Anti-magie"
+    ],
+    [
+        "Grimoire à 4 feuilles",
+        "Grimoire à 5 feuilles"
+    ],
+    [
+        "Shinra",
+        "Sho"
+    ],
+    [
+        "Arthur",
+        "Ogun"
+    ],
+    [
+        "Benimaru",
+        "Burns"
+    ],
+    [
+        "Maki",
+        "Tamaki"
+    ],
+    [
+        "Joker",
+        "Licht"
+    ],
+    [
+        "Hibana",
+        "Iris"
+    ],
+    [
+        "Vulcan",
+        "Giovanni"
+    ],
+    [
+        "Compagnie 8",
+        "Compagnie 1"
+    ],
+    [
+        "Adolla",
+        "Monde réel"
+    ],
+    [
+        "Deuxième génération",
+        "Troisième génération"
+    ],
+    [
+        "Rudeus",
+        "Paul"
+    ],
+    [
+        "Roxy",
+        "Sylphiette"
+    ],
+    [
+        "Eris",
+        "Ghislaine"
+    ],
+    [
+        "Ruijerd",
+        "Orsted"
+    ],
+    [
+        "Zenith",
+        "Lilia"
+    ],
+    [
+        "Ariel",
+        "Nanahoshi"
+    ],
+    [
+        "Rudeus",
+        "Cliff"
+    ],
+    [
+        "Paul",
+        "Geese"
+    ],
+    [
+        "Magie",
+        "Touki"
+    ],
+    [
+        "Migurd",
+        "Superd"
+    ],
+    [
+        "Subaru",
+        "Reinhard"
+    ],
+    [
+        "Emilia",
+        "Satella"
+    ],
+    [
+        "Rem",
+        "Ram"
+    ],
+    [
+        "Beatrice",
+        "Echidna"
+    ],
+    [
+        "Roswaal",
+        "Puck"
+    ],
+    [
+        "Garfiel",
+        "Frederica"
+    ],
+    [
+        "Otto",
+        "Garfiel"
+    ],
+    [
+        "Crusch",
+        "Anastasia"
+    ],
+    [
+        "Regulus",
+        "Petelgeuse"
+    ],
+    [
+        "Sorcière",
+        "Archevêque"
+    ],
+    [
+        "Return by Death",
+        "Autorité"
+    ],
+    [
+        "Natsu",
+        "Gajeel"
+    ],
+    [
+        "Gray",
+        "Lyon"
+    ],
+    [
+        "Erza",
+        "Mirajane"
+    ],
+    [
+        "Lucy",
+        "Yukino"
+    ],
+    [
+        "Wendy",
+        "Chelia"
+    ],
+    [
+        "Happy",
+        "Carla"
+    ],
+    [
+        "Makarov",
+        "Gildarts"
+    ],
+    [
+        "Zeref",
+        "Acnologia"
+    ],
+    [
+        "Sting",
+        "Rogue"
+    ],
+    [
+        "Jellal",
+        "Mystogan"
+    ],
+    [
+        "Fairy Tail",
+        "Sabertooth"
+    ],
+    [
+        "Dragon Slayer",
+        "God Slayer"
+    ],
+    [
+        "Isagi",
+        "Rin"
+    ],
+    [
+        "Bachira",
+        "Shidou"
+    ],
+    [
+        "Nagi",
+        "Reo"
+    ],
+    [
+        "Barou",
+        "Kunigami"
+    ],
+    [
+        "Chigiri",
+        "Zantetsu"
+    ],
+    [
+        "Sae",
+        "Rin"
+    ],
+    [
+        "Ego",
+        "Noa"
+    ],
+    [
+        "Gagamaru",
+        "Aryu"
+    ],
+    [
+        "Karasu",
+        "Otoya"
+    ],
+    [
+        "Kaiser",
+        "Isagi"
+    ],
+    [
+        "Dribble",
+        "Tir"
+    ],
+    [
+        "Vision périphérique",
+        "Meta Vision"
+    ],
+    [
+        "Edward",
+        "Alphonse"
+    ],
+    [
+        "Roy",
+        "Riza"
+    ],
+    [
+        "Scar",
+        "Greed"
+    ],
+    [
+        "Bradley",
+        "Father"
+    ],
+    [
+        "Winry",
+        "Pinako"
+    ],
+    [
+        "Izumi",
+        "Edward"
+    ],
+    [
+        "Envy",
+        "Lust"
+    ],
+    [
+        "Gluttony",
+        "Sloth"
+    ],
+    [
+        "Alchimie",
+        "Alkahestrie"
+    ],
+    [
+        "Pierre philosophale",
+        "Transmutation humaine"
+    ],
+    [
+        "Denji",
+        "Aki"
+    ],
+    [
+        "Power",
+        "Kobeni"
+    ],
+    [
+        "Makima",
+        "Reze"
+    ],
+    [
+        "Pochita",
+        "Nayuta"
+    ],
+    [
+        "Kishibe",
+        "Yoshida"
+    ],
+    [
+        "Katana Man",
+        "Denji"
+    ],
+    [
+        "Angel Devil",
+        "Future Devil"
+    ],
+    [
+        "Démon",
+        "Hybride"
+    ],
+    [
+        "Public Safety",
+        "Chasseurs privés"
+    ],
+    [
+        "Yugo",
+        "Adamai"
+    ],
+    [
+        "Tristepin",
+        "Goultard"
+    ],
+    [
+        "Amalia",
+        "Evangelyne"
+    ],
+    [
+        "Ruel",
+        "Alibert"
+    ],
+    [
+        "Qilby",
+        "Yugo"
+    ],
+    [
+        "Nox",
+        "Oropo"
+    ],
+    [
+        "Elely",
+        "Flopin"
+    ],
+    [
+        "Eliatrope",
+        "Dragon"
+    ],
+    [
+        "Shushu",
+        "Dofus"
+    ],
+    [
+        "Wakfu",
+        "Stasis"
+    ],
+    [
+        "Tanjiro",
+        "Yoriichi"
+    ],
+    [
+        "Nezuko",
+        "Tamayo"
+    ],
+    [
+        "Zenitsu",
+        "Inosuke"
+    ],
+    [
+        "Giyu",
+        "Sanemi"
+    ],
+    [
+        "Rengoku",
+        "Tengen"
+    ],
+    [
+        "Shinobu",
+        "Mitsuri"
+    ],
+    [
+        "Muichiro",
+        "Obanai"
+    ],
+    [
+        "Muzan",
+        "Kokushibo"
+    ],
+    [
+        "Akaza",
+        "Doma"
+    ],
+    [
+        "Gyutaro",
+        "Rui"
+    ],
+    [
+        "Pilier",
+        "Lune Supérieure"
+    ],
+    [
+        "Souffle de l'eau",
+        "Souffle du soleil"
+    ],
+    [
+        "Pikachu",
+        "Raichu"
+    ],
+    [
+        "Dracaufeu",
+        "Dracolosse"
+    ],
+    [
+        "Mew",
+        "Mewtwo"
+    ],
+    [
+        "Groudon",
+        "Kyogre"
+    ],
+    [
+        "Dialga",
+        "Palkia"
+    ],
+    [
+        "Reshiram",
+        "Zekrom"
+    ],
+    [
+        "Lugia",
+        "Ho-Oh"
+    ],
+    [
+        "Ectoplasma",
+        "Alakazam"
+    ],
+    [
+        "Lucario",
+        "Zoroark"
+    ],
+    [
+        "Sacha",
+        "Red"
+    ],
+    [
+        "Poké Ball",
+        "Master Ball"
+    ],
+    [
+        "Méga-Évolution",
+        "Dynamax"
+    ],
+    [
+        "Goku",
+        "Vegeta"
+    ],
+    [
+        "Gohan",
+        "Trunks"
+    ],
+    [
+        "Piccolo",
+        "Nail"
+    ],
+    [
+        "Freezer",
+        "Cell"
+    ],
+    [
+        "Buu",
+        "Cell"
+    ],
+    [
+        "Beerus",
+        "Champa"
+    ],
+    [
+        "Whis",
+        "Vados"
+    ],
+    [
+        "Gogeta",
+        "Vegetto"
+    ],
+    [
+        "Broly",
+        "Kale"
+    ],
+    [
+        "Jiren",
+        "Toppo"
+    ],
+    [
+        "Super Saiyan",
+        "Super Saiyan God"
+    ],
+    [
+        "Ultra Instinct",
+        "Ultra Ego"
+    ],
+    [
+        "Kamehameha",
+        "Final Flash"
+    ],
+    [
+        "Gabimaru",
+        "Chobei"
+    ],
+    [
+        "Sagiri",
+        "Yuzuriha"
+    ],
+    [
+        "Shion",
+        "Tenza"
+    ],
+    [
+        "Fuchi",
+        "Senta"
+    ],
+    [
+        "Mei",
+        "Rien"
+    ],
+    [
+        "Chobei",
+        "Toma"
+    ],
+    [
+        "Tao",
+        "Ninjutsu"
+    ],
+    [
+        "Asaemon",
+        "Criminel"
+    ],
+    [
+        "Rudo",
+        "Zanka"
+    ],
+    [
+        "Enjin",
+        "Riyo"
+    ],
+    [
+        "Jabber",
+        "Zodyl"
+    ],
+    [
+        "Tamsy",
+        "Delmon"
+    ],
+    [
+        "Amo",
+        "Chiwa"
+    ],
+    [
+        "Regto",
+        "Corvus"
+    ],
+    [
+        "Eishia",
+        "August"
+    ],
+    [
+        "Guita",
+        "Dear"
+    ],
+    [
+        "Cleaners",
+        "Raiders"
+    ],
+    [
+        "Giver",
+        "Jinki"
+    ],
+    [
+        "Hinata",
+        "Kageyama"
+    ],
+    [
+        "Oikawa",
+        "Atsumu"
+    ],
+    [
+        "Bokuto",
+        "Ushijima"
+    ],
+    [
+        "Kenma",
+        "Akaashi"
+    ],
+    [
+        "Nishinoya",
+        "Yaku"
+    ],
+    [
+        "Tsukishima",
+        "Kuroo"
+    ],
+    [
+        "Daichi",
+        "Kita"
+    ],
+    [
+        "Asahi",
+        "Aran"
+    ],
+    [
+        "Karasuno",
+        "Nekoma"
+    ],
+    [
+        "Shiratorizawa",
+        "Inarizaki"
+    ],
+    [
+        "Passeur",
+        "Libéro"
+    ],
+    [
+        "Yuji",
+        "Yuta"
+    ],
+    [
+        "Gojo",
+        "Sukuna"
+    ],
+    [
+        "Megumi",
+        "Nobara"
+    ],
+    [
+        "Maki",
+        "Toji"
+    ],
+    [
+        "Geto",
+        "Kenjaku"
+    ],
+    [
+        "Nanami",
+        "Kusakabe"
+    ],
+    [
+        "Todo",
+        "Hakari"
+    ],
+    [
+        "Mahito",
+        "Jogo"
+    ],
+    [
+        "Choso",
+        "Eso"
+    ],
+    [
+        "Rika",
+        "Mahoraga"
+    ],
+    [
+        "Fléau",
+        "Exorciste"
+    ],
+    [
+        "Black Flash",
+        "Extension du territoire"
+    ],
+    [
+        "Jonathan",
+        "Joseph"
+    ],
+    [
+        "Jotaro",
+        "Josuke"
+    ],
+    [
+        "Giorno",
+        "Jolyne"
+    ],
+    [
+        "Dio",
+        "Kars"
+    ],
+    [
+        "Kira",
+        "Diavolo"
+    ],
+    [
+        "Pucci",
+        "Valentine"
+    ],
+    [
+        "Caesar",
+        "Polnareff"
+    ],
+    [
+        "Speedwagon",
+        "Stroheim"
+    ],
+    [
+        "Hamon",
+        "Stand"
+    ],
+    [
+        "Star Platinum",
+        "The World"
+    ],
+    [
+        "Crazy Diamond",
+        "Gold Experience"
+    ],
+    [
+        "Rimuru",
+        "Veldora"
+    ],
+    [
+        "Benimaru",
+        "Souei"
+    ],
+    [
+        "Shion",
+        "Shuna"
+    ],
+    [
+        "Diablo",
+        "Testarossa"
+    ],
+    [
+        "Milim",
+        "Ramiris"
+    ],
+    [
+        "Guy",
+        "Leon"
+    ],
+    [
+        "Hinata",
+        "Chloe"
+    ],
+    [
+        "Ranga",
+        "Gobta"
+    ],
+    [
+        "Demon Lord",
+        "True Dragon"
+    ],
+    [
+        "Tempest",
+        "Dwargon"
+    ],
+    [
+        "Saitama",
+        "Blast"
+    ],
+    [
+        "Genos",
+        "Drive Knight"
+    ],
+    [
+        "Garou",
+        "Bang"
+    ],
+    [
+        "Tatsumaki",
+        "Fubuki"
+    ],
+    [
+        "Sonic",
+        "Flashy Flash"
+    ],
+    [
+        "Metal Bat",
+        "Tanktop Master"
+    ],
+    [
+        "Boros",
+        "Orochi"
+    ],
+    [
+        "King",
+        "Mumen Rider"
+    ],
+    [
+        "Hero Association",
+        "Monster Association"
+    ],
+    [
+        "Classe S",
+        "Classe A"
+    ],
+    [
+        "Kirito",
+        "Eugeo"
+    ],
+    [
+        "Asuna",
+        "Alice"
+    ],
+    [
+        "Sinon",
+        "Leafa"
+    ],
+    [
+        "Klein",
+        "Agil"
+    ],
+    [
+        "Yui",
+        "Cardinal"
+    ],
+    [
+        "Heathcliff",
+        "Oberon"
+    ],
+    [
+        "Kirito",
+        "Death Gun"
+    ],
+    [
+        "Aincrad",
+        "Alfheim"
+    ],
+    [
+        "SAO",
+        "GGO"
+    ],
+    [
+        "Épée",
+        "Épée photon"
+    ],
+    [
+        "Kaneki",
+        "Haise"
+    ],
+    [
+        "Touka",
+        "Hinami"
+    ],
+    [
+        "Arima",
+        "Juuzou"
+    ],
+    [
+        "Amon",
+        "Akira"
+    ],
+    [
+        "Eto",
+        "Yoshimura"
+    ],
+    [
+        "Tsukiyama",
+        "Nishiki"
+    ],
+    [
+        "Ayato",
+        "Touka"
+    ],
+    [
+        "Rize",
+        "Kaneki"
+    ],
+    [
+        "CCG",
+        "Aogiri"
+    ],
+    [
+        "Quinque",
+        "Kagune"
+    ],
+    [
+        "Kakuja",
+        "Kagune"
+    ],
+    [
+        "Takemichi",
+        "Chifuyu"
+    ],
+    [
+        "Mikey",
+        "Draken"
+    ],
+    [
+        "Baji",
+        "Kazutora"
+    ],
+    [
+        "Mitsuya",
+        "Hakkai"
+    ],
+    [
+        "Angry",
+        "Smiley"
+    ],
+    [
+        "Taiju",
+        "South"
+    ],
+    [
+        "Kisaki",
+        "Hanma"
+    ],
+    [
+        "Izana",
+        "Kakucho"
+    ],
+    [
+        "Emma",
+        "Hina"
+    ],
+    [
+        "Toman",
+        "Tenjiku"
+    ],
+    [
+        "Black Dragons",
+        "Valhalla"
+    ]
 ];
 
 // Liste Undercover Hardcore (Tous les persos avec leur anime)
@@ -406,6 +1804,512 @@ const undercoverHardcorePool = [
     // Tokyo Ghoul
     "Ken Kaneki (Tokyo Ghoul)", "Touka Kirishima (Tokyo Ghoul)", "Rize Kamishiro (Tokyo Ghoul)", "Hideyoshi Nagachika (Tokyo Ghoul)"
 ];
+
+
+
+// Extension Hardcore : personnages issus des nouveaux univers Rolland Garos
+undercoverHardcorePool.push(
+    "Gon Freecss (Hunter x Hunter)",
+    "Killua Zoldyck (Hunter x Hunter)",
+    "Kurapika (Hunter x Hunter)",
+    "Leorio Paradinight (Hunter x Hunter)",
+    "Hisoka Morow (Hunter x Hunter)",
+    "Illumi Zoldyck (Hunter x Hunter)",
+    "Ging Freecss (Hunter x Hunter)",
+    "Kite (Hunter x Hunter)",
+    "Biscuit Krueger (Hunter x Hunter)",
+    "Isaac Netero (Hunter x Hunter)",
+    "Zeno Zoldyck (Hunter x Hunter)",
+    "Silva Zoldyck (Hunter x Hunter)",
+    "Kikyo Zoldyck (Hunter x Hunter)",
+    "Milluki Zoldyck (Hunter x Hunter)",
+    "Alluka Zoldyck (Hunter x Hunter)",
+    "Nanika (Hunter x Hunter)",
+    "Kalluto Zoldyck (Hunter x Hunter)",
+    "Gotoh (Hunter x Hunter)",
+    "Canary (Hunter x Hunter)",
+    "Tsubone (Hunter x Hunter)",
+    "Eren Jäger (SNK / L'Attaque des Titans)",
+    "Mikasa Ackerman (SNK / L'Attaque des Titans)",
+    "Armin Arlert (SNK / L'Attaque des Titans)",
+    "Levi Ackerman (SNK / L'Attaque des Titans)",
+    "Erwin Smith (SNK / L'Attaque des Titans)",
+    "Hange Zoë (SNK / L'Attaque des Titans)",
+    "Jean Kirstein (SNK / L'Attaque des Titans)",
+    "Connie Springer (SNK / L'Attaque des Titans)",
+    "Sasha Blouse (SNK / L'Attaque des Titans)",
+    "Historia Reiss (SNK / L'Attaque des Titans)",
+    "Ymir (SNK / L'Attaque des Titans)",
+    "Reiner Braun (SNK / L'Attaque des Titans)",
+    "Bertholdt Hoover (SNK / L'Attaque des Titans)",
+    "Annie Leonhart (SNK / L'Attaque des Titans)",
+    "Marco Bott (SNK / L'Attaque des Titans)",
+    "Floch Forster (SNK / L'Attaque des Titans)",
+    "Petra Ral (SNK / L'Attaque des Titans)",
+    "Oluo Bozado (SNK / L'Attaque des Titans)",
+    "Eld Jinn (SNK / L'Attaque des Titans)",
+    "Gunther Schultz (SNK / L'Attaque des Titans)",
+    "Light Yagami (Death Note)",
+    "L Lawliet (Death Note)",
+    "Misa Amane (Death Note)",
+    "Ryuk (Death Note)",
+    "Rem (Death Note)",
+    "Near (Death Note)",
+    "Mello (Death Note)",
+    "Soichiro Yagami (Death Note)",
+    "Sachiko Yagami (Death Note)",
+    "Sayu Yagami (Death Note)",
+    "Touta Matsuda (Death Note)",
+    "Shuichi Aizawa (Death Note)",
+    "Kanzo Mogi (Death Note)",
+    "Hideki Ide (Death Note)",
+    "Hirokazu Ukita (Death Note)",
+    "Watari (Death Note)",
+    "Teru Mikami (Death Note)",
+    "Kiyomi Takada (Death Note)",
+    "Naomi Misora (Death Note)",
+    "Raye Penber (Death Note)",
+    "Kiyotaka Ayanokoji (Classroom of the Elite)",
+    "Suzune Horikita (Classroom of the Elite)",
+    "Manabu Horikita (Classroom of the Elite)",
+    "Kikyo Kushida (Classroom of the Elite)",
+    "Kei Karuizawa (Classroom of the Elite)",
+    "Yosuke Hirata (Classroom of the Elite)",
+    "Ken Sudo (Classroom of the Elite)",
+    "Kanji Ike (Classroom of the Elite)",
+    "Haruki Yamauchi (Classroom of the Elite)",
+    "Airi Sakura (Classroom of the Elite)",
+    "Akito Miyake (Classroom of the Elite)",
+    "Haruka Hasebe (Classroom of the Elite)",
+    "Keisei Yukimura (Classroom of the Elite)",
+    "Chiaki Matsushita (Classroom of the Elite)",
+    "Maya Sato (Classroom of the Elite)",
+    "Kokoro Inogashira (Classroom of the Elite)",
+    "Rokusuke Koenji (Classroom of the Elite)",
+    "Arisu Sakayanagi (Classroom of the Elite)",
+    "Kohei Katsuragi (Classroom of the Elite)",
+    "Masayoshi Hashimoto (Classroom of the Elite)",
+    "Sung Jinwoo (Solo Leveling)",
+    "Sung Jinah (Solo Leveling)",
+    "Park Kyung-Hye (Solo Leveling)",
+    "Yoo Jinho (Solo Leveling)",
+    "Cha Hae-In (Solo Leveling)",
+    "Lee Joohee (Solo Leveling)",
+    "Song Chi-Yul (Solo Leveling)",
+    "Kim Sangshik (Solo Leveling)",
+    "Hwang Dongsuk (Solo Leveling)",
+    "Kang Taeshik (Solo Leveling)",
+    "Hwang Dongsoo (Solo Leveling)",
+    "Baek Yoonho (Solo Leveling)",
+    "Choi Jong-In (Solo Leveling)",
+    "Woo Jinchul (Solo Leveling)",
+    "Go Gunhee (Solo Leveling)",
+    "Lim Tae-Gyu (Solo Leveling)",
+    "Ma Dongwook (Solo Leveling)",
+    "Min Byung-Gyu (Solo Leveling)",
+    "Thomas Andre (Solo Leveling)",
+    "Liu Zhigang (Solo Leveling)",
+    "Shinra Kusakabe (Fire Force)",
+    "Arthur Boyle (Fire Force)",
+    "Maki Oze (Fire Force)",
+    "Tamaki Kotatsu (Fire Force)",
+    "Akitaru Obi (Fire Force)",
+    "Takehisa Hinawa (Fire Force)",
+    "Iris (Fire Force)",
+    "Viktor Licht (Fire Force)",
+    "Vulcan Joseph (Fire Force)",
+    "Lisa Isaribe (Fire Force)",
+    "Yu (Fire Force)",
+    "Benimaru Shinmon (Fire Force)",
+    "Konro Sagamiya (Fire Force)",
+    "Hibana (Fire Force)",
+    "Karim Flam (Fire Force)",
+    "Rekka Hoshimiya (Fire Force)",
+    "Leonard Burns (Fire Force)",
+    "Ogun Montgomery (Fire Force)",
+    "Pan Ko Paat (Fire Force)",
+    "Joker (Fire Force)",
+    "Rudeus Greyrat (Mushoku Tensei)",
+    "Roxy Migurdia (Mushoku Tensei)",
+    "Sylphiette (Mushoku Tensei)",
+    "Eris Boreas Greyrat (Mushoku Tensei)",
+    "Paul Greyrat (Mushoku Tensei)",
+    "Zenith Greyrat (Mushoku Tensei)",
+    "Lilia Greyrat (Mushoku Tensei)",
+    "Norn Greyrat (Mushoku Tensei)",
+    "Aisha Greyrat (Mushoku Tensei)",
+    "Ruijerd Superdia (Mushoku Tensei)",
+    "Ghislaine Dedoldia (Mushoku Tensei)",
+    "Orsted (Mushoku Tensei)",
+    "Nanahoshi Shizuka (Mushoku Tensei)",
+    "Hitogami (Mushoku Tensei)",
+    "Kishirika Kishirisu (Mushoku Tensei)",
+    "Badigadi (Mushoku Tensei)",
+    "Atofe (Mushoku Tensei)",
+    "Ariel Anemoi Asura (Mushoku Tensei)",
+    "Luke Notos Greyrat (Mushoku Tensei)",
+    "Cliff Grimoire (Mushoku Tensei)",
+    "Subaru Natsuki (Re:Zero)",
+    "Emilia (Re:Zero)",
+    "Rem (Re:Zero)",
+    "Ram (Re:Zero)",
+    "Beatrice (Re:Zero)",
+    "Roswaal L. Mathers (Re:Zero)",
+    "Puck (Re:Zero)",
+    "Otto Suwen (Re:Zero)",
+    "Garfiel Tinsel (Re:Zero)",
+    "Frederica Baumann (Re:Zero)",
+    "Petra Leyte (Re:Zero)",
+    "Patrasche (Re:Zero)",
+    "Reinhard van Astrea (Re:Zero)",
+    "Felt (Re:Zero)",
+    "Crusch Karsten (Re:Zero)",
+    "Felix Argyle (Re:Zero)",
+    "Wilhelm van Astrea (Re:Zero)",
+    "Theresia van Astrea (Re:Zero)",
+    "Anastasia Hoshin (Re:Zero)",
+    "Julius Juukulius (Re:Zero)",
+    "Yoichi Isagi (Blue Lock)",
+    "Meguru Bachira (Blue Lock)",
+    "Rensuke Kunigami (Blue Lock)",
+    "Hyoma Chigiri (Blue Lock)",
+    "Shoei Barou (Blue Lock)",
+    "Seishiro Nagi (Blue Lock)",
+    "Reo Mikage (Blue Lock)",
+    "Rin Itoshi (Blue Lock)",
+    "Sae Itoshi (Blue Lock)",
+    "Ryusei Shidou (Blue Lock)",
+    "Jyubei Aryu (Blue Lock)",
+    "Aoshi Tokimitsu (Blue Lock)",
+    "Gin Gagamaru (Blue Lock)",
+    "Ikki Niko (Blue Lock)",
+    "Raichi Jingo (Blue Lock)",
+    "Gurimu Igarashi (Blue Lock)",
+    "Asahi Naruhaya (Blue Lock)",
+    "Wataru Kuon (Blue Lock)",
+    "Yudai Imamura (Blue Lock)",
+    "Junichi Wanima (Blue Lock)",
+    "Edward Elric (Fullmetal Alchemist)",
+    "Alphonse Elric (Fullmetal Alchemist)",
+    "Winry Rockbell (Fullmetal Alchemist)",
+    "Pinako Rockbell (Fullmetal Alchemist)",
+    "Van Hohenheim (Fullmetal Alchemist)",
+    "Trisha Elric (Fullmetal Alchemist)",
+    "Roy Mustang (Fullmetal Alchemist)",
+    "Riza Hawkeye (Fullmetal Alchemist)",
+    "Jean Havoc (Fullmetal Alchemist)",
+    "Heymans Breda (Fullmetal Alchemist)",
+    "Vato Falman (Fullmetal Alchemist)",
+    "Kain Fuery (Fullmetal Alchemist)",
+    "Maes Hughes (Fullmetal Alchemist)",
+    "Gracia Hughes (Fullmetal Alchemist)",
+    "Elicia Hughes (Fullmetal Alchemist)",
+    "Alex Louis Armstrong (Fullmetal Alchemist)",
+    "Olivier Mira Armstrong (Fullmetal Alchemist)",
+    "Buccaneer (Fullmetal Alchemist)",
+    "Miles (Fullmetal Alchemist)",
+    "Grumman (Fullmetal Alchemist)",
+    "Denji (Chainsaw Man)",
+    "Pochita (Chainsaw Man)",
+    "Power (Chainsaw Man)",
+    "Aki Hayakawa (Chainsaw Man)",
+    "Makima (Chainsaw Man)",
+    "Kobeni Higashiyama (Chainsaw Man)",
+    "Himeno (Chainsaw Man)",
+    "Kishibe (Chainsaw Man)",
+    "Hirokazu Arai (Chainsaw Man)",
+    "Madoka (Chainsaw Man)",
+    "Reze (Chainsaw Man)",
+    "Beam (Chainsaw Man)",
+    "Angel Devil (Chainsaw Man)",
+    "Violence Fiend (Chainsaw Man)",
+    "Galgali (Chainsaw Man)",
+    "Princi (Chainsaw Man)",
+    "Future Devil (Chainsaw Man)",
+    "Curse Devil (Chainsaw Man)",
+    "Fox Devil (Chainsaw Man)",
+    "Ghost Devil (Chainsaw Man)",
+    "Yugo (Wakfu)",
+    "Tristepin de Percedal (Wakfu)",
+    "Amalia Sheran Sharm (Wakfu)",
+    "Evangelyne (Wakfu)",
+    "Ruel Stroud (Wakfu)",
+    "Adamai (Wakfu)",
+    "Az (Wakfu)",
+    "Grougaloragran (Wakfu)",
+    "Alibert (Wakfu)",
+    "Qilby (Wakfu)",
+    "Shinonome (Wakfu)",
+    "Phaeris (Wakfu)",
+    "Chibi (Wakfu)",
+    "Mina (Wakfu)",
+    "Glip (Wakfu)",
+    "Baltazar (Wakfu)",
+    "Nox (Wakfu)",
+    "Oropo (Wakfu)",
+    "Echo (Wakfu)",
+    "Harebourg (Wakfu)",
+    "Tanjiro Kamado (Demon Slayer)",
+    "Nezuko Kamado (Demon Slayer)",
+    "Zenitsu Agatsuma (Demon Slayer)",
+    "Inosuke Hashibira (Demon Slayer)",
+    "Kanao Tsuyuri (Demon Slayer)",
+    "Genya Shinazugawa (Demon Slayer)",
+    "Murata (Demon Slayer)",
+    "Aoi Kanzaki (Demon Slayer)",
+    "Giyu Tomioka (Demon Slayer)",
+    "Kyojuro Rengoku (Demon Slayer)",
+    "Tengen Uzui (Demon Slayer)",
+    "Shinobu Kocho (Demon Slayer)",
+    "Mitsuri Kanroji (Demon Slayer)",
+    "Muichiro Tokito (Demon Slayer)",
+    "Sanemi Shinazugawa (Demon Slayer)",
+    "Gyomei Himejima (Demon Slayer)",
+    "Obanai Iguro (Demon Slayer)",
+    "Kanae Kocho (Demon Slayer)",
+    "Kagaya Ubuyashiki (Demon Slayer)",
+    "Amane Ubuyashiki (Demon Slayer)",
+    "Pikachu (Pokémon)",
+    "Raichu (Pokémon)",
+    "Bulbasaur (Pokémon)",
+    "Ivysaur (Pokémon)",
+    "Venusaur (Pokémon)",
+    "Charmander (Pokémon)",
+    "Charmeleon (Pokémon)",
+    "Charizard (Pokémon)",
+    "Squirtle (Pokémon)",
+    "Wartortle (Pokémon)",
+    "Blastoise (Pokémon)",
+    "Caterpie (Pokémon)",
+    "Butterfree (Pokémon)",
+    "Pidgeot (Pokémon)",
+    "Rattata (Pokémon)",
+    "Spearow (Pokémon)",
+    "Ekans (Pokémon)",
+    "Arbok (Pokémon)",
+    "Sandshrew (Pokémon)",
+    "Nidoran (Pokémon)",
+    "Goku (Dragon Ball)",
+    "Vegeta (Dragon Ball)",
+    "Gohan (Dragon Ball)",
+    "Goten (Dragon Ball)",
+    "Trunks (Dragon Ball)",
+    "Future Trunks (Dragon Ball)",
+    "Piccolo (Dragon Ball)",
+    "Krillin (Dragon Ball)",
+    "Tien Shinhan (Dragon Ball)",
+    "Chiaotzu (Dragon Ball)",
+    "Yamcha (Dragon Ball)",
+    "Master Roshi (Dragon Ball)",
+    "Bulma (Dragon Ball)",
+    "Chi-Chi (Dragon Ball)",
+    "Videl (Dragon Ball)",
+    "Pan (Dragon Ball)",
+    "Mr. Satan (Dragon Ball)",
+    "Majin Buu (Dragon Ball)",
+    "Uub (Dragon Ball)",
+    "Bardock (Dragon Ball)",
+    "Gabimaru (Hell's Paradise)",
+    "Yamada Asaemon Sagiri (Hell's Paradise)",
+    "Yuzuriha (Hell's Paradise)",
+    "Aza Chobei (Hell's Paradise)",
+    "Aza Toma (Hell's Paradise)",
+    "Tamiya Gantetsusai (Hell's Paradise)",
+    "Yamada Asaemon Fuchi (Hell's Paradise)",
+    "Yamada Asaemon Shion (Hell's Paradise)",
+    "Nurugai (Hell's Paradise)",
+    "Yamada Asaemon Tenza (Hell's Paradise)",
+    "Yamada Asaemon Senta (Hell's Paradise)",
+    "Yamada Asaemon Eizen (Hell's Paradise)",
+    "Yamada Asaemon Genji (Hell's Paradise)",
+    "Yamada Asaemon Kisho (Hell's Paradise)",
+    "Yamada Asaemon Jikka (Hell's Paradise)",
+    "Yamada Asaemon Shugen (Hell's Paradise)",
+    "Isuzu (Hell's Paradise)",
+    "Kiyomaru (Hell's Paradise)",
+    "Mei (Hell's Paradise)",
+    "Rien (Hell's Paradise)",
+    "Rudo (Gachiakuta)",
+    "Enjin (Gachiakuta)",
+    "Zanka (Gachiakuta)",
+    "Riyo (Gachiakuta)",
+    "Tamsy (Gachiakuta)",
+    "Delmon (Gachiakuta)",
+    "Bro (Gachiakuta)",
+    "Dear (Gachiakuta)",
+    "Guita (Gachiakuta)",
+    "Gris (Gachiakuta)",
+    "Follo (Gachiakuta)",
+    "Tomme (Gachiakuta)",
+    "Corvus (Gachiakuta)",
+    "Semiu (Gachiakuta)",
+    "August (Gachiakuta)",
+    "Eishia (Gachiakuta)",
+    "Zodyl (Gachiakuta)",
+    "Jabber (Gachiakuta)",
+    "Cthoni (Gachiakuta)",
+    "Noerde (Gachiakuta)",
+    "Shoyo Hinata (Haikyuu)",
+    "Tobio Kageyama (Haikyuu)",
+    "Kei Tsukishima (Haikyuu)",
+    "Tadashi Yamaguchi (Haikyuu)",
+    "Daichi Sawamura (Haikyuu)",
+    "Koshi Sugawara (Haikyuu)",
+    "Asahi Azumane (Haikyuu)",
+    "Yu Nishinoya (Haikyuu)",
+    "Ryunosuke Tanaka (Haikyuu)",
+    "Chikara Ennoshita (Haikyuu)",
+    "Hisashi Kinoshita (Haikyuu)",
+    "Kazuhito Narita (Haikyuu)",
+    "Kiyoko Shimizu (Haikyuu)",
+    "Hitoka Yachi (Haikyuu)",
+    "Ittetsu Takeda (Haikyuu)",
+    "Keishin Ukai (Haikyuu)",
+    "Toru Oikawa (Haikyuu)",
+    "Hajime Iwaizumi (Haikyuu)",
+    "Issei Matsukawa (Haikyuu)",
+    "Takahiro Hanamaki (Haikyuu)",
+    "Yuji Itadori (Jujutsu Kaisen)",
+    "Megumi Fushiguro (Jujutsu Kaisen)",
+    "Nobara Kugisaki (Jujutsu Kaisen)",
+    "Satoru Gojo (Jujutsu Kaisen)",
+    "Yuta Okkotsu (Jujutsu Kaisen)",
+    "Maki Zenin (Jujutsu Kaisen)",
+    "Toge Inumaki (Jujutsu Kaisen)",
+    "Panda (Jujutsu Kaisen)",
+    "Masamichi Yaga (Jujutsu Kaisen)",
+    "Kento Nanami (Jujutsu Kaisen)",
+    "Shoko Ieiri (Jujutsu Kaisen)",
+    "Kiyotaka Ijichi (Jujutsu Kaisen)",
+    "Atsuya Kusakabe (Jujutsu Kaisen)",
+    "Aoi Todo (Jujutsu Kaisen)",
+    "Mai Zenin (Jujutsu Kaisen)",
+    "Kasumi Miwa (Jujutsu Kaisen)",
+    "Kokichi Muta (Jujutsu Kaisen)",
+    "Mechamaru (Jujutsu Kaisen)",
+    "Noritoshi Kamo (Jujutsu Kaisen)",
+    "Momo Nishimiya (Jujutsu Kaisen)",
+    "Jonathan Joestar (JoJo's Bizarre Adventure)",
+    "Joseph Joestar (JoJo's Bizarre Adventure)",
+    "Jotaro Kujo (JoJo's Bizarre Adventure)",
+    "Josuke Higashikata (JoJo's Bizarre Adventure)",
+    "Giorno Giovanna (JoJo's Bizarre Adventure)",
+    "Jolyne Cujoh (JoJo's Bizarre Adventure)",
+    "Johnny Joestar (JoJo's Bizarre Adventure)",
+    "Josuke Higashikata Gappy (JoJo's Bizarre Adventure)",
+    "Dio Brando (JoJo's Bizarre Adventure)",
+    "Robert E. O. Speedwagon (JoJo's Bizarre Adventure)",
+    "Will A. Zeppeli (JoJo's Bizarre Adventure)",
+    "Erina Pendleton (JoJo's Bizarre Adventure)",
+    "Dire (JoJo's Bizarre Adventure)",
+    "Straizo (JoJo's Bizarre Adventure)",
+    "Caesar Zeppeli (JoJo's Bizarre Adventure)",
+    "Lisa Lisa (JoJo's Bizarre Adventure)",
+    "Rudol von Stroheim (JoJo's Bizarre Adventure)",
+    "Santana (JoJo's Bizarre Adventure)",
+    "Wamuu (JoJo's Bizarre Adventure)",
+    "Esidisi (JoJo's Bizarre Adventure)",
+    "Rimuru Tempest (Tensura)",
+    "Veldora Tempest (Tensura)",
+    "Shizue Izawa (Tensura)",
+    "Benimaru (Tensura)",
+    "Shuna (Tensura)",
+    "Shion (Tensura)",
+    "Souei (Tensura)",
+    "Hakuro (Tensura)",
+    "Kurobe (Tensura)",
+    "Gobta (Tensura)",
+    "Rigurd (Tensura)",
+    "Rigur (Tensura)",
+    "Ranga (Tensura)",
+    "Geld (Tensura)",
+    "Gabiru (Tensura)",
+    "Diablo (Tensura)",
+    "Testarossa (Tensura)",
+    "Carrera (Tensura)",
+    "Ultima (Tensura)",
+    "Zegion (Tensura)",
+    "Saitama (One Punch Man)",
+    "Genos (One Punch Man)",
+    "King (One Punch Man)",
+    "Tatsumaki (One Punch Man)",
+    "Fubuki (One Punch Man)",
+    "Bang (One Punch Man)",
+    "Bomb (One Punch Man)",
+    "Blast (One Punch Man)",
+    "Mumen Rider (One Punch Man)",
+    "Atomic Samurai (One Punch Man)",
+    "Child Emperor (One Punch Man)",
+    "Metal Knight (One Punch Man)",
+    "Zombieman (One Punch Man)",
+    "Drive Knight (One Punch Man)",
+    "Pig God (One Punch Man)",
+    "Superalloy Darkshine (One Punch Man)",
+    "Watchdog Man (One Punch Man)",
+    "Flashy Flash (One Punch Man)",
+    "Tanktop Master (One Punch Man)",
+    "Metal Bat (One Punch Man)",
+    "Kirito (Sword Art Online)",
+    "Kazuto Kirigaya (Sword Art Online)",
+    "Asuna Yuuki (Sword Art Online)",
+    "Leafa (Sword Art Online)",
+    "Suguha Kirigaya (Sword Art Online)",
+    "Sinon (Sword Art Online)",
+    "Shino Asada (Sword Art Online)",
+    "Klein (Sword Art Online)",
+    "Agil (Sword Art Online)",
+    "Yui (Sword Art Online)",
+    "Silica (Sword Art Online)",
+    "Lisbeth (Sword Art Online)",
+    "Sachi (Sword Art Online)",
+    "Argo (Sword Art Online)",
+    "Diavel (Sword Art Online)",
+    "Kibaou (Sword Art Online)",
+    "Heathcliff (Sword Art Online)",
+    "Akihiko Kayaba (Sword Art Online)",
+    "Yuuki Konno (Sword Art Online)",
+    "Sakuya (Sword Art Online)",
+    "Ken Kaneki (Tokyo Ghoul)",
+    "Touka Kirishima (Tokyo Ghoul)",
+    "Rize Kamishiro (Tokyo Ghoul)",
+    "Hideyoshi Nagachika (Tokyo Ghoul)",
+    "Nishiki Nishio (Tokyo Ghoul)",
+    "Kimi Nishino (Tokyo Ghoul)",
+    "Hinami Fueguchi (Tokyo Ghoul)",
+    "Yoshimura (Tokyo Ghoul)",
+    "Eto Yoshimura (Tokyo Ghoul)",
+    "Ayato Kirishima (Tokyo Ghoul)",
+    "Renji Yomo (Tokyo Ghoul)",
+    "Shu Tsukiyama (Tokyo Ghoul)",
+    "Uta (Tokyo Ghoul)",
+    "Itori (Tokyo Ghoul)",
+    "Roma Hoito (Tokyo Ghoul)",
+    "Kaya Irimi (Tokyo Ghoul)",
+    "Enji Koma (Tokyo Ghoul)",
+    "Kishou Arima (Tokyo Ghoul)",
+    "Juuzou Suzuya (Tokyo Ghoul)",
+    "Kotaro Amon (Tokyo Ghoul)",
+    "Takemichi Hanagaki (Tokyo Revengers)",
+    "Manjiro Sano (Tokyo Revengers)",
+    "Mikey (Tokyo Revengers)",
+    "Ken Ryuguji (Tokyo Revengers)",
+    "Draken (Tokyo Revengers)",
+    "Keisuke Baji (Tokyo Revengers)",
+    "Chifuyu Matsuno (Tokyo Revengers)",
+    "Takashi Mitsuya (Tokyo Revengers)",
+    "Kazutora Hanemiya (Tokyo Revengers)",
+    "Haruki Hayashida (Tokyo Revengers)",
+    "Pah-chin (Tokyo Revengers)",
+    "Ryohei Hayashi (Tokyo Revengers)",
+    "Peh-yan (Tokyo Revengers)",
+    "Nahoya Kawata (Tokyo Revengers)",
+    "Smiley (Tokyo Revengers)",
+    "Souya Kawata (Tokyo Revengers)",
+    "Angry (Tokyo Revengers)",
+    "Hakkai Shiba (Tokyo Revengers)",
+    "Atsushi Sendo (Tokyo Revengers)",
+    "Akkun (Tokyo Revengers)"
+);
 
 /* ================= Rolland Garos : listes de personnages ================= */
 
@@ -2797,14 +4701,1329 @@ const CLOVER_RAW = `1. Acier Silva
 196. Zogratis siblings
 197. Zora Ideale`;
 
+const RG_HXH_RAW = `Gon Freecss
+Killua Zoldyck
+Kurapika
+Leorio Paradinight
+Hisoka Morow
+Illumi Zoldyck
+Ging Freecss
+Kite
+Biscuit Krueger
+Isaac Netero
+Zeno Zoldyck
+Silva Zoldyck
+Kikyo Zoldyck
+Milluki Zoldyck
+Alluka Zoldyck
+Nanika
+Kalluto Zoldyck
+Gotoh
+Canary
+Tsubone
+Amane
+Satotz
+Menchi
+Buhara
+Lippo
+Hanzo
+Pokkle
+Ponzu
+Tonpa
+Bodoro
+Geretta
+Melody
+Basho
+Squala
+Baise
+Dalzollene
+Neon Nostrade
+Light Nostrade
+Chrollo Lucilfer
+Nobunaga Hazama
+Feitan Portor
+Machi Komacine
+Phinks Magcub
+Franklin Bordeau
+Shizuku Murasaki
+Bonolenov Ndongo
+Pakunoda
+Uvogin
+Shalnark
+Kortopi
+Razor
+Genthru
+Sub
+Bara
+Tsezguerra
+Goreinu
+Abengane
+Meruem
+Neferpitou
+Shaiapouf
+Menthuthuyoupi
+Colt
+Reina
+Cheetu
+Leol
+Welfin
+Bloster
+Ikalgo
+Meleoron
+Zazan
+Pike
+Rammot
+Morel Mackernasey
+Knov
+Knuckle Bine
+Shoot McMahon
+Palm Siberia
+Komugi
+Gyro`;
+
+const RG_SNK_RAW = `Eren Jäger
+Mikasa Ackerman
+Armin Arlert
+Levi Ackerman
+Erwin Smith
+Hange Zoë
+Jean Kirstein
+Connie Springer
+Sasha Blouse
+Historia Reiss
+Ymir
+Reiner Braun
+Bertholdt Hoover
+Annie Leonhart
+Marco Bott
+Floch Forster
+Petra Ral
+Oluo Bozado
+Eld Jinn
+Gunther Schultz
+Miche Zacharius
+Nanaba
+Moblit Berner
+Keith Shadis
+Dot Pixis
+Nile Dok
+Darius Zackly
+Kenny Ackerman
+Rod Reiss
+Frieda Reiss
+Uri Reiss
+Grisha Jäger
+Carla Jäger
+Dina Fritz
+Eren Kruger
+Zeke Jäger
+Pieck Finger
+Porco Galliard
+Marcel Galliard
+Gabi Braun
+Falco Grice
+Colt Grice
+Theo Magath
+Yelena
+Onyankopon
+Niccolo
+Willy Tybur
+Lara Tybur
+Ymir Fritz`;
+
+const RG_DEATHNOTE_RAW = `Light Yagami
+L Lawliet
+Misa Amane
+Ryuk
+Rem
+Near
+Mello
+Soichiro Yagami
+Sachiko Yagami
+Sayu Yagami
+Touta Matsuda
+Shuichi Aizawa
+Kanzo Mogi
+Hideki Ide
+Hirokazu Ukita
+Watari
+Teru Mikami
+Kiyomi Takada
+Naomi Misora
+Raye Penber
+Kyosuke Higuchi
+Reiji Namikawa
+Wedy
+Aiber
+Matt
+Sidoh
+Gelus`;
+
+const RG_COTE_RAW = `Kiyotaka Ayanokoji
+Suzune Horikita
+Manabu Horikita
+Kikyo Kushida
+Kei Karuizawa
+Yosuke Hirata
+Ken Sudo
+Kanji Ike
+Haruki Yamauchi
+Airi Sakura
+Akito Miyake
+Haruka Hasebe
+Keisei Yukimura
+Chiaki Matsushita
+Maya Sato
+Kokoro Inogashira
+Rokusuke Koenji
+Arisu Sakayanagi
+Kohei Katsuragi
+Masayoshi Hashimoto
+Masumi Kamuro
+Kakeru Ryuen
+Mio Ibuki
+Albert Yamada
+Daichi Ishizaki
+Hiyori Shiina
+Honami Ichinose
+Ryuji Kanzaki
+Chie Hoshinomiya
+Sae Chabashira
+Miyabi Nagumo
+Takuya Yagami
+Ichika Amasawa
+Nanase Tsubasa
+Kazuomi Hosen
+Fuka Kiryuin`;
+
+const RG_SOLO_RAW = `Sung Jinwoo
+Sung Jinah
+Park Kyung-Hye
+Yoo Jinho
+Cha Hae-In
+Lee Joohee
+Song Chi-Yul
+Kim Sangshik
+Hwang Dongsuk
+Kang Taeshik
+Hwang Dongsoo
+Baek Yoonho
+Choi Jong-In
+Woo Jinchul
+Go Gunhee
+Lim Tae-Gyu
+Ma Dongwook
+Min Byung-Gyu
+Thomas Andre
+Liu Zhigang
+Christopher Reed
+Siddharth Bachchan
+Norma Selner
+Igris
+Beru
+Bellion
+Tusk
+Iron
+Tank
+Greed
+Kaisel
+Ashborn
+Antares
+Baran
+Rakan
+Sillad
+Querehsha
+Tarnak
+Legia
+Yogumunt
+Architect
+Kandiaru
+Esil Radiru
+Kamish`;
+
+const RG_FIREFORCE_RAW = `Shinra Kusakabe
+Arthur Boyle
+Maki Oze
+Tamaki Kotatsu
+Akitaru Obi
+Takehisa Hinawa
+Iris
+Viktor Licht
+Vulcan Joseph
+Lisa Isaribe
+Yu
+Benimaru Shinmon
+Konro Sagamiya
+Hibana
+Karim Flam
+Rekka Hoshimiya
+Leonard Burns
+Ogun Montgomery
+Pan Ko Paat
+Joker
+Sho Kusakabe
+Haumea
+Charon
+Arrow
+Inca Kasugatani
+Ritsu
+Yona
+Assault
+Dragon
+Giovanni
+Nataku Son
+Kurono Yuichiro
+Amaterasu`;
+
+const RG_MUSHOKU_RAW = `Rudeus Greyrat
+Roxy Migurdia
+Sylphiette
+Eris Boreas Greyrat
+Paul Greyrat
+Zenith Greyrat
+Lilia Greyrat
+Norn Greyrat
+Aisha Greyrat
+Ruijerd Superdia
+Ghislaine Dedoldia
+Orsted
+Nanahoshi Shizuka
+Hitogami
+Kishirika Kishirisu
+Badigadi
+Atofe
+Ariel Anemoi Asura
+Luke Notos Greyrat
+Cliff Grimoire
+Zanoba Shirone
+Julie
+Elinalise Dragonroad
+Talhand
+Geese Nukadia
+Philip Boreas Greyrat
+Hilda Boreas Greyrat
+Sauros Boreas Greyrat
+Perugius Dola
+Almanfi
+Soldat Heckler
+Sara
+Linia Dedoldia
+Pursena Adoldia
+Pax Shirone
+Randolph Marianne`;
+
+const RG_REZERO_RAW = `Subaru Natsuki
+Emilia
+Rem
+Ram
+Beatrice
+Roswaal L. Mathers
+Puck
+Otto Suwen
+Garfiel Tinsel
+Frederica Baumann
+Petra Leyte
+Patrasche
+Reinhard van Astrea
+Felt
+Crusch Karsten
+Felix Argyle
+Wilhelm van Astrea
+Theresia van Astrea
+Anastasia Hoshin
+Julius Juukulius
+Ricardo Welkin
+Mimi
+Hetaro
+Tivey
+Priscilla Barielle
+Al
+Echidna
+Satella
+Minerva
+Typhon
+Daphne
+Sekhmet
+Carmilla
+Pandora
+Petelgeuse Romanee-Conti
+Regulus Corneas
+Sirius Romanee-Conti
+Capella Emerada Lugunica
+Lye Batenkaitos
+Roy Alphard
+Louis Arneb
+Elsa Granhiert
+Meili Portroute`;
+
+const RG_BLUELOCK_RAW = `Yoichi Isagi
+Meguru Bachira
+Rensuke Kunigami
+Hyoma Chigiri
+Shoei Barou
+Seishiro Nagi
+Reo Mikage
+Rin Itoshi
+Sae Itoshi
+Ryusei Shidou
+Jyubei Aryu
+Aoshi Tokimitsu
+Gin Gagamaru
+Ikki Niko
+Raichi Jingo
+Gurimu Igarashi
+Asahi Naruhaya
+Wataru Kuon
+Yudai Imamura
+Junichi Wanima
+Keisuke Wanima
+Tabito Karasu
+Eita Otoya
+Kenyu Yukimiya
+Yo Hiori
+Ranze Kurona
+Nijiro Nanase
+Kiyora Jin
+Oliver Aiku
+Shuto Sendou
+Miroku Darai
+Teppei Neru
+Kazuma Niou
+Gen Fukaku
+Michael Kaiser
+Alexis Ness
+Don Lorenzo
+Charles Chevalier
+Noel Noa
+Julian Loki
+Lavinho
+Chris Prince
+Marc Snuffy
+Jinpachi Ego
+Anri Teieri`;
+
+const RG_FMA_RAW = `Edward Elric
+Alphonse Elric
+Winry Rockbell
+Pinako Rockbell
+Van Hohenheim
+Trisha Elric
+Roy Mustang
+Riza Hawkeye
+Jean Havoc
+Heymans Breda
+Vato Falman
+Kain Fuery
+Maes Hughes
+Gracia Hughes
+Elicia Hughes
+Alex Louis Armstrong
+Olivier Mira Armstrong
+Buccaneer
+Miles
+Grumman
+Basque Grand
+Scar
+May Chang
+Ling Yao
+Lan Fan
+Fu
+Yoki
+Tim Marcoh
+Izumi Curtis
+Sig Curtis
+Father
+Pride
+Selim Bradley
+Wrath
+King Bradley
+Greed
+Lust
+Envy
+Gluttony
+Sloth
+Shou Tucker
+Nina Tucker
+Alexander
+Barry the Chopper
+Maria Ross
+Denny Brosh`;
+
+const RG_CHAINSAW_RAW = `Denji
+Pochita
+Power
+Aki Hayakawa
+Makima
+Kobeni Higashiyama
+Himeno
+Kishibe
+Hirokazu Arai
+Madoka
+Reze
+Beam
+Angel Devil
+Violence Fiend
+Galgali
+Princi
+Future Devil
+Curse Devil
+Fox Devil
+Ghost Devil
+Katana Man
+Akane Sawatari
+Quanxi
+Cosmo
+Pingtsi
+Long
+Tsugihagi
+Santa Claus
+Tolka
+Aldo
+Asa Mitaka
+Yoru
+Nayuta
+Hirofumi Yoshida
+Fami
+Haruka Iseumi
+Seigi Akoku
+Nobana Higashiyama
+Barem Bridge
+Miri Sugo
+Whip Hybrid
+Spear Hybrid`;
+
+const RG_WAKFU_RAW = `Yugo
+Tristepin de Percedal
+Amalia Sheran Sharm
+Evangelyne
+Ruel Stroud
+Adamai
+Az
+Grougaloragran
+Alibert
+Qilby
+Shinonome
+Phaeris
+Chibi
+Mina
+Glip
+Baltazar
+Nox
+Oropo
+Echo
+Harebourg
+Ush Galesh
+Black Bump
+Goultard
+Rubilax
+Elely
+Flopin
+Pin
+Joris Jurgen
+Kerubim Crepin
+Atcham
+Remington Smisse
+Grany Smisse
+Maskemane
+Kabrok
+Miranda
+Armand Sheran Sharm
+Aurora
+Moon`;
+
+const RG_DEMONSLAYER_RAW = `Tanjiro Kamado
+Nezuko Kamado
+Zenitsu Agatsuma
+Inosuke Hashibira
+Kanao Tsuyuri
+Genya Shinazugawa
+Murata
+Aoi Kanzaki
+Giyu Tomioka
+Kyojuro Rengoku
+Tengen Uzui
+Shinobu Kocho
+Mitsuri Kanroji
+Muichiro Tokito
+Sanemi Shinazugawa
+Gyomei Himejima
+Obanai Iguro
+Kanae Kocho
+Kagaya Ubuyashiki
+Amane Ubuyashiki
+Sakonji Urokodaki
+Sabito
+Makomo
+Jigoro Kuwajima
+Shinjuro Rengoku
+Senjuro Rengoku
+Muzan Kibutsuji
+Kokushibo
+Doma
+Akaza
+Hantengu
+Gyokko
+Gyutaro
+Daki
+Nakime
+Kaigaku
+Enmu
+Rui
+Kyogai
+Susamaru
+Yahaba
+Tamayo
+Yushiro
+Yoriichi Tsugikuni
+Michikatsu Tsugikuni`;
+
+const RG_POKEMON_RAW = `Pikachu
+Raichu
+Bulbasaur
+Ivysaur
+Venusaur
+Charmander
+Charmeleon
+Charizard
+Squirtle
+Wartortle
+Blastoise
+Caterpie
+Butterfree
+Pidgeot
+Rattata
+Spearow
+Ekans
+Arbok
+Sandshrew
+Nidoran
+Clefairy
+Vulpix
+Jigglypuff
+Zubat
+Oddish
+Paras
+Venonat
+Diglett
+Meowth
+Psyduck
+Mankey
+Growlithe
+Poliwag
+Abra
+Machop
+Bellsprout
+Tentacool
+Geodude
+Ponyta
+Slowpoke
+Magnemite
+Farfetch'd
+Doduo
+Seel
+Grimer
+Shellder
+Gastly
+Haunter
+Gengar
+Onix
+Drowzee
+Krabby
+Voltorb
+Exeggcute
+Cubone
+Hitmonlee
+Hitmonchan
+Lickitung
+Koffing
+Rhyhorn
+Chansey
+Tangela
+Kangaskhan
+Horsea
+Goldeen
+Staryu
+Mr. Mime
+Scyther
+Jynx
+Electabuzz
+Magmar
+Pinsir
+Tauros
+Magikarp
+Gyarados
+Lapras
+Ditto
+Eevee
+Vaporeon
+Jolteon
+Flareon
+Porygon
+Omanyte
+Kabuto
+Aerodactyl
+Snorlax
+Articuno
+Zapdos
+Moltres
+Dratini
+Dragonair
+Dragonite
+Mewtwo
+Mew
+Lugia
+Ho-Oh
+Celebi
+Groudon
+Kyogre
+Rayquaza
+Jirachi
+Deoxys
+Dialga
+Palkia
+Giratina
+Arceus
+Reshiram
+Zekrom
+Kyurem
+Xerneas
+Yveltal
+Zygarde
+Solgaleo
+Lunala
+Necrozma
+Zacian
+Zamazenta
+Eternatus
+Koraidon
+Miraidon
+Ash Ketchum
+Misty
+Brock
+Gary Oak
+Professor Oak
+Jessie
+James
+Giovanni
+Tracey
+May
+Max
+Dawn
+Iris
+Cilan
+Serena
+Clemont
+Bonnie
+Lillie
+Kiawe
+Lana
+Mallow
+Sophocles
+Goh
+Leon
+Cynthia
+Steven Stone
+Lance
+Diantha
+Alder
+Raihan
+Paul
+Alain`;
+
+const RG_DRAGONBALL_RAW = `Goku
+Vegeta
+Gohan
+Goten
+Trunks
+Future Trunks
+Piccolo
+Krillin
+Tien Shinhan
+Chiaotzu
+Yamcha
+Master Roshi
+Bulma
+Chi-Chi
+Videl
+Pan
+Mr. Satan
+Majin Buu
+Uub
+Bardock
+Gine
+Raditz
+Nappa
+King Vegeta
+Tarble
+Frieza
+King Cold
+Cooler
+Zarbon
+Dodoria
+Captain Ginyu
+Jeice
+Burter
+Recoome
+Guldo
+Android 16
+Android 17
+Android 18
+Android 19
+Dr. Gero
+Cell
+Babidi
+Dabura
+Supreme Kai
+Kibito
+Beerus
+Whis
+Champa
+Vados
+Zeno
+Grand Priest
+Hit
+Cabba
+Caulifla
+Kale
+Kefla
+Frost
+Botamo
+Magetta
+Jiren
+Toppo
+Dyspo
+Goku Black
+Zamasu
+Fused Zamasu
+Broly
+Paragus
+Gogeta
+Vegito
+Gotenks
+Moro
+Merus
+Granolah
+Gas
+Elec`;
+
+const RG_HELLSPARADISE_RAW = `Gabimaru
+Yamada Asaemon Sagiri
+Yuzuriha
+Aza Chobei
+Aza Toma
+Tamiya Gantetsusai
+Yamada Asaemon Fuchi
+Yamada Asaemon Shion
+Nurugai
+Yamada Asaemon Tenza
+Yamada Asaemon Senta
+Yamada Asaemon Eizen
+Yamada Asaemon Genji
+Yamada Asaemon Kisho
+Yamada Asaemon Jikka
+Yamada Asaemon Shugen
+Isuzu
+Kiyomaru
+Mei
+Rien
+Zhu Jin
+Mu Dan
+Ju Fa
+Tao Fa
+Gui Fa`;
+
+const RG_GACHIAKUTA_RAW = `Rudo
+Enjin
+Zanka
+Riyo
+Tamsy
+Delmon
+Bro
+Dear
+Guita
+Gris
+Follo
+Tomme
+Corvus
+Semiu
+August
+Eishia
+Zodyl
+Jabber
+Cthoni
+Noerde
+Fu
+Bundus
+Regto
+Chiwa
+Alice
+Remlin
+Amo`;
+
+const RG_HAIKYUU_RAW = `Shoyo Hinata
+Tobio Kageyama
+Kei Tsukishima
+Tadashi Yamaguchi
+Daichi Sawamura
+Koshi Sugawara
+Asahi Azumane
+Yu Nishinoya
+Ryunosuke Tanaka
+Chikara Ennoshita
+Hisashi Kinoshita
+Kazuhito Narita
+Kiyoko Shimizu
+Hitoka Yachi
+Ittetsu Takeda
+Keishin Ukai
+Toru Oikawa
+Hajime Iwaizumi
+Issei Matsukawa
+Takahiro Hanamaki
+Shinji Watari
+Shigeru Yahaba
+Yutaro Kindaichi
+Akira Kunimi
+Tetsuro Kuroo
+Kenma Kozume
+Morisuke Yaku
+Nobuyuki Kai
+Taketora Yamamoto
+Shohei Fukunaga
+Lev Haiba
+So Inuoka
+Tamahiko Teshiro
+Kotaro Bokuto
+Keiji Akaashi
+Akinori Konoha
+Wakatoshi Ushijima
+Satori Tendo
+Tsutomu Goshiki
+Kenjiro Shirabu
+Eita Semi
+Reon Ohira
+Taichi Kawanishi
+Atsumu Miya
+Osamu Miya
+Shinsuke Kita
+Rintaro Suna
+Aran Ojiro
+Korai Hoshiumi
+Sachiro Hirugami
+Motoya Komori
+Kiyoomi Sakusa
+Takanobu Aone
+Kenji Futakuchi
+Kanji Koganegawa
+Yuji Terushima
+Suguru Daisho`;
+
+const RG_JJK_RAW = `Yuji Itadori
+Megumi Fushiguro
+Nobara Kugisaki
+Satoru Gojo
+Yuta Okkotsu
+Maki Zenin
+Toge Inumaki
+Panda
+Masamichi Yaga
+Kento Nanami
+Shoko Ieiri
+Kiyotaka Ijichi
+Atsuya Kusakabe
+Aoi Todo
+Mai Zenin
+Kasumi Miwa
+Kokichi Muta
+Mechamaru
+Noritoshi Kamo
+Momo Nishimiya
+Utahime Iori
+Yoshinobu Gakuganji
+Suguru Geto
+Kenjaku
+Toji Fushiguro
+Riko Amanai
+Misato Kuroi
+Yu Haibara
+Ryomen Sukuna
+Mahito
+Jogo
+Hanami
+Dagon
+Choso
+Eso
+Kechizu
+Uraume
+Mei Mei
+Ui Ui
+Yuki Tsukumo
+Tengen
+Naobito Zenin
+Naoya Zenin
+Ogi Zenin
+Jinichi Zenin
+Kinji Hakari
+Kirara Hoshi
+Hiromi Higuruma
+Fumihiko Takaba
+Hajime Kashimo
+Reggie Star
+Remi
+Rin Amai
+Iori Hazenoki
+Chizuru Hari
+Ryu Ishigori
+Takako Uro
+Dhruv Lakdawalla
+Kurourushi
+Hana Kurusu
+Angel
+Charles Bernard`;
+
+const RG_JOJO_RAW = `Jonathan Joestar
+Joseph Joestar
+Jotaro Kujo
+Josuke Higashikata
+Giorno Giovanna
+Jolyne Cujoh
+Johnny Joestar
+Josuke Higashikata Gappy
+Dio Brando
+Robert E. O. Speedwagon
+Will A. Zeppeli
+Erina Pendleton
+Dire
+Straizo
+Caesar Zeppeli
+Lisa Lisa
+Rudol von Stroheim
+Santana
+Wamuu
+Esidisi
+Kars
+Suzi Q
+Muhammad Avdol
+Noriaki Kakyoin
+Jean Pierre Polnareff
+Iggy
+Hol Horse
+Enya
+Vanilla Ice
+Oingo
+Boingo
+Mariah
+Pet Shop
+Koichi Hirose
+Okuyasu Nijimura
+Rohan Kishibe
+Yukako Yamagishi
+Shigekiyo Yangu
+Tonio Trussardi
+Akira Otoishi
+Reimi Sugimoto
+Yoshikage Kira
+Bruno Bucciarati
+Guido Mista
+Narancia Ghirga
+Leone Abbacchio
+Pannacotta Fugo
+Trish Una
+Diavolo
+Vinegar Doppio
+Risotto Nero
+Prosciutto
+Pesci
+Ghiaccio
+Melone
+Formaggio
+Illuso
+Ermes Costello
+Foo Fighters
+Weather Report
+Narciso Anasui
+Emporio Alnino
+Enrico Pucci
+Gyro Zeppeli
+Diego Brando
+Funny Valentine
+Hot Pants
+Lucy Steel`;
+
+const RG_TENSURA_RAW = `Rimuru Tempest
+Veldora Tempest
+Shizue Izawa
+Benimaru
+Shuna
+Shion
+Souei
+Hakuro
+Kurobe
+Gobta
+Rigurd
+Rigur
+Ranga
+Geld
+Gabiru
+Diablo
+Testarossa
+Carrera
+Ultima
+Zegion
+Apito
+Kumara
+Adalmann
+Milim Nava
+Ramiris
+Guy Crimson
+Luminous Valentine
+Leon Cromwell
+Dagruel
+Dino
+Frey
+Carrion
+Clayman
+Hinata Sakaguchi
+Chloe Aubert
+Yuuki Kagurazaka
+Kagali
+Laplace
+Tear
+Footman
+Velgrynd
+Velzard
+Treyni
+Beretta
+Kaijin
+Gazel Dwargo`;
+
+const RG_OPM_RAW = `Saitama
+Genos
+King
+Tatsumaki
+Fubuki
+Bang
+Bomb
+Blast
+Mumen Rider
+Atomic Samurai
+Child Emperor
+Metal Knight
+Zombieman
+Drive Knight
+Pig God
+Superalloy Darkshine
+Watchdog Man
+Flashy Flash
+Tanktop Master
+Metal Bat
+Puri-Puri Prisoner
+Amai Mask
+Iaian
+Okamaitachi
+Bushidrill
+Spring Mustachio
+Golden Ball
+Tanktop Tiger
+Tanktop Black Hole
+Speed-o'-Sound Sonic
+Garou
+Suiryu
+Boros
+Melzargard
+Geryuganshoop
+Groribas
+Orochi
+Psykos
+Gyoro Gyoro
+Black Sperm
+Homeless Emperor
+Elder Centipede
+Gouketsu
+Fuhrer Ugly
+Nyan
+Phoenix Man
+Deep Sea King
+Vaccine Man
+Carnage Kabuto
+Mosquito Girl
+Beast King
+Armored Gorilla
+Dr. Genus`;
+
+const RG_SAO_RAW = `Kirito
+Kazuto Kirigaya
+Asuna Yuuki
+Leafa
+Suguha Kirigaya
+Sinon
+Shino Asada
+Klein
+Agil
+Yui
+Silica
+Lisbeth
+Sachi
+Argo
+Diavel
+Kibaou
+Heathcliff
+Akihiko Kayaba
+Yuuki Konno
+Sakuya
+Alicia Rue
+Recon
+Oberon
+Nobuyuki Sugou
+Death Gun
+XaXa
+PoH
+Vassago Casals
+Eugeo
+Alice Zuberg
+Selka Zuberg
+Ronie Arabel
+Tiese Shtolienen
+Cardinal
+Administrator
+Quinella
+Chudelkin
+Bercouli Synthesis One
+Fanatio Synthesis Two
+Deusolbert
+Sheyta
+Iskahn
+Gabriel Miller`;
+
+const RG_TOKYOGHOUL_RAW = `Ken Kaneki
+Touka Kirishima
+Rize Kamishiro
+Hideyoshi Nagachika
+Nishiki Nishio
+Kimi Nishino
+Hinami Fueguchi
+Yoshimura
+Eto Yoshimura
+Ayato Kirishima
+Renji Yomo
+Shu Tsukiyama
+Uta
+Itori
+Roma Hoito
+Kaya Irimi
+Enji Koma
+Kishou Arima
+Juuzou Suzuya
+Kotaro Amon
+Akira Mado
+Kureo Mado
+Seidou Takizawa
+Yukinori Shinohara
+Iwao Kuroiwa
+Koori Ui
+Take Hirako
+Mougan Tanakamaru
+Yakumo Oomori
+Jason
+Naki
+Tatara
+Noro
+Donato Porpora
+Shachi
+Haise Sasaki
+Kuki Urie
+Ginshi Shirazu
+Tooru Mutsuki
+Saiko Yonebayashi
+Shinsanpei Aura
+Hairu Ihei
+Nimura Furuta
+Kanae von Rosewald
+Kurona Yasuhisa
+Nashiro Yasuhisa`;
+
+const RG_TOKYOREVENGERS_RAW = `Takemichi Hanagaki
+Manjiro Sano
+Mikey
+Ken Ryuguji
+Draken
+Keisuke Baji
+Chifuyu Matsuno
+Takashi Mitsuya
+Kazutora Hanemiya
+Haruki Hayashida
+Pah-chin
+Ryohei Hayashi
+Peh-yan
+Nahoya Kawata
+Smiley
+Souya Kawata
+Angry
+Hakkai Shiba
+Atsushi Sendo
+Akkun
+Takuya Yamamoto
+Makoto Suzuki
+Kazushi Yamagishi
+Hinata Tachibana
+Naoto Tachibana
+Emma Sano
+Shinichiro Sano
+Tetta Kisaki
+Shuji Hanma
+Nobutaka Osanai
+Taiju Shiba
+Yuzuha Shiba
+Seishu Inui
+Hajime Kokonoi
+Izana Kurokawa
+Kakucho
+Kanji Mochizuki
+Shion Madarame
+Ran Haitani
+Rindo Haitani
+Yasuhiro Muto
+Mucho
+Haruchiyo Sanzu
+South Terano
+Senju Kawaragi
+Takeomi Akashi
+Wakasa Imaushi
+Keizo Arashi
+Benkei`;
+
 const RG_UNIVERSES = {
-    naruto:   { name: 'Naruto',              raw: NARUTO_RAW },
-    onepiece: { name: 'One Piece',           raw: ONEPIECE_RAW },
-    bleach:   { name: 'Bleach',              raw: BLEACH_RAW },
-    sds:      { name: 'Seven Deadly Sins',   raw: SDS_RAW },
-    mha:      { name: 'My Hero Academia',    raw: MHA_RAW },
-    fairy:    { name: 'Fairy Tail',          raw: FAIRY_RAW },
-    clover:   { name: 'Black Clover',        raw: CLOVER_RAW },
+    naruto: { name: "Naruto", raw: NARUTO_RAW },
+    onepiece: { name: "One Piece", raw: ONEPIECE_RAW },
+    bleach: { name: "Bleach", raw: BLEACH_RAW },
+    hxh: { name: "Hunter x Hunter", raw: RG_HXH_RAW },
+    snk: { name: "SNK / L'Attaque des Titans", raw: RG_SNK_RAW },
+    sds: { name: "Seven Deadly Sins", raw: SDS_RAW },
+    deathnote: { name: "Death Note", raw: RG_DEATHNOTE_RAW },
+    cote: { name: "Classroom of the Elite", raw: RG_COTE_RAW },
+    solo: { name: "Solo Leveling", raw: RG_SOLO_RAW },
+    clover: { name: "Black Clover", raw: CLOVER_RAW },
+    fireforce: { name: "Fire Force", raw: RG_FIREFORCE_RAW },
+    mushoku: { name: "Mushoku Tensei", raw: RG_MUSHOKU_RAW },
+    rezero: { name: "Re:Zero", raw: RG_REZERO_RAW },
+    fairy: { name: "Fairy Tail", raw: FAIRY_RAW },
+    bluelock: { name: "Blue Lock", raw: RG_BLUELOCK_RAW },
+    fma: { name: "Fullmetal Alchemist", raw: RG_FMA_RAW },
+    chainsaw: { name: "Chainsaw Man", raw: RG_CHAINSAW_RAW },
+    wakfu: { name: "Wakfu", raw: RG_WAKFU_RAW },
+    demonslayer: { name: "Demon Slayer", raw: RG_DEMONSLAYER_RAW },
+    pokemon: { name: "Pokémon", raw: RG_POKEMON_RAW },
+    dragonball: { name: "Dragon Ball", raw: RG_DRAGONBALL_RAW },
+    hellsparadise: { name: "Hell's Paradise", raw: RG_HELLSPARADISE_RAW },
+    gachiakuta: { name: "Gachiakuta", raw: RG_GACHIAKUTA_RAW },
+    haikyuu: { name: "Haikyuu", raw: RG_HAIKYUU_RAW },
+    jjk: { name: "Jujutsu Kaisen", raw: RG_JJK_RAW },
+    jojo: { name: "JoJo's Bizarre Adventure", raw: RG_JOJO_RAW },
+    tensura: { name: "Tensura", raw: RG_TENSURA_RAW },
+    opm: { name: "One Punch Man", raw: RG_OPM_RAW },
+    sao: { name: "Sword Art Online", raw: RG_SAO_RAW },
+    tokyoghoul: { name: "Tokyo Ghoul", raw: RG_TOKYOGHOUL_RAW },
+    tokyorevengers: { name: "Tokyo Revengers", raw: RG_TOKYOREVENGERS_RAW },
 };
 
 /* ================= Rolland Garos : logique de partie ================= */
