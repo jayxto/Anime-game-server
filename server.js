@@ -314,1452 +314,1452 @@ const rgPools = {};    // roomCode -> { pool: string[], usedNorm: Set<string> }
 // Liste Undercover Normal (Paires)
 const undercoverPairsNormal = [
     [
-        "Naruto",
-        "Minato"
+        "Naruto (Naruto)",
+        "Minato (Naruto)"
     ],
     [
-        "Sasuke",
-        "Itachi"
+        "Sasuke (Naruto)",
+        "Itachi (Naruto)"
     ],
     [
-        "Sakura",
-        "Tsunade"
+        "Sakura (Naruto)",
+        "Tsunade (Naruto)"
     ],
     [
-        "Kakashi",
-        "Obito"
+        "Kakashi (Naruto)",
+        "Obito (Naruto)"
     ],
     [
-        "Jiraiya",
-        "Orochimaru"
+        "Jiraiya (Naruto)",
+        "Orochimaru (Naruto)"
     ],
     [
-        "Gaara",
-        "Sasori"
+        "Gaara (Naruto)",
+        "Sasori (Naruto)"
     ],
     [
-        "Madara",
-        "Hashirama"
+        "Madara (Naruto)",
+        "Hashirama (Naruto)"
     ],
     [
-        "Hinata",
-        "Neji"
+        "Hinata (Naruto)",
+        "Neji (Naruto)"
     ],
     [
-        "Shikamaru",
-        "Shikaku"
+        "Shikamaru (Naruto)",
+        "Shikaku (Naruto)"
     ],
     [
-        "Rock Lee",
-        "Might Guy"
+        "Rock Lee (Naruto)",
+        "Might Guy (Naruto)"
     ],
     [
-        "Pain",
-        "Konan"
+        "Pain (Naruto)",
+        "Konan (Naruto)"
     ],
     [
-        "Deidara",
-        "Sasori"
+        "Deidara (Naruto)",
+        "Sasori (Naruto)"
     ],
     [
-        "Kisame",
-        "Zabuza"
+        "Kisame (Naruto)",
+        "Zabuza (Naruto)"
     ],
     [
-        "Kurama",
-        "Shukaku"
+        "Kurama (Naruto)",
+        "Shukaku (Naruto)"
     ],
     [
-        "Rasengan",
-        "Chidori"
+        "Rasengan (Naruto)",
+        "Chidori (Naruto)"
     ],
     [
-        "Sharingan",
-        "Byakugan"
+        "Sharingan (Naruto)",
+        "Byakugan (Naruto)"
     ],
     [
-        "Amaterasu",
-        "Kamui"
+        "Amaterasu (Naruto)",
+        "Kamui (Naruto)"
     ],
     [
-        "Akatsuki",
-        "ANBU"
+        "Akatsuki (Naruto)",
+        "ANBU (Naruto)"
     ],
     [
-        "Konoha",
-        "Suna"
+        "Konoha (Naruto)",
+        "Suna (Naruto)"
     ],
     [
-        "Hokage",
-        "Kazekage"
+        "Hokage (Naruto)",
+        "Kazekage (Naruto)"
     ],
     [
-        "Luffy",
-        "Ace"
+        "Luffy (One Piece)",
+        "Ace (One Piece)"
     ],
     [
-        "Zoro",
-        "Mihawk"
+        "Zoro (One Piece)",
+        "Mihawk (One Piece)"
     ],
     [
-        "Sanji",
-        "Zeff"
+        "Sanji (One Piece)",
+        "Zeff (One Piece)"
     ],
     [
-        "Nami",
-        "Robin"
+        "Nami (One Piece)",
+        "Robin (One Piece)"
     ],
     [
-        "Usopp",
-        "Franky"
+        "Usopp (One Piece)",
+        "Franky (One Piece)"
     ],
     [
-        "Shanks",
-        "Roger"
+        "Shanks (One Piece)",
+        "Roger (One Piece)"
     ],
     [
-        "Garp",
-        "Sengoku"
+        "Garp (One Piece)",
+        "Sengoku (One Piece)"
     ],
     [
-        "Law",
-        "Kid"
+        "Law (One Piece)",
+        "Kid (One Piece)"
     ],
     [
-        "Kaido",
-        "Big Mom"
+        "Kaido (One Piece)",
+        "Big Mom (One Piece)"
     ],
     [
-        "Crocodile",
-        "Doflamingo"
+        "Crocodile (One Piece)",
+        "Doflamingo (One Piece)"
     ],
     [
-        "Akainu",
-        "Aokiji"
+        "Akainu (One Piece)",
+        "Aokiji (One Piece)"
     ],
     [
-        "Kizaru",
-        "Fujitora"
+        "Kizaru (One Piece)",
+        "Fujitora (One Piece)"
     ],
     [
-        "Sabo",
-        "Ace"
+        "Sabo (One Piece)",
+        "Ace (One Piece)"
     ],
     [
-        "Chopper",
-        "Bepo"
+        "Chopper (One Piece)",
+        "Bepo (One Piece)"
     ],
     [
-        "Vivi",
-        "Rebecca"
+        "Vivi (One Piece)",
+        "Rebecca (One Piece)"
     ],
     [
-        "Haki de l'armement",
-        "Haki de l'observation"
+        "Haki de l'armement (One Piece)",
+        "Haki de l'observation (One Piece)"
     ],
     [
-        "Gear 4",
-        "Gear 5"
+        "Gear 4 (One Piece)",
+        "Gear 5 (One Piece)"
     ],
     [
-        "Marine",
-        "Gouvernement Mondial"
+        "Marine (One Piece)",
+        "Gouvernement Mondial (One Piece)"
     ],
     [
-        "Grand Line",
-        "Nouveau Monde"
+        "Grand Line (One Piece)",
+        "Nouveau Monde (One Piece)"
     ],
     [
-        "Impel Down",
-        "Enies Lobby"
+        "Impel Down (One Piece)",
+        "Enies Lobby (One Piece)"
     ],
     [
-        "Ichigo",
-        "Uryu"
+        "Ichigo (Bleach)",
+        "Uryu (Bleach)"
     ],
     [
-        "Rukia",
-        "Renji"
+        "Rukia (Bleach)",
+        "Renji (Bleach)"
     ],
     [
-        "Byakuya",
-        "Toshiro"
+        "Byakuya (Bleach)",
+        "Toshiro (Bleach)"
     ],
     [
-        "Kenpachi",
-        "Unohana"
+        "Kenpachi (Bleach)",
+        "Unohana (Bleach)"
     ],
     [
-        "Aizen",
-        "Yhwach"
+        "Aizen (Bleach)",
+        "Yhwach (Bleach)"
     ],
     [
-        "Gin",
-        "Tosen"
+        "Gin (Bleach)",
+        "Tosen (Bleach)"
     ],
     [
-        "Grimmjow",
-        "Ulquiorra"
+        "Grimmjow (Bleach)",
+        "Ulquiorra (Bleach)"
     ],
     [
-        "Orihime",
-        "Rangiku"
+        "Orihime (Bleach)",
+        "Rangiku (Bleach)"
     ],
     [
-        "Chad",
-        "Ganju"
+        "Chad (Bleach)",
+        "Ganju (Bleach)"
     ],
     [
-        "Kisuke",
-        "Mayuri"
+        "Kisuke (Bleach)",
+        "Mayuri (Bleach)"
     ],
     [
-        "Shinigami",
-        "Quincy"
+        "Shinigami (Bleach)",
+        "Quincy (Bleach)"
     ],
     [
-        "Hollow",
-        "Arrancar"
+        "Hollow (Bleach)",
+        "Arrancar (Bleach)"
     ],
     [
-        "Bankai",
-        "Shikai"
+        "Bankai (Bleach)",
+        "Shikai (Bleach)"
     ],
     [
-        "Soul Society",
-        "Hueco Mundo"
+        "Soul Society (Bleach)",
+        "Hueco Mundo (Bleach)"
     ],
     [
-        "Gotei 13",
-        "Sternritter"
+        "Gotei 13 (Bleach)",
+        "Sternritter (Bleach)"
     ],
     [
-        "Gon",
-        "Killua"
+        "Gon (Hunter x Hunter)",
+        "Killua (Hunter x Hunter)"
     ],
     [
-        "Kurapika",
-        "Leorio"
+        "Kurapika (Hunter x Hunter)",
+        "Leorio (Hunter x Hunter)"
     ],
     [
-        "Hisoka",
-        "Illumi"
+        "Hisoka (Hunter x Hunter)",
+        "Illumi (Hunter x Hunter)"
     ],
     [
-        "Chrollo",
-        "Kurapika"
+        "Chrollo (Hunter x Hunter)",
+        "Kurapika (Hunter x Hunter)"
     ],
     [
-        "Meruem",
-        "Netero"
+        "Meruem (Hunter x Hunter)",
+        "Netero (Hunter x Hunter)"
     ],
     [
-        "Pitou",
-        "Pouf"
+        "Pitou (Hunter x Hunter)",
+        "Pouf (Hunter x Hunter)"
     ],
     [
-        "Knuckle",
-        "Shoot"
+        "Knuckle (Hunter x Hunter)",
+        "Shoot (Hunter x Hunter)"
     ],
     [
-        "Kite",
-        "Ging"
+        "Kite (Hunter x Hunter)",
+        "Ging (Hunter x Hunter)"
     ],
     [
-        "Biscuit",
-        "Wing"
+        "Biscuit (Hunter x Hunter)",
+        "Wing (Hunter x Hunter)"
     ],
     [
-        "Feitan",
-        "Phinks"
+        "Feitan (Hunter x Hunter)",
+        "Phinks (Hunter x Hunter)"
     ],
     [
-        "Zeno",
-        "Silva"
+        "Zeno (Hunter x Hunter)",
+        "Silva (Hunter x Hunter)"
     ],
     [
-        "Nen",
-        "Ren"
+        "Nen (Hunter x Hunter)",
+        "Ren (Hunter x Hunter)"
     ],
     [
-        "Ten",
-        "Zetsu"
+        "Ten (Hunter x Hunter)",
+        "Zetsu (Hunter x Hunter)"
     ],
     [
-        "Hunter",
-        "Brigade Fantôme"
+        "Hunter (Hunter x Hunter)",
+        "Brigade Fantôme (Hunter x Hunter)"
     ],
     [
-        "Eren",
-        "Reiner"
+        "Eren (SNK / L'Attaque des Titans)",
+        "Reiner (SNK / L'Attaque des Titans)"
     ],
     [
-        "Mikasa",
-        "Annie"
+        "Mikasa (SNK / L'Attaque des Titans)",
+        "Annie (SNK / L'Attaque des Titans)"
     ],
     [
-        "Armin",
-        "Erwin"
+        "Armin (SNK / L'Attaque des Titans)",
+        "Erwin (SNK / L'Attaque des Titans)"
     ],
     [
-        "Levi",
-        "Kenny"
+        "Levi (SNK / L'Attaque des Titans)",
+        "Kenny (SNK / L'Attaque des Titans)"
     ],
     [
-        "Zeke",
-        "Grisha"
+        "Zeke (SNK / L'Attaque des Titans)",
+        "Grisha (SNK / L'Attaque des Titans)"
     ],
     [
-        "Jean",
-        "Connie"
+        "Jean (SNK / L'Attaque des Titans)",
+        "Connie (SNK / L'Attaque des Titans)"
     ],
     [
-        "Sasha",
-        "Historia"
+        "Sasha (SNK / L'Attaque des Titans)",
+        "Historia (SNK / L'Attaque des Titans)"
     ],
     [
-        "Hansi",
-        "Erwin"
+        "Hansi (SNK / L'Attaque des Titans)",
+        "Erwin (SNK / L'Attaque des Titans)"
     ],
     [
-        "Gabi",
-        "Falco"
+        "Gabi (SNK / L'Attaque des Titans)",
+        "Falco (SNK / L'Attaque des Titans)"
     ],
     [
-        "Porco",
-        "Reiner"
+        "Porco (SNK / L'Attaque des Titans)",
+        "Reiner (SNK / L'Attaque des Titans)"
     ],
     [
-        "Titan Assaillant",
-        "Titan Cuirassé"
+        "Titan Assaillant (SNK / L'Attaque des Titans)",
+        "Titan Cuirassé (SNK / L'Attaque des Titans)"
     ],
     [
-        "Titan Colossal",
-        "Titan Bestial"
+        "Titan Colossal (SNK / L'Attaque des Titans)",
+        "Titan Bestial (SNK / L'Attaque des Titans)"
     ],
     [
-        "Paradis",
-        "Marley"
+        "Paradis (SNK / L'Attaque des Titans)",
+        "Marley (SNK / L'Attaque des Titans)"
     ],
     [
-        "Bataillon d'exploration",
-        "Brigades spéciales"
+        "Bataillon d'exploration (SNK / L'Attaque des Titans)",
+        "Brigades spéciales (SNK / L'Attaque des Titans)"
     ],
     [
-        "Meliodas",
-        "Zeldris"
+        "Meliodas (Seven Deadly Sins)",
+        "Zeldris (Seven Deadly Sins)"
     ],
     [
-        "Ban",
-        "Escanor"
+        "Ban (Seven Deadly Sins)",
+        "Escanor (Seven Deadly Sins)"
     ],
     [
-        "King",
-        "Gowther"
+        "King (Seven Deadly Sins)",
+        "Gowther (Seven Deadly Sins)"
     ],
     [
-        "Diane",
-        "Merlin"
+        "Diane (Seven Deadly Sins)",
+        "Merlin (Seven Deadly Sins)"
     ],
     [
-        "Elizabeth",
-        "Elaine"
+        "Elizabeth (Seven Deadly Sins)",
+        "Elaine (Seven Deadly Sins)"
     ],
     [
-        "Estarossa",
-        "Zeldris"
+        "Estarossa (Seven Deadly Sins)",
+        "Zeldris (Seven Deadly Sins)"
     ],
     [
-        "Chandler",
-        "Cusack"
+        "Chandler (Seven Deadly Sins)",
+        "Cusack (Seven Deadly Sins)"
     ],
     [
-        "Mael",
-        "Ludociel"
+        "Mael (Seven Deadly Sins)",
+        "Ludociel (Seven Deadly Sins)"
     ],
     [
-        "Hawk",
-        "Wild"
+        "Hawk (Seven Deadly Sins)",
+        "Wild (Seven Deadly Sins)"
     ],
     [
-        "Dreyfus",
-        "Hendrickson"
+        "Dreyfus (Seven Deadly Sins)",
+        "Hendrickson (Seven Deadly Sins)"
     ],
     [
-        "Démons",
-        "Déesses"
+        "Démons (Seven Deadly Sins)",
+        "Déesses (Seven Deadly Sins)"
     ],
     [
-        "Dix Commandements",
-        "Seven Deadly Sins"
+        "Dix Commandements (Seven Deadly Sins)",
+        "Seven Deadly Sins (Seven Deadly Sins)"
     ],
     [
-        "Full Counter",
-        "Revenge Counter"
+        "Full Counter (Seven Deadly Sins)",
+        "Revenge Counter (Seven Deadly Sins)"
     ],
     [
-        "Light",
-        "L"
+        "Light (Death Note)",
+        "L (Death Note)"
     ],
     [
-        "Near",
-        "Mello"
+        "Near (Death Note)",
+        "Mello (Death Note)"
     ],
     [
-        "Ryuk",
-        "Rem"
+        "Ryuk (Death Note)",
+        "Rem (Death Note)"
     ],
     [
-        "Misa",
-        "Kiyomi"
+        "Misa (Death Note)",
+        "Kiyomi (Death Note)"
     ],
     [
-        "Soichiro",
-        "Matsuda"
+        "Soichiro (Death Note)",
+        "Matsuda (Death Note)"
     ],
     [
-        "Light",
-        "Mikami"
+        "Light (Death Note)",
+        "Mikami (Death Note)"
     ],
     [
-        "Death Note",
-        "Faux Death Note"
+        "Death Note (Death Note)",
+        "Faux Death Note (Death Note)"
     ],
     [
-        "Kira",
-        "L"
+        "Kira (Death Note)",
+        "L (Death Note)"
     ],
     [
-        "Shinigami",
-        "Humain"
+        "Shinigami (Death Note)",
+        "Humain (Death Note)"
     ],
     [
-        "Ayanokoji",
-        "Koenji"
+        "Ayanokoji (Classroom of the Elite)",
+        "Koenji (Classroom of the Elite)"
     ],
     [
-        "Horikita",
-        "Kushida"
+        "Horikita (Classroom of the Elite)",
+        "Kushida (Classroom of the Elite)"
     ],
     [
-        "Ryuen",
-        "Sakayanagi"
+        "Ryuen (Classroom of the Elite)",
+        "Sakayanagi (Classroom of the Elite)"
     ],
     [
-        "Ichinose",
-        "Horikita"
+        "Ichinose (Classroom of the Elite)",
+        "Horikita (Classroom of the Elite)"
     ],
     [
-        "Manabu",
-        "Nagumo"
+        "Manabu (Classroom of the Elite)",
+        "Nagumo (Classroom of the Elite)"
     ],
     [
-        "Kei",
-        "Kushida"
+        "Kei (Classroom of the Elite)",
+        "Kushida (Classroom of the Elite)"
     ],
     [
-        "Sudo",
-        "Ike"
+        "Sudo (Classroom of the Elite)",
+        "Ike (Classroom of the Elite)"
     ],
     [
-        "Classe A",
-        "Classe D"
+        "Classe A (Classroom of the Elite)",
+        "Classe D (Classroom of the Elite)"
     ],
     [
-        "Examen spécial",
-        "Examen écrit"
+        "Examen spécial (Classroom of the Elite)",
+        "Examen écrit (Classroom of the Elite)"
     ],
     [
-        "Jinwoo",
-        "Igris"
+        "Jinwoo (Solo Leveling)",
+        "Igris (Solo Leveling)"
     ],
     [
-        "Jinwoo",
-        "Jinho"
+        "Jinwoo (Solo Leveling)",
+        "Jinho (Solo Leveling)"
     ],
     [
-        "Cha Hae-In",
-        "Lee Joohee"
+        "Cha Hae-In (Solo Leveling)",
+        "Lee Joohee (Solo Leveling)"
     ],
     [
-        "Baek Yoonho",
-        "Choi Jong-In"
+        "Baek Yoonho (Solo Leveling)",
+        "Choi Jong-In (Solo Leveling)"
     ],
     [
-        "Thomas Andre",
-        "Liu Zhigang"
+        "Thomas Andre (Solo Leveling)",
+        "Liu Zhigang (Solo Leveling)"
     ],
     [
-        "Beru",
-        "Igris"
+        "Beru (Solo Leveling)",
+        "Igris (Solo Leveling)"
     ],
     [
-        "Antares",
-        "Ashborn"
+        "Antares (Solo Leveling)",
+        "Ashborn (Solo Leveling)"
     ],
     [
-        "Monarque",
-        "Dirigeant"
+        "Monarque (Solo Leveling)",
+        "Dirigeant (Solo Leveling)"
     ],
     [
-        "Ombre",
-        "Chasseur"
+        "Ombre (Solo Leveling)",
+        "Chasseur (Solo Leveling)"
     ],
     [
-        "Portail",
-        "Donjon"
+        "Portail (Solo Leveling)",
+        "Donjon (Solo Leveling)"
     ],
     [
-        "Asta",
-        "Yuno"
+        "Asta (Black Clover)",
+        "Yuno (Black Clover)"
     ],
     [
-        "Yami",
-        "Nacht"
+        "Yami (Black Clover)",
+        "Nacht (Black Clover)"
     ],
     [
-        "Noelle",
-        "Mimosa"
+        "Noelle (Black Clover)",
+        "Mimosa (Black Clover)"
     ],
     [
-        "Luck",
-        "Magna"
+        "Luck (Black Clover)",
+        "Magna (Black Clover)"
     ],
     [
-        "Finral",
-        "Langris"
+        "Finral (Black Clover)",
+        "Langris (Black Clover)"
     ],
     [
-        "Fuegoleon",
-        "Mereoleona"
+        "Fuegoleon (Black Clover)",
+        "Mereoleona (Black Clover)"
     ],
     [
-        "Julius",
-        "Lumière"
+        "Julius (Black Clover)",
+        "Lumière (Black Clover)"
     ],
     [
-        "Patry",
-        "Licht"
+        "Patry (Black Clover)",
+        "Licht (Black Clover)"
     ],
     [
-        "Dante",
-        "Zenon"
+        "Dante (Black Clover)",
+        "Zenon (Black Clover)"
     ],
     [
-        "Vanessa",
-        "Grey"
+        "Vanessa (Black Clover)",
+        "Grey (Black Clover)"
     ],
     [
-        "Black Bulls",
-        "Golden Dawn"
+        "Black Bulls (Black Clover)",
+        "Golden Dawn (Black Clover)"
     ],
     [
-        "Mana",
-        "Anti-magie"
+        "Mana (Black Clover)",
+        "Anti-magie (Black Clover)"
     ],
     [
-        "Grimoire à 4 feuilles",
-        "Grimoire à 5 feuilles"
+        "Grimoire à 4 feuilles (Black Clover)",
+        "Grimoire à 5 feuilles (Black Clover)"
     ],
     [
-        "Shinra",
-        "Sho"
+        "Shinra (Fire Force)",
+        "Sho (Fire Force)"
     ],
     [
-        "Arthur",
-        "Ogun"
+        "Arthur (Fire Force)",
+        "Ogun (Fire Force)"
     ],
     [
-        "Benimaru",
-        "Burns"
+        "Benimaru (Fire Force)",
+        "Burns (Fire Force)"
     ],
     [
-        "Maki",
-        "Tamaki"
+        "Maki (Fire Force)",
+        "Tamaki (Fire Force)"
     ],
     [
-        "Joker",
-        "Licht"
+        "Joker (Fire Force)",
+        "Licht (Fire Force)"
     ],
     [
-        "Hibana",
-        "Iris"
+        "Hibana (Fire Force)",
+        "Iris (Fire Force)"
     ],
     [
-        "Vulcan",
-        "Giovanni"
+        "Vulcan (Fire Force)",
+        "Giovanni (Fire Force)"
     ],
     [
-        "Compagnie 8",
-        "Compagnie 1"
+        "Compagnie 8 (Fire Force)",
+        "Compagnie 1 (Fire Force)"
     ],
     [
-        "Adolla",
-        "Monde réel"
+        "Adolla (Fire Force)",
+        "Monde réel (Fire Force)"
     ],
     [
-        "Deuxième génération",
-        "Troisième génération"
+        "Deuxième génération (Fire Force)",
+        "Troisième génération (Fire Force)"
     ],
     [
-        "Rudeus",
-        "Paul"
+        "Rudeus (Mushoku Tensei)",
+        "Paul (Mushoku Tensei)"
     ],
     [
-        "Roxy",
-        "Sylphiette"
+        "Roxy (Mushoku Tensei)",
+        "Sylphiette (Mushoku Tensei)"
     ],
     [
-        "Eris",
-        "Ghislaine"
+        "Eris (Mushoku Tensei)",
+        "Ghislaine (Mushoku Tensei)"
     ],
     [
-        "Ruijerd",
-        "Orsted"
+        "Ruijerd (Mushoku Tensei)",
+        "Orsted (Mushoku Tensei)"
     ],
     [
-        "Zenith",
-        "Lilia"
+        "Zenith (Mushoku Tensei)",
+        "Lilia (Mushoku Tensei)"
     ],
     [
-        "Ariel",
-        "Nanahoshi"
+        "Ariel (Mushoku Tensei)",
+        "Nanahoshi (Mushoku Tensei)"
     ],
     [
-        "Rudeus",
-        "Cliff"
+        "Rudeus (Mushoku Tensei)",
+        "Cliff (Mushoku Tensei)"
     ],
     [
-        "Paul",
-        "Geese"
+        "Paul (Mushoku Tensei)",
+        "Geese (Mushoku Tensei)"
     ],
     [
-        "Magie",
-        "Touki"
+        "Magie (Mushoku Tensei)",
+        "Touki (Mushoku Tensei)"
     ],
     [
-        "Migurd",
-        "Superd"
+        "Migurd (Mushoku Tensei)",
+        "Superd (Mushoku Tensei)"
     ],
     [
-        "Subaru",
-        "Reinhard"
+        "Subaru (Re:Zero)",
+        "Reinhard (Re:Zero)"
     ],
     [
-        "Emilia",
-        "Satella"
+        "Emilia (Re:Zero)",
+        "Satella (Re:Zero)"
     ],
     [
-        "Rem",
-        "Ram"
+        "Rem (Re:Zero)",
+        "Ram (Re:Zero)"
     ],
     [
-        "Beatrice",
-        "Echidna"
+        "Beatrice (Re:Zero)",
+        "Echidna (Re:Zero)"
     ],
     [
-        "Roswaal",
-        "Puck"
+        "Roswaal (Re:Zero)",
+        "Puck (Re:Zero)"
     ],
     [
-        "Garfiel",
-        "Frederica"
+        "Garfiel (Re:Zero)",
+        "Frederica (Re:Zero)"
     ],
     [
-        "Otto",
-        "Garfiel"
+        "Otto (Re:Zero)",
+        "Garfiel (Re:Zero)"
     ],
     [
-        "Crusch",
-        "Anastasia"
+        "Crusch (Re:Zero)",
+        "Anastasia (Re:Zero)"
     ],
     [
-        "Regulus",
-        "Petelgeuse"
+        "Regulus (Re:Zero)",
+        "Petelgeuse (Re:Zero)"
     ],
     [
-        "Sorcière",
-        "Archevêque"
+        "Sorcière (Re:Zero)",
+        "Archevêque (Re:Zero)"
     ],
     [
-        "Return by Death",
-        "Autorité"
+        "Return by Death (Re:Zero)",
+        "Autorité (Re:Zero)"
     ],
     [
-        "Natsu",
-        "Gajeel"
+        "Natsu (Fairy Tail)",
+        "Gajeel (Fairy Tail)"
     ],
     [
-        "Gray",
-        "Lyon"
+        "Gray (Fairy Tail)",
+        "Lyon (Fairy Tail)"
     ],
     [
-        "Erza",
-        "Mirajane"
+        "Erza (Fairy Tail)",
+        "Mirajane (Fairy Tail)"
     ],
     [
-        "Lucy",
-        "Yukino"
+        "Lucy (Fairy Tail)",
+        "Yukino (Fairy Tail)"
     ],
     [
-        "Wendy",
-        "Chelia"
+        "Wendy (Fairy Tail)",
+        "Chelia (Fairy Tail)"
     ],
     [
-        "Happy",
-        "Carla"
+        "Happy (Fairy Tail)",
+        "Carla (Fairy Tail)"
     ],
     [
-        "Makarov",
-        "Gildarts"
+        "Makarov (Fairy Tail)",
+        "Gildarts (Fairy Tail)"
     ],
     [
-        "Zeref",
-        "Acnologia"
+        "Zeref (Fairy Tail)",
+        "Acnologia (Fairy Tail)"
     ],
     [
-        "Sting",
-        "Rogue"
+        "Sting (Fairy Tail)",
+        "Rogue (Fairy Tail)"
     ],
     [
-        "Jellal",
-        "Mystogan"
+        "Jellal (Fairy Tail)",
+        "Mystogan (Fairy Tail)"
     ],
     [
-        "Fairy Tail",
-        "Sabertooth"
+        "Fairy Tail (Fairy Tail)",
+        "Sabertooth (Fairy Tail)"
     ],
     [
-        "Dragon Slayer",
-        "God Slayer"
+        "Dragon Slayer (Fairy Tail)",
+        "God Slayer (Fairy Tail)"
     ],
     [
-        "Isagi",
-        "Rin"
+        "Isagi (Blue Lock)",
+        "Rin (Blue Lock)"
     ],
     [
-        "Bachira",
-        "Shidou"
+        "Bachira (Blue Lock)",
+        "Shidou (Blue Lock)"
     ],
     [
-        "Nagi",
-        "Reo"
+        "Nagi (Blue Lock)",
+        "Reo (Blue Lock)"
     ],
     [
-        "Barou",
-        "Kunigami"
+        "Barou (Blue Lock)",
+        "Kunigami (Blue Lock)"
     ],
     [
-        "Chigiri",
-        "Zantetsu"
+        "Chigiri (Blue Lock)",
+        "Zantetsu (Blue Lock)"
     ],
     [
-        "Sae",
-        "Rin"
+        "Sae (Blue Lock)",
+        "Rin (Blue Lock)"
     ],
     [
-        "Ego",
-        "Noa"
+        "Ego (Blue Lock)",
+        "Noa (Blue Lock)"
     ],
     [
-        "Gagamaru",
-        "Aryu"
+        "Gagamaru (Blue Lock)",
+        "Aryu (Blue Lock)"
     ],
     [
-        "Karasu",
-        "Otoya"
+        "Karasu (Blue Lock)",
+        "Otoya (Blue Lock)"
     ],
     [
-        "Kaiser",
-        "Isagi"
+        "Kaiser (Blue Lock)",
+        "Isagi (Blue Lock)"
     ],
     [
-        "Dribble",
-        "Tir"
+        "Dribble (Blue Lock)",
+        "Tir (Blue Lock)"
     ],
     [
-        "Vision périphérique",
-        "Meta Vision"
+        "Vision périphérique (Blue Lock)",
+        "Meta Vision (Blue Lock)"
     ],
     [
-        "Edward",
-        "Alphonse"
+        "Edward (Fullmetal Alchemist)",
+        "Alphonse (Fullmetal Alchemist)"
     ],
     [
-        "Roy",
-        "Riza"
+        "Roy (Fullmetal Alchemist)",
+        "Riza (Fullmetal Alchemist)"
     ],
     [
-        "Scar",
-        "Greed"
+        "Scar (Fullmetal Alchemist)",
+        "Greed (Fullmetal Alchemist)"
     ],
     [
-        "Bradley",
-        "Father"
+        "Bradley (Fullmetal Alchemist)",
+        "Father (Fullmetal Alchemist)"
     ],
     [
-        "Winry",
-        "Pinako"
+        "Winry (Fullmetal Alchemist)",
+        "Pinako (Fullmetal Alchemist)"
     ],
     [
-        "Izumi",
-        "Edward"
+        "Izumi (Fullmetal Alchemist)",
+        "Edward (Fullmetal Alchemist)"
     ],
     [
-        "Envy",
-        "Lust"
+        "Envy (Fullmetal Alchemist)",
+        "Lust (Fullmetal Alchemist)"
     ],
     [
-        "Gluttony",
-        "Sloth"
+        "Gluttony (Fullmetal Alchemist)",
+        "Sloth (Fullmetal Alchemist)"
     ],
     [
-        "Alchimie",
-        "Alkahestrie"
+        "Alchimie (Fullmetal Alchemist)",
+        "Alkahestrie (Fullmetal Alchemist)"
     ],
     [
-        "Pierre philosophale",
-        "Transmutation humaine"
+        "Pierre philosophale (Fullmetal Alchemist)",
+        "Transmutation humaine (Fullmetal Alchemist)"
     ],
     [
-        "Denji",
-        "Aki"
+        "Denji (Chainsaw Man)",
+        "Aki (Chainsaw Man)"
     ],
     [
-        "Power",
-        "Kobeni"
+        "Power (Chainsaw Man)",
+        "Kobeni (Chainsaw Man)"
     ],
     [
-        "Makima",
-        "Reze"
+        "Makima (Chainsaw Man)",
+        "Reze (Chainsaw Man)"
     ],
     [
-        "Pochita",
-        "Nayuta"
+        "Pochita (Chainsaw Man)",
+        "Nayuta (Chainsaw Man)"
     ],
     [
-        "Kishibe",
-        "Yoshida"
+        "Kishibe (Chainsaw Man)",
+        "Yoshida (Chainsaw Man)"
     ],
     [
-        "Katana Man",
-        "Denji"
+        "Katana Man (Chainsaw Man)",
+        "Denji (Chainsaw Man)"
     ],
     [
-        "Angel Devil",
-        "Future Devil"
+        "Angel Devil (Chainsaw Man)",
+        "Future Devil (Chainsaw Man)"
     ],
     [
-        "Démon",
-        "Hybride"
+        "Démon (Chainsaw Man)",
+        "Hybride (Chainsaw Man)"
     ],
     [
-        "Public Safety",
-        "Chasseurs privés"
+        "Public Safety (Chainsaw Man)",
+        "Chasseurs privés (Chainsaw Man)"
     ],
     [
-        "Yugo",
-        "Adamai"
+        "Yugo (Wakfu)",
+        "Adamai (Wakfu)"
     ],
     [
-        "Tristepin",
-        "Goultard"
+        "Tristepin (Wakfu)",
+        "Goultard (Wakfu)"
     ],
     [
-        "Amalia",
-        "Evangelyne"
+        "Amalia (Wakfu)",
+        "Evangelyne (Wakfu)"
     ],
     [
-        "Ruel",
-        "Alibert"
+        "Ruel (Wakfu)",
+        "Alibert (Wakfu)"
     ],
     [
-        "Qilby",
-        "Yugo"
+        "Qilby (Wakfu)",
+        "Yugo (Wakfu)"
     ],
     [
-        "Nox",
-        "Oropo"
+        "Nox (Wakfu)",
+        "Oropo (Wakfu)"
     ],
     [
-        "Elely",
-        "Flopin"
+        "Elely (Wakfu)",
+        "Flopin (Wakfu)"
     ],
     [
-        "Eliatrope",
-        "Dragon"
+        "Eliatrope (Wakfu)",
+        "Dragon (Wakfu)"
     ],
     [
-        "Shushu",
-        "Dofus"
+        "Shushu (Wakfu)",
+        "Dofus (Wakfu)"
     ],
     [
-        "Wakfu",
-        "Stasis"
+        "Wakfu (Wakfu)",
+        "Stasis (Wakfu)"
     ],
     [
-        "Tanjiro",
-        "Yoriichi"
+        "Tanjiro (Demon Slayer)",
+        "Yoriichi (Demon Slayer)"
     ],
     [
-        "Nezuko",
-        "Tamayo"
+        "Nezuko (Demon Slayer)",
+        "Tamayo (Demon Slayer)"
     ],
     [
-        "Zenitsu",
-        "Inosuke"
+        "Zenitsu (Demon Slayer)",
+        "Inosuke (Demon Slayer)"
     ],
     [
-        "Giyu",
-        "Sanemi"
+        "Giyu (Demon Slayer)",
+        "Sanemi (Demon Slayer)"
     ],
     [
-        "Rengoku",
-        "Tengen"
+        "Rengoku (Demon Slayer)",
+        "Tengen (Demon Slayer)"
     ],
     [
-        "Shinobu",
-        "Mitsuri"
+        "Shinobu (Demon Slayer)",
+        "Mitsuri (Demon Slayer)"
     ],
     [
-        "Muichiro",
-        "Obanai"
+        "Muichiro (Demon Slayer)",
+        "Obanai (Demon Slayer)"
     ],
     [
-        "Muzan",
-        "Kokushibo"
+        "Muzan (Demon Slayer)",
+        "Kokushibo (Demon Slayer)"
     ],
     [
-        "Akaza",
-        "Doma"
+        "Akaza (Demon Slayer)",
+        "Doma (Demon Slayer)"
     ],
     [
-        "Gyutaro",
-        "Rui"
+        "Gyutaro (Demon Slayer)",
+        "Rui (Demon Slayer)"
     ],
     [
-        "Pilier",
-        "Lune Supérieure"
+        "Pilier (Demon Slayer)",
+        "Lune Supérieure (Demon Slayer)"
     ],
     [
-        "Souffle de l'eau",
-        "Souffle du soleil"
+        "Souffle de l'eau (Demon Slayer)",
+        "Souffle du soleil (Demon Slayer)"
     ],
     [
-        "Pikachu",
-        "Raichu"
+        "Pikachu (Pokémon)",
+        "Raichu (Pokémon)"
     ],
     [
-        "Dracaufeu",
-        "Dracolosse"
+        "Dracaufeu (Pokémon)",
+        "Dracolosse (Pokémon)"
     ],
     [
-        "Mew",
-        "Mewtwo"
+        "Mew (Pokémon)",
+        "Mewtwo (Pokémon)"
     ],
     [
-        "Groudon",
-        "Kyogre"
+        "Groudon (Pokémon)",
+        "Kyogre (Pokémon)"
     ],
     [
-        "Dialga",
-        "Palkia"
+        "Dialga (Pokémon)",
+        "Palkia (Pokémon)"
     ],
     [
-        "Reshiram",
-        "Zekrom"
+        "Reshiram (Pokémon)",
+        "Zekrom (Pokémon)"
     ],
     [
-        "Lugia",
-        "Ho-Oh"
+        "Lugia (Pokémon)",
+        "Ho-Oh (Pokémon)"
     ],
     [
-        "Ectoplasma",
-        "Alakazam"
+        "Ectoplasma (Pokémon)",
+        "Alakazam (Pokémon)"
     ],
     [
-        "Lucario",
-        "Zoroark"
+        "Lucario (Pokémon)",
+        "Zoroark (Pokémon)"
     ],
     [
-        "Sacha",
-        "Red"
+        "Sacha (Pokémon)",
+        "Red (Pokémon)"
     ],
     [
-        "Poké Ball",
-        "Master Ball"
+        "Poké Ball (Pokémon)",
+        "Master Ball (Pokémon)"
     ],
     [
-        "Méga-Évolution",
-        "Dynamax"
+        "Méga-Évolution (Pokémon)",
+        "Dynamax (Pokémon)"
     ],
     [
-        "Goku",
-        "Vegeta"
+        "Goku (Dragon Ball)",
+        "Vegeta (Dragon Ball)"
     ],
     [
-        "Gohan",
-        "Trunks"
+        "Gohan (Dragon Ball)",
+        "Trunks (Dragon Ball)"
     ],
     [
-        "Piccolo",
-        "Nail"
+        "Piccolo (Dragon Ball)",
+        "Nail (Dragon Ball)"
     ],
     [
-        "Freezer",
-        "Cell"
+        "Freezer (Dragon Ball)",
+        "Cell (Dragon Ball)"
     ],
     [
-        "Buu",
-        "Cell"
+        "Buu (Dragon Ball)",
+        "Cell (Dragon Ball)"
     ],
     [
-        "Beerus",
-        "Champa"
+        "Beerus (Dragon Ball)",
+        "Champa (Dragon Ball)"
     ],
     [
-        "Whis",
-        "Vados"
+        "Whis (Dragon Ball)",
+        "Vados (Dragon Ball)"
     ],
     [
-        "Gogeta",
-        "Vegetto"
+        "Gogeta (Dragon Ball)",
+        "Vegetto (Dragon Ball)"
     ],
     [
-        "Broly",
-        "Kale"
+        "Broly (Dragon Ball)",
+        "Kale (Dragon Ball)"
     ],
     [
-        "Jiren",
-        "Toppo"
+        "Jiren (Dragon Ball)",
+        "Toppo (Dragon Ball)"
     ],
     [
-        "Super Saiyan",
-        "Super Saiyan God"
+        "Super Saiyan (Dragon Ball)",
+        "Super Saiyan God (Dragon Ball)"
     ],
     [
-        "Ultra Instinct",
-        "Ultra Ego"
+        "Ultra Instinct (Dragon Ball)",
+        "Ultra Ego (Dragon Ball)"
     ],
     [
-        "Kamehameha",
-        "Final Flash"
+        "Kamehameha (Dragon Ball)",
+        "Final Flash (Dragon Ball)"
     ],
     [
-        "Gabimaru",
-        "Chobei"
+        "Gabimaru (Hell's Paradise)",
+        "Chobei (Hell's Paradise)"
     ],
     [
-        "Sagiri",
-        "Yuzuriha"
+        "Sagiri (Hell's Paradise)",
+        "Yuzuriha (Hell's Paradise)"
     ],
     [
-        "Shion",
-        "Tenza"
+        "Shion (Hell's Paradise)",
+        "Tenza (Hell's Paradise)"
     ],
     [
-        "Fuchi",
-        "Senta"
+        "Fuchi (Hell's Paradise)",
+        "Senta (Hell's Paradise)"
     ],
     [
-        "Mei",
-        "Rien"
+        "Mei (Hell's Paradise)",
+        "Rien (Hell's Paradise)"
     ],
     [
-        "Chobei",
-        "Toma"
+        "Chobei (Hell's Paradise)",
+        "Toma (Hell's Paradise)"
     ],
     [
-        "Tao",
-        "Ninjutsu"
+        "Tao (Hell's Paradise)",
+        "Ninjutsu (Hell's Paradise)"
     ],
     [
-        "Asaemon",
-        "Criminel"
+        "Asaemon (Hell's Paradise)",
+        "Criminel (Hell's Paradise)"
     ],
     [
-        "Rudo",
-        "Zanka"
+        "Rudo (Gachiakuta)",
+        "Zanka (Gachiakuta)"
     ],
     [
-        "Enjin",
-        "Riyo"
+        "Enjin (Gachiakuta)",
+        "Riyo (Gachiakuta)"
     ],
     [
-        "Jabber",
-        "Zodyl"
+        "Jabber (Gachiakuta)",
+        "Zodyl (Gachiakuta)"
     ],
     [
-        "Tamsy",
-        "Delmon"
+        "Tamsy (Gachiakuta)",
+        "Delmon (Gachiakuta)"
     ],
     [
-        "Amo",
-        "Chiwa"
+        "Amo (Gachiakuta)",
+        "Chiwa (Gachiakuta)"
     ],
     [
-        "Regto",
-        "Corvus"
+        "Regto (Gachiakuta)",
+        "Corvus (Gachiakuta)"
     ],
     [
-        "Eishia",
-        "August"
+        "Eishia (Gachiakuta)",
+        "August (Gachiakuta)"
     ],
     [
-        "Guita",
-        "Dear"
+        "Guita (Gachiakuta)",
+        "Dear (Gachiakuta)"
     ],
     [
-        "Cleaners",
-        "Raiders"
+        "Cleaners (Gachiakuta)",
+        "Raiders (Gachiakuta)"
     ],
     [
-        "Giver",
-        "Jinki"
+        "Giver (Gachiakuta)",
+        "Jinki (Gachiakuta)"
     ],
     [
-        "Hinata",
-        "Kageyama"
+        "Hinata (Haikyuu)",
+        "Kageyama (Haikyuu)"
     ],
     [
-        "Oikawa",
-        "Atsumu"
+        "Oikawa (Haikyuu)",
+        "Atsumu (Haikyuu)"
     ],
     [
-        "Bokuto",
-        "Ushijima"
+        "Bokuto (Haikyuu)",
+        "Ushijima (Haikyuu)"
     ],
     [
-        "Kenma",
-        "Akaashi"
+        "Kenma (Haikyuu)",
+        "Akaashi (Haikyuu)"
     ],
     [
-        "Nishinoya",
-        "Yaku"
+        "Nishinoya (Haikyuu)",
+        "Yaku (Haikyuu)"
     ],
     [
-        "Tsukishima",
-        "Kuroo"
+        "Tsukishima (Haikyuu)",
+        "Kuroo (Haikyuu)"
     ],
     [
-        "Daichi",
-        "Kita"
+        "Daichi (Haikyuu)",
+        "Kita (Haikyuu)"
     ],
     [
-        "Asahi",
-        "Aran"
+        "Asahi (Haikyuu)",
+        "Aran (Haikyuu)"
     ],
     [
-        "Karasuno",
-        "Nekoma"
+        "Karasuno (Haikyuu)",
+        "Nekoma (Haikyuu)"
     ],
     [
-        "Shiratorizawa",
-        "Inarizaki"
+        "Shiratorizawa (Haikyuu)",
+        "Inarizaki (Haikyuu)"
     ],
     [
-        "Passeur",
-        "Libéro"
+        "Passeur (Haikyuu)",
+        "Libéro (Haikyuu)"
     ],
     [
-        "Yuji",
-        "Yuta"
+        "Yuji (Jujutsu Kaisen)",
+        "Yuta (Jujutsu Kaisen)"
     ],
     [
-        "Gojo",
-        "Sukuna"
+        "Gojo (Jujutsu Kaisen)",
+        "Sukuna (Jujutsu Kaisen)"
     ],
     [
-        "Megumi",
-        "Nobara"
+        "Megumi (Jujutsu Kaisen)",
+        "Nobara (Jujutsu Kaisen)"
     ],
     [
-        "Maki",
-        "Toji"
+        "Maki (Jujutsu Kaisen)",
+        "Toji (Jujutsu Kaisen)"
     ],
     [
-        "Geto",
-        "Kenjaku"
+        "Geto (Jujutsu Kaisen)",
+        "Kenjaku (Jujutsu Kaisen)"
     ],
     [
-        "Nanami",
-        "Kusakabe"
+        "Nanami (Jujutsu Kaisen)",
+        "Kusakabe (Jujutsu Kaisen)"
     ],
     [
-        "Todo",
-        "Hakari"
+        "Todo (Jujutsu Kaisen)",
+        "Hakari (Jujutsu Kaisen)"
     ],
     [
-        "Mahito",
-        "Jogo"
+        "Mahito (Jujutsu Kaisen)",
+        "Jogo (Jujutsu Kaisen)"
     ],
     [
-        "Choso",
-        "Eso"
+        "Choso (Jujutsu Kaisen)",
+        "Eso (Jujutsu Kaisen)"
     ],
     [
-        "Rika",
-        "Mahoraga"
+        "Rika (Jujutsu Kaisen)",
+        "Mahoraga (Jujutsu Kaisen)"
     ],
     [
-        "Fléau",
-        "Exorciste"
+        "Fléau (Jujutsu Kaisen)",
+        "Exorciste (Jujutsu Kaisen)"
     ],
     [
-        "Black Flash",
-        "Extension du territoire"
+        "Black Flash (Jujutsu Kaisen)",
+        "Extension du territoire (Jujutsu Kaisen)"
     ],
     [
-        "Jonathan",
-        "Joseph"
+        "Jonathan (JoJo's Bizarre Adventure)",
+        "Joseph (JoJo's Bizarre Adventure)"
     ],
     [
-        "Jotaro",
-        "Josuke"
+        "Jotaro (JoJo's Bizarre Adventure)",
+        "Josuke (JoJo's Bizarre Adventure)"
     ],
     [
-        "Giorno",
-        "Jolyne"
+        "Giorno (JoJo's Bizarre Adventure)",
+        "Jolyne (JoJo's Bizarre Adventure)"
     ],
     [
-        "Dio",
-        "Kars"
+        "Dio (JoJo's Bizarre Adventure)",
+        "Kars (JoJo's Bizarre Adventure)"
     ],
     [
-        "Kira",
-        "Diavolo"
+        "Kira (JoJo's Bizarre Adventure)",
+        "Diavolo (JoJo's Bizarre Adventure)"
     ],
     [
-        "Pucci",
-        "Valentine"
+        "Pucci (JoJo's Bizarre Adventure)",
+        "Valentine (JoJo's Bizarre Adventure)"
     ],
     [
-        "Caesar",
-        "Polnareff"
+        "Caesar (JoJo's Bizarre Adventure)",
+        "Polnareff (JoJo's Bizarre Adventure)"
     ],
     [
-        "Speedwagon",
-        "Stroheim"
+        "Speedwagon (JoJo's Bizarre Adventure)",
+        "Stroheim (JoJo's Bizarre Adventure)"
     ],
     [
-        "Hamon",
-        "Stand"
+        "Hamon (JoJo's Bizarre Adventure)",
+        "Stand (JoJo's Bizarre Adventure)"
     ],
     [
-        "Star Platinum",
-        "The World"
+        "Star Platinum (JoJo's Bizarre Adventure)",
+        "The World (JoJo's Bizarre Adventure)"
     ],
     [
-        "Crazy Diamond",
-        "Gold Experience"
+        "Crazy Diamond (JoJo's Bizarre Adventure)",
+        "Gold Experience (JoJo's Bizarre Adventure)"
     ],
     [
-        "Rimuru",
-        "Veldora"
+        "Rimuru (Tensura)",
+        "Veldora (Tensura)"
     ],
     [
-        "Benimaru",
-        "Souei"
+        "Benimaru (Tensura)",
+        "Souei (Tensura)"
     ],
     [
-        "Shion",
-        "Shuna"
+        "Shion (Tensura)",
+        "Shuna (Tensura)"
     ],
     [
-        "Diablo",
-        "Testarossa"
+        "Diablo (Tensura)",
+        "Testarossa (Tensura)"
     ],
     [
-        "Milim",
-        "Ramiris"
+        "Milim (Tensura)",
+        "Ramiris (Tensura)"
     ],
     [
-        "Guy",
-        "Leon"
+        "Guy (Tensura)",
+        "Leon (Tensura)"
     ],
     [
-        "Hinata",
-        "Chloe"
+        "Hinata (Tensura)",
+        "Chloe (Tensura)"
     ],
     [
-        "Ranga",
-        "Gobta"
+        "Ranga (Tensura)",
+        "Gobta (Tensura)"
     ],
     [
-        "Demon Lord",
-        "True Dragon"
+        "Demon Lord (Tensura)",
+        "True Dragon (Tensura)"
     ],
     [
-        "Tempest",
-        "Dwargon"
+        "Tempest (Tensura)",
+        "Dwargon (Tensura)"
     ],
     [
-        "Saitama",
-        "Blast"
+        "Saitama (One Punch Man)",
+        "Blast (One Punch Man)"
     ],
     [
-        "Genos",
-        "Drive Knight"
+        "Genos (One Punch Man)",
+        "Drive Knight (One Punch Man)"
     ],
     [
-        "Garou",
-        "Bang"
+        "Garou (One Punch Man)",
+        "Bang (One Punch Man)"
     ],
     [
-        "Tatsumaki",
-        "Fubuki"
+        "Tatsumaki (One Punch Man)",
+        "Fubuki (One Punch Man)"
     ],
     [
-        "Sonic",
-        "Flashy Flash"
+        "Sonic (One Punch Man)",
+        "Flashy Flash (One Punch Man)"
     ],
     [
-        "Metal Bat",
-        "Tanktop Master"
+        "Metal Bat (One Punch Man)",
+        "Tanktop Master (One Punch Man)"
     ],
     [
-        "Boros",
-        "Orochi"
+        "Boros (One Punch Man)",
+        "Orochi (One Punch Man)"
     ],
     [
-        "King",
-        "Mumen Rider"
+        "King (One Punch Man)",
+        "Mumen Rider (One Punch Man)"
     ],
     [
-        "Hero Association",
-        "Monster Association"
+        "Hero Association (One Punch Man)",
+        "Monster Association (One Punch Man)"
     ],
     [
-        "Classe S",
-        "Classe A"
+        "Classe S (One Punch Man)",
+        "Classe A (One Punch Man)"
     ],
     [
-        "Kirito",
-        "Eugeo"
+        "Kirito (Sword Art Online)",
+        "Eugeo (Sword Art Online)"
     ],
     [
-        "Asuna",
-        "Alice"
+        "Asuna (Sword Art Online)",
+        "Alice (Sword Art Online)"
     ],
     [
-        "Sinon",
-        "Leafa"
+        "Sinon (Sword Art Online)",
+        "Leafa (Sword Art Online)"
     ],
     [
-        "Klein",
-        "Agil"
+        "Klein (Sword Art Online)",
+        "Agil (Sword Art Online)"
     ],
     [
-        "Yui",
-        "Cardinal"
+        "Yui (Sword Art Online)",
+        "Cardinal (Sword Art Online)"
     ],
     [
-        "Heathcliff",
-        "Oberon"
+        "Heathcliff (Sword Art Online)",
+        "Oberon (Sword Art Online)"
     ],
     [
-        "Kirito",
-        "Death Gun"
+        "Kirito (Sword Art Online)",
+        "Death Gun (Sword Art Online)"
     ],
     [
-        "Aincrad",
-        "Alfheim"
+        "Aincrad (Sword Art Online)",
+        "Alfheim (Sword Art Online)"
     ],
     [
-        "SAO",
-        "GGO"
+        "SAO (Sword Art Online)",
+        "GGO (Sword Art Online)"
     ],
     [
-        "Épée",
-        "Épée photon"
+        "Épée (Sword Art Online)",
+        "Épée photon (Sword Art Online)"
     ],
     [
-        "Kaneki",
-        "Haise"
+        "Kaneki (Tokyo Ghoul)",
+        "Haise (Tokyo Ghoul)"
     ],
     [
-        "Touka",
-        "Hinami"
+        "Touka (Tokyo Ghoul)",
+        "Hinami (Tokyo Ghoul)"
     ],
     [
-        "Arima",
-        "Juuzou"
+        "Arima (Tokyo Ghoul)",
+        "Juuzou (Tokyo Ghoul)"
     ],
     [
-        "Amon",
-        "Akira"
+        "Amon (Tokyo Ghoul)",
+        "Akira (Tokyo Ghoul)"
     ],
     [
-        "Eto",
-        "Yoshimura"
+        "Eto (Tokyo Ghoul)",
+        "Yoshimura (Tokyo Ghoul)"
     ],
     [
-        "Tsukiyama",
-        "Nishiki"
+        "Tsukiyama (Tokyo Ghoul)",
+        "Nishiki (Tokyo Ghoul)"
     ],
     [
-        "Ayato",
-        "Touka"
+        "Ayato (Tokyo Ghoul)",
+        "Touka (Tokyo Ghoul)"
     ],
     [
-        "Rize",
-        "Kaneki"
+        "Rize (Tokyo Ghoul)",
+        "Kaneki (Tokyo Ghoul)"
     ],
     [
-        "CCG",
-        "Aogiri"
+        "CCG (Tokyo Ghoul)",
+        "Aogiri (Tokyo Ghoul)"
     ],
     [
-        "Quinque",
-        "Kagune"
+        "Quinque (Tokyo Ghoul)",
+        "Kagune (Tokyo Ghoul)"
     ],
     [
-        "Kakuja",
-        "Kagune"
+        "Kakuja (Tokyo Ghoul)",
+        "Kagune (Tokyo Ghoul)"
     ],
     [
-        "Takemichi",
-        "Chifuyu"
+        "Takemichi (Tokyo Revengers)",
+        "Chifuyu (Tokyo Revengers)"
     ],
     [
-        "Mikey",
-        "Draken"
+        "Mikey (Tokyo Revengers)",
+        "Draken (Tokyo Revengers)"
     ],
     [
-        "Baji",
-        "Kazutora"
+        "Baji (Tokyo Revengers)",
+        "Kazutora (Tokyo Revengers)"
     ],
     [
-        "Mitsuya",
-        "Hakkai"
+        "Mitsuya (Tokyo Revengers)",
+        "Hakkai (Tokyo Revengers)"
     ],
     [
-        "Angry",
-        "Smiley"
+        "Angry (Tokyo Revengers)",
+        "Smiley (Tokyo Revengers)"
     ],
     [
-        "Taiju",
-        "South"
+        "Taiju (Tokyo Revengers)",
+        "South (Tokyo Revengers)"
     ],
     [
-        "Kisaki",
-        "Hanma"
+        "Kisaki (Tokyo Revengers)",
+        "Hanma (Tokyo Revengers)"
     ],
     [
-        "Izana",
-        "Kakucho"
+        "Izana (Tokyo Revengers)",
+        "Kakucho (Tokyo Revengers)"
     ],
     [
-        "Emma",
-        "Hina"
+        "Emma (Tokyo Revengers)",
+        "Hina (Tokyo Revengers)"
     ],
     [
-        "Toman",
-        "Tenjiku"
+        "Toman (Tokyo Revengers)",
+        "Tenjiku (Tokyo Revengers)"
     ],
     [
-        "Black Dragons",
-        "Valhalla"
+        "Black Dragons (Tokyo Revengers)",
+        "Valhalla (Tokyo Revengers)"
     ]
 ];
 
