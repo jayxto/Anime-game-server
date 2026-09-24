@@ -171,6 +171,20 @@
             padding: 5px 12px;
             font-size: 0.8rem;
         }
+
+        /* ================= AnimeDLE ================= */
+        .dle-board { width:100%; overflow-x:auto; margin-top:16px; }
+        .dle-grid { min-width:900px; display:grid; gap:7px; }
+        .dle-head { font-size:.68rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:7px 5px; }
+        .dle-cell { min-height:58px; display:flex; align-items:center; justify-content:center; text-align:center; padding:8px 6px; border-radius:8px; font-size:.78rem; font-weight:700; border:1px solid #2a2a40; background:#11111a; }
+        .dle-cell.good { background:rgba(0,255,136,.18); border-color:#00ff88; color:#baffd8; }
+        .dle-cell.close { background:rgba(255,230,0,.14); border-color:var(--accent-yellow); color:#fff6a8; }
+        .dle-cell.bad { background:rgba(255,42,95,.12); border-color:rgba(255,42,95,.7); color:#ffc1d0; }
+        .dle-suggestions { position:absolute; z-index:30; left:0; right:0; top:100%; max-height:220px; overflow:auto; background:#0b0b10; border:1px solid var(--accent-cyan); border-radius:0 0 8px 8px; box-shadow:0 12px 28px rgba(0,0,0,.45); display:none; }
+        .dle-suggestion { padding:9px 11px; cursor:pointer; text-align:left; font-size:.82rem; border-bottom:1px solid #202033; }
+        .dle-suggestion:hover { background:#18182a; color:var(--accent-cyan); }
+        .dle-winner { padding:12px; border:2px solid #00ff88; border-radius:9px; background:rgba(0,255,136,.08); color:#00ff88; font-weight:800; margin:12px 0; }
+
     </style>
 </head>
 <body>
@@ -386,12 +400,45 @@
                     </div>
                 </div>
 
-                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
-                    <div>
-                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
-                        <p style="margin: 0; font-size: 0.85rem;">Devine le personnage mystère grâce aux indices — course multijoueur</p>
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid var(--accent-cyan); text-align: left;">
+                    <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — le premier qui le trouve gagne. Les indices vous rapprochent à chaque essai.</p>
+                    <div class="chat-input-box" style="margin-top:0;">
+                        <select id="dle-universe-picker">
+                            <option value="naruto">Naruto</option>
+                            <option value="onepiece">One Piece</option>
+                            <option value="bleach">Bleach</option>
+                            <option value="hxh">Hunter x Hunter</option>
+                            <option value="snk">SNK / L'Attaque des Titans</option>
+                            <option value="sds">Seven Deadly Sins</option>
+                            <option value="deathnote">Death Note</option>
+                            <option value="cote">Classroom of the Elite</option>
+                            <option value="solo">Solo Leveling</option>
+                            <option value="clover">Black Clover</option>
+                            <option value="fireforce">Fire Force</option>
+                            <option value="mushoku">Mushoku Tensei</option>
+                            <option value="rezero">Re:Zero</option>
+                            <option value="fairy">Fairy Tail</option>
+                            <option value="bluelock">Blue Lock</option>
+                            <option value="fma">Fullmetal Alchemist</option>
+                            <option value="chainsaw">Chainsaw Man</option>
+                            <option value="wakfu">Wakfu</option>
+                            <option value="demonslayer">Demon Slayer</option>
+                            <option value="pokemon">Pokémon</option>
+                            <option value="dragonball">Dragon Ball</option>
+                            <option value="hellsparadise">Hell's Paradise</option>
+                            <option value="gachiakuta">Gachiakuta</option>
+                            <option value="haikyuu">Haikyuu</option>
+                            <option value="jjk">Jujutsu Kaisen</option>
+                            <option value="jojo">JoJo's Bizarre Adventure</option>
+                            <option value="tensura">Tensura</option>
+                            <option value="opm">One Punch Man</option>
+                            <option value="sao">Sword Art Online</option>
+                            <option value="tokyoghoul">Tokyo Ghoul</option>
+                            <option value="tokyorevengers">Tokyo Revengers</option>
+                        </select>
+                        <button class="btn-action" style="width:auto; margin-top:0;" onclick="createRoom('dle', document.getElementById('dle-universe-picker').value)">Créer</button>
                     </div>
-                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('dle', 'all')">Créer</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
@@ -626,26 +673,30 @@
         </div>
 
         <div id="dle-room" class="game-panel" style="max-width:900px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <h2 style="margin-bottom:0;">AnimeDLE</h2>
-                <button onclick="backToMenu()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;cursor:pointer;">🔙 Menu</button>
+                <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:.75rem; cursor:pointer;">🔙 Menu</button>
             </div>
-            <p id="dle-info">Devine le personnage mystère. Vert = exact, jaune = proche/partiel.</p>
-            <div class="chat-input-box">
-                <input id="dle-guess" list="dle-characters" placeholder="Nom du personnage…" autocomplete="off" maxlength="60">
-                <datalist id="dle-characters"></datalist>
-                <button class="btn-action" style="width:auto;margin-top:0;" onclick="submitDleGuess()">Tester</button>
+            <p id="dle-universe-label" style="margin:8px 0 4px;"></p>
+            <p id="dle-status" style="margin:0 0 12px; color:var(--accent-cyan); font-weight:700;">Trouve le personnage mystère.</p>
+
+            <div id="dle-winner-box" class="dle-winner" style="display:none;"></div>
+
+            <div id="dle-input-wrap" style="position:relative; margin:12px 0;">
+                <div class="chat-input-box" style="margin-top:0;">
+                    <input id="dle-input" type="text" autocomplete="off" placeholder="Tape un personnage…" oninput="renderDleSuggestions()" onkeydown="dleKeydown(event)">
+                    <button class="btn-action" style="width:auto; margin-top:0;" onclick="submitDleGuess()">Valider</button>
+                </div>
+                <div id="dle-suggestions" class="dle-suggestions"></div>
             </div>
-            <div id="dle-progress" style="margin:12px 0;color:var(--text-muted);font-size:.85rem;"></div>
-            <div style="overflow-x:auto;margin-top:15px;">
-                <table style="width:100%;border-collapse:separate;border-spacing:5px;font-size:.78rem;">
-                    <thead><tr><th>Perso</th><th>Anime</th><th>Sexe</th><th>Rôle</th><th>Type</th><th>Affiliation</th></tr></thead>
-                    <tbody id="dle-results"></tbody>
-                </table>
+
+            <div class="dle-board">
+                <div class="dle-grid" id="dle-grid"></div>
             </div>
-            <div id="dle-end-buttons" style="display:none;margin-top:20px;flex-direction:column;gap:10px;">
-                <button class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
-                <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+
+            <div id="dle-end-buttons" style="display:none; margin-top:18px; flex-direction:column; gap:10px;">
+                <button class="btn-action" style="background:#00ff88; color:#000; margin-top:0;" onclick="nextStepGame()">Nouveau personnage</button>
+                <button class="btn-action" style="background:var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
         </div>
 
@@ -906,7 +957,6 @@
             document.getElementById('enchere-room').style.display = 'none';
             document.getElementById('enchereaveugle-room').style.display = 'none';
             document.getElementById('connexion-room').style.display = 'none';
-            document.getElementById('dle-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -916,7 +966,6 @@
             document.getElementById('enchere-end-buttons').style.display = 'none';
             document.getElementById('ea-end-buttons').style.display = 'none';
             document.getElementById('cx-end-buttons').style.display = 'none';
-            document.getElementById('dle-end-buttons').style.display = 'none';
         }
 
         function goToMenuSelection() {
@@ -1263,31 +1312,6 @@
 
         function nextStepGame() { socket.emit('next_step_game', currentRoomCode); }
         function backToMenu() { socket.emit('back_to_menu', currentRoomCode); }
-
-        function submitDleGuess() {
-            const input = document.getElementById('dle-guess');
-            const guess = input.value.trim();
-            if (!guess) return;
-            socket.emit('dle_guess', { roomCode: currentRoomCode, guess });
-            input.value = '';
-        }
-        document.getElementById('dle-guess')?.addEventListener('keydown', e => { if (e.key === 'Enter') submitDleGuess(); });
-        socket.on('dle_state', data => {
-            hideAllPanels();
-            document.getElementById('dle-room').style.display = 'block';
-            document.getElementById('dle-end-buttons').style.display = data.gameOver ? 'flex' : 'none';
-            document.getElementById('dle-info').innerText = data.gameOver ? `🏆 ${data.winner || 'Partie terminée'} — réponse : ${data.answer}` : 'Devine le personnage mystère. Vert = exact, jaune = proche/partiel.';
-            document.getElementById('dle-progress').innerText = data.players.map(p => `${p.name}: ${p.guesses} essai${p.guesses>1?'s':''}`).join(' • ');
-            const dl=document.getElementById('dle-characters'); dl.innerHTML=(data.names||[]).map(n=>`<option value="${n.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('');
-            const body=document.getElementById('dle-results'); body.innerHTML='';
-            (data.myHistory||[]).slice().reverse().forEach(g=>{
-                const tr=document.createElement('tr');
-                const cell=(v,s)=>`<td style="padding:9px 7px;border-radius:6px;background:${s==='exact'?'#087f5b':s==='partial'?'#9a6700':'#242435'};color:white;font-weight:600;">${v}</td>`;
-                tr.innerHTML=cell(g.name,'exact')+cell(g.anime,g.match.anime)+cell(g.gender,g.match.gender)+cell(g.role,g.match.role)+cell(g.type,g.match.type)+cell(g.affiliation,g.match.affiliation);
-                body.appendChild(tr);
-            });
-        });
-        socket.on('dle_error', d => alert(d.message));
 
         /* ---------------- Effets sonores (synthétisés, aucun fichier) ---------------- */
 
@@ -1769,6 +1793,53 @@
                 sendChatMessage();
             }
         });
+
+
+        /* ================= AnimeDLE V2 client ================= */
+        let dleCandidates=[];
+        function dleEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+        function renderDleSuggestions(){
+            const input=document.getElementById('dle-input'),box=document.getElementById('dle-suggestions');
+            if(!input||!box)return; const q=input.value.trim().toLowerCase();
+            if(!q){box.style.display='none';box.innerHTML='';return;}
+            const found=dleCandidates.filter(c=>c.label.toLowerCase().includes(q)).slice(0,8);
+            if(!found.length){box.style.display='none';box.innerHTML='';return;}
+            box.innerHTML=found.map(c=>`<div class="dle-suggestion" data-value="${dleEsc(c.label)}">${dleEsc(c.label)}</div>`).join('');
+            box.querySelectorAll('.dle-suggestion').forEach(el=>el.onclick=()=>{input.value=el.dataset.value;box.style.display='none';input.focus();});
+            box.style.display='block';
+        }
+        function dleKeydown(e){if(e.key==='Enter'){e.preventDefault();submitDleGuess();}}
+        function submitDleGuess(){
+            const input=document.getElementById('dle-input'),guess=(input?.value||'').trim();
+            if(!guess||!currentRoomCode)return; socket.emit('dle_guess',{roomCode:currentRoomCode,guess});
+            input.value=''; document.getElementById('dle-suggestions').style.display='none';
+        }
+        function renderDleState(room){
+            if(!room?.dle)return; const d=room.dle; dleCandidates=d.candidates||[];
+            document.getElementById('dle-universe-label').innerText=`🎴 ${d.universeName}`;
+            const status=document.getElementById('dle-status'),winner=document.getElementById('dle-winner-box'),
+                  inputWrap=document.getElementById('dle-input-wrap'),end=document.getElementById('dle-end-buttons');
+            if(d.finished){
+                status.innerText=`Personnage : ${d.targetName}`; winner.style.display='block';
+                winner.innerText=`🏆 ${d.winnerName} a trouvé ${d.targetName} en ${d.winnerAttempts} essai${d.winnerAttempts>1?'s':''} !`;
+                inputWrap.style.display='none'; end.style.display=room.host===socket.id?'flex':'none';
+            }else{
+                status.innerText=`Trouve le personnage mystère • ${d.guesses.length} essai${d.guesses.length>1?'s':''}`;
+                winner.style.display='none';inputWrap.style.display='block';end.style.display='none';
+            }
+            const grid=document.getElementById('dle-grid'),cats=d.categories||[];
+            grid.style.gridTemplateColumns=`1.45fr repeat(${cats.length}, minmax(115px,1fr))`;
+            grid.innerHTML=`<div class="dle-head">Personnage</div>`+cats.map(c=>`<div class="dle-head">${dleEsc(c.label)}</div>`).join('');
+            [...d.guesses].reverse().forEach(g=>{
+                const first=document.createElement('div'); first.className=`dle-cell ${g.correct?'good':'bad'}`;
+                first.innerHTML=`${dleEsc(g.name)}<br><span style="font-size:.65rem;color:var(--text-muted)">${dleEsc(g.playerName)}</span>`; grid.appendChild(first);
+                cats.forEach(cat=>{const a=g.attrs?.[cat.key]||{value:'—',match:false},el=document.createElement('div');
+                    el.className=`dle-cell ${a.match?'good':'bad'}`;el.textContent=a.value;grid.appendChild(el);});
+            });
+            setTimeout(()=>document.getElementById('dle-input')?.focus(),30);
+        }
+        socket.on('dle_state',room=>{hideAllPanels();document.getElementById('dle-room').style.display='block';renderDleState(room);});
+        socket.on('dle_feedback',data=>{if(!data?.ok){const s=document.getElementById('dle-status');if(s){s.innerText=data?.message||'Personnage introuvable.';s.style.color='var(--accent-pink)';setTimeout(()=>s.style.color='var(--accent-cyan)',1200);}}});
 
         socket.on('chat_message', (data) => {
             const box = document.getElementById('chat-messages');
