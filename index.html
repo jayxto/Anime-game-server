@@ -388,6 +388,14 @@
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
+                        <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
+                        <p style="margin: 0; font-size: 0.85rem;">Devine le personnage mystère grâce aux indices — course multijoueur</p>
+                    </div>
+                    <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('dle', 'all')">Créer</button>
+                </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                    <div>
                         <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Jeu de connexion</h3>
                         <p style="margin: 0; font-size: 0.85rem;">2 joueurs min — écrivez le même mot pour gagner</p>
                     </div>
@@ -614,6 +622,30 @@
             <div id="ea-end-buttons" style="display:none; margin-top: 20px; flex-direction: column; gap: 10px;">
                 <button class="btn-action" style="background: #00ff88; color: black; margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                 <button class="btn-action" style="background: var(--text-muted); margin-top:0;" onclick="backToMenu()">Retour au menu</button>
+            </div>
+        </div>
+
+        <div id="dle-room" class="game-panel" style="max-width:900px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <h2 style="margin-bottom:0;">AnimeDLE</h2>
+                <button onclick="backToMenu()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;cursor:pointer;">🔙 Menu</button>
+            </div>
+            <p id="dle-info">Devine le personnage mystère. Vert = exact, jaune = proche/partiel.</p>
+            <div class="chat-input-box">
+                <input id="dle-guess" list="dle-characters" placeholder="Nom du personnage…" autocomplete="off" maxlength="60">
+                <datalist id="dle-characters"></datalist>
+                <button class="btn-action" style="width:auto;margin-top:0;" onclick="submitDleGuess()">Tester</button>
+            </div>
+            <div id="dle-progress" style="margin:12px 0;color:var(--text-muted);font-size:.85rem;"></div>
+            <div style="overflow-x:auto;margin-top:15px;">
+                <table style="width:100%;border-collapse:separate;border-spacing:5px;font-size:.78rem;">
+                    <thead><tr><th>Perso</th><th>Anime</th><th>Sexe</th><th>Rôle</th><th>Type</th><th>Affiliation</th></tr></thead>
+                    <tbody id="dle-results"></tbody>
+                </table>
+            </div>
+            <div id="dle-end-buttons" style="display:none;margin-top:20px;flex-direction:column;gap:10px;">
+                <button class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au menu</button>
             </div>
         </div>
 
@@ -874,6 +906,7 @@
             document.getElementById('enchere-room').style.display = 'none';
             document.getElementById('enchereaveugle-room').style.display = 'none';
             document.getElementById('connexion-room').style.display = 'none';
+            document.getElementById('dle-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -883,6 +916,7 @@
             document.getElementById('enchere-end-buttons').style.display = 'none';
             document.getElementById('ea-end-buttons').style.display = 'none';
             document.getElementById('cx-end-buttons').style.display = 'none';
+            document.getElementById('dle-end-buttons').style.display = 'none';
         }
 
         function goToMenuSelection() {
@@ -1229,6 +1263,31 @@
 
         function nextStepGame() { socket.emit('next_step_game', currentRoomCode); }
         function backToMenu() { socket.emit('back_to_menu', currentRoomCode); }
+
+        function submitDleGuess() {
+            const input = document.getElementById('dle-guess');
+            const guess = input.value.trim();
+            if (!guess) return;
+            socket.emit('dle_guess', { roomCode: currentRoomCode, guess });
+            input.value = '';
+        }
+        document.getElementById('dle-guess')?.addEventListener('keydown', e => { if (e.key === 'Enter') submitDleGuess(); });
+        socket.on('dle_state', data => {
+            hideAllPanels();
+            document.getElementById('dle-room').style.display = 'block';
+            document.getElementById('dle-end-buttons').style.display = data.gameOver ? 'flex' : 'none';
+            document.getElementById('dle-info').innerText = data.gameOver ? `🏆 ${data.winner || 'Partie terminée'} — réponse : ${data.answer}` : 'Devine le personnage mystère. Vert = exact, jaune = proche/partiel.';
+            document.getElementById('dle-progress').innerText = data.players.map(p => `${p.name}: ${p.guesses} essai${p.guesses>1?'s':''}`).join(' • ');
+            const dl=document.getElementById('dle-characters'); dl.innerHTML=(data.names||[]).map(n=>`<option value="${n.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></option>`).join('');
+            const body=document.getElementById('dle-results'); body.innerHTML='';
+            (data.myHistory||[]).slice().reverse().forEach(g=>{
+                const tr=document.createElement('tr');
+                const cell=(v,s)=>`<td style="padding:9px 7px;border-radius:6px;background:${s==='exact'?'#087f5b':s==='partial'?'#9a6700':'#242435'};color:white;font-weight:600;">${v}</td>`;
+                tr.innerHTML=cell(g.name,'exact')+cell(g.anime,g.match.anime)+cell(g.gender,g.match.gender)+cell(g.role,g.match.role)+cell(g.type,g.match.type)+cell(g.affiliation,g.match.affiliation);
+                body.appendChild(tr);
+            });
+        });
+        socket.on('dle_error', d => alert(d.message));
 
         /* ---------------- Effets sonores (synthétisés, aucun fichier) ---------------- */
 

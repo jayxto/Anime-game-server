@@ -7008,6 +7008,120 @@ function endEnchereAveugle(room, roomCode) {
     });
 }
 
+const DLE_CHARACTERS = [
+    { name:'Naruto', anime:'Naruto', gender:'Homme', role:'Héros', type:'Ninja', affiliation:'Konoha' },
+    { name:'Sasuke', anime:'Naruto', gender:'Homme', role:'Rival', type:'Ninja', affiliation:'Konoha' },
+    { name:'Sakura', anime:'Naruto', gender:'Femme', role:'Héroïne', type:'Ninja', affiliation:'Konoha' },
+    { name:'Kakashi', anime:'Naruto', gender:'Homme', role:'Mentor', type:'Ninja', affiliation:'Konoha' },
+    { name:'Itachi', anime:'Naruto', gender:'Homme', role:'Antagoniste', type:'Ninja', affiliation:'Akatsuki' },
+    { name:'Luffy', anime:'One Piece', gender:'Homme', role:'Héros', type:'Pirate', affiliation:'Équipage du Chapeau de Paille' },
+    { name:'Zoro', anime:'One Piece', gender:'Homme', role:'Allié', type:'Pirate', affiliation:'Équipage du Chapeau de Paille' },
+    { name:'Nami', anime:'One Piece', gender:'Femme', role:'Alliée', type:'Pirate', affiliation:'Équipage du Chapeau de Paille' },
+    { name:'Sanji', anime:'One Piece', gender:'Homme', role:'Allié', type:'Pirate', affiliation:'Équipage du Chapeau de Paille' },
+    { name:'Shanks', anime:'One Piece', gender:'Homme', role:'Allié', type:'Pirate', affiliation:'Empereurs' },
+    { name:'Ichigo', anime:'Bleach', gender:'Homme', role:'Héros', type:'Shinigami', affiliation:'Soul Society' },
+    { name:'Rukia', anime:'Bleach', gender:'Femme', role:'Alliée', type:'Shinigami', affiliation:'Soul Society' },
+    { name:'Aizen', anime:'Bleach', gender:'Homme', role:'Antagoniste', type:'Shinigami', affiliation:'Arrancar' },
+    { name:'Gon', anime:'Hunter x Hunter', gender:'Homme', role:'Héros', type:'Hunter', affiliation:'Hunter Association' },
+    { name:'Killua', anime:'Hunter x Hunter', gender:'Homme', role:'Allié', type:'Hunter', affiliation:'Zoldyck' },
+    { name:'Hisoka', anime:'Hunter x Hunter', gender:'Homme', role:'Antagoniste', type:'Nen', affiliation:'Brigade Fantôme' },
+    { name:'Eren', anime:'SNK', gender:'Homme', role:'Héros', type:'Titan', affiliation:'Bataillon d’exploration' },
+    { name:'Mikasa', anime:'SNK', gender:'Femme', role:'Alliée', type:'Soldat', affiliation:'Bataillon d’exploration' },
+    { name:'Levi', anime:'SNK', gender:'Homme', role:'Allié', type:'Soldat', affiliation:'Bataillon d’exploration' },
+    { name:'Meliodas', anime:'Seven Deadly Sins', gender:'Homme', role:'Héros', type:'Démon', affiliation:'Seven Deadly Sins' },
+    { name:'Ban', anime:'Seven Deadly Sins', gender:'Homme', role:'Allié', type:'Humain', affiliation:'Seven Deadly Sins' },
+    { name:'Escanor', anime:'Seven Deadly Sins', gender:'Homme', role:'Allié', type:'Humain', affiliation:'Seven Deadly Sins' },
+    { name:'Light', anime:'Death Note', gender:'Homme', role:'Protagoniste', type:'Humain', affiliation:'Kira' },
+    { name:'L', anime:'Death Note', gender:'Homme', role:'Rival', type:'Humain', affiliation:'Police' },
+    { name:'Misa', anime:'Death Note', gender:'Femme', role:'Alliée', type:'Humain', affiliation:'Kira' },
+    { name:'Ayanokoji', anime:'Classroom of the Elite', gender:'Homme', role:'Héros', type:'Étudiant', affiliation:'Classe D' },
+    { name:'Horikita', anime:'Classroom of the Elite', gender:'Femme', role:'Alliée', type:'Étudiante', affiliation:'Classe D' },
+    { name:'Ryuen', anime:'Classroom of the Elite', gender:'Homme', role:'Rival', type:'Étudiant', affiliation:'Classe C' },
+    { name:'Sung Jinwoo', anime:'Solo Leveling', gender:'Homme', role:'Héros', type:'Chasseur', affiliation:'Guilde Ahjin' },
+    { name:'Cha Hae-In', anime:'Solo Leveling', gender:'Femme', role:'Alliée', type:'Chasseur', affiliation:'Hunters Guild' },
+    { name:'Igris', anime:'Solo Leveling', gender:'Homme', role:'Allié', type:'Ombre', affiliation:'Armée des Ombres' },
+    { name:'Asta', anime:'Black Clover', gender:'Homme', role:'Héros', type:'Mage', affiliation:'Black Bulls' },
+    { name:'Yuno', anime:'Black Clover', gender:'Homme', role:'Rival', type:'Mage', affiliation:'Golden Dawn' },
+    { name:'Noelle', anime:'Black Clover', gender:'Femme', role:'Alliée', type:'Mage', affiliation:'Black Bulls' },
+    { name:'Shinra', anime:'Fire Force', gender:'Homme', role:'Héros', type:'Pyrokinétique', affiliation:'Compagnie 8' },
+    { name:'Arthur', anime:'Fire Force', gender:'Homme', role:'Allié', type:'Pyrokinétique', affiliation:'Compagnie 8' },
+    { name:'Benimaru', anime:'Fire Force', gender:'Homme', role:'Allié', type:'Pyrokinétique', affiliation:'Compagnie 7' },
+    { name:'Rudeus', anime:'Mushoku Tensei', gender:'Homme', role:'Héros', type:'Mage', affiliation:'Greyrat' },
+    { name:'Roxy', anime:'Mushoku Tensei', gender:'Femme', role:'Mentor', type:'Mage', affiliation:'Migurd' },
+    { name:'Eris', anime:'Mushoku Tensei', gender:'Femme', role:'Alliée', type:'Épéiste', affiliation:'Greyrat' },
+    { name:'Subaru', anime:'Re:Zero', gender:'Homme', role:'Héros', type:'Humain', affiliation:'Camp Emilia' },
+    { name:'Emilia', anime:'Re:Zero', gender:'Femme', role:'Héroïne', type:'Demi-elfe', affiliation:'Camp Emilia' },
+    { name:'Rem', anime:'Re:Zero', gender:'Femme', role:'Alliée', type:'Oni', affiliation:'Manoir Roswaal' },
+    { name:'Natsu', anime:'Fairy Tail', gender:'Homme', role:'Héros', type:'Dragon Slayer', affiliation:'Fairy Tail' },
+    { name:'Lucy', anime:'Fairy Tail', gender:'Femme', role:'Héroïne', type:'Mage', affiliation:'Fairy Tail' },
+    { name:'Erza', anime:'Fairy Tail', gender:'Femme', role:'Alliée', type:'Mage', affiliation:'Fairy Tail' },
+    { name:'Isagi', anime:'Blue Lock', gender:'Homme', role:'Héros', type:'Footballeur', affiliation:'Blue Lock' },
+    { name:'Rin', anime:'Blue Lock', gender:'Homme', role:'Rival', type:'Footballeur', affiliation:'Blue Lock' },
+    { name:'Nagi', anime:'Blue Lock', gender:'Homme', role:'Rival', type:'Footballeur', affiliation:'Blue Lock' },
+    { name:'Edward Elric', anime:'Fullmetal Alchemist', gender:'Homme', role:'Héros', type:'Alchimiste', affiliation:'Armée d’Amestris' },
+    { name:'Alphonse Elric', anime:'Fullmetal Alchemist', gender:'Homme', role:'Allié', type:'Alchimiste', affiliation:'Elric' },
+    { name:'Roy Mustang', anime:'Fullmetal Alchemist', gender:'Homme', role:'Allié', type:'Alchimiste', affiliation:'Armée d’Amestris' },
+    { name:'Denji', anime:'Chainsaw Man', gender:'Homme', role:'Héros', type:'Hybride', affiliation:'Public Safety' },
+    { name:'Power', anime:'Chainsaw Man', gender:'Femme', role:'Alliée', type:'Fiend', affiliation:'Public Safety' },
+    { name:'Makima', anime:'Chainsaw Man', gender:'Femme', role:'Antagoniste', type:'Démon', affiliation:'Public Safety' },
+    { name:'Yugo', anime:'Wakfu', gender:'Homme', role:'Héros', type:'Eliatrope', affiliation:'Confrérie du Tofu' },
+    { name:'Tristepin', anime:'Wakfu', gender:'Homme', role:'Allié', type:'Iop', affiliation:'Confrérie du Tofu' },
+    { name:'Amalia', anime:'Wakfu', gender:'Femme', role:'Alliée', type:'Sadida', affiliation:'Confrérie du Tofu' },
+    { name:'Tanjiro', anime:'Demon Slayer', gender:'Homme', role:'Héros', type:'Pourfendeur', affiliation:'Demon Slayer Corps' },
+    { name:'Nezuko', anime:'Demon Slayer', gender:'Femme', role:'Alliée', type:'Démon', affiliation:'Kamado' },
+    { name:'Zenitsu', anime:'Demon Slayer', gender:'Homme', role:'Allié', type:'Pourfendeur', affiliation:'Demon Slayer Corps' },
+    { name:'Pikachu', anime:'Pokémon', gender:'Inconnu', role:'Héros', type:'Pokémon', affiliation:'Équipe de Sacha' },
+    { name:'Sacha', anime:'Pokémon', gender:'Homme', role:'Héros', type:'Dresseur', affiliation:'Bourg Palette' },
+    { name:'Mewtwo', anime:'Pokémon', gender:'Inconnu', role:'Rival', type:'Pokémon', affiliation:'Aucune' },
+    { name:'Goku', anime:'Dragon Ball', gender:'Homme', role:'Héros', type:'Saiyan', affiliation:'Z Fighters' },
+    { name:'Vegeta', anime:'Dragon Ball', gender:'Homme', role:'Rival', type:'Saiyan', affiliation:'Z Fighters' },
+    { name:'Freezer', anime:'Dragon Ball', gender:'Homme', role:'Antagoniste', type:'Alien', affiliation:'Armée de Freezer' },
+    { name:'Gabimaru', anime:'Hell’s Paradise', gender:'Homme', role:'Héros', type:'Ninja', affiliation:'Iwagakure' },
+    { name:'Sagiri', anime:'Hell’s Paradise', gender:'Femme', role:'Alliée', type:'Samouraï', affiliation:'Yamada Asaemon' },
+    { name:'Chobei', anime:'Hell’s Paradise', gender:'Homme', role:'Rival', type:'Criminel', affiliation:'Aza' },
+    { name:'Rudo', anime:'Gachiakuta', gender:'Homme', role:'Héros', type:'Giver', affiliation:'Cleaners' },
+    { name:'Enjin', anime:'Gachiakuta', gender:'Homme', role:'Mentor', type:'Giver', affiliation:'Cleaners' },
+    { name:'Zanka', anime:'Gachiakuta', gender:'Homme', role:'Allié', type:'Giver', affiliation:'Cleaners' },
+    { name:'Hinata', anime:'Haikyuu', gender:'Homme', role:'Héros', type:'Volleyeur', affiliation:'Karasuno' },
+    { name:'Kageyama', anime:'Haikyuu', gender:'Homme', role:'Rival', type:'Volleyeur', affiliation:'Karasuno' },
+    { name:'Ushijima', anime:'Haikyuu', gender:'Homme', role:'Rival', type:'Volleyeur', affiliation:'Shiratorizawa' },
+    { name:'Yuji Itadori', anime:'Jujutsu Kaisen', gender:'Homme', role:'Héros', type:'Exorciste', affiliation:'Tokyo Jujutsu High' },
+    { name:'Gojo', anime:'Jujutsu Kaisen', gender:'Homme', role:'Mentor', type:'Exorciste', affiliation:'Tokyo Jujutsu High' },
+    { name:'Sukuna', anime:'Jujutsu Kaisen', gender:'Homme', role:'Antagoniste', type:'Fléau', affiliation:'Aucune' },
+    { name:'Jotaro', anime:'JoJo', gender:'Homme', role:'Héros', type:'Stand User', affiliation:'Joestar' },
+    { name:'Dio', anime:'JoJo', gender:'Homme', role:'Antagoniste', type:'Vampire', affiliation:'DIO' },
+    { name:'Giorno', anime:'JoJo', gender:'Homme', role:'Héros', type:'Stand User', affiliation:'Passione' },
+    { name:'Rimuru', anime:'Tensura', gender:'Inconnu', role:'Héros', type:'Slime', affiliation:'Tempest' },
+    { name:'Veldora', anime:'Tensura', gender:'Homme', role:'Allié', type:'Dragon', affiliation:'Tempest' },
+    { name:'Milim', anime:'Tensura', gender:'Femme', role:'Alliée', type:'Demon Lord', affiliation:'Octagram' },
+    { name:'Saitama', anime:'One Punch Man', gender:'Homme', role:'Héros', type:'Héros', affiliation:'Hero Association' },
+    { name:'Genos', anime:'One Punch Man', gender:'Homme', role:'Allié', type:'Cyborg', affiliation:'Hero Association' },
+    { name:'Garou', anime:'One Punch Man', gender:'Homme', role:'Rival', type:'Humain', affiliation:'Aucune' },
+    { name:'Kirito', anime:'Sword Art Online', gender:'Homme', role:'Héros', type:'Joueur', affiliation:'SAO' },
+    { name:'Asuna', anime:'Sword Art Online', gender:'Femme', role:'Héroïne', type:'Joueuse', affiliation:'SAO' },
+    { name:'Sinon', anime:'Sword Art Online', gender:'Femme', role:'Alliée', type:'Joueuse', affiliation:'GGO' },
+    { name:'Kaneki', anime:'Tokyo Ghoul', gender:'Homme', role:'Héros', type:'Goule', affiliation:'Anteiku' },
+    { name:'Touka', anime:'Tokyo Ghoul', gender:'Femme', role:'Alliée', type:'Goule', affiliation:'Anteiku' },
+    { name:'Arima', anime:'Tokyo Ghoul', gender:'Homme', role:'Rival', type:'Inspecteur', affiliation:'CCG' },
+    { name:'Takemichi', anime:'Tokyo Revengers', gender:'Homme', role:'Héros', type:'Délinquant', affiliation:'Toman' },
+    { name:'Mikey', anime:'Tokyo Revengers', gender:'Homme', role:'Allié', type:'Délinquant', affiliation:'Toman' },
+    { name:'Draken', anime:'Tokyo Revengers', gender:'Homme', role:'Allié', type:'Délinquant', affiliation:'Toman' },
+];
+
+
+function normalizeDle(s) { return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''); }
+function startDle(room, roomCode) {
+    const answer = DLE_CHARACTERS[Math.floor(Math.random()*DLE_CHARACTERS.length)];
+    room.status='dle_playing'; room.dle={ answer:answer.name, histories:{}, winner:null };
+    room.players.forEach(p=>room.dle.histories[p.id]=[]); emitDleState(room, roomCode);
+}
+function dleSnapshot(room, viewerId) {
+    const d=room.dle, over=room.status==='dle_over';
+    return {gameOver:over,winner:d.winner,answer:over?d.answer:null,names:DLE_CHARACTERS.map(x=>x.name).sort(),
+      players:room.players.map(p=>({name:p.name,guesses:(d.histories[p.id]||[]).length})),myHistory:d.histories[viewerId]||[]};
+}
+function emitDleState(room, roomCode){ room.players.forEach(p=>io.to(p.id).emit('dle_state',dleSnapshot(room,p.id))); }
+
 /* ================= Jeu de connexion : logique de partie (mode indépendant) ================= */
 // Chaque joueur écrit un mot en secret. Quand tout le monde a écrit, les mots sont révélés.
 // Si tout le monde a écrit le même mot -> victoire commune. Sinon on repart pour un tour.
@@ -7196,6 +7310,9 @@ io.on('connection', (socket) => {
                 return;
             }
             startEnchereAveugle(room, roomCode);
+        } else if (room.mode === 'dle') {
+            if (room.players.length < 2) { socket.emit('game_error', { message: "Il faut au moins 2 joueurs pour AnimeDLE." }); return; }
+            startDle(room, roomCode);
         } else if (room.mode === 'connexion') {
             if (room.players.length < 2) {
                 socket.emit('game_error', { message: "Il faut au moins 2 joueurs dans le salon pour lancer le Jeu de connexion." });
@@ -7621,6 +7738,20 @@ io.on('connection', (socket) => {
         resolveEnchereAveuglePass(room, roomCode, socket.id, false);
     });
 
+    socket.on('dle_guess', ({ roomCode, guess }) => {
+        const room=rooms[roomCode]; if(!room || room.status!=='dle_playing' || !room.dle) return;
+        const guessed=DLE_CHARACTERS.find(c=>normalizeDle(c.name)===normalizeDle(guess));
+        if(!guessed){ socket.emit('dle_error',{message:'Personnage inconnu dans la base AnimeDLE.'}); return; }
+        const hist=room.dle.histories[socket.id] || (room.dle.histories[socket.id]=[]);
+        if(hist.some(x=>normalizeDle(x.name)===normalizeDle(guessed.name))){ socket.emit('dle_error',{message:'Tu as déjà essayé ce personnage.'}); return; }
+        const answer=DLE_CHARACTERS.find(c=>c.name===room.dle.answer);
+        const fields=['anime','gender','role','type','affiliation'], match={};
+        fields.forEach(k=>{ const a=normalizeDle(answer[k]),g=normalizeDle(guessed[k]); match[k]=a===g?'exact':(a.includes(g)||g.includes(a))?'partial':'none'; });
+        hist.push({...guessed,match});
+        if(normalizeDle(guessed.name)===normalizeDle(answer.name)){ room.status='dle_over'; room.dle.winner=(room.players.find(p=>p.id===socket.id)||{}).name||'Un joueur'; }
+        emitDleState(room,roomCode);
+    });
+
     socket.on('next_step_game', (roomCode) => {
         const room = rooms[roomCode];
         if (!room) return;
@@ -7633,6 +7764,8 @@ io.on('connection', (socket) => {
             startEnchere(room, roomCode);
         } else if (room.mode === 'enchereaveugle') {
             startEnchereAveugle(room, roomCode);
+        } else if (room.mode === 'dle') {
+            startDle(room, roomCode);
         } else if (room.mode === 'connexion') {
             startConnexion(room, roomCode);
         } else {
@@ -7657,6 +7790,7 @@ io.on('connection', (socket) => {
             delete room.enchere;
             delete room.enchereAveugle;
             delete room.connexion;
+            delete room.dle;
             room.status = 'waiting';
             room.players.forEach(p => {
                 p.isAlive = true;
