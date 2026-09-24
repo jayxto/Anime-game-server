@@ -6530,14 +6530,72 @@ const ENCHERE_FAIRY = [
     { name: 'Wakaba début', value: 12 }
 ];
 
+// Construit une base Enchère de 50 personnages exactement par univers.
+// Les valeurs sont une échelle de puissance de jeu de 1 à 100.
+const ENCHERE_EXTRAS = {"snk": ["Carla Yeager", "Keith Shadis", "Daz"], "deathnote": ["Raye Penber", "Naomi Misora", "Watari", "Aiber", "Wedy", "Halle Lidner", "Stephen Gevanni", "Anthony Rester", "Demegawa", "Sachiko Yagami", "Sayu Yagami", "Kiyomi Takada", "Teru Mikami", "Gelus", "Sidoh", "Mido", "Nameless Shinigami", "Rod Ross", "Jack Neylon", "Matt", "Roger Ruvie", "Lind L. Tailor", "Armonia Justin Beyondormason", "Touta Matsuda", "Kanzo Mogi", "Shuichi Aizawa", "Hideki Ide", "Hitoshi Demegawa", "Kyosuke Higuchi", "Reiji Namikawa", "Shingo Mido", "Masahiko Kida", "Eiichi Takahashi", "Arayoshi Hatori", "Suguru Shimura", "Takuo Shibuimaru", "Kiichiro Osoreda", "Yuri", "Steve Mason", "George Sairas", "Yamamoto"], "cote": ["Hiyori Shiina", "Albert Yamada", "Mio Ibuki", "Daichi Ishizaki", "Rokusuke Koenji", "Teruhiko Yukimura", "Haruka Hasebe", "Akito Miyake", "Airi Sakura", "Chiaki Matsushita", "Maya Sato", "Yosuke Hirata", "Honami Ichinose", "Ryuji Kanzaki", "Masayoshi Hashimoto", "Kakeru Ryuen", "Arisu Sakayanagi", "Kei Karuizawa", "Sae Chabashira", "Chie Hoshinomiya", "Tsubasa Nanase", "Ichika Amasawa", "Takuya Yagami", "Kyo Ishigami", "Riku Utomiya", "Sakurako Tsubaki", "Nanase Tsubasa", "Fuka Kiryuin", "Nazuna Asahina", "Miki Yamamura", "Tokito Hiroya", "Kito Hayato", "Kamuro Masumi", "Yuki Himeno", "Katsuragi Kohei", "Miyabi Nagumo", "Kiriyama Ikuto", "Mako Amikura"], "solo": ["Go Gunhee", "Woo Jinchul", "Min Byung-Gyu", "Ma Dongwook", "Lim Tae-Gyu", "Hwang Dongsoo", "Hwang Dongsuk", "Kang Taeshik", "Song Chi-Yul", "Kim Chul", "Iron", "Tank", "Tusk", "Bellion", "Kaisel", "Kamish", "Yoo Myunghan", "Yoo Soohyun", "Han Song-Yi", "Park Heejin", "Park Kyung-Hye", "Sung Jinah", "Lee Minsung", "Park Jongsoo", "Goto Ryuji", "Kanae Tawata"], "fireforce": ["Akitaru Obi", "Takehisa Hinawa", "Viktor Licht", "Vulcan Joseph", "Lisa Isaribi", "Yu", "Karim Flam", "Foien Li", "Onyango", "Rekka Hoshimiya", "Arrow", "Haumea", "Charon", "Inca Kasugatani", "Ritsu", "Dragon", "Giovanni", "Yona", "Assault", "Tempe", "Sumire", "Faerie", "Pan Ko Paat", "Ogun Montgomery", "Asako Hague", "Dr. Giovanni", "Gold", "Stream", "Iron", "Sasori", "Flail", "Mirage", "Haran", "Nataku Son", "Kurono Yuichiro", "Raffles III", "Anton"], "mushoku": ["Elinalise Dragonroad", "Talhand", "Geese Nukadia", "Cliff Grimoire", "Zanoba Shirone", "Julie", "Aisha Greyrat", "Norn Greyrat", "Pax Shirone", "Perugius Dola", "Nanahoshi Shizuka", "Badigadi", "Kishirika Kishirisu", "Atofe Raibaku", "Kalman II", "Kalman III", "Doga", "Sandor von Grandeur", "Arumanfi", "Sylvaril", "Luke Notos Greyrat", "Derrick Redbat", "Tristina Purplehorse", "Isolte Cruel", "Nina Farion", "Jino Britts", "Gal Farion", "Reida Reia", "Randolph Marianne", "Moore", "Soldat Heckler", "Sara", "Suzanne"], "rezero": ["Felt", "Rom", "Priscilla Barielle", "Al", "Anastasia Hoshin", "Julius Juukulius", "Wilhelm van Astrea", "Theresia van Astrea", "Felix Argyle", "Petelgeuse Romanee-Conti", "Regulus Corneas", "Capella Emerada Lugunica", "Sirius Romanee-Conti", "Lye Batenkaitos", "Roy Alphard", "Louis Arneb", "Pandora", "Hector", "Shaula", "Reid Astrea", "Crusch Karsten", "Ricardo Welkin", "Mimi Pearlbaton", "Hetaro Pearlbaton", "Tivey Pearlbaton", "Joshua Juukulius", "Meili Portroute", "Elsa Granhiert", "Frederica Baumann", "Garfiel Tinsel"], "bluelock": ["Yo Hiori", "Ranze Kurona", "Jingo Raichi", "Gin Gagamaru", "Jyubei Aryu", "Aoshi Tokimitsu", "Tabito Karasu", "Eita Otoya", "Kenyu Yukimiya", "Ikki Niko", "Oliver Aiku", "Shuto Sendou", "Ryusei Shidou", "Michael Kaiser", "Alexis Ness", "Don Lorenzo", "Marc Snuffy", "Chris Prince", "Lavinho", "Julian Loki", "Nanase Nijiro", "Zantetsu Tsurugi", "Hajime Nishioka", "Hibiki Okawa", "Wataru Kuon", "Yudai Imamura", "Asahi Naruhaya", "Okuhito Iemon", "Gurimu Igarashi", "Ryunosuke Kira"], "fma": ["Solf J. Kimblee", "Paninya", "Rose Thomas", "Darius", "Heinkel", "Jerso", "Zampano", "Martel", "Dolcetto", "Roa"], "chainsaw": ["Fumiko Mifune", "Yuko", "Joey", "Nail Fiend", "Bucky", "Falling Devil", "Darkness Devil", "Gun Devil", "Control Devil", "War Devil", "Famine Devil", "Death Devil"], "wakfu": ["Ogrest", "Otomaï", "Dathura", "Nora", "Efrim", "Yugo le Eliatrope", "Pandiego de la Vega", "Eva la Cra", "Maître Joris", "Bonta Guard", "Brakmar Guard", "Sipho", "Coqueline", "Poo", "Pandora"], "demonslayer": ["Hotaru Haganezuka", "Kotetsu", "Tecchin Tecchikawahara", "Suma", "Makio", "Hinatsuru", "Kiyo Terauchi", "Naho Takada", "Sumi Nakahara", "Goto", "Ozaki", "Spider Demon Father", "Spider Demon Mother", "Spider Demon Brother"], "hellsparadise": ["Rokurota", "Horubo", "Moro Makiya", "Akaginu", "Kido Maru", "Aza Chobei", "Aza Toma", "Yamada Asaemon Kisho", "Yamada Asaemon Jikka", "Yamada Asaemon Shugen", "Yamada Asaemon Isuzu", "Yamada Asaemon Kiyomaru", "Yamada Asaemon Tsumutsumu", "Yamada Asaemon Gagaimo", "Yamada Asaemon Aoki", "Yamada Asaemon Makiya", "Yamada Asaemon Saki", "Doshi", "Hoko", "Mu Dan Flower Tao", "Ju Fa Flower Tao", "Tao Fa Flower Tao", "Gui Fa Flower Tao", "Mei Child Form", "Rien Tensen", "Yamada Asaemon Eizen", "Yamada Asaemon Genji", "Yamada Asaemon Senta", "Yamada Asaemon Fuchi", "Yamada Asaemon Tenza", "Yamada Asaemon Shion", "Nurugai", "Tamiya Gantetsusai", "Gabimaru Wife", "Yui", "Yamada Asaemon Tetsushin", "Yamada Asaemon Kiyomaru II", "Iwagakure Chief"], "gachiakuta": ["Arkha", "Canis Surebrec", "Tomme", "Zanka Nijiku", "Riyo Reaper", "Semiu Grier", "Gris Rubion", "Follo Tunito", "Tamsy Caines", "Delmon Gates", "Eishia Stilza", "August Stilza", "Guita Hebby Fantasia", "Dear Santa", "Bro Santa", "Jabber Wonger", "Zodyl Typhon", "Cthoni Andor", "Noerde Hew Amozo", "Fu Orostor", "Bundus Begalkeit", "Remlin Tysark", "Alice", "Amo Empool", "Regto Surebrec"], "sao": ["Sachi", "Argo", "Diavel", "Kibaou", "Sakuya", "Alicia Rue", "Recon", "Oberon", "Nobuyuki Sugou", "Death Gun", "XaXa", "PoH", "Vassago Casals", "Ronie Arabel", "Tiese Shtolienen", "Selka Zuberg", "Chudelkin", "Sheyta Synthesis Twelve", "Iskahn", "Sortiliena Serlut", "Eiji Nochizawa", "Yuna Shigemura", "Professor Shigemura", "Mito", "Misumi Tozawa", "Kyouji Shinkawa", "Shouichi Shinkawa", "Musketeer X", "Pitohui", "Llenn"], "tensura": ["Zegion", "Apito", "Geld", "Gabiru", "Beretta", "Feldway", "Michael", "Veldanava", "Granbell Rosso", "Razul", "Masayuki Honjo", "Rudra Nam Ul Nasca", "Kondou Tatsuya", "Damrada", "Moss"], "tokyoghoul": ["Shachi", "Kurona Yasuhisa", "Nashiro Yasuhisa", "Miza Kusakari", "Naki", "Hooguro", "Shousei Idera", "Hanbee Abara", "Shinsanpei Aura", "Mizurou Tamaki"], "tokyorevengers": ["Ryoko Baji", "Akane Inui", "Mana Mitsuya", "Luna Mitsuya", "Masato Tachibana", "Sakurai"]};
+
+function buildEnchere50(raw, extras = []) {
+    const names = [...parseRGList(raw), ...extras];
+    const unique = [];
+    const seen = new Set();
+    for (const name of names) {
+        const key = normalizeRG(name);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        unique.push(name);
+        if (unique.length === 50) break;
+    }
+    // 100 -> 1 sur 50 rangs. Le rang suit l'ordre de la base de l'univers.
+    return unique.map((name, i) => ({
+        name,
+        value: Math.max(1, Math.round(100 - (i * 99 / 49)))
+    }));
+}
+
+function clampEncherePool(pool, fallbackRaw, extras = []) {
+    const base = (pool || []).map(c => ({ ...c, value: Math.max(1, Math.min(100, Number(c.value) || 1)) }));
+    const seen = new Set(base.map(c => normalizeRG(c.name)));
+    for (const c of buildEnchere50(fallbackRaw, extras)) {
+        if (base.length >= 50) break;
+        if (seen.has(normalizeRG(c.name))) continue;
+        seen.add(normalizeRG(c.name));
+        base.push(c);
+    }
+    return base.slice(0, 50);
+}
+
 const ENCHERE_UNIVERSES = {
-    naruto:   { name: 'Naruto',              characters: ENCHERE_NARUTO },
-    onepiece: { name: 'One Piece',           characters: ENCHERE_ONEPIECE },
-    bleach:   { name: 'Bleach',              characters: ENCHERE_BLEACH },
-    sds:      { name: 'Seven Deadly Sins',   characters: ENCHERE_SDS },
-    mha:      { name: 'My Hero Academia',    characters: ENCHERE_MHA },
-    clover:   { name: 'Black Clover',        characters: ENCHERE_CLOVER },
-    fairy:    { name: 'Fairy Tail',          characters: ENCHERE_FAIRY }
+    naruto: { name: 'Naruto', characters: clampEncherePool(ENCHERE_NARUTO, NARUTO_RAW) },
+    onepiece: { name: 'One Piece', characters: clampEncherePool(ENCHERE_ONEPIECE, ONEPIECE_RAW) },
+    bleach: { name: 'Bleach', characters: clampEncherePool(ENCHERE_BLEACH, BLEACH_RAW) },
+    hxh: { name: 'Hunter x Hunter', characters: buildEnchere50(RG_HXH_RAW, ENCHERE_EXTRAS.hxh) },
+    snk: { name: "SNK / L'Attaque des Titans", characters: buildEnchere50(RG_SNK_RAW, ENCHERE_EXTRAS.snk) },
+    sds: { name: 'Seven Deadly Sins', characters: clampEncherePool(ENCHERE_SDS, SDS_RAW) },
+    deathnote: { name: 'Death Note', characters: buildEnchere50(RG_DEATHNOTE_RAW, ENCHERE_EXTRAS.deathnote) },
+    cote: { name: 'Classroom of the Elite', characters: buildEnchere50(RG_COTE_RAW, ENCHERE_EXTRAS.cote) },
+    solo: { name: 'Solo Leveling', characters: buildEnchere50(RG_SOLO_RAW, ENCHERE_EXTRAS.solo) },
+    clover: { name: 'Black Clover', characters: clampEncherePool(ENCHERE_CLOVER, CLOVER_RAW) },
+    fireforce: { name: 'Fire Force', characters: buildEnchere50(RG_FIREFORCE_RAW, ENCHERE_EXTRAS.fireforce) },
+    mushoku: { name: 'Mushoku Tensei', characters: buildEnchere50(RG_MUSHOKU_RAW, ENCHERE_EXTRAS.mushoku) },
+    rezero: { name: 'Re:Zero', characters: buildEnchere50(RG_REZERO_RAW, ENCHERE_EXTRAS.rezero) },
+    fairy: { name: 'Fairy Tail', characters: clampEncherePool(ENCHERE_FAIRY, FAIRY_RAW) },
+    bluelock: { name: 'Blue Lock', characters: buildEnchere50(RG_BLUELOCK_RAW, ENCHERE_EXTRAS.bluelock) },
+    fma: { name: 'Fullmetal Alchemist', characters: buildEnchere50(RG_FMA_RAW, ENCHERE_EXTRAS.fma) },
+    chainsaw: { name: 'Chainsaw Man', characters: buildEnchere50(RG_CHAINSAW_RAW, ENCHERE_EXTRAS.chainsaw) },
+    wakfu: { name: 'Wakfu', characters: buildEnchere50(RG_WAKFU_RAW, ENCHERE_EXTRAS.wakfu) },
+    demonslayer: { name: 'Demon Slayer', characters: buildEnchere50(RG_DEMONSLAYER_RAW, ENCHERE_EXTRAS.demonslayer) },
+    pokemon: { name: 'Pokémon', characters: buildEnchere50(RG_POKEMON_RAW) },
+    dragonball: { name: 'Dragon Ball', characters: buildEnchere50(RG_DRAGONBALL_RAW) },
+    hellsparadise: { name: "Hell's Paradise", characters: buildEnchere50(RG_HELLSPARADISE_RAW, ENCHERE_EXTRAS.hellsparadise) },
+    gachiakuta: { name: 'Gachiakuta', characters: buildEnchere50(RG_GACHIAKUTA_RAW, ENCHERE_EXTRAS.gachiakuta) },
+    haikyuu: { name: 'Haikyuu', characters: buildEnchere50(RG_HAIKYUU_RAW) },
+    jjk: { name: 'Jujutsu Kaisen', characters: buildEnchere50(RG_JJK_RAW) },
+    jojo: { name: "JoJo's Bizarre Adventure", characters: buildEnchere50(RG_JOJO_RAW) },
+    tensura: { name: 'Tensura', characters: buildEnchere50(RG_TENSURA_RAW, ENCHERE_EXTRAS.tensura) },
+    opm: { name: 'One Punch Man', characters: buildEnchere50(RG_OPM_RAW) },
+    sao: { name: 'Sword Art Online', characters: buildEnchere50(RG_SAO_RAW, ENCHERE_EXTRAS.sao) },
+    tokyoghoul: { name: 'Tokyo Ghoul', characters: buildEnchere50(RG_TOKYOGHOUL_RAW, ENCHERE_EXTRAS.tokyoghoul) },
+    tokyorevengers: { name: 'Tokyo Revengers', characters: buildEnchere50(RG_TOKYOREVENGERS_RAW, ENCHERE_EXTRAS.tokyorevengers) }
 };
 
 function shuffleEnchereDeck(arr) {
