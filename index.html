@@ -1020,6 +1020,7 @@
             document.getElementById('enchere-room').style.display = 'none';
             document.getElementById('enchereaveugle-room').style.display = 'none';
             document.getElementById('connexion-room').style.display = 'none';
+            document.getElementById('dle-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -1036,6 +1037,8 @@
             document.getElementById('menu-selection').style.display = 'block';
             const chatBox = document.getElementById('chat-messages');
             if (chatBox) chatBox.innerHTML = '';
+            const dleProgress = document.getElementById('dle-enrichment-progress');
+            if (dleProgress) dleProgress.style.display = 'none';
         }
 
         // Reconnexion automatique après une coupure réseau / mise en veille du téléphone
@@ -1256,8 +1259,17 @@
         }
 
         socket.on('update_room', (room) => {
-            // Sécurité : si une partie est en cours, on ne bascule jamais vers le salon d'attente
+            // Sécurité : si une partie est en cours, on ne bascule jamais vers le salon d'attente.
             if (room.status && room.status !== 'waiting') return;
+
+            // Un paquet "waiting" retardé ne doit pas recouvrir un écran de jeu déjà ouvert.
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room'];
+            const gameAlreadyVisible = activeGamePanels.some(id => {
+                const el = document.getElementById(id);
+                return el && getComputedStyle(el).display !== 'none';
+            });
+            if (gameAlreadyVisible) return;
+
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
@@ -2405,7 +2417,14 @@
             setTimeout(()=>document.getElementById('dle-input')?.focus(),30);
         }
 
-        socket.on('dle_state',room=>{hideAllPanels();document.getElementById('dle-room').style.display='block';renderDleState(room);});
+        socket.on('dle_state', room => {
+            hideAllPanels();
+            const waiting = document.getElementById('waiting-room');
+            if (waiting) waiting.style.display = 'none';
+            const dleRoom = document.getElementById('dle-room');
+            if (dleRoom) dleRoom.style.display = 'block';
+            renderDleState(room);
+        });
         socket.on('dle_feedback',data=>{if(!data?.ok){const s=document.getElementById('dle-status');if(s){s.innerText=data?.message||'Personnage introuvable.';s.style.color='var(--accent-pink)';setTimeout(()=>s.style.color='var(--accent-cyan)',1200);}}});
 
         socket.on('chat_message', (data) => {
