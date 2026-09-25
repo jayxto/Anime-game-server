@@ -7445,6 +7445,21 @@ async function startDleLiveExpansion() {
 
 const DLE_PROFILE_CACHE = new Map();
 
+// ================= AnimeDLE V10 — pool propre et dédoublonné =================
+const DLE_MASTER_NAMES = {"naruto":["Naruto Uzumaki","Sasuke Uchiha","Sakura Haruno","Kakashi Hatake","Itachi Uchiha","Hinata Hyūga","Gaara","Minato Namikaze","Madara Uchiha","Hashirama Senju","Neji Hyūga","Jiraiya","Agara","Ageha","Akahoshi","Akamaru","Akatsuchi","Akino","Anko Mitarashi","Ao","Aoi Rokushô","Arashi Fûma","Ashina Uzumaki","Asura Ōtsutsuki","Asuma Sarutobi","Ayame","Black Zetsu","Boruto Uzumaki","Chino","Chiriku","Chiyo","Chôchô Akimichi","Chôji Akimichi","Chôza Akimichi","Daemon","Danzô Shimura","Darui","Deidara","Denki Kaminarimon","Ebisu","Fû","Fū Yamanaka","Fubuki Kakuyoku","Fugaku Uchiha","Might Guy","Gakidô","Gama","Gamabunta","Gamakichi","Hagoromo Ôtsutsuki","Haku","Hamura Ôtsutsuki","Hanabi Hyûga","Hanzô","Hayate Gekkô","Hiashi Hyûga","Hidan","Himawari Uzumaki","Hiruzen Sarutobi","Ibiki Morino","Indra Ôtsutsuki","Ino Yamanaka","Inoichi Yamanaka","Inojin Yamanaka","Iruka Umino","Izumi Uchiha","Jigen","Akebino","Jinpachi Munashi","Jirôbô","Jirocho","Jōseki","Jûbi","Jûgo","Jūjin","Jūzō Biwa","Kabuto Yakushi","Kagami Uchiha","Kagari","Kaguya Ôtsutsuki","Kakuzu","Kankurô","Karin Uzumaki","Karui","Katsuyu","Kawaki","Kiba","Killer Bee","Kimimaro","Kisame Hoshigaki","Konan","Konohamaru Sarutobi","Kurama","Kurenaï","Kushina Uzumaki","Matatabi","Meï Terumi","Metal Lee","Might Duy","Mito Uzumaki","Mitsuki","Momoshiki Ôtsutsuki","Mû","Nagato","Obito Uchiha","Omoï","Onoki","Orochimaru","Pain","Pakkun","Rin Nohara","Rock Lee","Saï","Samui","Sarada Uchiha","Sasori","Shikadai Nara","Shikaku Nara","Shikamaru Nara","Shino Aburame","Shisui Uchiha","Shukaku","Son Gokû","Suzume","Temari","Tenten","Tobirama Senju","Tsunade","Utakata","White Zetsu","Yahiko","Yamato","Zōmei","Zôri"],"onepiece":["Monkey D. Luffy","Roronoa Zoro","Nami","Sanji","Nico Robin","Trafalgar D. Water Law","Shanks","Portgas D. Ace","Marshall D. Teach","Kaido","Boa Hancock","Sabo","Abdullah","Absalom","Ain","Aisa","Aladine","Alpacaman","Alvida","Charlotte Amande","Andre","Aphelandra","Aramaki","Arlong","Ashura Doji","Atlas","Atmos","Avalo Pizarro","Axe-Hand Morgan","Babanuki","Baby 5","Baccarat","Baggaley","Bakkin","Bao Huang","Bariete","Bartholomew Kuma","Bartolomeo","Basil Hawkins","Bastille","Batman","Bellamy","Bell-mère","Belo Betty","Benn Beckman","Bentham","Bepo","Big Pan","Billy","Binz","Black Maria","Blackback","Blamenco","Blenheim","Blue Gilly","Blueno","Boa Marigold","Boa Sandersonia","Bobbin","Bogard","Jewelry Bonney","Boo","Boodle","Borsalino","Brannew","Briscola","Brogy","Brook","Brownbeard","Buchi","Buffalo","Buggy","Byrnndi World","Cabaji","Caesar Clown","Caimanlady","Kalgara","Camie","Capone Bege","Caribou","Carina","Carmel","Carne","Carrot","Catarina Devon","Cavendish","Chaka","Charlos","Charlotte Anana","Charlotte Anglais","Charlotte Basans","Charlotte Bavarois","Charlotte Brownie","Charlotte Brûlée","Charlotte Chiboust","Charlotte Chiffon","Charlotte Cinnamon","Charlotte Citron","Charlotte Compote","Charlotte Counter","Charlotte Cracker","Charlotte Custard","Charlotte Daifuku","Charlotte Decuple","Charlotte Dolce","Charlotte Dragée","Charlotte Flampe","Charlotte Galette","Charlotte Harumatsu","Charlotte Joconde","Charlotte Joscarpone","Charlotte Kanten","Charlotte Katakuri","Charlotte Kato","Charlotte Linlin","Charlotte Lola","Charlotte Mascarpone","Charlotte Mash","Charlotte Mobile","Charlotte Mont-d'Or","Charlotte Moscato","Charlotte Myukuru","Charlotte Newichi","Charlotte Newji","Charlotte Nougat","Charlotte Nusstorte","Charlotte Opera","Charlotte Oven","Charlotte Perospero","Charlotte Poire","Charlotte Praline","Charlotte Pudding","Charlotte Raisin","Charlotte Smoothie","Charlotte Snack","Charlotte Tablet","Charlotte Yuen","Chess","Chew","Chimney","Cindry","Clover","Conis","Coribou","Crocodile","Crocus","Curiel","Curly Dadan","Dagama","Daifugo","Daikoku","Dalmatian","Dalton","Damask","Daruma","Daz Bones","Dellinger","Demalo Black","Den","Denjiro","Diamante","Dice","Disco","Django","Doberman","Dobon","Doc Q","Doma","Domino","Don Chinjao","Don Krieg","Donquixote Doflamingo","Donquixote Homing","Donquixote Mjosgard","Donquixote Rosinante","Dorry","Dosun","Douglas Bullet","Dr. Hiriluk","Dr. Hogback","Dr. Indigo","Dr. Kureha","Dracule Mihawk","Perona","Drake","Du Feld","Duval","Edison","Edward Newgate","Edward Weevil","Elizabello II","Emporio Ivankov","Enel","Epoida","Saint Ethanbaron V. Nusjuro","Eustass Kid","Farafra","Fisher Tiger","Fossa","Foxy","Franky","Fukaboshi","Fukuro","Fukurokuju","Fukurou","Fullbody","Funkfreed","Scopper Gaban","Gaimon","Galdino","Gambia","Gan Fall","Gasparde","Gazelleman","Gecko Moria","Gedatsu","Genzo","Gerd","Gin","Ginny","Ginrummy","Giolla","Gladius","Gloriosa","Gol D. Roger","Gonbe","Gordon","Gotti","Guernica","Gyaro","Gyukimaru","Hack","Hajrudin","Hamburg","Hammond","Hannyabal","Hanzo","Haredas","Haruta","Hatchan","Hattori","Heat","Helmeppo","Héra","Heracles","Hildon","Hina","Hody Jones","Holdem","Hongo","Hotori","Hyogoro","Hyouzou","Iceburg","Ideo","Igaram","Ikaros Much","Imu","Inazuma","Indigo","Inuarashi","Ipponmatsu","Issho","Isuka","Itomimizu","Izo","Jabra","Jack","Jaguar D. Saul","Jango","Saint Jaygarcia Saturn","Jean Bart","Jeet","Jesus Burgess","Jinbe","Jiro","John","Johnny","Jonathan","Jora","Joy Boy","Jozu","Kaku","Kalifa","Kanjuro","Karasu","Karoo","Kashii","Kawamatsu","Kaya","Kikunojo","Kikyo","Killer","Kin'emon","King","King Neptune","Kingdew","Koala","Koby","Kokoro","Komachiyo","Komurasaki","Kong","Kotori","Koushirou","Koza","Kozuki Hiyori","Kozuki Momonosuke","Kozuki Oden","Kozuki Sukiyaki","Kozuki Toki","Kuina","Kumadori","Kumashi","Kuro","Kuromarimo","Kuroobi","Kurozumi Higurashi","Kurozumi Orochi","Kuzan","Kyoshiro","Kyros","Laboon","Lacroix","Laffitte","Laki","Lao G","Leo","Lilith","Lindbergh","Little Oars Jr.","Loki","Lonz","Lorenz","Lucky Roux","Lulu","Machvise","Macro","Magellan","Makino","Manboshi","Mansherry","Marco","Saint Marcus Mars","Marguerite","Masira","Maynard","McGuy","McKinley","Merry","Minatomo","Miss Doublefinger","Miss Friday","Miss Goldenweek","Miss Merry Christmas","Miss Monday","Miss Valentine","Miyagi","Mohji","Momonga","Monet","Monkey D. Dragon","Monkey D. Garp","Mont Blanc Cricket","Mont Blanc Noland","Morgan","Morgans","Morley","Mouseman","Mousse","Mozambia","Mr. 13","Mr. 4","Mr. 5","Mr. 7","Mr. 9","Namur","Napoléon","Nefertari Cobra","Nefertari D. Lili","Nefertari Vivi","Nekomamushi","Nero","Nezumi","Nico Olvia","Ninjin","Nojiko","Nure-Onna","Nyon","Oars","Ochoku","Ohm","Oimo","Okiku","Onigumo","Onimaru","Orlumbus","O-Tama","Otohime","O-Toko","O-Tsuru","Pagaya","Page One","Pappag","Patty","Paulie","Pearl","Pedro","Pekoms","Pell","Penguin","Pica","Pierre","Porche","Porchemy","Portgas D. Rouge","Pound","Prometheus","Pythagoras","Queen","Rabbitman","Raizo","Raki","Rakuyo","Rebecca","Richie","Riku Doldo III","Rindo","Rob Lucci","Rocks D. Xebec","Rockstar","Roddy","Roshio","Rosward","Rush","Ryuboshi","Ryuma","Sadi","Saga","Sai","Saint Figarland Garling","Saint Shepherd Ju Peter","Saint Topman Warcury","Sakazuki","Saldeath","Salome","Sanjuan Wolf","Sarahebi","Sarquiss","Sarutobi","Sasaki","Satori","S-Bat","S-Bear","Scarlett","Scotch","Scratchmen Apoo","Sengoku","Senor Pink","Sentomaru","S-Flamingo","Shachi","Shaka","Shakuyaku","Shalria","Sham","S-Hawk","Sheepshead","Shiki","Shiryu","Shimotsuki Kozaburo","Shimotsuki Yasuie","Shinobu","Shirahoshi","Shoujou","Shura","Shyarly","Sicilian","Silver Axe","Silvers Rayleigh","Smoker","Solitaire","Spandam","Spandine","Speed","Speed Jill","Squardo","S-Shark","S-Snake","Strawberry","Streusen","Stronger","Stussy","Sugar","Suleiman","Surume","Sweet Pea","Tamago","Tank Lepanto","Tansui","Tararan","Taro","Tashigi","T-Bone","Tenguyama Hitetsu","Terracotta","Tesoro","Thatch","Tilestone","Tom","Tonoyasu","Tony Tony Chopper","Toto","Trebol","Tristan","Tsuru","Ucy","Ulti","Urashima","Urouge","Usopp","Uta","Van Augur","Vander Decken IX","Vasco Shot","Vegapunk","York","Vergo","Victoria Cindry","Vinsmoke Ichiji","Vinsmoke Judge","Vinsmoke Niji","Vinsmoke Reiju","Vinsmoke Sora","Vinsmoke Yonji","Viola","Vista","Vito","Wadatsumi","Wanda","Wanze","Wapol","Whitey Bay","Who's Who","Wire","Wyper","X Drake","Yama","Yamakaji","Yamato","Yasopp","Yokozuna","Yosaku","Yuda","Zala","Zambai","Zeff","Zeo","Zephyr","Zepo","Zeus","Zodia","Zunesha"],"hxh":["Gon Freecss","Killua Zoldyck","Kurapika","Leorio Paradinight","Hisoka Morow","Chrollo Lucilfer","Illumi Zoldyck","Meruem","Isaac Netero","Neferpitou","Ging Freecss","Kite","Biscuit Krueger","Zeno Zoldyck","Silva Zoldyck","Kikyo Zoldyck","Milluki Zoldyck","Alluka Zoldyck","Nanika","Kalluto Zoldyck","Gotoh","Canary","Tsubone","Amane","Satotz","Menchi","Buhara","Lippo","Hanzo","Pokkle","Ponzu","Tonpa","Bodoro","Geretta","Melody","Basho","Squala","Baise","Dalzollene","Neon Nostrade","Light Nostrade","Nobunaga Hazama","Feitan Portor","Machi Komacine","Phinks Magcub","Franklin Bordeau","Shizuku Murasaki","Bonolenov Ndongo","Pakunoda","Uvogin","Shalnark","Kortopi","Razor","Genthru","Sub","Bara","Tsezguerra","Goreinu","Abengane","Shaiapouf","Menthuthuyoupi","Colt","Reina","Cheetu","Leol","Welfin","Bloster","Ikalgo","Meleoron","Zazan","Pike","Rammot","Morel Mackernasey","Knov","Knuckle Bine","Shoot McMahon","Palm Siberia","Komugi","Gyro"],"sds":["Meliodas","Ban","King","Diane","Gowther","Merlin","Escanor","Elizabeth Liones","Zeldris","Estarossa","Mael","Hawk","Aldrich","Anne","Arthur Pendragon","Bartra Liones","Bellion","Burgie","Cain Barzad","Cath","Chandler","Chaos","Dale","Dalmally","Dana","Derieri","Dolores","Dreyfus","Drole","Elaine","Fraudrin","Galand","Gilthunder","Gloxinia","Griamore","Guila","Howzer","Hawk Mama","Helbram","Hendrickson","Jericho","Lancelot","Liz","Margaret Liones","Matrona","Melascula","Monspeet","Slader","Tristan","Twigo","Veronica Liones","Vivian","Zaneri","Zaratras","Zhivago"],"fairy":["Natsu Dragneel","Lucy Heartfilia","Gray Fullbuster","Erza Scarlet","Wendy Marvell","Gajeel Redfox","Laxus Dreyar","Juvia Lockser","Mirajane Strauss","Makarov Dreyar","Sting Eucliffe","Rogue Cheney","Acnologia","Aldoron","Alzack Connell","Angel","Anna Heartfilia","Aquarius","Arcadios","Aries","Athena","Bisca Connell","Blue Note","Cana Alberona","Cancer","Capricorn","Carla","Cobra","Coco","Deliora","Droy","Duke Barbaroa","Elfman","Eve Tearm","Evergreen","Mavis Vermillion","Freed Justine","Frosch","Gemini","Gildarts Clive","Hades","Happy","Ichiya","Igneel","Jellal Fernandes","Jose Porla","Jura Neekis","Kagura Mikazuchi","Lector","Loke","Lyon Vastia","Macao Conbolt","Mest Gryder","Metalicana","Nadi","Neinhart","Nichiya","Org","Panther Lily","Racer","Ren Akatsuki","Romeo Conbolt","Scorpio","Sherria Blendy","Silver","Tauros","Virgo","Wakaba Mine","Wally Buchanan","Warren Rocko","Warrod Sequen","Weisslogia","Wolfheim","Yajima","Yomazu","Yuka Suzuki","Yukino Agria","Yuri Dreyar","Yury","Zancrow","Zentopia","Zera","Zeref Dragneel","Zero","Zirconis","Zoldeo"],"chainsaw":["Denji","Power","Aki Hayakawa","Makima","Kobeni Higashiyama","Himeno","Reze","Katana Man","Angel Devil","Pochita","Kishibe","Hirokazu Arai","Madoka","Beam","Violence Fiend","Princi","Future Devil","Curse Devil","Fox Devil","Ghost Devil","Akane Sawatari","Quanxi","Cosmo","Pingtsi","Long","Tsugihagi","Santa Claus","Tolka","Aldo","Asa Mitaka","Yoru","Nayuta","Hirofumi Yoshida","Fami","Haruka Iseumi","Seigi Akoku","Nobana Higashiyama","Barem Bridge","Miri Sugo","Whip Hybrid","Spear Hybrid"],"dragonball":["Son Goku","Vegeta","Son Gohan","Piccolo","Freezer","Cell","Majin Buu","Beerus","Jiren","Broly","Gogeta","Vegito","Goten","Trunks","Future Trunks","Krillin","Tien Shinhan","Chiaotzu","Yamcha","Master Roshi","Bulma","Chi-Chi","Videl","Pan","Mr. Satan","Uub","Bardock","Gine","Raditz","Nappa","King Vegeta","Tarble","King Cold","Cooler","Zarbon","Dodoria","Captain Ginyu","Jeice","Burter","Recoome","Guldo","Android 16","Android 17","Android 18","Android 19","Dr. Gero","Babidi","Dabura","Supreme Kai","Kibito","Whis","Champa","Vados","Zeno","Grand Priest","Hit","Cabba","Caulifla","Kale","Kefla","Frost","Botamo","Magetta","Toppo","Dyspo","Goku Black","Zamasu","Fused Zamasu","Paragus","Gotenks","Moro","Merus","Granolah","Gas","Elec"],"haikyuu":["Shoyo Hinata","Tobio Kageyama","Kei Tsukishima","Yu Nishinoya","Toru Oikawa","Wakatoshi Ushijima","Kotaro Bokuto","Kenma Kozume","Tetsuro Kuroo","Atsumu Miya","Osamu Miya","Kiyoomi Sakusa","Tadashi Yamaguchi","Daichi Sawamura","Koshi Sugawara","Asahi Azumane","Ryunosuke Tanaka","Chikara Ennoshita","Hisashi Kinoshita","Kazuhito Narita","Kiyoko Shimizu","Hitoka Yachi","Ittetsu Takeda","Keishin Ukai","Hajime Iwaizumi","Issei Matsukawa","Takahiro Hanamaki","Shinji Watari","Shigeru Yahaba","Yutaro Kindaichi","Akira Kunimi","Morisuke Yaku","Nobuyuki Kai","Taketora Yamamoto","Shohei Fukunaga","Lev Haiba","So Inuoka","Tamahiko Teshiro","Keiji Akaashi","Akinori Konoha","Satori Tendo","Tsutomu Goshiki","Kenjiro Shirabu","Eita Semi","Reon Ohira","Taichi Kawanishi","Shinsuke Kita","Rintaro Suna","Aran Ojiro","Korai Hoshiumi","Sachiro Hirugami","Motoya Komori","Takanobu Aone","Kenji Futakuchi","Kanji Koganegawa","Yuji Terushima","Suguru Daisho"],"opm":["Saitama","Genos","Tatsumaki","Bang","King","Fubuki","Garou","Boros","Mumen Rider","Flashy Flash","Bomb","Blast","Atomic Samurai","Child Emperor","Metal Knight","Zombieman","Drive Knight","Pig God","Superalloy Darkshine","Watchdog Man","Tanktop Master","Metal Bat","Puri-Puri Prisoner","Amai Mask","Iaian","Okamaitachi","Bushidrill","Spring Mustachio","Golden Ball","Tanktop Tiger","Tanktop Black Hole","Speed-o'-Sound Sonic","Suiryu","Melzargard","Geryuganshoop","Groribas","Orochi","Psykos","Gyoro Gyoro","Black Sperm","Homeless Emperor","Elder Centipede","Gouketsu","Fuhrer Ugly","Nyan","Phoenix Man","Deep Sea King","Vaccine Man","Carnage Kabuto","Mosquito Girl","Beast King","Armored Gorilla","Dr. Genus"],"tokyorevengers":["Takemichi Hanagaki","Manjiro Sano","Ken Ryuguji","Keisuke Baji","Chifuyu Matsuno","Takashi Mitsuya","Kazutora Hanemiya","Tetta Kisaki","Izana Kurokawa","Taiju Shiba","Haruki Hayashida","Ryohei Hayashi","Nahoya Kawata","Souya Kawata","Hakkai Shiba","Atsushi Sendo","Takuya Yamamoto","Makoto Suzuki","Kazushi Yamagishi","Hinata Tachibana","Naoto Tachibana","Emma Sano","Shinichiro Sano","Shuji Hanma","Nobutaka Osanai","Yuzuha Shiba","Seishu Inui","Hajime Kokonoi","Kakucho","Kanji Mochizuki","Shion Madarame","Ran Haitani","Rindo Haitani","Yasuhiro Muto","Haruchiyo Sanzu","South Terano","Senju Kawaragi","Takeomi Akashi","Wakasa Imaushi","Keizo Arashi"],"bleach":["Ichigo Kurosaki","Rukia Kuchiki","Renji Abarai","Byakuya Kuchiki","Toshiro Hitsugaya","Kenpachi Zaraki","Sosuke Aizen","Uryu Ishida","Grimmjow Jaegerjaquez","Ulquiorra Cifer","Kisuke Urahara","Yhwach","Acidwire","Akon","As Nodt","Asguiaro Ebern","Ashido Kano","Askin","Bambietta Basterbine","Baraggan Louisenbairn","Bazz-B","BG9","Bonnie","Chojiro Sasakibe","Cirucci Sanderwicci","Coyote Starrk","Cyan Sung-Sun","Danon","Di Roy Rinker","Edrad Liones","Eikichirō Saidō","Ganryu","Garogai","Genryusai Shigekuni Yamamoto","Gerard Valkyrie","Gin Ichimaru","Ginrei Kuchiki","Giriko Kutsuzawa","Giselle Gewelle","Grand Fisher","Gremmy Thoumeaux","Shuhei Hisagi","Hisana Kuchiki","Ichibe Hyosube","Isane Kotetsu","Isshin Kurosaki","Jugram Haschwalth","Jushiro Ukitake","Lille Barro","Oetsu Nimaiya","Orihime Inoue","Ouko Yushima","Pernida Parnkgjas","Rangiku Matsumoto","Retsu Unohana","Shinji Hirako","Shunsui Kyoraku","Sode no Shirayuki","Soi Fon","Soken Ishida","Soul King","Szayelaporro Granz","Tier Harribel","Wabisuke","Yachiru Kusajishi","Yoruichi Shihoin","Yylfordt Granz","Zangetsu","Zennosuke Kurumadani","Zommari Rureaux","Mayuri Kurotsuchi"],"snk":["Eren Yeager","Mikasa Ackerman","Armin Arlert","Levi Ackerman","Reiner Braun","Annie Leonhart","Zeke Yeager","Erwin Smith","Hange Zoë","Jean Kirstein","Connie Springer","Sasha Blouse","Historia Reiss","Ymir","Bertholdt Hoover","Marco Bott","Floch Forster","Petra Ral","Oluo Bozado","Eld Jinn","Gunther Schultz","Miche Zacharius","Moblit Berner","Keith Shadis","Dot Pixis","Darius Zackly","Kenny Ackerman","Rod Reiss","Frieda Reiss","Grisha Yeager","Dina Fritz","Pieck Finger","Porco Galliard","Marcel Galliard","Gabi Braun","Falco Grice","Theo Magath","Yelena","Onyankopon","Niccolo"],"deathnote":["Light Yagami","L Lawliet","Misa Amane","Near","Mello","Ryuk","Rem","Teru Mikami","Soichiro Yagami","Touta Matsuda","Sachiko Yagami","Sayu Yagami","Shuichi Aizawa","Kanzo Mogi","Hideki Ide","Hirokazu Ukita","Watari","Kiyomi Takada","Naomi Misora","Raye Penber","Kyosuke Higuchi","Reiji Namikawa","Wedy","Aiber","Matt","Sidoh","Gelus"],"cote":["Kiyotaka Ayanokoji","Suzune Horikita","Kikyo Kushida","Kei Karuizawa","Kakeru Ryuen","Arisu Sakayanagi","Honami Ichinose","Rokusuke Koenji","Manabu Horikita","Miyabi Nagumo","Yosuke Hirata","Ken Sudo","Kanji Ike","Haruki Yamauchi","Airi Sakura","Akito Miyake","Haruka Hasebe"],"solo":["Sung Jinwoo","Cha Hae-In","Choi Jong-In","Baek Yoonho","Yoo Jinho","Thomas Andre","Liu Zhigang","Igris","Beru","Antares","Sung Jinah","Park Kyung-Hye","Lee Joohee","Song Chi-Yul","Kim Sangshik","Hwang Dongsuk","Kang Taeshik","Hwang Dongsoo","Woo Jinchul","Go Gunhee","Lim Tae-Gyu","Ma Dongwook","Min Byung-Gyu","Christopher Reed","Siddharth Bachchan","Norma Selner","Bellion","Tusk","Iron","Tank","Greed","Kaisel","Ashborn","Baran","Rakan","Sillad","Querehsha","Tarnak","Legia","Yogumunt","Kandiaru","Esil Radiru","Kamish"],"clover":["Asta","Yuno","Noelle Silva","Yami Sukehiro","Luck Voltia","Magna Swing","Fuegoleon Vermillion","Mereoleona Vermillion","Julius Novachrono","Nacht Faust","Finral Roulacase","Vanessa Enoteca","Acier Silva","Alecdora Sandler","Charlotte Roselei","Charmy Pappitson","Ciel Grinberryall","Conrad Leto","Damnatio Kira","Dante Zogratis","Fana","Ichika Yami","Jack the Ripper","Kirsch Vermillion","Klaus Lunettes","Langris Vaude","Leopold Vermillion","Licht","Liebe","Lilith","Lolopechka","Lucifero","Lucius Zogratis","Marx Francois","Megicula","Mimosa Vermillion","Nero","Nozel Silva","Rill Boismortier","Sekke Bronzazza","Sister Lily","Sister Theresa","Undine","Vanica Zogratis","William Vangeance","Zenon Zogratis"],"fireforce":["Shinra Kusakabe","Arthur Boyle","Maki Oze","Tamaki Kotatsu","Akitaru Obi","Takehisa Hinawa","Benimaru Shinmon","Leonard Burns","Sho Kusakabe","Haumea","Iris","Viktor Licht","Vulcan Joseph","Lisa Isaribe","Yu","Konro Sagamiya","Hibana","Karim Flam","Rekka Hoshimiya","Ogun Montgomery","Pan Ko Paat","Joker","Charon","Arrow","Inca Kasugatani","Ritsu","Yona","Assault","Dragon","Giovanni","Nataku Son","Kurono Yuichiro","Amaterasu"],"mushoku":["Rudeus Greyrat","Roxy Migurdia","Sylphiette","Eris Boreas Greyrat","Ruijerd Superdia","Orsted","Paul Greyrat","Ghislaine Dedoldia","Nanahoshi Shizuka","Zenith Greyrat","Lilia Greyrat","Norn Greyrat","Aisha Greyrat","Hitogami","Kishirika Kishirisu","Badigadi","Luke Notos Greyrat","Zanoba Shirone","Elinalise Dragonroad","Philip Boreas Greyrat","Hilda Boreas Greyrat","Sauros Boreas Greyrat","Perugius Dola","Almanfi","Soldat Heckler","Sara","Linia Dedoldia","Pursena Adoldia","Pax Shirone","Randolph Marianne"],"rezero":["Subaru Natsuki","Emilia","Rem","Ram","Beatrice","Roswaal L. Mathers","Reinhard van Astrea","Crusch Karsten","Priscilla Barielle","Regulus Corneas","Puck","Otto Suwen","Garfiel Tinsel","Frederica Baumann","Petra Leyte","Patrasche","Felt","Felix Argyle","Wilhelm van Astrea","Theresia van Astrea","Anastasia Hoshin","Julius Juukulius","Ricardo Welkin","Mimi","Hetaro","Tivey","Al","Echidna","Satella","Minerva","Typhon","Daphne","Sekhmet","Carmilla","Pandora","Petelgeuse Romanee-Conti","Sirius Romanee-Conti","Capella Emerada Lugunica","Lye Batenkaitos","Roy Alphard","Louis Arneb","Elsa Granhiert","Meili Portroute"],"bluelock":["Yoichi Isagi","Rin Itoshi","Meguru Bachira","Seishiro Nagi","Reo Mikage","Shoei Barou","Hyoma Chigiri","Ryusei Shidou","Michael Kaiser","Sae Itoshi","Oliver Aiku","Gin Gagamaru","Rensuke Kunigami","Jyubei Aryu","Aoshi Tokimitsu","Ikki Niko","Raichi Jingo","Tabito Karasu","Eita Otoya","Kenyu Yukimiya","Yo Hiori","Ranze Kurona","Kiyora Jin","Alexis Ness","Don Lorenzo","Charles Chevalier","Noel Noa","Julian Loki","Lavinho","Chris Prince","Marc Snuffy","Jinpachi Ego","Anri Teieri"],"fma":["Edward Elric","Alphonse Elric","Roy Mustang","Riza Hawkeye","Scar","Winry Rockbell","King Bradley","Greed","Envy","Father","Pinako Rockbell","Van Hohenheim","Trisha Elric","Jean Havoc","Heymans Breda","Vato Falman","Kain Fuery","Maes Hughes","Gracia Hughes","Elicia Hughes","Alex Louis Armstrong","Olivier Mira Armstrong","Buccaneer","Miles","Grumman","Basque Grand","May Chang","Ling Yao","Lan Fan","Fu","Yoki","Tim Marcoh","Izumi Curtis","Sig Curtis","Selim Bradley","Lust","Gluttony","Sloth","Shou Tucker","Nina Tucker","Alexander","Barry the Chopper","Maria Ross","Denny Brosh"],"wakfu":["Yugo","Tristepin de Percedal","Amalia Sheran Sharm","Evangelyne","Ruel Stroud","Adamai","Qilby","Nox","Oropo","Goultard","Az","Grougaloragran","Alibert","Shinonome","Phaeris","Chibi","Mina","Glip","Baltazar","Echo","Harebourg","Ush Galesh","Black Bump","Rubilax","Elely","Flopin","Pin","Joris Jurgen","Kerubim Crepin","Atcham","Remington Smisse","Grany Smisse","Maskemane","Kabrok","Miranda","Armand Sheran Sharm","Aurora","Moon"],"demonslayer":["Tanjiro Kamado","Nezuko Kamado","Zenitsu Agatsuma","Inosuke Hashibira","Giyu Tomioka","Kyojuro Rengoku","Shinobu Kocho","Muzan Kibutsuji","Kokushibo","Akaza","Kanao Tsuyuri","Genya Shinazugawa","Tengen Uzui","Mitsuri Kanroji","Muichiro Tokito","Sanemi Shinazugawa","Gyomei Himejima","Obanai Iguro","Kanae Kocho","Kagaya Ubuyashiki","Amane Ubuyashiki","Sakonji Urokodaki","Sabito","Makomo","Jigoro Kuwajima","Shinjuro Rengoku","Senjuro Rengoku","Doma","Hantengu","Gyokko","Gyutaro","Daki","Nakime","Kaigaku","Enmu","Rui","Kyogai","Susamaru","Yahaba","Tamayo","Yushiro","Yoriichi Tsugikuni"],"pokemon":["Pikachu","Dracaufeu","Bulbizarre","Carapuce","Ectoplasma","Mewtwo","Lucario","Gardevoir","Dracolosse","Amphinobi","Rayquaza","Arceus","Raichu","Charmeleon","Wartortle","Blastoise","Caterpie","Butterfree","Pidgeot","Rattata","Spearow","Ekans","Arbok","Sandshrew","Nidoran","Clefairy","Vulpix","Jigglypuff","Zubat","Oddish","Paras","Venonat","Diglett","Meowth","Psyduck","Mankey","Growlithe","Poliwag","Abra","Machop","Bellsprout","Tentacool","Geodude","Ponyta","Slowpoke","Magnemite","Farfetch'd","Doduo","Seel","Grimer","Shellder","Gastly","Haunter","Onix","Drowzee","Krabby","Voltorb","Exeggcute","Cubone","Hitmonlee","Hitmonchan","Lickitung","Koffing","Rhyhorn","Chansey","Tangela","Kangaskhan","Horsea","Goldeen","Staryu","Mr. Mime","Scyther","Jynx","Electabuzz","Magmar","Pinsir","Tauros","Magikarp","Gyarados","Lapras","Ditto","Eevee","Vaporeon","Jolteon","Flareon","Porygon","Omanyte","Kabuto","Aerodactyl","Snorlax","Articuno","Zapdos","Moltres","Dratini","Dragonair","Mew","Lugia","Ho-Oh","Celebi","Groudon","Kyogre","Jirachi","Deoxys","Dialga","Palkia","Giratina","Reshiram","Zekrom","Kyurem","Xerneas","Yveltal","Zygarde","Solgaleo","Lunala","Necrozma","Zacian","Zamazenta","Eternatus","Koraidon","Miraidon"],"hellsparadise":["Gabimaru","Yamada Asaemon Sagiri","Yuzuriha","Aza Chobei","Aza Toma","Yamada Asaemon Shion","Yamada Asaemon Tenza","Tamiya Gantetsusai","Rien","Mei","Yamada Asaemon Fuchi","Nurugai","Yamada Asaemon Senta","Yamada Asaemon Eizen","Yamada Asaemon Genji","Yamada Asaemon Kisho","Yamada Asaemon Jikka","Yamada Asaemon Shugen","Isuzu","Kiyomaru","Zhu Jin","Mu Dan","Ju Fa","Tao Fa","Gui Fa"],"gachiakuta":["Rudo Surebrec","Enjin","Zanka Nijiku","Riyo Reaper","Jabber Wonger","Zodyl Typhon","Tamsy Caines","Semiu Grier","Regto Surebrec","Amo Empool","Delmon","Bro","Dear","Guita","Gris","Follo","Tomme","Corvus","August","Eishia","Cthoni","Noerde","Fu","Bundus","Chiwa","Alice","Remlin"],"jjk":["Yuji Itadori","Megumi Fushiguro","Nobara Kugisaki","Satoru Gojo","Yuta Okkotsu","Maki Zenin","Suguru Geto","Ryomen Sukuna","Mahito","Kento Nanami","Toji Fushiguro","Aoi Todo","Toge Inumaki","Panda","Masamichi Yaga","Shoko Ieiri","Kiyotaka Ijichi","Atsuya Kusakabe","Mai Zenin","Kasumi Miwa","Mechamaru","Noritoshi Kamo","Momo Nishimiya","Utahime Iori","Kenjaku","Riko Amanai","Jogo","Hanami","Dagon","Choso","Eso","Kechizu","Uraume","Mei Mei","Ui Ui","Yuki Tsukumo","Tengen","Naobito Zenin","Naoya Zenin","Ogi Zenin","Jinichi Zenin","Kinji Hakari","Hiromi Higuruma","Hajime Kashimo","Reggie Star","Angel"],"tensura":["Rimuru Tempest","Veldora Tempest","Milim Nava","Diablo","Benimaru","Shion","Guy Crimson","Luminous Valentine","Hinata Sakaguchi","Gobta","Shizue Izawa","Shuna","Souei","Hakuro","Kurobe","Rigurd","Rigur","Ranga","Geld","Gabiru","Testarossa","Carrera","Ultima","Zegion","Apito","Kumara","Adalmann","Ramiris","Leon Cromwell","Dagruel","Dino","Frey","Carrion","Clayman","Chloe Aubert","Yuuki Kagurazaka","Kagali","Laplace","Tear","Footman","Velgrynd","Velzard","Treyni","Beretta","Kaijin","Gazel Dwargo"],"sao":["Kirito","Asuna Yuuki","Sinon","Leafa","Klein","Agil","Yuuki Konno","Alice Zuberg","Eugeo","Heathcliff","Yui","Silica","Lisbeth","Sachi","Argo","Diavel","Kibaou","Oberon","Death Gun","XaXa","Vassago Casals","Selka Zuberg","Ronie Arabel","Tiese Shtolienen","Cardinal","Administrator","Chudelkin","Bercouli Synthesis One","Fanatio Synthesis Two","Deusolbert","Gabriel Miller"],"tokyoghoul":["Ken Kaneki","Touka Kirishima","Kishou Arima","Juuzou Suzuya","Eto Yoshimura","Shu Tsukiyama","Hinami Fueguchi","Ayato Kirishima","Kotaro Amon","Nishiki Nishio","Rize Kamishiro","Hideyoshi Nagachika","Kimi Nishino","Yoshimura","Renji Yomo","Uta","Itori","Roma Hoito","Kaya Irimi","Enji Koma","Akira Mado","Kureo Mado","Seidou Takizawa","Yukinori Shinohara","Iwao Kuroiwa","Koori Ui"],"jojo":["Jonathan Joestar","Joseph Joestar","Jotaro Kujo","Josuke Higashikata","Giorno Giovanna","Jolyne Cujoh","Johnny Joestar","Josuke Higashikata Gappy","Dio Brando","Robert E. O. Speedwagon","Will A. Zeppeli","Erina Pendleton","Dire","Straizo","Caesar Zeppeli","Lisa Lisa","Rudol von Stroheim","Santana","Wamuu","Esidisi","Kars","Suzi Q","Muhammad Avdol","Noriaki Kakyoin","Jean Pierre Polnareff","Iggy","Hol Horse","Enya","Vanilla Ice","Oingo","Boingo","Mariah","Pet Shop","Koichi Hirose","Okuyasu Nijimura","Rohan Kishibe","Yukako Yamagishi","Shigekiyo Yangu","Tonio Trussardi","Akira Otoishi","Reimi Sugimoto","Yoshikage Kira","Bruno Bucciarati","Guido Mista","Narancia Ghirga","Leone Abbacchio","Pannacotta Fugo","Trish Una","Diavolo","Vinegar Doppio","Risotto Nero","Prosciutto","Pesci","Ghiaccio","Melone","Formaggio","Illuso","Ermes Costello","Foo Fighters","Weather Report","Narciso Anasui","Emporio Alnino","Enrico Pucci","Gyro Zeppeli","Diego Brando","Funny Valentine","Hot Pants","Lucy Steel"]};
+const DLE_MASTER_ALIASES = {"naruto":{"itachi uchiwa":"itachi uchiha","madara uchiwa":"madara uchiha","rikudo":"hagoromo otsutsuki","zetsu noir":"black zetsu","obito uchiwa":"obito uchiha","fugaku uchiwa":"fugaku uchiha","izumi uchiwa":"izumi uchiha","kagami uchiwa":"kagami uchiha","sarada uchiwa":"sarada uchiha","shisui uchiwa":"shisui uchiha"},"onepiece":{"daz bonez":"daz bones","demaro black":"demalo black","flampe":"charlotte flampe","hogback":"dr hogback","jinbei":"jinbe","lafitte":"laffitte","mjosgard":"donquixote mjosgard","neptune":"king neptune","shepherd ju peter":"saint shepherd ju peter","shutenmaru":"ashura doji","snakeman":"monkey d luffy","tama":"o tama","toko":"o toko","topman warcury":"saint topman warcury","vegapunk atlas":"atlas","vegapunk pythagoras":"pythagoras"},"fairy":{"rogue":"rogue cheney","nineheart":"neinhart"},"chainsaw":{"galgali":"violence fiend"},"dragonball":{"goku":"son goku","gohan":"son gohan","frieza":"freezer"},"tokyorevengers":{"mikey":"manjiro sano","draken":"ken ryuguji","pah chin":"haruki hayashida","peh yan":"ryohei hayashi","smiley":"nahoya kawata","angry":"souya kawata","akkun":"atsushi sendo","mucho":"yasuhiro muto","benkei":"keizo arashi"},"bleach":{"uryu quincy":"uryu ishida","yachiru unohana":"retsu unohana","zaraki kenpachi":"kenpachi zaraki"},"snk":{"eren jager":"eren yeager","grisha jager":"grisha yeager"},"fma":{"wrath":"king bradley"},"pokemon":{"charizard":"dracaufeu","gengar":"ectoplasma","dragonite":"dracolosse"},"gachiakuta":{"rudo":"rudo surebrec","zanka":"zanka nijiku","riyo":"riyo reaper","tamsy":"tamsy caines","semiu":"semiu grier","zodyl":"zodyl typhon","jabber":"jabber wonger","regto":"regto surebrec","amo":"amo empool"},"sao":{"kazuto kirigaya":"kirito","suguha kirigaya":"leafa","akihiko kayaba":"heathcliff","quinella":"administrator"}};
+
+function dleMasterCanonicalNorm(universeKey, rawName) {
+    const n = normalizeDle(rawName);
+    if (!n) return null;
+    const aliased = DLE_MASTER_ALIASES[universeKey]?.[n] || n;
+    const names = DLE_MASTER_NAMES[universeKey] || [];
+    return names.some(x => normalizeDle(x) === aliased) ? aliased : null;
+}
+function dleMasterDisplayName(universeKey, canonicalNorm) {
+    return (DLE_MASTER_NAMES[universeKey] || []).find(x => normalizeDle(x) === canonicalNorm) || null;
+}
+
 const DLE_VERIFIED_PROFILES = Object.fromEntries(
     Object.keys(DLE_UNIVERSES).map(k => [k, new Map()])
 );
@@ -7474,20 +7489,23 @@ async function loadVerifiedDleProfilesFromDb() {
     if (!process.env.DATABASE_URL) return;
     try {
         const result = await pool.query('SELECT universe_key, norm_name, display_name, attrs FROM dle_profiles');
+        let duplicatesIgnored = 0, outsideMasterIgnored = 0;
         for (const row of result.rows) {
-            if (!DLE_VERIFIED_PROFILES[row.universe_key]) continue;
             const base = DLE_UNIVERSES[row.universe_key];
-            if (!base) continue;
+            if (!base || !DLE_VERIFIED_PROFILES[row.universe_key]) continue;
             if (!isCompleteDleAttrs(row.attrs, base.categories)) continue;
-
-            DLE_VERIFIED_PROFILES[row.universe_key].set(row.norm_name, {
-                name: row.display_name,
+            const canonical = dleMasterCanonicalNorm(row.universe_key, row.display_name || row.norm_name);
+            if (!canonical) { outsideMasterIgnored++; continue; }
+            const map = DLE_VERIFIED_PROFILES[row.universe_key];
+            if (map.has(canonical)) { duplicatesIgnored++; continue; }
+            map.set(canonical, {
+                name: dleMasterDisplayName(row.universe_key, canonical),
                 attrs: row.attrs,
                 attrKnown: Object.fromEntries(base.categories.map(cat => [cat.key, true])),
                 profiled: true
             });
         }
-        console.log(`[AnimeDLE] ${result.rows.length} profils persistants chargés depuis Postgres.`);
+        console.log(`[AnimeDLE] Profils DB: doublons ignorés=${duplicatesIgnored}, hors liste maître=${outsideMasterIgnored}.`);
     } catch (e) {
         console.warn('[AnimeDLE] Chargement dle_profiles impossible :', e.message);
     }
@@ -7496,30 +7514,27 @@ async function loadVerifiedDleProfilesFromDb() {
 async function saveVerifiedDleProfile(universeKey, character, source='fandom') {
     const base = DLE_UNIVERSES[universeKey];
     if (!base || !character || !isCompleteDleAttrs(character.attrs, base.categories)) return false;
-
-    const normName = normalizeDle(character.name);
+    const canonical = dleMasterCanonicalNorm(universeKey, character.name);
+    if (!canonical) return false;
+    const displayName = dleMasterDisplayName(universeKey, canonical);
     const verified = {
-        name: character.name,
+        name: displayName,
         attrs: { ...character.attrs },
         attrKnown: Object.fromEntries(base.categories.map(cat => [cat.key, true])),
         profiled: true
     };
-    DLE_VERIFIED_PROFILES[universeKey].set(normName, verified);
-
+    DLE_VERIFIED_PROFILES[universeKey].set(canonical, verified);
     if (!process.env.DATABASE_URL) return true;
     try {
         await pool.query(`
             INSERT INTO dle_profiles (universe_key, norm_name, display_name, attrs, source, updated_at)
             VALUES ($1,$2,$3,$4::jsonb,$5,now())
             ON CONFLICT (universe_key, norm_name)
-            DO UPDATE SET display_name=EXCLUDED.display_name,
-                          attrs=EXCLUDED.attrs,
-                          source=EXCLUDED.source,
-                          updated_at=now()
-        `, [universeKey, normName, character.name, JSON.stringify(character.attrs), source]);
+            DO UPDATE SET display_name=EXCLUDED.display_name, attrs=EXCLUDED.attrs, source=EXCLUDED.source, updated_at=now()
+        `, [universeKey, canonical, displayName, JSON.stringify(character.attrs), source]);
         return true;
     } catch (e) {
-        console.warn(`[AnimeDLE] Sauvegarde profil ${universeKey}/${character.name} impossible:`, e.message);
+        console.warn(`[AnimeDLE] Sauvegarde profil ${universeKey}/${displayName} impossible:`, e.message);
         return false;
     }
 }
@@ -7895,89 +7910,60 @@ async function ensureDleCharacterProfile(universeKey, character, categories) {
 
 function dleExpandedUniverse(key) {
     const base = dleBaseUniverse(key);
-    const byNorm = new Map();
+    const byCanonical = new Map();
 
-    // Fiches V2 déjà complètes.
     for (const c of (base.characters || [])) {
-        byNorm.set(normalizeDle(c.name), {
-            name: c.name,
-            attrs: { ...(c.attrs || {}) },
-            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
-            profiled: true
+        const canonical = dleMasterCanonicalNorm(key, c.name);
+        if (!canonical || byCanonical.has(canonical)) continue;
+        byCanonical.set(canonical, {
+            name: dleMasterDisplayName(key, canonical), attrs: { ...(c.attrs || {}) },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])), profiled: true
         });
     }
 
-    // Overrides manuels complets.
     for (const [cacheKey, attrs] of Object.entries(DLE_MANUAL_OVERRIDES || {})) {
-        const [overrideUniverse, normalizedName] = cacheKey.split('|');
-        if (overrideUniverse !== key) continue;
-        if (!isCompleteDleAttrs(attrs, base.categories)) continue;
-
-        let displayName = normalizedName;
-        const rg = RG_UNIVERSES[key];
-        if (rg) {
-            const exact = parseRGList(rg.raw).find(n => normalizeDle(n) === normalizedName);
-            if (exact) displayName = exact;
-        }
-
-        byNorm.set(normalizedName, {
-            name: displayName,
-            attrs: { ...attrs },
-            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
-            profiled: true
+        const [u, raw] = cacheKey.split('|');
+        if (u !== key || !isCompleteDleAttrs(attrs, base.categories)) continue;
+        const canonical = dleMasterCanonicalNorm(key, raw);
+        if (!canonical || byCanonical.has(canonical)) continue;
+        byCanonical.set(canonical, {
+            name: dleMasterDisplayName(key, canonical), attrs: { ...attrs },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])), profiled: true
         });
     }
 
-    // Profils complétés automatiquement puis validés.
-    for (const [normName, profile] of (DLE_VERIFIED_PROFILES[key] || new Map())) {
+    for (const [raw, profile] of (DLE_VERIFIED_PROFILES[key] || new Map())) {
         if (!isCompleteDleAttrs(profile.attrs, base.categories)) continue;
-        byNorm.set(normName, {
-            name: profile.name,
-            attrs: { ...profile.attrs },
-            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
-            profiled: true
+        const canonical = dleMasterCanonicalNorm(key, profile.name || raw);
+        if (!canonical || byCanonical.has(canonical)) continue;
+        byCanonical.set(canonical, {
+            name: dleMasterDisplayName(key, canonical), attrs: { ...profile.attrs },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])), profiled: true
         });
     }
 
-    return {
-        name: base.name,
-        categories: [...(base.categories || [])],
-        customCategoryCount: (base.categories || []).length,
-        characters: [...byNorm.values()]
-    };
+    return { name: base.name, categories: [...(base.categories || [])], customCategoryCount:(base.categories||[]).length, characters:[...byCanonical.values()] };
 }
-
 
 function getDleMasterNames(universeKey) {
     const names = new Map();
-    const add = (name) => {
-        const clean = cleanDleExternalTitle(name);
-        if (!clean) return;
-        const n = normalizeDle(clean);
-        if (!n) return;
-        if (!names.has(n)) names.set(n, clean);
-    };
-
-    const base = DLE_UNIVERSES[universeKey];
-    for (const c of (base?.characters || [])) add(c.name);
-
-    const rg = RG_UNIVERSES[universeKey];
-    if (rg) for (const name of parseRGList(rg.raw)) add(name);
-
-    for (const name of (DLE_LIVE_POOLS[universeKey] || [])) add(name);
-
+    for (const displayName of (DLE_MASTER_NAMES[universeKey] || [])) {
+        const canonical = dleMasterCanonicalNorm(universeKey, displayName);
+        if (canonical && !names.has(canonical)) names.set(canonical, displayName);
+    }
     return names;
 }
 
-function dleProfileExists(universeKey, normName) {
-    if (DLE_VERIFIED_PROFILES[universeKey]?.has(normName)) return true;
+function dleProfileExists(universeKey, rawNameOrNorm) {
+    const canonical = dleMasterCanonicalNorm(universeKey, rawNameOrNorm);
+    if (!canonical) return false;
+    if (DLE_VERIFIED_PROFILES[universeKey]?.has(canonical)) return true;
     const base = DLE_UNIVERSES[universeKey];
-    if ((base?.characters || []).some(c => normalizeDle(c.name) === normName)) return true;
-    const manual = Object.entries(DLE_MANUAL_OVERRIDES || {}).some(([k, attrs]) => {
-        const [u, n] = k.split('|');
-        return u === universeKey && n === normName && isCompleteDleAttrs(attrs, base.categories);
+    if ((base?.characters || []).some(c => dleMasterCanonicalNorm(universeKey, c.name) === canonical)) return true;
+    return Object.entries(DLE_MANUAL_OVERRIDES || {}).some(([k, attrs]) => {
+        const [u,n] = k.split('|');
+        return u === universeKey && dleMasterCanonicalNorm(universeKey, n) === canonical && isCompleteDleAttrs(attrs, base.categories);
     });
-    return manual;
 }
 
 function sleepDle(ms) {
@@ -8010,13 +7996,6 @@ async function enrichOneDleProfile(universeKey, displayName) {
 async function enrichDleUniverse(universeKey, { delayMs=350 } = {}) {
     DLE_ENRICHMENT_STATE.currentUniverse = universeKey;
 
-    try {
-        await Promise.race([
-            ensureDleUniverseExpansion(universeKey),
-            new Promise(resolve => setTimeout(resolve, 15000))
-        ]);
-    } catch (_) {}
-
     const names = getDleMasterNames(universeKey);
 
     for (const [normName, displayName] of names) {
@@ -8043,9 +8022,6 @@ async function startDleProfileEnrichment() {
 
     try {
         await loadVerifiedDleProfilesFromDb();
-
-        // Charge les gros noms publics en arrière-plan.
-        startDleLiveExpansion().catch(() => {});
 
         // Priorité aux univers les plus testés / populaires puis le reste.
         const priority = [
@@ -8156,8 +8132,9 @@ async function startDle(room, roomCode) {
 
 function resolveDleGuess(room, rawGuess) {
     const u = dleExpandedUniverse(room.dle.universeKey);
-    const n = normalizeDle(rawGuess);
-    return u.characters.find(c => normalizeDle(c.name) === n) || null;
+    const canonical = dleMasterCanonicalNorm(room.dle.universeKey, rawGuess);
+    if (!canonical) return null;
+    return u.characters.find(c => dleMasterCanonicalNorm(room.dle.universeKey, c.name) === canonical) || null;
 }
 
 function dleTokenSet(value) {
