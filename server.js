@@ -9160,7 +9160,13 @@ const BLINDTEST_TRACKS = [
     { n:85, anime:"Beastars", title:"YOASOBI - Kaibutsu" },
     { n:86, anime:"Frieren", title:"Yorushika - Haru" },
     { n:87, anime:"Fullmetal Alchemist: Brotherhood", title:"YUI - again" }
-].map(t => ({ ...t, src:`/music/track_${String(t.n).padStart(3,'0')}.mp3` }));
+].map(t => {
+    // Requête YouTube pour retrouver la vidéo de l'opening/ending (version sans générique si possible)
+    const song = t.title.replace(/\s*\((Lo-fi|Remix)\)\s*$/i, '');
+    const ost = [38,49,50,69,70,71,72,73,74,75].includes(t.n); // films / OST : pas de version "creditless"
+    const yt = ost ? `${t.anime} ${song}` : `${t.anime} ${song} creditless`;
+    return { ...t, yt, src:`/music/track_${String(t.n).padStart(3,'0')}.mp3` };
+});
 
 // Leurres supplémentaires pour varier les propositions
 const BLINDTEST_EXTRA_CHOICES = [
@@ -9172,7 +9178,35 @@ const BLINDTEST_EXTRA_CHOICES = [
 const BLINDTEST_ANIMES = [...new Set(BLINDTEST_TRACKS.map(t => t.anime))];
 const BLINDTEST_ROUNDS = 10;
 const BLINDTEST_ROUND_MS = 20000;
-const BLINDTEST_REVEAL_MS = 5000;
+const BLINDTEST_REVEAL_MS = 25000; // le temps de regarder l'opening (l'hôte peut passer)
+const btVideoCache = new Map(); // requête -> videoId (ou null)
+
+// Recherche le premier résultat YouTube (sans clé API) — résultat mis en cache
+async function btFindVideo(query) {
+    if (btVideoCache.has(query)) return btVideoCache.get(query);
+    let id = null;
+    try {
+        if (typeof fetch !== 'function') throw new Error('fetch indisponible');
+        const ctrl = new AbortController();
+        const to = setTimeout(() => ctrl.abort(), 6000);
+        const r = await fetch('https://www.youtube.com/results?search_query=' + encodeURIComponent(query), {
+            signal:ctrl.signal,
+            headers:{
+                'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
+                'Accept-Language':'fr-FR,fr;q=0.9,en;q=0.8',
+                'Cookie':'CONSENT=YES+1; SOCS=CAI'
+            }
+        });
+        clearTimeout(to);
+        const html = await r.text();
+        const m = html.match(/"videoRenderer":\{"videoId":"([A-Za-z0-9_-]{11})"/) || html.match(/"videoId":"([A-Za-z0-9_-]{11})"/);
+        id = m ? m[1] : null;
+    } catch (e) {
+        console.warn('[BlindTest] Recherche YouTube impossible :', e.message);
+    }
+    if (id) btVideoCache.set(query, id); // on ne met pas en cache les échecs
+    return id;
+}
 const blindTimers = {};
 
 function btShuffle(arr) {
@@ -9220,7 +9254,11 @@ function btPublicState(room) {
             };
         }),
         winnerNames:bt.winnerNames || null,
-        hostId:room.host
+        hostId:room.host,
+        videoId:revealed ? (bt.videoId || null) : null,
+        videoSearch:revealed ? (bt.current?.yt || null) : null,
+        revealEndsAt:bt.revealEndsAt || null,
+        revealMs:BLINDTEST_REVEAL_MS
     };
 }
 
@@ -9261,6 +9299,15 @@ function btNextRound(room, roomCode) {
     bt.answers = {};
     bt.startedAt = Date.now();
     bt.endsAt = bt.startedAt + BLINDTEST_ROUND_MS;
+    bt.videoId = null;
+    bt.revealEndsAt = null;
+    // On cherche la vidéo dès le début de la manche pour qu'elle soit prête à la révélation
+    const roundNo = bt.round;
+    btFindVideo(track.yt).then(id => {
+        if (!room.blindtest || room.blindtest !== bt || bt.round !== roundNo) return;
+        bt.videoId = id;
+        if (bt.phase === 'reveal' && id) emitBlindState(room, roomCode);
+    });
 
     emitBlindState(room, roomCode);
     blindTimers[roomCode] = setTimeout(() => btReveal(room, roomCode), BLINDTEST_ROUND_MS + 300);
@@ -9271,6 +9318,7 @@ function btReveal(room, roomCode) {
     if (!bt || bt.phase !== 'playing' || rooms[roomCode] !== room) return;
     btClearTimer(roomCode);
     bt.phase = 'reveal';
+    bt.revealEndsAt = Date.now() + BLINDTEST_REVEAL_MS;
     emitBlindState(room, roomCode);
     blindTimers[roomCode] = setTimeout(() => {
         if (rooms[roomCode] !== room || !room.blindtest) return;
@@ -9652,6 +9700,13 @@ io.on('connection', (socket) => {
         } else {
             emitBlindState(room, roomCode);
         }
+    });
+
+    socket.on('bt_skip', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        const bt = room?.blindtest;
+        if (!room || !bt || room.host !== socket.id || bt.phase !== 'reveal') return;
+        btNextRound(room, roomCode);
     });
 
     socket.on('chat_message', ({ roomCode, message }) => {

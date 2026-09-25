@@ -330,6 +330,11 @@
         .bt-choice.bad{border-color:var(--accent-pink);background:rgba(255,42,95,.12);color:var(--accent-pink);}
         .bt-timer{height:8px;background:#1b1b28;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
         .bt-timer-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));transition:width .2s linear;}
+        .bt-video{display:none;margin:14px auto 0;max-width:720px;}
+        .bt-video-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;border:2px solid var(--accent-cyan);background:#000;}
+        .bt-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+        .bt-video-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px;}
+        .bt-video-links a,.bt-video-links button{font-size:.8rem;color:var(--accent-cyan);background:none;border:1px solid #34344a;border-radius:6px;padding:6px 10px;cursor:pointer;text-decoration:none;font-weight:700;}
         .bt-disc{font-size:4rem;text-align:center;margin:10px 0;}
         .bt-disc.spin{animation:btspin 2.2s linear infinite;}
         @keyframes btspin{to{transform:rotate(360deg);}}
@@ -931,6 +936,13 @@
                 <div id="bt-choices" class="bt-choices"></div>
                 <div id="bt-result" style="min-height:28px;text-align:center;font-weight:800;margin:14px 0 4px;"></div>
                 <div id="bt-song" style="text-align:center;color:var(--text-muted);font-size:.85rem;"></div>
+                <div id="bt-video" class="bt-video">
+                    <div id="bt-video-frame" class="bt-video-frame"></div>
+                    <div class="bt-video-links">
+                        <a id="bt-video-link" href="#" target="_blank" rel="noopener">Ouvrir sur YouTube ↗</a>
+                        <button id="bt-skip-btn" onclick="btSkip()" style="display:none;">⏭ Manche suivante</button>
+                    </div>
+                </div>
                 <div id="bt-end-buttons" style="display:none;margin-top:18px;flex-direction:column;gap:10px;">
                     <button id="bt-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                     <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
@@ -3016,6 +3028,7 @@
         }
 
         function btStopAudio() {
+            if (typeof btClearVideo === 'function') btClearVideo();
             btAudio.pause();
             btAudio.removeAttribute('src');
             btAudio.load();
@@ -3060,6 +3073,12 @@
             const q = btState;
             const fill = document.getElementById('bt-timer-fill');
             const label = document.getElementById('bt-time');
+            if (q && q.phase === 'reveal' && q.revealEndsAt) {
+                const left = Math.max(0, q.revealEndsAt - (Date.now() + btClockOffset));
+                if (fill) fill.style.width = `${(left / q.revealMs) * 100}%`;
+                if (label) label.textContent = `Suite dans ${Math.ceil(left / 1000)}s`;
+                return;
+            }
             if (!q || q.phase !== 'playing') {
                 if (fill) fill.style.width = '0%';
                 if (label) label.textContent = q?.phase === 'finished' ? 'Terminé' : 'Réponse !';
@@ -3068,6 +3087,52 @@
             const left = Math.max(0, q.endsAt - (Date.now() + btClockOffset));
             if (fill) fill.style.width = `${(left / q.roundMs) * 100}%`;
             if (label) label.textContent = `${Math.ceil(left / 1000)}s`;
+        }
+
+        let btVideoKey = null;
+
+        function btClearVideo() {
+            btVideoKey = null;
+            const box = document.getElementById('bt-video');
+            const frame = document.getElementById('bt-video-frame');
+            if (frame) frame.innerHTML = '';
+            if (box) box.style.display = 'none';
+        }
+
+        function btShowVideo(q) {
+            const box = document.getElementById('bt-video');
+            const frame = document.getElementById('bt-video-frame');
+            const link = document.getElementById('bt-video-link');
+            box.style.display = 'block';
+            link.href = q.videoId
+                ? `https://www.youtube.com/watch?v=${q.videoId}`
+                : `https://www.youtube.com/results?search_query=${encodeURIComponent(q.videoSearch || q.answer || '')}`;
+            document.getElementById('bt-skip-btn').style.display = q.hostId === socket.id ? 'inline-block' : 'none';
+
+            const key = `${q.round}|${q.videoId || ''}`;
+            if (btVideoKey === key) return;
+            btVideoKey = key;
+
+            if (q.videoId) {
+                // La vidéo prend le relais de l'extrait audio
+                btAudio.pause();
+                document.getElementById('bt-play-btn').style.display = 'none';
+                const f = document.createElement('iframe');
+                f.src = `https://www.youtube-nocookie.com/embed/${q.videoId}?autoplay=1&rel=0&playsinline=1`;
+                f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+                f.allowFullscreen = true;
+                f.title = 'Opening';
+                frame.innerHTML = '';
+                frame.appendChild(f);
+                frame.style.display = 'block';
+            } else {
+                frame.innerHTML = '';
+                frame.style.display = 'none';
+            }
+        }
+
+        function btSkip() {
+            socket.emit('bt_skip', { roomCode:currentRoomCode });
         }
 
         function btAnswer(choice) {
@@ -3141,6 +3206,7 @@
                 disc.textContent = '💿';
                 song.textContent = '';
                 endBtns.style.display = 'none';
+                btClearVideo();
                 if (btMyChoice) { result.style.color = 'var(--accent-cyan)'; result.textContent = 'Réponse envoyée, attends les autres…'; }
                 else { result.style.color = 'var(--text-color)'; result.textContent = 'Écoute bien… de quel anime vient cette musique ?'; }
                 btLoadRound(q);
@@ -3152,8 +3218,10 @@
                     result.textContent = me?.correct ? `✅ Bien joué ! C'était ${q.answer} (+${me.gained})` : `❌ C'était ${q.answer}`;
                     song.textContent = `🎶 ${q.songTitle || ''}`;
                     endBtns.style.display = 'none';
+                    btShowVideo(q);
                 } else {
                     btStopAudio();
+                    btClearVideo();
                     disc.textContent = '🏆';
                     const w = q.winnerNames || [];
                     result.style.color = 'var(--accent-yellow)';
