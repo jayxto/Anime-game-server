@@ -1202,7 +1202,7 @@
 
                     if (progress) {
                         progress.style.display='block';
-                        progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches complètes — récupération des infos + photos…`;
+                        progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches réellement jouables — récupération des fiches manquantes + photos…`;
                     }
 
                     let cursor = 0;
@@ -1214,14 +1214,14 @@
                             const ok = await enrichOneDleCharacter(universeKey, name);
                             if (ok) completed++;
                             if (progress) {
-                                progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches complètes — photos incluses`;
+                                progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches réellement jouables — photos incluses`;
                             }
                         }
                     }
                     await Promise.all(Array.from({length:workers}, () => worker()));
 
                     if (progress) {
-                        progress.textContent=`✅ ${info.universeName} : ${completed}/${info.targetCount} fiches complètes prêtes.`;
+                        progress.textContent=`✅ ${info.universeName} : ${completed}/${info.targetCount} fiches réellement jouables prêtes.`;
                     }
                 } catch (_) {
                     if (progress) {
@@ -1463,12 +1463,37 @@
                 // fallback to our server/cache
                 try {
                     const r = await fetch(`/api/character-image?universe=${encodeURIComponent(universe)}&name=${encodeURIComponent(name)}`);
-                    if (!r.ok) return null;
-                    const data = await r.json();
-                    return data?.imageUrl ? data : null;
-                } catch (_) {
-                    return null;
-                }
+                    if (r.ok) {
+                        const data = await r.json();
+                        if (data?.imageUrl) return data;
+                    }
+                } catch (_) {}
+
+                // Dernier secours pour que le jeu affiche quand même une photo :
+                // recherche Jikan/MAL, en privilégiant une correspondance exacte du nom.
+                try {
+                    const r = await fetch(`https://api.jikan.moe/v4/characters?q=${encodeURIComponent(name)}&limit=10`);
+                    if (r.ok) {
+                        const data = await r.json();
+                        const wanted = normalizeFandomClient(name);
+                        const candidates = Array.isArray(data?.data) ? data.data : [];
+                        const exact = candidates.find(c =>
+                            normalizeFandomClient(c?.name || '') === wanted ||
+                            (c?.nicknames || []).some(n => normalizeFandomClient(n) === wanted)
+                        );
+                        const picked = exact || candidates[0];
+                        const imageUrl = picked?.images?.jpg?.image_url || picked?.images?.webp?.image_url || null;
+                        if (imageUrl) {
+                            return {
+                                imageUrl,
+                                sourceUrl: picked?.url || null,
+                                status:'ok-jikan-fallback'
+                            };
+                        }
+                    }
+                } catch (_) {}
+
+                return null;
             })();
 
             fandomImageClientCache.set(key, promise);
