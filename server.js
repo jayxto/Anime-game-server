@@ -53,6 +53,19 @@ async function initDb() {
             PRIMARY KEY (universe_key, norm_name)
         );
     `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS character_images (
+            universe_key TEXT NOT NULL,
+            norm_name TEXT NOT NULL,
+            display_name TEXT NOT NULL,
+            image_url TEXT,
+            source_url TEXT,
+            status TEXT NOT NULL DEFAULT 'ok',
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            PRIMARY KEY (universe_key, norm_name)
+        );
+    `);
 }
 
 initDb()
@@ -60,6 +73,363 @@ initDb()
     .catch(err => {
         console.error("Erreur d'initialisation de la base de données :", err);
     });
+
+
+/* ================= Images personnages — Fandom automatique =================
+   Aucun lien à remplir à la main :
+   - première apparition d'un perso -> recherche de son image principale sur Fandom
+   - URL + page source mises en cache en mémoire et dans Postgres
+   - les appels suivants réutilisent directement le cache
+============================================================================ */
+
+const FANDOM_WIKIS = {
+    naruto: 'naruto.fandom.com',
+    onepiece: 'onepiece.fandom.com',
+    bleach: 'bleach.fandom.com',
+    hxh: 'hunterxhunter.fandom.com',
+    snk: 'attackontitan.fandom.com',
+    sds: 'nanatsu-no-taizai.fandom.com',
+    deathnote: 'deathnote.fandom.com',
+    cote: 'you-zitsu.fandom.com',
+    solo: 'solo-leveling.fandom.com',
+    clover: 'blackclover.fandom.com',
+    fireforce: 'fire-force.fandom.com',
+    mushoku: 'mushokutensei.fandom.com',
+    rezero: 'rezero.fandom.com',
+    fairy: 'fairytail.fandom.com',
+    bluelock: 'bluelock.fandom.com',
+    fma: 'fma.fandom.com',
+    chainsaw: 'chainsaw-man.fandom.com',
+    wakfu: 'wakfu.fandom.com',
+    demonslayer: 'kimetsu-no-yaiba.fandom.com',
+    pokemon: 'pokemon.fandom.com',
+    dragonball: 'dragonball.fandom.com',
+    hellsparadise: 'jigokuraku.fandom.com',
+    gachiakuta: 'gachiakuta.fandom.com',
+    haikyuu: 'haikyuu.fandom.com',
+    jjk: 'jujutsu-kaisen.fandom.com',
+    jojo: 'jojo.fandom.com',
+    tensura: 'tensura.fandom.com',
+    opm: 'onepunchman.fandom.com',
+    sao: 'swordartonline.fandom.com',
+    tokyoghoul: 'tokyoghoul.fandom.com',
+    tokyorevengers: 'tokyorevengers.fandom.com'
+};
+
+const FANDOM_UNIVERSE_ALIASES = {
+    'naruto':'naruto',
+    'one piece':'onepiece',
+    'bleach':'bleach',
+    'hunter x hunter':'hxh',
+    "snk":"snk",
+    "snk / l'attaque des titans":"snk",
+    "l'attaque des titans":"snk",
+    "attack on titan":"snk",
+    'seven deadly sins':'sds',
+    'death note':'deathnote',
+    'classroom of the elite':'cote',
+    'solo leveling':'solo',
+    'black clover':'clover',
+    'fire force':'fireforce',
+    'mushoku tensei':'mushoku',
+    're:zero':'rezero',
+    'rezero':'rezero',
+    'fairy tail':'fairy',
+    'blue lock':'bluelock',
+    'fullmetal alchemist':'fma',
+    'chainsaw man':'chainsaw',
+    'wakfu':'wakfu',
+    'demon slayer':'demonslayer',
+    'pokemon':'pokemon',
+    'pokémon':'pokemon',
+    'dragon ball':'dragonball',
+    "hell's paradise":'hellsparadise',
+    'gachiakuta':'gachiakuta',
+    'haikyuu':'haikyuu',
+    'jujutsu kaisen':'jjk',
+    'jjk':'jjk',
+    "jojo's bizarre adventure":'jojo',
+    'jojo':'jojo',
+    'tensura':'tensura',
+    'one punch man':'opm',
+    'sword art online':'sao',
+    'sao':'sao',
+    'tokyo ghoul':'tokyoghoul',
+    'tokyo revengers':'tokyorevengers'
+};
+
+const CHARACTER_IMAGE_CACHE = new Map();
+const CHARACTER_IMAGE_INFLIGHT = new Map();
+
+function normalizeImageKey(value) {
+    return String(value || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[’`]/g, "'")
+        .replace(/[^a-z0-9']+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function resolveImageUniverseKey(rawUniverse) {
+    const raw = String(rawUniverse || '').trim();
+    if (FANDOM_WIKIS[raw]) return raw;
+    return FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)] || null;
+}
+
+function cleanImageCharacterName(name) {
+    return String(name || '')
+        .replace(/\s+\((?:adult|young|child|anime|manga|movie|film)\)\s*$/i, '')
+        .trim();
+}
+
+function parseCharacterLabelForImage(label) {
+    const s = String(label || '').trim();
+    if (!s) return { name:'', universe:null };
+
+    if (s.endsWith(')')) {
+        const i = s.lastIndexOf(' (');
+        if (i > 0) {
+            return {
+                name: s.slice(0, i).trim(),
+                universe: s.slice(i + 2, -1).trim()
+            };
+        }
+    }
+    return { name:s, universe:null };
+}
+
+async function getCachedCharacterImage(universeKey, displayName) {
+    const normName = normalizeImageKey(displayName);
+    const cacheKey = `${universeKey}|${normName}`;
+
+    if (CHARACTER_IMAGE_CACHE.has(cacheKey)) {
+        return CHARACTER_IMAGE_CACHE.get(cacheKey);
+    }
+
+    if (!process.env.DATABASE_URL) return null;
+    try {
+        const result = await pool.query(
+            `SELECT image_url, source_url, status
+             FROM character_images
+             WHERE universe_key=$1 AND norm_name=$2
+             LIMIT 1`,
+            [universeKey, normName]
+        );
+        if (!result.rows.length) return null;
+        const row = result.rows[0];
+        const data = {
+            imageUrl: row.image_url || null,
+            sourceUrl: row.source_url || null,
+            status: row.status || 'missing'
+        };
+        CHARACTER_IMAGE_CACHE.set(cacheKey, data);
+        return data;
+    } catch (e) {
+        return null;
+    }
+}
+
+async function saveCachedCharacterImage(universeKey, displayName, data) {
+    const normName = normalizeImageKey(displayName);
+    const cacheKey = `${universeKey}|${normName}`;
+    CHARACTER_IMAGE_CACHE.set(cacheKey, data);
+
+    if (!process.env.DATABASE_URL) return;
+    try {
+        await pool.query(`
+            INSERT INTO character_images
+                (universe_key, norm_name, display_name, image_url, source_url, status, updated_at)
+            VALUES ($1,$2,$3,$4,$5,$6,now())
+            ON CONFLICT (universe_key, norm_name)
+            DO UPDATE SET
+                display_name=EXCLUDED.display_name,
+                image_url=EXCLUDED.image_url,
+                source_url=EXCLUDED.source_url,
+                status=EXCLUDED.status,
+                updated_at=now()
+        `, [
+            universeKey,
+            normName,
+            displayName,
+            data.imageUrl || null,
+            data.sourceUrl || null,
+            data.status || 'missing'
+        ]);
+    } catch (e) {
+        console.warn('[Fandom image] cache DB impossible:', e.message);
+    }
+}
+
+function pageImageFromApiPage(page) {
+    if (!page || page.missing != null) return null;
+    const imageUrl = page.original?.source || page.thumbnail?.source || null;
+    if (!imageUrl) return null;
+    return {
+        imageUrl,
+        sourceUrl: page.fullurl || null,
+        title: page.title || null
+    };
+}
+
+function fandomPageScore(page, wantedName) {
+    const wanted = normalizeImageKey(wantedName);
+    const title = normalizeImageKey(page?.title || '');
+    if (!title) return -999;
+    let score = 0;
+    if (title === wanted) score += 100;
+    if (title.includes(wanted) || wanted.includes(title)) score += 45;
+
+    const wantedTokens = new Set(wanted.split(' ').filter(Boolean));
+    const titleTokens = new Set(title.split(' ').filter(Boolean));
+    let overlap = 0;
+    wantedTokens.forEach(t => { if (titleTokens.has(t)) overlap++; });
+    score += overlap * 8;
+
+    if (/gallery|image gallery|images|list of|category|episode|chapter|volume/i.test(page?.title || '')) score -= 45;
+    return score;
+}
+
+async function fetchFandomPageImageByExactTitle(host, title) {
+    const params = new URLSearchParams({
+        action: 'query',
+        titles: title,
+        prop: 'pageimages|info',
+        piprop: 'original|thumbnail',
+        pithumbsize: '700',
+        inprop: 'url',
+        redirects: '1',
+        format: 'json',
+        origin: '*'
+    });
+    const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 12000);
+    const pages = Object.values(data?.query?.pages || {});
+    for (const page of pages) {
+        const hit = pageImageFromApiPage(page);
+        if (hit) return hit;
+    }
+    return null;
+}
+
+async function fetchFandomPageImageBySearch(host, name) {
+    const params = new URLSearchParams({
+        action: 'query',
+        generator: 'search',
+        gsrsearch: name,
+        gsrnamespace: '0',
+        gsrlimit: '8',
+        prop: 'pageimages|info',
+        piprop: 'original|thumbnail',
+        pithumbsize: '700',
+        inprop: 'url',
+        format: 'json',
+        origin: '*'
+    });
+    const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 12000);
+    const pages = Object.values(data?.query?.pages || {})
+        .filter(p => pageImageFromApiPage(p))
+        .sort((a,b) => fandomPageScore(b, name) - fandomPageScore(a, name));
+
+    return pages.length ? pageImageFromApiPage(pages[0]) : null;
+}
+
+async function resolveCharacterImage(universeKey, displayName) {
+    const host = FANDOM_WIKIS[universeKey];
+    if (!host || !displayName) {
+        return { imageUrl:null, sourceUrl:null, status:'unsupported' };
+    }
+
+    const cleanName = cleanImageCharacterName(displayName);
+    const cacheKey = `${universeKey}|${normalizeImageKey(cleanName)}`;
+
+    const cached = await getCachedCharacterImage(universeKey, cleanName);
+    // Un "ok" est permanent. Un missing de plus de 7 jours peut être retenté côté DB
+    // lors d'un futur nettoyage; ici on évite de spammer Fandom.
+    if (cached) return cached;
+
+    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) {
+        return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
+    }
+
+    const task = (async () => {
+        try {
+            // Les alias DLE servent aussi pour les recherches d'images.
+            let searchName = cleanName;
+            try {
+                const n = normalizeImageKey(cleanName);
+                const alias = typeof DLE_MASTER_ALIASES !== 'undefined'
+                    ? DLE_MASTER_ALIASES[universeKey]?.[n]
+                    : null;
+                if (alias && typeof DLE_MASTER_NAMES !== 'undefined') {
+                    const found = (DLE_MASTER_NAMES[universeKey] || [])
+                        .find(x => normalizeImageKey(x) === alias);
+                    if (found) searchName = found;
+                }
+            } catch (_) {}
+
+            let hit = await fetchFandomPageImageByExactTitle(host, searchName);
+            if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
+
+            const result = hit
+                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl, status:'ok' }
+                : { imageUrl:null, sourceUrl:null, status:'missing' };
+
+            await saveCachedCharacterImage(universeKey, cleanName, result);
+            return result;
+        } catch (e) {
+            console.warn(`[Fandom image] ${universeKey}/${cleanName}:`, e.message);
+            return { imageUrl:null, sourceUrl:null, status:'error' };
+        } finally {
+            CHARACTER_IMAGE_INFLIGHT.delete(cacheKey);
+        }
+    })();
+
+    CHARACTER_IMAGE_INFLIGHT.set(cacheKey, task);
+    return task;
+}
+
+app.get('/api/character-image', async (req, res) => {
+    const rawUniverse = String(req.query.universeKey || req.query.universe || '').trim();
+    const name = String(req.query.name || '').trim();
+
+    if (!rawUniverse || !name) {
+        return res.status(400).json({ ok:false, imageUrl:null, message:'universe/name requis' });
+    }
+
+    const universeKey = resolveImageUniverseKey(rawUniverse);
+    if (!universeKey) {
+        return res.json({ ok:false, imageUrl:null, status:'unsupported' });
+    }
+
+    const result = await resolveCharacterImage(universeKey, name);
+    res.json({
+        ok: !!result.imageUrl,
+        universeKey,
+        name,
+        imageUrl: result.imageUrl,
+        sourceUrl: result.sourceUrl,
+        status: result.status
+    });
+});
+
+app.get('/api/character-image-stats', async (req, res) => {
+    if (!process.env.DATABASE_URL) {
+        return res.json({ cachedInMemory:CHARACTER_IMAGE_CACHE.size, persistent:false });
+    }
+    try {
+        const result = await pool.query(`
+            SELECT
+                COUNT(*)::int AS total,
+                COUNT(*) FILTER (WHERE status='ok')::int AS ok,
+                COUNT(*) FILTER (WHERE status='missing')::int AS missing,
+                COUNT(*) FILTER (WHERE status='error')::int AS error
+            FROM character_images
+        `);
+        res.json({ persistent:true, cachedInMemory:CHARACTER_IMAGE_CACHE.size, ...(result.rows[0] || {}) });
+    } catch (e) {
+        res.json({ persistent:true, cachedInMemory:CHARACTER_IMAGE_CACHE.size, error:e.message });
+    }
+});
 
 /* ================= Système de rangs & ELO ================= */
 

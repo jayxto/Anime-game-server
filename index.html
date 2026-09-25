@@ -189,6 +189,45 @@
         .dle-suggestions { position:absolute; z-index:30; left:0; right:0; top:100%; max-height:220px; overflow:auto; background:#0b0b10; border:1px solid var(--accent-cyan); border-radius:0 0 8px 8px; box-shadow:0 12px 28px rgba(0,0,0,.45); display:none; }
         .dle-suggestion { padding:9px 11px; cursor:pointer; text-align:left; font-size:.82rem; border-bottom:1px solid #202033; }
         .dle-suggestion:hover { background:#18182a; color:var(--accent-cyan); }
+
+        .character-fandom-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            object-position: top center;
+            border-radius: 12px;
+            border: 2px solid var(--accent-cyan);
+            background: #08080d;
+            box-shadow: 0 8px 24px rgba(0,0,0,.35);
+            display: none;
+            margin: 10px auto;
+        }
+        .character-fandom-image.small {
+            width: 74px;
+            height: 74px;
+            border-radius: 8px;
+            margin: 0 auto 7px;
+        }
+        .character-fandom-source {
+            display:none;
+            font-size:.66rem;
+            color:var(--text-muted);
+            text-decoration:none;
+            margin-top:-4px;
+            margin-bottom:7px;
+        }
+        .character-fandom-source:hover { color:var(--accent-cyan); }
+        .dle-character-thumb {
+            width: 58px;
+            height: 58px;
+            object-fit: cover;
+            object-position: top center;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,.28);
+            display:none;
+            margin:0 auto 6px;
+            background:#09090d;
+        }
         .dle-winner { padding:12px; border:2px solid #00ff88; border-radius:9px; background:rgba(0,255,136,.08); color:#00ff88; font-weight:800; margin:12px 0; }
 
     </style>
@@ -496,6 +535,8 @@
             <div style="background: #0b0b10; border: 2px solid var(--accent-pink); padding: 15px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 0; color: var(--text-muted);">Ton mot secret / Rôle :</p>
                 <div id="my-secret-display" style="font-family:'Bangers'; font-size:1.8rem; color:var(--accent-cyan);">---</div>
+                <img id="my-secret-image" class="character-fandom-image" alt="Image du personnage">
+                <a id="my-secret-image-source" class="character-fandom-source" target="_blank" rel="noopener">Source : Fandom</a>
                 <div id="my-secret-hidden" style="display:none; font-family:'Bangers'; font-size:1.8rem; color:var(--text-muted); letter-spacing:4px;">● ● ● ● ●</div>
                 <button id="toggle-secret-btn" onclick="toggleSecretVisibility()" style="margin-top:10px; background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 12px; font-size:0.75rem; cursor:pointer;">🙈 Cacher</button>
             </div>
@@ -600,6 +641,8 @@
             <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin-bottom:15px;">
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">PERSONNAGE EN VENTE</div>
                 <div id="enchere-char-name" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
+                <img id="enchere-char-image" class="character-fandom-image" alt="Image du personnage">
+                <a id="enchere-char-image-source" class="character-fandom-source" target="_blank" rel="noopener">Source : Fandom</a>
                 <div style="font-size:0.8rem; color:var(--text-muted); margin: 4px 0 10px;" id="enchere-char-value">Valeur : -- pts</div>
                 <div style="font-size:0.75rem; color:var(--text-muted);">Enchère actuelle</div>
                 <div id="enchere-current-bid" style="font-family:'Bangers'; font-size:2rem; color:var(--accent-yellow);">0M</div>
@@ -649,6 +692,8 @@
             <div style="background:#11111a; border:2px solid var(--accent-yellow); border-radius:10px; padding:16px; text-align:center; margin-bottom:15px;">
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">PERSONNAGE EN VENTE</div>
                 <div id="ea-char-name" style="font-family:'Bangers'; font-size:1.5rem; color:var(--accent-cyan);">---</div>
+                <img id="ea-char-image" class="character-fandom-image" alt="Image du personnage">
+                <a id="ea-char-image-source" class="character-fandom-source" target="_blank" rel="noopener">Source : Fandom</a>
                 <div style="font-size:0.8rem; color:var(--text-muted); margin: 4px 0 6px;" id="ea-char-value">Valeur : -- pts</div>
                 <div style="font-size:0.75rem; color: var(--accent-pink); margin-bottom: 10px; font-weight:600;" id="ea-vision-label"></div>
                 <div style="font-size:0.75rem; color:var(--text-muted);">Enchère actuelle</div>
@@ -1053,6 +1098,80 @@
             socket.emit('start_game', currentRoomCode);
         }
 
+
+        const fandomImageClientCache = new Map();
+
+        function fandomImageUniverseKey(universe) {
+            return String(universe || '').trim();
+        }
+
+        function parseCharacterLabelClient(label) {
+            const s = String(label || '').trim();
+            if (!s) return {name:'', universe:''};
+            if (s.endsWith(')')) {
+                const i = s.lastIndexOf(' (');
+                if (i > 0) return {name:s.slice(0,i).trim(), universe:s.slice(i+2,-1).trim()};
+            }
+            return {name:s, universe:''};
+        }
+
+        async function getFandomCharacterImage(universe, name) {
+            if (!universe || !name) return null;
+            const key = `${String(universe).toLowerCase()}|${String(name).toLowerCase()}`;
+            if (fandomImageClientCache.has(key)) return fandomImageClientCache.get(key);
+
+            const promise = fetch(`/api/character-image?universe=${encodeURIComponent(universe)}&name=${encodeURIComponent(name)}`)
+                .then(r => r.ok ? r.json() : null)
+                .then(data => data?.imageUrl ? data : null)
+                .catch(() => null);
+
+            fandomImageClientCache.set(key, promise);
+            return promise;
+        }
+
+        function clearFandomImage(imgId, sourceId) {
+            const img = document.getElementById(imgId);
+            const source = document.getElementById(sourceId);
+            if (img) {
+                img.removeAttribute('src');
+                img.style.display = 'none';
+            }
+            if (source) {
+                source.removeAttribute('href');
+                source.style.display = 'none';
+            }
+        }
+
+        async function setFandomImage(imgId, sourceId, universe, name, visible=true) {
+            const img = document.getElementById(imgId);
+            const source = document.getElementById(sourceId);
+            if (!img) return;
+
+            if (!visible || !universe || !name) {
+                clearFandomImage(imgId, sourceId);
+                return;
+            }
+
+            const requestKey = `${universe}|${name}`;
+            img.dataset.requestKey = requestKey;
+            const data = await getFandomCharacterImage(universe, name);
+            if (img.dataset.requestKey !== requestKey) return;
+
+            if (!data?.imageUrl) {
+                clearFandomImage(imgId, sourceId);
+                return;
+            }
+
+            img.src = data.imageUrl;
+            img.style.display = 'block';
+            img.onerror = () => clearFandomImage(imgId, sourceId);
+
+            if (source && data.sourceUrl) {
+                source.href = data.sourceUrl;
+                source.style.display = 'inline-block';
+            }
+        }
+
         let secretHidden = false;
 
         function toggleSecretVisibility() {
@@ -1064,12 +1183,25 @@
             document.getElementById('my-secret-display').style.display = secretHidden ? 'none' : 'block';
             document.getElementById('my-secret-hidden').style.display = secretHidden ? 'block' : 'none';
             document.getElementById('toggle-secret-btn').innerText = secretHidden ? '👁️ Afficher' : '🙈 Cacher';
+
+            const img = document.getElementById('my-secret-image');
+            const source = document.getElementById('my-secret-image-source');
+            if (img && img.src) img.style.display = secretHidden ? 'none' : 'block';
+            if (source && source.href) source.style.display = secretHidden ? 'none' : 'inline-block';
         }
 
         // À chaque nouveau mot/note attribué, on repart en mode visible
         function setSecretText(text) {
             document.getElementById('my-secret-display').innerText = text;
             secretHidden = false;
+            clearFandomImage('my-secret-image', 'my-secret-image-source');
+
+            const parsed = parseCharacterLabelClient(text);
+            if (parsed.universe) {
+                setFandomImage('my-secret-image', 'my-secret-image-source', parsed.universe, parsed.name, true)
+                    .then(() => applySecretVisibility());
+            }
+
             applySecretVisibility();
         }
 
@@ -1572,9 +1704,11 @@
             if (e.currentCharacter) {
                 document.getElementById('enchere-char-name').innerText = e.currentCharacter.name;
                 document.getElementById('enchere-char-value').innerText = `Valeur : ${e.currentCharacter.value} pts`;
+                setFandomImage('enchere-char-image', 'enchere-char-image-source', e.universeName, e.currentCharacter.name, true);
             } else {
                 document.getElementById('enchere-char-name').innerText = '---';
                 document.getElementById('enchere-char-value').innerText = '';
+                clearFandomImage('enchere-char-image', 'enchere-char-image-source');
             }
 
             document.getElementById('enchere-current-bid').innerText = e.currentBid + 'M';
@@ -1658,15 +1792,18 @@
                     document.getElementById('ea-char-name').innerText = ea.currentCharacter.name;
                     document.getElementById('ea-char-value').innerText = `Valeur : ${ea.currentCharacter.value} pts`;
                     document.getElementById('ea-vision-label').innerText = "👁️ Tu vois ce perso, l'adversaire mise à l'aveugle !";
+                    setFandomImage('ea-char-image', 'ea-char-image-source', ea.universeName, ea.currentCharacter.name, true);
                 } else {
                     document.getElementById('ea-char-name').innerText = '??? Mystère';
                     document.getElementById('ea-char-value').innerText = 'Tu ne sais pas qui c\'est';
                     document.getElementById('ea-vision-label').innerText = "🙈 Tu enchéris à l'aveugle sur ce perso.";
+                    clearFandomImage('ea-char-image', 'ea-char-image-source');
                 }
             } else {
                 document.getElementById('ea-char-name').innerText = '---';
                 document.getElementById('ea-char-value').innerText = '';
                 document.getElementById('ea-vision-label').innerText = '';
+                clearFandomImage('ea-char-image', 'ea-char-image-source');
             }
 
             document.getElementById('ea-current-bid').innerText = ea.currentBid + 'M';
@@ -1836,7 +1973,11 @@
             if(d.finished){
                 status.innerText=`Personnage : ${d.targetName}`;
                 winner.style.display='block';
-                winner.innerText=`🏆 ${d.winnerName} a trouvé ${d.targetName} en ${d.winnerAttempts} essai${d.winnerAttempts>1?'s':''} !`;
+                winner.innerHTML=`🏆 ${dleEsc(d.winnerName)} a trouvé ${dleEsc(d.targetName)} en ${d.winnerAttempts} essai${d.winnerAttempts>1?'s':''} !<br><img id="dle-target-image" class="character-fandom-image small" alt="Image du personnage">`;
+                getFandomCharacterImage(d.universeName, d.targetName).then(data=>{
+                    const img=document.getElementById('dle-target-image');
+                    if(img&&data?.imageUrl){img.src=data.imageUrl;img.style.display='block';}
+                });
                 inputWrap.style.display='none';
                 end.style.display=room.host===socket.id?'flex':'none';
             }else{
@@ -1855,8 +1996,29 @@
                 const first=document.createElement('div');
                 first.className=`dle-cell ${g.correct?'good':'bad'}`;
                 first.classList.add('dle-character-cell');
-                first.innerHTML=`<div class="dle-character-name">${dleEsc(g.name)}</div><div class="dle-player-name">${dleEsc(g.playerName)}</div>`;
+                const img=document.createElement('img');
+                img.className='dle-character-thumb';
+                img.alt=`Image de ${g.name}`;
+                first.appendChild(img);
+
+                const charName=document.createElement('div');
+                charName.className='dle-character-name';
+                charName.textContent=g.name;
+                first.appendChild(charName);
+
+                const playerName=document.createElement('div');
+                playerName.className='dle-player-name';
+                playerName.textContent=g.playerName;
+                first.appendChild(playerName);
                 grid.appendChild(first);
+
+                getFandomCharacterImage(d.universeName, g.name).then(data=>{
+                    if(data?.imageUrl){
+                        img.src=data.imageUrl;
+                        img.style.display='block';
+                        img.onerror=()=>{img.style.display='none';};
+                    }
+                });
 
                 cats.forEach(cat=>{
                     const a=g.attrs?.[cat.key]||{value:'DONNÉE INVALIDE',known:false,match:false,close:false,direction:null};
