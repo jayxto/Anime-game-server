@@ -3082,6 +3082,10 @@
             btState = q;
             btClockOffset = q.serverNow - Date.now();
 
+            // Nouvelle manche : on réinitialise le choix AVANT de dessiner les boutons
+            // (sinon le choix de la manche précédente les laissait désactivés une manche sur deux)
+            if (q.phase === 'playing' && btLoadedKey !== `${q.round}|${q.src}`) btMyChoice = null;
+
             document.getElementById('bt-round').textContent = `Manche ${q.round}/${q.totalRounds}`;
             const answeredCount = q.players.filter(p => p.answered).length;
             document.getElementById('bt-answered').textContent = `Réponses : ${answeredCount}/${q.players.length}`;
