@@ -41,6 +41,18 @@ async function initDb() {
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
     `);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS dle_profiles (
+            universe_key TEXT NOT NULL,
+            norm_name TEXT NOT NULL,
+            display_name TEXT NOT NULL,
+            attrs JSONB NOT NULL,
+            source TEXT NOT NULL DEFAULT 'fandom',
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            PRIMARY KEY (universe_key, norm_name)
+        );
+    `);
 }
 
 initDb()
@@ -7433,6 +7445,86 @@ async function startDleLiveExpansion() {
 
 const DLE_PROFILE_CACHE = new Map();
 
+const DLE_VERIFIED_PROFILES = Object.fromEntries(
+    Object.keys(DLE_UNIVERSES).map(k => [k, new Map()])
+);
+const DLE_ENRICHMENT_STATE = {
+    running: false,
+    startedAt: null,
+    currentUniverse: null,
+    checked: 0,
+    completed: 0,
+    skipped: 0,
+    lastError: null
+};
+
+function isRealDleValue(v) {
+    if (v === undefined || v === null) return false;
+    const s = String(v).trim();
+    if (!s || s === '?') return false;
+    return !/^(non révélé|non precise|non précisé|non précisée|non précisés|non précisées|non révélé \/ non précisé|donnée invalide)$/i
+        .test(normalizeDle(s));
+}
+
+function isCompleteDleAttrs(attrs, categories) {
+    return (categories || []).every(cat => isRealDleValue(attrs?.[cat.key]));
+}
+
+async function loadVerifiedDleProfilesFromDb() {
+    if (!process.env.DATABASE_URL) return;
+    try {
+        const result = await pool.query('SELECT universe_key, norm_name, display_name, attrs FROM dle_profiles');
+        for (const row of result.rows) {
+            if (!DLE_VERIFIED_PROFILES[row.universe_key]) continue;
+            const base = DLE_UNIVERSES[row.universe_key];
+            if (!base) continue;
+            if (!isCompleteDleAttrs(row.attrs, base.categories)) continue;
+
+            DLE_VERIFIED_PROFILES[row.universe_key].set(row.norm_name, {
+                name: row.display_name,
+                attrs: row.attrs,
+                attrKnown: Object.fromEntries(base.categories.map(cat => [cat.key, true])),
+                profiled: true
+            });
+        }
+        console.log(`[AnimeDLE] ${result.rows.length} profils persistants chargés depuis Postgres.`);
+    } catch (e) {
+        console.warn('[AnimeDLE] Chargement dle_profiles impossible :', e.message);
+    }
+}
+
+async function saveVerifiedDleProfile(universeKey, character, source='fandom') {
+    const base = DLE_UNIVERSES[universeKey];
+    if (!base || !character || !isCompleteDleAttrs(character.attrs, base.categories)) return false;
+
+    const normName = normalizeDle(character.name);
+    const verified = {
+        name: character.name,
+        attrs: { ...character.attrs },
+        attrKnown: Object.fromEntries(base.categories.map(cat => [cat.key, true])),
+        profiled: true
+    };
+    DLE_VERIFIED_PROFILES[universeKey].set(normName, verified);
+
+    if (!process.env.DATABASE_URL) return true;
+    try {
+        await pool.query(`
+            INSERT INTO dle_profiles (universe_key, norm_name, display_name, attrs, source, updated_at)
+            VALUES ($1,$2,$3,$4::jsonb,$5,now())
+            ON CONFLICT (universe_key, norm_name)
+            DO UPDATE SET display_name=EXCLUDED.display_name,
+                          attrs=EXCLUDED.attrs,
+                          source=EXCLUDED.source,
+                          updated_at=now()
+        `, [universeKey, normName, character.name, JSON.stringify(character.attrs), source]);
+        return true;
+    } catch (e) {
+        console.warn(`[AnimeDLE] Sauvegarde profil ${universeKey}/${character.name} impossible:`, e.message);
+        return false;
+    }
+}
+
+
 const DLE_MANUAL_OVERRIDES = {
     "sao|chudelkin": {
         c0: "Underworld (Alicization)",
@@ -7789,10 +7881,15 @@ async function ensureDleCharacterProfile(universeKey, character, categories) {
         }
     }
 
-    DLE_PROFILE_CACHE.set(cacheKey, { attrs:{ ...attrs }, attrKnown:{ ...attrKnown } });
     character.attrs = attrs;
     character.attrKnown = attrKnown;
-    character.profiled = Object.values(attrKnown).every(Boolean);
+    character.profiled = Object.values(attrKnown).every(Boolean) && isCompleteDleAttrs(attrs, categories);
+
+    // On ne met en cache définitif que les fiches réellement complètes.
+    // Une fiche incomplète pourra être retentée plus tard si le wiki répond mieux.
+    if (character.profiled) {
+        DLE_PROFILE_CACHE.set(cacheKey, { attrs:{ ...attrs }, attrKnown:{ ...attrKnown } });
+    }
     return character;
 }
 
@@ -7800,7 +7897,7 @@ function dleExpandedUniverse(key) {
     const base = dleBaseUniverse(key);
     const byNorm = new Map();
 
-    // Les fiches thématiques manuelles de la V2 ont priorité.
+    // Fiches V2 déjà complètes.
     for (const c of (base.characters || [])) {
         byNorm.set(normalizeDle(c.name), {
             name: c.name,
@@ -7810,31 +7907,35 @@ function dleExpandedUniverse(key) {
         });
     }
 
-    // Gros pool local (Rolland Garos).
-    const rg = RG_UNIVERSES[key];
-    const rgNames = rg ? parseRGList(rg.raw) : [];
-    for (const name of rgNames) {
-        const n = normalizeDle(name);
-        if (!n || byNorm.has(n)) continue;
-        byNorm.set(n, {
-            name,
-            attrs: {},
-            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, false])),
-            profiled: false
+    // Overrides manuels complets.
+    for (const [cacheKey, attrs] of Object.entries(DLE_MANUAL_OVERRIDES || {})) {
+        const [overrideUniverse, normalizedName] = cacheKey.split('|');
+        if (overrideUniverse !== key) continue;
+        if (!isCompleteDleAttrs(attrs, base.categories)) continue;
+
+        let displayName = normalizedName;
+        const rg = RG_UNIVERSES[key];
+        if (rg) {
+            const exact = parseRGList(rg.raw).find(n => normalizeDle(n) === normalizedName);
+            if (exact) displayName = exact;
+        }
+
+        byNorm.set(normalizedName, {
+            name: displayName,
+            attrs: { ...attrs },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
+            profiled: true
         });
     }
 
-    // Expansion web massive : Fandom + base publique Jikan/MAL.
-    // Toujours dans l'univers sélectionné, jamais de mélange.
-    for (const rawName of (DLE_LIVE_POOLS[key] || [])) {
-        const name = cleanDleExternalTitle(rawName);
-        const n = normalizeDle(name);
-        if (!name || !n || byNorm.has(n)) continue;
-        byNorm.set(n, {
-            name,
-            attrs: {},
-            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, false])),
-            profiled: false
+    // Profils complétés automatiquement puis validés.
+    for (const [normName, profile] of (DLE_VERIFIED_PROFILES[key] || new Map())) {
+        if (!isCompleteDleAttrs(profile.attrs, base.categories)) continue;
+        byNorm.set(normName, {
+            name: profile.name,
+            attrs: { ...profile.attrs },
+            attrKnown: Object.fromEntries((base.categories || []).map(cat => [cat.key, true])),
+            profiled: true
         });
     }
 
@@ -7843,6 +7944,153 @@ function dleExpandedUniverse(key) {
         categories: [...(base.categories || [])],
         customCategoryCount: (base.categories || []).length,
         characters: [...byNorm.values()]
+    };
+}
+
+
+function getDleMasterNames(universeKey) {
+    const names = new Map();
+    const add = (name) => {
+        const clean = cleanDleExternalTitle(name);
+        if (!clean) return;
+        const n = normalizeDle(clean);
+        if (!n) return;
+        if (!names.has(n)) names.set(n, clean);
+    };
+
+    const base = DLE_UNIVERSES[universeKey];
+    for (const c of (base?.characters || [])) add(c.name);
+
+    const rg = RG_UNIVERSES[universeKey];
+    if (rg) for (const name of parseRGList(rg.raw)) add(name);
+
+    for (const name of (DLE_LIVE_POOLS[universeKey] || [])) add(name);
+
+    return names;
+}
+
+function dleProfileExists(universeKey, normName) {
+    if (DLE_VERIFIED_PROFILES[universeKey]?.has(normName)) return true;
+    const base = DLE_UNIVERSES[universeKey];
+    if ((base?.characters || []).some(c => normalizeDle(c.name) === normName)) return true;
+    const manual = Object.entries(DLE_MANUAL_OVERRIDES || {}).some(([k, attrs]) => {
+        const [u, n] = k.split('|');
+        return u === universeKey && n === normName && isCompleteDleAttrs(attrs, base.categories);
+    });
+    return manual;
+}
+
+function sleepDle(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function enrichOneDleProfile(universeKey, displayName) {
+    const base = DLE_UNIVERSES[universeKey];
+    if (!base) return false;
+
+    const normName = normalizeDle(displayName);
+    if (dleProfileExists(universeKey, normName)) return true;
+
+    const character = {
+        name: displayName,
+        attrs: {},
+        attrKnown: Object.fromEntries(base.categories.map(cat => [cat.key, false])),
+        profiled: false
+    };
+
+    await ensureDleCharacterProfile(universeKey, character, base.categories);
+
+    if (!character.profiled || !isCompleteDleAttrs(character.attrs, base.categories)) {
+        return false;
+    }
+
+    return await saveVerifiedDleProfile(universeKey, character, 'fandom');
+}
+
+async function enrichDleUniverse(universeKey, { delayMs=350 } = {}) {
+    DLE_ENRICHMENT_STATE.currentUniverse = universeKey;
+
+    try {
+        await Promise.race([
+            ensureDleUniverseExpansion(universeKey),
+            new Promise(resolve => setTimeout(resolve, 15000))
+        ]);
+    } catch (_) {}
+
+    const names = getDleMasterNames(universeKey);
+
+    for (const [normName, displayName] of names) {
+        if (dleProfileExists(universeKey, normName)) continue;
+
+        DLE_ENRICHMENT_STATE.checked++;
+        try {
+            const ok = await enrichOneDleProfile(universeKey, displayName);
+            if (ok) DLE_ENRICHMENT_STATE.completed++;
+            else DLE_ENRICHMENT_STATE.skipped++;
+        } catch (e) {
+            DLE_ENRICHMENT_STATE.skipped++;
+            DLE_ENRICHMENT_STATE.lastError = e.message;
+        }
+
+        if (delayMs > 0) await sleepDle(delayMs);
+    }
+}
+
+async function startDleProfileEnrichment() {
+    if (DLE_ENRICHMENT_STATE.running) return;
+    DLE_ENRICHMENT_STATE.running = true;
+    DLE_ENRICHMENT_STATE.startedAt = new Date().toISOString();
+
+    try {
+        await loadVerifiedDleProfilesFromDb();
+
+        // Charge les gros noms publics en arrière-plan.
+        startDleLiveExpansion().catch(() => {});
+
+        // Priorité aux univers les plus testés / populaires puis le reste.
+        const priority = [
+            'sao','naruto','onepiece','jjk','dragonball','demonslayer','bluelock',
+            'bleach','fairy','clover','hxh','snk','sds','solo','chainsaw',
+            'haikyuu','jojo','opm','tokyoghoul','tokyorevengers','pokemon'
+        ];
+        const rest = Object.keys(DLE_UNIVERSES).filter(k => !priority.includes(k));
+
+        for (const key of [...priority, ...rest]) {
+            await enrichDleUniverse(key, { delayMs: 300 });
+        }
+    } catch (e) {
+        DLE_ENRICHMENT_STATE.lastError = e.message;
+        console.warn('[AnimeDLE] Enrichissement global interrompu :', e.message);
+    } finally {
+        DLE_ENRICHMENT_STATE.currentUniverse = null;
+        DLE_ENRICHMENT_STATE.running = false;
+    }
+}
+
+function getDleCompletionStats() {
+    const perUniverse = {};
+    let totalMaster = 0;
+    let totalComplete = 0;
+
+    for (const key of Object.keys(DLE_UNIVERSES)) {
+        const master = getDleMasterNames(key);
+        const complete = dleExpandedUniverse(key).characters.length;
+        const raw = master.size;
+        perUniverse[key] = {
+            raw,
+            complete,
+            incomplete: Math.max(0, raw - complete)
+        };
+        totalMaster += raw;
+        totalComplete += complete;
+    }
+
+    return {
+        totalMaster,
+        totalComplete,
+        totalIncomplete: Math.max(0, totalMaster - totalComplete),
+        perUniverse,
+        enrichment: { ...DLE_ENRICHMENT_STATE }
     };
 }
 
@@ -7872,32 +8120,20 @@ function emitDleState(room, roomCode) {
 }
 
 async function startDle(room, roomCode) {
-    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : "naruto";
+    const universeKey = DLE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
 
-    // Priorité à l'univers choisi. Le gros chargement global continue en arrière-plan.
-    try {
-        await Promise.race([
-            ensureDleUniverseExpansion(universeKey),
-            new Promise(resolve => setTimeout(resolve, 12000))
-        ]);
-    } catch (_) {}
+    // Priorité à l'univers sélectionné, sans jamais montrer une fiche incomplète.
+    enrichDleUniverse(universeKey, { delayMs: 0 }).catch(() => {});
 
-    startDleLiveExpansion().catch(() => {});
     const u = dleExpandedUniverse(universeKey);
     if (!u.characters.length) {
-        io.to(roomCode).emit("game_error", { message:"Aucun personnage AnimeDLE pour cet univers." });
+        io.to(roomCode).emit('game_error', { message:"Aucun personnage AnimeDLE complet pour cet univers." });
         return;
     }
 
-    // Aucun personnage n'est supprimé du pool.
-    // Pour éviter une manche dont la réponse n'a aucune donnée exploitable,
-    // on préfère une fiche déjà complète quand elle existe.
-    const completeTargets = u.characters.filter(c => c.profiled);
-    const targetPool = completeTargets.length ? completeTargets : u.characters;
-    const target = targetPool[Math.floor(Math.random() * targetPool.length)];
-    await ensureDleCharacterProfile(universeKey, target, u.categories);
+    const target = u.characters[Math.floor(Math.random() * u.characters.length)];
 
-    room.status = "dle_playing";
+    room.status = 'dle_playing';
     room.dle = {
         universeKey,
         universeName: u.name,
@@ -7913,7 +8149,7 @@ async function startDle(room, roomCode) {
         profiledSize: u.characters.length,
         candidates: u.characters
             .map(c => ({ label:c.name, name:c.name }))
-            .sort((a,b) => a.label.localeCompare(b.label, "fr"))
+            .sort((a,b) => a.label.localeCompare(b.label, 'fr'))
     };
     emitDleState(room, roomCode);
 }
@@ -7939,12 +8175,13 @@ function makeDleComparison(character, target, player, categories) {
         const wanted = target.attrs?.[cat.key];
 
         const mineKnown = character.attrKnown?.[cat.key] !== false &&
-                          mine !== undefined && mine !== null && String(mine).trim() !== "";
+                          mine !== undefined && mine !== null && String(mine).trim() !== "" &&
+                          !/^(non révélé|non précisé|non précisée|non précisés|non précisées|non révélé \/ non précisé)$/i.test(String(mine).trim());
         const targetKnown = target.attrKnown?.[cat.key] !== false &&
-                            wanted !== undefined && wanted !== null && String(wanted).trim() !== "";
+                            wanted !== undefined && wanted !== null && String(wanted).trim() !== "" &&
+                            !/^(non révélé|non précisé|non précisée|non précisés|non précisées|non révélé \/ non précisé)$/i.test(String(wanted).trim());
 
         const known = mineKnown && targetKnown;
-
         let match = false;
         let close = false;
         let direction = null;
@@ -7957,7 +8194,6 @@ function makeDleComparison(character, target, player, categories) {
                 if (!match && Number.isFinite(a) && Number.isFinite(b)) direction = a < b ? "up" : "down";
             } else {
                 match = normalizeDle(mine) === normalizeDle(wanted);
-
                 if (!match && !cat.meta) {
                     const a = dleTokenSet(mine);
                     const b = new Set(dleTokenSet(wanted));
@@ -7967,7 +8203,7 @@ function makeDleComparison(character, target, player, categories) {
         }
 
         attrs[cat.key] = {
-            value: mine ?? dleFallbackForLabel(cat.label),
+            value: known ? mine : "DONNÉE INVALIDE",
             known,
             match,
             close,
@@ -7986,7 +8222,7 @@ function makeDleComparison(character, target, player, categories) {
 
 
 app.get('/api/dle-pool-stats', (req, res) => {
-    res.json(getDleGlobalPoolStats());
+    res.json(getDleCompletionStats());
 });
 
 io.on('connection', (socket) => {
@@ -8238,9 +8474,6 @@ io.on('connection', (socket) => {
             socket.emit('dle_feedback', { ok:false, message:"Choisis un personnage proposé dans la liste." });
             return;
         }
-
-        await ensureDleCharacterProfile(room.dle.universeKey, character, room.dle.categories);
-        await ensureDleCharacterProfile(room.dle.universeKey, room.dle.target, room.dle.categories);
 
         room.dle.attemptsByPlayer[player.id] = (room.dle.attemptsByPlayer[player.id] || 0) + 1;
         const comparison = makeDleComparison(character, room.dle.target, player, room.dle.categories);
@@ -8850,6 +9083,7 @@ process.on('unhandledRejection', (raison) => {
     console.error('[PROMESSE REJETÉE] le serveur continue malgré tout :', raison);
 });
 server.listen(PORT, () => {
+    startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
     startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
