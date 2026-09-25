@@ -2339,6 +2339,115 @@ function normalizeRG(s) {
         .trim();
 }
 
+
+// ================= Rolland Garos V11 — anti-doublons / anti-formes =================
+// Le Rolland Garos utilise maintenant la liste maître DLE propre :
+// 1 personnage réel = 1 seule entrée, même s'il existe sous plusieurs formes,
+// surnoms, romanisations ou versions.
+function rgStripFormDescriptors(value) {
+    let n = normalizeRG(value);
+
+    const patterns = [
+        /\bmode baryon\b/g, /\bbaryon mode\b/g,
+        /\bmode ermite\b/g, /\bsage mode\b/g,
+        /\bmode kurama\b/g, /\bkurama mode\b/g,
+        /\bmode kyubi\b/g, /\bkyubi mode\b/g,
+        /\bsix paths sage mode\b/g, /\bsix paths\b/g,
+        /\brikudo mode\b/g,
+        /\bgear\s*(?:2|3|4|5|second|third|fourth|fifth)\b/g,
+        /\bsnakeman\b/g, /\bbounceman\b/g, /\btankman\b/g,
+        /\bultra instinct\b/g, /\bmastered ultra instinct\b/g, /\bmui\b/g,
+        /\bultra ego\b/g,
+        /\bsuper saiyan(?:\s*(?:god|blue|rose|[1-4]|ssj\d*))?\b/g,
+        /\bssj(?:\s*\d+)?\b/g,
+        /\bbankai\b/g, /\bshikai\b/g,
+        /\brinnegan\b/g, /\bsharingan\b/g, /\bmangekyo\b/g,
+        /\bedo tensei\b/g, /\breanimated\b/g,
+        /\bjinchuriki\b/g,
+        /\bawakened\b/g, /\beveille\b/g, /\beveil\b/g,
+        /\btransformed\b/g, /\btransformation\b/g,
+        /\bfinal form\b/g, /\bforme finale\b/g,
+        /\bhybrid form\b/g, /\bforme hybride\b/g,
+        /\badult\b/g, /\badulte\b/g,
+        /\byoung\b/g, /\bjeune\b/g,
+        /\bchild\b/g, /\benfant\b/g,
+        /\bteen\b/g, /\bteenager\b/g,
+        /\bpre timeskip\b/g, /\bpost timeskip\b/g, /\btimeskip\b/g,
+        /\bshippuden\b/g, /\bboruto version\b/g,
+        /\bmovie version\b/g, /\bfilm version\b/g,
+        /\bversion anime\b/g, /\bversion manga\b/g
+    ];
+
+    for (const rx of patterns) n = n.replace(rx, ' ');
+    return n.replace(/\s+/g, ' ').trim();
+}
+
+function rgMasterPoolForUniverse(universeKey, rawFallback) {
+    // Priorité à la liste maître propre/dédoublonnée créée pour le DLE.
+    const master = (typeof DLE_MASTER_NAMES !== 'undefined' && Array.isArray(DLE_MASTER_NAMES[universeKey]))
+        ? DLE_MASTER_NAMES[universeKey]
+        : [];
+
+    const source = master.length ? master : parseRGList(rawFallback);
+    const seen = new Set();
+    const pool = [];
+
+    for (const rawName of source) {
+        const name = String(rawName || '').trim();
+        if (!name) continue;
+
+        const norm = normalizeRG(name);
+        if (!norm || seen.has(norm)) continue;
+
+        seen.add(norm);
+        pool.push(name);
+    }
+
+    return pool;
+}
+
+function rgApplyKnownAliases(universeKey, value) {
+    let n = normalizeRG(value);
+    if (!n) return n;
+
+    // Alias historiques du Rolland Garos.
+    if (typeof ALIAS_RG !== 'undefined' && ALIAS_RG[n]) {
+        n = normalizeRG(ALIAS_RG[n]);
+    }
+
+    // Alias issus du nettoyage DLE (Mikey -> Manjiro, Goku -> Son Goku, etc.).
+    if (typeof DLE_MASTER_ALIASES !== 'undefined' && DLE_MASTER_ALIASES[universeKey]?.[n]) {
+        n = normalizeRG(DLE_MASTER_ALIASES[universeKey][n]);
+    }
+
+    return n;
+}
+
+function rgCanonicalInput(universeKey, value, pool) {
+    const norms = new Set(pool.map(name => normalizeRG(name)));
+
+    // 1) Forme brute + alias connus.
+    let n = rgApplyKnownAliases(universeKey, value);
+    if (norms.has(n)) return n;
+
+    // 2) Retire les descripteurs de formes puis retente les alias.
+    const stripped = rgStripFormDescriptors(value);
+    if (stripped) {
+        n = rgApplyKnownAliases(universeKey, stripped);
+        if (norms.has(n)) return n;
+    }
+
+    // 3) Si l'utilisateur donne uniquement "Sasuke", "Goku", "Mikey", etc.,
+    // on le rattache seulement si UN SEUL personnage du pool correspond.
+    const candidateToken = n || normalizeRG(stripped);
+    if (candidateToken && !candidateToken.includes(' ')) {
+        const matches = pool.filter(name => normalizeRG(name).split(' ').includes(candidateToken));
+        if (matches.length === 1) return normalizeRG(matches[0]);
+    }
+
+    return n || normalizeRG(value);
+}
+
 // Alias VF / VO connus : les deux écritures sont acceptées indifféremment.
 const ALIAS_RG = {
     // --- One Piece ---
@@ -6067,9 +6176,14 @@ function buildAmbiguousTokens(pool) {
 function startRollandGaros(room, roomCode) {
     const key = RG_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
     const universe = RG_UNIVERSES[key];
-    const pool = [...new Set(parseRGList(universe.raw))];
+    const pool = rgMasterPoolForUniverse(key, universe.raw);
 
-    rgPools[roomCode] = { pool, usedNorm: new Set(), ambigus: buildAmbiguousTokens(pool) };
+    rgPools[roomCode] = {
+        universeKey: key,
+        pool,
+        usedNorm: new Set(),
+        ambigus: buildAmbiguousTokens(pool)
+    };
 
     // Vies individuelles : chaque joueur a ses 2 propres vies
     room.players.forEach(p => {
@@ -6085,6 +6199,7 @@ function startRollandGaros(room, roomCode) {
         turnIndex: 0,
         timeLeft: 10,
         found: [],
+        poolSize: pool.length,
         winnerName: null
     };
 
@@ -8626,8 +8741,8 @@ io.on('connection', (socket) => {
         const norm = normalizeRG(answer);
         if (!norm) return;
 
-        // On applique d'abord les alias VF/VO connus
-        const cible = ALIAS_RG[norm] || norm;
+        // Alias + formes/transformation => toujours ramenés au personnage unique.
+        const cible = rgCanonicalInput(poolData.universeKey || room.rg.universeKey, answer, poolData.pool);
 
         const dispo = poolData.pool.filter(name => !poolData.usedNorm.has(normalizeRG(name)));
 
