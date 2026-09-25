@@ -321,6 +321,18 @@
         .quote-scoreboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0;}
         .quote-score{display:flex;justify-content:space-between;gap:8px;background:#101018;border:1px solid #2f2f46;border-radius:8px;padding:9px 10px;}
         .quote-score.turn{border-color:var(--accent-yellow);}
+        .bt-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px;}
+        .bt-choice{background:#11111a;color:#fff;border:2px solid #34344a;border-radius:10px;padding:16px 12px;font-weight:800;font-size:1rem;cursor:pointer;transition:transform .08s,border-color .15s;}
+        .bt-choice:hover:not(:disabled){border-color:var(--accent-cyan);color:var(--accent-cyan);transform:translateY(-1px);}
+        .bt-choice:disabled{cursor:default;}
+        .bt-choice.picked{border-color:var(--accent-yellow);color:var(--accent-yellow);}
+        .bt-choice.good{border-color:#00ff88;background:rgba(0,255,136,.12);color:#00ff88;}
+        .bt-choice.bad{border-color:var(--accent-pink);background:rgba(255,42,95,.12);color:var(--accent-pink);}
+        .bt-timer{height:8px;background:#1b1b28;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
+        .bt-timer-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));transition:width .2s linear;}
+        .bt-disc{font-size:4rem;text-align:center;margin:10px 0;}
+        .bt-disc.spin{animation:btspin 2.2s linear infinite;}
+        @keyframes btspin{to{transform:rotate(360deg);}}
         #quote-speaker-image{width:110px;height:110px;object-fit:cover;object-position:top center;display:none;border-radius:12px;border:2px solid var(--accent-cyan);margin:12px auto 0;}
 </style>
 </head>
@@ -418,6 +430,12 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">À qui appartient cette citation ? <span class="quote-new">NOUVEAU</span></h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">775 citations • 25 par anime • 488 personnages/orateurs • solo ou multi • bonne réponse = +1 point • indice destinataire après 5 erreurs</p>
                     <button class="btn-action" style="margin-top:0;" onclick="openQuoteUniverseSelection()">Choisir l'univers</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:var(--accent-pink);">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
+                    <button class="btn-action" style="margin-top:0;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
@@ -891,6 +909,35 @@
             </div>
         </div>
 
+        <div id="blindtest-room" class="game-panel" style="display:none;max-width:950px;margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><h2 style="margin:0;">🎧 BLIND TEST ANIME</h2><div style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;">De quel anime vient cette musique ?</div></div>
+                <button onclick="backToMenu()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Salon</button>
+            </div>
+            <div id="bt-scoreboard" class="quote-scoreboard"></div>
+            <div class="quote-card">
+                <div class="quote-meta">
+                    <span class="quote-chip" id="bt-round">Manche 1/10</span>
+                    <span class="quote-chip" id="bt-time">20s</span>
+                    <span class="quote-chip" id="bt-answered">Réponses : 0/0</span>
+                </div>
+                <div class="bt-timer"><div id="bt-timer-fill" class="bt-timer-fill"></div></div>
+                <div id="bt-disc" class="bt-disc">💿</div>
+                <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <button id="bt-play-btn" class="btn-action" style="display:none;width:auto;margin-top:0;background:var(--accent-yellow);color:#111;" onclick="btForcePlay()">🔊 Activer le son</button>
+                    <span style="font-size:.8rem;color:var(--text-muted);">🔈</span>
+                    <input id="bt-volume" type="range" min="0" max="100" value="60" oninput="btSetVolume(this.value/100)" style="max-width:160px;">
+                </div>
+                <div id="bt-choices" class="bt-choices"></div>
+                <div id="bt-result" style="min-height:28px;text-align:center;font-weight:800;margin:14px 0 4px;"></div>
+                <div id="bt-song" style="text-align:center;color:var(--text-muted);font-size:.85rem;"></div>
+                <div id="bt-end-buttons" style="display:none;margin-top:18px;flex-direction:column;gap:10px;">
+                    <button id="bt-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                    <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
+                </div>
+            </div>
+        </div>
+
 <div id="dle-room" class="game-panel" style="max-width:900px;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <h2 style="margin-bottom:0;">AnimeDLE</h2>
@@ -1190,6 +1237,7 @@
             document.getElementById('connexion-room').style.display = 'none';
             document.getElementById('dle-room').style.display = 'none';
             document.getElementById('quote-room').style.display = 'none';
+            document.getElementById('blindtest-room').style.display = 'none';
             document.getElementById('quote-universe-selection').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
@@ -1203,6 +1251,7 @@
         }
 
         function goToMenuSelection() {
+            if (typeof btStopAudio === 'function') btStopAudio();
             returningToWaitingRoom = false;
             hideAllPanels();
             document.getElementById('menu-selection').style.display = 'block';
@@ -1539,7 +1588,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -1548,6 +1597,7 @@
             if (gameAlreadyVisible && !returningToWaitingRoom) return;
 
             returningToWaitingRoom = false;
+            if (typeof btStopAudio === 'function') btStopAudio();
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
@@ -2329,6 +2379,7 @@
         let returningToWaitingRoom = false;
 
         function backToMenu() {
+            if (typeof btStopAudio === 'function') btStopAudio();
             if (!currentRoomCode) {
                 goToMenuSelection();
                 return;
@@ -2936,6 +2987,190 @@
             const panel = document.getElementById('quote-room');
             if (panel) panel.style.display = 'block';
             renderQuoteState(q);
+        });
+
+
+        /* ================= Blind Test Anime ================= */
+        const btAudio = new Audio();
+        btAudio.preload = 'auto';
+        let btVolume = 0.6;
+        try { const v = Number(localStorage.getItem('bt_volume')); if (Number.isFinite(v) && localStorage.getItem('bt_volume') !== null) btVolume = Math.max(0, Math.min(1, v)); } catch (_) {}
+        let btState = null;
+        let btLoadedKey = null;   // manche actuellement chargée
+        let btMyChoice = null;
+        let btTimerInterval = null;
+        let btClockOffset = 0;    // serveur - client
+        let btBgWasPlaying = false;
+
+        function btSetVolume(v) {
+            btVolume = Math.max(0, Math.min(1, Number(v) || 0));
+            btAudio.volume = btVolume;
+            try { localStorage.setItem('bt_volume', String(btVolume)); } catch (_) {}
+        }
+
+        function btPauseBackground() {
+            if (!backgroundMusic.paused) {
+                btBgWasPlaying = true;
+                backgroundMusic.pause();
+            }
+        }
+
+        function btStopAudio() {
+            btAudio.pause();
+            btAudio.removeAttribute('src');
+            btAudio.load();
+            btLoadedKey = null;
+            if (btTimerInterval) { clearInterval(btTimerInterval); btTimerInterval = null; }
+            if (btBgWasPlaying && musicEnabled) {
+                btBgWasPlaying = false;
+                backgroundMusic.play().catch(()=>{});
+            }
+        }
+
+        async function btForcePlay() {
+            try { await btAudio.play(); document.getElementById('bt-play-btn').style.display = 'none'; } catch (_) {}
+        }
+
+        function btLoadRound(q) {
+            const key = `${q.round}|${q.src}`;
+            if (btLoadedKey === key) return;
+            btLoadedKey = key;
+            btMyChoice = null;
+            btPauseBackground();
+            btAudio.pause();
+            btAudio.src = q.src;
+            btAudio.volume = btVolume;
+            const elapsed = Math.max(0, (Date.now() + btClockOffset) - (q.endsAt - q.roundMs)) / 1000;
+            const seek = () => {
+                let start = q.offset + elapsed;
+                const d = btAudio.duration;
+                if (Number.isFinite(d) && d > 0 && start > d - 25) start = Math.max(0, d * 0.3);
+                try { btAudio.currentTime = start; } catch (_) {}
+                btAudio.play().then(()=>{
+                    document.getElementById('bt-play-btn').style.display = 'none';
+                }).catch(()=>{
+                    document.getElementById('bt-play-btn').style.display = 'inline-block';
+                });
+            };
+            if (btAudio.readyState >= 1) seek();
+            else btAudio.addEventListener('loadedmetadata', seek, { once:true });
+        }
+
+        function btTick() {
+            const q = btState;
+            const fill = document.getElementById('bt-timer-fill');
+            const label = document.getElementById('bt-time');
+            if (!q || q.phase !== 'playing') {
+                if (fill) fill.style.width = '0%';
+                if (label) label.textContent = q?.phase === 'finished' ? 'Terminé' : 'Réponse !';
+                return;
+            }
+            const left = Math.max(0, q.endsAt - (Date.now() + btClockOffset));
+            if (fill) fill.style.width = `${(left / q.roundMs) * 100}%`;
+            if (label) label.textContent = `${Math.ceil(left / 1000)}s`;
+        }
+
+        function btAnswer(choice) {
+            if (!btState || btState.phase !== 'playing' || btMyChoice) return;
+            btMyChoice = choice;
+            socket.emit('bt_answer', { roomCode:currentRoomCode, choice });
+            renderBlindTest(btState);
+        }
+
+        function renderBlindTest(q) {
+            if (!q) return;
+            btState = q;
+            btClockOffset = q.serverNow - Date.now();
+
+            document.getElementById('bt-round').textContent = `Manche ${q.round}/${q.totalRounds}`;
+            const answeredCount = q.players.filter(p => p.answered).length;
+            document.getElementById('bt-answered').textContent = `Réponses : ${answeredCount}/${q.players.length}`;
+
+            const me = q.players.find(p => p.id === socket.id);
+            if (me?.answered && q.phase === 'playing' && !btMyChoice) btMyChoice = '__answered__';
+            if (q.phase !== 'playing' && me?.choice) btMyChoice = me.choice;
+
+            // Tableau des scores
+            const board = document.getElementById('bt-scoreboard');
+            board.innerHTML = '';
+            [...q.players].sort((a,b)=>b.score-a.score).forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'quote-score';
+                const name = document.createElement('span');
+                let mark = '';
+                if (q.phase === 'playing') mark = p.answered ? ' ✔️' : ' …';
+                else if (q.phase === 'reveal') mark = p.correct ? ` ✅ +${p.gained}` : (p.answered ? ' ❌' : ' ⌛');
+                name.textContent = p.name + mark;
+                const score = document.createElement('strong');
+                score.style.color = 'var(--accent-yellow)';
+                score.textContent = `${p.score} pts`;
+                row.append(name, score);
+                board.appendChild(row);
+            });
+
+            // Propositions
+            const box = document.getElementById('bt-choices');
+            box.innerHTML = '';
+            (q.choices || []).forEach(c => {
+                const b = document.createElement('button');
+                b.className = 'bt-choice';
+                b.textContent = c;
+                if (q.phase === 'playing') {
+                    b.disabled = !!btMyChoice;
+                    if (btMyChoice === c) b.classList.add('picked');
+                    b.onclick = () => btAnswer(c);
+                } else {
+                    b.disabled = true;
+                    if (c === q.answer) b.classList.add('good');
+                    else if (btMyChoice === c) b.classList.add('bad');
+                }
+                box.appendChild(b);
+            });
+
+            const disc = document.getElementById('bt-disc');
+            const result = document.getElementById('bt-result');
+            const song = document.getElementById('bt-song');
+            const endBtns = document.getElementById('bt-end-buttons');
+
+            if (q.phase === 'playing') {
+                disc.classList.add('spin');
+                disc.textContent = '💿';
+                song.textContent = '';
+                endBtns.style.display = 'none';
+                if (btMyChoice) { result.style.color = 'var(--accent-cyan)'; result.textContent = 'Réponse envoyée, attends les autres…'; }
+                else { result.style.color = 'var(--text-color)'; result.textContent = 'Écoute bien… de quel anime vient cette musique ?'; }
+                btLoadRound(q);
+            } else {
+                disc.classList.remove('spin');
+                if (q.phase === 'reveal') {
+                    disc.textContent = me?.correct ? '🎉' : '🎵';
+                    result.style.color = me?.correct ? '#00ff88' : 'var(--accent-pink)';
+                    result.textContent = me?.correct ? `✅ Bien joué ! C'était ${q.answer} (+${me.gained})` : `❌ C'était ${q.answer}`;
+                    song.textContent = `🎶 ${q.songTitle || ''}`;
+                    endBtns.style.display = 'none';
+                } else {
+                    btStopAudio();
+                    disc.textContent = '🏆';
+                    const w = q.winnerNames || [];
+                    result.style.color = 'var(--accent-yellow)';
+                    result.textContent = w.length > 1 ? `Égalité : ${w.join(', ')} !` : `🏆 ${w[0] || '---'} remporte le Blind Test !`;
+                    song.textContent = `Dernière musique : ${q.answer} — ${q.songTitle || ''}`;
+                    endBtns.style.display = 'flex';
+                }
+            }
+
+            if (q.phase !== 'finished' && !btTimerInterval) btTimerInterval = setInterval(btTick, 200);
+            btTick();
+            const replay = document.getElementById('bt-replay-btn');
+            if (replay) replay.style.display = q.hostId === socket.id ? 'block' : 'none';
+        }
+
+        socket.on('bt_state', q => {
+            if (!q) return;
+            hideAllPanels();
+            const panel = document.getElementById('blindtest-room');
+            if (panel) panel.style.display = 'block';
+            renderBlindTest(q);
         });
 
         socket.on('quote_feedback', data => {

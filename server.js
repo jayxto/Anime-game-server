@@ -9074,6 +9074,228 @@ function quoteScheduleNext(roomCode) {
     }, 1800);
 }
 
+
+/* ================= Blind Test Anime (QCM : trouver l'anime) ================= */
+// Chaque musique du dossier /music est associée à son anime.
+// Les pistes qui ne viennent pas d'un anime (ou dont l'anime est incertain) sont exclues.
+const BLINDTEST_TRACKS = [
+    { n:1,  anime:"L'Attaque des Titans", title:"Ai Higuchi - Akuma no Ko" },
+    { n:2,  anime:"Demon Slayer", title:"Aimer - Zankyou Sanka" },
+    { n:3,  anime:"Dandadan", title:"AiNA THE END - Kakumei Douchuu" },
+    { n:4,  anime:"Jujutsu Kaisen", title:"ALI, AKLO - LOST IN PARADISE" },
+    { n:5,  anime:"My Hero Academia", title:"amazarashi - Sora ni Utaeba" },
+    { n:6,  anime:"86 Eighty-Six", title:"amazarashi - Kyoukaisen (Remix)" },
+    { n:7,  anime:"Naruto", title:"ASIAN KUNG-FU GENERATION - Blood Circulator" },
+    { n:8,  anime:"Naruto", title:"ASIAN KUNG-FU GENERATION - Haruka Kanata" },
+    { n:9,  anime:"My Hero Academia", title:"BLUE ENCOUNT - Polaris" },
+    { n:10, anime:"Haikyuu", title:"BURNOUT SYNDROMES - FLY HIGH!!" },
+    { n:11, anime:"Serial Experiments Lain", title:"bôa - Duvet" },
+    { n:12, anime:"JoJo's Bizarre Adventure", title:"Coda - BLOODY STREAM" },
+    { n:13, anime:"Mashle", title:"Creepy Nuts - Bling-Bang-Bang-Born" },
+    { n:14, anime:"Dandadan", title:"Creepy Nuts - Otonoke" },
+    { n:15, anime:"Tokyo Ghoul", title:"Cö shu Nie - asphyxia" },
+    { n:17, anime:"Jujutsu Kaisen", title:"Eve - Kaikai Kitan" },
+    { n:18, anime:"Parasite (Kiseijuu)", title:"Fear, and Loathing in Las Vegas - Let Me Hear" },
+    { n:19, anime:"Code Geass", title:"FLOW - COLORS" },
+    { n:20, anime:"Naruto", title:"FLOW - GO!!!" },
+    { n:21, anime:"Naruto", title:"FLOW - Sign" },
+    { n:23, anime:"Hunter x Hunter", title:"GALNERYUS - HUNTING FOR YOUR DREAM" },
+    { n:24, anime:"Spy x Family", title:"Gen Hoshino - Comedy" },
+    { n:25, anime:"Given", title:"Given - Fuyu no Hanashi" },
+    { n:26, anime:"Noragami", title:"Hello Sleepwalkers - Goya no Machiawase" },
+    { n:27, anime:"Naruto", title:"Ikimonogakari - Blue Bird" },
+    { n:28, anime:"Naruto", title:"Ikimonogakari - Hotaru no Hikari" },
+    { n:30, anime:"Naruto", title:"KANA-BOON - Silhouette" },
+    { n:31, anime:"Chainsaw Man", title:"Kenshi Yonezu - IRIS OUT" },
+    { n:32, anime:"Chainsaw Man", title:"Kenshi Yonezu - KICK BACK" },
+    { n:33, anime:"My Hero Academia", title:"Kenshi Yonezu - Peace Sign" },
+    { n:34, anime:"Jujutsu Kaisen", title:"King Gnu - SPECIALZ" },
+    { n:35, anime:"Les Carnets de l'Apothicaire", title:"Lilas - Hyakka Ryouran" },
+    { n:36, anime:"L'Attaque des Titans", title:"Linked Horizon - Guren no Yumiya" },
+    { n:37, anime:"L'Attaque des Titans", title:"Linked Horizon - Shinzou wo Sasageyo!" },
+    { n:38, anime:"Sword Art Online", title:"LiSA - Catch the Moment" },
+    { n:39, anime:"Sword Art Online", title:"LiSA - crossing field" },
+    { n:40, anime:"My Hero Academia", title:"LiSA - Datte Atashi no Hero." },
+    { n:41, anime:"Demon Slayer", title:"LiSA - Gurenge" },
+    { n:42, anime:"Solo Leveling", title:"LiSA, Felix - ReawakeR" },
+    { n:43, anime:"Seven Deadly Sins", title:"MAN WITH A MISSION - Seven Deadly Sins" },
+    { n:44, anime:"Demon Slayer", title:"MAN WITH A MISSION, milet - Kizuna no Kiseki" },
+    { n:45, anime:"Hunter x Hunter", title:"Masatoshi Ono - Departure!" },
+    { n:46, anime:"Darling in the Franxx", title:"Mika Nakashima - KISS OF DEATH" },
+    { n:47, anime:"Fire Force", title:"Mrs. GREEN APPLE - Inferno" },
+    { n:49, anime:"L'Attaque des Titans", title:"Ner Leva - My War (Remix)" },
+    { n:50, anime:"L'Attaque des Titans", title:"Ner Leva - The Rumbling (Remix)" },
+    { n:51, anime:"Death Note", title:"NIGHTMARE - the WORLD" },
+    { n:52, anime:"Tokyo Revengers", title:"OFFICIAL HIGE DANDISM - Cry Baby" },
+    { n:53, anime:"Spy x Family", title:"OFFICIAL HIGE DANDISM - Mixed Nuts" },
+    { n:54, anime:"Bleach", title:"Asterisk (Lo-fi)" },
+    { n:55, anime:"Naruto", title:"Blue Bird (Lo-fi)" },
+    { n:56, anime:"Assassination Classroom", title:"Bye Bye Yesterday (Lo-fi)" },
+    { n:57, anime:"Hunter x Hunter", title:"Departure! (Lo-fi)" },
+    { n:58, anime:"L'Attaque des Titans", title:"Guren no Yumiya (Lo-fi)" },
+    { n:59, anime:"L'Attaque des Titans", title:"Jiyuu no Tsubasa (Lo-fi)" },
+    { n:60, anime:"Noragami", title:"Kyouran Hey Kids!! (Lo-fi)" },
+    { n:61, anime:"Soul Eater", title:"Resonance (Lo-fi)" },
+    { n:62, anime:"Death Note", title:"The World (Lo-fi)" },
+    { n:63, anime:"JoJo's Bizarre Adventure", title:"Bloody Stream (Lo-fi)" },
+    { n:64, anime:"Steins;Gate", title:"Hacking to the Gate (Lo-fi)" },
+    { n:65, anime:"Naruto", title:"Silhouette (Lo-fi)" },
+    { n:66, anime:"Cowboy Bebop", title:"Tank! (Lo-fi)" },
+    { n:67, anime:"My Hero Academia", title:"PornoGraffitti - THE DAY" },
+    { n:69, anime:"Your Name", title:"RADWIMPS - Nandemonaiya" },
+    { n:70, anime:"Your Name", title:"RADWIMPS - Zenzenzense" },
+    { n:71, anime:"Your Name", title:"RADWIMPS - Yumetourou" },
+    { n:72, anime:"L'Ère des Cristaux (Houseki no Kuni)", title:"Ryuven, Ner Leva - Kyoumen no Nami" },
+    { n:73, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - Attack on Titan" },
+    { n:74, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - The Reluctant Heroes" },
+    { n:75, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - YouSeeBIGGIRL/T:T" },
+    { n:76, anime:"L'Attaque des Titans", title:"SiM - Under the Tree" },
+    { n:77, anime:"Jujutsu Kaisen", title:"Tatsuya Kitani - Ao no Sumika" },
+    { n:78, anime:"Noragami", title:"THE ORAL CIGARETTES - Kyouran Hey Kids!!" },
+    { n:79, anime:"Kakegurui", title:"Tia - Deal with the devil" },
+    { n:80, anime:"Tokyo Ghoul", title:"TK from Ling tosite sigure - unravel" },
+    { n:81, anime:"My Hero Academia", title:"UVERworld - ODD FUTURE" },
+    { n:82, anime:"The Promised Neverland", title:"UVERworld - Touch off" },
+    { n:83, anime:"Oshi no Ko", title:"YOASOBI - Idol" },
+    { n:85, anime:"Beastars", title:"YOASOBI - Kaibutsu" },
+    { n:86, anime:"Frieren", title:"Yorushika - Haru" },
+    { n:87, anime:"Fullmetal Alchemist: Brotherhood", title:"YUI - again" }
+].map(t => ({ ...t, src:`/music/track_${String(t.n).padStart(3,'0')}.mp3` }));
+
+// Leurres supplémentaires pour varier les propositions
+const BLINDTEST_EXTRA_CHOICES = [
+    'One Piece','Dragon Ball Z','Black Clover','Fairy Tail','Blue Lock','One Punch Man',
+    'Mob Psycho 100','Vinland Saga','Re:Zero','Mushoku Tensei','Tensura','Hell\'s Paradise',
+    'Bungo Stray Dogs','Classroom of the Elite','Kaiju No. 8','Sakamoto Days','Gachiakuta'
+];
+
+const BLINDTEST_ANIMES = [...new Set(BLINDTEST_TRACKS.map(t => t.anime))];
+const BLINDTEST_ROUNDS = 10;
+const BLINDTEST_ROUND_MS = 20000;
+const BLINDTEST_REVEAL_MS = 5000;
+const blindTimers = {};
+
+function btShuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function btClearTimer(roomCode) {
+    if (blindTimers[roomCode]) {
+        clearTimeout(blindTimers[roomCode]);
+        delete blindTimers[roomCode];
+    }
+}
+
+function btPublicState(room) {
+    const bt = room.blindtest;
+    if (!bt) return null;
+    const revealed = bt.phase !== 'playing';
+    return {
+        round:bt.round,
+        totalRounds:bt.totalRounds,
+        phase:bt.phase, // playing | reveal | finished
+        src:bt.current?.src || null,
+        offset:bt.offset,
+        choices:bt.choices,
+        endsAt:bt.endsAt,
+        serverNow:Date.now(),
+        roundMs:BLINDTEST_ROUND_MS,
+        answer:revealed ? bt.current?.anime : null,
+        songTitle:revealed ? bt.current?.title : null,
+        players:room.players.map(p => {
+            const a = bt.answers[p.id];
+            return {
+                id:p.id,
+                name:p.name,
+                score:bt.scores[p.id] || 0,
+                answered:!!a,
+                choice:revealed && a ? a.choice : null,
+                correct:revealed && a ? a.correct : null,
+                gained:revealed && a ? a.gained : 0
+            };
+        }),
+        winnerNames:bt.winnerNames || null,
+        hostId:room.host
+    };
+}
+
+function emitBlindState(room, roomCode) {
+    io.to(roomCode).emit('bt_state', btPublicState(room));
+}
+
+function btNextRound(room, roomCode) {
+    const bt = room.blindtest;
+    if (!bt) return;
+    btClearTimer(roomCode);
+
+    if (bt.round >= bt.totalRounds) {
+        bt.phase = 'finished';
+        const best = Math.max(0, ...room.players.map(p => bt.scores[p.id] || 0));
+        bt.winnerNames = room.players.filter(p => (bt.scores[p.id] || 0) === best).map(p => p.name);
+        room.status = 'bt_over';
+        emitBlindState(room, roomCode);
+        return;
+    }
+
+    // On tire d'abord un anime (pour ne pas avoir 10 fois SNK), puis une de ses musiques
+    let pool = BLINDTEST_ANIMES.filter(a => !bt.usedAnimes.includes(a));
+    if (!pool.length) { bt.usedAnimes = []; pool = BLINDTEST_ANIMES.slice(); }
+    const anime = pool[Math.floor(Math.random() * pool.length)];
+    bt.usedAnimes.push(anime);
+    const tracks = BLINDTEST_TRACKS.filter(t => t.anime === anime);
+    const track = tracks[Math.floor(Math.random() * tracks.length)];
+
+    const wrongPool = btShuffle([...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES].filter(a => a !== anime));
+    const wrong = [...new Set(wrongPool)].slice(0, 3);
+
+    bt.round += 1;
+    bt.phase = 'playing';
+    bt.current = track;
+    bt.offset = 15 + Math.floor(Math.random() * 40); // on démarre entre 15s et 55s dans la musique
+    bt.choices = btShuffle([anime, ...wrong]);
+    bt.answers = {};
+    bt.startedAt = Date.now();
+    bt.endsAt = bt.startedAt + BLINDTEST_ROUND_MS;
+
+    emitBlindState(room, roomCode);
+    blindTimers[roomCode] = setTimeout(() => btReveal(room, roomCode), BLINDTEST_ROUND_MS + 300);
+}
+
+function btReveal(room, roomCode) {
+    const bt = room.blindtest;
+    if (!bt || bt.phase !== 'playing' || rooms[roomCode] !== room) return;
+    btClearTimer(roomCode);
+    bt.phase = 'reveal';
+    emitBlindState(room, roomCode);
+    blindTimers[roomCode] = setTimeout(() => {
+        if (rooms[roomCode] !== room || !room.blindtest) return;
+        btNextRound(room, roomCode);
+    }, BLINDTEST_REVEAL_MS);
+}
+
+function startBlindTest(room, roomCode) {
+    btClearTimer(roomCode);
+    room.status = 'bt_playing';
+    room.blindtest = {
+        round:0,
+        totalRounds:BLINDTEST_ROUNDS,
+        phase:'playing',
+        current:null,
+        offset:0,
+        choices:[],
+        answers:{},
+        scores:Object.fromEntries(room.players.map(p => [p.id, 0])),
+        usedAnimes:[],
+        winnerNames:null
+    };
+    btNextRound(room, roomCode);
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -9200,6 +9422,8 @@ io.on('connection', (socket) => {
                 return;
             }
             startQuoteGame(room, roomCode);
+        } else if (room.mode === 'blindtest') {
+            startBlindTest(room, roomCode);
         }
     });
 
@@ -9402,6 +9626,32 @@ io.on('connection', (socket) => {
 
         qg.hintUsed = true;
         emitQuoteState(room, roomCode);
+    });
+
+    socket.on('bt_answer', ({ roomCode, choice }) => {
+        const room = rooms[roomCode];
+        const bt = room?.blindtest;
+        if (!room || !bt || room.status !== 'bt_playing' || bt.phase !== 'playing') return;
+        if (!room.players.some(p => p.id === socket.id)) return;
+        if (bt.answers[socket.id]) return; // une seule réponse par manche
+        if (!bt.choices.includes(choice)) return;
+
+        const correct = choice === bt.current.anime;
+        let gained = 0;
+        if (correct) {
+            // 100 points + bonus de rapidité (jusqu'à +50)
+            const left = Math.max(0, bt.endsAt - Date.now());
+            gained = 100 + Math.round(50 * left / BLINDTEST_ROUND_MS);
+            bt.scores[socket.id] = (bt.scores[socket.id] || 0) + gained;
+        }
+        bt.answers[socket.id] = { choice, correct, gained };
+
+        const connected = room.players.filter(p => !p.disconnected);
+        if (connected.every(p => bt.answers[p.id])) {
+            btReveal(room, roomCode);
+        } else {
+            emitBlindState(room, roomCode);
+        }
     });
 
     socket.on('chat_message', ({ roomCode, message }) => {
@@ -9725,6 +9975,9 @@ io.on('connection', (socket) => {
             startEnchereAveugle(room, roomCode);
         } else if (room.mode === 'connexion') {
             startConnexion(room, roomCode);
+        } else if (room.mode === 'blindtest') {
+            if (room.host !== socket.id) return;
+            startBlindTest(room, roomCode);
         } else {
             room.status = 'choosing_theme';
             room.pendingFreshStart = true; // nouvelle manche : nouvelles notes / nouveau rôle
@@ -9749,6 +10002,8 @@ io.on('connection', (socket) => {
             delete room.connexion;
             delete room.dle;
             delete room.quoteGame;
+            delete room.blindtest;
+            btClearTimer(roomCode);
             if (quoteTimers[roomCode]) {
                 clearTimeout(quoteTimers[roomCode]);
                 delete quoteTimers[roomCode];
@@ -9821,6 +10076,10 @@ io.on('connection', (socket) => {
             if (room.enchereAveugle.seerId === ancienId) room.enchereAveugle.seerId = socket.id;
         }
         if (room.connexion) remap(room.connexion.words);
+        if (room.blindtest) {
+            remap(room.blindtest.scores);
+            remap(room.blindtest.answers);
+        }
 
         io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: true });
 
@@ -9837,6 +10096,8 @@ io.on('connection', (socket) => {
             emitEnchereAveugleState(room, roomCode);
         } else if (room.status === 'connexion_playing') {
             emitConnexionState(room, roomCode);
+        } else if (room.status === 'bt_playing' || room.status === 'bt_over') {
+            emitBlindState(room, roomCode);
         } else if (room.status === 'voting') {
             socket.emit('start_voting', room);
         } else if (room.status === 'choosing_theme') {
@@ -9892,6 +10153,7 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
             room.players = room.players.filter(p => p.id !== socketId);
 
             if (room.players.length === 0) {
+                btClearTimer(roomCode);
                 if (rgTimers[roomCode]) {
                     clearInterval(rgTimers[roomCode]);
                     delete rgTimers[roomCode];
@@ -9907,7 +10169,8 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
 
             // Salon d'attente : mise à jour normale de la liste des joueurs
             if (room.status === 'waiting' || room.status === 'results' || room.status === 'rg_over'
-                || room.status === 'enchere_over' || room.status === 'enchereaveugle_over' || room.status === 'connexion_over') {
+                || room.status === 'enchere_over' || room.status === 'enchereaveugle_over' || room.status === 'connexion_over'
+                || room.status === 'bt_over') {
                 io.to(roomCode).emit('update_room', room);
                 return;
             }
@@ -9946,6 +10209,17 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
                 } else {
                     if (etaitSonTourAveugle) room.enchereAveugle.turnPlayerId = room.players[0].id;
                     emitEnchereAveugleState(room, roomCode);
+                }
+                return;
+            }
+
+            if (room.status === 'bt_playing' && room.blindtest) {
+                delete room.blindtest.answers[socketId];
+                const bt = room.blindtest;
+                if (bt.phase === 'playing' && room.players.filter(p => !p.disconnected).every(p => bt.answers[p.id])) {
+                    btReveal(room, roomCode);
+                } else {
+                    emitBlindState(room, roomCode);
                 }
                 return;
             }
