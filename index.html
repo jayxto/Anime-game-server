@@ -1033,6 +1033,7 @@
         }
 
         function goToMenuSelection() {
+            returningToWaitingRoom = false;
             hideAllPanels();
             document.getElementById('menu-selection').style.display = 'block';
             const chatBox = document.getElementById('chat-messages');
@@ -1259,17 +1260,20 @@
         }
 
         socket.on('update_room', (room) => {
-            // Sécurité : si une partie est en cours, on ne bascule jamais vers le salon d'attente.
+            // Sécurité : un état de jeu ne doit pas être rendu comme un salon d'attente.
             if (room.status && room.status !== 'waiting') return;
 
-            // Un paquet "waiting" retardé ne doit pas recouvrir un écran de jeu déjà ouvert.
+            // Un paquet "waiting" retardé ne recouvre pas une partie...
+            // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
             const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
             });
-            if (gameAlreadyVisible) return;
 
+            if (gameAlreadyVisible && !returningToWaitingRoom) return;
+
+            returningToWaitingRoom = false;
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
@@ -1833,7 +1837,25 @@
         });
 
         function nextStepGame() { socket.emit('next_step_game', currentRoomCode); }
-        function backToMenu() { socket.emit('back_to_menu', currentRoomCode); }
+        let returningToWaitingRoom = false;
+
+        function backToMenu() {
+            if (!currentRoomCode) {
+                goToMenuSelection();
+                return;
+            }
+
+            // Important : V18 bloquait ensuite l'update_room du serveur parce qu'un
+            // panneau de jeu était encore visible. On marque explicitement ce retour.
+            returningToWaitingRoom = true;
+
+            // Feedback immédiat : évite l'impression que le bouton ne fonctionne pas.
+            hideAllPanels();
+            const waiting = document.getElementById('waiting-room');
+            if (waiting) waiting.style.display = 'block';
+
+            socket.emit('back_to_menu', currentRoomCode);
+        }
 
         /* ---------------- Effets sonores (synthétisés, aucun fichier) ---------------- */
 

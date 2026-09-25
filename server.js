@@ -9499,7 +9499,9 @@ io.on('connection', (socket) => {
             delete room.enchere;
             delete room.enchereAveugle;
             delete room.connexion;
+            delete room.dle;
             room.status = 'waiting';
+            room.votes = {};
             room.players.forEach(p => {
                 p.isAlive = true;
                 p.isImpostor = false;
