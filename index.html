@@ -230,7 +230,18 @@
         }
         .dle-winner { padding:12px; border:2px solid #00ff88; border-radius:9px; background:rgba(0,255,136,.08); color:#00ff88; font-weight:800; margin:12px 0; }
 
-    </style>
+    
+        #dle-enrichment-progress {
+            display:none;
+            margin:10px 0 4px;
+            padding:9px 10px;
+            border:1px solid rgba(0,240,255,.35);
+            border-radius:7px;
+            color:var(--accent-cyan);
+            font-size:.78rem;
+            background:rgba(0,240,255,.05);
+        }
+</style>
 </head>
 <body>
 
@@ -447,7 +458,7 @@
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid var(--accent-cyan); text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
-                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — liste propre, dédoublonnée, uniquement des fiches complètes.</p>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — jusqu’à ~100 persos prioritaires par anime, fiches complètes + photos Fandom.</p>
                     <div class="chat-input-box" style="margin-top:0;">
                         <select id="dle-universe-picker">
                             <option value="naruto">Naruto</option>
@@ -513,6 +524,7 @@
             <p>Joueurs connectés :</p>
             <ul class="player-list" id="waiting-players-list"></ul>
 
+            <div id="dle-enrichment-progress"></div>
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
             <button class="btn-action" style="background: var(--text-muted);" onclick="goToMenuSelection()">Retour au menu</button>
         </div>
@@ -1056,7 +1068,176 @@
             // Simple information de présence, aucun changement d'écran
         });
 
-        function createRoom(mode, subMode) {            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        const dleBootstrapRunning = new Map();
+
+        function extractPortableInfoboxFields(html) {
+            const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+            const fields = {};
+
+            doc.querySelectorAll('.pi-data').forEach(row => {
+                const label = row.querySelector('.pi-data-label')?.textContent?.trim()
+                    || row.getAttribute('data-source')
+                    || '';
+                const value = row.querySelector('.pi-data-value')?.textContent?.trim() || '';
+                if (label && value && !fields[label]) fields[label] = value;
+            });
+
+            doc.querySelectorAll('table.infobox tr, aside tr').forEach(row => {
+                const label = row.querySelector('th')?.textContent?.trim() || '';
+                const value = row.querySelector('td')?.textContent?.trim() || '';
+                if (label && value && !fields[label]) fields[label] = value;
+            });
+
+            return fields;
+        }
+
+        async function fandomFindProfilePage(universeKey, name) {
+            const host = FANDOM_CLIENT_WIKIS[universeKey];
+            if (!host) return null;
+
+            const exact = new URLSearchParams({
+                action:'query', titles:name, prop:'info', inprop:'url',
+                redirects:'1', format:'json', origin:'*'
+            });
+            try {
+                const data = await fandomBrowserFetchJson(`https://${host}/api.php?${exact.toString()}`);
+                const page = Object.values(data?.query?.pages || {}).find(p => p?.pageid && p?.title);
+                if (page) return {title:page.title, sourceUrl:page.fullurl || null};
+            } catch (_) {}
+
+            const search = new URLSearchParams({
+                action:'query', list:'search', srsearch:name, srnamespace:'0',
+                srlimit:'6', format:'json', origin:'*'
+            });
+            try {
+                const data = await fandomBrowserFetchJson(`https://${host}/api.php?${search.toString()}`);
+                const hit = data?.query?.search?.[0];
+                if (hit?.title) return {
+                    title:hit.title,
+                    sourceUrl:`https://${host}/wiki/${encodeURIComponent(hit.title.replace(/ /g,'_'))}`
+                };
+            } catch (_) {}
+            return null;
+        }
+
+        async function fetchFandomProfileFields(universeKey, name) {
+            const host = FANDOM_CLIENT_WIKIS[universeKey];
+            if (!host) return null;
+            const page = await fandomFindProfilePage(universeKey, name);
+            if (!page?.title) return null;
+
+            const p = new URLSearchParams({
+                action:'parse', page:page.title, prop:'text',
+                format:'json', origin:'*'
+            });
+            try {
+                const data = await fandomBrowserFetchJson(`https://${host}/api.php?${p.toString()}`);
+                const html = data?.parse?.text?.['*'] || '';
+                return {fields:extractPortableInfoboxFields(html), sourceUrl:page.sourceUrl};
+            } catch (_) {
+                return null;
+            }
+        }
+
+        async function cacheBrowserCharacterImage(universeKey, name) {
+            try {
+                const data = await getFandomCharacterImage(universeKey, name);
+                if (!data?.imageUrl) return false;
+                fetch('/api/character-image-cache', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        universeKey,
+                        name,
+                        imageUrl:data.imageUrl,
+                        sourceUrl:data.sourceUrl || null
+                    })
+                }).catch(()=>{});
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        async function enrichOneDleCharacter(universeKey, name) {
+            const [profile] = await Promise.all([
+                fetchFandomProfileFields(universeKey, name),
+                cacheBrowserCharacterImage(universeKey, name)
+            ]);
+
+            if (!profile?.fields || !Object.keys(profile.fields).length) return false;
+            try {
+                const r = await fetch('/api/dle-import-fandom-profile', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        universeKey,
+                        name,
+                        fields:profile.fields,
+                        sourceUrl:profile.sourceUrl || null
+                    })
+                });
+                const data = await r.json();
+                return !!data?.complete;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        async function bootstrapDleUniverse(universeKey) {
+            if (!universeKey) return;
+            if (dleBootstrapRunning.has(universeKey)) return dleBootstrapRunning.get(universeKey);
+
+            const task = (async () => {
+                const progress = document.getElementById('dle-enrichment-progress');
+                try {
+                    const info = await fetch(`/api/dle-targets?universeKey=${encodeURIComponent(universeKey)}`)
+                        .then(r => r.json());
+                    if (!info?.ok) return;
+
+                    const completeSet = new Set((info.completeNames || []).map(normalizeFandomClient));
+                    const pending = (info.names || []).filter(n => !completeSet.has(normalizeFandomClient(n)));
+                    let completed = info.completeCount || 0;
+
+                    if (progress) {
+                        progress.style.display='block';
+                        progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches complètes — récupération des infos + photos…`;
+                    }
+
+                    let cursor = 0;
+                    const workers = Math.min(5, Math.max(1, pending.length));
+                    async function worker() {
+                        while (cursor < pending.length) {
+                            const i = cursor++;
+                            const name = pending[i];
+                            const ok = await enrichOneDleCharacter(universeKey, name);
+                            if (ok) completed++;
+                            if (progress) {
+                                progress.textContent=`📚 ${info.universeName} : ${completed}/${info.targetCount} fiches complètes — photos incluses`;
+                            }
+                        }
+                    }
+                    await Promise.all(Array.from({length:workers}, () => worker()));
+
+                    if (progress) {
+                        progress.textContent=`✅ ${info.universeName} : ${completed}/${info.targetCount} fiches complètes prêtes.`;
+                    }
+                } catch (_) {
+                    if (progress) {
+                        progress.style.display='block';
+                        progress.textContent='AnimeDLE : Fandom est temporairement indisponible.';
+                    }
+                }
+            })();
+
+            dleBootstrapRunning.set(universeKey, task);
+            try { await task; } finally { dleBootstrapRunning.delete(universeKey); }
+        }
+
+        function createRoom(mode, subMode) {
+            if (mode === 'dle' && subMode) bootstrapDleUniverse(subMode);
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let code = "";
             for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             
