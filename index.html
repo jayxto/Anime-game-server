@@ -911,6 +911,7 @@
                 <input id="music-options-volume" type="range" min="0" max="100" value="18" style="flex:1;accent-color:#00f0ff;" oninput="setMusicVolume(this.value/100)">
             </div>
             <div id="music-options-track" style="font-size:.72rem;color:var(--accent-cyan);margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Aucune musique lancée</div>
+            <div id="music-file-count" style="font-size:.68rem;color:var(--text-muted);margin-top:6px;">0 fichier audio détecté</div>
 
         </div>
     </section>
@@ -1917,6 +1918,29 @@
 
         /* ================= V20 — Playlist Anime ================= */
         const BACKGROUND_MUSIC_TRACKS = [{"title":"Ai Higuchi - 悪魔の子","src":"/music/track_001.mp3"},{"title":"Aimer - 残響散歌","src":"/music/track_002.mp3"},{"title":"AiNA THE END - 革命道中 - On The Way","src":"/music/track_003.mp3"},{"title":"ALI, AKLO - LOST IN PARADISE","src":"/music/track_004.mp3"},{"title":"amazarashi - 空に歌えば","src":"/music/track_005.mp3"},{"title":"amazarashi, Naeleck - 境界線 (Naeleck Remix) - SACRA BEATS Singles","src":"/music/track_006.mp3"},{"title":"ASIAN KUNG-FU GENERATION - ブラッドサーキュレーター","src":"/music/track_007.mp3"},{"title":"ASIAN KUNG-FU GENERATION - 遥か彼方","src":"/music/track_008.mp3"},{"title":"BLUE ENCOUNT - ポラリス","src":"/music/track_009.mp3"},{"title":"BURNOUT SYNDROMES - FLY HIGH!!","src":"/music/track_010.mp3"},{"title":"bôa - Duvet","src":"/music/track_011.mp3"},{"title":"Coda - BLOODY STREAM","src":"/music/track_012.mp3"},{"title":"Creepy Nuts - Bling-Bang-Bang-Born","src":"/music/track_013.mp3"},{"title":"Creepy Nuts - オトノケ - Otonoke","src":"/music/track_014.mp3"},{"title":"Cö shu Nie - asphyxia","src":"/music/track_015.mp3"},{"title":"Cö shu Nie, Naeleck - SAKURA BURST (Naeleck Remix) - SACRA BEATS Singles","src":"/music/track_016.mp3"},{"title":"Eve - Kaikai Kitan","src":"/music/track_017.mp3"},{"title":"Fear, and Loathing in Las Vegas - Let Me Hear","src":"/music/track_018.mp3"},{"title":"FLOW - COLORS","src":"/music/track_019.mp3"},{"title":"FLOW - GO!!!","src":"/music/track_020.mp3"},{"title":"FLOW - Sign","src":"/music/track_021.mp3"},{"title":"Fukkk Offf, Naeleck, KATFYR - Bang Your Head - Naeleck & KATFYR Remix","src":"/music/track_022.mp3"},{"title":"GALNERYUS - HUNTING FOR YOUR DREAM","src":"/music/track_023.mp3"},{"title":"Gen Hoshino - Comedy","src":"/music/track_024.mp3"},{"title":"Given - 冬のはなし","src":"/music/track_025.mp3"},{"title":"Hello Sleepwalkers - Goya No Machiawase","src":"/music/track_026.mp3"},{"title":"Ikimonogakari - ブルーバード","src":"/music/track_027.mp3"},{"title":"Ikimonogakari - ホタルノヒカリ","src":"/music/track_028.mp3"},{"title":"KANA-BOON - ないものねだり","src":"/music/track_029.mp3"},{"title":"KANA-BOON - シルエット","src":"/music/track_030.mp3"},{"title":"Kenshi Yonezu - IRIS OUT","src":"/music/track_031.mp3"},{"title":"Kenshi Yonezu - KICK BACK","src":"/music/track_032.mp3"},{"title":"Kenshi Yonezu - ピースサイン - Peace Sign","src":"/music/track_033.mp3"},{"title":"King Gnu - SPECIALZ","src":"/music/track_034.mp3"},{"title":"Lilas - 百花繚乱","src":"/music/track_035.mp3"},{"title":"Linked Horizon - Guren no Yumiya Tv Size Ver.","src":"/music/track_036.mp3"},{"title":"Linked Horizon - Shinzo wo Sasageyo! - TV Size","src":"/music/track_037.mp3"},{"title":"LiSA - Catch the Moment","src":"/music/track_038.mp3"},{"title":"LiSA - crossing field","src":"/music/track_039.mp3"},{"title":"LiSA - だってアタシのヒーロー。","src":"/music/track_040.mp3"},{"title":"LiSA - 紅蓮華","src":"/music/track_041.mp3"},{"title":"LiSA, Felix - ReawakeR (feat. Felix of Stray Kids)","src":"/music/track_042.mp3"},{"title":"MAN WITH A MISSION - Seven Deadly Sins","src":"/music/track_043.mp3"},{"title":"MAN WITH A MISSION, milet - 絆ノ奇跡","src":"/music/track_044.mp3"},{"title":"Masatoshi Ono - Departure!","src":"/music/track_045.mp3"},{"title":"Mika Nakashima - KISS OF DEATH（Produced by HYDE）","src":"/music/track_046.mp3"},{"title":"Mrs. GREEN APPLE - インフェルノ","src":"/music/track_047.mp3"},{"title":"Mrs. GREEN APPLE - ライラック","src":"/music/track_048.mp3"},{"title":"Ner Leva - My War (Attack on Titan) - 僕の戦争","src":"/music/track_049.mp3"},{"title":"Ner Leva - The Rumbling (Attack on Titan)","src":"/music/track_050.mp3"},{"title":"NIGHTMARE - the WORLD","src":"/music/track_051.mp3"},{"title":"OFFICIAL HIGE DANDISM - Cry Baby","src":"/music/track_052.mp3"},{"title":"OFFICIAL HIGE DANDISM - Mixed Nuts","src":"/music/track_053.mp3"},{"title":"Otaku - Asterisk (Bleach)","src":"/music/track_054.mp3"},{"title":"Otaku - Blue Bird (Naruto)","src":"/music/track_055.mp3"},{"title":"Otaku - Bye Bye Yesterday (Assassination Classroom)","src":"/music/track_056.mp3"},{"title":"Otaku - Departure! (Hunter X Hunter)","src":"/music/track_057.mp3"},{"title":"Otaku - Guren No Yumiya (Attack On Titan)","src":"/music/track_058.mp3"},{"title":"Otaku - Jiyuu No Tsubasa (SNK)","src":"/music/track_059.mp3"},{"title":"Otaku - Kyoran Hey Kids!! (Noragami Aragoto)","src":"/music/track_060.mp3"},{"title":"Otaku - Resonance (Soul Eater)","src":"/music/track_061.mp3"},{"title":"Otaku - The World (Death Note)","src":"/music/track_062.mp3"},{"title":"Otaku, LoFi Waiter - Bloody Stream (Jojo)","src":"/music/track_063.mp3"},{"title":"Otaku, LoFi Waiter - Hacking to the Gate (Stein;Gate)","src":"/music/track_064.mp3"},{"title":"Otaku, LoFi Waiter - Silhouette (Naruto Shippuden)","src":"/music/track_065.mp3"},{"title":"Otaku, LoFi Waiter - Tank! (Cowboy Bebop)","src":"/music/track_066.mp3"},{"title":"PornoGraffitti - THE DAY","src":"/music/track_067.mp3"},{"title":"Radiohead - Paranoid Android","src":"/music/track_068.mp3"},{"title":"RADWIMPS - Nandemonaiya - movie ver.","src":"/music/track_069.mp3"},{"title":"RADWIMPS - 前前前世 - movie ver.","src":"/music/track_070.mp3"},{"title":"RADWIMPS - 夢灯籠","src":"/music/track_071.mp3"},{"title":"Ryuven, Ner Leva - Kyoumen no Nami (Houseki no Kuni) - 鏡面の波","src":"/music/track_072.mp3"},{"title":"Sawano Hiroyuki - Attack on Titan","src":"/music/track_073.mp3"},{"title":"Sawano Hiroyuki - The Reluctant Heroes","src":"/music/track_074.mp3"},{"title":"Sawano Hiroyuki - You See Big Girl T T","src":"/music/track_075.mp3"},{"title":"SiM - Under the Tree","src":"/music/track_076.mp3"},{"title":"Tatsuya Kitani - 青のすみか","src":"/music/track_077.mp3"},{"title":"THE ORAL CIGARETTES - Kyouran Hey Kids!!","src":"/music/track_078.mp3"},{"title":"Tia - Deal with the devil","src":"/music/track_079.mp3"},{"title":"TK from Ling tosite sigure - unravel","src":"/music/track_080.mp3"},{"title":"UVERworld - ODD FUTURE","src":"/music/track_081.mp3"},{"title":"UVERworld - Touch off","src":"/music/track_082.mp3"},{"title":"YOASOBI - アイドル","src":"/music/track_083.mp3"},{"title":"YOASOBI - 夜に駆ける","src":"/music/track_084.mp3"},{"title":"YOASOBI - 怪物","src":"/music/track_085.mp3"},{"title":"Yorushika - 晴る","src":"/music/track_086.mp3"},{"title":"YUI - again","src":"/music/track_087.mp3"}];
+
+        let AVAILABLE_MUSIC_TRACKS = [];
+
+        async function loadAvailableMusicTracks() {
+            try {
+                const r = await fetch('/api/music-tracks', { cache:'no-store' });
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const data = await r.json();
+                const existing = new Set((data?.tracks || []).map(String));
+
+                AVAILABLE_MUSIC_TRACKS = BACKGROUND_MUSIC_TRACKS.filter(t => existing.has(t.src));
+
+                const now = document.getElementById('music-now-playing');
+                if (now && AVAILABLE_MUSIC_TRACKS.length === 0) {
+                    now.textContent = '🎵 Aucun MP3 trouvé dans /music';
+                }
+                return AVAILABLE_MUSIC_TRACKS;
+            } catch (e) {
+                console.warn('[Musique] Impossible de lire /api/music-tracks', e);
+                AVAILABLE_MUSIC_TRACKS = [];
+                return AVAILABLE_MUSIC_TRACKS;
+            }
+        }
         const MUSIC_ENABLED_KEY = 'anime_game_music_enabled_v1';
         const MUSIC_VOLUME_KEY = 'anime_game_music_volume_v1';
 
@@ -1934,7 +1958,7 @@
         let musicStarted = false;
 
         function shuffleMusicOrder() {
-            musicOrder = BACKGROUND_MUSIC_TRACKS.map((_, i) => i);
+            musicOrder = AVAILABLE_MUSIC_TRACKS.map((_, i) => i);
             for (let i = musicOrder.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [musicOrder[i], musicOrder[j]] = [musicOrder[j], musicOrder[i]];
@@ -1944,7 +1968,7 @@
 
         function currentMusicTrack() {
             if (musicOrderPos < 0 || musicOrderPos >= musicOrder.length) return null;
-            return BACKGROUND_MUSIC_TRACKS[musicOrder[musicOrderPos]];
+            return AVAILABLE_MUSIC_TRACKS[musicOrder[musicOrderPos]];
         }
 
         function updateMusicUI() {
@@ -1957,11 +1981,13 @@
             const toggle = document.getElementById('music-toggle-btn');
             const vol1 = document.getElementById('music-volume');
             const vol2 = document.getElementById('music-options-volume');
+            const countEl = document.getElementById('music-file-count');
 
+            if (countEl) countEl.textContent = `${AVAILABLE_MUSIC_TRACKS.length} fichier${AVAILABLE_MUSIC_TRACKS.length > 1 ? 's' : ''} audio détecté${AVAILABLE_MUSIC_TRACKS.length > 1 ? 's' : ''}`;
             if (now) now.textContent = '🎵 ' + title;
             if (opt) opt.textContent = title;
             if (play) play.textContent = backgroundMusic.paused ? '▶' : '⏸';
-            if (counter) counter.textContent = track ? `${musicOrderPos + 1}/${musicOrder.length}` : `0/${BACKGROUND_MUSIC_TRACKS.length}`;
+            if (counter) counter.textContent = track ? `${musicOrderPos + 1}/${musicOrder.length}` : `0/${AVAILABLE_MUSIC_TRACKS.length}`;
             if (toggle) {
                 toggle.textContent = musicEnabled ? '🎵 Activée' : '🔇 Coupée';
                 toggle.style.background = musicEnabled ? '#00ff88' : '#55556a';
@@ -1973,7 +1999,7 @@
         }
 
         async function playMusicAtOrderPosition(pos) {
-            if (!BACKGROUND_MUSIC_TRACKS.length || !musicEnabled) {
+            if (!AVAILABLE_MUSIC_TRACKS.length || !musicEnabled) {
                 updateMusicUI();
                 return;
             }
@@ -2002,7 +2028,7 @@
         }
 
         function startBackgroundMusicIfAllowed() {
-            if (!musicEnabled || musicStarted || !BACKGROUND_MUSIC_TRACKS.length) return;
+            if (!musicEnabled || musicStarted || !AVAILABLE_MUSIC_TRACKS.length) return;
             if (!musicOrder.length) shuffleMusicOrder();
             playMusicAtOrderPosition(0);
         }
@@ -2071,7 +2097,11 @@
 
         // Les navigateurs refusent l'autoplay sonore avant une interaction utilisateur.
         // Un seul clic/touche suffit ensuite pour lancer la playlist.
-        function unlockBackgroundMusic() {
+        async function unlockBackgroundMusic() {
+            if (!AVAILABLE_MUSIC_TRACKS.length) {
+                await loadAvailableMusicTracks();
+                shuffleMusicOrder();
+            }
             startBackgroundMusicIfAllowed();
             document.removeEventListener('pointerdown', unlockBackgroundMusic);
             document.removeEventListener('keydown', unlockBackgroundMusic);
@@ -2079,8 +2109,9 @@
         document.addEventListener('pointerdown', unlockBackgroundMusic, { once:true });
         document.addEventListener('keydown', unlockBackgroundMusic, { once:true });
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             backgroundMusic.volume = musicVolume;
+            await loadAvailableMusicTracks();
             shuffleMusicOrder();
             updateMusicUI();
         });

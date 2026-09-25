@@ -4,6 +4,8 @@ const { Server } = require('socket.io');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,6 +13,28 @@ const io = new Server(server);
 
 app.use(express.json());
 app.use(express.static(__dirname));
+
+app.get('/api/music-tracks', (req, res) => {
+    try {
+        const musicDir = path.join(__dirname, 'music');
+        if (!fs.existsSync(musicDir)) {
+            return res.json({ ok:true, tracks:[], count:0, missingFolder:true });
+        }
+
+        const files = fs.readdirSync(musicDir)
+            .filter(name => /^track_\d{3}\.mp3$/i.test(name))
+            .sort((a,b) => a.localeCompare(b, undefined, { numeric:true }));
+
+        res.json({
+            ok:true,
+            count:files.length,
+            tracks:files.map(name => `/music/${name}`)
+        });
+    } catch (e) {
+        res.status(500).json({ ok:false, tracks:[], count:0, error:e.message });
+    }
+});
+
 
 /* ================= Comptes utilisateurs (Postgres + JWT) ================= */
 // La base vit en dehors de Render (Neon / Supabase / etc.) via DATABASE_URL,
