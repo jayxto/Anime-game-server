@@ -8914,6 +8914,166 @@ app.get('/api/dle-pool-stats', (req, res) => {
     res.json(getDleCompletionStats());
 });
 
+
+/* ================= V23 — À qui appartient cette citation ? =================
+   31 univers, 310 citations courtes/adaptées.
+   Tour par tour : bonne réponse = +1 point. Première personne à 10 points gagne.
+   Après 5 mauvaises tentatives sur une citation, l'indice "destinataire" devient disponible.
+============================================================================ */
+const QUOTE_UNIVERSES = {"naruto":{"name":"Naruto","quotes":[{"text":"Je deviendrai Hokage, peu importe combien de fois je tombe.","speaker":"Naruto Uzumaki","recipient":"à Iruka et au village","aliases":["Naruto"]},{"text":"Mon seul but est de tuer un certain homme.","speaker":"Sasuke Uchiha","recipient":"à l'équipe 7","aliases":["Sasuke"]},{"text":"Ceux qui abandonnent leurs amis sont pires que des déchets.","speaker":"Kakashi Hatake","recipient":"à l'équipe 7","aliases":["Kakashi"]},{"text":"Même le plus puissant a une faiblesse.","speaker":"Itachi Uchiha","recipient":"à Sasuke","aliases":["Itachi"]},{"text":"Quand on connaît la douleur, on peut comprendre les autres.","speaker":"Pain","recipient":"à Naruto","aliases":["Nagato","Pain Nagato"]},{"text":"Je protégerai Naruto, même si je dois risquer ma vie.","speaker":"Hinata Hyūga","recipient":"à Pain","aliases":["Hinata","Hinata Hyuga"]},{"text":"La jeunesse est une flamme qui ne s'éteint jamais !","speaker":"Might Guy","recipient":"à Rock Lee","aliases":["Guy","Gai","Gaï Maito"]},{"text":"Les règles sont importantes, mais les camarades le sont encore plus.","speaker":"Obito Uchiha","recipient":"à Kakashi","aliases":["Obito"]},{"text":"Un ninja doit voir derrière ce qui est visible.","speaker":"Jiraiya","recipient":"à Naruto","aliases":[]},{"text":"Je veux créer un monde où les enfants n'auront plus à se battre.","speaker":"Hashirama Senju","recipient":"à Madara","aliases":["Hashirama"]}]},"onepiece":{"name":"One Piece","quotes":[{"text":"Je serai le Roi des Pirates !","speaker":"Monkey D. Luffy","recipient":"à tous ceux qui doutent de lui","aliases":["Luffy"]},{"text":"Je ne perdrai plus jamais jusqu'à devenir le meilleur sabreur.","speaker":"Roronoa Zoro","recipient":"à Luffy","aliases":["Zoro"]},{"text":"Un homme meurt vraiment lorsqu'il est oublié.","speaker":"Dr. Hiriluk","recipient":"à Chopper","aliases":["Hiriluk","Hiluluk"]},{"text":"Je veux vivre ! Emmenez-moi avec vous !","speaker":"Nico Robin","recipient":"aux Chapeaux de paille","aliases":["Robin"]},{"text":"Merci de m'avoir aimé.","speaker":"Portgas D. Ace","recipient":"à Luffy et ses proches","aliases":["Ace"]},{"text":"Les rêves des hommes ne meurent jamais !","speaker":"Marshall D. Teach","recipient":"à Luffy","aliases":["Teach","Barbe Noire","Blackbeard"]},{"text":"Quand le monde te rejette, regarde devant toi et avance.","speaker":"Shanks","recipient":"à Luffy","aliases":[]},{"text":"Je ne frapperai jamais une femme, même si ça doit me coûter la vie.","speaker":"Sanji","recipient":"à ses adversaires","aliases":[]},{"text":"La justice change selon l'endroit où l'on se tient.","speaker":"Donquixote Doflamingo","recipient":"aux combattants de Marineford","aliases":["Doflamingo","Doffy"]},{"text":"Le One Piece existe !","speaker":"Edward Newgate","recipient":"au monde entier","aliases":["Barbe Blanche","Whitebeard"]}]},"bleach":{"name":"Bleach","quotes":[{"text":"Si je ne peux pas protéger ceux que j'aime, à quoi sert ma force ?","speaker":"Ichigo Kurosaki","recipient":"à lui-même","aliases":["Ichigo"]},{"text":"La peur est nécessaire pour comprendre le courage.","speaker":"Rukia Kuchiki","recipient":"à Ichigo","aliases":["Rukia"]},{"text":"La fierté ne sert à rien si elle t'empêche de protéger quelqu'un.","speaker":"Byakuya Kuchiki","recipient":"à Rukia","aliases":["Byakuya"]},{"text":"L'admiration est le sentiment le plus éloigné de la compréhension.","speaker":"Sosuke Aizen","recipient":"à ses adversaires","aliases":["Aizen","Sōsuke Aizen"]},{"text":"Je suis venu ici pour me battre. Rien de plus.","speaker":"Kenpachi Zaraki","recipient":"à Ichigo","aliases":["Kenpachi","Zaraki"]},{"text":"Si un miracle n'arrive qu'une fois, appelle ça plutôt de la chance.","speaker":"Kisuke Urahara","recipient":"à Ichigo","aliases":["Urahara"]},{"text":"Je déteste la pluie. Elle tombe aussi dans mon cœur.","speaker":"Orihime Inoue","recipient":"à elle-même","aliases":["Orihime"]},{"text":"La justice sans pouvoir est vide, le pouvoir sans justice est violence.","speaker":"Genryusai Shigekuni Yamamoto","recipient":"au Gotei 13","aliases":["Yamamoto"]},{"text":"Un combat n'est amusant que si l'adversaire peut te tuer.","speaker":"Grimmjow Jaegerjaquez","recipient":"à Ichigo","aliases":["Grimmjow"]},{"text":"Le cœur n'existe que parce que nous ne pouvons pas le voir.","speaker":"Ulquiorra Cifer","recipient":"à Orihime","aliases":["Ulquiorra"]}]},"hxh":{"name":"Hunter x Hunter","quotes":[{"text":"Je veux découvrir pourquoi mon père a préféré être Hunter plutôt que rester avec moi.","speaker":"Gon Freecss","recipient":"à ses amis","aliases":["Gon"]},{"text":"Gon, tu es la lumière. Parfois tu brilles trop fort pour moi.","speaker":"Killua Zoldyck","recipient":"à Gon","aliases":["Killua"]},{"text":"Je ne crains que la colère qui pourrait disparaître un jour.","speaker":"Kurapika","recipient":"à lui-même","aliases":[]},{"text":"Je choisis mes combats selon ce qui m'amuse.","speaker":"Hisoka Morow","recipient":"à ses adversaires","aliases":["Hisoka"]},{"text":"Le potentiel humain d'évolution est presque infini.","speaker":"Isaac Netero","recipient":"à Meruem","aliases":["Netero"]},{"text":"Je ne suis pas né pour devenir roi. Je veux savoir qui je suis.","speaker":"Meruem","recipient":"à Komugi","aliases":[]},{"text":"Si tu veux connaître quelqu'un, découvre ce qui le met en colère.","speaker":"Mito Freecss","recipient":"à Gon","aliases":["Mito"]},{"text":"Les amis n'ont pas besoin de remercier leurs amis.","speaker":"Leorio Paradinight","recipient":"à Kurapika","aliases":["Leorio"]},{"text":"Une famille d'assassins n'a pas besoin d'amour pour fonctionner.","speaker":"Silva Zoldyck","recipient":"à Killua","aliases":["Silva"]},{"text":"Je veux juste que Komugi se réveille.","speaker":"Neferpitou","recipient":"à Gon","aliases":["Pitou","Neferpitou"]}]},"snk":{"name":"SNK / L'Attaque des Titans","quotes":[{"text":"Si nous ne nous battons pas, nous ne pouvons pas gagner.","speaker":"Eren Yeager","recipient":"à Mikasa","aliases":["Eren","Eren Jäger"]},{"text":"Ce monde est cruel, mais il est aussi magnifique.","speaker":"Mikasa Ackerman","recipient":"à elle-même","aliases":["Mikasa"]},{"text":"Abandonne tes rêves et meurs.","speaker":"Levi Ackerman","recipient":"à Erwin","aliases":["Levi"]},{"text":"Mes soldats avancent ! Mes soldats hurlent !","speaker":"Erwin Smith","recipient":"au Bataillon d'exploration","aliases":["Erwin"]},{"text":"Quelqu'un doit se salir les mains pour changer quelque chose.","speaker":"Armin Arlert","recipient":"à Jean","aliases":["Armin"]},{"text":"Je suis le Titan Cuirassé, et lui le Titan Colossal.","speaker":"Reiner Braun","recipient":"à Eren","aliases":["Reiner"]},{"text":"Je veux simplement rentrer chez moi.","speaker":"Annie Leonhart","recipient":"à elle-même","aliases":["Annie"]},{"text":"Tout ce que je veux, c'est que les gens vivent sans haine.","speaker":"Historia Reiss","recipient":"à son peuple","aliases":["Historia"]},{"text":"Nous sommes tous esclaves de quelque chose.","speaker":"Kenny Ackerman","recipient":"à Levi","aliases":["Kenny"]},{"text":"Je voulais seulement que mon frère ait une longue vie.","speaker":"Zeke Yeager","recipient":"à Eren","aliases":["Zeke","Zeke Jäger"]}]},"sds":{"name":"Seven Deadly Sins","quotes":[{"text":"Peu importe tes péchés, je resterai à tes côtés.","speaker":"Meliodas","recipient":"à Elizabeth","aliases":[]},{"text":"Un vrai homme ne revient jamais sur sa parole.","speaker":"Ban","recipient":"à ses amis","aliases":[]},{"text":"Pourquoi haïrais-je quelqu'un de plus faible que moi ?","speaker":"Escanor","recipient":"à Estarossa","aliases":[]},{"text":"Je protégerai toujours la forêt et ceux que j'aime.","speaker":"King","recipient":"à Diane","aliases":["Harlequin"]},{"text":"Je veux être humaine pour comprendre ce que je ressens.","speaker":"Gowther","recipient":"aux Seven Deadly Sins","aliases":[]},{"text":"Je ne regrette pas d'avoir choisi mes amis.","speaker":"Diane","recipient":"à ses compagnons","aliases":[]},{"text":"Le savoir sans cœur peut devenir une malédiction.","speaker":"Merlin","recipient":"aux Seven Deadly Sins","aliases":[]},{"text":"Je n'ai besoin que de mon frère.","speaker":"Zeldris","recipient":"à Meliodas","aliases":[]},{"text":"Je veux sauver tout le monde, même ceux qui me détestent.","speaker":"Elizabeth Liones","recipient":"à Meliodas","aliases":["Elizabeth"]},{"text":"La lumière peut être plus cruelle que les ténèbres.","speaker":"Mael","recipient":"à ses adversaires","aliases":[]}]},"deathnote":{"name":"Death Note","quotes":[{"text":"Je deviendrai le dieu de ce nouveau monde.","speaker":"Light Yagami","recipient":"à lui-même","aliases":["Light","Kira"]},{"text":"Je suis L.","speaker":"L Lawliet","recipient":"à Light","aliases":["L","Lawliet"]},{"text":"Si Kira est attrapé, alors il est le mal. S'il gagne, il devient la justice.","speaker":"Light Yagami","recipient":"à Ryuk","aliases":["Light","Kira"]},{"text":"Je préfère perdre seule plutôt que vivre dans un monde sans Light.","speaker":"Misa Amane","recipient":"à Rem","aliases":["Misa"]},{"text":"Les humains sont vraiment intéressants.","speaker":"Ryuk","recipient":"à Light","aliases":[]},{"text":"Personne ne peut surpasser L seul, mais ensemble nous le pouvons.","speaker":"Near","recipient":"à Mello","aliases":["Nate River"]},{"text":"Je serai le premier, pas le second.","speaker":"Mello","recipient":"à Near","aliases":["Mihael Keehl"]},{"text":"Je ferai tout pour protéger Misa.","speaker":"Rem","recipient":"à Light","aliases":[]},{"text":"Kira est dieu. Je suis sa main.","speaker":"Teru Mikami","recipient":"à lui-même","aliases":["Mikami"]},{"text":"Un père doit croire en son fils jusqu'au bout.","speaker":"Soichiro Yagami","recipient":"à Light","aliases":["Soichiro"]}]},"cote":{"name":"Classroom of the Elite","quotes":[{"text":"Les gens ne sont que des outils. L'important est de gagner à la fin.","speaker":"Kiyotaka Ayanokoji","recipient":"à lui-même","aliases":["Ayanokoji","Ayanokōji"]},{"text":"Je monterai en classe A par mes propres moyens.","speaker":"Suzune Horikita","recipient":"à Ayanokoji","aliases":["Horikita","Suzune"]},{"text":"Tout le monde a une face qu'il cache aux autres.","speaker":"Kikyo Kushida","recipient":"à Horikita","aliases":["Kushida"]},{"text":"Je ne veux plus être utilisée par les autres.","speaker":"Kei Karuizawa","recipient":"à Ayanokoji","aliases":["Kei","Karuizawa"]},{"text":"La peur est parfois le moyen le plus rapide d'obtenir l'obéissance.","speaker":"Kakeru Ryuen","recipient":"à sa classe","aliases":["Ryuen","Ryūen"]},{"text":"Je veux enfin jouer contre toi à armes égales.","speaker":"Arisu Sakayanagi","recipient":"à Ayanokoji","aliases":["Arisu","Sakayanagi"]},{"text":"Je veux que notre classe avance sans sacrifier personne.","speaker":"Honami Ichinose","recipient":"à sa classe","aliases":["Ichinose"]},{"text":"Je n'ai aucun intérêt pour une compétition dont je connais déjà le résultat.","speaker":"Rokusuke Koenji","recipient":"à ses camarades","aliases":["Koenji","Kōenji"]},{"text":"La force n'a de valeur que si elle est maîtrisée.","speaker":"Manabu Horikita","recipient":"à Suzune","aliases":["Manabu"]},{"text":"Le pouvoir appartient à celui qui sait utiliser les règles.","speaker":"Miyabi Nagumo","recipient":"au conseil étudiant","aliases":["Nagumo"]}]},"solo":{"name":"Solo Leveling","quotes":[{"text":"Si je dois devenir plus fort pour survivre, alors je monterai de niveau.","speaker":"Sung Jinwoo","recipient":"à lui-même","aliases":["Jinwoo","Sung Jin-Woo"]},{"text":"Je veux combattre à tes côtés, pas derrière toi.","speaker":"Cha Hae-In","recipient":"à Jinwoo","aliases":["Cha Hae In","Hae-In"]},{"text":"Je suis peut-être faible, mais je ne t'abandonnerai pas.","speaker":"Yoo Jinho","recipient":"à Jinwoo","aliases":["Jinho"]},{"text":"Un vrai Hunter protège les faibles avant de penser à la gloire.","speaker":"Go Gunhee","recipient":"aux Hunters","aliases":["Go Gun-Hee","Gunhee"]},{"text":"La puissance d'un rang S se reconnaît avant même qu'il attaque.","speaker":"Baek Yoonho","recipient":"aux Hunters","aliases":["Baek"]},{"text":"Tu es le seul adversaire qui mérite que je me batte sérieusement.","speaker":"Thomas Andre","recipient":"à Jinwoo","aliases":["Thomas"]},{"text":"Mon roi, donnez-moi un ordre.","speaker":"Igris","recipient":"à Jinwoo","aliases":[]},{"text":"Mon roi ! Regardez comme je suis utile !","speaker":"Beru","recipient":"à Jinwoo","aliases":[]},{"text":"Le Monarque des Ombres n'est pas un simple humain.","speaker":"Ashborn","recipient":"à Jinwoo","aliases":[]},{"text":"La destruction est la seule fin qui convienne à ce monde.","speaker":"Antares","recipient":"à Jinwoo","aliases":[]}]},"clover":{"name":"Black Clover","quotes":[{"text":"Je n'abandonnerai jamais. C'est ça, ma magie !","speaker":"Asta","recipient":"à ses adversaires","aliases":[]},{"text":"Je deviendrai Empereur-Mage.","speaker":"Yuno","recipient":"à Asta","aliases":[]},{"text":"Je suis royale, mais je veux devenir forte par moi-même.","speaker":"Noelle Silva","recipient":"à ses amis","aliases":["Noelle"]},{"text":"Dépasse tes limites, ici et maintenant !","speaker":"Yami Sukehiro","recipient":"au Taureau Noir","aliases":["Yami"]},{"text":"La magie est faite pour protéger les gens, pas pour les dominer.","speaker":"Julius Novachrono","recipient":"aux chevaliers-mages","aliases":["Julius"]},{"text":"Plus mon adversaire est fort, plus j'ai envie de me battre.","speaker":"Luck Voltia","recipient":"à ses adversaires","aliases":["Luck"]},{"text":"Je ne laisserai personne insulter mes camarades.","speaker":"Magna Swing","recipient":"à ses adversaires","aliases":["Magna"]},{"text":"La force ne vient pas du sang royal, mais de ce qu'on choisit de faire.","speaker":"Mereoleona Vermillion","recipient":"aux chevaliers-mages","aliases":["Mereoleona"]},{"text":"Un capitaine doit faire confiance à ses hommes.","speaker":"Fuegoleon Vermillion","recipient":"au Lion Pourpre","aliases":["Fuegoleon"]},{"text":"Je ne laisserai plus mon passé décider de mon avenir.","speaker":"Nacht Faust","recipient":"à Asta","aliases":["Nacht"]}]},"fireforce":{"name":"Fire Force","quotes":[{"text":"Je deviendrai un héros, pas un démon.","speaker":"Shinra Kusakabe","recipient":"à ses camarades","aliases":["Shinra"]},{"text":"Un chevalier ne recule jamais devant le mal.","speaker":"Arthur Boyle","recipient":"à Shinra","aliases":["Arthur"]},{"text":"La force sans contrôle ne sert à rien.","speaker":"Maki Oze","recipient":"à Shinra et Arthur","aliases":["Maki"]},{"text":"La 8e existe pour découvrir la vérité sur les incendies.","speaker":"Akitaru Obi","recipient":"à la 8e brigade","aliases":["Obi"]},{"text":"Le feu est une arme, mais aussi quelque chose qu'on doit comprendre.","speaker":"Takehisa Hinawa","recipient":"à la 8e brigade","aliases":["Hinawa"]},{"text":"Asakusa protège les siens à sa manière.","speaker":"Benimaru Shinmon","recipient":"à Shinra","aliases":["Benimaru"]},{"text":"Je veux savoir pourquoi l'Adolla nous a choisis.","speaker":"Sho Kusakabe","recipient":"à Shinra","aliases":["Sho","Shō"]},{"text":"La foi peut brûler plus fort que n'importe quelle flamme.","speaker":"Haumea","recipient":"aux White-Clad","aliases":[]},{"text":"Je ne suis pas une demoiselle en détresse !","speaker":"Tamaki Kotatsu","recipient":"à ses camarades","aliases":["Tamaki"]},{"text":"Les faits sont plus intéressants que les croyances.","speaker":"Viktor Licht","recipient":"à la 8e brigade","aliases":["Licht"]}]},"mushoku":{"name":"Mushoku Tensei","quotes":[{"text":"Cette fois, je veux vivre sans regrets.","speaker":"Rudeus Greyrat","recipient":"à lui-même","aliases":["Rudeus"]},{"text":"La magie devient simple quand on comprend ce qu'on imagine.","speaker":"Roxy Migurdia","recipient":"à Rudeus","aliases":["Roxy"]},{"text":"Je veux rester à tes côtés, même si je change.","speaker":"Sylphiette","recipient":"à Rudeus","aliases":["Sylphy","Fitz"]},{"text":"Je serai assez forte pour ne plus dépendre de personne.","speaker":"Eris Boreas Greyrat","recipient":"à Rudeus","aliases":["Eris"]},{"text":"Un guerrier doit protéger les enfants avant son honneur.","speaker":"Ruijerd Superdia","recipient":"à Rudeus","aliases":["Ruijerd"]},{"text":"Ne te fie jamais à l'Homme-Dieu.","speaker":"Orsted","recipient":"à Rudeus","aliases":[]},{"text":"Être père ne veut pas dire savoir toujours quoi faire.","speaker":"Paul Greyrat","recipient":"à Rudeus","aliases":["Paul"]},{"text":"L'épée répond à celui qui n'hésite pas.","speaker":"Ghislaine Dedoldia","recipient":"à Eris","aliases":["Ghislaine"]},{"text":"Je veux rentrer dans mon monde, même si personne ne me comprend.","speaker":"Nanahoshi Shizuka","recipient":"à Rudeus","aliases":["Nanahoshi"]},{"text":"La connaissance magique mérite qu'on lui consacre sa vie.","speaker":"Cliff Grimoire","recipient":"à ses camarades","aliases":["Cliff"]}]},"rezero":{"name":"Re:Zero","quotes":[{"text":"Je recommencerai autant de fois qu'il le faudra pour vous sauver.","speaker":"Subaru Natsuki","recipient":"à Emilia","aliases":["Subaru"]},{"text":"Je suis Emilia. Juste Emilia.","speaker":"Emilia","recipient":"à Subaru","aliases":[]},{"text":"Subaru est le héros de Rem.","speaker":"Rem","recipient":"à Subaru","aliases":[]},{"text":"Ram n'attend pas grand-chose de Barusu.","speaker":"Ram","recipient":"à Subaru","aliases":[]},{"text":"Je suppose que je vais t'aider, je suppose.","speaker":"Beatrice","recipient":"à Subaru","aliases":["Betty"]},{"text":"Tout est pour atteindre mon objectif, même cette douleur.","speaker":"Roswaal L. Mathers","recipient":"à Subaru","aliases":["Roswaal"]},{"text":"Si tu me demandes de te sauver, je le ferai.","speaker":"Reinhard van Astrea","recipient":"à Felt","aliases":["Reinhard"]},{"text":"Un chef doit porter les conséquences de ses choix.","speaker":"Crusch Karsten","recipient":"à Subaru","aliases":["Crusch"]},{"text":"Le monde devrait être reconnaissant de pouvoir m'admirer.","speaker":"Priscilla Barielle","recipient":"à son entourage","aliases":["Priscilla"]},{"text":"Pourquoi devrais-je souffrir pour le bonheur de quelqu'un d'autre ?","speaker":"Regulus Corneas","recipient":"à ses victimes","aliases":["Regulus"]}]},"fairy":{"name":"Fairy Tail","quotes":[{"text":"Je n'abandonnerai jamais un membre de Fairy Tail.","speaker":"Natsu Dragneel","recipient":"à ses ennemis","aliases":["Natsu"]},{"text":"Les souvenirs de mes amis me donnent la force d'avancer.","speaker":"Lucy Heartfilia","recipient":"à ses amis","aliases":["Lucy"]},{"text":"Je ne veux plus perdre quelqu'un qui compte pour moi.","speaker":"Gray Fullbuster","recipient":"à Natsu","aliases":["Gray"]},{"text":"Quand mes amis pleurent, je deviens plus forte.","speaker":"Erza Scarlet","recipient":"à ses ennemis","aliases":["Erza"]},{"text":"Même petite, je peux protéger ma guilde.","speaker":"Wendy Marvell","recipient":"à Fairy Tail","aliases":["Wendy"]},{"text":"Je ne suis plus ton ennemi. Fairy Tail est ma famille.","speaker":"Gajeel Redfox","recipient":"à ses camarades","aliases":["Gajeel"]},{"text":"La vraie force ne vient pas de la peur qu'on inspire.","speaker":"Laxus Dreyar","recipient":"à Fairy Tail","aliases":["Laxus"]},{"text":"Juvia vit pour protéger ceux qu'elle aime.","speaker":"Juvia Lockser","recipient":"à Gray","aliases":["Juvia"]},{"text":"Il n'existe pas de magie plus forte que celle des liens.","speaker":"Makarov Dreyar","recipient":"à Fairy Tail","aliases":["Makarov"]},{"text":"La mort n'est pas une punition suffisante pour mon immortalité.","speaker":"Zeref Dragneel","recipient":"à Natsu","aliases":["Zeref"]}]},"bluelock":{"name":"Blue Lock","quotes":[{"text":"Je vais dévorer tous les génies sur ce terrain.","speaker":"Yoichi Isagi","recipient":"à ses rivaux","aliases":["Isagi"]},{"text":"Le football est un jeu où celui qui marque le plus est le meilleur.","speaker":"Jinpachi Ego","recipient":"aux joueurs de Blue Lock","aliases":["Ego"]},{"text":"Je veux jouer au football avec mon monstre intérieur.","speaker":"Meguru Bachira","recipient":"à Isagi","aliases":["Bachira"]},{"text":"Je veux seulement battre mon frère.","speaker":"Rin Itoshi","recipient":"à Isagi","aliases":["Rin"]},{"text":"Tout est une corvée, sauf quand le football devient intéressant.","speaker":"Seishiro Nagi","recipient":"à Reo","aliases":["Nagi"]},{"text":"Je serai celui qui fait de Nagi le meilleur du monde.","speaker":"Reo Mikage","recipient":"à Nagi","aliases":["Reo"]},{"text":"Le roi ne s'agenouille devant personne.","speaker":"Shoei Barou","recipient":"à ses rivaux","aliases":["Barou"]},{"text":"Ma vitesse est l'arme que personne ne peut m'enlever.","speaker":"Hyoma Chigiri","recipient":"à ses rivaux","aliases":["Chigiri"]},{"text":"Je veux écraser tout ce qui est beau devant moi.","speaker":"Ryusei Shidou","recipient":"à ses adversaires","aliases":["Shidou","Shidō"]},{"text":"Tu n'es qu'un obstacle sur le chemin de mon but.","speaker":"Michael Kaiser","recipient":"à Isagi","aliases":["Kaiser"]}]},"fma":{"name":"Fullmetal Alchemist","quotes":[{"text":"Un cœur fait d'acier peut encore ressentir la douleur.","speaker":"Edward Elric","recipient":"à ses proches","aliases":["Edward","Ed"]},{"text":"Je veux retrouver nos corps, pas obtenir une victoire facile.","speaker":"Alphonse Elric","recipient":"à Edward","aliases":["Alphonse","Al"]},{"text":"Il pleut aujourd'hui.","speaker":"Roy Mustang","recipient":"à Hawkeye","aliases":["Mustang","Roy"]},{"text":"La guerre ne laisse personne propre.","speaker":"Riza Hawkeye","recipient":"à Roy Mustang","aliases":["Hawkeye","Riza"]},{"text":"Un homme qui a perdu sa voie peut encore choisir sa prochaine étape.","speaker":"Scar","recipient":"à lui-même","aliases":[]},{"text":"Je ne supporte pas de voir Ed abandonner.","speaker":"Winry Rockbell","recipient":"à Edward","aliases":["Winry"]},{"text":"Un roi existe pour son peuple, pas l'inverse.","speaker":"Ling Yao","recipient":"à Greed","aliases":["Ling"]},{"text":"Je veux tout : les femmes, l'argent, le pouvoir… et mes amis.","speaker":"Greed","recipient":"à ses compagnons","aliases":[]},{"text":"Les humains sont de petites créatures, mais leur volonté est immense.","speaker":"Van Hohenheim","recipient":"à Father","aliases":["Hohenheim"]},{"text":"Je suis ce que vous appelez Dieu, le Monde, l'Univers… et aussi toi.","speaker":"Truth","recipient":"aux alchimistes","aliases":["La Vérité","Vérité"]}]},"chainsaw":{"name":"Chainsaw Man","quotes":[{"text":"Je veux juste manger de bonnes choses et vivre une vie normale.","speaker":"Denji","recipient":"à lui-même","aliases":[]},{"text":"Les chats valent plus que les humains.","speaker":"Power","recipient":"à Denji","aliases":[]},{"text":"Je veux tuer le Démon-Flingue, quoi qu'il m'en coûte.","speaker":"Aki Hayakawa","recipient":"à ses collègues","aliases":["Aki"]},{"text":"Un chien obéissant mérite une récompense.","speaker":"Makima","recipient":"à Denji","aliases":[]},{"text":"Je ne veux pas mourir !","speaker":"Kobeni Higashiyama","recipient":"à ses collègues","aliases":["Kobeni"]},{"text":"On devient plus fort quand on a quelque chose à perdre.","speaker":"Himeno","recipient":"à Aki","aliases":[]},{"text":"Si tu venais avec moi, on pourrait tout oublier.","speaker":"Reze","recipient":"à Denji","aliases":[]},{"text":"Le futur est génial !","speaker":"Future Devil","recipient":"à Aki","aliases":["Démon du Futur","Future"]},{"text":"Même les chasseurs de démons ont peur de quelque chose.","speaker":"Kishibe","recipient":"à Denji et Power","aliases":[]},{"text":"Je veux transformer mes peurs en armes.","speaker":"Asa Mitaka","recipient":"à elle-même","aliases":["Asa"]}]},"wakfu":{"name":"Wakfu","quotes":[{"text":"Je retrouverai ma famille et la vérité sur les Eliatropes.","speaker":"Yugo","recipient":"à ses amis","aliases":[]},{"text":"Un Iop n'abandonne jamais un combat !","speaker":"Tristepin de Percedal","recipient":"à ses ennemis","aliases":["Tristepin","Percedal","Pinpin"]},{"text":"Mon peuple passe avant mon confort.","speaker":"Amalia Sheran Sharm","recipient":"à ses amis","aliases":["Amalia"]},{"text":"Je ne rate jamais deux fois la même cible.","speaker":"Evangelyne","recipient":"à ses adversaires","aliases":["Eva"]},{"text":"L'expérience vaut parfois plus que toutes les kamas du monde.","speaker":"Ruel Stroud","recipient":"à la Confrérie","aliases":["Ruel"]},{"text":"Le temps est la seule chose que personne ne peut vaincre.","speaker":"Nox","recipient":"à Yugo","aliases":["Noximilien"]},{"text":"Je voulais seulement réparer ce qui nous a été pris.","speaker":"Qilby","recipient":"à Yugo","aliases":[]},{"text":"Je ne suis pas ton ombre, Yugo.","speaker":"Adamai","recipient":"à Yugo","aliases":["Adamaï"]},{"text":"Les dieux jouent avec les mortels comme avec des pions.","speaker":"Oropo","recipient":"à Yugo","aliases":[]},{"text":"La force d'un Iop vient aussi de son cœur.","speaker":"Goultard","recipient":"à Tristepin","aliases":[]}]},"demonslayer":{"name":"Demon Slayer","quotes":[{"text":"Je transformerai Nezuko en humaine.","speaker":"Tanjiro Kamado","recipient":"à lui-même","aliases":["Tanjiro","Tanjirō"]},{"text":"Même un démon peut protéger quelqu'un qu'il aime.","speaker":"Nezuko Kamado","recipient":"à Tanjiro","aliases":["Nezuko"]},{"text":"Je suis peut-être terrifié, mais je dois quand même avancer.","speaker":"Zenitsu Agatsuma","recipient":"à lui-même","aliases":["Zenitsu"]},{"text":"Je suis le roi de la montagne !","speaker":"Inosuke Hashibira","recipient":"à ses adversaires","aliases":["Inosuke"]},{"text":"Ne pleure pas. Avance et deviens plus fort.","speaker":"Kyojuro Rengoku","recipient":"à Tanjiro","aliases":["Rengoku","Kyōjurō"]},{"text":"Je ne suis pas détesté par les autres.","speaker":"Giyu Tomioka","recipient":"à Shinobu","aliases":["Giyu","Giyū"]},{"text":"La colère ne disparaît pas simplement parce que je souris.","speaker":"Shinobu Kocho","recipient":"à Tanjiro","aliases":["Shinobu","Shinobu Kochō"]},{"text":"Je ne pardonnerai jamais aux démons.","speaker":"Sanemi Shinazugawa","recipient":"à Tanjiro","aliases":["Sanemi"]},{"text":"Je veux devenir quelqu'un dont ma famille serait fière.","speaker":"Muichiro Tokito","recipient":"à lui-même","aliases":["Muichiro"]},{"text":"Je suis une catastrophe naturelle. Les humains ne peuvent rien contre moi.","speaker":"Muzan Kibutsuji","recipient":"aux Pourfendeurs","aliases":["Muzan"]}]},"pokemon":{"name":"Pokémon","quotes":[{"text":"Je veux devenir Maître Pokémon !","speaker":"Ash Ketchum","recipient":"à ses amis","aliases":["Sacha","Ash"]},{"text":"Pikachu !","speaker":"Ash Ketchum","recipient":"à Pikachu","aliases":["Sacha","Ash"]},{"text":"La Team Rocket s'envole vers d'autres cieux !","speaker":"Jessie","recipient":"à ses adversaires","aliases":[]},{"text":"Pour protéger le monde de la dévastation !","speaker":"Jessie","recipient":"à ceux qui rencontrent la Team Rocket","aliases":[]},{"text":"Pour rallier tous les peuples à notre nation !","speaker":"James","recipient":"à ceux qui rencontrent la Team Rocket","aliases":[]},{"text":"Miaouss, oui la guerre !","speaker":"Meowth","recipient":"à Jessie et James","aliases":["Miaouss"]},{"text":"Un vrai Dresseur apprend autant de ses défaites que de ses victoires.","speaker":"Brock","recipient":"à Ash","aliases":["Pierre"]},{"text":"Les Pokémon Eau sont les meilleurs !","speaker":"Misty","recipient":"à Ash","aliases":["Ondine"]},{"text":"Il n'y a pas de Pokémon faible, seulement des stratégies différentes.","speaker":"Cynthia","recipient":"à ses challengers","aliases":["Cynthia Shirona"]},{"text":"Pour comprendre un Pokémon, il faut d'abord l'écouter.","speaker":"Professor Oak","recipient":"aux jeunes Dresseurs","aliases":["Professeur Chen","Oak"]}]},"dragonball":{"name":"Dragon Ball","quotes":[{"text":"Je suis Son Goku, et je viens de la Terre !","speaker":"Son Goku","recipient":"à ses adversaires","aliases":["Goku","Sangoku"]},{"text":"Je suis le prince de tous les Saiyans.","speaker":"Vegeta","recipient":"à ses adversaires","aliases":[]},{"text":"Je me battrai pour protéger ceux que j'aime.","speaker":"Son Gohan","recipient":"à Cell","aliases":["Gohan"]},{"text":"Parfois, un ancien ennemi devient le meilleur allié.","speaker":"Piccolo","recipient":"à Gohan","aliases":[]},{"text":"Vous allez connaître la puissance de l'empereur de l'univers.","speaker":"Freezer","recipient":"à Goku","aliases":["Frieza"]},{"text":"Je suis la perfection.","speaker":"Cell","recipient":"aux Z-Fighters","aliases":["Perfect Cell"]},{"text":"Je ne détruis pas pour le plaisir. C'est simplement mon travail.","speaker":"Beerus","recipient":"à Goku","aliases":["Bills"]},{"text":"La force sans maîtrise n'est rien.","speaker":"Whis","recipient":"à Goku et Vegeta","aliases":[]},{"text":"La justice de mon univers exige que je gagne.","speaker":"Jiren","recipient":"à Goku","aliases":[]},{"text":"Kakarot !","speaker":"Broly","recipient":"à Goku","aliases":[]}]},"hellsparadise":{"name":"Hell's Paradise","quotes":[{"text":"Je veux rentrer vivant auprès de ma femme.","speaker":"Gabimaru","recipient":"à Sagiri","aliases":[]},{"text":"La peur de mourir prouve que tu tiens encore à la vie.","speaker":"Yamada Asaemon Sagiri","recipient":"à Gabimaru","aliases":["Sagiri"]},{"text":"Je survivrai parce que mourir serait vraiment trop ennuyeux.","speaker":"Yuzuriha","recipient":"à Sagiri","aliases":[]},{"text":"La liberté vaut plus que les chaînes de n'importe quel clan.","speaker":"Aza Chobei","recipient":"à Toma","aliases":["Chobei","Chōbei"]},{"text":"Je suivrai mon frère jusqu'au bout.","speaker":"Aza Toma","recipient":"à Chobei","aliases":["Toma","Tōma"]},{"text":"Un sabre hésitant tue celui qui le tient.","speaker":"Yamada Asaemon Shion","recipient":"à Tenza","aliases":["Shion"]},{"text":"Je veux choisir moi-même la façon dont je vais vivre.","speaker":"Yamada Asaemon Tenza","recipient":"à Nurugai","aliases":["Tenza"]},{"text":"Je deviendrai plus fort pour que personne ne décide à ma place.","speaker":"Nurugai","recipient":"à Tenza","aliases":[]},{"text":"L'immortalité n'est pas un cadeau si elle détruit ce que nous sommes.","speaker":"Mei","recipient":"à Gabimaru","aliases":[]},{"text":"Les humains cherchent toujours l'éternité sans comprendre son prix.","speaker":"Rien","recipient":"aux intrus","aliases":[]}]},"gachiakuta":{"name":"Gachiakuta","quotes":[{"text":"Je vais remonter là-haut et découvrir qui a tué Regto.","speaker":"Rudo Surebrec","recipient":"à lui-même","aliases":["Rudo"]},{"text":"Un objet aimé longtemps finit par porter quelque chose de son propriétaire.","speaker":"Enjin","recipient":"à Rudo","aliases":[]},{"text":"Tu n'es pas spécial juste parce que tu souffres.","speaker":"Zanka Nijiku","recipient":"à Rudo","aliases":["Zanka"]},{"text":"Je préfère sourire quand je me bats.","speaker":"Riyo Reaper","recipient":"à ses adversaires","aliases":["Riyo"]},{"text":"Les gens sont bien plus amusants quand on les pousse à bout.","speaker":"Jabber Wonger","recipient":"à Rudo","aliases":["Jabber"]},{"text":"Le monde d'en haut jette tout ce qu'il ne veut plus voir.","speaker":"Zodyl Typhon","recipient":"à ses alliés","aliases":["Zodyl"]},{"text":"La confiance est fragile. C'est ce qui la rend utile.","speaker":"Tamsy Caines","recipient":"à ses compagnons","aliases":["Tamsy"]},{"text":"Même les ordures ont une histoire.","speaker":"Regto Surebrec","recipient":"à Rudo","aliases":["Regto"]},{"text":"Je veux juste un endroit où personne ne me rejette.","speaker":"Amo Empool","recipient":"à Rudo","aliases":["Amo"]},{"text":"Observer avant d'agir, c'est aussi se battre.","speaker":"Semiu Grier","recipient":"aux Cleaners","aliases":["Semiu"]}]},"haikyuu":{"name":"Haikyuu","quotes":[{"text":"Je peux voler même si je suis petit.","speaker":"Shoyo Hinata","recipient":"à ses adversaires","aliases":["Hinata","Shōyō Hinata"]},{"text":"Un passeur doit donner à son attaquant la meilleure balle possible.","speaker":"Tobio Kageyama","recipient":"à Hinata","aliases":["Kageyama"]},{"text":"Le volleyball est un sport où l'on regarde toujours vers le haut.","speaker":"Kei Tsukishima","recipient":"à lui-même","aliases":["Tsukishima"]},{"text":"Je suis le gardien de Karasuno !","speaker":"Yu Nishinoya","recipient":"à son équipe","aliases":["Nishinoya","Noya"]},{"text":"Le talent fleurit, l'instinct se polit.","speaker":"Toru Oikawa","recipient":"à ses rivaux","aliases":["Oikawa","Tōru Oikawa"]},{"text":"Je ne pense pas être meilleur que les autres. Je fais juste mon travail.","speaker":"Wakatoshi Ushijima","recipient":"à Hinata","aliases":["Ushijima"]},{"text":"Hé, hé, hé !","speaker":"Kotaro Bokuto","recipient":"à son équipe","aliases":["Bokuto","Kōtarō Bokuto"]},{"text":"Je n'aime pas me fatiguer, mais j'aime gagner.","speaker":"Kenma Kozume","recipient":"à Hinata","aliases":["Kenma"]},{"text":"Le bloc n'est pas là pour arrêter la balle, mais pour la toucher.","speaker":"Tetsuro Kuroo","recipient":"à Tsukishima","aliases":["Kuroo","Tetsurō Kuroo"]},{"text":"Celui qui contrôle le service contrôle le début de l'échange.","speaker":"Atsumu Miya","recipient":"à ses adversaires","aliases":["Atsumu"]}]},"jjk":{"name":"Jujutsu Kaisen","quotes":[{"text":"Je veux que les gens aient une mort correcte.","speaker":"Yuji Itadori","recipient":"à lui-même","aliases":["Yuji","Itadori","Yūji"]},{"text":"Je sauverai les gens de façon injuste.","speaker":"Megumi Fushiguro","recipient":"à Yuji","aliases":["Megumi"]},{"text":"Je m'aime quand je suis jolie et quand je suis forte.","speaker":"Nobara Kugisaki","recipient":"à ses adversaires","aliases":["Nobara"]},{"text":"Dans le ciel et sur la terre, moi seul suis l'honoré.","speaker":"Satoru Gojo","recipient":"à Toji","aliases":["Gojo","Gojō"]},{"text":"L'amour est la plus tordue des malédictions.","speaker":"Satoru Gojo","recipient":"à Yuta","aliases":["Gojo","Gojō"]},{"text":"Je veux un monde où les exorcistes n'auront plus à souffrir.","speaker":"Suguru Geto","recipient":"à Gojo","aliases":["Geto","Getō"]},{"text":"Connais ta place, idiot.","speaker":"Ryomen Sukuna","recipient":"à ses adversaires","aliases":["Sukuna"]},{"text":"Le travail, c'est nul.","speaker":"Kento Nanami","recipient":"à Yuji","aliases":["Nanami"]},{"text":"Je ne travaille pas gratuitement.","speaker":"Mei Mei","recipient":"à ses alliés","aliases":[]},{"text":"Je n'ai jamais travaillé pour personne gratuitement, surtout pas pour les Zenin.","speaker":"Toji Fushiguro","recipient":"à ses employeurs","aliases":["Toji","Tōji"]}]},"jojo":{"name":"JoJo's Bizarre Adventure","quotes":[{"text":"Ce n'est pas fini tant que je n'ai pas décidé que ça l'était.","speaker":"Jonathan Joestar","recipient":"à Dio","aliases":["Jonathan"]},{"text":"Ta prochaine phrase sera…","speaker":"Joseph Joestar","recipient":"à ses adversaires","aliases":["Joseph"]},{"text":"Yare yare daze.","speaker":"Jotaro Kujo","recipient":"à son entourage","aliases":["Jotaro","Jōtarō"]},{"text":"Quel beau jour pour avoir des cheveux aussi parfaits.","speaker":"Josuke Higashikata","recipient":"à ceux qui parlent de ses cheveux","aliases":["Josuke"]},{"text":"J'ai un rêve.","speaker":"Giorno Giovanna","recipient":"à Bucciarati","aliases":["Giorno"]},{"text":"Je veux sortir de cette prison et reprendre ma vie.","speaker":"Jolyne Cujoh","recipient":"à ses alliés","aliases":["Jolyne"]},{"text":"Kono Dio da !","speaker":"Dio Brando","recipient":"à Jonathan","aliases":["DIO","Dio"]},{"text":"Je veux simplement vivre une vie tranquille.","speaker":"Yoshikage Kira","recipient":"à ses adversaires","aliases":["Kira"]},{"text":"Le résultat seul compte. C'est la vérité de ce monde.","speaker":"Diavolo","recipient":"à Giorno","aliases":[]},{"text":"Atteindre le paradis demande des sacrifices.","speaker":"Enrico Pucci","recipient":"à ses alliés","aliases":["Pucci"]}]},"tensura":{"name":"Tensura","quotes":[{"text":"Je voulais une vie tranquille, et me voilà chef d'une nation.","speaker":"Rimuru Tempest","recipient":"à ses amis","aliases":["Rimuru"]},{"text":"Je suis Veldora, le Dragon des Tempêtes !","speaker":"Veldora Tempest","recipient":"à Rimuru","aliases":["Veldora"]},{"text":"Si c'est amusant, alors je suis partante !","speaker":"Milim Nava","recipient":"à Rimuru","aliases":["Milim"]},{"text":"Tout ce que mon seigneur désire sera accompli.","speaker":"Diablo","recipient":"à Rimuru","aliases":[]},{"text":"Je protégerai Tempest au nom de Rimuru-sama.","speaker":"Benimaru","recipient":"aux habitants de Tempest","aliases":[]},{"text":"Rimuru-sama mérite le meilleur de mes plats.","speaker":"Shion","recipient":"à Rimuru","aliases":[]},{"text":"Les démons respectent la force, pas les titres.","speaker":"Guy Crimson","recipient":"aux Demon Lords","aliases":["Guy"]},{"text":"La foi n'empêche pas d'utiliser son jugement.","speaker":"Luminous Valentine","recipient":"à Hinata","aliases":["Luminous"]},{"text":"Je juge les monstres sur leurs actes, pas sur leur race.","speaker":"Hinata Sakaguchi","recipient":"à Rimuru","aliases":["Hinata"]},{"text":"Même moi, je peux devenir utile à Tempest !","speaker":"Gobta","recipient":"à Rimuru","aliases":[]}]},"opm":{"name":"One Punch Man","quotes":[{"text":"Je suis un héros pour le plaisir.","speaker":"Saitama","recipient":"à ses adversaires","aliases":[]},{"text":"Maître, apprenez-moi le secret de votre puissance.","speaker":"Genos","recipient":"à Saitama","aliases":[]},{"text":"Je n'ai pas de temps à perdre avec des faibles.","speaker":"Tatsumaki","recipient":"aux autres héros","aliases":["Tornado"]},{"text":"La force véritable vient de toute une vie d'entraînement.","speaker":"Bang","recipient":"à Garou","aliases":["Silver Fang"]},{"text":"Parfois, avoir l'air fort suffit à gagner.","speaker":"King","recipient":"à Saitama","aliases":[]},{"text":"Je veux devenir assez forte pour ne plus vivre dans l'ombre de ma sœur.","speaker":"Fubuki","recipient":"à Saitama","aliases":["Blizzard"]},{"text":"Je deviendrai le mal absolu.","speaker":"Garou","recipient":"aux héros","aliases":["Garoh"]},{"text":"Tu es trop fort, Saitama.","speaker":"Boros","recipient":"à Saitama","aliases":[]},{"text":"Même sans pouvoir, je peux toujours pédaler vers le danger.","speaker":"Mumen Rider","recipient":"aux civils","aliases":["Rider sans permis"]},{"text":"La vitesse est tout ce dont un ninja a besoin.","speaker":"Flashy Flash","recipient":"à ses adversaires","aliases":["Flash"]}]},"sao":{"name":"Sword Art Online","quotes":[{"text":"Dans ce monde, mourir dans le jeu signifie mourir pour de vrai.","speaker":"Kirito","recipient":"aux joueurs de SAO","aliases":["Kazuto Kirigaya"]},{"text":"Je préfère vivre ici avec toi que survivre seule.","speaker":"Asuna Yuuki","recipient":"à Kirito","aliases":["Asuna"]},{"text":"Une balle virtuelle peut quand même réveiller une vraie peur.","speaker":"Sinon","recipient":"à Kirito","aliases":["Shino Asada"]},{"text":"Même dans un jeu, nos sentiments sont réels.","speaker":"Leafa","recipient":"à Kirito","aliases":["Suguha Kirigaya"]},{"text":"Les amis rencontrés ici ne sont pas moins vrais.","speaker":"Klein","recipient":"à Kirito","aliases":[]},{"text":"Je suis peut-être une IA, mais je vous aime comme mes parents.","speaker":"Yui","recipient":"à Kirito et Asuna","aliases":[]},{"text":"Je veux me battre de toutes mes forces pendant que je le peux.","speaker":"Yuuki Konno","recipient":"à Asuna","aliases":["Yuuki","Yūki"]},{"text":"Je protégerai l'Underworld, même si je dois briser les règles.","speaker":"Alice Zuberg","recipient":"à Kirito","aliases":["Alice"]},{"text":"Je veux retrouver Alice et notre liberté.","speaker":"Eugeo","recipient":"à Kirito","aliases":[]},{"text":"Ce monde était une expérience, mais vos choix étaient réels.","speaker":"Heathcliff","recipient":"à Kirito","aliases":["Akihiko Kayaba","Kayaba"]}]},"tokyoghoul":{"name":"Tokyo Ghoul","quotes":[{"text":"Je ne suis ni humain ni goule. Je suis moi.","speaker":"Ken Kaneki","recipient":"à lui-même","aliases":["Kaneki"]},{"text":"Pourquoi les goules devraient-elles être les seules à souffrir ?","speaker":"Touka Kirishima","recipient":"à Kaneki","aliases":["Touka","Tōka"]},{"text":"Le monde n'est pas mauvais. Il est simplement là.","speaker":"Kishou Arima","recipient":"à Kaneki","aliases":["Arima"]},{"text":"Je vais faire de ce combat mon chef-d'œuvre.","speaker":"Juuzou Suzuya","recipient":"à ses adversaires","aliases":["Juuzou","Jūzō"]},{"text":"Je veux créer un monde où les goules puissent vivre ouvertement.","speaker":"Eto Yoshimura","recipient":"à Kaneki","aliases":["Eto"]},{"text":"Kaneki est délicieux parce qu'il est unique.","speaker":"Shu Tsukiyama","recipient":"à lui-même","aliases":["Tsukiyama"]},{"text":"Je veux protéger les gens qui m'ont donné un foyer.","speaker":"Hinami Fueguchi","recipient":"à Touka","aliases":["Hinami"]},{"text":"Je ne veux plus être le petit frère qu'on doit protéger.","speaker":"Ayato Kirishima","recipient":"à Touka","aliases":["Ayato"]},{"text":"Je pensais que toutes les goules étaient des monstres. J'avais tort.","speaker":"Kotaro Amon","recipient":"à lui-même","aliases":["Amon"]},{"text":"On survit parfois simplement parce qu'on refuse de mourir.","speaker":"Nishiki Nishio","recipient":"à Kaneki","aliases":["Nishiki"]}]},"tokyorevengers":{"name":"Tokyo Revengers","quotes":[{"text":"Cette fois, je ne fuirai plus.","speaker":"Takemichi Hanagaki","recipient":"à lui-même","aliases":["Takemichi"]},{"text":"Toman appartient à chacun de nous.","speaker":"Manjiro Sano","recipient":"aux membres de Toman","aliases":["Mikey"]},{"text":"Mikey n'a pas besoin d'un serviteur. Il a besoin d'un ami.","speaker":"Ken Ryuguji","recipient":"à Mikey","aliases":["Draken"]},{"text":"Je confie Toman à ceux qui protégeront son esprit.","speaker":"Keisuke Baji","recipient":"à Chifuyu","aliases":["Baji"]},{"text":"Je suivrai Baji-san jusqu'au bout.","speaker":"Chifuyu Matsuno","recipient":"à Takemichi","aliases":["Chifuyu"]},{"text":"La violence ne sert à rien si elle détruit ceux qu'on veut protéger.","speaker":"Takashi Mitsuya","recipient":"à ses camarades","aliases":["Mitsuya"]},{"text":"C'est la faute de Mikey si tout est arrivé.","speaker":"Kazutora Hanemiya","recipient":"à Baji","aliases":["Kazutora"]},{"text":"Les gens sont faciles à manipuler quand on connaît leurs faiblesses.","speaker":"Tetta Kisaki","recipient":"à ses alliés","aliases":["Kisaki"]},{"text":"Je veux être le seul roi que Mikey ne puisse pas oublier.","speaker":"Izana Kurokawa","recipient":"à Mikey","aliases":["Izana"]},{"text":"Je protégerai Yuzuha, même si je dois affronter mon frère.","speaker":"Hakkai Shiba","recipient":"à Takemichi","aliases":["Hakkai"]}]}};
+const quoteTimers = {};
+
+function normalizeQuoteAnswer(value) {
+    return String(value || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[’`]/g, "'")
+        .replace(/[^a-z0-9']+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function quoteCandidates(universeKey) {
+    const u = QUOTE_UNIVERSES[universeKey];
+    if (!u) return [];
+    return [...new Set(u.quotes.map(q => q.speaker))].sort((a,b)=>a.localeCompare(b,'fr'));
+}
+
+function quoteAnswerMatches(rawAnswer, quote, universeKey) {
+    const a = normalizeQuoteAnswer(rawAnswer);
+    if (!a) return false;
+
+    const accepted = new Set([
+        normalizeQuoteAnswer(quote.speaker),
+        ...(quote.aliases || []).map(normalizeQuoteAnswer)
+    ]);
+
+    if (accepted.has(a)) return true;
+
+    // Prénom / nom seul accepté seulement s'il identifie un seul orateur dans cet univers.
+    if (!a.includes(' ') && a.length >= 3) {
+        const matches = quoteCandidates(universeKey).filter(name =>
+            normalizeQuoteAnswer(name).split(' ').includes(a)
+        );
+        if (matches.length === 1 && normalizeQuoteAnswer(matches[0]) === normalizeQuoteAnswer(quote.speaker)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function quotePublicState(room) {
+    const qg = room.quoteGame;
+    if (!qg) return null;
+    const players = room.players.map((p, idx) => ({
+        id:p.id,
+        name:p.name,
+        score:qg.scores[p.id] || 0,
+        isTurn:idx === qg.currentTurnIndex
+    }));
+    return {
+        universeKey:qg.universeKey,
+        universeName:qg.universeName,
+        quoteText:qg.currentQuote?.text || '',
+        recipient:qg.hintUsed ? qg.currentQuote?.recipient || '' : null,
+        attempts:qg.attempts,
+        hintAvailable:qg.attempts >= 5,
+        hintUsed:qg.hintUsed,
+        currentTurnId:room.players[qg.currentTurnIndex]?.id || null,
+        currentTurnName:room.players[qg.currentTurnIndex]?.name || '',
+        scores:qg.scores,
+        players,
+        candidates:qg.candidates,
+        targetScore:qg.targetScore,
+        round:qg.round,
+        resolved:qg.resolved,
+        lastResult:qg.lastResult || null,
+        finished:qg.finished,
+        winnerId:qg.winnerId || null,
+        winnerName:qg.winnerName || null,
+        revealedSpeaker:qg.resolved ? qg.currentQuote?.speaker || null : null
+    };
+}
+
+function emitQuoteState(room, roomCode) {
+    io.to(roomCode).emit('quote_state', quotePublicState(room));
+}
+
+function nextQuoteTurnIndex(room, current) {
+    if (!room.players.length) return 0;
+    return (current + 1) % room.players.length;
+}
+
+function chooseNextQuote(room) {
+    const qg = room.quoteGame;
+    const u = QUOTE_UNIVERSES[qg.universeKey];
+    if (!u?.quotes?.length) return false;
+
+    let available = u.quotes
+        .map((q,i)=>({q,i}))
+        .filter(x => !qg.usedQuoteIndexes.includes(x.i));
+
+    if (!available.length) {
+        qg.usedQuoteIndexes = [];
+        available = u.quotes.map((q,i)=>({q,i}));
+    }
+
+    const pick = available[Math.floor(Math.random()*available.length)];
+    qg.usedQuoteIndexes.push(pick.i);
+    qg.currentQuote = pick.q;
+    qg.attempts = 0;
+    qg.hintUsed = false;
+    qg.resolved = false;
+    qg.lastResult = null;
+    qg.round += 1;
+    return true;
+}
+
+function startQuoteGame(room, roomCode) {
+    const universeKey = QUOTE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
+    const u = QUOTE_UNIVERSES[universeKey];
+
+    if (quoteTimers[roomCode]) {
+        clearTimeout(quoteTimers[roomCode]);
+        delete quoteTimers[roomCode];
+    }
+
+    room.status = 'quote_playing';
+    room.quoteGame = {
+        universeKey,
+        universeName:u.name,
+        currentQuote:null,
+        usedQuoteIndexes:[],
+        scores:Object.fromEntries(room.players.map(p => [p.id,0])),
+        currentTurnIndex:0,
+        attempts:0,
+        hintUsed:false,
+        resolved:false,
+        lastResult:null,
+        targetScore:10,
+        round:0,
+        candidates:quoteCandidates(universeKey),
+        finished:false,
+        winnerId:null,
+        winnerName:null
+    };
+
+    chooseNextQuote(room);
+    emitQuoteState(room, roomCode);
+}
+
+function scheduleNextQuote(room, roomCode) {
+    if (quoteTimers[roomCode]) clearTimeout(quoteTimers[roomCode]);
+    quoteTimers[roomCode] = setTimeout(() => {
+        delete quoteTimers[roomCode];
+        const currentRoom = rooms[roomCode];
+        if (!currentRoom?.quoteGame || currentRoom.quoteGame.finished || currentRoom.status !== 'quote_playing') return;
+        currentRoom.quoteGame.currentTurnIndex = nextQuoteTurnIndex(currentRoom, currentRoom.quoteGame.currentTurnIndex);
+        chooseNextQuote(currentRoom);
+        emitQuoteState(currentRoom, roomCode);
+    }, 1800);
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -9034,6 +9194,12 @@ io.on('connection', (socket) => {
                 return;
             }
             startConnexion(room, roomCode);
+        } else if (room.mode === 'quote') {
+            if (room.players.length < 2) {
+                socket.emit('game_error', { message: "Il faut au moins 2 joueurs pour jouer aux citations." });
+                return;
+            }
+            startQuoteGame(room, roomCode);
         }
     });
 
@@ -9180,6 +9346,72 @@ io.on('connection', (socket) => {
     });
 
     // Chat de salon : purement social, n'impacte aucune mécanique de jeu
+
+    socket.on('quote_submit_answer', ({ roomCode, answer }) => {
+        const room = rooms[roomCode];
+        const qg = room?.quoteGame;
+        if (!room || !qg || room.status !== 'quote_playing' || qg.finished || qg.resolved) return;
+
+        const currentPlayer = room.players[qg.currentTurnIndex];
+        if (!currentPlayer || currentPlayer.id !== socket.id) {
+            socket.emit('quote_feedback', { ok:false, message:"Ce n'est pas ton tour." });
+            return;
+        }
+
+        const clean = String(answer || '').trim();
+        if (!clean) return;
+
+        if (quoteAnswerMatches(clean, qg.currentQuote, qg.universeKey)) {
+            qg.scores[socket.id] = (qg.scores[socket.id] || 0) + 1;
+            qg.resolved = true;
+            qg.lastResult = {
+                correct:true,
+                playerId:socket.id,
+                playerName:currentPlayer.name,
+                speaker:qg.currentQuote.speaker,
+                answer:clean
+            };
+
+            if (qg.scores[socket.id] >= qg.targetScore) {
+                qg.finished = true;
+                qg.winnerId = socket.id;
+                qg.winnerName = currentPlayer.name;
+            }
+
+            emitQuoteState(room, roomCode);
+            if (!qg.finished) scheduleNextQuote(room, roomCode);
+            return;
+        }
+
+        qg.attempts += 1;
+        qg.lastResult = {
+            correct:false,
+            playerId:socket.id,
+            playerName:currentPlayer.name,
+            answer:clean
+        };
+        qg.currentTurnIndex = nextQuoteTurnIndex(room, qg.currentTurnIndex);
+        emitQuoteState(room, roomCode);
+    });
+
+    socket.on('quote_use_hint', ({ roomCode }) => {
+        const room = rooms[roomCode];
+        const qg = room?.quoteGame;
+        if (!room || !qg || room.status !== 'quote_playing' || qg.finished || qg.resolved) return;
+
+        const currentPlayer = room.players[qg.currentTurnIndex];
+        if (!currentPlayer || currentPlayer.id !== socket.id) {
+            socket.emit('quote_feedback', { ok:false, message:"L'indice peut être activé par le joueur dont c'est le tour." });
+            return;
+        }
+        if (qg.attempts < 5) {
+            socket.emit('quote_feedback', { ok:false, message:`Indice disponible après 5 erreurs (${qg.attempts}/5).` });
+            return;
+        }
+        qg.hintUsed = true;
+        emitQuoteState(room, roomCode);
+    });
+
     socket.on('chat_message', ({ roomCode, message }) => {
         const room = rooms[roomCode];
         if (!room) return;
@@ -9524,6 +9756,11 @@ io.on('connection', (socket) => {
             delete room.enchereAveugle;
             delete room.connexion;
             delete room.dle;
+            delete room.quoteGame;
+            if (quoteTimers[roomCode]) {
+                clearTimeout(quoteTimers[roomCode]);
+                delete quoteTimers[roomCode];
+            }
             room.status = 'waiting';
             room.votes = {};
             room.players.forEach(p => {

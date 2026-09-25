@@ -307,6 +307,75 @@
         @media (max-width:600px) {
             #music-player { right:10px; bottom:10px; width:calc(100vw - 20px); }
         }
+
+        /* ================= V23 — Jeu des citations ================= */
+        .quote-card {
+            background:linear-gradient(145deg,#11111a,#171724);
+            border:2px solid var(--accent-cyan);
+            border-radius:14px;
+            padding:22px;
+            box-shadow:0 12px 34px rgba(0,0,0,.34);
+            margin:14px 0;
+        }
+        .quote-text {
+            font-family:'Bangers', cursive;
+            font-size:clamp(1.45rem,3vw,2.15rem);
+            line-height:1.25;
+            color:white;
+            text-align:center;
+            letter-spacing:.02em;
+            margin:12px auto;
+            max-width:900px;
+        }
+        .quote-meta {
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            justify-content:center;
+            font-size:.76rem;
+            color:var(--text-muted);
+        }
+        .quote-chip {
+            border:1px solid #34344b;
+            border-radius:999px;
+            padding:5px 10px;
+            background:#0d0d15;
+        }
+        .quote-scoreboard {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+            gap:8px;
+            margin:12px 0;
+        }
+        .quote-score {
+            border:1px solid #2f2f46;
+            border-radius:8px;
+            padding:9px 10px;
+            background:#101018;
+            display:flex;
+            justify-content:space-between;
+            gap:8px;
+        }
+        .quote-score.turn {
+            border-color:var(--accent-yellow);
+            box-shadow:0 0 0 1px rgba(255,230,0,.2);
+        }
+        .quote-result {
+            min-height:28px;
+            text-align:center;
+            font-weight:800;
+            margin:10px 0;
+        }
+        #quote-speaker-image {
+            width:110px;
+            height:110px;
+            object-fit:cover;
+            object-position:top center;
+            border-radius:12px;
+            border:2px solid var(--accent-cyan);
+            margin:10px auto 0;
+            display:none;
+        }
 </style>
 </head>
 <body>
@@ -397,6 +466,47 @@
                         <p style="margin: 0; font-size: 0.85rem;">Mode classique</p>
                     </div>
                     <button class="btn-action" style="width: auto; margin-top:0; padding: 10px 20px;" onclick="createRoom('note', 'normal')">Créer</button>
+                </div>
+
+                <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
+                    <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">À qui appartient cette citation ?</h3>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Tour par tour — trouve l'auteur de la citation, +1 point. Indice destinataire après 5 erreurs.</p>
+                    <div class="chat-input-box" style="margin-top:0;">
+                        <select id="quote-universe-picker">
+                            <option value="naruto">Naruto</option>
+<option value="onepiece">One Piece</option>
+<option value="bleach">Bleach</option>
+<option value="hxh">Hunter x Hunter</option>
+<option value="snk">SNK / L'Attaque des Titans</option>
+<option value="sds">Seven Deadly Sins</option>
+<option value="deathnote">Death Note</option>
+<option value="cote">Classroom of the Elite</option>
+<option value="solo">Solo Leveling</option>
+<option value="clover">Black Clover</option>
+<option value="fireforce">Fire Force</option>
+<option value="mushoku">Mushoku Tensei</option>
+<option value="rezero">Re:Zero</option>
+<option value="fairy">Fairy Tail</option>
+<option value="bluelock">Blue Lock</option>
+<option value="fma">Fullmetal Alchemist</option>
+<option value="chainsaw">Chainsaw Man</option>
+<option value="wakfu">Wakfu</option>
+<option value="demonslayer">Demon Slayer</option>
+<option value="pokemon">Pokémon</option>
+<option value="dragonball">Dragon Ball</option>
+<option value="hellsparadise">Hell's Paradise</option>
+<option value="gachiakuta">Gachiakuta</option>
+<option value="haikyuu">Haikyuu</option>
+<option value="jjk">Jujutsu Kaisen</option>
+<option value="jojo">JoJo's Bizarre Adventure</option>
+<option value="tensura">Tensura</option>
+<option value="opm">One Punch Man</option>
+<option value="sao">Sword Art Online</option>
+<option value="tokyoghoul">Tokyo Ghoul</option>
+<option value="tokyorevengers">Tokyo Revengers</option>
+                        </select>
+                        <button class="btn-action" style="width:auto; margin-top:0;" onclick="createRoom('quote', document.getElementById('quote-universe-picker').value)">Créer</button>
+                    </div>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
@@ -801,7 +911,46 @@
             </div>
         </div>
 
-        <div id="dle-room" class="game-panel" style="max-width:900px;">
+        
+        <div id="quote-room" class="game-panel" style="display:none; max-width:950px; margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div>
+                    <h2 style="margin:0;">À QUI APPARTIENT CETTE CITATION ?</h2>
+                    <div id="quote-universe-name" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;">---</div>
+                </div>
+                <button onclick="backToMenu()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Menu</button>
+            </div>
+
+            <div id="quote-scoreboard" class="quote-scoreboard"></div>
+
+            <div class="quote-card">
+                <div class="quote-meta">
+                    <span class="quote-chip" id="quote-round">Manche 1</span>
+                    <span class="quote-chip" id="quote-turn">Tour : ---</span>
+                    <span class="quote-chip" id="quote-attempts">Erreurs : 0/5</span>
+                    <span class="quote-chip">Premier à 10 pts</span>
+                </div>
+
+                <div class="quote-text" id="quote-text">---</div>
+
+                <div id="quote-hint-box" style="display:none;text-align:center;color:var(--accent-yellow);font-weight:800;margin:10px 0;"></div>
+
+                <div class="chat-input-box" style="margin-top:15px;position:relative;">
+                    <input id="quote-answer-input" type="text" list="quote-speaker-list" autocomplete="off" placeholder="Qui a dit cette citation ?" onkeydown="if(event.key==='Enter') submitQuoteAnswer()">
+                    <datalist id="quote-speaker-list"></datalist>
+                    <button id="quote-answer-btn" class="btn-action" style="width:auto;margin-top:0;" onclick="submitQuoteAnswer()">Valider</button>
+                </div>
+
+                <button id="quote-hint-btn" class="btn-action" onclick="useQuoteHint()" style="display:none;background:var(--accent-yellow);color:#111;margin-top:10px;">
+                    💡 Indice : afficher le destinataire
+                </button>
+
+                <div id="quote-result" class="quote-result"></div>
+                <img id="quote-speaker-image" alt="Personnage">
+            </div>
+        </div>
+
+<div id="dle-room" class="game-panel" style="max-width:900px;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <h2 style="margin-bottom:0;">AnimeDLE</h2>
                 <button onclick="backToMenu()" style="background:none; border:1px solid var(--text-muted); color:var(--text-muted); border-radius:4px; padding:6px 10px; font-size:.75rem; cursor:pointer;">🔙 Menu</button>
@@ -1099,6 +1248,7 @@
             document.getElementById('enchereaveugle-room').style.display = 'none';
             document.getElementById('connexion-room').style.display = 'none';
             document.getElementById('dle-room').style.display = 'none';
+            document.getElementById('quote-room').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
             document.getElementById('end-clues-options-undercover').style.display = 'none';
@@ -1343,7 +1493,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -2731,6 +2881,117 @@
 
             setTimeout(()=>document.getElementById('dle-input')?.focus(),30);
         }
+
+
+        function submitQuoteAnswer() {
+            const input = document.getElementById('quote-answer-input');
+            const answer = input?.value?.trim();
+            if (!answer) return;
+            socket.emit('quote_submit_answer', { roomCode:currentRoomCode, answer });
+            input.value = '';
+        }
+
+        function useQuoteHint() {
+            socket.emit('quote_use_hint', { roomCode:currentRoomCode });
+        }
+
+        function renderQuoteState(q) {
+            if (!q) return;
+            document.getElementById('quote-universe-name').textContent = q.universeName || '';
+            document.getElementById('quote-text').textContent = `“${q.quoteText || ''}”`;
+            document.getElementById('quote-round').textContent = `Manche ${q.round || 1}`;
+            document.getElementById('quote-turn').textContent = q.finished ? 'Partie terminée' : `Tour : ${q.currentTurnName || '---'}`;
+            document.getElementById('quote-attempts').textContent = `Erreurs : ${q.attempts || 0}/5`;
+
+            const list = document.getElementById('quote-speaker-list');
+            if (list) {
+                list.innerHTML = '';
+                (q.candidates || []).forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    list.appendChild(opt);
+                });
+            }
+
+            const board = document.getElementById('quote-scoreboard');
+            board.innerHTML = '';
+            (q.players || []).forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'quote-score' + (p.isTurn && !q.finished ? ' turn' : '');
+                const name = document.createElement('span');
+                name.textContent = (p.isTurn && !q.finished ? '👉 ' : '') + p.name;
+                const score = document.createElement('strong');
+                score.style.color = 'var(--accent-yellow)';
+                score.textContent = `${p.score} pt${p.score > 1 ? 's' : ''}`;
+                row.append(name, score);
+                board.appendChild(row);
+            });
+
+            const isMyTurn = q.currentTurnId === socket.id && !q.finished && !q.resolved;
+            const input = document.getElementById('quote-answer-input');
+            const answerBtn = document.getElementById('quote-answer-btn');
+            input.disabled = !isMyTurn;
+            answerBtn.disabled = !isMyTurn;
+            input.placeholder = q.finished ? 'Partie terminée' : (isMyTurn ? 'Qui a dit cette citation ?' : `Tour de ${q.currentTurnName}…`);
+
+            const hintBtn = document.getElementById('quote-hint-btn');
+            hintBtn.style.display = q.hintAvailable && !q.hintUsed && !q.resolved ? 'block' : 'none';
+            hintBtn.disabled = !isMyTurn;
+
+            const hintBox = document.getElementById('quote-hint-box');
+            if (q.hintUsed && q.recipient) {
+                hintBox.style.display = 'block';
+                hintBox.textContent = `💡 Destinataire : ${q.recipient}`;
+            } else {
+                hintBox.style.display = 'none';
+                hintBox.textContent = '';
+            }
+
+            const result = document.getElementById('quote-result');
+            const img = document.getElementById('quote-speaker-image');
+            img.style.display = 'none';
+            img.removeAttribute('src');
+
+            if (q.finished) {
+                result.style.color = 'var(--accent-yellow)';
+                result.textContent = `🏆 ${q.winnerName} gagne la partie ! La réponse était ${q.revealedSpeaker}.`;
+            } else if (q.resolved && q.lastResult?.correct) {
+                result.style.color = '#00ff88';
+                result.textContent = `✅ ${q.lastResult.playerName} a trouvé : ${q.revealedSpeaker} ! +1 point`;
+            } else if (q.lastResult && q.lastResult.correct === false) {
+                result.style.color = 'var(--accent-pink)';
+                result.textContent = `❌ ${q.lastResult.playerName} : mauvaise réponse.`;
+            } else {
+                result.textContent = '';
+            }
+
+            if (q.resolved && q.revealedSpeaker) {
+                getFandomCharacterImage(q.universeName, q.revealedSpeaker).then(data => {
+                    if (data?.imageUrl) {
+                        img.src = data.imageUrl;
+                        img.style.display = 'block';
+                    }
+                });
+            }
+
+            if (isMyTurn) setTimeout(() => input.focus(), 100);
+        }
+
+        socket.on('quote_state', q => {
+            hideAllPanels();
+            const waiting = document.getElementById('waiting-room');
+            if (waiting) waiting.style.display = 'none';
+            const panel = document.getElementById('quote-room');
+            if (panel) panel.style.display = 'block';
+            renderQuoteState(q);
+        });
+
+        socket.on('quote_feedback', data => {
+            const result = document.getElementById('quote-result');
+            if (!result) return;
+            result.style.color = 'var(--accent-pink)';
+            result.textContent = data?.message || 'Action impossible.';
+        });
 
         socket.on('dle_state', room => {
             hideAllPanels();
