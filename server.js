@@ -9195,8 +9195,8 @@ io.on('connection', (socket) => {
             }
             startConnexion(room, roomCode);
         } else if (room.mode === 'quote') {
-            if (room.players.length < 2) {
-                socket.emit('game_error', { message: "Il faut au moins 2 joueurs pour lancer le mode Citations." });
+            if (room.players.length < 1) {
+                socket.emit('game_error', { message: "Il faut au moins 1 joueur pour lancer le mode Citations." });
                 return;
             }
             startQuoteGame(room, roomCode);
