@@ -1101,8 +1101,70 @@
 
         const fandomImageClientCache = new Map();
 
+        const FANDOM_CLIENT_WIKIS = {
+            naruto:'naruto.fandom.com',
+            onepiece:'onepiece.fandom.com',
+            bleach:'bleach.fandom.com',
+            hxh:'hunterxhunter.fandom.com',
+            snk:'attackontitan.fandom.com',
+            sds:'nanatsu-no-taizai.fandom.com',
+            deathnote:'deathnote.fandom.com',
+            cote:'you-zitsu.fandom.com',
+            solo:'solo-leveling.fandom.com',
+            clover:'blackclover.fandom.com',
+            fireforce:'fire-force.fandom.com',
+            mushoku:'mushokutensei.fandom.com',
+            rezero:'rezero.fandom.com',
+            fairy:'fairytail.fandom.com',
+            bluelock:'bluelock.fandom.com',
+            fma:'fma.fandom.com',
+            chainsaw:'chainsaw-man.fandom.com',
+            wakfu:'wakfu.fandom.com',
+            demonslayer:'kimetsu-no-yaiba.fandom.com',
+            pokemon:'pokemon.fandom.com',
+            dragonball:'dragonball.fandom.com',
+            hellsparadise:'jigokuraku.fandom.com',
+            gachiakuta:'gachiakuta.fandom.com',
+            haikyuu:'haikyuu.fandom.com',
+            jjk:'jujutsu-kaisen.fandom.com',
+            jojo:'jojo.fandom.com',
+            tensura:'tensura.fandom.com',
+            opm:'onepunchman.fandom.com',
+            sao:'swordartonline.fandom.com',
+            tokyoghoul:'tokyoghoul.fandom.com',
+            tokyorevengers:'tokyorevengers.fandom.com'
+        };
+
+        function normalizeFandomClient(value) {
+            return String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                .toLowerCase()
+                .replace(/[’`]/g, "'")
+                .replace(/[^a-z0-9']+/g,' ')
+                .replace(/\s+/g,' ')
+                .trim();
+        }
+
+        const FANDOM_CLIENT_UNIVERSES = {
+            'naruto':'naruto','one piece':'onepiece','bleach':'bleach',
+            'hunter x hunter':'hxh','snk':'snk',"snk l'attaque des titans":'snk',
+            "l'attaque des titans":'snk','attack on titan':'snk',
+            'seven deadly sins':'sds','death note':'deathnote',
+            'classroom of the elite':'cote','solo leveling':'solo','black clover':'clover',
+            'fire force':'fireforce','mushoku tensei':'mushoku','re zero':'rezero',
+            'fairy tail':'fairy','blue lock':'bluelock','fullmetal alchemist':'fma',
+            'chainsaw man':'chainsaw','wakfu':'wakfu','demon slayer':'demonslayer',
+            'pokemon':'pokemon','dragon ball':'dragonball',"hell's paradise":'hellsparadise',
+            'gachiakuta':'gachiakuta','haikyuu':'haikyuu','jujutsu kaisen':'jjk','jjk':'jjk',
+            "jojo's bizarre adventure":'jojo','jojo':'jojo','tensura':'tensura',
+            'one punch man':'opm','sword art online':'sao','sao':'sao',
+            'tokyo ghoul':'tokyoghoul','tokyo revengers':'tokyorevengers'
+        };
+
         function fandomImageUniverseKey(universe) {
-            return String(universe || '').trim();
+            const raw = String(universe || '').trim();
+            if (FANDOM_CLIENT_WIKIS[raw]) return raw;
+            return FANDOM_CLIENT_UNIVERSES[normalizeFandomClient(raw)] || null;
         }
 
         function parseCharacterLabelClient(label) {
@@ -1115,15 +1177,118 @@
             return {name:s, universe:''};
         }
 
+        function fandomBestPage(pages, wantedName) {
+            const wanted = normalizeFandomClient(wantedName);
+            const list = Object.values(pages || {}).filter(p => p && p.pageid && (p.original?.source || p.thumbnail?.source));
+            if (!list.length) return null;
+
+            const score = p => {
+                const title = normalizeFandomClient(p.title || '');
+                let s = 0;
+                if (title === wanted) s += 100;
+                if (title.includes(wanted) || wanted.includes(title)) s += 35;
+                const wt = new Set(wanted.split(' '));
+                title.split(' ').forEach(t => { if (wt.has(t)) s += 7; });
+                if (/gallery|images|category|episode|chapter|volume/i.test(p.title || '')) s -= 50;
+                return s;
+            };
+
+            list.sort((a,b)=>score(b)-score(a));
+            return list[0];
+        }
+
+        async function fandomBrowserFetchJson(url) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(()=>ctrl.abort(), 9000);
+            try {
+                const r = await fetch(url, { mode:'cors', signal:ctrl.signal, credentials:'omit' });
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return await r.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function fetchFandomImageDirect(universe, name) {
+            const universeKey = fandomImageUniverseKey(universe);
+            const host = FANDOM_CLIENT_WIKIS[universeKey];
+            if (!host) return null;
+
+            // 1. exact page / redirect
+            const exact = new URLSearchParams({
+                action:'query',
+                titles:name,
+                prop:'pageimages|info',
+                piprop:'original|thumbnail',
+                pithumbsize:'700',
+                inprop:'url',
+                redirects:'1',
+                format:'json',
+                origin:'*'
+            });
+
+            try {
+                const data = await fandomBrowserFetchJson(`https://${host}/api.php?${exact.toString()}`);
+                const page = fandomBestPage(data?.query?.pages, name);
+                if (page) return {
+                    imageUrl: page.original?.source || page.thumbnail?.source || null,
+                    sourceUrl: page.fullurl || `https://${host}/wiki/${encodeURIComponent((page.title || name).replace(/ /g,'_'))}`,
+                    status:'ok-browser',
+                    universeKey
+                };
+            } catch (_) {}
+
+            // 2. search if exact title isn't the wiki title
+            const search = new URLSearchParams({
+                action:'query',
+                generator:'search',
+                gsrsearch:name,
+                gsrnamespace:'0',
+                gsrlimit:'8',
+                prop:'pageimages|info',
+                piprop:'original|thumbnail',
+                pithumbsize:'700',
+                inprop:'url',
+                format:'json',
+                origin:'*'
+            });
+
+            try {
+                const data = await fandomBrowserFetchJson(`https://${host}/api.php?${search.toString()}`);
+                const page = fandomBestPage(data?.query?.pages, name);
+                if (page) return {
+                    imageUrl: page.original?.source || page.thumbnail?.source || null,
+                    sourceUrl: page.fullurl || `https://${host}/wiki/${encodeURIComponent((page.title || name).replace(/ /g,'_'))}`,
+                    status:'ok-browser-search',
+                    universeKey
+                };
+            } catch (_) {}
+
+            return null;
+        }
+
         async function getFandomCharacterImage(universe, name) {
             if (!universe || !name) return null;
             const key = `${String(universe).toLowerCase()}|${String(name).toLowerCase()}`;
             if (fandomImageClientCache.has(key)) return fandomImageClientCache.get(key);
 
-            const promise = fetch(`/api/character-image?universe=${encodeURIComponent(universe)}&name=${encodeURIComponent(name)}`)
-                .then(r => r.ok ? r.json() : null)
-                .then(data => data?.imageUrl ? data : null)
-                .catch(() => null);
+            const promise = (async () => {
+                // IMPORTANT: direct browser -> Fandom first.
+                // Fandom often blocks cloud/server IPs even though its MediaWiki API
+                // allows browser CORS with origin=*.
+                const direct = await fetchFandomImageDirect(universe, name);
+                if (direct?.imageUrl) return direct;
+
+                // fallback to our server/cache
+                try {
+                    const r = await fetch(`/api/character-image?universe=${encodeURIComponent(universe)}&name=${encodeURIComponent(name)}`);
+                    if (!r.ok) return null;
+                    const data = await r.json();
+                    return data?.imageUrl ? data : null;
+                } catch (_) {
+                    return null;
+                }
+            })();
 
             fandomImageClientCache.set(key, promise);
             return promise;
@@ -1158,6 +1323,7 @@
             if (img.dataset.requestKey !== requestKey) return;
 
             if (!data?.imageUrl) {
+                console.warn('[Anime Game] Image Fandom introuvable :', universe, name);
                 clearFandomImage(imgId, sourceId);
                 return;
             }
