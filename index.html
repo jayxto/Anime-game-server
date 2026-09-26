@@ -410,6 +410,15 @@
         .arc-bac-table td small{display:block;color:var(--text-muted);font-size:.7rem;}
         .arc-bac-table td.ok b{color:#00ff88;} .arc-bac-table td.ko{color:var(--accent-pink);text-decoration:line-through;} .arc-bac-table td.ko b{text-decoration:none;} .arc-bac-table td.empty{color:#555;}
         @media (max-width:560px){.arc-bac-row{grid-template-columns:1fr;gap:4px;}}
+        .dle-turn{text-align:center;font-weight:800;padding:9px 12px;border-radius:10px;margin:0 0 10px;background:#101018;border:1px solid #34344a;color:var(--text-muted);}
+        .dle-turn.mine{border-color:var(--accent-yellow);color:var(--accent-yellow);box-shadow:0 0 18px rgba(255,230,0,.15);}
+        .bt-yt-box{position:relative;width:100%;max-width:420px;height:150px;margin:10px auto;border-radius:14px;overflow:hidden;border:2px solid #2c2c44;background:#0b0b12;}
+        .bt-yt-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+        .bt-yt-veil{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;
+            background:rgba(11,11,18,.9);-webkit-backdrop-filter:blur(30px) brightness(.35);backdrop-filter:blur(30px) brightness(.35);font-weight:800;color:var(--accent-cyan);font-size:1rem;}
+        .bt-yt-box.tap{border-color:var(--accent-yellow);}
+        .bt-yt-box.tap .bt-yt-veil{color:var(--accent-yellow);animation:btPulse 1.2s ease-in-out infinite;}
+        @keyframes btPulse{50%{opacity:.6}}
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -700,7 +709,7 @@
 
             <div id="dle-enrichment-progress"></div>
             <button class="btn-action" id="btn-start-game" style="display:none;" onclick="startGame()">Lancer la partie</button>
-            <button class="btn-action" style="background: var(--text-muted);" onclick="goToMenuSelection()">Retour au menu</button>
+            <button class="btn-action" style="background: var(--text-muted);" onclick="leaveRoom()">Quitter le salon</button>
         </div>
 
         <div id="gameplay-room" class="game-panel">
@@ -950,6 +959,7 @@
                 </div>
                 <div class="bt-timer"><div id="bt-timer-fill" class="bt-timer-fill"></div></div>
                 <div id="bt-disc" class="bt-disc">💿</div>
+                <div id="bt-yt-box" class="bt-yt-box" style="display:none;"><div id="bt-yt-player"></div><div class="bt-yt-veil"><span id="bt-yt-hint">🎵 Écoute bien…</span></div></div>
                 <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;">
                     <button id="bt-play-btn" class="btn-action" style="display:none;width:auto;margin-top:0;background:var(--accent-yellow);color:#111;" onclick="btForcePlay()">🔊 Activer le son</button>
                     <span style="font-size:.8rem;color:var(--text-muted);">🔈</span>
@@ -1037,6 +1047,7 @@
             </div>
             <p id="dle-universe-label" style="margin:8px 0 4px;"></p>
             <p id="dle-status" style="margin:0 0 12px; color:var(--accent-cyan); font-weight:700;">Trouve le personnage mystère.</p>
+            <div id="dle-turn" class="dle-turn" style="display:none;"></div>
 
             <div id="dle-winner-box" class="dle-winner" style="display:none;"></div>
 
@@ -1349,6 +1360,20 @@
             document.getElementById('ea-end-buttons').style.display = 'none';
             document.getElementById('cx-end-buttons').style.display = 'none';
         }
+
+        // Quitter vraiment le salon : le serveur nous retire, on ne sera plus ramené dedans
+        function leaveRoom() {
+            if (typeof btStopAudio === 'function') btStopAudio();
+            if (currentRoomCode) socket.emit('leave_room', { roomCode: currentRoomCode });
+            currentRoomCode = '';
+            goToMenuSelection();
+        }
+
+        socket.on('force_rejoin', ({ roomCode } = {}) => {
+            if (!roomCode) return;
+            currentRoomCode = roomCode;
+            socket.emit('rejoin_room', { roomCode });
+        });
 
         function goToMenuSelection() {
             if (typeof btStopAudio === 'function') btStopAudio();
@@ -1762,6 +1787,8 @@
         socket.on('update_room', (room) => {
             // Sécurité : un état de jeu ne doit pas être rendu comme un salon d'attente.
             if (room.status && room.status !== 'waiting') return;
+            // Salon quitté (ou un autre salon) : on ne s'y fait plus ramener
+            if (!currentRoomCode || (room.code && room.code !== currentRoomCode)) return;
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
@@ -3199,6 +3226,26 @@
             dleGuessedNames.add(dleNorm(guess)); // retiré tout de suite des suggestions
             socket.emit('dle_guess',{roomCode:currentRoomCode,guess});
         }
+        let dleTurnState=null,dleTurnClock=0,dleTurnInterval=null;
+        function dleRenderTurn(room){
+            const d=room.dle, box=document.getElementById('dle-turn'), input=document.getElementById('dle-input');
+            const multi=(room.players||[]).length>1;
+            dleTurnState=(!d.finished&&multi&&d.turnId)?d:null;
+            if(d.serverNow) dleTurnClock=d.serverNow-Date.now();
+            const myTurn=!dleTurnState||d.turnId===socket.id;
+            if(input){ input.disabled=!myTurn; input.placeholder=myTurn?'Tape un personnage…':`Au tour de ${d.turnName||'un autre joueur'}…`; }
+            if(!dleTurnState){ box.style.display='none'; if(dleTurnInterval){clearInterval(dleTurnInterval);dleTurnInterval=null;} return; }
+            box.style.display='block';
+            box.className='dle-turn'+(myTurn?' mine':'');
+            const tick=()=>{
+                if(!dleTurnState){return;}
+                const left=Math.max(0,Math.ceil((dleTurnState.turnEndsAt-(Date.now()+dleTurnClock))/1000));
+                box.textContent=(dleTurnState.turnId===socket.id?'🎯 À toi de jouer !':`⏳ Au tour de ${dleTurnState.turnName}`)+` — ${left}s`;
+            };
+            tick();
+            if(!dleTurnInterval) dleTurnInterval=setInterval(tick,250);
+            if(myTurn&&input&&window.innerWidth>700) setTimeout(()=>input.focus(),30);
+        }
         function renderDleState(room){
             if(!room?.dle)return;
             const d=room.dle;
@@ -3230,6 +3277,7 @@
                 inputWrap.style.display='block';
                 end.style.display='none';
             }
+            dleRenderTurn(room);
 
             const grid=document.getElementById('dle-grid'),cats=d.categories||[];
             grid.style.gridTemplateColumns=`1.45fr repeat(${cats.length}, minmax(112px,1fr))`;
@@ -3336,7 +3384,7 @@
         }
 
         async function btForcePlay() {
-            if (btYtKey && btYt) { try { btYt.playVideo(); btYt.unMute(); btYt.setVolume(Math.round(btVolume * 100)); } catch (_) {} document.getElementById('bt-play-btn').style.display = 'none'; return; }
+            if (btYtKey && btYt) { try { btYt.unMute(); btYt.setVolume(Math.round(btVolume * 100)); btYt.playVideo(); } catch (_) {} return; }
             try { await btAudio.play(); document.getElementById('bt-play-btn').style.display = 'none'; } catch (_) {}
         }
 
@@ -3396,30 +3444,48 @@
             return __ytApiPromise;
         }
         let btYt = null, btYtKey = null, btYtFade = null, btYtReady = null;
+        function btYtShow(on) {
+            const box = document.getElementById('bt-yt-box'), disc = document.getElementById('bt-disc');
+            if (box) box.style.display = on ? 'block' : 'none';
+            if (disc) disc.style.display = on ? 'none' : '';
+        }
+        function btYtHint(text, tap) {
+            const h = document.getElementById('bt-yt-hint'), box = document.getElementById('bt-yt-box');
+            if (h) h.textContent = text;
+            if (box) box.classList.toggle('tap', !!tap);
+        }
         function btYtStop() {
             btYtKey = null;
             if (btYtFade) { clearInterval(btYtFade); btYtFade = null; }
             try { if (btYt && btYt.stopVideo) btYt.stopVideo(); } catch (_) {}
+            btYtShow(false);
         }
         function btYtFadeIn() {
             if (!btYt) return;
             if (btYtFade) clearInterval(btYtFade);
             let step = 0;
-            try { btYt.setVolume(0); btYt.unMute(); } catch (_) {}
+            try { btYt.unMute(); btYt.setVolume(0); } catch (_) {}
             btYtFade = setInterval(() => {
                 step++;
                 try { btYt.setVolume(Math.round(btVolume * 100 * Math.min(1, step / 10))); } catch (_) {}
                 if (step >= 10) { clearInterval(btYtFade); btYtFade = null; }
             }, 60);
         }
+        // Lecteur YouTube visible mais flouté : sur téléphone, le son ne peut démarrer qu'après un toucher
+        // DANS le lecteur. Le voile laisse passer le toucher, sans montrer l'image (qui donnerait la réponse).
         async function btYtLoad(q, key) {
+            btYtShow(true);
+            btYtHint('⏳ Chargement de la musique…', false);
             const YT = await ytApi();
             if (btLoadedKey !== key) return;
             btYtKey = key;
             let seeked = false;
             const handlers = {
                 state: e => {
-                    if (btYtKey !== key || seeked || e.data !== YT.PlayerState.PLAYING) return;
+                    if (btYtKey !== key || e.data !== YT.PlayerState.PLAYING) return;
+                    btYtHint('🎵 Écoute bien…', false);
+                    document.getElementById('bt-play-btn').style.display = 'none';
+                    if (seeked) return;
                     seeked = true;
                     const dur = btYt.getDuration() || 90;
                     const elapsed = Math.max(0, (Date.now() + btClockOffset) - (q.endsAt - q.roundMs)) / 1000;
@@ -3427,25 +3493,16 @@
                     if (start > dur - 4) start = dur * 0.3;
                     btYt.seekTo(start, true);
                     btYtFadeIn();
-                    document.getElementById('bt-play-btn').style.display = 'none';
                 },
                 error: () => { if (btYtKey === key) socket.emit('bt_media_error', { roomCode: currentRoomCode, round: q.round }); }
             };
             if (!btYt) {
-                let host = document.getElementById('bt-yt-host');
-                if (!host) {
-                    host = document.createElement('div');
-                    host.id = 'bt-yt-host';
-                    host.style.cssText = 'position:fixed;left:-9999px;top:0;width:320px;height:180px;opacity:0;pointer-events:none;';
-                    host.innerHTML = '<div id="bt-yt-player"></div>';
-                    document.body.appendChild(host);
-                }
                 btYtReady = new Promise(res => {
                     btYt = new YT.Player('bt-yt-player', {
-                        width: 320, height: 180, videoId: q.ytId,
-                        playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0, disablekb: 1 },
+                        width: '100%', height: '100%', videoId: q.ytId,
+                        playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0, disablekb: 1, fs: 0, iv_load_policy: 3 },
                         events: {
-                            onReady: e => { e.target.mute(); e.target.playVideo(); res(); },
+                            onReady: e => { try { e.target.setVolume(Math.round(btVolume * 100)); e.target.playVideo(); } catch (_) {} res(); },
                             onStateChange: e => btYt.__h && btYt.__h.state(e),
                             onError: e => btYt.__h && btYt.__h.error(e)
                         }
@@ -3456,10 +3513,36 @@
                 btYt.__h = handlers;
                 await btYtReady;
                 if (btLoadedKey !== key) return;
-                try { btYt.mute(); btYt.loadVideoById(q.ytId); } catch (_) {}
+                try { btYt.loadVideoById(q.ytId); btYt.playVideo(); } catch (_) {}
             }
-            setTimeout(() => { if (btYtKey === key && !seeked) document.getElementById('bt-play-btn').style.display = 'inline-block'; }, 4000);
+            // Lecture automatique bloquée (téléphone) : on demande un toucher sur le lecteur
+            setTimeout(() => {
+                if (btYtKey === key && !seeked) {
+                    btYtHint('👆 Touche ici pour lancer la musique', true);
+                    document.getElementById('bt-play-btn').style.display = 'inline-block';
+                }
+            }, 1800);
         }
+
+        // iPhone / Android : on "débloque" le lecteur audio dès le premier toucher sur la page
+        (function unlockBtAudioOnce() {
+            const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+            const unlock = () => {
+                document.removeEventListener('touchend', unlock, true);
+                document.removeEventListener('click', unlock, true);
+                try { ytApi(); } catch (_) {} // précharge le lecteur YouTube
+                if (btAudio.src && !btAudio.paused) return;
+                try {
+                    btAudio.muted = true;
+                    btAudio.src = SILENT;
+                    const p = btAudio.play();
+                    const done = () => { btAudio.pause(); btAudio.muted = false; if (btAudio.src === SILENT) btAudio.removeAttribute('src'); };
+                    if (p && p.then) p.then(done).catch(() => { btAudio.muted = false; }); else done();
+                } catch (_) { btAudio.muted = false; }
+            };
+            document.addEventListener('touchend', unlock, true);
+            document.addEventListener('click', unlock, true);
+        })();
 
         function btTick() {
             const q = btState;

@@ -8845,13 +8845,51 @@ function dlePublicRoom(room) {
             winnerName: d.winnerName,
             winnerAttempts: d.winnerAttempts,
             targetName: d.finished ? d.target.name : null,
-            candidates: d.candidates
+            candidates: d.candidates,
+            turnId: d.finished ? null : (d.turnId || null),
+            turnName: d.finished ? null : ((room.players.find(p => p.id === d.turnId) || {}).name || null),
+            turnEndsAt: d.finished ? null : (d.turnEndsAt || null),
+            turnMs: DLE_TURN_MS,
+            serverNow: Date.now()
         } : null
     };
 }
 
 function emitDleState(room, roomCode) {
     io.to(roomCode).emit('dle_state', dlePublicRoom(room));
+}
+
+/* ----- AnimeDLE chacun son tour : 1 proposition par joueur, puis la main passe (30 s max) ----- */
+const DLE_TURN_MS = 30000;
+const dleTurnTimers = {};
+function dleClearTurn(roomCode) {
+    if (dleTurnTimers[roomCode]) { clearTimeout(dleTurnTimers[roomCode]); delete dleTurnTimers[roomCode]; }
+}
+function dleSetTurn(room, roomCode, playerId) {
+    const d = room.dle;
+    dleClearTurn(roomCode);
+    if (!d || d.finished) return;
+    d.turnId = playerId;
+    d.turnEndsAt = Date.now() + DLE_TURN_MS;
+    dleTurnTimers[roomCode] = setTimeout(() => {
+        try {
+            if (rooms[roomCode] !== room || !room.dle || room.dle !== d || d.finished) return;
+            dleAdvanceTurn(room, roomCode, true);
+            emitDleState(room, roomCode);
+        } catch (e) { console.error('[DLE tour]', e); }
+    }, DLE_TURN_MS + 200);
+}
+function dleAdvanceTurn(room, roomCode, timeout) {
+    const d = room.dle;
+    if (!d || d.finished) return;
+    const list = room.players;
+    if (!list.length) return;
+    const start = Math.max(0, list.findIndex(p => p.id === d.turnId));
+    for (let k = 1; k <= list.length; k++) {
+        const p = list[(start + k) % list.length];
+        if (!p.disconnected) { d.lastSkip = timeout ? ((list[start] || {}).name || null) : null; dleSetTurn(room, roomCode, p.id); return; }
+    }
+    dleSetTurn(room, roomCode, list[(start + 1) % list.length].id);
 }
 
 async function startDle(room, roomCode) {
@@ -8886,6 +8924,8 @@ async function startDle(room, roomCode) {
             .map(c => ({ label:c.name, name:c.name, image: universeKey === 'pokemon' ? (POKEMON_IMAGE_BY_NAME[c.name] || null) : null }))
             .sort((a,b) => a.label.localeCompare(b.label, 'fr'))
     };
+    const firstPlayer = room.players.find(p => !p.disconnected) || room.players[0];
+    if (firstPlayer) dleSetTurn(room, roomCode, firstPlayer.id);
     emitDleState(room, roomCode);
 }
 
@@ -9683,7 +9723,24 @@ io.on('connection', (socket) => {
         }
 
         const room = rooms[roomCode];
-        
+
+        // Même compte déjà dans ce salon sous un ancien identifiant (téléphone reconnecté, onglet rouvert…) :
+        // on reprend SA place au lieu de créer un doublon.
+        const memeCompte = room.players.find(p => p.id !== socket.id &&
+            ((socket.user.id && p.userId === socket.user.id) || (!socket.user.id && p.name === socket.user.pseudo)));
+        if (memeCompte) {
+            if (room.status !== 'waiting') {
+                socket.emit('force_rejoin', { roomCode });
+                return;
+            }
+            const ancienId = memeCompte.id;
+            if (graceTimers[ancienId]) { clearTimeout(graceTimers[ancienId]); delete graceTimers[ancienId]; }
+            memeCompte.id = socket.id;
+            delete memeCompte.disconnected;
+            delete memeCompte.disconnectedAt;
+            if (room.host === ancienId) room.host = socket.id;
+        }
+
         const existingPlayer = room.players.find(p => p.id === socket.id);
         if (!existingPlayer) {
             // Partie déjà lancée : on n'autorise pas l'entrée (sinon tout le salon est renvoyé au menu)
@@ -9903,6 +9960,11 @@ io.on('connection', (socket) => {
 
         const player = room.players.find(p => p.id === socket.id);
         if (!player) return;
+        if (room.dle.turnId && room.dle.turnId !== socket.id && room.players.length > 1) {
+            const cur = room.players.find(p => p.id === room.dle.turnId);
+            socket.emit('dle_feedback', { ok:false, message:`Ce n'est pas ton tour : c'est à ${cur ? cur.name : 'un autre joueur'}.` });
+            return;
+        }
 
         const character = resolveDleGuess(room, guess);
         if (!character) {
@@ -9924,6 +9986,9 @@ io.on('connection', (socket) => {
             room.dle.winnerName = player.name;
             room.dle.winnerAttempts = room.dle.attemptsByPlayer[player.id];
             room.status = 'dle_finished';
+            dleClearTurn(roomCode);
+        } else {
+            dleAdvanceTurn(room, roomCode, false);
         }
 
         emitDleState(room, roomCode);
@@ -10385,6 +10450,7 @@ io.on('connection', (socket) => {
             delete room.enchereAveugle;
             delete room.connexion;
             delete room.dle;
+            dleClearTurn(roomCode);
             delete room.quoteGame;
             delete room.blindtest;
             btClearTimer(roomCode);
@@ -10473,6 +10539,7 @@ io.on('connection', (socket) => {
         if (room.dle) {
             remap(room.dle.attemptsByPlayer);
             if (room.dle.winnerId === ancienId) room.dle.winnerId = socket.id;
+            if (room.dle.turnId === ancienId) room.dle.turnId = socket.id;
         }
 
         io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: true });
@@ -10552,6 +10619,7 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
 
             if (room.players.length === 0) {
                 btClearTimer(roomCode);
+                dleClearTurn(roomCode);
                 if (typeof arcStop === 'function') arcStop(roomCode);
                 if (rgTimers[roomCode]) {
                     clearInterval(rgTimers[roomCode]);
@@ -10642,8 +10710,12 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
                 return;
             }
 
-            // AnimeDLE : chacun devine de son côté, on renvoie juste l'état
+            // AnimeDLE : si c'était son tour, la main passe au joueur suivant
             if ((room.status === 'dle_playing' || room.status === 'dle_finished') && room.dle) {
+                if (!room.dle.finished && !room.players.some(p => p.id === room.dle.turnId)) {
+                    const next = room.players.find(p => !p.disconnected) || room.players[0];
+                    if (next) dleSetTurn(room, roomCode, next.id);
+                }
                 emitDleState(room, roomCode);
                 return;
             }
@@ -11587,6 +11659,26 @@ io.on('connection', socket => {
         bt.round -= 1;
         bt.usedAnimes.pop();
         btNextRound(room, roomCode);
+    });
+
+    // Quitter vraiment le salon (bouton "Retour au menu") : on n'est plus rattaché à ce salon
+    socket.on('leave_room', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        socket.leave(roomCode);
+        if (graceTimers[socket.id]) { clearTimeout(graceTimers[socket.id]); delete graceTimers[socket.id]; }
+        if (room && room.players.some(p => p.id === socket.id)) retirerJoueurDuSalon(room, roomCode, socket.id);
+    });
+
+    // Rejoindre un nouveau salon fait quitter l'ancien (plus de "fantôme" dans deux salons)
+    socket.on('join_room', ({ roomCode } = {}) => {
+        for (const code of Object.keys(rooms)) {
+            if (code === roomCode) continue;
+            const r = rooms[code];
+            if (r && r.players.some(p => p.id === socket.id)) {
+                socket.leave(code);
+                retirerJoueurDuSalon(r, code, socket.id);
+            }
+        }
     });
 
     socket.on('arc_skip', ({ roomCode } = {}) => {
