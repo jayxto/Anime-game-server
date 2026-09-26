@@ -330,6 +330,20 @@
         .bt-choice.bad{border-color:var(--accent-pink);background:rgba(255,42,95,.12);color:var(--accent-pink);}
         .bt-timer{height:8px;background:#1b1b28;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
         .bt-timer-fill{height:100%;width:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));transition:width .2s linear;}
+        .public-rooms-panel{margin-top:12px;text-align:left;border-top:1px solid #2a2a40;padding-top:12px;}
+        .public-rooms-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.82rem;color:var(--text-muted);margin-bottom:8px;flex-wrap:wrap;}
+        .public-refresh{background:none;border:1px solid var(--accent-cyan);color:var(--accent-cyan);border-radius:6px;padding:5px 10px;cursor:pointer;font-weight:700;font-size:.78rem;}
+        .public-rooms-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow:auto;}
+        .public-room{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101018;border:1px solid #2f2f46;border-radius:8px;padding:10px 12px;}
+        .public-room-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+        .public-room-mode{font-weight:800;color:var(--accent-yellow);}
+        .public-room-meta{font-size:.76rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;}
+        .public-room .btn-action{width:auto;margin-top:0;padding:8px 14px;flex-shrink:0;}
+        .public-empty{font-size:.85rem;color:var(--text-muted);text-align:center;padding:14px;}
+        .room-visibility{display:flex;flex-direction:column;align-items:center;gap:6px;margin:10px 0;}
+        .room-public-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:.9rem;}
+        .room-public-toggle input{width:18px;height:18px;accent-color:var(--accent-cyan);}
+        .room-visibility-badge{font-size:.78rem;color:var(--text-muted);border:1px solid #34344b;border-radius:99px;padding:3px 10px;}
         .bt-video{display:none;margin:14px auto 0;max-width:720px;}
         .bt-video-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;border:2px solid var(--accent-cyan);background:#000;}
         .bt-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
@@ -403,6 +417,14 @@
                 <div class="chat-input-box">
                     <input type="text" id="join-code-input" placeholder="Code (ex: AB12)" style="text-transform: uppercase;">
                     <button class="btn-action" style="width: auto; margin-top:0;" onclick="joinRoomByCode()">Rejoindre</button>
+                </div>
+                <button class="btn-action" id="btn-public-rooms" style="margin-top:12px;background:var(--accent-yellow);color:#111;" onclick="togglePublicRooms()">🔎 Chercher un salon public</button>
+                <div id="public-rooms-panel" class="public-rooms-panel" style="display:none;">
+                    <div class="public-rooms-head">
+                        <span>Salons publics en attente de joueurs</span>
+                        <button type="button" class="public-refresh" onclick="refreshPublicRooms()">↻ Actualiser</button>
+                    </div>
+                    <div id="public-rooms-list" class="public-rooms-list"></div>
                 </div>
             </div>
 
@@ -673,6 +695,14 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
+            <div id="room-visibility-box" class="room-visibility">
+                <label id="room-public-label" class="room-public-toggle" style="display:none;">
+                    <input type="checkbox" id="room-public-checkbox" onchange="setRoomPublic(this.checked)">
+                    <span>🌍 Salon public — visible dans « Chercher un salon »</span>
+                </label>
+                <span id="room-visibility-badge" class="room-visibility-badge">🔒 Salon privé</span>
+            </div>
+
             <p>Joueurs connectés :</p>
             <ul class="player-list" id="waiting-players-list"></ul>
 
@@ -1625,11 +1655,80 @@
             } else {
                 document.getElementById('btn-start-game').style.display = 'none';
             }
+
+            // Salon public / privé : seul l'hôte peut changer
+            const isHost = room.host === socket.id;
+            const pubLabel = document.getElementById('room-public-label');
+            const pubBox = document.getElementById('room-public-checkbox');
+            const badge = document.getElementById('room-visibility-badge');
+            if (pubLabel) pubLabel.style.display = isHost ? 'flex' : 'none';
+            if (pubBox) pubBox.checked = !!room.isPublic;
+            if (badge) badge.textContent = room.isPublic ? '🌍 Salon public : n\'importe qui peut rejoindre' : '🔒 Salon privé : seulement avec le code';
         });
 
         function startGame() {
             socket.emit('start_game', currentRoomCode);
         }
+
+        /* ---------- Salons publics ---------- */
+        let publicRoomsTimer = null;
+        function setRoomPublic(isPublic) {
+            if (!currentRoomCode) return;
+            socket.emit('set_room_public', { roomCode: currentRoomCode, isPublic: !!isPublic });
+        }
+        function refreshPublicRooms() {
+            socket.emit('list_public_rooms');
+        }
+        function togglePublicRooms(forceOpen) {
+            const panel = document.getElementById('public-rooms-panel');
+            const btn = document.getElementById('btn-public-rooms');
+            const open = forceOpen === true || (forceOpen !== false && panel.style.display === 'none');
+            panel.style.display = open ? 'block' : 'none';
+            btn.textContent = open ? '✖ Fermer la recherche' : '🔎 Chercher un salon public';
+            if (publicRoomsTimer) { clearInterval(publicRoomsTimer); publicRoomsTimer = null; }
+            if (open) {
+                document.getElementById('public-rooms-list').innerHTML = '<div class="public-empty">Recherche…</div>';
+                refreshPublicRooms();
+                publicRoomsTimer = setInterval(() => {
+                    const menu = document.getElementById('menu-selection');
+                    if (!menu || getComputedStyle(menu).display === 'none') { togglePublicRooms(false); return; }
+                    refreshPublicRooms();
+                }, 4000);
+            }
+        }
+        function joinPublicRoom(code, mode, subMode) {
+            togglePublicRooms(false);
+            currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode, subMode });
+        }
+        socket.on('public_rooms', list => {
+            const box = document.getElementById('public-rooms-list');
+            if (!box) return;
+            box.innerHTML = '';
+            if (!list || !list.length) {
+                box.innerHTML = '<div class="public-empty">Aucun salon public pour le moment. Crée un salon et coche « Salon public » pour que d\'autres te rejoignent !</div>';
+                return;
+            }
+            list.forEach(r => {
+                const row = document.createElement('div');
+                row.className = 'public-room';
+                const info = document.createElement('div');
+                info.className = 'public-room-info';
+                const mode = document.createElement('span');
+                mode.className = 'public-room-mode';
+                mode.textContent = r.modeLabel + (r.subLabel ? ' · ' + r.subLabel : '');
+                const meta = document.createElement('span');
+                meta.className = 'public-room-meta';
+                meta.textContent = `👥 ${r.players}/${r.max} · Hôte : ${r.hostName} · #${r.code}`;
+                info.append(mode, meta);
+                const btn = document.createElement('button');
+                btn.className = 'btn-action';
+                btn.textContent = 'Rejoindre';
+                btn.onclick = () => joinPublicRoom(r.code, r.mode, r.subMode);
+                row.append(info, btn);
+                box.appendChild(row);
+            });
+        });
 
 
         const fandomImageClientCache = new Map();

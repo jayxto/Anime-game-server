@@ -9530,6 +9530,45 @@ function startBlindTest(room, roomCode) {
     btNextRound(room, roomCode);
 }
 
+/* ================= Salons publics (jouer avec des inconnus) ================= */
+const PUBLIC_MODE_LABELS = {
+    undercover:'Undercover', note:'Devine la note', rollandgaros:'Rolland Garros', enchere:'Enchère',
+    enchereaveugle:"Enchère à l'aveugle", dle:'AnimeDLE', connexion:'Jeu de connexion',
+    quote:'Citations', blindtest:'Blind Test'
+};
+
+function publicRoomMax(room) {
+    if (room.mode === 'enchere' || room.mode === 'enchereaveugle') return 2;
+    if (room.mode === 'undercover' || room.mode === 'note') return 10;
+    return 12;
+}
+
+function publicRoomSubLabel(room) {
+    const k = room.subMode;
+    if (room.mode === 'undercover') return k === 'hardcore' ? 'Hardcore' : 'Normal';
+    if (room.mode === 'rollandgaros') return RG_UNIVERSES[k]?.name || '';
+    if (room.mode === 'dle') return DLE_UNIVERSES[k]?.name || '';
+    if (room.mode === 'quote') return QUOTE_UNIVERSES[k]?.name || '';
+    if (room.mode === 'enchere' || room.mode === 'enchereaveugle') return ENCHERE_UNIVERSES[k]?.name || '';
+    return '';
+}
+
+function listPublicRooms() {
+    return Object.values(rooms)
+        .filter(r => r.isPublic && r.status === 'waiting' && r.players.length > 0 && r.players.length < publicRoomMax(r))
+        .map(r => ({
+            code: r.code,
+            mode: r.mode,
+            subMode: r.subMode,
+            modeLabel: PUBLIC_MODE_LABELS[r.mode] || r.mode,
+            subLabel: publicRoomSubLabel(r),
+            players: r.players.length,
+            max: publicRoomMax(r),
+            hostName: r.players.find(p => p.id === r.host)?.name || r.players[0]?.name || ''
+        }))
+        .sort((a, b) => b.players - a.players);
+}
+
 io.on('connection', (socket) => {
     console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
@@ -9578,6 +9617,12 @@ io.on('connection', (socket) => {
             }
 
             // Limite d'effectif : 10 joueurs max pour Undercover et Devine la note
+            if ((room.mode === 'enchere' || room.mode === 'enchereaveugle') && room.players.length >= 2) {
+                socket.leave(roomCode);
+                socket.emit('game_error', { message: "Ce salon est complet (2 joueurs maximum)." });
+                return;
+            }
+
             if ((room.mode === 'undercover' || room.mode === 'note') && room.players.length >= 10) {
                 socket.leave(roomCode);
                 socket.emit('game_error', { message: "Ce salon est complet (10 joueurs maximum)." });
@@ -9897,6 +9942,17 @@ io.on('connection', (socket) => {
         const bt = room?.blindtest;
         if (!room || !bt || room.host !== socket.id || bt.phase !== 'reveal') return;
         btNextRound(room, roomCode);
+    });
+
+    socket.on('set_room_public', ({ roomCode, isPublic }) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id) return;
+        room.isPublic = !!isPublic;
+        io.to(roomCode).emit('update_room', room);
+    });
+
+    socket.on('list_public_rooms', () => {
+        socket.emit('public_rooms', listPublicRooms());
     });
 
     socket.on('chat_message', ({ roomCode, message }) => {
