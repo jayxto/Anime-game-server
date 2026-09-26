@@ -344,6 +344,7 @@
         .room-public-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;font-size:.9rem;}
         .room-public-toggle input{width:18px;height:18px;accent-color:var(--accent-cyan);}
         .room-visibility-badge{font-size:.78rem;color:var(--text-muted);border:1px solid #34344b;border-radius:99px;padding:3px 10px;}
+        #dle-enrichment-progress{display:none!important;}
         .bt-video{display:none;margin:14px auto 0;max-width:720px;}
         .bt-video-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;border:2px solid var(--accent-cyan);background:#000;}
         .bt-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
@@ -468,165 +469,25 @@
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Rolland Garos</h3>
                     <p style="margin: 0 0 10px; font-size: 0.85rem;">Trouvez un max de persos à tour de rôle — 10s chrono, 2 vies pour l'équipe</p>
-                    <div class="chat-input-box" style="margin-top:0;">
-                        <select id="rg-universe-picker">
-                            <option value="naruto">Naruto</option>
-                            <option value="onepiece">One Piece</option>
-                            <option value="bleach">Bleach</option>
-                            <option value="hxh">Hunter x Hunter</option>
-                            <option value="snk">SNK / L'Attaque des Titans</option>
-                            <option value="sds">Seven Deadly Sins</option>
-                            <option value="deathnote">Death Note</option>
-                            <option value="cote">Classroom of the Elite</option>
-                            <option value="solo">Solo Leveling</option>
-                            <option value="clover">Black Clover</option>
-                            <option value="fireforce">Fire Force</option>
-                            <option value="mushoku">Mushoku Tensei</option>
-                            <option value="rezero">Re:Zero</option>
-                            <option value="fairy">Fairy Tail</option>
-                            <option value="bluelock">Blue Lock</option>
-                            <option value="fma">Fullmetal Alchemist</option>
-                            <option value="chainsaw">Chainsaw Man</option>
-                            <option value="wakfu">Wakfu</option>
-                            <option value="demonslayer">Demon Slayer</option>
-                            <option value="pokemon">Pokémon</option>
-                            <option value="dragonball">Dragon Ball</option>
-                            <option value="hellsparadise">Hell's Paradise</option>
-                            <option value="gachiakuta">Gachiakuta</option>
-                            <option value="haikyuu">Haikyuu</option>
-                            <option value="jjk">Jujutsu Kaisen</option>
-                            <option value="jojo">JoJo's Bizarre Adventure</option>
-                            <option value="tensura">Tensura</option>
-                            <option value="opm">One Punch Man</option>
-                            <option value="sao">Sword Art Online</option>
-                            <option value="tokyoghoul">Tokyo Ghoul</option>
-                            <option value="tokyorevengers">Tokyo Revengers</option>
-                        </select>
-                        <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('rollandgaros', document.getElementById('rg-universe-picker').value)">Créer</button>
-                    </div>
+                    <button class="btn-action" style="margin-top:0;" onclick="openUniverseSelection('rollandgaros')">Choisir l'univers</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Enchère</h3>
                     <p style="margin: 0 0 10px; font-size: 0.85rem;">1v1 — 50M chacun, construisez la meilleure équipe de 4 persos</p>
-                    <div class="chat-input-box" style="margin-top:0;">
-                        <select id="enchere-universe-picker">
-                            <option value="naruto">Naruto</option>
-                            <option value="onepiece">One Piece</option>
-                            <option value="bleach">Bleach</option>
-                            <option value="hxh">Hunter x Hunter</option>
-                            <option value="snk">SNK / L'Attaque des Titans</option>
-                            <option value="sds">Seven Deadly Sins</option>
-                            <option value="deathnote">Death Note</option>
-                            <option value="cote">Classroom of the Elite</option>
-                            <option value="solo">Solo Leveling</option>
-                            <option value="clover">Black Clover</option>
-                            <option value="fireforce">Fire Force</option>
-                            <option value="mushoku">Mushoku Tensei</option>
-                            <option value="rezero">Re:Zero</option>
-                            <option value="fairy">Fairy Tail</option>
-                            <option value="bluelock">Blue Lock</option>
-                            <option value="fma">Fullmetal Alchemist</option>
-                            <option value="chainsaw">Chainsaw Man</option>
-                            <option value="wakfu">Wakfu</option>
-                            <option value="demonslayer">Demon Slayer</option>
-                            <option value="pokemon">Pokémon</option>
-                            <option value="dragonball">Dragon Ball</option>
-                            <option value="hellsparadise">Hell's Paradise</option>
-                            <option value="gachiakuta">Gachiakuta</option>
-                            <option value="haikyuu">Haikyuu</option>
-                            <option value="jjk">Jujutsu Kaisen</option>
-                            <option value="jojo">JoJo's Bizarre Adventure</option>
-                            <option value="tensura">Tensura</option>
-                            <option value="opm">One Punch Man</option>
-                            <option value="sao">Sword Art Online</option>
-                            <option value="tokyoghoul">Tokyo Ghoul</option>
-                            <option value="tokyorevengers">Tokyo Revengers</option>
-                        </select>
-                        <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('enchere', document.getElementById('enchere-universe-picker').value)">Créer</button>
-                    </div>
+                    <button class="btn-action" style="margin-top:0;" onclick="openUniverseSelection('enchere')">Choisir l'univers</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">Enchère à l'aveugle</h3>
                     <p style="margin: 0 0 10px; font-size: 0.85rem;">1v1 — un seul voit le perso à chaque tour, l'autre mise à l'aveugle. Minimum 1 mise pour pouvoir laisser.</p>
-                    <div class="chat-input-box" style="margin-top:0;">
-                        <select id="ea-universe-picker">
-                            <option value="naruto">Naruto</option>
-                            <option value="onepiece">One Piece</option>
-                            <option value="bleach">Bleach</option>
-                            <option value="hxh">Hunter x Hunter</option>
-                            <option value="snk">SNK / L'Attaque des Titans</option>
-                            <option value="sds">Seven Deadly Sins</option>
-                            <option value="deathnote">Death Note</option>
-                            <option value="cote">Classroom of the Elite</option>
-                            <option value="solo">Solo Leveling</option>
-                            <option value="clover">Black Clover</option>
-                            <option value="fireforce">Fire Force</option>
-                            <option value="mushoku">Mushoku Tensei</option>
-                            <option value="rezero">Re:Zero</option>
-                            <option value="fairy">Fairy Tail</option>
-                            <option value="bluelock">Blue Lock</option>
-                            <option value="fma">Fullmetal Alchemist</option>
-                            <option value="chainsaw">Chainsaw Man</option>
-                            <option value="wakfu">Wakfu</option>
-                            <option value="demonslayer">Demon Slayer</option>
-                            <option value="pokemon">Pokémon</option>
-                            <option value="dragonball">Dragon Ball</option>
-                            <option value="hellsparadise">Hell's Paradise</option>
-                            <option value="gachiakuta">Gachiakuta</option>
-                            <option value="haikyuu">Haikyuu</option>
-                            <option value="jjk">Jujutsu Kaisen</option>
-                            <option value="jojo">JoJo's Bizarre Adventure</option>
-                            <option value="tensura">Tensura</option>
-                            <option value="opm">One Punch Man</option>
-                            <option value="sao">Sword Art Online</option>
-                            <option value="tokyoghoul">Tokyo Ghoul</option>
-                            <option value="tokyorevengers">Tokyo Revengers</option>
-                        </select>
-                        <button class="btn-action" style="width: auto; margin-top:0;" onclick="createRoom('enchereaveugle', document.getElementById('ea-universe-picker').value)">Créer</button>
-                    </div>
+                    <button class="btn-action" style="margin-top:0;" onclick="openUniverseSelection('enchereaveugle')">Choisir l'univers</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid var(--accent-cyan); text-align: left;">
                     <h3 style="color: var(--accent-yellow); margin-bottom: 5px;">AnimeDLE</h3>
-                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le même personnage — encore plus de persos jouables dans tous les univers, fiches complètes + photos automatiques.</p>
-                    <div class="chat-input-box" style="margin-top:0;">
-                        <select id="dle-universe-picker">
-                            <option value="naruto">Naruto</option>
-                            <option value="onepiece">One Piece</option>
-                            <option value="bleach">Bleach</option>
-                            <option value="hxh">Hunter x Hunter</option>
-                            <option value="snk">SNK / L'Attaque des Titans</option>
-                            <option value="sds">Seven Deadly Sins</option>
-                            <option value="deathnote">Death Note</option>
-                            <option value="cote">Classroom of the Elite</option>
-                            <option value="solo">Solo Leveling</option>
-                            <option value="clover">Black Clover</option>
-                            <option value="fireforce">Fire Force</option>
-                            <option value="mushoku">Mushoku Tensei</option>
-                            <option value="rezero">Re:Zero</option>
-                            <option value="fairy">Fairy Tail</option>
-                            <option value="bluelock">Blue Lock</option>
-                            <option value="fma">Fullmetal Alchemist</option>
-                            <option value="chainsaw">Chainsaw Man</option>
-                            <option value="wakfu">Wakfu</option>
-                            <option value="demonslayer">Demon Slayer</option>
-                            <option value="pokemon">Pokémon</option>
-                            <option value="dragonball">Dragon Ball</option>
-                            <option value="hellsparadise">Hell's Paradise</option>
-                            <option value="gachiakuta">Gachiakuta</option>
-                            <option value="haikyuu">Haikyuu</option>
-                            <option value="jjk">Jujutsu Kaisen</option>
-                            <option value="jojo">JoJo's Bizarre Adventure</option>
-                            <option value="tensura">Tensura</option>
-                            <option value="opm">One Punch Man</option>
-                            <option value="sao">Sword Art Online</option>
-                            <option value="tokyoghoul">Tokyo Ghoul</option>
-                            <option value="tokyorevengers">Tokyo Revengers</option>
-                        </select>
-                        <button class="btn-action" style="width:auto; margin-top:0;" onclick="createRoom('dle', document.getElementById('dle-universe-picker').value)">Créer</button>
-                    </div>
+                    <p style="margin: 0 0 10px; font-size: 0.85rem;">Devinez le personnage mystère grâce aux indices — 31 univers, dont le Pokédex complet.</p>
+                    <button class="btn-action" style="margin-top:0;" onclick="openUniverseSelection('dle')">Choisir l'univers</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
@@ -652,12 +513,12 @@
         <div id="quote-universe-selection" class="game-panel" style="display:none;max-width:920px;margin:0 auto;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                 <div>
-                    <h2 style="margin-bottom:4px;">À QUI APPARTIENT CETTE CITATION ?</h2>
-                    <p style="margin:0;color:var(--text-muted);">Choisis ton univers — 25 citations dans chacun des 31 animes.</p>
+                    <h2 id="universe-select-title" style="margin-bottom:4px;">À QUI APPARTIENT CETTE CITATION ?</h2>
+                    <p id="universe-select-sub" style="margin:0;color:var(--text-muted);">Choisis ton univers — 25 citations dans chacun des 31 animes.</p>
                 </div>
                 <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:7px 10px;cursor:pointer;">🔙 Retour</button>
             </div>
-            <div class="quote-universe-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+            <div class="quote-universe-grid" id="universe-select-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('onepiece')">One Piece<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('bleach')">Bleach<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('hxh')">Hunter x Hunter<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
@@ -1501,10 +1362,52 @@
         }
 
 
-        function openQuoteUniverseSelection() {
+        // Écran de choix d'univers commun à tous les modes (même présentation que les Citations)
+        const UNIVERSE_CHOICES = [
+            ['naruto','Naruto'],['onepiece','One Piece'],['bleach','Bleach'],['hxh','Hunter x Hunter'],
+            ['snk',"SNK / L'Attaque des Titans"],['sds','Seven Deadly Sins'],['deathnote','Death Note'],
+            ['cote','Classroom of the Elite'],['solo','Solo Leveling'],['clover','Black Clover'],['fireforce','Fire Force'],
+            ['mushoku','Mushoku Tensei'],['rezero','Re:Zero'],['fairy','Fairy Tail'],['bluelock','Blue Lock'],
+            ['fma','Fullmetal Alchemist'],['chainsaw','Chainsaw Man'],['wakfu','Wakfu'],['demonslayer','Demon Slayer'],
+            ['pokemon','Pokémon'],['dragonball','Dragon Ball'],['hellsparadise',"Hell's Paradise"],['gachiakuta','Gachiakuta'],
+            ['haikyuu','Haikyuu'],['jjk','Jujutsu Kaisen'],['jojo',"JoJo's Bizarre Adventure"],['tensura','Tensura'],
+            ['opm','One Punch Man'],['sao','Sword Art Online'],['tokyoghoul','Tokyo Ghoul'],['tokyorevengers','Tokyo Revengers']
+        ];
+        const UNIVERSE_SELECT_MODES = {
+            quote:          { title:'À QUI APPARTIENT CETTE CITATION ?', sub:'Choisis ton univers — 25 citations dans chacun des 31 animes.', tag:'25 citations' },
+            rollandgaros:   { title:'ROLLAND GAROS', sub:'Choisis ton univers — trouvez un max de persos à tour de rôle.', tag:'' },
+            enchere:        { title:'ENCHÈRE', sub:'Choisis ton univers — 1v1, 50M chacun, 4 persos par équipe.', tag:'' },
+            enchereaveugle: { title:"ENCHÈRE À L'AVEUGLE", sub:"Choisis ton univers — un seul voit le perso, l'autre mise à l'aveugle.", tag:'' },
+            dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' }
+        };
+        function openUniverseSelection(mode) {
+            const cfg = UNIVERSE_SELECT_MODES[mode] || UNIVERSE_SELECT_MODES.quote;
             hideAllPanels();
+            document.getElementById('universe-select-title').textContent = cfg.title;
+            document.getElementById('universe-select-sub').textContent = cfg.sub;
+            const grid = document.getElementById('universe-select-grid');
+            grid.innerHTML = '';
+            UNIVERSE_CHOICES.forEach(([key, label]) => {
+                const b = document.createElement('button');
+                b.className = 'quote-universe-btn';
+                b.textContent = label;
+                if (cfg.tag) {
+                    b.appendChild(document.createElement('br'));
+                    const t = document.createElement('span');
+                    t.style.cssText = 'font-size:.65rem;color:var(--text-muted);';
+                    t.textContent = cfg.tag;
+                    b.appendChild(t);
+                }
+                b.onclick = () => mode === 'quote' ? createQuoteRoom(key) : createRoom(mode, key);
+                grid.appendChild(b);
+            });
             const p = document.getElementById('quote-universe-selection');
             if (p) p.style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function openQuoteUniverseSelection() {
+            openUniverseSelection('quote');
         }
 
         function createQuoteRoom(universeKey) {
