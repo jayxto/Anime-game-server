@@ -2127,13 +2127,7 @@
             if (fandomImageClientCache.has(key)) return fandomImageClientCache.get(key);
 
             const promise = (async () => {
-                // IMPORTANT: direct browser -> Fandom first.
-                // Fandom often blocks cloud/server IPs even though its MediaWiki API
-                // allows browser CORS with origin=*.
-                const direct = await fetchFandomImageDirect(universe, name);
-                if (direct?.imageUrl) return direct;
-
-                // fallback to our server/cache
+                // 1) Notre serveur : image officielle de l'anime (AniList), sinon Fandom
                 try {
                     const r = await fetch(`/api/character-image?universe=${encodeURIComponent(universe)}&name=${encodeURIComponent(name)}`);
                     if (r.ok) {
@@ -2141,6 +2135,10 @@
                         if (data?.imageUrl) return data;
                     }
                 } catch (_) {}
+
+                // 2) Navigateur -> Fandom directement (Fandom bloque parfois les serveurs cloud)
+                const direct = await fetchFandomImageDirect(universe, name);
+                if (direct?.imageUrl) return direct;
 
                 // Dernier secours pour que le jeu affiche quand même une photo :
                 // recherche Jikan/MAL, en privilégiant une correspondance exacte du nom.
@@ -4443,7 +4441,7 @@
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
                 if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
-                try { stored = localStorage.getItem('itemimg:' + k); } catch (e) {}
+                try { stored = localStorage.getItem('itemimg2:' + k); } catch (e) {}
                 if (stored) return resolve(stored === '-' ? null : '/api/img?u=' + encodeURIComponent(stored));
                 itemImgQueue.push({ source, name: item.name, k, resolve });
                 itemImagePump();
@@ -4458,7 +4456,7 @@
                     .then(r => r.json()).catch(() => null)
                     .then(d => {
                         const url = d && d.imageUrl;
-                        try { localStorage.setItem('itemimg:' + job.k, url || '-'); } catch (e) {}
+                        try { localStorage.setItem('itemimg2:' + job.k, url || '-'); } catch (e) {}
                         if (!url) delete ITEM_IMG_CACHE[job.k];
                         job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
                     })
@@ -4744,14 +4742,18 @@
             const ck = key + '|' + name;
             let url = card.dataset.img || gal.cache[ck];
             if (url === undefined) {
-                try { const s = localStorage.getItem('galimg:' + ck); if (s !== null) url = s || null; } catch (e) {}
+                try { const s = localStorage.getItem('galimg2:' + ck); if (s !== null) url = s || null; } catch (e) {}
             }
             if (url === undefined) {
                 try {
                     const d = await (await fetch(`/api/persos-image?u=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}`)).json();
                     url = d.imageUrl || null;
                 } catch (e) { url = null; }
-                try { localStorage.setItem('galimg:' + ck, url || ''); } catch (e) {}
+                if (!url && typeof getFandomCharacterImage === 'function') {
+                    const u = gal.universes.find(x => x.key === key);
+                    try { const d2 = await getFandomCharacterImage(u ? u.name : key, name); url = d2?.imageUrl || null; } catch (e) {}
+                }
+                try { localStorage.setItem('galimg2:' + ck, url || ''); } catch (e) {}
             }
             gal.cache[ck] = url;
             const box = card.querySelector('.gal-img');
