@@ -9,7 +9,14 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    // Connexion plus tolérante (téléphone en veille, Wi-Fi/4G qui coupe une seconde) :
+    pingInterval: 25000,
+    pingTimeout: 60000,
+    // Après une courte coupure, le joueur retrouve la MÊME session (même id, mêmes salons,
+    // événements manqués renvoyés) : la partie continue sans aucun retour au salon.
+    connectionStateRecovery: { maxDisconnectionDuration: 2 * 60 * 1000, skipMiddlewares: false }
+});
 
 app.use(express.json());
 app.use(express.static(__dirname));
@@ -709,7 +716,8 @@ io.use(async (socket, next) => {
 const rooms = {};
 
 // Reconnexion : délai pendant lequel on garde la place d'un joueur déconnecté
-const RECONNECT_GRACE_MS = 90000; // 90 secondes
+const RECONNECT_GRACE_MS = 150000; // 2 min 30 : place gardée pendant une partie
+const WAITING_GRACE_MS = 30000;    // 30 s : place gardée dans le salon d'attente
 const graceTimers = {}; // socketId -> timeout de retrait définitif
 
 // Timers et pools de la manche Rolland Garos, tenus à part de `rooms`
@@ -9570,7 +9578,20 @@ function listPublicRooms() {
 }
 
 io.on('connection', (socket) => {
-    console.log(`Un utilisateur s'est connecté : ${socket.id}`);
+    console.log(`Un utilisateur s'est connecté : ${socket.id}${socket.recovered ? ' (session récupérée)' : ''}`);
+
+    // Session récupérée après une micro-coupure : on annule le retrait prévu et on le remet "en ligne"
+    if (socket.recovered) {
+        if (graceTimers[socket.id]) { clearTimeout(graceTimers[socket.id]); delete graceTimers[socket.id]; }
+        for (const code in rooms) {
+            const p = rooms[code].players.find(pl => pl.id === socket.id);
+            if (p && p.disconnected) {
+                delete p.disconnected;
+                delete p.disconnectedAt;
+                io.to(code).emit('player_connection_changed', { playerId: socket.id, online: true });
+            }
+        }
+    }
 
     // Chaque handler est isolé : si l'un plante, l'erreur est journalisée et
     // seule l'action concernée échoue — la partie et les autres joueurs continuent.
@@ -10329,10 +10350,13 @@ io.on('connection', (socket) => {
         }
 
         // On retrouve le joueur par son compte (ou son pseudo pour les invités)
-        const ancien = room.players.find(p => p.disconnected && (
-            (socket.user.id && p.userId === socket.user.id) ||
-            (!socket.user.id && p.name === socket.user.pseudo)
-        ));
+        // On retrouve le joueur par son compte (ou son pseudo pour les invités). On ne demande plus
+        // qu'il soit déjà marqué "déconnecté" : le téléphone revient souvent AVANT que le serveur ait
+        // remarqué la coupure, et c'est ce qui renvoyait au menu.
+        const memeJoueur = p => (socket.user.id && p.userId === socket.user.id) ||
+                                (!socket.user.id && p.name === socket.user.pseudo);
+        const ancien = room.players.find(p => p.disconnected && memeJoueur(p))
+                    || room.players.find(p => memeJoueur(p));
 
         if (!ancien) {
             socket.emit('rejoin_failed');
@@ -10353,6 +10377,7 @@ io.on('connection', (socket) => {
 
         // Report de l'ancien identifiant vers le nouveau dans toutes les structures de jeu
         const remap = (obj) => {
+            if (ancienId === socket.id) return; // session récupérée : même identifiant, rien à déplacer
             if (obj && Object.prototype.hasOwnProperty.call(obj, ancienId)) {
                 obj[socket.id] = obj[ancienId];
                 delete obj[ancienId];
@@ -10381,6 +10406,11 @@ io.on('connection', (socket) => {
             remap(room.blindtest.scores);
             remap(room.blindtest.answers);
         }
+        if (room.quoteGame) remap(room.quoteGame.scores);
+        if (room.dle) {
+            remap(room.dle.attemptsByPlayer);
+            if (room.dle.winnerId === ancienId) room.dle.winnerId = socket.id;
+        }
 
         io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: true });
 
@@ -10399,6 +10429,10 @@ io.on('connection', (socket) => {
             emitConnexionState(room, roomCode);
         } else if (room.status === 'bt_playing' || room.status === 'bt_over') {
             emitBlindState(room, roomCode);
+        } else if ((room.status === 'dle_playing' || room.status === 'dle_finished') && room.dle) {
+            socket.emit('dle_state', dlePublicRoom(room));
+        } else if (room.status === 'quote_playing' && room.quoteGame) {
+            socket.emit('quote_state', quotePublicState(room));
         } else if (room.status === 'voting') {
             socket.emit('start_voting', room);
         } else if (room.status === 'choosing_theme') {
@@ -10417,7 +10451,7 @@ io.on('connection', (socket) => {
 
             // Coupure réseau / mise en veille : on garde sa place pendant un court délai
             // au lieu de le sortir tout de suite, pour qu'il puisse revenir dans SA partie.
-            if (room.status !== 'waiting') {
+            {
                 joueur.disconnected = true;
                 joueur.disconnectedAt = Date.now();
                 if (graceTimers[socket.id]) clearTimeout(graceTimers[socket.id]);
@@ -10432,12 +10466,10 @@ io.on('connection', (socket) => {
                     } catch (e) {
                         console.error('[délai de reconnexion]', e);
                     }
-                }, RECONNECT_GRACE_MS);
+                }, room.status === 'waiting' ? WAITING_GRACE_MS : RECONNECT_GRACE_MS);
                 io.to(roomCode).emit('player_connection_changed', { playerId: socket.id, online: false });
                 continue;
             }
-
-            retirerJoueurDuSalon(room, roomCode, socket.id);
         }
     });
 });
@@ -10536,6 +10568,19 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
                 return;
             }
 
+            // AnimeDLE : chacun devine de son côté, on renvoie juste l'état
+            if ((room.status === 'dle_playing' || room.status === 'dle_finished') && room.dle) {
+                emitDleState(room, roomCode);
+                return;
+            }
+
+            // Citations : si c'était son tour, on passe au suivant
+            if (room.status === 'quote_playing' && room.quoteGame) {
+                quoteEnsureTurn(room);
+                emitQuoteState(room, roomCode);
+                return;
+            }
+
             // Undercover / Devine la note : la partie continue sans le joueur parti
             if (room.status === 'voting') {
                 delete room.votes[socketId];
@@ -10560,7 +10605,8 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
                 return;
             }
 
-            io.to(roomCode).emit('update_gameplay', room);
+            // Autres états : on ne renvoie l'écran Undercover que pour les modes Undercover / note
+            if (room.mode === 'undercover' || room.mode === 'note') io.to(roomCode).emit('update_gameplay', room);
         }
 }
 

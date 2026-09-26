@@ -965,7 +965,14 @@
         let currentUser = null;
         let authMode = 'login';
 
-        const socket = io({ autoConnect: false });
+        const socket = io({
+            autoConnect: false,
+            reconnection: true,
+            reconnectionAttempts: Infinity,   // on ne lâche jamais : le jeu se reconnecte tout seul
+            reconnectionDelay: 500,
+            reconnectionDelayMax: 3000,
+            timeout: 20000
+        });
         let currentRoomCode = "";
         let currentThemeMasterId = "";
 
@@ -1172,22 +1179,42 @@
         });
 
         socket.on('rejoin_failed', () => {
-            // La partie n'existe plus côté serveur (redémarrage ou délai dépassé)
+            // La partie n'existe plus côté serveur (redémarrage du serveur ou absence trop longue)
             currentRoomCode = "";
             goToMenuSelection();
-            alert("La connexion au serveur a été réinitialisée et la partie n'a pas pu être retrouvée. Recrée ou rejoins un salon.");
+            const el = document.getElementById('connection-banner');
+            if (el) {
+                el.textContent = "La partie n'a pas pu être retrouvée (serveur redémarré ou absence trop longue). Recrée ou rejoins un salon.";
+                el.style.display = 'block';
+                setTimeout(() => { el.style.display = 'none'; }, 7000);
+            }
+        });
+
+        // Retour sur l'onglet / déverrouillage du téléphone : on se reconnecte immédiatement
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !socket.connected && (authToken || socket.auth)) socket.connect();
+        });
+        window.addEventListener('online', () => {
+            if (!socket.connected && (authToken || socket.auth)) socket.connect();
         });
 
         socket.on('disconnect', (raison) => {
             if (currentRoomCode && raison !== 'io client disconnect') {
                 const el = document.getElementById('connection-banner');
-                if (el) el.style.display = 'block';
+                if (el) {
+                    el.textContent = '📡 Connexion perdue… reconnexion automatique, ta place est gardée.';
+                    el.style.display = 'block';
+                }
             }
         });
 
         socket.io.on('reconnect', () => {
             const el = document.getElementById('connection-banner');
             if (el) el.style.display = 'none';
+        });
+        socket.on('connect', () => {
+            const el = document.getElementById('connection-banner');
+            if (el && socket.recovered) el.style.display = 'none';
         });
 
         socket.on('player_connection_changed', () => {
