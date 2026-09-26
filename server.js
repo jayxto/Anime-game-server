@@ -9524,12 +9524,19 @@ function btNextRound(room, roomCode) {
     // On tire d'abord un anime (pour ne pas avoir 10 fois SNK), puis une de ses musiques
     const playable = t => !(t.ytId && BT_BAD_IDS.has(t.ytId));
     const playableAnimes = BLINDTEST_ANIMES.filter(a => BLINDTEST_TRACKS.some(t => t.anime === a && playable(t)));
-    let pool = playableAnimes.filter(a => !bt.usedAnimes.includes(a));
-    if (!pool.length) { bt.usedAnimes = []; pool = playableAnimes.slice(); }
-    const anime = pool[Math.floor(Math.random() * pool.length)];
-    bt.usedAnimes.push(anime);
-    const tracks = BLINDTEST_TRACKS.filter(t => t.anime === anime && playable(t));
-    const track = tracks[Math.floor(Math.random() * tracks.length)];
+    let anime, track;
+    const daily = bt.dailyTracks ? bt.dailyTracks.find((t, i) => i >= bt.round && playable(t) && !bt.usedAnimes.includes(t.anime)) : null;
+    if (daily) {
+        track = daily; anime = daily.anime;
+        bt.usedAnimes.push(anime);
+    } else {
+        let pool = playableAnimes.filter(a => !bt.usedAnimes.includes(a));
+        if (!pool.length) { bt.usedAnimes = []; pool = playableAnimes.slice(); }
+        anime = pool[Math.floor(Math.random() * pool.length)];
+        bt.usedAnimes.push(anime);
+        const tracks = BLINDTEST_TRACKS.filter(t => t.anime === anime && playable(t));
+        track = tracks[Math.floor(Math.random() * tracks.length)];
+    }
 
     const wrongPool = btShuffle([...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES].filter(a => a !== anime));
     const wrong = [...new Set(wrongPool)].slice(0, 3);
@@ -12444,3 +12451,732 @@ setTimeout(async () => {
         await new Promise(r => setTimeout(r, 1500));
     }
 }, 20000);
+
+/* =====================================================================
+   PROGRESSION : XP, niveaux, badges, stats, classements hebdo
+   ===================================================================== */
+const PROG_MEM = { results: [], xp: new Map(), badges: new Map(), daily: [] }; // repli sans base de données
+const HAS_DB = !!process.env.DATABASE_URL;
+
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS xp INTEGER NOT NULL DEFAULT 0`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS game_results (
+                id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, pseudo TEXT NOT NULL, mode TEXT NOT NULL, universe TEXT,
+                points INTEGER NOT NULL DEFAULT 0, won BOOLEAN NOT NULL DEFAULT false, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE INDEX IF NOT EXISTS game_results_user ON game_results(user_id)`);
+            await pool.query(`CREATE INDEX IF NOT EXISTS game_results_time ON game_results(created_at)`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS user_badges (
+                user_id INTEGER NOT NULL, badge TEXT NOT NULL, earned_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY (user_id, badge))`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS daily_results (
+                day TEXT NOT NULL, game TEXT NOT NULL, user_id INTEGER NOT NULL, pseudo TEXT NOT NULL,
+                score INTEGER NOT NULL DEFAULT 0, attempts INTEGER, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                PRIMARY KEY (day, game, user_id))`);
+        } catch (e) { console.warn('[Progression] tables :', e.message); }
+    })();
+}
+
+function levelFromXp(xp) {
+    const level = Math.floor(Math.sqrt(Math.max(0, xp) / 60)) + 1;
+    const cur = 60 * (level - 1) * (level - 1), next = 60 * level * level;
+    return { level, xp, cur, next };
+}
+const _publicUserV1 = publicUser;
+publicUser = function (row) {
+    const u = _publicUserV1(row);
+    u.xp = +row.xp || 0;
+    Object.assign(u, { level: levelFromXp(u.xp).level });
+    return u;
+};
+
+const MODE_LABELS = {
+    blindtest: 'Blind Test', dle: 'AnimeDLE', rollandgaros: 'Rolland Garros', quote: 'Citations',
+    'arcade:pixel': 'Pixel Anime', 'arcade:silhouette': 'Silhouette', 'arcade:emoji': 'Emoji Anime', 'arcade:quatre': '4 images = 1 anime',
+    'arcade:mapguess': 'Map Guess', 'arcade:fusion': 'Fusion Anime', 'arcade:scene': 'Scene Guessr', 'arcade:link': 'Common Link',
+    'arcade:popularite': 'Popularity Guess', 'arcade:bac': 'Petit bac', 'arcade:imposteur': 'Imposteur', 'arcade:audio': 'Écoute la scène',
+    'arcade:chrono': 'Chrono-quiz', 'arcade:draft': 'Draft 5v5', 'arcade:tournoi': 'Tournoi'
+};
+
+// Badges : [id, nom, description, condition(stats)]
+const BADGES = [
+    ['first', 'Premiers pas', 'Joue ta première partie', s => s.games >= 1],
+    ['games10', 'Habitué', '10 parties jouées', s => s.games >= 10],
+    ['games50', 'Accro', '50 parties jouées', s => s.games >= 50],
+    ['games200', 'Légende du site', '200 parties jouées', s => s.games >= 200],
+    ['win1', 'Première victoire', 'Gagne une partie', s => s.wins >= 1],
+    ['win10', 'Champion', '10 victoires', s => s.wins >= 10],
+    ['win50', 'Invincible', '50 victoires', s => s.wins >= 50],
+    ['bt20', 'Oreille absolue', '20 blind tests joués', s => (s.byMode.blindtest || 0) >= 20],
+    ['dle10', 'Détective', '10 AnimeDLE gagnés', s => (s.winsByMode.dle || 0) >= 10],
+    ['rg10', 'Roi du Rolland Garros', '10 Rolland Garros gagnés', s => (s.winsByMode.rollandgaros || 0) >= 10],
+    ['arcade6', 'Touche-à-tout', 'Essaie 6 mini-jeux différents', s => Object.keys(s.byMode).filter(m => m.startsWith('arcade:')).length >= 6],
+    ['daily1', 'Défi relevé', 'Termine un défi du jour', s => s.daily >= 1],
+    ['daily7', 'Assidu', '7 défis du jour terminés', s => s.daily >= 7],
+    ['universes10', 'Globe-trotter', 'Joue dans 10 univers différents', s => s.universes >= 10],
+    ['points5k', 'Machine à points', '5 000 points cumulés', s => s.points >= 5000]
+];
+
+async function progStats(userId) {
+    const s = { games: 0, wins: 0, points: 0, byMode: {}, winsByMode: {}, pointsByMode: {}, universes: 0, daily: 0, byUniverse: {} };
+    let rows = [], daily = 0;
+    if (HAS_DB) {
+        try {
+            rows = (await pool.query(`SELECT mode, universe, count(*)::int AS games, sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins,
+                COALESCE(sum(points),0)::int AS points, COALESCE(max(points),0)::int AS best FROM game_results WHERE user_id=$1 GROUP BY mode, universe`, [userId])).rows;
+            daily = (await pool.query(`SELECT count(DISTINCT day)::int AS n FROM daily_results WHERE user_id=$1`, [userId])).rows[0]?.n || 0;
+        } catch (_) {}
+    } else {
+        const agg = {};
+        PROG_MEM.results.filter(r => r.user_id === userId).forEach(r => {
+            const k = r.mode + '|' + (r.universe || '');
+            const o = agg[k] = agg[k] || { mode: r.mode, universe: r.universe, games: 0, wins: 0, points: 0, best: 0 };
+            o.games++; o.wins += r.won ? 1 : 0; o.points += r.points; o.best = Math.max(o.best, r.points);
+        });
+        rows = Object.values(agg);
+        daily = new Set(PROG_MEM.daily.filter(d => d.user_id === userId).map(d => d.day)).size;
+    }
+    const unis = new Set();
+    rows.forEach(r => {
+        s.games += r.games; s.wins += r.wins; s.points += r.points;
+        s.byMode[r.mode] = (s.byMode[r.mode] || 0) + r.games;
+        s.winsByMode[r.mode] = (s.winsByMode[r.mode] || 0) + r.wins;
+        s.pointsByMode[r.mode] = Math.max(s.pointsByMode[r.mode] || 0, r.best);
+        if (r.universe && r.universe !== 'all' && ARC_UNIVERSE_ANIME[r.universe]) {
+            unis.add(r.universe);
+            s.byUniverse[r.universe] = (s.byUniverse[r.universe] || 0) + r.games;
+        }
+    });
+    s.universes = unis.size; s.daily = daily;
+    return s;
+}
+
+async function progBadges(userId) {
+    if (HAS_DB) {
+        try { return (await pool.query('SELECT badge FROM user_badges WHERE user_id=$1', [userId])).rows.map(r => r.badge); } catch (_) { return []; }
+    }
+    return [...(PROG_MEM.badges.get(userId) || [])];
+}
+
+// Enregistre le résultat d'une partie pour chaque joueur connecté à un compte, puis XP + badges
+async function progRecord(room, mode, universe, entries) {
+    for (const e of entries) {
+        const p = e.player;
+        if (!p || !p.userId) continue;
+        const points = Math.max(0, Math.round(e.points || 0));
+        const xpGain = 15 + (e.won ? 25 : 0) + Math.min(40, Math.round(points / 40));
+        try {
+            if (HAS_DB) {
+                await pool.query('INSERT INTO game_results (user_id, pseudo, mode, universe, points, won) VALUES ($1,$2,$3,$4,$5,$6)',
+                    [p.userId, p.name, mode, universe || null, points, !!e.won]);
+                await pool.query('UPDATE users SET xp = xp + $1 WHERE id = $2', [xpGain, p.userId]);
+            } else {
+                PROG_MEM.results.push({ user_id: p.userId, pseudo: p.name, mode, universe, points, won: !!e.won, created_at: Date.now() });
+                PROG_MEM.xp.set(p.userId, (PROG_MEM.xp.get(p.userId) || 0) + xpGain);
+            }
+            await progCheckBadges(p, xpGain);
+        } catch (err) { console.warn('[Progression]', err.message); }
+    }
+}
+
+async function progCheckBadges(p, xpGain) {
+    const stats = await progStats(p.userId);
+    const have = new Set(await progBadges(p.userId));
+    const earned = [];
+    for (const [id, name, desc, cond] of BADGES) {
+        if (have.has(id) || !cond(stats)) continue;
+        earned.push({ id, name, desc });
+        if (HAS_DB) { try { await pool.query('INSERT INTO user_badges (user_id, badge) VALUES ($1,$2) ON CONFLICT DO NOTHING', [p.userId, id]); } catch (_) {} }
+        else { const set = PROG_MEM.badges.get(p.userId) || new Set(); set.add(id); PROG_MEM.badges.set(p.userId, set); }
+    }
+    io.to(p.id).emit('xp_gain', { xp: xpGain, badges: earned });
+    notifyProfileUpdate(p.id, p.userId);
+}
+
+// ---- Accroches sur les fins de partie ----
+const _arcFinishP = arcFinish;
+arcFinish = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    const already = g && g.phase === 'finished';
+    _arcFinishP(room, roomCode);
+    if (!g || already || g.message || g.recorded) return;
+    g.recorded = true;
+    const best = Math.max(0, ...room.players.map(p => g.scores[p.id] || 0));
+    const mode = 'arcade:' + (g.tour ? 'tournoi' : g.game);
+    progRecord(room, mode, g.universe, room.players.map(p => ({ player: p, points: g.scores[p.id] || 0, won: room.players.length > 1 && best > 0 && (g.scores[p.id] || 0) === best })));
+    if (g.daily) dailyRecord('pixel', room.players, p => ({ score: g.scores[p.id] || 0, attempts: null }));
+};
+
+const _btNextRoundP = btNextRound;
+btNextRound = function (room, roomCode) {
+    _btNextRoundP(room, roomCode);
+    const bt = room.blindtest;
+    if (!bt || bt.phase !== 'finished' || bt.recorded) return;
+    bt.recorded = true;
+    const best = Math.max(0, ...room.players.map(p => bt.scores[p.id] || 0));
+    progRecord(room, 'blindtest', null, room.players.map(p => ({ player: p, points: bt.scores[p.id] || 0, won: room.players.length > 1 && best > 0 && (bt.scores[p.id] || 0) === best })));
+    if (bt.daily) dailyRecord('blindtest', room.players, p => ({ score: bt.scores[p.id] || 0, attempts: null }));
+};
+
+const _emitDleStateP = emitDleState;
+emitDleState = function (room, roomCode) {
+    _emitDleStateP(room, roomCode);
+    const d = room.dle;
+    if (!d || !d.finished || d.recorded) return;
+    d.recorded = true;
+    progRecord(room, 'dle', d.universeKey, room.players.map(p => ({ player: p, points: p.id === d.winnerId ? Math.max(10, 110 - 10 * (d.winnerAttempts || 1)) : 5, won: p.id === d.winnerId })));
+    if (d.daily) dailyRecord('dle', room.players.filter(p => p.id === d.winnerId), p => ({ score: Math.max(10, 110 - 10 * (d.attemptsByPlayer[p.id] || d.guesses.length)), attempts: d.guesses.length }));
+};
+
+const _rgEndGameP = rgEndGame;
+rgEndGame = function (room, roomCode, winner) {
+    _rgEndGameP(room, roomCode, winner);
+    if (!room.rg || room.rg.recorded) return;
+    room.rg.recorded = true;
+    progRecord(room, 'rollandgaros', room.rg.universeKey, room.players.map(p => ({ player: p, points: (room.rg.score || 0) * 10, won: !!winner && p.id === winner.id })));
+};
+
+const _emitQuoteStateP = emitQuoteState;
+emitQuoteState = function (room, roomCode) {
+    _emitQuoteStateP(room, roomCode);
+    const qg = room.quoteGame;
+    if (!qg || !qg.finished || qg.recorded) return;
+    qg.recorded = true;
+    progRecord(room, 'quote', qg.universeKey, room.players.map(p => ({ player: p, points: (qg.scores[p.id] || 0) * 20, won: p.name === qg.winnerName })));
+};
+
+// ---- API profil & classements ----
+function authUserId(req) {
+    const h = req.headers.authorization || '';
+    const payload = h.startsWith('Bearer ') ? verifyToken(h.slice(7)) : null;
+    return payload ? payload.sub : null;
+}
+
+app.get('/api/profile', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid) return res.status(401).json({ ok: false });
+    let xp = PROG_MEM.xp.get(uid) || 0;
+    if (HAS_DB) { try { xp = (await pool.query('SELECT xp FROM users WHERE id=$1', [uid])).rows[0]?.xp || 0; } catch (_) {} }
+    const stats = await progStats(uid);
+    const have = new Set(await progBadges(uid));
+    res.json({
+        ok: true,
+        level: levelFromXp(xp),
+        stats: {
+            games: stats.games, wins: stats.wins, points: stats.points, daily: stats.daily,
+            modes: Object.keys(stats.byMode).map(m => ({ mode: m, label: MODE_LABELS[m] || m, games: stats.byMode[m], wins: stats.winsByMode[m] || 0, best: stats.pointsByMode[m] || 0 }))
+                .sort((a, b) => b.games - a.games),
+            universes: Object.keys(stats.byUniverse).map(u => ({ key: u, name: ARC_UNIVERSE_ANIME[u], games: stats.byUniverse[u] })).sort((a, b) => b.games - a.games)
+        },
+        badges: BADGES.map(([id, name, desc]) => ({ id, name, desc, earned: have.has(id) }))
+    });
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+    const period = req.query.period === 'all' ? 'all' : 'week';
+    const mode = String(req.query.mode || '');
+    let rows = [];
+    if (HAS_DB) {
+        try {
+            const params = [];
+            let where = period === 'week' ? `created_at > now() - interval '7 days'` : 'true';
+            if (mode) { params.push(mode); where += ` AND mode = $${params.length}`; }
+            rows = (await pool.query(`SELECT user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games,
+                sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY points DESC LIMIT 25`, params)).rows;
+        } catch (_) {}
+    } else {
+        const since = period === 'week' ? Date.now() - 7 * 86400000 : 0;
+        const agg = {};
+        PROG_MEM.results.filter(r => r.created_at > since && (!mode || r.mode === mode)).forEach(r => {
+            const o = agg[r.user_id] = agg[r.user_id] || { user_id: r.user_id, pseudo: r.pseudo, points: 0, games: 0, wins: 0 };
+            o.points += r.points; o.games++; o.wins += r.won ? 1 : 0;
+        });
+        rows = Object.values(agg).sort((a, b) => b.points - a.points).slice(0, 25);
+    }
+    res.json({ ok: true, period, mode, rows, modes: MODE_LABELS });
+});
+
+/* =====================================================================
+   DÉFI DU JOUR : le même DLE, blind test et Pixel pour tout le monde
+   ===================================================================== */
+function dailyKey(d = new Date()) {
+    // jour à l'heure de Paris
+    const s = d.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' }); // AAAA-MM-JJ
+    return s;
+}
+function dailyRng(salt) {
+    let h = 1779033703 ^ salt.length;
+    for (let i = 0; i < salt.length; i++) { h = Math.imul(h ^ salt.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+    let a = h >>> 0;
+    return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function dailyShuffle(arr, rng) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+}
+const DAILY_DLE_UNIVERSES = ['naruto', 'onepiece', 'bleach', 'hxh', 'snk', 'demonslayer', 'jjk', 'dragonball', 'pokemon', 'fairy', 'chainsaw', 'fma', 'deathnote', 'opm', 'jojo', 'haikyuu', 'clover', 'tokyoghoul', 'sds', 'bluelock'];
+function dailyInfo(day = dailyKey()) {
+    const rng = dailyRng('dle|' + day);
+    const list = DAILY_DLE_UNIVERSES.filter(x => typeof DLE_UNIVERSES === 'undefined' || DLE_UNIVERSES[x]);
+    const u = list[Math.floor(rng() * list.length)] || 'naruto';
+    return { day, dleUniverse: u, dleUniverseName: ARC_UNIVERSE_ANIME[u] || u };
+}
+
+// DLE du jour : univers + perso fixés par la date
+const _startDleD = startDle;
+startDle = async function (room, roomCode) {
+    if (room.subMode !== 'daily') return _startDleD(room, roomCode);
+    const info = dailyInfo();
+    room.subMode = info.dleUniverse;
+    try { await _startDleD(room, roomCode); } finally { room.subMode = 'daily'; }
+    if (!room.dle) return;
+    const u = dleExpandedUniverse(info.dleUniverse);
+    // perso connu de préférence (liste DLE triée par popularité)
+    const famous = new Set(arcFamous(info.dleUniverse).slice(0, 60).map(c => normalizeDle(c.raw)));
+    const cands = u.characters.filter(c => famous.has(normalizeDle(c.name)));
+    const list = (cands.length >= 10 ? cands : u.characters).slice().sort((a, b) => a.name.localeCompare(b.name));
+    room.dle.target = list[Math.floor(dailyRng('dlet|' + info.day)() * list.length)];
+    room.dle.daily = true;
+    emitDleState(room, roomCode);
+};
+
+// Blind test du jour : 5 musiques fixées par la date
+const _startBlindTestD = startBlindTest;
+startBlindTest = function (room, roomCode) {
+    if (room.subMode !== 'daily') return _startBlindTestD(room, roomCode);
+    const rng = dailyRng('bt|' + dailyKey());
+    const byAnime = {};
+    BLINDTEST_TRACKS.forEach(t => { (byAnime[t.anime] = byAnime[t.anime] || []).push(t); });
+    const animes = dailyShuffle(Object.keys(byAnime).sort(), rng);
+    const tracks = animes.map(a => { const l = byAnime[a]; return l[Math.floor(rng() * l.length)]; });
+    btClearTimer(roomCode);
+    room.status = 'bt_playing';
+    room.blindtest = {
+        round: 0, totalRounds: 5, phase: 'playing', current: null, offset: 0, choices: [], answers: {},
+        scores: Object.fromEntries(room.players.map(p => [p.id, 0])), usedAnimes: [], winnerNames: null,
+        dailyTracks: tracks, daily: true
+    };
+    btNextRound(room, roomCode);
+};
+
+// Pixel du jour : 5 persos connus fixés par la date
+const _startArcadeD = startArcade;
+startArcade = function (room, roomCode) {
+    if (room.subMode !== 'pixel:daily') return _startArcadeD(room, roomCode);
+    arcStop(roomCode);
+    const rng = dailyRng('pix|' + dailyKey());
+    const all = [];
+    arcUniverses().forEach(u => arcFamous(u).slice(0, u === 'pokemon' ? 151 : 20).forEach(c => all.push({ ...c, u })));
+    const g = {
+        game: 'pixel', universe: 'all', round: 0, totalRounds: 5, phase: 'loading',
+        current: null, answers: {}, found: {}, gainedRound: {},
+        scores: Object.fromEntries(room.players.map(p => [p.id, 0])),
+        used: new Set(), usedU: [], lastGuess: {},
+        daily: true, dailyPtr: 0,
+        dailyList: dailyShuffle(all.sort((a, b) => (a.u + a.display).localeCompare(b.u + b.display)), rng)
+    };
+    arcGames[roomCode] = g;
+    room.status = 'arc_playing';
+    arcEmit(room, roomCode);
+    io.to(roomCode).emit('arc_names', { names: arcNamesFor(g) });
+    arcNextRound(room, roomCode);
+};
+const _arcBuildRoundD = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (!g.daily || g.game !== 'pixel') return _arcBuildRoundD(g);
+    while (g.dailyPtr < g.dailyList.length && g.dailyPtr < 60) {
+        const c = g.dailyList[g.dailyPtr++];
+        const url = await arcCharImage(c.u, c.raw);
+        if (url && await arcUsableImage(url)) return { u: c.u, targets: [c], img: arcToken(url), answer: c.display };
+    }
+    return null;
+};
+
+async function dailyRecord(game, players, scoreOf) {
+    const day = dailyKey();
+    for (const p of players) {
+        if (!p.userId) continue;
+        const { score, attempts } = scoreOf(p);
+        try {
+            if (HAS_DB) {
+                await pool.query('INSERT INTO daily_results (day, game, user_id, pseudo, score, attempts) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING',
+                    [day, game, p.userId, p.name, Math.round(score || 0), attempts ?? null]);
+            } else if (!PROG_MEM.daily.some(d => d.day === day && d.game === game && d.user_id === p.userId)) {
+                PROG_MEM.daily.push({ day, game, user_id: p.userId, pseudo: p.name, score: Math.round(score || 0), attempts, created_at: Date.now() });
+            }
+        } catch (_) {}
+    }
+}
+
+app.get('/api/daily', async (req, res) => {
+    const info = dailyInfo();
+    const uid = authUserId(req);
+    const boards = {};
+    const played = {};
+    for (const game of ['dle', 'blindtest', 'pixel']) {
+        let rows = [];
+        const order = game === 'dle' ? (a, b) => (a.attempts - b.attempts) || (a.t - b.t) : (a, b) => (b.score - a.score) || (a.t - b.t);
+        if (HAS_DB) {
+            try {
+                rows = (await pool.query(`SELECT user_id, pseudo, score, attempts, extract(epoch from created_at) AS t FROM daily_results WHERE day=$1 AND game=$2`, [info.day, game])).rows
+                    .map(r => ({ ...r, t: +r.t }));
+            } catch (_) {}
+        } else rows = PROG_MEM.daily.filter(d => d.day === info.day && d.game === game).map(d => ({ ...d, t: d.created_at }));
+        rows.sort(order);
+        boards[game] = rows.slice(0, 15).map(r => ({ pseudo: r.pseudo, score: r.score, attempts: r.attempts }));
+        const mine = uid ? rows.find(r => r.user_id === uid) : null;
+        played[game] = mine ? { score: mine.score, attempts: mine.attempts, rank: rows.indexOf(mine) + 1, total: rows.length } : null;
+    }
+    const now = new Date();
+    const paris = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    const msToMidnight = (24 * 3600 - (paris.getHours() * 3600 + paris.getMinutes() * 60 + paris.getSeconds())) * 1000;
+    res.json({ ok: true, ...info, boards, played, nextInMs: msToMidnight });
+});
+
+
+/* =====================================================================
+   SALONS GÉANTS + RÉACTIONS
+   ===================================================================== */
+const _publicRoomMaxR = publicRoomMax;
+publicRoomMax = function (room) {
+    if (room.mode === 'arcade' || room.mode === 'blindtest' || room.mode === 'quote') return 50;
+    return _publicRoomMaxR(room);
+};
+const REACTIONS = ['😂', '🔥', '😭', '😱', '👏', '💀', '❤️', '🤯', '😎', '🐐'];
+const reactionLast = new Map();
+io.on('connection', socket => {
+    socket.on('reaction', ({ roomCode, emoji } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !REACTIONS.includes(emoji)) return;
+        const p = room.players.find(x => x.id === socket.id);
+        if (!p) return;
+        const now = Date.now();
+        if (now - (reactionLast.get(socket.id) || 0) < 600) return;
+        reactionLast.set(socket.id, now);
+        io.to(roomCode).emit('reaction', { name: p.name, emoji, id: socket.id });
+    });
+    socket.on('disconnect', () => reactionLast.delete(socket.id));
+});
+
+/* =====================================================================
+   NOUVEAUX MINI-JEUX : Imposteur, Écoute la scène, Chrono-quiz, Draft 5v5
+   ===================================================================== */
+ARC_GAMES.imposteur = { label: 'Imposteur', icon: '🕵️', universe: false, rounds: 10, roundMs: 20000, answer: 'choice' };
+ARC_GAMES.audio     = { label: 'Écoute la scène', icon: '🎧', universe: false, rounds: 10, roundMs: 22000, answer: 'choice' };
+ARC_GAMES.chrono    = { label: 'Chrono-quiz', icon: '⏱️', universe: false, rounds: 1, roundMs: 60000, answer: 'chrono' };
+ARC_GAMES.draft     = { label: 'Draft 5v5', icon: '🃏', universe: true, rounds: 1, roundMs: 3600000, answer: 'draft' };
+ARC_GAMES.tournoi   = { label: 'Tournoi', icon: '🏆', universe: false, rounds: 3, roundMs: 20000, answer: 'choice' };
+
+// Recherche d'images en parallèle (plus rapide pour le draft)
+async function arcFindCharactersFast(g, u, count, maxTries) {
+    const cands = arcShuffle(arcFamous(u)).filter(c => !g.used.has(u + '|' + c.display)).slice(0, maxTries);
+    const out = [];
+    for (let i = 0; i < cands.length && out.length < count; i += 6) {
+        const batch = await Promise.all(cands.slice(i, i + 6).map(async c => {
+            const url = await arcCharImage(u, c.raw);
+            return url && await arcUsableImage(url) ? { ...c, u, url } : null;
+        }));
+        batch.filter(Boolean).forEach(c => { if (out.length < count) { out.push(c); g.used.add(u + '|' + c.display); } });
+    }
+    return out;
+}
+
+const _arcBuildRoundN = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game === 'imposteur') {
+        const us = arcShuffle(arcUniverses());
+        for (let k = 0; k + 1 < us.length && k < 8; k += 2) {
+            const [main, other] = [us[k], us[k + 1]];
+            const three = await arcFindCharacters(g, main, 3, 9);
+            if (three.length < 3) continue;
+            const [odd] = await arcFindCharacters(g, other, 1, 5);
+            if (!odd) continue;
+            const all = arcShuffle([...three, odd]);
+            return {
+                imgs: all.map(c => arcToken(c.url)),
+                names: all.map(c => c.display),
+                answer: odd.display,
+                choices: all.map(c => c.display),
+                place: `${odd.display} vient de ${ARC_UNIVERSE_ANIME[other]} — les 3 autres de ${ARC_UNIVERSE_ANIME[main]}`
+            };
+        }
+        return null;
+    }
+    if (g.game === 'audio') {
+        // mêmes clips que Scene Guessr, mais on n'entend que le son
+        const saved = g.game; g.game = 'scene';
+        const pr = _arcBuildRoundN(g);
+        g.game = saved;
+        return pr;
+    }
+    if (g.game === 'chrono') return { chrono: true, answer: null };
+    if (g.game === 'draft') {
+        const n = Math.max(1, g.playerCount || 2);
+        const size = Math.min(40, n * 5 + 6);
+        const pool = [];
+        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(arcUniverses());
+        if (us.length === 1) pool.push(...await arcFindCharactersFast(g, us[0], size, Math.min(arcFamous(us[0]).length, size + 20)));
+        else for (const u of us) { if (pool.length >= size) break; pool.push(...await arcFindCharactersFast(g, u, 2, 5)); }
+        if (pool.length < Math.min(size, n * 3)) return null;
+        return { draftPool: pool.slice(0, size).map(c => ({ name: c.display, u: c.u, img: arcToken(c.url) })), answer: null };
+    }
+    return _arcBuildRoundN(g);
+};
+
+// --- Chrono-quiz : chacun sa série de questions pendant 60 s ---
+function chronoQuestion() {
+    const us = arcUniverses();
+    const u = arcPick(us);
+    const c = arcPick(arcFamous(u).slice(0, 30));
+    const id = ARC_CRYPTO.randomBytes(4).toString('hex');
+    if (Math.random() < 0.6) {
+        const answer = ARC_UNIVERSE_ANIME[u];
+        const wrong = arcShuffle(Object.values(ARC_UNIVERSE_ANIME).filter(a => a !== answer)).slice(0, 3);
+        return { id, text: `${c.display} vient de quel anime ?`, choices: arcShuffle([answer, ...wrong]), answer };
+    }
+    const others = arcShuffle(us.filter(x => x !== u)).slice(0, 3).map(x => arcPick(arcFamous(x).slice(0, 30)).display);
+    return { id, text: `Quel perso vient de ${ARC_UNIVERSE_ANIME[u]} ?`, choices: arcShuffle([c.display, ...others]), answer: c.display };
+}
+function chronoSend(roomCode, g, pid) {
+    const st = g.chrono[pid];
+    if (!st) return;
+    io.to(pid).emit('arc_chrono_q', { id: st.q.id, text: st.q.text, choices: st.q.choices, correct: st.correct, streak: st.streak });
+}
+const _arcNextRoundN = arcNextRound;
+arcNextRound = async function (room, roomCode) {
+    const g0 = arcGames[roomCode];
+    if (g0) g0.playerCount = room.players.length;
+    await _arcNextRoundN(room, roomCode);
+    const g = arcGames[roomCode];
+    if (!g || g.phase !== 'playing') return;
+    if (g.game === 'chrono' && g.current?.chrono) {
+        g.chrono = {};
+        room.players.forEach(p => { g.chrono[p.id] = { q: chronoQuestion(), correct: 0, streak: 0, total: 0 }; chronoSend(roomCode, g, p.id); });
+    }
+    if (g.game === 'draft' && g.current?.draftPool) draftStart(room, roomCode, g);
+};
+
+// --- Draft 5v5 : chacun son tour on compose une équipe, puis on vote pour la meilleure ---
+const DRAFT_PICK_MS = 20000, DRAFT_VOTE_MS = 40000;
+function draftStart(room, roomCode, g) {
+    if (g.timer) clearTimeout(g.timer);
+    const players = room.players.map(p => p.id);
+    const per = Math.min(5, Math.floor(g.current.draftPool.length / Math.max(1, players.length)));
+    const order = [];
+    for (let r = 0; r < per; r++) (r % 2 ? players.slice().reverse() : players).forEach(id => order.push(id));
+    g.draft = { order, turn: 0, per, picks: Object.fromEntries(players.map(id => [id, []])), taken: {}, phase: 'pick', votes: {}, endsAt: 0 };
+    draftNextTurn(room, roomCode, g);
+}
+function draftNextTurn(room, roomCode, g) {
+    const d = g.draft;
+    if (g.timer) clearTimeout(g.timer);
+    // saute les joueurs partis
+    while (d.turn < d.order.length && !room.players.some(p => p.id === d.order[d.turn])) d.turn++;
+    if (d.turn >= d.order.length) return draftVote(room, roomCode, g);
+    d.endsAt = Date.now() + DRAFT_PICK_MS;
+    const turn = d.turn;
+    g.timer = setTimeout(() => {
+        if (g.dead || !g.draft || d.turn !== turn || d.phase !== 'pick') return;
+        const free = g.current.draftPool.map((c, i) => i).filter(i => d.taken[i] === undefined);
+        if (free.length) draftPick(room, roomCode, g, d.order[d.turn], arcPick(free));
+    }, DRAFT_PICK_MS + 200);
+    arcEmit(room, roomCode);
+}
+function draftPick(room, roomCode, g, pid, idx) {
+    const d = g.draft;
+    if (!d || d.phase !== 'pick' || d.order[d.turn] !== pid || d.taken[idx] !== undefined || !g.current.draftPool[idx]) return;
+    d.taken[idx] = pid;
+    (d.picks[pid] = d.picks[pid] || []).push(idx);
+    d.turn++;
+    draftNextTurn(room, roomCode, g);
+}
+function draftVote(room, roomCode, g) {
+    const d = g.draft;
+    if (room.players.length < 2) return draftEnd(room, roomCode, g);
+    d.phase = 'vote';
+    d.endsAt = Date.now() + DRAFT_VOTE_MS;
+    if (g.timer) clearTimeout(g.timer);
+    g.timer = setTimeout(() => { if (!g.dead && g.draft && d.phase === 'vote') draftEnd(room, roomCode, g); }, DRAFT_VOTE_MS + 200);
+    arcEmit(room, roomCode);
+}
+function draftEnd(room, roomCode, g) {
+    const d = g.draft;
+    d.phase = 'done';
+    const count = {};
+    Object.values(d.votes).forEach(t => { count[t] = (count[t] || 0) + 1; });
+    d.count = count;
+    g.gainedRound = {};
+    room.players.forEach(p => { const pts = (count[p.id] || 0) * 100; g.scores[p.id] = (g.scores[p.id] || 0) + pts; g.gainedRound[p.id] = pts; });
+    const best = Math.max(0, ...Object.values(count));
+    g.current.answer = best ? room.players.filter(p => (count[p.id] || 0) === best).map(p => 'Équipe de ' + p.name).join(' & ') : 'Aucun vote';
+    g.answers = Object.fromEntries(room.players.map(p => [p.id, { correct: (count[p.id] || 0) === best && best > 0 }]));
+    arcReveal(room, roomCode);
+}
+
+io.on('connection', socket => {
+    socket.on('arc_chrono', ({ roomCode, id, choice } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'chrono' || g.phase !== 'playing' || !g.chrono) return;
+        const st = g.chrono[socket.id];
+        if (!st || st.q.id !== id) return;
+        st.total++;
+        const ok = choice === st.q.answer;
+        if (ok) {
+            st.correct++; st.streak++;
+            const pts = 10 + Math.min(10, (st.streak - 1) * 2);
+            g.scores[socket.id] = (g.scores[socket.id] || 0) + pts;
+            g.gainedRound[socket.id] = (g.gainedRound[socket.id] || 0) + pts;
+        } else st.streak = 0;
+        socket.emit('arc_feedback', { ok, message: ok ? `✅ +${10 + Math.min(10, (st.streak - 1) * 2)}${st.streak >= 3 ? ` • série x${st.streak} 🔥` : ''}` : `❌ C'était ${st.q.answer}` });
+        st.q = chronoQuestion();
+        chronoSend(roomCode, g, socket.id);
+        const now = Date.now();
+        if (now - (g.chronoEmit || 0) > 700) { g.chronoEmit = now; arcEmit(room, roomCode); }
+    });
+    socket.on('arc_draft_pick', ({ roomCode, idx } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'draft' || !g.draft) return;
+        draftPick(room, roomCode, g, socket.id, Number(idx));
+    });
+    socket.on('arc_draft_vote', ({ roomCode, target } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'draft' || !g.draft || g.draft.phase !== 'vote') return;
+        if (!room.players.some(p => p.id === socket.id) || !room.players.some(p => p.id === target)) return;
+        if (target === socket.id && room.players.length > 2) return; // on ne vote pas pour soi (sauf à 2)
+        g.draft.votes[socket.id] = target;
+        const connected = room.players.filter(p => !p.disconnected);
+        if (connected.every(p => g.draft.votes[p.id])) draftEnd(room, roomCode, g);
+        else arcEmit(room, roomCode);
+    });
+});
+
+/* =====================================================================
+   TOURNOI : plusieurs épreuves à la suite, le dernier est éliminé à chaque fois
+   ===================================================================== */
+const TOUR_POOL = ['emoji', 'quatre', 'scene', 'link', 'imposteur', 'popularite', 'pixel', 'silhouette', 'audio', 'mapguess'];
+const _startArcadeT = startArcade;
+startArcade = function (room, roomCode) {
+    if (!String(room.subMode || '').startsWith('tournoi')) return _startArcadeT(room, roomCode);
+    arcStop(roomCode);
+    const games = arcShuffle(TOUR_POOL).slice(0, 5);
+    const per = room.arcRounds && room.arcRounds > 0 ? Math.min(room.arcRounds, 10) : 3;
+    const g = {
+        game: games[0], universe: 'all', round: 0, totalRounds: per, phase: 'loading',
+        current: null, answers: {}, found: {}, gainedRound: {},
+        scores: Object.fromEntries(room.players.map(p => [p.id, 0])),
+        used: new Set(), usedU: [], lastGuess: {},
+        tour: { games, idx: 0, per, eliminated: [] }
+    };
+    arcGames[roomCode] = g;
+    room.status = 'arc_playing';
+    arcEmit(room, roomCode);
+    io.to(roomCode).emit('arc_names', { names: arcNamesFor(g) });
+    arcNextRound(room, roomCode);
+};
+const _arcPlayerDoneT = arcPlayerDone;
+arcPlayerDone = function (g, pid) {
+    if (g.tour && g.tour.eliminated.includes(pid)) return true;
+    return _arcPlayerDoneT(g, pid);
+};
+const _arcFinishT = arcFinish;
+arcFinish = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g || !g.tour || g.message || g.tour.idx >= g.tour.games.length - 1) return _arcFinishT(room, roomCode);
+    // Fin d'une épreuve : classement, élimination du dernier, puis épreuve suivante
+    arcClearTimers(g);
+    const alive = room.players.filter(p => !g.tour.eliminated.includes(p.id));
+    let out = null;
+    if (alive.length > 2) {
+        const min = Math.min(...alive.map(p => g.scores[p.id] || 0));
+        const last = alive.filter(p => (g.scores[p.id] || 0) === min);
+        if (last.length === 1) { out = last[0]; g.tour.eliminated.push(out.id); }
+    }
+    g.phase = 'intermission';
+    g.tour.lastOut = out ? out.name : null;
+    g.tour.nextLabel = ARC_GAMES[g.tour.games[g.tour.idx + 1]]?.label;
+    g.revealEndsAt = Date.now() + 8000;
+    arcEmit(room, roomCode);
+    g.timer = setTimeout(() => {
+        if (g.dead || arcGames[roomCode] !== g) return;
+        g.tour.idx++;
+        g.game = g.tour.games[g.tour.idx];
+        g.round = 0;
+        g.totalRounds = g.tour.per;
+        g.nextPromise = null;
+        g.current = null;
+        io.to(roomCode).emit('arc_names', { names: arcNamesFor(g) });
+        arcNextRound(room, roomCode);
+    }, 8000);
+};
+const _arcPublicT = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicT(room, g);
+    if (g.tour) {
+        out.tour = {
+            idx: g.tour.idx, total: g.tour.games.length, games: g.tour.games.map(k => ARC_GAMES[k]?.label || k),
+            eliminated: room.players.filter(p => g.tour.eliminated.includes(p.id)).map(p => p.id),
+            lastOut: g.tour.lastOut || null, nextLabel: g.tour.nextLabel || null
+        };
+        out.players.forEach(p => { p.eliminated = g.tour.eliminated.includes(p.id); });
+        out.gameLabel = `Tournoi • ${ARC_GAMES[g.game]?.label || ''}`;
+    }
+    if (g.game === 'imposteur' && g.current?.names && g.phase !== 'loading') {
+        out.stage.imgs = g.current.imgs; out.stage.names = g.current.names;
+        if (out.reveal) out.reveal.items = [];
+    }
+    if (g.game === 'audio' && g.current?.video) { out.stage.audio = true; }
+    if (g.game === 'chrono' && g.chrono) out.players.forEach(p => { p.progress = g.chrono[p.id]?.correct || 0; p.done = false; });
+    if (g.game === 'draft' && g.draft && g.current?.draftPool) {
+        const d = g.draft;
+        out.stage.draft = {
+            pool: g.current.draftPool.map((c, i) => ({ name: c.name, img: c.img, anime: ARC_UNIVERSE_ANIME[c.u], takenBy: d.taken[i] ?? null })),
+            picks: d.picks, per: d.per, phase: d.phase,
+            turnId: d.phase === 'pick' ? d.order[d.turn] || null : null,
+            endsAt: d.endsAt, votedCount: Object.keys(d.votes).length,
+            count: d.phase === 'done' ? d.count : null
+        };
+    }
+    return out;
+};
+const _arcSendToT = arcSendTo;
+arcSendTo = function (socket, room, roomCode) {
+    const ok = _arcSendToT(socket, room, roomCode);
+    const g = arcGames[roomCode];
+    if (ok && g && g.game === 'chrono' && g.chrono && g.phase === 'playing') {
+        if (!g.chrono[socket.id]) g.chrono[socket.id] = { q: chronoQuestion(), correct: 0, streak: 0, total: 0 };
+        chronoSend(roomCode, g, socket.id);
+    }
+    return ok;
+};
+const _arcRemapT = arcRemap;
+arcRemap = function (roomCode, oldId, newId) {
+    _arcRemapT(roomCode, oldId, newId);
+    const g = arcGames[roomCode];
+    if (!g || oldId === newId) return;
+    if (g.chrono && g.chrono[oldId]) { g.chrono[newId] = g.chrono[oldId]; delete g.chrono[oldId]; }
+    if (g.tour) g.tour.eliminated = g.tour.eliminated.map(x => x === oldId ? newId : x);
+    if (g.draft) {
+        const d = g.draft;
+        d.order = d.order.map(x => x === oldId ? newId : x);
+        if (d.picks[oldId]) { d.picks[newId] = d.picks[oldId]; delete d.picks[oldId]; }
+        Object.keys(d.taken).forEach(k => { if (d.taken[k] === oldId) d.taken[k] = newId; });
+        if (d.votes[oldId]) { d.votes[newId] = d.votes[oldId]; delete d.votes[oldId]; }
+        Object.keys(d.votes).forEach(k => { if (d.votes[k] === oldId) d.votes[k] = newId; });
+    }
+};
+// Tournoi : un joueur éliminé ne marque plus de points
+const _arcRevealT = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.tour && g.phase === 'playing') {
+        g.tour.eliminated.forEach(pid => {
+            const gained = g.gainedRound[pid] || 0;
+            if (gained) { g.scores[pid] = (g.scores[pid] || 0) - gained; g.gainedRound[pid] = 0; }
+        });
+    }
+    return _arcRevealT(room, roomCode);
+};

@@ -425,6 +425,89 @@
         .bb-card.bb-op img{object-position:center;}
         .bb-play{position:absolute;top:10px;right:10px;z-index:3;background:rgba(0,0,0,.75);color:#fff;border:1px solid var(--accent-cyan);border-radius:99px;padding:6px 12px;font-weight:800;cursor:pointer;font-size:.8rem;}
         .bb-video{position:absolute;inset:0 0 70px 0;width:100%;height:calc(100% - 70px);border:0;z-index:2;}
+
+        /* ===== Défi du jour, progression, réactions, streamer, thème ===== */
+        .daily-card{background:linear-gradient(135deg,rgba(0,240,255,.14),rgba(255,230,0,.08));border:2px solid var(--accent-cyan);border-radius:12px;padding:16px;margin-bottom:18px;text-align:left;}
+        .daily-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+        .daily-head h3{color:var(--accent-yellow);margin:0;}
+        #daily-countdown{font-size:.75rem;color:var(--text-muted);}
+        .daily-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+        .daily-btn{display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:#11111a;border:1px solid #34344a;color:#fff;border-radius:10px;padding:10px;cursor:pointer;text-align:left;}
+        .daily-btn:hover{border-color:var(--accent-cyan);}
+        .daily-btn span{font-size:.72rem;color:var(--text-muted);}
+        .daily-btn.done{border-color:#00ff88;}
+        .daily-btn.done span{color:#00ff88;}
+        .daily-rank-btn{margin-top:10px;background:none;border:1px solid var(--accent-yellow);color:var(--accent-yellow);border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer;}
+        .daily-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:10px;}
+        .daily-col b{display:block;margin-bottom:6px;color:var(--accent-cyan);}
+        .daily-row{display:flex;justify-content:space-between;gap:8px;font-size:.8rem;padding:6px 8px;border-radius:6px;background:#101018;margin-bottom:4px;}
+        .daily-row.me{border:1px solid var(--accent-yellow);}
+        @media (max-width:560px){.daily-grid{grid-template-columns:1fr;}}
+        .opt-panel{max-width:520px;margin:20px auto 0;background:var(--panel-color);padding:20px;border-radius:8px;}
+        .prog-level{display:flex;justify-content:space-between;font-weight:800;}
+        .prog-level b{color:var(--accent-yellow);font-size:1.3rem;}
+        .prog-bar{height:12px;background:#1b1b28;border-radius:99px;overflow:hidden;margin:6px 0;}
+        .prog-bar div{height:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));}
+        .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;}
+        .badge{background:#101018;border:1px solid #2f2f46;border-radius:8px;padding:8px;opacity:.45;}
+        .badge.on{opacity:1;border-color:var(--accent-yellow);}
+        .badge b{display:block;font-size:.78rem;}
+        .badge small{font-size:.68rem;color:var(--text-muted);}
+        .lb-select{width:100%;background:#0d0d15;color:#fff;border:1px solid #34344a;border-radius:8px;padding:8px;}
+        .invite-btn{display:block;margin:0 auto 10px;background:none;border:1px dashed var(--accent-cyan);color:var(--accent-cyan);border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
+        #fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+        #fx-toasts{position:fixed;top:70px;right:12px;z-index:9998;display:flex;flex-direction:column;gap:8px;max-width:300px;}
+        .fx-toast{background:#161622;border:2px solid var(--accent-cyan);border-radius:10px;padding:10px 14px;font-size:.85rem;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:arcPop .3s ease-out;transition:opacity .5s,transform .5s;}
+        .fx-toast.out{opacity:0;transform:translateX(30px);}
+        #fx-reactions{position:fixed;left:0;right:0;bottom:0;height:60vh;pointer-events:none;z-index:9997;overflow:hidden;}
+        .fx-react{position:absolute;bottom:60px;display:flex;flex-direction:column;align-items:center;animation:fxUp 2.8s ease-out forwards;}
+        .fx-react .e{font-size:2.4rem;}
+        .fx-react .n{font-size:.65rem;font-weight:800;background:rgba(0,0,0,.6);border-radius:99px;padding:1px 6px;}
+        @keyframes fxUp{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-30px) scale(1.1)}100%{transform:translateY(-45vh) scale(1);opacity:0}}
+        #fx-react-bar{position:fixed;left:10px;bottom:10px;z-index:9996;gap:4px;background:rgba(22,22,34,.92);border:1px solid #34344a;border-radius:99px;padding:4px 8px;flex-wrap:wrap;max-width:calc(100vw - 20px);}
+        #fx-react-bar button{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px 4px;transition:transform .1s;}
+        #fx-react-bar button:active{transform:scale(1.3);}
+        #fx-share{position:fixed;inset:0;z-index:9995;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:16px;}
+        .fx-share-card{background:#161622;border:2px solid var(--accent-yellow);border-radius:14px;padding:18px;max-width:420px;width:100%;}
+        .fx-share-card h3{color:var(--accent-yellow);margin:0 0 8px;}
+        .fx-share-card pre{white-space:pre-wrap;background:#0d0d15;border-radius:8px;padding:10px;font-size:.85rem;line-height:1.4;}
+        #stream-widget{position:fixed;top:70px;left:12px;z-index:9990;width:260px;background:rgba(22,22,34,.95);border:2px solid #9146FF;border-radius:12px;padding:10px;}
+        .sv-head{font-weight:800;color:#bf94ff;margin-bottom:6px;}
+        .sv-row{position:relative;display:flex;justify-content:space-between;gap:6px;background:#101018;border-radius:6px;padding:6px 8px;margin-bottom:4px;font-size:.78rem;overflow:hidden;}
+        .sv-row span,.sv-row b{position:relative;z-index:1;}
+        .sv-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(145,70,255,.35);transition:width .3s;}
+        .sv-row.good{outline:2px solid #00ff88;}
+        .chrono-top{display:flex;justify-content:space-between;font-weight:800;color:var(--accent-yellow);margin-bottom:8px;}
+        .chrono-q{font-family:'Bangers',cursive;font-size:clamp(1.4rem,4vw,2rem);text-align:center;margin:8px 0 4px;}
+        .draft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;}
+        .draft-card{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;border:2px solid #2c2c44;background:#0b0b12;}
+        .draft-card img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .draft-card .draft-name{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:.62rem;font-weight:800;padding:12px 3px 3px;text-align:center;}
+        .draft-card.pickable{cursor:pointer;border-color:var(--accent-cyan);}
+        .draft-card.pickable:hover{transform:translateY(-2px);}
+        .draft-card.taken{opacity:.35;}
+        .draft-teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:12px;}
+        .draft-team{background:#101018;border:1px solid #2f2f46;border-radius:10px;padding:8px;}
+        .draft-team.turn{border-color:var(--accent-yellow);}
+        .draft-team-head{font-weight:800;font-size:.82rem;margin-bottom:6px;}
+        .draft-team-row{display:flex;gap:4px;flex-wrap:wrap;}
+        .draft-mini{width:52px;text-align:center;}
+        .draft-mini img{width:52px;height:64px;object-fit:cover;object-position:top;border-radius:6px;}
+        .draft-mini span{display:block;font-size:.55rem;line-height:1.1;}
+        .arc-audio-veil{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(circle,#1d1d3a,#0b0b12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--accent-cyan);font-weight:800;}
+        /* Thème clair : inversion douce, en gardant les images et vidéos intactes */
+        html.light{filter:invert(1) hue-rotate(180deg);background:#fff;}
+        html.light img,html.light video,html.light iframe,html.light canvas,html.light .arc-emoji,html.light .fx-react .e,html.light #fx-react-bar button,html.light .bt-disc{filter:invert(1) hue-rotate(180deg);}
+        /* Mobile */
+        @media (max-width:560px){
+            .bt-choices{grid-template-columns:1fr;}
+            .bt-choice{padding:13px 10px;font-size:.92rem;}
+            .quote-card{padding:14px;}
+            .quote-scoreboard{grid-template-columns:repeat(2,minmax(0,1fr));}
+            .game-panel h2{font-size:1.4rem;}
+            #stream-widget{width:200px;top:auto;bottom:60px;}
+            #fx-toasts{right:8px;left:8px;max-width:none;}
+        }
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -546,6 +629,18 @@
                 </div>
             </div>
 
+            <div id="daily-card" class="daily-card">
+                <div class="daily-head"><h3>📅 Défi du jour</h3><span id="daily-countdown"></span></div>
+                <p style="margin:0 0 10px;font-size:.85rem;">Le même défi pour tout le monde • un seul essai compté • partage ton score !</p>
+                <div class="daily-grid">
+                    <button class="daily-btn" id="daily-btn-dle" onclick="startDaily('dle')"><b>🎴 AnimeDLE</b><span id="daily-dle-sub">…</span></button>
+                    <button class="daily-btn" id="daily-btn-bt" onclick="startDaily('blindtest')"><b>🎧 Blind test</b><span id="daily-bt-sub">5 musiques</span></button>
+                    <button class="daily-btn" id="daily-btn-px" onclick="startDaily('pixel')"><b>🖼️ Pixel</b><span id="daily-px-sub">5 persos</span></button>
+                </div>
+                <button class="daily-rank-btn" onclick="toggleDailyBoard()">🏆 Classement du jour</button>
+                <div id="daily-board" class="daily-board" style="display:none;"></div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
@@ -597,7 +692,17 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('link')"><span class="arc-ico">🔗</span><b>Common Link</b><span>4 persos → trouve leur point commun</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('popularite')"><span class="arc-ico">👥</span><b>Popularity Guess</b><span>Qui a le plus de fans ? (favoris MyAnimeList)</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('bac')"><span class="arc-ico">🔤</span><b>Petit bac anime</b><span>Une lettre, 5 catégories : anime, perso, Pokémon…</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#00ff88;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tournoi <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">5 épreuves de mini-jeux à la suite, points cumulés • le dernier est éliminé après chaque épreuve • jusqu'à 50 joueurs, parfait en live</p>
+                    <button class="btn-action" style="margin-top:0;background:#00ff88;color:#111;" onclick="createRoom('arcade','tournoi')">Créer un tournoi</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:var(--accent-yellow);">
@@ -704,6 +809,7 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
+            <button class="invite-btn" onclick="copyInviteLink()">🔗 Copier le lien d'invitation</button>
             <div id="room-rounds-box" class="room-rounds" style="display:none;">
                 <span>🔁 Nombre de manches :</span>
                 <select id="room-rounds-select" onchange="setArcRounds(this.value)">
@@ -1150,6 +1256,37 @@
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px;">Ton rang évolue après chaque partie classée : Bronze → Argent → Or → Platine → Diamant, puis un classement pur à l'ELO au-delà.</p>
 
             <button class="btn-action" style="background: var(--text-muted); margin-top: 15px;" onclick="logout()">Se déconnecter</button>
+        </div>
+
+        <div class="opt-panel">
+            <h2>⭐ Progression</h2>
+            <div id="prog-box"><p class="tl-hint">Chargement…</p></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>🏆 Classement</h2>
+            <div class="bb-tabs" style="justify-content:flex-start;">
+                <button class="lb-tab on" data-p="week" onclick="setLbPeriod('week')">Cette semaine</button>
+                <button class="lb-tab" data-p="all" onclick="setLbPeriod('all')">Depuis toujours</button>
+            </div>
+            <select id="lb-mode" class="lb-select" onchange="lbMode=this.value;loadLeaderboard()"><option value="">Tous les modes</option></select>
+            <div id="lb-box" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>🎥 Mode streamer</h2>
+            <p class="tl-hint" style="text-align:left;">Ton chat Twitch vote en direct pendant les blind tests, mini-jeux à choix et battles d'openings : les viewers tapent <b>!1</b>, <b>!2</b>, <b>!3</b> ou <b>!4</b>.</p>
+            <div class="chat-input-box" style="margin-top:10px;">
+                <input type="text" id="stream-channel" placeholder="Nom de ta chaîne (ex : jordan_jrc)">
+                <button class="btn-action" style="width:auto;margin-top:0;" onclick="streamConnect()">Connecter</button>
+            </div>
+            <button class="btn-action" style="background:#2a2a40;margin-top:8px;" onclick="streamDisconnect()">Désactiver</button>
+            <div id="stream-status" class="tl-hint" style="text-align:left;margin-top:8px;">Mode streamer désactivé.</div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>🎨 Apparence</h2>
+            <button id="theme-btn" class="btn-action" style="margin-top:6px;" onclick="toggleTheme()">☀️ Passer en clair</button>
         </div>
 
         <div style="max-width: 400px; margin: 20px auto 0; background: var(--panel-color); padding: 20px; border-radius: 8px;">
@@ -1642,6 +1779,7 @@
             arc_pixel:      { title:'🖼️ PIXEL ANIME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_popularite: { title:'👥 POPULARITY GUESS', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
         function openUniverseSelection(mode) {
@@ -3807,6 +3945,10 @@
             link:{ title:'🔗 COMMON LINK', sub:'Quel est le point commun entre ces 4 personnages ?', universe:false },
             popularite:{ title:'👥 POPULARITY GUESS', sub:'Qui a le plus de fans ? (nombre de favoris sur MyAnimeList)', universe:true },
             bac:{ title:'🔤 PETIT BAC ANIME', sub:'Un mot par catégorie qui commence par la lettre. Réponse unique = 10 pts, partagée = 5 pts', universe:false },
+            imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
+            audio:{ title:'🎧 ÉCOUTE LA SCÈNE', sub:"Pas d'image, juste le son d'une scène culte : de quel anime vient-elle ?", universe:false },
+            chrono:{ title:'⏱️ CHRONO-QUIZ', sub:'60 secondes pour enchaîner un max de bonnes réponses (bonus de série)', universe:false },
+            draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
@@ -3955,13 +4097,27 @@
 
         function arcRenderStage(q) {
             const stage = document.getElementById('arc-stage');
-            const key = q.game === 'scene' && q.stage && q.stage.video
-                ? `${q.round}|scene|${q.stage.video}`
+            const key = (q.game === 'scene' || q.game === 'audio') && q.stage && q.stage.video
+                ? `${q.round}|${q.game}|${q.stage.video}`
                 : `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}`;
             if (q.game === 'scene' && q.phase === 'reveal' && arcYt) { try { arcYt.unMute(); arcYt.setVolume(60); } catch (_) {} }
+            if (q.game === 'audio' && q.phase !== 'playing') { const v = document.querySelector('.arc-video .arc-audio-veil'); if (v) v.remove(); }
             if (q.phase === 'loading') {
                 if (arcStageKey !== 'loading') stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation de la manche…</div></div>';
                 arcStageKey = 'loading';
+                return;
+            }
+            if (q.game === 'chrono' || q.game === 'draft') {
+                if (arcRaf) { cancelAnimationFrame(arcRaf); arcRaf = null; }
+                arcStageKey = key + '|' + q.game;
+                if (q.game === 'chrono') arcRenderChrono(q, stage); else arcRenderDraft(q, stage);
+                return;
+            }
+            if (q.phase === 'intermission') {
+                if (arcStageKey === 'inter' + q.tour?.idx) return;
+                arcStageKey = 'inter' + q.tour?.idx;
+                arcDestroyVideo();
+                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:4rem;">🏁</div><div class="arc-ask">Fin de l'épreuve ${(q.tour?.idx || 0) + 1}/${q.tour?.total || ''}</div></div>`;
                 return;
             }
             if (key === arcStageKey) return;
@@ -3971,7 +4127,7 @@
             const reveal = q.phase !== 'playing';
             const st = q.stage || {};
 
-            if (q.game === 'link') {
+            if (q.game === 'link' || q.game === 'imposteur') {
                 stage.innerHTML = '';
                 const grid = document.createElement('div'); grid.className = 'arc-grid4';
                 (st.names || []).forEach((n, i) => {
@@ -4041,14 +4197,23 @@
                 stage.appendChild(grid);
                 return;
             }
-            if (q.game === 'scene' && st.video) {
+            if ((q.game === 'scene' || q.game === 'audio') && st.video) {
+                const audioOnly = q.game === 'audio';
                 stage.innerHTML = '';
                 const box = document.createElement('div'); box.className = 'arc-video';
                 const holder = document.createElement('div'); holder.id = 'arc-yt-' + q.round + '-' + st.video;
                 const shield = document.createElement('div'); shield.className = 'arc-video-shield';
                 const cover = document.createElement('div'); cover.className = 'arc-video-cover'; cover.innerHTML = '<div class="arc-spin"></div>';
-                const badge = document.createElement('div'); badge.className = 'arc-video-badge'; badge.textContent = '🔇 scène sans le son';
+                const badge = document.createElement('div'); badge.className = 'arc-video-badge'; badge.textContent = audioOnly ? '🎧 écoute bien…' : '🔇 scène sans le son';
                 box.append(holder, shield, cover, badge);
+                let veil = null;
+                if (audioOnly) {
+                    // voile opaque : on n'entend que le son (le toucher passe au lecteur pour lancer l'audio sur mobile)
+                    shield.remove();
+                    cover.style.pointerEvents = 'none';
+                    veil = document.createElement('div'); veil.className = 'arc-audio-veil'; veil.innerHTML = '<div style="font-size:3rem;">🎧</div><div id="arc-audio-hint">Chargement du son…</div>';
+                    box.appendChild(veil);
+                }
                 stage.appendChild(box);
                 const myKey = arcStageKey, round = q.round;
                 ytApi().then(YT => {
@@ -4056,9 +4221,10 @@
                     let seeked = false;
                     arcYt = new YT.Player(holder.id, {
                         videoId: st.video,
-                        playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1, iv_load_policy: 3, modestbranding: 1 },
+                        playerVars: { autoplay: 1, mute: audioOnly ? 0 : 1, controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1, iv_load_policy: 3, modestbranding: 1 },
                         events: {
-                            onReady: e => { e.target.mute(); e.target.playVideo(); },
+                            onReady: e => { if (audioOnly) { e.target.unMute(); e.target.setVolume(85); } else e.target.mute(); e.target.playVideo();
+                                if (audioOnly) setTimeout(() => { const h = document.getElementById('arc-audio-hint'); if (h && !seeked) h.textContent = '👆 Touche ici pour lancer le son'; }, 1800); },
                             onStateChange: e => {
                                 if (arcStageKey !== myKey || seeked || e.data !== YT.PlayerState.PLAYING) return;
                                 seeked = true;
@@ -4066,6 +4232,7 @@
                                 const elapsed = Math.max(0, arcNow() - arcState.startedAt) / 1000;
                                 e.target.seekTo(Math.min(dur - 3, dur * (st.frac || 0.4) + elapsed), true);
                                 setTimeout(() => cover.remove(), 700);
+                                const h = document.getElementById('arc-audio-hint'); if (h) h.textContent = 'Écoute bien…';
                             },
                             onError: () => { if (arcStageKey === myKey && arcState && arcState.phase === 'playing') socket.emit('arc_media_error', { roomCode: currentRoomCode, round }); }
                         }
@@ -4223,7 +4390,10 @@
             arcClock = q.serverNow - Date.now();
             const ui = ARC_UI[q.game] || {};
             document.getElementById('arc-title').textContent = ui.title || q.gameLabel;
-            document.getElementById('arc-subtitle').textContent = (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
+            document.getElementById('arc-subtitle').textContent = q.tour
+                ? `🏆 Tournoi • épreuve ${q.tour.idx + 1}/${q.tour.total} • ${ui.sub || ''}`
+                : (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
+            if (q.tour) document.getElementById('arc-title').textContent = '🏆 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
             document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds ?? '∞'}`;
             const arcEnd = document.getElementById('arc-end-infinite');
             if (arcEnd) arcEnd.style.display = q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none';
@@ -4240,9 +4410,10 @@
                 const row = document.createElement('div'); row.className = 'quote-score';
                 const name = document.createElement('span');
                 let mark = '';
-                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : q.answerType === 'bac' ? ` ${p.filled || 0}/5${p.done ? ' 🛑' : ''}` : (p.done ? ' ✔️' : ' …');
+                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : q.answerType === 'bac' ? ` ${p.filled || 0}/5${p.done ? ' 🛑' : ''}` : q.answerType === 'chrono' ? ` ✅ ${p.progress || 0}` : q.answerType === 'draft' ? '' : (p.done ? ' ✔️' : ' …');
                 else if (q.phase === 'reveal') mark = p.gained ? ` ✅ +${p.gained}` : ' ❌';
-                name.textContent = (p.offline ? '📡 ' : '') + p.name + mark;
+                name.textContent = (p.offline ? '📡 ' : '') + (p.eliminated ? '☠️ ' : '') + p.name + mark;
+                if (p.eliminated) row.style.opacity = '.5';
                 const sc = document.createElement('strong'); sc.style.color = 'var(--accent-yellow)'; sc.textContent = `${p.score} pts`;
                 row.append(name, sc); board.appendChild(row);
             });
@@ -4260,7 +4431,7 @@
                 q.choices.forEach(c => {
                     const b = document.createElement('button'); b.className = 'bt-choice'; b.textContent = c;
                     if (q.phase === 'playing') {
-                        b.disabled = !!me.done;
+                        b.disabled = !!me.done || !!me.eliminated;
                         if (arcState.__myChoice === c && me.done) b.classList.add('picked');
                         b.onclick = () => { arcState.__myChoice = c; arcMyChoice = c; socket.emit('arc_choice', { roomCode: currentRoomCode, choice: c }); b.classList.add('picked'); [...choices.children].forEach(x => x.disabled = true); };
                     } else {
@@ -4275,7 +4446,7 @@
                 }
             } else {
                 choices.style.display = 'none';
-                const typing = (q.answerType === 'text' || q.answerType === 'multi') && q.phase === 'playing' && !me.done;
+                const typing = (q.answerType === 'text' || q.answerType === 'multi') && q.phase === 'playing' && !me.done && !me.eliminated;
                 if (q.answerType === 'bac' || q.game === 'popularite') { inputWrap.style.display = 'none'; }
                 inputWrap.style.display = typing ? 'block' : 'none';
                 input.placeholder = q.answerType === 'multi' ? 'Un des 4 persos…' : 'Nom du personnage…';
@@ -4300,6 +4471,18 @@
 
             if (q.phase === 'loading') {
                 result.style.color = 'var(--text-muted)'; result.textContent = '';
+            } else if (q.phase === 'intermission') {
+                result.style.color = 'var(--accent-yellow)';
+                result.textContent = (q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : '');
+            } else if (q.phase === 'playing' && me.eliminated) {
+                result.style.color = 'var(--text-muted)'; result.textContent = '☠️ Tu es éliminé du tournoi… tu regardes la suite 👀';
+            } else if (q.phase === 'playing' && q.answerType === 'chrono') {
+                result.style.color = arcLastFeedback ? (arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)') : 'var(--text-color)';
+                result.textContent = arcLastFeedback ? arcLastFeedback.message : 'Réponds le plus vite possible : une mauvaise réponse casse ta série !';
+            } else if (q.phase === 'playing' && q.answerType === 'draft') {
+                const d = q.stage.draft || {};
+                result.style.color = 'var(--accent-cyan)';
+                result.textContent = d.phase === 'vote' ? `🗳️ Votez pour la meilleure équipe (${d.votedCount || 0}/${q.players.length} votes)` : (d.turnId === socket.id ? '🎯 À toi de choisir un perso !' : `⏳ ${((q.players.find(p => p.id === d.turnId) || {}).name) || '…'} choisit…`);
             } else if (q.phase === 'playing') {
                 if (me.done) { result.style.color = 'var(--accent-cyan)'; result.textContent = arcLastFeedback?.ok ? arcLastFeedback.message + ' — attends les autres…' : 'Réponse envoyée, attends les autres…'; }
                 else if (arcLastFeedback) { result.style.color = arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = arcLastFeedback.message; }
@@ -4311,8 +4494,9 @@
                 result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
                 const bits = [];
                 if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
-                if (q.reveal?.place) bits.push('📍 ' + q.reveal.place);
-                if (q.reveal?.song) bits.push(q.game === 'scene' ? q.reveal.song : '🎶 ' + q.reveal.song);
+                if (q.reveal?.place) bits.push(q.game === 'imposteur' ? q.reveal.place : '📍 ' + q.reveal.place);
+                if (q.reveal?.song) bits.push(q.game === 'scene' || q.game === 'audio' ? q.reveal.song : '🎶 ' + q.reveal.song);
+                if (q.answerType === 'chrono') result.textContent = `⏱️ Temps écoulé ! Tu marques ${me.gained || 0} pts (${me.progress || 0} bonnes réponses)`;
                 extra.textContent = bits.join(' • ');
             } else {
                 if (q.message) { result.style.color = 'var(--accent-pink)'; result.textContent = q.message; }
@@ -4328,6 +4512,7 @@
 
             if (!arcTick) arcTick = setInterval(arcTickFn, 200);
             arcTickFn();
+            if (typeof arcAfterRender === 'function') arcAfterRender(q, me);
         }
         let arcMyChoice = null;
 
@@ -4838,9 +5023,458 @@
             }
         }
 
+
+        /* ===================== CHRONO-QUIZ ===================== */
+        let arcChronoQ = null, arcChronoSent = null;
+        socket.on('arc_chrono_q', q => {
+            arcChronoQ = q; arcChronoSent = null;
+            if (arcState && arcState.game === 'chrono') arcRenderChrono(arcState, document.getElementById('arc-stage'));
+        });
+        function arcRenderChrono(q, stage) {
+            if (q.phase !== 'playing') {
+                const me = q.players.find(p => p.id === socket.id) || {};
+                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:3.5rem;">⏱️</div><div class="arc-ask">${me.progress || 0} bonne(s) réponse(s)</div></div>`;
+                return;
+            }
+            const cq = arcChronoQ;
+            if (!cq) { stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div></div>'; return; }
+            if (stage.__qid === cq.id) return;
+            stage.__qid = cq.id;
+            stage.innerHTML = '';
+            const box = document.createElement('div'); box.style.cssText = 'width:100%;max-width:620px;';
+            const top = document.createElement('div'); top.className = 'chrono-top';
+            top.innerHTML = `<span>✅ ${cq.correct}</span><span>${cq.streak >= 2 ? '🔥 série x' + cq.streak : ''}</span>`;
+            const t = document.createElement('div'); t.className = 'chrono-q'; t.textContent = cq.text;
+            const grid = document.createElement('div'); grid.className = 'bt-choices';
+            cq.choices.forEach(c => {
+                const b = document.createElement('button'); b.className = 'bt-choice'; b.textContent = c;
+                b.onclick = () => {
+                    if (arcChronoSent === cq.id) return;
+                    arcChronoSent = cq.id;
+                    b.classList.add('picked');
+                    socket.emit('arc_chrono', { roomCode: currentRoomCode, id: cq.id, choice: c });
+                };
+                grid.appendChild(b);
+            });
+            box.append(top, t, grid);
+            stage.appendChild(box);
+        }
+
+        /* ===================== DRAFT 5V5 ===================== */
+        function arcRenderDraft(q, stage) {
+            const d = q.stage && q.stage.draft;
+            if (!d) { stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation des cartes…</div></div>'; return; }
+            const names = Object.fromEntries(q.players.map(p => [p.id, p.name]));
+            const key = JSON.stringify([d.phase, d.turnId, Object.values(d.picks).map(x => x.length), d.votedCount, !!d.count, q.phase]);
+            if (stage.__dkey === key) return;
+            stage.__dkey = key;
+            stage.innerHTML = '';
+            const wrap = document.createElement('div'); wrap.style.width = '100%';
+            if (d.phase === 'pick') {
+                const grid = document.createElement('div'); grid.className = 'draft-grid';
+                const myTurn = d.turnId === socket.id;
+                d.pool.forEach((c, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'draft-card' + (c.takenBy ? ' taken' : '') + (myTurn && !c.takenBy ? ' pickable' : '');
+                    card.innerHTML = `<img src="${c.img}" alt=""><div class="draft-name"></div>`;
+                    card.querySelector('.draft-name').textContent = c.takenBy ? `${c.name} • ${names[c.takenBy] || ''}` : c.name;
+                    if (myTurn && !c.takenBy) card.onclick = () => { socket.emit('arc_draft_pick', { roomCode: currentRoomCode, idx: i }); card.classList.add('taken'); };
+                    grid.appendChild(card);
+                });
+                wrap.appendChild(grid);
+            }
+            const teams = document.createElement('div'); teams.className = 'draft-teams';
+            q.players.forEach(p => {
+                const t = document.createElement('div'); t.className = 'draft-team' + (d.turnId === p.id ? ' turn' : '');
+                const picks = (d.picks[p.id] || []).map(i => d.pool[i]).filter(Boolean);
+                const h = document.createElement('div'); h.className = 'draft-team-head';
+                const votes = d.count ? ` • ${d.count[p.id] || 0} vote(s)` : '';
+                h.textContent = `${p.name}${p.id === socket.id ? ' (toi)' : ''} — ${picks.length}/${d.per}${votes}`;
+                t.appendChild(h);
+                const row = document.createElement('div'); row.className = 'draft-team-row';
+                picks.forEach(c => { const im = document.createElement('div'); im.className = 'draft-mini'; im.innerHTML = `<img src="${c.img}" alt=""><span></span>`; im.querySelector('span').textContent = c.name; row.appendChild(im); });
+                t.appendChild(row);
+                if (d.phase === 'vote' && (p.id !== socket.id || q.players.length <= 2)) {
+                    const b = document.createElement('button'); b.className = 'btn-action'; b.style.cssText = 'margin:8px 0 0;padding:8px;'; b.textContent = '🗳️ Voter pour cette équipe';
+                    b.onclick = () => { socket.emit('arc_draft_vote', { roomCode: currentRoomCode, target: p.id }); document.querySelectorAll('.draft-team .btn-action').forEach(x => x.disabled = true); b.textContent = '✅ Vote envoyé'; };
+                    t.appendChild(b);
+                }
+                teams.appendChild(t);
+            });
+            wrap.appendChild(teams);
+            stage.appendChild(wrap);
+        }
+
+        /* ===================== APRÈS CHAQUE RENDU ARCADE : sons, confettis, stream, défi ===================== */
+        let arcFxKey = '';
+        function arcAfterRender(q, me) {
+            const k = q.round + '|' + q.phase;
+            if (k !== arcFxKey) {
+                arcFxKey = k;
+                if (q.phase === 'reveal' && q.answerType !== 'bac') {
+                    if (me.gained) fxGood(); else if (!me.eliminated) fxBad();
+                    if (dailyMode === 'pixel') dailyTrack.push(!!me.gained);
+                }
+                if (q.phase === 'finished' && !q.message) {
+                    if ((q.winnerNames || []).includes(me.name)) confetti();
+                    if (dailyMode === 'pixel') dailyShowShare('pixel', { score: me.score, marks: dailyTrack.slice() });
+                }
+            }
+            // Mode streamer : sondage du chat sur les réponses à choix
+            if (q.phase === 'playing' && q.answerType === 'choice' && q.choices) streamPoll('arc|' + q.round + '|' + q.game, q.choices);
+            else if (q.phase === 'reveal' && q.choices) streamPollReveal(q.answer);
+            else streamPoll(null);
+        }
+
+        /* ===================== EFFETS : sons + confettis + toasts ===================== */
+        function fxGood() { try { if (typeof sfxValide === 'function' && sfxOn) sfxValide(); } catch (_) {} }
+        function fxBad() { try { if (typeof sfxErreur === 'function' && sfxOn) sfxErreur(); } catch (_) {} }
+        function confetti(ms = 2600) {
+            const c = document.getElementById('fx-confetti');
+            if (!c) return;
+            const ctx = c.getContext('2d');
+            c.width = innerWidth; c.height = innerHeight; c.style.display = 'block';
+            const colors = ['#ffe600', '#00f0ff', '#ff2a5f', '#00ff88', '#ffffff'];
+            const parts = Array.from({ length: 160 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vx: (Math.random() - .5) * 4, vy: 2 + Math.random() * 4, r: 4 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - .5) * .3, col: colors[Math.floor(Math.random() * colors.length)] }));
+            const t0 = performance.now();
+            const step = t => {
+                ctx.clearRect(0, 0, c.width, c.height);
+                parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .05; p.a += p.va; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.col; ctx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); ctx.restore(); });
+                if (t - t0 < ms) requestAnimationFrame(step); else { ctx.clearRect(0, 0, c.width, c.height); c.style.display = 'none'; }
+            };
+            requestAnimationFrame(step);
+        }
+        function toast(html, color) {
+            const box = document.getElementById('fx-toasts');
+            if (!box) return;
+            const t = document.createElement('div'); t.className = 'fx-toast'; t.innerHTML = html;
+            if (color) t.style.borderColor = color;
+            box.appendChild(t);
+            setTimeout(() => t.classList.add('out'), 3600);
+            setTimeout(() => t.remove(), 4200);
+        }
+        socket.on('xp_gain', d => {
+            if (!d) return;
+            toast(`⭐ <b>+${d.xp} XP</b>`, 'var(--accent-cyan)');
+            (d.badges || []).forEach((b, i) => setTimeout(() => { toast(`🏅 Badge débloqué : <b>${b.name}</b><br><small>${b.desc}</small>`, 'var(--accent-yellow)'); confetti(1500); }, 600 + i * 900));
+        });
+
+        /* Confettis + sons dans les autres modes */
+        socket.on('bt_state', q => {
+            if (!q) return;
+            const me = (q.players || []).find(p => p.id === socket.id) || {};
+            const k = 'bt|' + q.round + '|' + q.phase;
+            if (window.__btFx === k) return;
+            window.__btFx = k;
+            if (q.phase === 'reveal') { if (me.correct) fxGood(); else fxBad(); if (dailyMode === 'blindtest') dailyTrack.push(!!me.correct); streamPollReveal(q.answer); }
+            if (q.phase === 'playing') streamPoll('bt|' + q.round + '|' + (q.key || ''), q.choices || []);
+            if (q.phase === 'finished') {
+                streamPoll(null);
+                if ((q.winnerNames || []).includes(me.name)) confetti();
+                if (dailyMode === 'blindtest') dailyShowShare('blindtest', { score: me.score, marks: dailyTrack.slice() });
+            }
+        });
+        socket.on('dle_state', room => {
+            const d = room && room.dle;
+            if (!d || !d.finished || window.__dleFx === d.targetName + d.guesses.length) return;
+            window.__dleFx = d.targetName + d.guesses.length;
+            if (d.winnerId === socket.id) { confetti(); fxGood(); }
+            if (dailyMode === 'dle') dailyShowShare('dle', { attempts: d.guesses.length, guesses: d.guesses, universe: d.universeName, won: d.winnerId === socket.id });
+        });
+        socket.on('rg_game_over', data => {
+            const w = data?.room?.rg?.winnerName;
+            if (w && currentUser && w === currentUser.pseudo) confetti();
+        });
+
+        /* ===================== DÉFI DU JOUR ===================== */
+        let dailyMode = null, dailyTrack = [], dailyData = null, dailyPendingStart = false;
+        async function loadDaily() {
+            try {
+                const r = await fetch('/api/daily', { headers: authToken ? { Authorization: 'Bearer ' + authToken } : {} });
+                dailyData = await r.json();
+            } catch (e) { return; }
+            const d = dailyData;
+            const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            set('daily-dle-sub', d.played?.dle ? `✅ ${d.played.dle.attempts} essais • #${d.played.dle.rank}` : `Univers : ${d.dleUniverseName}`);
+            set('daily-bt-sub', d.played?.blindtest ? `✅ ${d.played.blindtest.score} pts • #${d.played.blindtest.rank}` : '5 musiques');
+            set('daily-px-sub', d.played?.pixel ? `✅ ${d.played.pixel.score} pts • #${d.played.pixel.rank}` : '5 persos');
+            ['dle', 'bt', 'px'].forEach(k => { const b = document.getElementById('daily-btn-' + k); const g = { dle: 'dle', bt: 'blindtest', px: 'pixel' }[k]; if (b) b.classList.toggle('done', !!d.played?.[g]); });
+            dailyCountdown();
+            const board = document.getElementById('daily-board');
+            if (board && board.style.display !== 'none') renderDailyBoard();
+        }
+        let dailyCdTimer = null;
+        function dailyCountdown() {
+            if (!dailyData) return;
+            const end = Date.now() + dailyData.nextInMs;
+            clearInterval(dailyCdTimer);
+            const tick = () => {
+                const left = Math.max(0, end - Date.now());
+                const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60, s2 = Math.floor(left / 1000) % 60;
+                const el = document.getElementById('daily-countdown');
+                if (el) el.textContent = `Nouveau défi dans ${h}h${String(m).padStart(2, '0')}m${String(s2).padStart(2, '0')}s`;
+                if (left <= 0) { clearInterval(dailyCdTimer); loadDaily(); }
+            };
+            tick(); dailyCdTimer = setInterval(tick, 1000);
+        }
+        function toggleDailyBoard() {
+            const b = document.getElementById('daily-board');
+            b.style.display = b.style.display === 'none' ? 'block' : 'none';
+            if (b.style.display === 'block') renderDailyBoard();
+        }
+        function renderDailyBoard() {
+            const b = document.getElementById('daily-board');
+            if (!dailyData) { b.textContent = 'Chargement…'; return; }
+            const col = (title, rows, fmt) => `<div class="daily-col"><b>${title}</b>${rows.length ? rows.map((r, i) => `<div class="daily-row"><span>${i + 1}. ${escHtml(r.pseudo)}</span><span>${fmt(r)}</span></div>`).join('') : '<div class="daily-row"><span>Personne encore…</span></div>'}</div>`;
+            b.innerHTML = col('🎴 DLE', dailyData.boards.dle || [], r => `${r.attempts} essais`) + col('🎧 Blind test', dailyData.boards.blindtest || [], r => `${r.score} pts`) + col('🖼️ Pixel', dailyData.boards.pixel || [], r => `${r.score} pts`);
+        }
+        function escHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function startDaily(game) {
+            dailyMode = game; dailyTrack = []; dailyPendingStart = true;
+            if (currentUser && currentUser.isGuest) toast('ℹ️ En invité, ton score ne compte pas dans le classement du jour.', 'var(--accent-pink)');
+            if (game === 'dle') createRoom('dle', 'daily');
+            else if (game === 'blindtest') createRoom('blindtest', 'daily');
+            else createRoom('arcade', 'pixel:daily');
+        }
+        // Lancement automatique du défi (pas besoin de passer par le salon)
+        socket.on('update_room', room => {
+            if (!dailyPendingStart || !room || room.code !== currentRoomCode || room.host !== socket.id) return;
+            dailyPendingStart = false;
+            setTimeout(() => socket.emit('start_game', currentRoomCode), 150);
+        });
+        function dailyShowShare(game, info) {
+            const day = (dailyData && dailyData.day) || new Date().toISOString().slice(0, 10);
+            const [y, m, d] = day.split('-');
+            let txt = `🎌 Anime Game — Défi du ${d}/${m}\n`;
+            if (game === 'dle') {
+                txt += `🎴 AnimeDLE (${info.universe}) : ${info.won ? `trouvé en ${info.attempts} essai${info.attempts > 1 ? 's' : ''}` : 'raté'}\n`;
+                (info.guesses || []).slice(0, 8).forEach(g => { txt += Object.values(g.attrs || {}).map(a => a.match ? '🟩' : a.close ? '🟨' : '🟥').join('') + (g.correct ? ' ✅' : '') + '\n'; });
+            } else {
+                const label = game === 'blindtest' ? '🎧 Blind test' : '🖼️ Pixel';
+                const ok = info.marks.filter(Boolean).length;
+                txt += `${label} : ${ok}/${info.marks.length} ${info.marks.map(x => x ? '✅' : '❌').join('')} (${info.score} pts)\n`;
+            }
+            txt += location.origin;
+            dailyMode = null;
+            setTimeout(() => {
+                const box = document.getElementById('fx-share');
+                box.querySelector('pre').textContent = txt;
+                box.style.display = 'flex';
+                loadDaily();
+            }, 1200);
+        }
+        function copyShare() {
+            const txt = document.querySelector('#fx-share pre').textContent;
+            const done = () => toast('📋 Résultat copié : colle-le où tu veux !', 'var(--accent-cyan)');
+            if (navigator.share && /Mobi/i.test(navigator.userAgent)) navigator.share({ text: txt }).catch(() => {});
+            else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done).catch(() => prompt('Copie :', txt));
+            else prompt('Copie :', txt);
+        }
+
+        /* ===================== PROFIL, BADGES, CLASSEMENTS ===================== */
+        async function loadProfile() {
+            const box = document.getElementById('prog-box');
+            if (!box) return;
+            if (!authToken || (currentUser && currentUser.isGuest)) { box.innerHTML = '<p class="tl-hint">Crée un compte pour gagner de l\'XP, des badges et apparaître dans les classements.</p>'; return; }
+            let d = null;
+            try { d = await (await fetch('/api/profile', { headers: { Authorization: 'Bearer ' + authToken } })).json(); } catch (e) {}
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Profil indisponible pour le moment.</p>'; return; }
+            const L = d.level, pct = Math.round(100 * (L.xp - L.cur) / Math.max(1, L.next - L.cur));
+            box.innerHTML = `
+                <div class="prog-level"><span>Niveau <b>${L.level}</b></span><span>${L.xp} XP</span></div>
+                <div class="prog-bar"><div style="width:${pct}%"></div></div>
+                <div class="tl-hint" style="text-align:left;">Encore ${L.next - L.xp} XP pour le niveau ${L.level + 1}</div>
+                <div class="rg-stat-row" style="margin-top:12px;">
+                    <div class="rg-stat"><div class="rg-stat-label">PARTIES</div><div class="rg-stat-value">${d.stats.games}</div></div>
+                    <div class="rg-stat"><div class="rg-stat-label">VICTOIRES</div><div class="rg-stat-value" style="color:#00ff88;">${d.stats.wins}</div></div>
+                    <div class="rg-stat cyan"><div class="rg-stat-label">DÉFIS</div><div class="rg-stat-value">${d.stats.daily}</div></div>
+                </div>
+                <h3 style="margin:16px 0 8px;color:var(--accent-yellow);">🏅 Badges (${d.badges.filter(b => b.earned).length}/${d.badges.length})</h3>
+                <div class="badge-grid">${d.badges.map(b => `<div class="badge ${b.earned ? 'on' : ''}" title="${escHtml(b.desc)}"><b>${b.earned ? '🏅' : '🔒'} ${escHtml(b.name)}</b><small>${escHtml(b.desc)}</small></div>`).join('')}</div>
+                <h3 style="margin:16px 0 8px;color:var(--accent-yellow);">📊 Par mode</h3>
+                ${d.stats.modes.length ? d.stats.modes.map(m => `<div class="daily-row"><span>${escHtml(m.label)}</span><span>${m.games} parties • ${m.wins} V • record ${m.best}</span></div>`).join('') : '<p class="tl-hint">Joue une partie pour voir tes stats !</p>'}
+                ${d.stats.universes.length ? `<h3 style="margin:16px 0 8px;color:var(--accent-yellow);">🌍 Univers préférés</h3>` + d.stats.universes.slice(0, 8).map(u => `<div class="daily-row"><span>${escHtml(u.name)}</span><span>${u.games} parties</span></div>`).join('') : ''}`;
+        }
+        let lbPeriod = 'week', lbMode = '';
+        async function loadLeaderboard() {
+            const box = document.getElementById('lb-box');
+            if (!box) return;
+            box.innerHTML = '<div class="arc-loading" style="padding:14px;"><div class="arc-spin"></div></div>';
+            let d = null;
+            try { d = await (await fetch(`/api/leaderboard?period=${lbPeriod}&mode=${encodeURIComponent(lbMode)}`)).json(); } catch (e) {}
+            const sel = document.getElementById('lb-mode');
+            if (d && sel && sel.options.length <= 1) Object.entries(d.modes || {}).forEach(([k, v]) => { const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o); });
+            if (!d || !d.rows || !d.rows.length) { box.innerHTML = '<p class="tl-hint">Pas encore de parties classées sur cette période.</p>'; return; }
+            box.innerHTML = d.rows.map((r, i) => `<div class="daily-row${currentUser && r.pseudo === currentUser.pseudo ? ' me' : ''}"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(r.pseudo)}</span><span>${r.points} pts • ${r.games} parties</span></div>`).join('');
+        }
+        function setLbPeriod(p) {
+            lbPeriod = p;
+            document.querySelectorAll('.lb-tab').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+            loadLeaderboard();
+        }
+        // Chargement quand on ouvre l'onglet Options
+        (function () {
+            const orig = window.switchTab;
+            if (typeof orig === 'function') window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfile(); loadLeaderboard(); } return r; };
+        })();
+        socket.on('profile_updated', () => { const o = document.getElementById('options'); if (o && o.classList.contains('active')) loadProfile(); });
+
+        /* ===================== RÉACTIONS EN PARTIE ===================== */
+        function sendReaction(e) { if (currentRoomCode) socket.emit('reaction', { roomCode: currentRoomCode, emoji: e }); }
+        socket.on('reaction', d => {
+            const layer = document.getElementById('fx-reactions');
+            if (!layer || !d) return;
+            const el = document.createElement('div'); el.className = 'fx-react';
+            el.style.left = (8 + Math.random() * 70) + '%';
+            el.innerHTML = `<span class="e">${d.emoji}</span><span class="n"></span>`;
+            el.querySelector('.n').textContent = d.name;
+            layer.appendChild(el);
+            setTimeout(() => el.remove(), 2800);
+        });
+        setInterval(() => {
+            const bar = document.getElementById('fx-react-bar');
+            if (!bar) return;
+            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room']
+                .some(id => { const el = document.getElementById(id); return el && el.offsetParent !== null; });
+            bar.style.display = inRoom ? 'flex' : 'none';
+        }, 700);
+
+        /* ===================== LIEN D'INVITATION ===================== */
+        function copyInviteLink() {
+            if (!currentRoomCode) return;
+            const url = `${location.origin}${location.pathname}?join=${encodeURIComponent(currentRoomCode)}`;
+            const done = () => toast('🔗 Lien copié ! Envoie-le à tes potes.', 'var(--accent-cyan)');
+            if (navigator.share && /Mobi/i.test(navigator.userAgent)) navigator.share({ title: 'Anime Game', text: 'Rejoins mon salon Anime Game !', url }).catch(() => {});
+            else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done).catch(() => prompt('Copie le lien :', url));
+            else prompt('Copie le lien :', url);
+        }
+        const pendingJoin = (new URLSearchParams(location.search).get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+        let pendingJoinDone = false;
+        socket.on('connect', () => {
+            if (!pendingJoin || pendingJoinDone || currentRoomCode) return;
+            pendingJoinDone = true;
+            history.replaceState(null, '', location.pathname);
+            currentRoomCode = pendingJoin;
+            socket.emit('join_room', { roomCode: pendingJoin, username: getUsername(), mode: 'undercover', subMode: 'normal' });
+        });
+        socket.on('connect', () => { loadDaily(); });
+
+        /* ===================== THÈME CLAIR / SOMBRE ===================== */
+        function applyTheme(t) {
+            document.documentElement.classList.toggle('light', t === 'light');
+            const b = document.getElementById('theme-btn');
+            if (b) b.textContent = t === 'light' ? '🌙 Passer en sombre' : '☀️ Passer en clair';
+        }
+        function toggleTheme() {
+            const t = document.documentElement.classList.contains('light') ? 'dark' : 'light';
+            try { localStorage.setItem('theme', t); } catch (e) {}
+            applyTheme(t);
+        }
+        try { applyTheme(localStorage.getItem('theme') || 'dark'); } catch (e) {}
+
+        /* ===================== MODE STREAMER : votes du chat Twitch ===================== */
+        const stream = { ws: null, channel: '', key: null, labels: [], votes: new Map(), revealed: null };
+        function streamConnect() {
+            const input = document.getElementById('stream-channel');
+            const ch = String(input.value || '').trim().toLowerCase().replace(/^#/, '').replace(/[^a-z0-9_]/g, '');
+            if (!ch) return;
+            streamDisconnect();
+            try { localStorage.setItem('stream_channel', ch); } catch (e) {}
+            stream.channel = ch;
+            const ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+            stream.ws = ws;
+            streamStatus('Connexion au chat…');
+            ws.onopen = () => {
+                ws.send('CAP REQ :twitch.tv/tags');
+                ws.send('PASS SCHMOOPIIE');
+                ws.send('NICK justinfan' + Math.floor(10000 + Math.random() * 80000));
+                ws.send('JOIN #' + ch);
+            };
+            ws.onmessage = ev => String(ev.data).split('\r\n').forEach(line => {
+                if (!line) return;
+                if (line.startsWith('PING')) { ws.send('PONG :tmi.twitch.tv'); return; }
+                if (line.includes(' 366 ') || line.includes('JOIN #' + ch)) streamStatus(`✅ Connecté au chat de ${ch} — les viewers votent avec !1 !2 !3 !4`);
+                const m = line.match(/:([^!\s]+)![^\s]+ PRIVMSG #[^\s]+ :(.*)$/);
+                if (m) streamVote(m[1], m[2].trim());
+            });
+            ws.onclose = () => { if (stream.ws === ws) streamStatus('Déconnecté du chat.'); };
+            ws.onerror = () => streamStatus('❌ Impossible de joindre le chat Twitch.');
+            document.getElementById('stream-widget').style.display = 'block';
+        }
+        function streamDisconnect() {
+            if (stream.ws) { try { stream.ws.close(); } catch (e) {} }
+            stream.ws = null;
+            streamStatus('Mode streamer désactivé.');
+            const w = document.getElementById('stream-widget'); if (w) w.style.display = 'none';
+        }
+        function streamStatus(t) { const el = document.getElementById('stream-status'); if (el) el.textContent = t; }
+        function streamVote(user, msg) {
+            if (!stream.key || stream.revealed) return;
+            let m = msg.match(/^!?\s*([1-9])\b/);
+            let idx = m ? Number(m[1]) - 1 : -1;
+            if (idx < 0) { m = msg.match(/^!([a-dA-D])\b/); if (m) idx = m[1].toLowerCase().charCodeAt(0) - 97; }
+            if (idx < 0 || idx >= stream.labels.length) return;
+            stream.votes.set(user, idx);
+            streamRender();
+        }
+        function streamPoll(key, labels) {
+            if (!stream.ws) return;
+            if (key === null) { if (stream.key && !stream.revealed) { stream.key = null; streamRender(); } return; }
+            if (stream.key === key) return;
+            stream.key = key; stream.labels = labels.slice(0, 9); stream.votes = new Map(); stream.revealed = null;
+            streamRender();
+        }
+        function streamPollReveal(answer) {
+            if (!stream.ws || !stream.key || stream.revealed) return;
+            stream.revealed = answer || '—';
+            streamRender();
+        }
+        function streamRender() {
+            const w = document.getElementById('stream-widget');
+            if (!w || !stream.ws) return;
+            const body = document.getElementById('stream-body');
+            if (!stream.key) { body.innerHTML = '<div class="tl-hint">En attente d\'une question…</div>'; return; }
+            const counts = stream.labels.map(() => 0);
+            stream.votes.forEach(i => counts[i]++);
+            const total = Math.max(1, stream.votes.size);
+            body.innerHTML = stream.labels.map((l, i) => {
+                const pct = Math.round(100 * counts[i] / total);
+                const good = stream.revealed && l === stream.revealed;
+                return `<div class="sv-row${good ? ' good' : ''}"><div class="sv-bar" style="width:${pct}%"></div><span>!${i + 1} ${escHtml(l)}</span><b>${pct}%</b></div>`;
+            }).join('') + `<div class="tl-hint">${stream.votes.size} vote(s) du chat${stream.revealed ? ' • réponse : ' + escHtml(stream.revealed) : ''}</div>`;
+        }
+        try { const ch = localStorage.getItem('stream_channel'); if (ch) setTimeout(() => { const i = document.getElementById('stream-channel'); if (i) i.value = ch; }, 50); } catch (e) {}
+        // Battle d'openings : le chat vote aussi (!1 gauche / !2 droite)
+        (function () {
+            const orig = window.bbRenderDuel;
+            if (typeof orig !== 'function') return;
+            window.bbRenderDuel = function () {
+                const r = orig.apply(this, arguments);
+                try { if (bb && bb.current) streamPoll('bb|' + bb.current.length + '|' + bb.idx, [bb.current[bb.idx], bb.current[bb.idx + 1]]); } catch (e) {}
+                return r;
+            };
+        })();
+
         tryAutoLogin();
     </script>
 
+    <canvas id="fx-confetti" style="display:none;"></canvas>
+    <div id="fx-toasts"></div>
+    <div id="fx-reactions"></div>
+    <div id="fx-react-bar" style="display:none;">
+        <button onclick="sendReaction('😂')">😂</button><button onclick="sendReaction('🔥')">🔥</button><button onclick="sendReaction('😭')">😭</button>
+        <button onclick="sendReaction('😱')">😱</button><button onclick="sendReaction('👏')">👏</button><button onclick="sendReaction('💀')">💀</button>
+        <button onclick="sendReaction('🤯')">🤯</button><button onclick="sendReaction('🐐')">🐐</button>
+    </div>
+    <div id="fx-share" style="display:none;">
+        <div class="fx-share-card">
+            <h3>🎉 Défi terminé !</h3>
+            <pre></pre>
+            <button class="btn-action" onclick="copyShare()">📋 Partager mon résultat</button>
+            <button class="btn-action" style="background:#2a2a40;" onclick="document.getElementById('fx-share').style.display='none'">Fermer</button>
+        </div>
+    </div>
+    <div id="stream-widget" style="display:none;"><div class="sv-head">🎥 Vote du chat</div><div id="stream-body"></div></div>
     <div id="music-player">
         <div class="music-player-head">
             <button class="music-mini-btn" onclick="previousMusicTrack()" title="Précédent">⏮</button>
