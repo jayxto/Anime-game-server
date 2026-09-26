@@ -354,6 +354,88 @@
         .bt-disc.spin{animation:btspin 2.2s linear infinite;}
         @keyframes btspin{to{transform:rotate(360deg);}}
         #quote-speaker-image{width:110px;height:110px;object-fit:cover;object-position:top center;display:none;border-radius:12px;border:2px solid var(--accent-cyan);margin:12px auto 0;}
+        /* ===== Mini-jeux arcade / Tier list / Battle ===== */
+        .arc-menu{background:linear-gradient(135deg,rgba(255,230,0,.10),rgba(0,240,255,.08));border:2px solid var(--accent-yellow);border-radius:12px;padding:18px;text-align:left;}
+        .arc-menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:12px;}
+        .arc-game-btn{display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:#11111a;color:#fff;border:1px solid #34344a;border-radius:10px;padding:12px;cursor:pointer;text-align:left;transition:border-color .15s,transform .08s;}
+        .arc-game-btn:hover{border-color:var(--accent-yellow);transform:translateY(-1px);}
+        .arc-game-btn b{font-size:.95rem;}
+        .arc-game-btn span{font-size:.72rem;color:var(--text-muted);line-height:1.3;}
+        .arc-game-btn .arc-ico{font-size:1.5rem;}
+        .arc-stage{position:relative;display:flex;justify-content:center;align-items:center;min-height:260px;margin:14px auto 6px;}
+        .arc-canvas{width:100%;max-width:420px;aspect-ratio:1/1;border-radius:14px;background:#0b0b12;border:2px solid #2c2c44;box-shadow:0 10px 40px rgba(0,0,0,.45);image-rendering:pixelated;}
+        .arc-photo{max-width:100%;max-height:360px;border-radius:12px;border:2px solid #2c2c44;box-shadow:0 10px 40px rgba(0,0,0,.45);background:#0b0b12;object-fit:contain;}
+        .arc-emoji{font-size:clamp(2.6rem,9vw,4.6rem);letter-spacing:.12em;text-align:center;line-height:1.3;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));animation:arcPop .35s ease-out;}
+        .arc-ask{text-align:center;color:var(--accent-cyan);font-weight:800;margin-top:6px;}
+        @keyframes arcPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+        .arc-grid4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;max-width:440px;}
+        .arc-tile{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#11111a;border:2px solid #2c2c44;display:flex;align-items:center;justify-content:center;}
+        .arc-tile img{width:100%;height:100%;object-fit:cover;object-position:top;animation:arcPop .3s ease-out;}
+        .arc-tile .arc-q{font-family:'Bangers',cursive;font-size:3rem;color:#34344a;}
+        .arc-tile .arc-cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:14px 6px 5px;font-size:.74rem;font-weight:800;text-align:center;}
+        .arc-loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--text-muted);}
+        .arc-spin{width:44px;height:44px;border-radius:50%;border:4px solid #2c2c44;border-top-color:var(--accent-cyan);animation:arcRot .9s linear infinite;}
+        @keyframes arcRot{to{transform:rotate(360deg)}}
+        .arc-input-wrap{position:relative;max-width:520px;margin:14px auto 0;}
+        .arc-input-row{display:flex;gap:8px;}
+        .arc-input-row input{flex:1;min-width:0;background:#0d0d15;border:2px solid #34344a;color:#fff;border-radius:10px;padding:12px 14px;font-size:1rem;}
+        .arc-input-row input:focus{outline:none;border-color:var(--accent-cyan);}
+        .arc-input-row button{width:auto;margin:0;}
+        .arc-sugg{position:absolute;left:0;right:0;top:100%;z-index:30;background:#12121c;border:1px solid #34344a;border-radius:10px;margin-top:4px;overflow:hidden;display:none;box-shadow:0 12px 30px rgba(0,0,0,.5);}
+        .arc-sugg div{padding:9px 12px;cursor:pointer;font-size:.9rem;}
+        .arc-sugg div.on,.arc-sugg div:hover{background:#1d1d2c;color:var(--accent-cyan);}
+        .arc-found{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;}
+        .arc-found span{background:rgba(0,255,136,.12);border:1px solid #00ff88;color:#00ff88;border-radius:99px;padding:4px 10px;font-size:.78rem;font-weight:700;}
+        .arc-result{min-height:28px;text-align:center;font-weight:800;margin:14px 0 4px;}
+        .arc-sub{text-align:center;color:var(--text-muted);font-size:.85rem;}
+        .arc-reveal-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;max-width:560px;margin:12px auto 0;}
+        .arc-host-skip{display:block;margin:10px auto 0;background:none;border:1px solid var(--accent-cyan);color:var(--accent-cyan);border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:700;}
+        /* Tier list */
+        .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
+        .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
+        .tl-board{display:flex;flex-direction:column;gap:4px;background:#0d0d15;border:2px solid #2c2c44;border-radius:12px;padding:6px;}
+        .tl-row{display:flex;min-height:86px;background:#141420;border-radius:8px;overflow:hidden;}
+        .tl-label{flex:0 0 78px;display:flex;align-items:center;justify-content:center;font-family:'Bangers',cursive;font-size:1.7rem;color:#111;text-align:center;padding:4px;outline:none;word-break:break-word;}
+        .tl-zone{flex:1;display:flex;flex-wrap:wrap;gap:4px;padding:4px;align-content:flex-start;min-width:0;}
+        .tl-zone.over,.tl-pool.over{background:rgba(0,240,255,.08);}
+        .tl-pool{display:flex;flex-wrap:wrap;gap:4px;min-height:96px;padding:8px;margin-top:12px;background:#0d0d15;border:2px dashed #34344a;border-radius:12px;}
+        .tl-item{position:relative;width:78px;height:78px;border-radius:6px;overflow:hidden;background:#1d1d2c;cursor:grab;user-select:none;-webkit-user-select:none;flex-shrink:0;border:2px solid transparent;touch-action:manipulation;}
+        .tl-item img{width:100%;height:100%;object-fit:cover;object-position:top;pointer-events:none;}
+        .tl-item .tl-name{position:absolute;left:0;right:0;bottom:0;font-size:.6rem;font-weight:800;line-height:1.1;padding:10px 3px 3px;background:linear-gradient(transparent,rgba(0,0,0,.9));text-align:center;}
+        .tl-item.noimg .tl-name{top:0;display:flex;align-items:center;justify-content:center;background:none;font-size:.68rem;padding:4px;}
+        .tl-item.sel{border-color:var(--accent-yellow);box-shadow:0 0 0 2px rgba(255,230,0,.35);}
+        .tl-item.dragging{opacity:.35;}
+        .tl-hint{text-align:center;color:var(--text-muted);font-size:.78rem;margin-top:6px;}
+        @media (max-width:560px){.tl-item{width:62px;height:62px}.tl-label{flex-basis:56px;font-size:1.3rem}.tl-row{min-height:70px}}
+        /* Battle */
+        .bb-head{text-align:center;margin:8px 0 4px;}
+        .bb-round{font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow);letter-spacing:1px;}
+        .bb-progress{height:6px;background:#1b1b28;border-radius:99px;overflow:hidden;max-width:520px;margin:8px auto 0;}
+        .bb-progress div{height:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));transition:width .3s;}
+        .bb-duel{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:18px 0;}
+        .bb-card{position:relative;border-radius:16px;overflow:hidden;background:#11111a;border:3px solid #2c2c44;cursor:pointer;aspect-ratio:3/4;transition:transform .12s,border-color .15s,box-shadow .15s;}
+        .bb-card:hover{transform:translateY(-3px);border-color:var(--accent-cyan);box-shadow:0 12px 40px rgba(0,240,255,.18);}
+        .bb-card img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .bb-card .bb-name{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.92));font-family:'Bangers',cursive;font-size:clamp(1.1rem,3vw,1.7rem);text-align:center;letter-spacing:.5px;}
+        .bb-card.noimg{display:flex;align-items:center;justify-content:center;}
+        .bb-card.noimg .bb-name{position:static;background:none;padding:10px;}
+        .bb-card.win{border-color:#00ff88;transform:scale(1.03);}
+        .bb-card.lose{opacity:.25;transform:scale(.96);}
+        .bb-vs{font-family:'Bangers',cursive;font-size:2.2rem;color:var(--accent-pink);text-shadow:0 0 18px rgba(255,42,95,.6);}
+        .bb-sizes{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0;}
+        .bb-sizes button{width:auto;margin:0;padding:12px 20px;}
+        .bb-champion{text-align:center;margin:10px 0;}
+        .bb-champion .bb-card{max-width:260px;margin:12px auto;cursor:default;border-color:var(--accent-yellow);box-shadow:0 0 50px rgba(255,230,0,.25);}
+        .bb-rank{display:flex;flex-direction:column;gap:6px;max-width:620px;margin:10px auto;}
+        .bb-rank-row{display:grid;grid-template-columns:34px 44px 1fr auto;gap:10px;align-items:center;background:#101018;border:1px solid #2f2f46;border-radius:10px;padding:6px 10px;}
+        .bb-rank-row img,.bb-rank-row .bb-ph{width:44px;height:44px;border-radius:8px;object-fit:cover;object-position:top;background:#1d1d2c;}
+        .bb-rank-row .bb-pos{font-family:'Bangers',cursive;font-size:1.2rem;color:var(--accent-yellow);text-align:center;}
+        .bb-bar{height:6px;background:#1b1b28;border-radius:99px;overflow:hidden;margin-top:4px;}
+        .bb-bar div{height:100%;background:var(--accent-cyan);}
+        .bb-tabs{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap;}
+        .bb-tabs button{width:auto;margin:0;padding:8px 14px;font-size:.85rem;background:#11111a;border:1px solid #34344a;color:#fff;}
+        .bb-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+        @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}}
 </style>
 </head>
 <body>
@@ -464,6 +546,32 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime <span class="quote-new">NOUVEAU</span></h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
                     <button class="btn-action" style="margin-top:0;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button>
+                </div>
+
+                <div class="arc-menu">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:4px;">🕹️ Mini-jeux <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0;font-size:.85rem;">Solo ou multi • 4 à 12 manches • plus tu réponds vite, plus tu gagnes de points</p>
+                    <div class="arc-menu-grid">
+                        <button class="arc-game-btn" onclick="openArcadeGame('pixel')"><span class="arc-ico">🖼️</span><b>Pixel Anime</b><span>Image ultra pixelisée qui se précise → devine le perso</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('silhouette')"><span class="arc-ico">👤</span><b>Silhouette</b><span>Ombre noire d'un perso → trouve son nom</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('emoji')"><span class="arc-ico">😀</span><b>Emoji Anime</b><span>🍥 🦊 🍃 → devine l'anime ou le perso</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('quatre')"><span class="arc-ico">🧩</span><b>4 images = 1 anime</b><span>Les images arrivent une à une → trouve l'anime</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('mapguess')"><span class="arc-ico">🗺️</span><b>Map Guess</b><span>Un lieu culte → de quel univers vient-il ?</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('fusion')"><span class="arc-ico">🧪</span><b>Fusion Anime</b><span>4 persos mélangés en une image → retrouve les 4</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Une capture d'opening → trouve l'anime</span></button>
+                    </div>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:var(--accent-yellow);">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tier List <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Classe tous les animes (107) ou les persos d'un univers de S à F • glisser-déposer (ou toucher sur mobile) • sauvegarde auto • export en image</p>
+                    <button class="btn-action" style="margin-top:0;" onclick="openTierSelection()">Faire ma tier list</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:var(--accent-pink);">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle de préférence <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Tournoi en duels : choisis ton préféré à chaque fois jusqu'au champion (8 à 64 participants) • classement mondial des votes</p>
+                    <button class="btn-action" style="margin-top:0;background:var(--accent-pink);" onclick="openBattleSelection()">Lancer une battle</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
@@ -841,6 +949,64 @@
             </div>
         </div>
 
+        <div id="arcade-room" class="game-panel" style="display:none;max-width:950px;margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><h2 id="arc-title" style="margin:0;">MINI-JEU</h2><div id="arc-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
+                <button onclick="backToMenu()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Salon</button>
+            </div>
+            <div id="arc-scoreboard" class="quote-scoreboard"></div>
+            <div class="quote-card">
+                <div class="quote-meta">
+                    <span class="quote-chip" id="arc-round">Manche 1/10</span>
+                    <span class="quote-chip" id="arc-time">--</span>
+                    <span class="quote-chip" id="arc-answered">Réponses : 0/0</span>
+                </div>
+                <div class="bt-timer"><div id="arc-timer-fill" class="bt-timer-fill"></div></div>
+                <div id="arc-stage" class="arc-stage"></div>
+                <div id="arc-choices" class="bt-choices" style="display:none;"></div>
+                <div id="arc-input-wrap" class="arc-input-wrap" style="display:none;">
+                    <div class="arc-input-row">
+                        <input id="arc-input" type="text" autocomplete="off" placeholder="Nom du personnage…" oninput="arcSuggest()" onkeydown="arcInputKey(event)">
+                        <button class="btn-action" onclick="arcSubmitGuess()">Valider</button>
+                    </div>
+                    <div id="arc-sugg" class="arc-sugg"></div>
+                </div>
+                <div id="arc-found" class="arc-found"></div>
+                <div id="arc-result" class="arc-result"></div>
+                <div id="arc-extra" class="arc-sub"></div>
+                <div id="arc-reveal" class="arc-reveal-items"></div>
+                <button id="arc-skip" class="arc-host-skip" style="display:none;" onclick="arcSkip()">⏭ Manche suivante</button>
+                <div id="arc-end-buttons" style="display:none;margin-top:18px;flex-direction:column;gap:10px;">
+                    <button id="arc-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
+                    <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tierlist-room" class="game-panel" style="display:none;max-width:1000px;margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><h2 style="margin:0;">🏆 TIER LIST</h2><div id="tl-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
+                <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Menu</button>
+            </div>
+            <div class="tl-toolbar">
+                <button class="btn-action" onclick="tlDownload()">📸 Télécharger en image</button>
+                <button class="btn-action" style="background:var(--accent-cyan);color:#111;" onclick="tlCopyText()">📋 Copier en texte</button>
+                <button class="btn-action" style="background:#2a2a40;" onclick="tlReset()">↺ Tout remettre en bas</button>
+                <button class="btn-action" style="background:#2a2a40;" onclick="openTierSelection()">🔁 Changer de liste</button>
+            </div>
+            <div id="tl-board" class="tl-board"></div>
+            <div id="tl-pool" class="tl-pool"></div>
+            <div class="tl-hint">Glisse les images dans les rangs. Sur téléphone : touche une image puis touche le rang. Clique sur la lettre d'un rang pour la renommer. Ta liste est sauvegardée automatiquement.</div>
+        </div>
+
+        <div id="battle-room" class="game-panel" style="display:none;max-width:900px;margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><h2 style="margin:0;">⚔️ BATTLE DE PRÉFÉRENCE</h2><div id="bb-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
+                <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Menu</button>
+            </div>
+            <div id="bb-body"></div>
+        </div>
+
 <div id="dle-room" class="game-panel" style="max-width:900px;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <h2 style="margin-bottom:0;">AnimeDLE</h2>
@@ -1148,6 +1314,7 @@
             document.getElementById('dle-room').style.display = 'none';
             document.getElementById('quote-room').style.display = 'none';
             document.getElementById('blindtest-room').style.display = 'none';
+            ['arcade-room','tierlist-room','battle-room'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
             document.getElementById('quote-universe-selection').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
@@ -1405,7 +1572,10 @@
             rollandgaros:   { title:'ROLLAND GAROS', sub:'Choisis ton univers — trouvez un max de persos à tour de rôle.', tag:'' },
             enchere:        { title:'ENCHÈRE', sub:'Choisis ton univers — 1v1, 50M chacun, 4 persos par équipe.', tag:'' },
             enchereaveugle: { title:"ENCHÈRE À L'AVEUGLE", sub:"Choisis ton univers — un seul voit le perso, l'autre mise à l'aveugle.", tag:'' },
-            dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' }
+            dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' },
+            arc_pixel:      { title:'🖼️ PIXEL ANIME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
         function openUniverseSelection(mode) {
             const cfg = UNIVERSE_SELECT_MODES[mode] || UNIVERSE_SELECT_MODES.quote;
@@ -1414,6 +1584,17 @@
             document.getElementById('universe-select-sub').textContent = cfg.sub;
             const grid = document.getElementById('universe-select-grid');
             grid.innerHTML = '';
+            const pick = key => mode === 'quote' ? createQuoteRoom(key)
+                : mode.startsWith('arc_') ? createRoom('arcade', mode.slice(4) + ':' + key)
+                : createRoom(mode, key);
+            if (cfg.all) {
+                const all = document.createElement('button');
+                all.className = 'quote-universe-btn';
+                all.style.cssText = 'border-color:var(--accent-yellow);color:var(--accent-yellow);';
+                all.textContent = '🌍 Tous les animes mélangés';
+                all.onclick = () => pick('all');
+                grid.appendChild(all);
+            }
             UNIVERSE_CHOICES.forEach(([key, label]) => {
                 const b = document.createElement('button');
                 b.className = 'quote-universe-btn';
@@ -1425,7 +1606,7 @@
                     t.textContent = cfg.tag;
                     b.appendChild(t);
                 }
-                b.onclick = () => mode === 'quote' ? createQuoteRoom(key) : createRoom(mode, key);
+                b.onclick = () => pick(key);
                 grid.appendChild(b);
             });
             const p = document.getElementById('quote-universe-selection');
@@ -1560,7 +1741,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -3387,6 +3568,881 @@
             box.scrollTop = box.scrollHeight;
         });
 
+
+
+        /* ===================== MINI-JEUX ARCADE ===================== */
+        const ARC_UI = {
+            pixel:{ title:'🖼️ PIXEL ANIME', sub:"L'image se précise avec le temps : trouve le perso le plus vite possible", universe:true },
+            silhouette:{ title:'👤 SILHOUETTE', sub:'Qui se cache derrière cette ombre ?', universe:true },
+            emoji:{ title:'😀 EMOJI ANIME', sub:'Décode les emojis : anime ou personnage', universe:false },
+            quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
+            mapguess:{ title:'🗺️ MAP GUESS', sub:'De quel univers vient ce lieu ?', universe:false },
+            fusion:{ title:'🧪 FUSION ANIME', sub:'4 persos sont mélangés dans cette image : retrouve-les tous', universe:true },
+            scene:{ title:"🎬 SCENE GUESSR", sub:"Une capture tirée d'un opening : de quel anime vient-elle ?", universe:false }
+        };
+        let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
+        let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null;
+
+        function openArcadeGame(game) {
+            if (ARC_UI[game].universe) {
+                openUniverseSelection('arc_' + game);
+            } else {
+                createRoom('arcade', game);
+            }
+        }
+
+        function arcNorm(s) {
+            return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function arcLoadImage(src) {
+            if (arcImgs[src]) return arcImgs[src];
+            const p = new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = src;
+            });
+            arcImgs[src] = p;
+            const keys = Object.keys(arcImgs);
+            if (keys.length > 60) delete arcImgs[keys[0]];
+            return p;
+        }
+
+        // Dessine l'image "contenue" dans le canvas à une résolution de n cases (pixelisation)
+        function arcDrawPixel(canvas, img, cells) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.fillStyle = '#0b0b12'; ctx.fillRect(0, 0, W, H);
+            const r = Math.min(W / img.width, H / img.height);
+            const w = img.width * r, h = img.height * r, x = (W - w) / 2, y = (H - h) / 2;
+            if (!cells) { ctx.imageSmoothingEnabled = true; ctx.drawImage(img, x, y, w, h); return; }
+            const sw = Math.max(2, Math.round(cells * w / Math.max(w, h))), sh = Math.max(2, Math.round(cells * h / Math.max(w, h)));
+            const tmp = arcDrawPixel.tmp || (arcDrawPixel.tmp = document.createElement('canvas'));
+            tmp.width = sw; tmp.height = sh;
+            const t = tmp.getContext('2d');
+            t.imageSmoothingEnabled = true;
+            t.clearRect(0, 0, sw, sh);
+            t.drawImage(img, 0, 0, sw, sh);
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(tmp, 0, 0, sw, sh, x, y, w, h);
+        }
+
+        // Silhouette : fond transparent => ombre parfaite ; sinon on retire le fond par remplissage depuis les bords.
+        function arcSilhouetteMask(img) {
+            const max = 360;
+            const r = Math.min(1, max / Math.max(img.width, img.height));
+            const w = Math.max(1, Math.round(img.width * r)), h = Math.max(1, Math.round(img.height * r));
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            let data;
+            try { data = ctx.getImageData(0, 0, w, h).data; } catch (e) { return null; }
+            const N = w * h, mask = new Uint8Array(N);
+            let transparent = 0;
+            for (let i = 0; i < N; i++) if (data[i * 4 + 3] < 25) transparent++;
+            if (transparent / N > 0.06) {
+                for (let i = 0; i < N; i++) mask[i] = data[i * 4 + 3] >= 70 ? 1 : 0;
+                return { w, h, mask, mode: 'alpha' };
+            }
+            // remplissage du fond depuis les bords (tolérance entre voisins + écart max à la couleur de départ)
+            const bg = new Uint8Array(N), seed = new Int32Array(N);
+            const stack = [];
+            const push = (i, s) => { if (!bg[i]) { bg[i] = 1; seed[i] = s; stack.push(i); } };
+            for (let x = 0; x < w; x++) { push(x, x); push((h - 1) * w + x, (h - 1) * w + x); }
+            for (let y = 0; y < h; y++) { push(y * w, y * w); push(y * w + w - 1, y * w + w - 1); }
+            const d = (a, b) => Math.abs(data[a * 4] - data[b * 4]) + Math.abs(data[a * 4 + 1] - data[b * 4 + 1]) + Math.abs(data[a * 4 + 2] - data[b * 4 + 2]);
+            while (stack.length) {
+                const i = stack.pop(), x = i % w, y = (i - x) / w, s = seed[i];
+                const nb = [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, y > 0 ? i - w : -1, y < h - 1 ? i + w : -1];
+                for (const j of nb) {
+                    if (j < 0 || bg[j]) continue;
+                    if (d(i, j) < 34 && d(s, j) < 120) push(j, s);
+                }
+            }
+            let fg = 0;
+            for (let i = 0; i < N; i++) { mask[i] = bg[i] ? 0 : 1; fg += mask[i]; }
+            const ratio = fg / N;
+            if (ratio > 0.1 && ratio < 0.8) return { w, h, mask, mode: 'fill' };
+            // Fond trop chargé : on garde les contours (plus dur, mais jamais l'image en clair)
+            const gray = new Float32Array(N);
+            for (let i = 0; i < N; i++) gray[i] = data[i * 4] * .3 + data[i * 4 + 1] * .59 + data[i * 4 + 2] * .11;
+            for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+                const i = y * w + x;
+                const gx = gray[i - w + 1] + 2 * gray[i + 1] + gray[i + w + 1] - gray[i - w - 1] - 2 * gray[i - 1] - gray[i + w - 1];
+                const gy = gray[i + w - 1] + 2 * gray[i + w] + gray[i + w + 1] - gray[i - w - 1] - 2 * gray[i - w] - gray[i - w + 1];
+                mask[i] = Math.hypot(gx, gy) > 130 ? 1 : 0;
+            }
+            return { w, h, mask, mode: 'edges' };
+        }
+
+        function arcDrawSilhouette(canvas, sil) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            const grad = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, W * .7);
+            grad.addColorStop(0, '#2a2a55'); grad.addColorStop(1, '#0b0b16');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+            const m = document.createElement('canvas'); m.width = sil.w; m.height = sil.h;
+            const mc = m.getContext('2d');
+            const id = mc.createImageData(sil.w, sil.h);
+            const col = sil.mode === 'edges' ? [235, 235, 255] : [6, 6, 12];
+            for (let i = 0; i < sil.mask.length; i++) {
+                if (!sil.mask[i]) continue;
+                id.data[i * 4] = col[0]; id.data[i * 4 + 1] = col[1]; id.data[i * 4 + 2] = col[2]; id.data[i * 4 + 3] = 255;
+            }
+            mc.putImageData(id, 0, 0);
+            const r = Math.min(W / sil.w, H / sil.h) * .94;
+            const w = sil.w * r, h = sil.h * r;
+            ctx.save();
+            ctx.shadowColor = sil.mode === 'edges' ? 'rgba(0,240,255,.5)' : 'rgba(0,240,255,.85)';
+            ctx.shadowBlur = 18;
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(m, (W - w) / 2, (H - h) / 2, w, h);
+            ctx.restore();
+        }
+
+        // Fusion : bandes verticales entrelacées des 4 persos
+        function arcDrawFusion(canvas, imgs, seed) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.fillStyle = '#0b0b12'; ctx.fillRect(0, 0, W, H);
+            let s = seed || 1;
+            const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+            const order = [0, 1, 2, 3].sort(() => rnd() - .5);
+            const strips = 8, sw = W / strips;
+            for (let k = 0; k < strips; k++) {
+                const img = imgs[order[k % 4]];
+                if (!img) continue;
+                const r = Math.max(W / img.width, H / img.height);
+                const w = img.width * r, h = img.height * r;
+                ctx.save();
+                ctx.beginPath(); ctx.rect(k * sw, 0, sw, H); ctx.clip();
+                ctx.drawImage(img, (W - w) / 2, 0, w, h); // cadré en haut : les visages restent visibles
+                ctx.restore();
+            }
+            ctx.fillStyle = 'rgba(11,11,18,.9)';
+            for (let k = 1; k < strips; k++) ctx.fillRect(k * sw - 1, 0, 2, H);
+        }
+
+        function arcNow() { return Date.now() + arcClock; }
+
+        function arcRenderStage(q) {
+            const stage = document.getElementById('arc-stage');
+            const key = `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}`;
+            if (q.phase === 'loading') {
+                if (arcStageKey !== 'loading') stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation de la manche…</div></div>';
+                arcStageKey = 'loading';
+                return;
+            }
+            if (key === arcStageKey) return;
+            arcStageKey = key;
+            if (arcRaf) { cancelAnimationFrame(arcRaf); arcRaf = null; }
+            const reveal = q.phase !== 'playing';
+            const st = q.stage || {};
+
+            if (q.game === 'emoji') {
+                stage.innerHTML = '';
+                const e = document.createElement('div'); e.className = 'arc-emoji'; e.textContent = st.emoji || '';
+                const a = document.createElement('div'); a.className = 'arc-ask'; a.textContent = st.ask || '';
+                const box = document.createElement('div'); box.append(e, a); stage.appendChild(box);
+                return;
+            }
+            if (q.game === 'quatre') {
+                stage.innerHTML = '';
+                const grid = document.createElement('div'); grid.className = 'arc-grid4';
+                const items = reveal && q.reveal ? q.reveal.items : (st.imgs || []).map(img => ({ img }));
+                for (let i = 0; i < 4; i++) {
+                    const tile = document.createElement('div'); tile.className = 'arc-tile';
+                    const it = items[i];
+                    if (it && it.img) {
+                        const im = document.createElement('img'); im.src = it.img; im.alt = ''; tile.appendChild(im);
+                        if (it.name) { const cap = document.createElement('div'); cap.className = 'arc-cap'; cap.textContent = it.name; tile.appendChild(cap); }
+                    } else {
+                        const qm = document.createElement('div'); qm.className = 'arc-q'; qm.textContent = '?'; tile.appendChild(qm);
+                    }
+                    grid.appendChild(tile);
+                }
+                stage.appendChild(grid);
+                return;
+            }
+            if (q.game === 'mapguess' || q.game === 'scene') {
+                stage.innerHTML = '';
+                const im = document.createElement('img'); im.className = 'arc-photo'; im.src = st.img; im.alt = '';
+                stage.appendChild(im);
+                return;
+            }
+            // pixel / silhouette / fusion : canvas
+            stage.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.className = 'arc-canvas'; canvas.width = 480; canvas.height = 480;
+            stage.appendChild(canvas);
+            const roundKey = arcStageKey;
+            if (q.game === 'fusion') {
+                if (reveal) {
+                    stage.innerHTML = '';
+                    const grid = document.createElement('div'); grid.className = 'arc-grid4';
+                    (q.reveal?.items || []).forEach(it => {
+                        const tile = document.createElement('div'); tile.className = 'arc-tile';
+                        const im = document.createElement('img'); im.src = it.img; tile.appendChild(im);
+                        const cap = document.createElement('div'); cap.className = 'arc-cap'; cap.textContent = it.name; tile.appendChild(cap);
+                        grid.appendChild(tile);
+                    });
+                    stage.appendChild(grid);
+                    return;
+                }
+                Promise.all((st.imgs || []).map(arcLoadImage)).then(imgs => {
+                    if (arcStageKey !== roundKey) return;
+                    arcDrawFusion(canvas, imgs, st.seed);
+                });
+                return;
+            }
+            arcLoadImage(st.img).then(img => {
+                if (arcStageKey !== roundKey) return;
+                if (!img) { const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.fillText('Image indisponible', 150, 240); return; }
+                if (reveal) { arcDrawPixel(canvas, img, 0); canvas.style.imageRendering = 'auto'; return; }
+                if (q.game === 'silhouette') {
+                    canvas.style.imageRendering = 'auto';
+                    const sil = img.__sil || (img.__sil = arcSilhouetteMask(img));
+                    if (sil) arcDrawSilhouette(canvas, sil);
+                    return;
+                }
+                // Pixel : de 6 cases à 56 cases, de façon progressive
+                const loop = () => {
+                    if (arcStageKey !== roundKey || !arcState || arcState.phase !== 'playing') return;
+                    const t = Math.min(1, Math.max(0, (arcNow() - arcState.startedAt) / arcState.roundMs));
+                    const cells = Math.round(6 * Math.pow(56 / 6, t));
+                    if (cells !== canvas.__cells) { canvas.__cells = cells; arcDrawPixel(canvas, img, cells); }
+                    arcRaf = requestAnimationFrame(loop);
+                };
+                loop();
+            });
+        }
+
+        function arcTickFn() {
+            const q = arcState;
+            if (!q) return;
+            const time = document.getElementById('arc-time');
+            const fill = document.getElementById('arc-timer-fill');
+            if (q.phase === 'playing') {
+                const left = Math.max(0, q.endsAt - arcNow());
+                time.textContent = `${Math.ceil(left / 1000)}s`;
+                fill.style.width = `${100 * left / q.roundMs}%`;
+            } else if (q.phase === 'reveal' && q.revealEndsAt) {
+                const left = Math.max(0, q.revealEndsAt - arcNow());
+                time.textContent = `Suite dans ${Math.ceil(left / 1000)}s`;
+                fill.style.width = '0%';
+            } else {
+                time.textContent = q.phase === 'loading' ? '…' : 'Terminé';
+                fill.style.width = '0%';
+            }
+        }
+
+        function arcRenderFound() {
+            const box = document.getElementById('arc-found');
+            box.innerHTML = '';
+            if (!arcState || arcState.answerType !== 'multi' || arcState.phase !== 'playing') return;
+            arcMyFound.forEach(n => { const s = document.createElement('span'); s.textContent = '✔ ' + n; box.appendChild(s); });
+        }
+
+        function renderArcade(q) {
+            if (!q) return;
+            const prevRound = arcState ? arcState.round + '|' + arcState.phase : '';
+            arcState = q;
+            arcClock = q.serverNow - Date.now();
+            const ui = ARC_UI[q.game] || {};
+            document.getElementById('arc-title').textContent = ui.title || q.gameLabel;
+            document.getElementById('arc-subtitle').textContent = (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
+            document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds}`;
+            const doneCount = q.players.filter(p => p.done).length;
+            document.getElementById('arc-answered').textContent = `Réponses : ${doneCount}/${q.players.length}`;
+            const me = q.players.find(p => p.id === socket.id) || {};
+            const newRound = prevRound !== q.round + '|' + q.phase && q.phase === 'playing';
+            if (newRound) { arcMyFound = []; arcLastFeedback = null; }
+
+            // Scores
+            const board = document.getElementById('arc-scoreboard');
+            board.innerHTML = '';
+            [...q.players].sort((a, b) => b.score - a.score).forEach(p => {
+                const row = document.createElement('div'); row.className = 'quote-score';
+                const name = document.createElement('span');
+                let mark = '';
+                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : (p.done ? ' ✔️' : ' …');
+                else if (q.phase === 'reveal') mark = p.gained ? ` ✅ +${p.gained}` : ' ❌';
+                name.textContent = (p.offline ? '📡 ' : '') + p.name + mark;
+                const sc = document.createElement('strong'); sc.style.color = 'var(--accent-yellow)'; sc.textContent = `${p.score} pts`;
+                row.append(name, sc); board.appendChild(row);
+            });
+
+            arcRenderStage(q);
+
+            // Réponses : boutons ou saisie
+            const choices = document.getElementById('arc-choices');
+            const inputWrap = document.getElementById('arc-input-wrap');
+            const input = document.getElementById('arc-input');
+            choices.innerHTML = '';
+            if (q.answerType === 'choice' && q.choices && q.phase !== 'loading' && q.phase !== 'finished') {
+                choices.style.display = 'grid';
+                inputWrap.style.display = 'none';
+                q.choices.forEach(c => {
+                    const b = document.createElement('button'); b.className = 'bt-choice'; b.textContent = c;
+                    if (q.phase === 'playing') {
+                        b.disabled = !!me.done;
+                        if (arcState.__myChoice === c && me.done) b.classList.add('picked');
+                        b.onclick = () => { arcState.__myChoice = c; arcMyChoice = c; socket.emit('arc_choice', { roomCode: currentRoomCode, choice: c }); b.classList.add('picked'); [...choices.children].forEach(x => x.disabled = true); };
+                    } else {
+                        b.disabled = true;
+                        if (c === q.answer) b.classList.add('good');
+                        else if (me.choice === c) b.classList.add('bad');
+                    }
+                    choices.appendChild(b);
+                });
+                if (q.phase === 'playing' && arcMyChoice && q.choices.includes(arcMyChoice) && me.done) {
+                    [...choices.children].forEach(x => { if (x.textContent === arcMyChoice) x.classList.add('picked'); });
+                }
+            } else {
+                choices.style.display = 'none';
+                const typing = (q.answerType === 'text' || q.answerType === 'multi') && q.phase === 'playing' && !me.done;
+                inputWrap.style.display = typing ? 'block' : 'none';
+                input.placeholder = q.answerType === 'multi' ? 'Un des 4 persos…' : 'Nom du personnage…';
+                if (newRound) { input.value = ''; arcHideSugg(); if (typing && window.innerWidth > 700) setTimeout(() => input.focus(), 60); }
+                if (!typing) arcHideSugg();
+            }
+            if (newRound) arcMyChoice = null;
+            arcRenderFound();
+
+            // Texte de résultat
+            const result = document.getElementById('arc-result');
+            const extra = document.getElementById('arc-extra');
+            const reveal = document.getElementById('arc-reveal');
+            const endBtns = document.getElementById('arc-end-buttons');
+            const skip = document.getElementById('arc-skip');
+            reveal.innerHTML = '';
+            extra.textContent = '';
+            skip.style.display = q.phase === 'reveal' && q.hostId === socket.id ? 'block' : 'none';
+            endBtns.style.display = q.phase === 'finished' ? 'flex' : 'none';
+            const replay = document.getElementById('arc-replay-btn');
+            if (replay) replay.style.display = q.hostId === socket.id ? 'block' : 'none';
+
+            if (q.phase === 'loading') {
+                result.style.color = 'var(--text-muted)'; result.textContent = '';
+            } else if (q.phase === 'playing') {
+                if (me.done) { result.style.color = 'var(--accent-cyan)'; result.textContent = arcLastFeedback?.ok ? arcLastFeedback.message + ' — attends les autres…' : 'Réponse envoyée, attends les autres…'; }
+                else if (arcLastFeedback) { result.style.color = arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = arcLastFeedback.message; }
+                else { result.style.color = 'var(--text-color)'; result.textContent = q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
+            } else if (q.phase === 'reveal') {
+                const ok = !!me.gained;
+                result.style.color = ok ? '#00ff88' : 'var(--accent-pink)';
+                result.textContent = (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
+                const bits = [];
+                if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
+                if (q.reveal?.place) bits.push('📍 ' + q.reveal.place);
+                if (q.reveal?.song) bits.push('🎶 ' + q.reveal.song);
+                extra.textContent = bits.join(' • ');
+            } else {
+                if (q.message) { result.style.color = 'var(--accent-pink)'; result.textContent = q.message; }
+                else {
+                    const w = q.winnerNames || [];
+                    result.style.color = 'var(--accent-yellow)';
+                    result.textContent = w.length > 1 ? `Égalité : ${w.join(', ')} !` : `🏆 ${w[0] || '---'} gagne la partie !`;
+                }
+                document.getElementById('arc-stage').innerHTML = '<div style="font-size:4rem;">🏆</div>';
+                arcStageKey = 'finished';
+            }
+
+            if (!arcTick) arcTick = setInterval(arcTickFn, 200);
+            arcTickFn();
+        }
+        let arcMyChoice = null;
+
+        function arcHideSugg() { const s = document.getElementById('arc-sugg'); if (s) { s.style.display = 'none'; s.innerHTML = ''; } }
+
+        function arcSuggest() {
+            const input = document.getElementById('arc-input');
+            const box = document.getElementById('arc-sugg');
+            const v = arcNorm(input.value);
+            box.innerHTML = '';
+            if (v.length < 2) { box.style.display = 'none'; return; }
+            const found = new Set(arcMyFound.map(arcNorm));
+            const starts = [], contains = [];
+            for (const n of arcNames) {
+                const k = arcNorm(n);
+                if (found.has(k)) continue;
+                if (k.startsWith(v) || k.split(' ').some(w => w.startsWith(v))) starts.push(n);
+                else if (k.includes(v)) contains.push(n);
+                if (starts.length >= 8) break;
+            }
+            const list = [...starts, ...contains].slice(0, 8);
+            arcSuggIdx = 0;
+            if (!list.length) { box.style.display = 'none'; return; }
+            list.forEach((n, i) => {
+                const d = document.createElement('div'); d.textContent = n;
+                if (i === 0) d.className = 'on';
+                d.onmousedown = e => { e.preventDefault(); input.value = n; arcSubmitGuess(); };
+                box.appendChild(d);
+            });
+            box.style.display = 'block';
+        }
+
+        function arcInputKey(e) {
+            const box = document.getElementById('arc-sugg');
+            const items = [...box.children];
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                if (!items.length) return;
+                e.preventDefault();
+                arcSuggIdx = (arcSuggIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+                items.forEach((d, i) => d.className = i === arcSuggIdx ? 'on' : '');
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = document.getElementById('arc-input');
+                if (box.style.display === 'block' && items[arcSuggIdx]) input.value = items[arcSuggIdx].textContent;
+                arcSubmitGuess();
+            } else if (e.key === 'Escape') arcHideSugg();
+        }
+
+        function arcSubmitGuess() {
+            const input = document.getElementById('arc-input');
+            const text = input.value.trim();
+            if (!text || !arcState || arcState.phase !== 'playing') return;
+            socket.emit('arc_guess', { roomCode: currentRoomCode, text });
+            input.value = '';
+            arcHideSugg();
+        }
+
+        function arcSkip() { socket.emit('arc_skip', { roomCode: currentRoomCode }); }
+
+        socket.on('arc_state', q => {
+            if (!q) return;
+            if (q.phase !== 'finished' && typeof btPauseBackground === 'function') btPauseBackground();
+            hideAllPanels();
+            document.getElementById('arcade-room').style.display = 'block';
+            renderArcade(q);
+        });
+        socket.on('arc_names', d => { arcNames = Array.isArray(d?.names) ? d.names : []; });
+        socket.on('arc_private', d => { arcMyFound = Array.isArray(d?.found) ? d.found : []; arcRenderFound(); });
+        socket.on('arc_feedback', d => {
+            arcLastFeedback = d;
+            const result = document.getElementById('arc-result');
+            if (result) { result.style.color = d.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = d.message; }
+            const input = document.getElementById('arc-input');
+            if (input && !d.ok) { input.style.borderColor = 'var(--accent-pink)'; setTimeout(() => input.style.borderColor = '', 500); }
+        });
+
+        /* ===================== Images tier list / battle ===================== */
+        const ITEM_IMG_CACHE = {};
+        const itemImgQueue = [];
+        let itemImgRunning = 0;
+        function itemImageKey(source, name) { return source + '|' + name; }
+        function itemImage(source, item) {
+            const k = itemImageKey(source, item.name);
+            if (ITEM_IMG_CACHE[k]) return ITEM_IMG_CACHE[k];
+            ITEM_IMG_CACHE[k] = new Promise(resolve => {
+                if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
+                let stored = null;
+                try { stored = localStorage.getItem('itemimg:' + k); } catch (e) {}
+                if (stored) return resolve(stored === '-' ? null : '/api/img?u=' + encodeURIComponent(stored));
+                itemImgQueue.push({ source, name: item.name, k, resolve });
+                itemImagePump();
+            });
+            return ITEM_IMG_CACHE[k];
+        }
+        function itemImagePump() {
+            while (itemImgRunning < 4 && itemImgQueue.length) {
+                const job = itemImgQueue.shift();
+                itemImgRunning++;
+                fetch(`/api/arcade/item-image?source=${encodeURIComponent(job.source)}&name=${encodeURIComponent(job.name)}`)
+                    .then(r => r.json()).catch(() => null)
+                    .then(d => {
+                        const url = d && d.imageUrl;
+                        try { localStorage.setItem('itemimg:' + job.k, url || '-'); } catch (e) {}
+                        if (!url) delete ITEM_IMG_CACHE[job.k];
+                        job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
+                    })
+                    .finally(() => { itemImgRunning--; itemImagePump(); });
+            }
+        }
+        async function loadItems(source) {
+            const r = await fetch('/api/arcade/items?source=' + encodeURIComponent(source));
+            const d = await r.json();
+            if (!d.ok) throw new Error('liste introuvable');
+            return d;
+        }
+        function openSourceSelection(title, sub, onPick) {
+            hideAllPanels();
+            document.getElementById('universe-select-title').textContent = title;
+            document.getElementById('universe-select-sub').textContent = sub;
+            const grid = document.getElementById('universe-select-grid');
+            grid.innerHTML = '';
+            const all = document.createElement('button');
+            all.className = 'quote-universe-btn';
+            all.style.cssText = 'border-color:var(--accent-yellow);color:var(--accent-yellow);';
+            all.textContent = '📺 Tous les animes';
+            all.onclick = () => onPick('animes');
+            grid.appendChild(all);
+            UNIVERSE_CHOICES.forEach(([key, label]) => {
+                const b = document.createElement('button');
+                b.className = 'quote-universe-btn';
+                b.textContent = 'Persos · ' + label;
+                b.onclick = () => onPick(key);
+                grid.appendChild(b);
+            });
+            document.getElementById('quote-universe-selection').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        /* ===================== TIER LIST ===================== */
+        const TL_DEFAULT = [['S', '#ff4f6d'], ['A', '#ff9f43'], ['B', '#ffd93d'], ['C', '#6bd66b'], ['D', '#4cc9f0'], ['F', '#b388ff']];
+        let tl = null, tlSelected = null, tlDragName = null;
+
+        function openTierSelection() {
+            openSourceSelection('🏆 TIER LIST', 'Que veux-tu classer ? Tous les animes, ou les persos d\'un univers.', startTierList);
+        }
+        async function startTierList(source) {
+            hideAllPanels();
+            document.getElementById('tierlist-room').style.display = 'block';
+            document.getElementById('tl-board').innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
+            document.getElementById('tl-pool').innerHTML = '';
+            let data;
+            try { data = await loadItems(source); } catch (e) { document.getElementById('tl-board').innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
+            const names = data.items.map(i => i.name);
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem('tierlist:' + source) || 'null'); } catch (e) {}
+            const tiers = TL_DEFAULT.map(([label, color], i) => ({ label: saved?.tiers?.[i]?.label || label, color, items: [] }));
+            const placed = new Set();
+            if (saved && Array.isArray(saved.tiers)) {
+                saved.tiers.forEach((t, i) => (t.items || []).forEach(n => { if (tiers[i] && names.includes(n) && !placed.has(n)) { tiers[i].items.push(n); placed.add(n); } }));
+            }
+            tl = { source, label: data.label, items: Object.fromEntries(data.items.map(i => [i.name, i])), tiers, pool: names.filter(n => !placed.has(n)) };
+            document.getElementById('tl-subtitle').textContent = `${data.label} • ${names.length} ${source === 'animes' ? 'animes' : 'persos'}`;
+            tlRender();
+        }
+        function tlSave() {
+            if (!tl) return;
+            try { localStorage.setItem('tierlist:' + tl.source, JSON.stringify({ tiers: tl.tiers.map(t => ({ label: t.label, items: t.items })) })); } catch (e) {}
+        }
+        function tlRemove(name) {
+            tl.tiers.forEach(t => t.items = t.items.filter(n => n !== name));
+            tl.pool = tl.pool.filter(n => n !== name);
+        }
+        function tlMove(name, target, beforeName) {
+            if (!tl || !name) return;
+            tlRemove(name);
+            const list = target === 'pool' ? tl.pool : tl.tiers[target].items;
+            const idx = beforeName ? list.indexOf(beforeName) : -1;
+            if (idx >= 0) list.splice(idx, 0, name); else list.push(name);
+            tlSelected = null;
+            tlSave();
+            tlRender();
+        }
+        function tlItemEl(name) {
+            const it = tl.items[name] || { name };
+            const el = document.createElement('div');
+            el.className = 'tl-item noimg' + (tlSelected === name ? ' sel' : '');
+            el.draggable = true;
+            el.dataset.name = name;
+            const cap = document.createElement('div'); cap.className = 'tl-name'; cap.textContent = name;
+            el.appendChild(cap);
+            itemImage(tl.source, it).then(src => {
+                if (!src) return;
+                const im = document.createElement('img'); im.src = src; im.alt = name; im.loading = 'lazy';
+                im.onload = () => el.classList.remove('noimg');
+                im.onerror = () => im.remove();
+                el.insertBefore(im, cap);
+            });
+            el.addEventListener('dragstart', e => { tlDragName = name; el.classList.add('dragging'); try { e.dataTransfer.setData('text/plain', name); e.dataTransfer.effectAllowed = 'move'; } catch (_) {} });
+            el.addEventListener('dragend', () => { el.classList.remove('dragging'); tlDragName = null; });
+            el.addEventListener('click', e => {
+                e.stopPropagation();
+                if (tlSelected && tlSelected !== name) {
+                    // déplacer l'image sélectionnée juste avant celle-ci
+                    const target = tl.pool.includes(name) ? 'pool' : tl.tiers.findIndex(t => t.items.includes(name));
+                    tlMove(tlSelected, target, name);
+                    return;
+                }
+                tlSelected = tlSelected === name ? null : name;
+                tlRender();
+            });
+            return el;
+        }
+        function tlBindZone(zone, target) {
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault(); zone.classList.remove('over');
+                const name = tlDragName || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+                const overItem = e.target.closest && e.target.closest('.tl-item');
+                tlMove(name, target, overItem && overItem.dataset.name !== name ? overItem.dataset.name : null);
+            });
+            zone.addEventListener('click', () => { if (tlSelected) tlMove(tlSelected, target, null); });
+        }
+        function tlRender() {
+            const board = document.getElementById('tl-board');
+            board.innerHTML = '';
+            tl.tiers.forEach((t, i) => {
+                const row = document.createElement('div'); row.className = 'tl-row';
+                const lab = document.createElement('div'); lab.className = 'tl-label'; lab.style.background = t.color;
+                lab.contentEditable = 'true'; lab.spellcheck = false; lab.textContent = t.label;
+                lab.addEventListener('blur', () => { t.label = lab.textContent.trim().slice(0, 14) || TL_DEFAULT[i][0]; lab.textContent = t.label; tlSave(); });
+                lab.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); lab.blur(); } });
+                const zone = document.createElement('div'); zone.className = 'tl-zone';
+                t.items.forEach(n => zone.appendChild(tlItemEl(n)));
+                tlBindZone(zone, i);
+                row.append(lab, zone);
+                board.appendChild(row);
+            });
+            const pool = document.getElementById('tl-pool');
+            pool.innerHTML = '';
+            tl.pool.forEach(n => pool.appendChild(tlItemEl(n)));
+            if (!tl.pool.length) { const d = document.createElement('div'); d.className = 'tl-hint'; d.style.width = '100%'; d.textContent = '🎉 Tout est classé ! Télécharge ta tier list en image pour la partager.'; pool.appendChild(d); }
+            if (!pool.__bound) { tlBindZone(pool, 'pool'); pool.__bound = true; }
+        }
+        function tlReset() {
+            if (!tl || !confirm('Remettre toutes les images en bas ?')) return;
+            tl.tiers.forEach(t => { tl.pool.push(...t.items); t.items = []; });
+            tlSave(); tlRender();
+        }
+        function tlCopyText() {
+            if (!tl) return;
+            const txt = `Ma tier list ${tl.label}\n` + tl.tiers.map(t => `${t.label} : ${t.items.join(', ') || '—'}`).join('\n');
+            const done = () => alert('Tier list copiée !');
+            if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done).catch(() => prompt('Copie ce texte :', txt));
+            else prompt('Copie ce texte :', txt);
+        }
+        async function tlDownload() {
+            if (!tl) return;
+            const size = 96, gap = 6, labelW = 120, perRow = 9, W = labelW + perRow * (size + gap) + gap;
+            const rows = tl.tiers.map(t => Math.max(1, Math.ceil(t.items.length / perRow)));
+            const H = 70 + rows.reduce((a, r) => a + r * (size + gap) + gap + 4, 0) + 30;
+            const c = document.createElement('canvas'); c.width = W; c.height = H;
+            const ctx = c.getContext('2d');
+            ctx.fillStyle = '#0b0b10'; ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#ffe600'; ctx.font = 'bold 30px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText(`TIER LIST — ${tl.label}`, 16, 36);
+            let y = 70;
+            const imgs = {};
+            await Promise.all(tl.tiers.flatMap(t => t.items).map(async n => {
+                const src = await itemImage(tl.source, tl.items[n] || { name: n });
+                if (src) imgs[n] = await arcLoadImage(src);
+            }));
+            tl.tiers.forEach((t, i) => {
+                const h = rows[i] * (size + gap) + gap;
+                ctx.fillStyle = '#161622'; ctx.fillRect(0, y, W, h);
+                ctx.fillStyle = t.color; ctx.fillRect(0, y, labelW, h);
+                ctx.fillStyle = '#111'; ctx.font = 'bold 34px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(t.label, labelW / 2, y + h / 2, labelW - 10);
+                t.items.forEach((n, k) => {
+                    const x = labelW + gap + (k % perRow) * (size + gap), yy = y + gap + Math.floor(k / perRow) * (size + gap);
+                    const img = imgs[n];
+                    ctx.fillStyle = '#1d1d2c'; ctx.fillRect(x, yy, size, size);
+                    if (img) {
+                        const r = Math.max(size / img.width, size / img.height);
+                        const w = img.width * r, hh = img.height * r;
+                        ctx.save(); ctx.beginPath(); ctx.rect(x, yy, size, size); ctx.clip();
+                        ctx.drawImage(img, x + (size - w) / 2, yy, w, hh);
+                        ctx.restore();
+                    }
+                    ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(x, yy + size - 20, size, 20);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+                    ctx.fillText(n, x + size / 2, yy + size - 10, size - 4);
+                });
+                y += h + 4;
+            });
+            ctx.fillStyle = '#a0a0b0'; ctx.font = '13px sans-serif'; ctx.textAlign = 'right';
+            ctx.fillText('Anime Game', W - 12, H - 14);
+            try {
+                const a = document.createElement('a');
+                a.download = `tierlist-${tl.source}.png`;
+                a.href = c.toDataURL('image/png');
+                document.body.appendChild(a); a.click(); a.remove();
+            } catch (e) { alert("Export impossible sur ce navigateur. Fais une capture d'écran à la place."); }
+        }
+
+        /* ===================== BATTLE DE PRÉFÉRENCE ===================== */
+        let bb = null;
+        const BB_ROUND_NAMES = { 2: 'FINALE', 4: 'DEMI-FINALES', 8: 'QUARTS DE FINALE', 16: 'HUITIÈMES DE FINALE', 32: 'SEIZIÈMES DE FINALE', 64: 'TOUR DES 64', 128: 'TOUR DES 128' };
+
+        function openBattleSelection() {
+            openSourceSelection('⚔️ BATTLE DE PRÉFÉRENCE', 'Choisis le thème de ton tournoi.', startBattleSetup);
+        }
+        async function startBattleSetup(source) {
+            hideAllPanels();
+            document.getElementById('battle-room').style.display = 'block';
+            const body = document.getElementById('bb-body');
+            body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
+            let data;
+            try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
+            bb = { source, label: data.label, all: data.items };
+            document.getElementById('bb-subtitle').textContent = `${data.label} • ${data.items.length} participants possibles`;
+            body.innerHTML = '';
+            const h = document.createElement('div'); h.className = 'bb-head';
+            h.innerHTML = '<div class="bb-round">COMBIEN DE PARTICIPANTS ?</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Ils sont tirés au hasard. À chaque duel, clique sur ton préféré (ou flèches ← →).</p>';
+            body.appendChild(h);
+            const sizes = document.createElement('div'); sizes.className = 'bb-sizes';
+            [8, 16, 32, 64].filter(n => n <= data.items.length).forEach(n => {
+                const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} participants`;
+                b.onclick = () => bbStart(n);
+                sizes.appendChild(b);
+            });
+            body.appendChild(sizes);
+            const rk = document.createElement('button'); rk.className = 'btn-action'; rk.style.cssText = 'background:#2a2a40;max-width:320px;display:block;margin:0 auto;';
+            rk.textContent = '🌍 Voir le classement mondial';
+            rk.onclick = () => bbShowRanking(body, true);
+            body.appendChild(rk);
+            // précharge quelques images
+            data.items.slice(0, 16).forEach(it => itemImage(source, it));
+        }
+        function bbShuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+        function bbStart(n) {
+            const entrants = bbShuffle(bb.all).slice(0, n).map(i => i.name);
+            Object.assign(bb, { size: n, current: entrants, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
+            bbRenderDuel();
+        }
+        function bbItem(name) { return bb.all.find(i => i.name === name) || { name }; }
+        function bbCard(name, onClick) {
+            const card = document.createElement('div'); card.className = 'bb-card noimg';
+            const cap = document.createElement('div'); cap.className = 'bb-name'; cap.textContent = name;
+            card.appendChild(cap);
+            itemImage(bb.source, bbItem(name)).then(src => {
+                if (!src) return;
+                const im = document.createElement('img'); im.src = src; im.alt = name;
+                im.onload = () => card.classList.remove('noimg');
+                im.onerror = () => im.remove();
+                card.insertBefore(im, cap);
+            });
+            if (onClick) card.onclick = onClick;
+            return card;
+        }
+        function bbRenderDuel() {
+            const body = document.getElementById('bb-body');
+            const total = bb.current.length / 2;
+            const matchNo = bb.idx / 2 + 1;
+            const a = bb.current[bb.idx], b = bb.current[bb.idx + 1];
+            body.innerHTML = '';
+            const head = document.createElement('div'); head.className = 'bb-head';
+            const rn = document.createElement('div'); rn.className = 'bb-round'; rn.textContent = BB_ROUND_NAMES[bb.current.length] || `TOUR DES ${bb.current.length}`;
+            const sub = document.createElement('div'); sub.style.cssText = 'color:var(--text-muted);font-size:.85rem;'; sub.textContent = `Duel ${matchNo} / ${total}`;
+            const prog = document.createElement('div'); prog.className = 'bb-progress';
+            const done = bb.duels.length, all = bb.size - 1;
+            prog.innerHTML = `<div style="width:${100 * done / all}%"></div>`;
+            head.append(rn, sub, prog);
+            body.appendChild(head);
+            const duel = document.createElement('div'); duel.className = 'bb-duel';
+            const ca = bbCard(a, () => bbPick(0, ca, cb));
+            const vs = document.createElement('div'); vs.className = 'bb-vs'; vs.textContent = 'VS';
+            const cb = bbCard(b, () => bbPick(1, ca, cb));
+            duel.append(ca, vs, cb);
+            body.appendChild(duel);
+            const tools = document.createElement('div'); tools.style.cssText = 'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;';
+            const undo = document.createElement('button'); undo.className = 'btn-action'; undo.style.cssText = 'width:auto;margin:0;background:#2a2a40;';
+            undo.textContent = '↩ Annuler le dernier choix'; undo.disabled = !bb.history.length; undo.onclick = bbUndo;
+            tools.appendChild(undo);
+            body.appendChild(tools);
+            // précharge le duel suivant
+            [bb.current[bb.idx + 2], bb.current[bb.idx + 3]].filter(Boolean).forEach(n => itemImage(bb.source, bbItem(n)));
+        }
+        function bbPick(side, ca, cb) {
+            if (!bb || bb.done || bb.busy) return;
+            bb.busy = true;
+            const a = bb.current[bb.idx], b = bb.current[bb.idx + 1];
+            const winner = side === 0 ? a : b, loser = side === 0 ? b : a;
+            (side === 0 ? ca : cb).classList.add('win');
+            (side === 0 ? cb : ca).classList.add('lose');
+            bb.history.push(JSON.stringify({ current: bb.current, next: bb.next, idx: bb.idx, duels: bb.duels, eliminated: bb.eliminated }));
+            bb.duels.push([winner, loser]);
+            bb.eliminated[loser] = bb.current.length;
+            bb.next.push(winner);
+            bb.idx += 2;
+            setTimeout(() => {
+                bb.busy = false;
+                if (bb.idx >= bb.current.length) {
+                    if (bb.next.length === 1) return bbFinish(bb.next[0]);
+                    bb.current = bb.next; bb.next = []; bb.idx = 0;
+                }
+                bbRenderDuel();
+            }, 380);
+        }
+        function bbUndo() {
+            if (!bb || !bb.history.length) return;
+            Object.assign(bb, JSON.parse(bb.history.pop()));
+            bb.done = false;
+            bbRenderDuel();
+        }
+        document.addEventListener('keydown', e => {
+            const panel = document.getElementById('battle-room');
+            if (!bb || bb.done || !panel || panel.style.display === 'none' || !bb.current) return;
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.isContentEditable)) return;
+            const cards = panel.querySelectorAll('.bb-card');
+            if (cards.length !== 2) return;
+            if (e.key === 'ArrowLeft') bbPick(0, cards[0], cards[1]);
+            if (e.key === 'ArrowRight') bbPick(1, cards[0], cards[1]);
+        });
+        function bbFinish(champion) {
+            bb.done = true;
+            const body = document.getElementById('bb-body');
+            body.innerHTML = '';
+            const box = document.createElement('div'); box.className = 'bb-champion';
+            box.innerHTML = '<div class="bb-round">🏆 TON CHAMPION</div>';
+            box.appendChild(bbCard(champion));
+            body.appendChild(box);
+            // Classement de ta battle : champion, finaliste, demi-finalistes...
+            const order = [champion, ...Object.keys(bb.eliminated).sort((x, y) => bb.eliminated[x] - bb.eliminated[y])];
+            const tabs = document.createElement('div'); tabs.className = 'bb-tabs';
+            const t1 = document.createElement('button'); t1.textContent = 'Mon classement'; t1.className = 'on';
+            const t2 = document.createElement('button'); t2.textContent = '🌍 Classement mondial';
+            tabs.append(t1, t2);
+            body.appendChild(tabs);
+            const list = document.createElement('div');
+            body.appendChild(list);
+            const showMine = () => {
+                t1.className = 'on'; t2.className = '';
+                list.innerHTML = '';
+                const rank = document.createElement('div'); rank.className = 'bb-rank';
+                const stageName = n => n === champion ? 'Champion' : ({ 2: 'Finaliste', 4: 'Demi-finale', 8: 'Quarts', 16: 'Huitièmes', 32: 'Seizièmes', 64: '1er tour' }[bb.eliminated[n]] || '');
+                order.forEach((n, i) => rank.appendChild(bbRankRow(i + 1, n, stageName(n), null)));
+                list.appendChild(rank);
+            };
+            t1.onclick = showMine;
+            t2.onclick = () => { t2.className = 'on'; t1.className = ''; bbShowRanking(list, false); };
+            showMine();
+            const again = document.createElement('div'); again.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;';
+            const b1 = document.createElement('button'); b1.className = 'btn-action'; b1.style.cssText = 'width:auto;margin:0;'; b1.textContent = '🔁 Rejouer'; b1.onclick = () => bbStart(bb.size);
+            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer de thème'; b2.onclick = openBattleSelection;
+            again.append(b1, b2);
+            body.appendChild(again);
+            fetch('/api/battle/result', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: bb.source, champion, duels: bb.duels }) }).catch(() => {});
+        }
+        function bbRankRow(pos, name, right, rate) {
+            const row = document.createElement('div'); row.className = 'bb-rank-row';
+            const p = document.createElement('div'); p.className = 'bb-pos'; p.textContent = pos;
+            const ph = document.createElement('div'); ph.className = 'bb-ph';
+            itemImage(bb.source, bbItem(name)).then(src => { if (src) { const im = document.createElement('img'); im.src = src; im.alt = ''; ph.replaceWith(im); } });
+            const mid = document.createElement('div');
+            const nm = document.createElement('div'); nm.style.fontWeight = '800'; nm.textContent = name;
+            mid.appendChild(nm);
+            if (rate != null) { const bar = document.createElement('div'); bar.className = 'bb-bar'; bar.innerHTML = `<div style="width:${rate}%"></div>`; mid.appendChild(bar); }
+            const r = document.createElement('div'); r.style.cssText = 'font-size:.78rem;color:var(--text-muted);text-align:right;'; r.textContent = right;
+            row.append(p, ph, mid, r);
+            return row;
+        }
+        async function bbShowRanking(container, withBack) {
+            container.innerHTML = '<div class="arc-loading" style="padding:20px;"><div class="arc-spin"></div></div>';
+            let d = null;
+            try { d = await (await fetch('/api/battle/ranking?theme=' + encodeURIComponent(bb.source))).json(); } catch (e) {}
+            container.innerHTML = '';
+            const h = document.createElement('div'); h.className = 'bb-head'; h.innerHTML = '<div class="bb-round">🌍 CLASSEMENT MONDIAL</div><p style="color:var(--text-muted);font-size:.8rem;">🏆 = nombre de fois champion • % = victoires en duel</p>';
+            container.appendChild(h);
+            const rank = document.createElement('div'); rank.className = 'bb-rank';
+            if (!d || !d.rows || !d.rows.length) {
+                rank.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Pas encore de votes pour ce thème : sois le premier à finir une battle !</p>';
+            } else {
+                d.rows.slice(0, 50).forEach((r, i) => rank.appendChild(bbRankRow(i + 1, r.name, `🏆 ${r.champions} • ${r.rate}% (${r.matches} duels)`, r.rate)));
+            }
+            container.appendChild(rank);
+            if (withBack) {
+                const back = document.createElement('button'); back.className = 'btn-action'; back.style.cssText = 'max-width:320px;display:block;margin:12px auto 0;background:#2a2a40;';
+                back.textContent = '← Retour'; back.onclick = () => startBattleSetup(bb.source);
+                container.appendChild(back);
+            }
+        }
 
         tryAutoLogin();
     </script>

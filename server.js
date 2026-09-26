@@ -9575,7 +9575,7 @@ function startBlindTest(room, roomCode) {
 const PUBLIC_MODE_LABELS = {
     undercover:'Undercover', note:'Devine la note', rollandgaros:'Rolland Garros', enchere:'Enchère',
     enchereaveugle:"Enchère à l'aveugle", dle:'AnimeDLE', connexion:'Jeu de connexion',
-    quote:'Citations', blindtest:'Blind Test'
+    quote:'Citations', blindtest:'Blind Test', arcade:'Mini-jeu'
 };
 
 function publicRoomMax(room) {
@@ -9590,6 +9590,11 @@ function publicRoomSubLabel(room) {
     if (room.mode === 'rollandgaros') return RG_UNIVERSES[k]?.name || '';
     if (room.mode === 'dle') return DLE_UNIVERSES[k]?.name || '';
     if (room.mode === 'quote') return QUOTE_UNIVERSES[k]?.name || '';
+    if (room.mode === 'arcade' && typeof ARC_GAMES !== 'undefined') {
+        const [g, u] = String(k || '').split(':');
+        const lab = ARC_GAMES[g]?.label || '';
+        return u && u !== 'all' && ARC_UNIVERSE_ANIME[u] ? `${lab} · ${ARC_UNIVERSE_ANIME[u]}` : lab;
+    }
     if (room.mode === 'enchere' || room.mode === 'enchereaveugle') return ENCHERE_UNIVERSES[k]?.name || '';
     return '';
 }
@@ -10314,6 +10319,12 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (!room) return;
 
+        if (room.mode === 'arcade') {
+            if (room.host !== socket.id) return;
+            startArcade(room, roomCode);
+            return;
+        }
+
         if (room.mode === 'dle') {
             if (room.host !== socket.id) return;
             await startDle(room, roomCode);
@@ -10440,6 +10451,7 @@ io.on('connection', (socket) => {
             remap(room.blindtest.answers);
         }
         if (room.quoteGame) remap(room.quoteGame.scores);
+        if (room.mode === 'arcade' && typeof arcRemap === 'function') arcRemap(roomCode, ancienId, socket.id);
         if (room.dle) {
             remap(room.dle.attemptsByPlayer);
             if (room.dle.winnerId === ancienId) room.dle.winnerId = socket.id;
@@ -10462,6 +10474,8 @@ io.on('connection', (socket) => {
             emitConnexionState(room, roomCode);
         } else if (room.status === 'bt_playing' || room.status === 'bt_over') {
             emitBlindState(room, roomCode);
+        } else if ((room.status === 'arc_playing' || room.status === 'arc_over') && typeof arcSendTo === 'function' && arcSendTo(socket, room, roomCode)) {
+            // mini-jeu arcade : état renvoyé par arcSendTo
         } else if ((room.status === 'dle_playing' || room.status === 'dle_finished') && room.dle) {
             socket.emit('dle_state', dlePublicRoom(room));
         } else if (room.status === 'quote_playing' && room.quoteGame) {
@@ -10520,6 +10534,7 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
 
             if (room.players.length === 0) {
                 btClearTimer(roomCode);
+                if (typeof arcStop === 'function') arcStop(roomCode);
                 if (rgTimers[roomCode]) {
                     clearInterval(rgTimers[roomCode]);
                     delete rgTimers[roomCode];
@@ -10536,8 +10551,16 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
             // Salon d'attente : mise à jour normale de la liste des joueurs
             if (room.status === 'waiting' || room.status === 'results' || room.status === 'rg_over'
                 || room.status === 'enchere_over' || room.status === 'enchereaveugle_over' || room.status === 'connexion_over'
-                || room.status === 'bt_over') {
+                || room.status === 'bt_over' || room.status === 'arc_over') {
                 io.to(roomCode).emit('update_room', room);
+                if (room.status === 'arc_over' && typeof arcGames !== 'undefined' && arcGames[roomCode]) {
+                    io.to(roomCode).emit('arc_state', arcPublic(room, arcGames[roomCode]));
+                }
+                return;
+            }
+
+            if (room.status === 'arc_playing' && typeof arcOnPlayerLeft === 'function') {
+                arcOnPlayerLeft(room, roomCode, socketId);
                 return;
             }
 
@@ -10737,3 +10760,962 @@ async function startDleLiveExpansion() { return null; }
 
 // Connexion Neon coupée pendant l'inactivité : simple message au lieu d'un gros log
 pool.on('error', err => console.error('[PG] connexion perdue :', err.message));
+
+
+/* =====================================================================
+   MINI-JEUX ARCADE : Pixel Anime, Silhouette, Emoji Anime, 4 images = 1 anime,
+   Map Guess, Fusion Anime, Scene Guessr  +  Tier list  +  Battle de préférence
+   ===================================================================== */
+
+const ARC_GAMES = {
+    pixel:      { label:'Pixel Anime',          icon:'🖼️', universe:true,  rounds:10, roundMs:30000, answer:'text'   },
+    silhouette: { label:'Silhouette',           icon:'👤', universe:true,  rounds:10, roundMs:25000, answer:'text'   },
+    emoji:      { label:'Emoji Anime',          icon:'😀', universe:false, rounds:12, roundMs:20000, answer:'choice' },
+    quatre:     { label:'4 images = 1 anime',   icon:'🧩', universe:false, rounds:10, roundMs:24000, answer:'choice' },
+    mapguess:   { label:'Map Guess',            icon:'🗺️', universe:false, rounds:10, roundMs:20000, answer:'choice' },
+    fusion:     { label:'Fusion Anime',         icon:'🧪', universe:true,  rounds:6,  roundMs:60000, answer:'multi'  },
+    scene:      { label:'Scene Guessr',         icon:'🎬', universe:false, rounds:10, roundMs:20000, answer:'choice' }
+};
+const ARC_REVEAL_MS = 7000;
+
+// Nombre de persos "connus" utilisés par univers (les listes DLE sont triées par popularité)
+const ARC_FAMOUS_LIMIT = { pokemon: 386, onepiece: 60, naruto: 55, dragonball: 45, bleach: 45, jojo: 40, fairy: 40 };
+const ARC_FAMOUS_DEFAULT = 32;
+
+// Animes (tier list, battle, fausses réponses). q = recherche MyAnimeList pour l'affiche.
+const ARC_ANIMES = [
+    ['Naruto','Naruto'],['One Piece','One Piece'],['Bleach','Bleach'],['Hunter x Hunter','Hunter x Hunter (2011)'],
+    ["L'Attaque des Titans",'Shingeki no Kyojin'],['Seven Deadly Sins','Nanatsu no Taizai'],['Death Note','Death Note'],
+    ['Classroom of the Elite','Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e'],['Solo Leveling','Ore dake Level Up na Ken'],
+    ['Black Clover','Black Clover'],['Fire Force','Enen no Shouboutai'],['Mushoku Tensei','Mushoku Tensei: Isekai Ittara Honki Dasu'],
+    ['Re:Zero','Re:Zero kara Hajimeru Isekai Seikatsu'],['Fairy Tail','Fairy Tail'],['Blue Lock','Blue Lock'],
+    ['Fullmetal Alchemist','Fullmetal Alchemist: Brotherhood'],['Chainsaw Man','Chainsaw Man'],['Wakfu','Wakfu'],
+    ['Demon Slayer','Kimetsu no Yaiba'],['Pokémon','Pokemon'],['Dragon Ball','Dragon Ball Z'],["Hell's Paradise",'Jigokuraku'],
+    ['Gachiakuta','Gachiakuta'],['Haikyuu','Haikyuu!!'],['Jujutsu Kaisen','Jujutsu Kaisen'],["JoJo's Bizarre Adventure",'JoJo no Kimyou na Bouken (TV)'],
+    ['Tensura','Tensei shitara Slime Datta Ken'],['One Punch Man','One Punch Man'],['Sword Art Online','Sword Art Online'],
+    ['Tokyo Ghoul','Tokyo Ghoul'],['Tokyo Revengers','Tokyo Revengers'],
+    ['My Hero Academia','Boku no Hero Academia'],['Spy x Family','Spy x Family'],['Frieren','Sousou no Frieren'],['Dandadan','Dandadan'],
+    ['Mob Psycho 100','Mob Psycho 100'],['Vinland Saga','Vinland Saga'],['Bungo Stray Dogs','Bungou Stray Dogs'],['Kaiju No. 8','Kaijuu 8-gou'],
+    ['Sakamoto Days','Sakamoto Days'],['Code Geass','Code Geass: Hangyaku no Lelouch'],['Steins;Gate','Steins;Gate'],['Cowboy Bebop','Cowboy Bebop'],
+    ['Neon Genesis Evangelion','Shinseiki Evangelion'],['Dr. Stone','Dr. Stone'],['The Promised Neverland','Yakusoku no Neverland'],
+    ['Made in Abyss','Made in Abyss'],['Violet Evergarden','Violet Evergarden'],['Your Lie in April','Shigatsu wa Kimi no Uso'],
+    ['Kaguya-sama','Kaguya-sama wa Kokurasetai'],['Oshi no Ko','Oshi no Ko'],['Cyberpunk: Edgerunners','Cyberpunk: Edgerunners'],
+    ['Parasite (Kiseijuu)','Kiseijuu: Sei no Kakuritsu'],['Berserk','Kenpuu Denki Berserk'],['Assassination Classroom','Ansatsu Kyoushitsu'],
+    ['Noragami','Noragami'],['Soul Eater','Soul Eater'],['Gintama','Gintama'],['Blue Exorcist','Ao no Exorcist'],['Magi','Magi: The Labyrinth of Magic'],
+    ['Akame ga Kill!','Akame ga Kill!'],['Mashle','Mashle'],['Black Butler','Kuroshitsuji'],['Konosuba','Kono Subarashii Sekai ni Shukufuku wo!'],
+    ['Overlord','Overlord'],['No Game No Life','No Game No Life'],['The Rising of the Shield Hero','Tate no Yuusha no Nariagari'],
+    ['Kill la Kill','Kill la Kill'],['Gurren Lagann','Tengen Toppa Gurren Lagann'],['Hajime no Ippo','Hajime no Ippo'],['Slam Dunk','Slam Dunk'],
+    ['Kuroko no Basket','Kuroko no Basket'],['Bocchi the Rock!','Bocchi the Rock!'],['Horimiya','Horimiya'],['Great Teacher Onizuka','Great Teacher Onizuka'],
+    ['Samurai Champloo','Samurai Champloo'],['Psycho-Pass','Psycho-Pass'],['Erased','Boku dake ga Inai Machi'],['Beastars','Beastars'],
+    ['Fruits Basket','Fruits Basket (2019)'],['Boruto','Boruto: Naruto Next Generations'],['Yu Yu Hakusho','Yuu☆Yuu☆Hakusho'],
+    ['Saint Seiya','Saint Seiya'],['Captain Tsubasa','Captain Tsubasa'],['Détective Conan','Meitantei Conan'],['City Hunter','City Hunter'],
+    ['Nana','Nana'],['Inuyasha','Inuyasha'],['Sailor Moon','Bishoujo Senshi Sailor Moon'],['Tower of God','Kami no Tou'],
+    ["Les Carnets de l'Apothicaire",'Kusuriya no Hitorigoto'],['Wind Breaker','Wind Breaker'],['Darling in the Franxx','Darling in the FranXX'],
+    ['Kakegurui','Kakegurui'],['Your Name','Kimi no Na wa.'],['Given','Given'],['Serial Experiments Lain','Serial Experiments Lain'],
+    ['Undead Unluck','Undead Unluck'],['Blue Period','Blue Period'],['Ao Ashi','Ao Ashi'],['Toradora!','Toradora!'],['Death Parade','Death Parade'],
+    ['Dororo','Dororo'],['Fire Punch','Fire Punch'],['Lookism','Lookism'],['Hellsing Ultimate','Hellsing Ultimate'],['Trigun','Trigun Stampede']
+];
+const ARC_ANIME_NAMES = ARC_ANIMES.map(a => a[0]);
+
+// Nom d'anime affiché pour chaque univers du site
+const ARC_UNIVERSE_ANIME = {
+    naruto:'Naruto', onepiece:'One Piece', bleach:'Bleach', hxh:'Hunter x Hunter', snk:"L'Attaque des Titans", sds:'Seven Deadly Sins',
+    deathnote:'Death Note', cote:'Classroom of the Elite', solo:'Solo Leveling', clover:'Black Clover', fireforce:'Fire Force',
+    mushoku:'Mushoku Tensei', rezero:'Re:Zero', fairy:'Fairy Tail', bluelock:'Blue Lock', fma:'Fullmetal Alchemist', chainsaw:'Chainsaw Man',
+    wakfu:'Wakfu', demonslayer:'Demon Slayer', pokemon:'Pokémon', dragonball:'Dragon Ball', hellsparadise:"Hell's Paradise",
+    gachiakuta:'Gachiakuta', haikyuu:'Haikyuu', jjk:'Jujutsu Kaisen', jojo:"JoJo's Bizarre Adventure", tensura:'Tensura',
+    opm:'One Punch Man', sao:'Sword Art Online', tokyoghoul:'Tokyo Ghoul', tokyorevengers:'Tokyo Revengers'
+};
+
+// Emoji Anime : [emojis, réponse, univers (pour les persos), type]
+// type 'anime' => 4 animes proposés ; type 'perso' => 4 persos du même univers proposés
+const ARC_EMOJI = [
+    ['🍥🦊🍃','Naruto',null,'anime'], ['🏴‍☠️👒🍖','One Piece',null,'anime'], ['⚔️💀🍊','Bleach',null,'anime'],
+    ['🧱🧱🧱👹🗡️','L\'Attaque des Titans',null,'anime'], ['📓✍️💀🍎','Death Note',null,'anime'], ['🎣👦🃏🤡','Hunter x Hunter',null,'anime'],
+    ['🐉⚽⚽⚽⚽⚽⚽⚽','Dragon Ball',null,'anime'], ['👊🥚🦲','One Punch Man',null,'anime'], ['🗡️👹🌸🎴','Demon Slayer',null,'anime'],
+    ['🤞👁️👁️🤞😈','Jujutsu Kaisen',null,'anime'], ['🪚🐶😈','Chainsaw Man',null,'anime'], ['⚡🐭🔴⚪','Pokémon',null,'anime'],
+    ['🔔🏃‍♂️💀🔁','Re:Zero',null,'anime'], ['🟦🔒⚽🥅','Blue Lock',null,'anime'], ['🏐🐦‍⬛🦉','Haikyuu',null,'anime'],
+    ['🧪🦾🧒🥫','Fullmetal Alchemist',null,'anime'], ['🍀📕🤬🗡️','Black Clover',null,'anime'], ['🧚‍♀️🔥🐉🍺','Fairy Tail',null,'anime'],
+    ['🎮⚔️🕹️🏰🗼','Sword Art Online',null,'anime'], ['☕👁️🩸🎭','Tokyo Ghoul',null,'anime'], ['⏪🏍️👊🏫','Tokyo Revengers',null,'anime'],
+    ['💧🟦👑😇','Tensura',null,'anime'], ['🌟🕺✋🪨','JoJo\'s Bizarre Adventure',null,'anime'], ['🔥🚒😁👣','Fire Force',null,'anime'],
+    ['🧙‍♂️👶📖🔄','Mushoku Tensei',null,'anime'], ['🏫♟️🧊😐','Classroom of the Elite',null,'anime'], ['🗡️👤⬆️📈','Solo Leveling',null,'anime'],
+    ['7️⃣😈🐷🍺','Seven Deadly Sins',null,'anime'], ['🍑🏝️🥷💀','Hell\'s Paradise',null,'anime'], ['🗑️🧤👊🏚️','Gachiakuta',null,'anime'],
+    ['🚪🌀🟢🎩','Wakfu',null,'anime'], ['🦸‍♂️🏫💥🥦','My Hero Academia',null,'anime'], ['🕵️‍♂️👧🥜🐕','Spy x Family',null,'anime'],
+    ['🧝‍♀️🪄⏳💐','Frieren',null,'anime'], ['👽👻🍆🧓','Dandadan',null,'anime'], ['🧑‍🦲💯🧂👻','Mob Psycho 100',null,'anime'],
+    ['⚔️🛶❄️👑','Vinland Saga',null,'anime'], ['🐯📚🔫🌆','Bungo Stray Dogs',null,'anime'], ['🦖🔢8️⃣🧹','Kaiju No. 8',null,'anime'],
+    ['🔫🏪👓🍭','Sakamoto Days',null,'anime'], ['♟️👁️‍🗨️👑🍕','Code Geass',null,'anime'], ['🔬📱⏰🍌','Steins;Gate',null,'anime'],
+    ['🚀🤠🐶🎷','Cowboy Bebop',null,'anime'], ['🤖👦📐✝️','Neon Genesis Evangelion',null,'anime'], ['🧪🪨🗿💡','Dr. Stone',null,'anime'],
+    ['🏠👧👦🍽️🌳','The Promised Neverland',null,'anime'], ['🕳️👧🤖🐰','Made in Abyss',null,'anime'], ['✉️🦾💌','Violet Evergarden',null,'anime'],
+    ['🎹🎻🌸😢','Your Lie in April',null,'anime'], ['❤️🧠♟️🏫','Kaguya-sama',null,'anime'], ['⭐👁️🎤🔪','Oshi no Ko',null,'anime'],
+    ['🌃🤖🦾🌙','Cyberpunk: Edgerunners',null,'anime'], ['✋👁️👄🩸','Parasite (Kiseijuu)',null,'anime'], ['🗡️🌘🐎⚫','Berserk',null,'anime'],
+    ['🐙🏫🎯🔫','Assassination Classroom',null,'anime'], ['⛩️🧣5️⃣💰','Noragami',null,'anime'], ['💀⚖️🛹🎃','Soul Eater',null,'anime'],
+    ['🍓🥛⚔️👓','Gintama',null,'anime'], ['🔥💙😈⛪','Blue Exorcist',null,'anime'], ['💪🍞🪄🏫','Mashle',null,'anime'],
+    ['🎩🍰😈🐈‍⬛','Black Butler',null,'anime'], ['💧🤦‍♀️💥🧙‍♀️','Konosuba',null,'anime'], ['💀👑🏰🦴','Overlord',null,'anime'],
+    ['🛡️🦝😠','The Rising of the Shield Hero',null,'anime'], ['🕶️🌀⛏️🌌','Gurren Lagann',null,'anime'], ['🥊🐟🔁','Hajime no Ippo',null,'anime'],
+    ['🏀🔴🦍','Slam Dunk',null,'anime'], ['🏀👻💙','Kuroko no Basket',null,'anime'], ['🎸😰🩷📦','Bocchi the Rock!',null,'anime'],
+    ['👨‍🏫🏍️🏫💰','Great Teacher Onizuka',null,'anime'], ['🔫⚖️🧠👮','Psycho-Pass',null,'anime'], ['⏪🧒🔪❄️','Erased',null,'anime'],
+    ['🐺🐰🎭🏫','Beastars',null,'anime'], ['🍙🐭🐍🐈','Fruits Basket',null,'anime'], ['🕵️👓👦💊','Détective Conan',null,'anime'],
+    ['🐕🗡️🌸🏯','Inuyasha',null,'anime'], ['🌙👸🐈‍⬛','Sailor Moon',null,'anime'], ['🗼🙋‍♂️👑🌊','Tower of God',null,'anime'],
+    ['💊🏯🧪👀','Les Carnets de l\'Apothicaire',null,'anime'], ['🌪️🏫🥊🌸','Wind Breaker',null,'anime'], ['🌸🤖🦖💋','Darling in the Franxx',null,'anime'],
+    ['🎲💸🏫😈','Kakegurui',null,'anime'], ['🌠🔄👦👧⛩️','Your Name',null,'anime'], ['🥋🏆🇯🇵⚽','Captain Tsubasa',null,'anime'],
+    ['🔴🧥⛓️🗝️','Code Geass',null,'anime'], ['🐉🛡️⭐🌌','Saint Seiya',null,'anime'], ['👻🔫👦🥋','Yu Yu Hakusho',null,'anime'],
+
+    ['🍜🦊🧡','Naruto Uzumaki','naruto','perso'], ['⚡👁️🐍','Sasuke Uchiha','naruto','perso'], ['📕😷⚡','Kakashi Hatake','naruto','perso'],
+    ['🐸📚🍶','Jiraiya','naruto','perso'], ['⏳🏜️🧸','Gaara','naruto','perso'], ['🍡🐦‍⬛💔','Itachi Uchiha','naruto','perso'],
+    ['👒🍖🤸','Monkey D. Luffy','onepiece','perso'], ['⚔️⚔️⚔️🧭❌','Roronoa Zoro','onepiece','perso'], ['🚬🍳🦵','Sanji','onepiece','perso'],
+    ['🍊🗺️💰','Nami','onepiece','perso'], ['🤥🎯🐸','Usopp','onepiece','perso'], ['🦌🎩🩺','Tony Tony Chopper','onepiece','perso'],
+    ['🔥🎩🏴‍☠️','Portgas D. Ace','onepiece','perso'], ['🍓🍓🧔🏴‍☠️','Barbe Blanche','onepiece','perso'],
+    ['🍊🦍🗡️','Ichigo Kurosaki','bleach','perso'], ['❄️🐉🧒','Toshiro Hitsugaya','bleach','perso'], ['👓🦋☕','Sosuke Aizen','bleach','perso'],
+    ['🎣🟢🧒','Gon Freecss','hxh','perso'], ['⚡🛹🍫','Killua Zoldyck','hxh','perso'], ['🃏🤡🍇','Hisoka Morow','hxh','perso'], ['⛓️👁️🔴','Kurapika','hxh','perso'],
+    ['🔑🧱😡','Eren Yeager','snk','perso'], ['🧹🍵🗡️','Levi Ackerman','snk','perso'], ['🧣🗡️❤️','Mikasa Ackerman','snk','perso'],
+    ['📓🍎😈','Ryuk','deathnote','perso'], ['🍰🍬🪑','L Lawliet','deathnote','perso'], ['🍫🔫','Mello','deathnote','perso'],
+    ['🦲🥚💪','Saitama','opm','perso'], ['🦾🔥🤖','Genos','opm','perso'], ['🌪️👧💚','Tatsumaki','opm','perso'],
+    ['🍊🥋☁️','Son Goku','dragonball','perso'], ['👑💪🟦','Vegeta','dragonball','perso'], ['🟢👂🎤','Piccolo','dragonball','perso'], ['❄️👽🚀','Freezer','dragonball','perso'],
+    ['🌊🗡️🎴🌞','Tanjiro Kamado','demonslayer','perso'], ['🎋📦👧','Nezuko Kamado','demonslayer','perso'], ['⚡😭💛','Zenitsu Agatsuma','demonslayer','perso'],
+    ['🐗🗡️🗡️','Inosuke Hashibira','demonslayer','perso'], ['🔥🍱🦉','Kyojuro Rengoku','demonslayer','perso'],
+    ['🙈♾️😎','Satoru Gojo','jjk','perso'], ['👄👄✋✋','Ryomen Sukuna','jjk','perso'], ['🐕‍🦺🌑🖐️','Megumi Fushiguro','jjk','perso'], ['🔨📍💅','Nobara Kugisaki','jjk','perso'],
+    ['🪚🍞🐶','Denji','chainsaw','perso'], ['🩸😈🐈','Power','chainsaw','perso'], ['🐕🐕⛓️👁️','Makima','chainsaw','perso'],
+    ['🦊🗡️🎮','Kirito','sao','perso'], ['⚡🐭','Pikachu','pokemon','perso'], ['🔥🦎🐉','Dracaufeu','pokemon','perso'], ['😴🍔🧸','Ronflex','pokemon','perso'],
+    ['🌱🦖🌸','Florizarre','pokemon','perso'], ['🧠🟣🥄','Mewtwo','pokemon','perso'], ['🐢💦💣','Tortank','pokemon','perso'], ['👻😈💜','Ectoplasma','pokemon','perso'],
+    ['🔥✊🐉','Natsu Dragneel','fairy','perso'], ['🗝️⭐👱‍♀️','Lucy Heartfilia','fairy','perso'], ['❄️👕😳','Gray Fullbuster','fairy','perso'],
+    ['🍀⚔️💪📢','Asta','clover','perso'], ['🌪️🌙🍃','Yuno','clover','perso'], ['🟦💧👑','Rimuru Tempest','tensura','perso'],
+    ['🧊🎹❤️','Emilia','rezero','perso'], ['💙🔨👧','Rem','rezero','perso'], ['🧂🍗🏍️','Manjiro Sano','tokyorevengers','perso'],
+    ['⭐👒🥷','Jotaro Kujo','jojo','perso'], ['🍔🧢🌟','Joseph Joestar','jojo','perso'], ['🐞🌟🌼','Giorno Giovanna','jojo','perso'],
+    ['🦾🧪🔨','Edward Elric','fma','perso'], ['🔥🧤💂','Roy Mustang','fma','perso'], ['🗡️👤👑','Sung Jinwoo','solo','perso'],
+    ['🧒🏐🐦‍⬛','Shoyo Hinata','haikyuu','perso'], ['👑🏐😠','Tobio Kageyama','haikyuu','perso'], ['🎮😼🍎','Kenma Kozume','haikyuu','perso'],
+    ['🦉📖🍷','Kyojuro Rengoku','demonslayer','perso']
+];
+
+// Map Guess : lieux emblématiques [titre de page Fandom, nom affiché]
+const ARC_PLACES = {
+    naruto: [['Konohagakure','Konoha'],['Sunagakure','Suna'],['Valley of the End','La Vallée de la Fin'],['Amegakure','Ame (le village de la Pluie)'],['Kirigakure','Kiri (le village de la Brume)'],['Hokage Rock','Le Mont des Hokage'],['Forest of Death','La Forêt de la Mort'],['Mount Myōboku','Le Mont Myoboku']],
+    onepiece: [['Arlong Park','Arlong Park'],['Loguetown','Loguetown'],['Alabasta Kingdom','Alabasta'],['Skypiea','Skypiea'],['Water 7','Water 7'],['Enies Lobby','Enies Lobby'],['Thriller Bark','Thriller Bark'],['Sabaody Archipelago','L\'archipel Sabaody'],['Impel Down','Impel Down'],['Marineford','Marineford'],['Fish-Man Island','L\'île des Hommes-Poissons'],['Dressrosa','Dressrosa'],['Whole Cake Island','Whole Cake Island'],['Wano Country','Wano'],['Egghead','Egghead']],
+    bleach: [['Seireitei','Le Seireitei'],['Las Noches','Las Noches'],['Karakura Town','Karakura'],['Rukongai','Le Rukongai'],['Hueco Mundo','Hueco Mundo']],
+    hxh: [['Heavens Arena','L\'Arène Céleste'],['Greed Island','Greed Island'],['Kukuroo Mountain','La montagne Kukuru'],['Yorknew City','Yorknew City'],['Whale Island','L\'île de la Baleine'],['Meteor City','Meteor City']],
+    snk: [['Shiganshina District','Shiganshina'],['Trost District','Trost'],['Wall Maria','Le Mur Maria'],['Paradis Island','L\'île du Paradis'],['Liberio','Liberio'],['Forest of Giant Trees','La Forêt des Arbres Géants'],['Stohess District','Stohess']],
+    demonslayer: [['Mt. Natagumo','Le mont Natagumo'],['Infinity Castle','La Forteresse Infinie'],['Swordsmith Village','Le Village des Forgerons'],['Butterfly Mansion','Le Domaine des Papillons'],['Entertainment District','Le Quartier des Plaisirs'],['Mt. Sagiri','Le mont Sagiri']],
+    jjk: [['Tokyo Jujutsu High','L\'école d\'exorcisme de Tokyo'],['Kyoto Jujutsu High','L\'école d\'exorcisme de Kyoto'],['Shibuya','Shibuya']],
+    fma: [['Central City','Central City'],['Resembool','Resembool'],['Lior','Lior'],['Ishval','Ishbal'],['Fort Briggs','Le Fort Briggs'],['Rush Valley','Rush Valley'],['Xing','Xing'],['Dublith','Dublith']],
+    dragonball: [['Kame House','La Kame House'],['Capsule Corporation','Capsule Corporation'],['Kami\'s Lookout','Le Palais du Tout-Puissant'],['Planet Namek','Namek'],['Hyperbolic Time Chamber','La Salle de l\'Esprit et du Temps'],['Korin Tower','La Tour de Karin'],['King Kai\'s planet','La planète de Maître Kaio'],['Planet Vegeta','La planète Vegeta']],
+    pokemon: [['Pallet Town','Bourg Palette'],['Cerulean City','Azuria'],['Celadon City','Céladopole'],['Lavender Town','Lavanville'],['Indigo Plateau','Le Plateau Indigo'],['Mt. Moon','Le Mont Sélénite'],['Viridian Forest','La Forêt de Jade'],['Saffron City','Safrania'],['Vermilion City','Carmin sur Mer']],
+    fairy: [['Magnolia Town','Magnolia'],['Tenrou Island','L\'île Tenrou'],['Edolas','Edolas'],['Crocus','Crocus']],
+    sao: [['Aincrad','Aincrad'],['Town of Beginnings','La Ville des Débuts'],['Underworld','L\'Underworld'],['Alfheim','Alfheim']],
+    tokyoghoul: [['Anteiku','L\'Antique (Anteiku)'],['Cochlea','Cochlea']],
+    sds: [['Liones','Liones'],['Boar Hat','Le Boar Hat'],['Camelot','Camelot'],['Fairy King\'s Forest','La Forêt du Roi des Fées']],
+    clover: [['Clover Kingdom','Le Royaume de Clover'],['Hage Village','Le village de Hage'],['Spade Kingdom','Le Royaume de Spade']],
+    tensura: [['Jura Tempest Federation','Tempest']],
+    rezero: [['Roswaal Mansion','Le manoir de Roswaal'],['Sanctuary','Le Sanctuaire']],
+    opm: [['City Z','La Ville Z']],
+    jojo: [['Morioh','Morioh']],
+    onepunch: []
+};
+
+const ARC_CRYPTO = require('crypto');
+const arcGames = {};
+
+function arcShuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+const arcPick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* ---------- Noms : affichage VF + vérification tolérante (alias anglais acceptés) ---------- */
+function arcDisplayName(u, name) {
+    try {
+        const pool = (typeof RG_POOLS_V2 !== 'undefined' && RG_POOLS_V2[u]) || [];
+        if (!pool.length) return name;
+        const c = rgCanonicalInput(u, name, pool);
+        return pool.find(n => normalizeRG(n) === c) || name;
+    } catch (_) { return name; }
+}
+
+
+// Listes "persos connus" écrites à la main pour les univers où la liste DLE devient alphabétique
+const ARC_FAMOUS_OVERRIDE = {
+    onepiece: ['Monkey D. Luffy','Roronoa Zoro','Nami','Usopp','Sanji','Tony Tony Chopper','Nico Robin','Franky','Brook','Jinbe','Shanks','Portgas D. Ace','Sabo','Trafalgar D. Water Law','Eustass Kid','Boa Hancock','Dracule Mihawk','Crocodile','Donquixote Doflamingo','Kaido','Charlotte Linlin','Edward Newgate','Marshall D. Teach','Monkey D. Garp','Sakazuki','Kuzan','Borsalino','Issho','Buggy','Enel','Arlong','Bartholomew Kuma','Rob Lucci','Nefertari Vivi','Yamato','Charlotte Katakuri','Marco','Smoker','Tashigi','Koby','Silvers Rayleigh','Monkey D. Dragon','Perona','Gecko Moria','Magellan','Emporio Ivankov','Bon Clay','Carrot','Bepo','Killer','Kozuki Oden','Kozuki Momonosuke','Vegapunk','Sengoku','Gol D. Roger','Shirahoshi','Hody Jones','Kalifa','Benn Beckman','Kinemon'],
+    bleach: ['Ichigo Kurosaki','Rukia Kuchiki','Renji Abarai','Byakuya Kuchiki','Toshiro Hitsugaya','Kenpachi Zaraki','Sosuke Aizen','Uryu Ishida','Orihime Inoue','Yasutora Sado','Kisuke Urahara','Yoruichi Shihoin','Gin Ichimaru','Ulquiorra Cifer','Grimmjow Jaegerjaquez','Genryusai Shigekuni Yamamoto','Soi Fon','Shunsui Kyoraku','Jushiro Ukitake','Mayuri Kurotsuchi','Retsu Unohana','Sajin Komamura','Kaname Tosen','Isshin Kurosaki','Kon','Coyote Starrk','Baraggan Louisenbairn','Nelliel Tu Odelschwanck','Yhwach','Ikkaku Madarame','Yumichika Ayasegawa','Rangiku Matsumoto','Hiyori Sarugaki','Shinji Hirako','Momo Hinamori','Tier Harribel','Nnoitra Gilga','Szayelaporro Granz','Jugram Haschwalth','Kukaku Shiba','Ganju Shiba','Hanataro Yamada'],
+    sds: ['Meliodas','Elizabeth Liones','Ban','King','Diane','Gowther','Merlin','Escanor','Hawk','Zeldris','Estarossa','Arthur Pendragon','Gilthunder','Howzer','Griamore','Hendrickson','Dreyfus','Elaine','Derieri','Monspeet','Galand','Fraudrin','Melascula','Grayroad','Gloxinia','Drole','Chandler','Cusack','Mael','Ludociel','Demon King','Jericho','Veronica Liones','Margaret Liones','Bartra Liones','Tristan','Percival','Guila'],
+    clover: ['Asta','Yuno','Noelle Silva','Yami Sukehiro','Luck Voltia','Magna Swing','Finral Roulacase','Vanessa Enoteca','Charmy Pappitson','Gauche Adlai','Grey','Gordon Agrippa','Zora Ideale','Secre Swallowtail','Henry Legolant','Julius Novachrono','William Vangeance','Fuegoleon Vermillion','Mereoleona Vermillion','Leopold Vermillion','Mimosa Vermillion','Klaus Lunettes','Nozel Silva','Charlotte Roselei','Dorothy Unsworth','Rill Boismortier','Licht','Patry','Lucius Zogratis','Zenon Zogratis','Vanica Zogratis','Dante Zogratis','Liebe','Langris Vaude','Jack the Ripper','Fana','Rades Spirito','Nacht Faust','Mars'],
+    fairy: ['Natsu Dragneel','Lucy Heartfilia','Gray Fullbuster','Erza Scarlet','Wendy Marvell','Happy','Carla','Gajeel Redfox','Laxus Dreyar','Juvia Lockser','Levy McGarden','Mirajane Strauss','Elfman Strauss','Lisanna Strauss','Makarov Dreyar','Gildarts Clive','Mavis Vermillion','Zeref Dragneel','Acnologia','Jellal Fernandes','Ultear Milkovich','Meredy','Sting Eucliffe','Rogue Cheney','Minerva Orland','Kagura Mikazuchi','Lyon Vastia','Cana Alberona','Freed Justine','Evergreen','Bickslow','Cobra','Hades','Irene Belserion','August','Brandish μ','Dimaria Yesta','Ichiya Vandalay Kotobuki','Panther Lily','Frosch','Lector','Jura Neekis','Yukino Agria']
+};
+const ARC_FAMOUS_CACHE = new Map();
+function arcFamous(u) {
+    if (ARC_FAMOUS_CACHE.has(u)) return ARC_FAMOUS_CACHE.get(u);
+    const src = ARC_FAMOUS_OVERRIDE[u] || (typeof DLE_TARGET_NAMES !== 'undefined' && DLE_TARGET_NAMES[u]) || [];
+    const limit = ARC_FAMOUS_OVERRIDE[u] ? 999 : (ARC_FAMOUS_LIMIT[u] || ARC_FAMOUS_DEFAULT);
+    const seen = new Set();
+    const out = [];
+    for (const raw of src) {
+        if (out.length >= limit) break;
+        const display = arcDisplayName(u, raw);
+        const k = normalizeRG(display);
+        if (!k || seen.has(k)) continue;
+        seen.add(k);
+        out.push({ raw, display });
+    }
+    ARC_FAMOUS_CACHE.set(u, out);
+    return out;
+}
+function arcUniverses() {
+    return Object.keys(ARC_UNIVERSE_ANIME).filter(u => arcFamous(u).length >= 8);
+}
+
+const ARC_TOKEN_COUNT = new Map();
+function arcTokenCounts(u) {
+    if (ARC_TOKEN_COUNT.has(u)) return ARC_TOKEN_COUNT.get(u);
+    const counts = new Map();
+    const pool = (RG_POOLS_V2 && RG_POOLS_V2[u]) || [];
+    const seen = new Set(pool.map(n => normalizeRG(n)));
+    const groups = pool.map(n => normalizeRG(n));
+    // les noms d'origine (anglais / japonais) comptent aussi, rattachés au même perso
+    arcFamous(u).forEach(c => {
+        const i = groups.indexOf(normalizeRG(c.display));
+        const raw = normalizeRG(c.raw);
+        if (i >= 0) groups[i] += ' ' + raw; else if (!seen.has(raw)) groups.push(raw);
+    });
+    for (const n of groups) {
+        new Set(n.split(' ')).forEach(t => { if (t) counts.set(t, (counts.get(t) || 0) + 1); });
+    }
+    ARC_TOKEN_COUNT.set(u, counts);
+    return counts;
+}
+
+// Vrai si "input" désigne bien le perso (nom VF, nom anglais/japonais, prénom seul non ambigu, petite faute).
+function arcNameMatches(u, target, input) {
+    const x = normalizeRG(String(input || ''));
+    if (!x) return false;
+    const t = normalizeRG(target.display);
+    const r = normalizeRG(target.raw || target.display);
+    if (x === t || x === r) return true;
+    try {
+        const pool = (RG_POOLS_V2 && RG_POOLS_V2[u]) || [];
+        if (pool.length && rgCanonicalInput(u, input, pool) === t) return true;
+    } catch (_) {}
+    const tol = s => toleranceRG(Math.max(s.length, x.length));
+    if (distanceRG(x, t) <= tol(t) || distanceRG(x, r) <= tol(r)) return true;
+    // Prénom / nom seul, s'il ne désigne qu'un seul perso de l'univers
+    const counts = arcTokenCounts(u);
+    const tokens = new Set([...t.split(' '), ...r.split(' ')].filter(w => w.length >= 3));
+    for (const w of tokens) {
+        if ((counts.get(w) || 0) > 1) continue;
+        if (x === w) return true;
+        if (w.length >= 5 && distanceRG(x, w) <= tol(w)) return true;
+    }
+    return false;
+}
+
+/* ---------- Images : jetons opaques (le nom du perso n'apparaît jamais dans l'URL) ---------- */
+const ARC_IMG_TOKENS = new Map();   // jeton -> { url, exp }
+const ARC_IMG_CACHE = new Map();    // url -> { buf, type }
+const ARC_IMG_INFLIGHT = new Map();
+let ARC_IMG_CACHE_BYTES = 0;
+const ARC_IMG_HOSTS = /(^|\.)(wikia\.nocookie\.net|githubusercontent\.com|ytimg\.com|myanimelist\.net|fandom\.com)$/i;
+
+function arcToken(url) {
+    const token = ARC_CRYPTO.randomBytes(10).toString('hex');
+    ARC_IMG_TOKENS.set(token, { url, exp: Date.now() + 45 * 60 * 1000 });
+    if (ARC_IMG_TOKENS.size > 4000) {
+        const now = Date.now();
+        for (const [k, v] of ARC_IMG_TOKENS) if (v.exp < now) ARC_IMG_TOKENS.delete(k);
+    }
+    return '/api/arc-img/' + token;
+}
+
+async function arcFetchImage(url) {
+    if (ARC_IMG_CACHE.has(url)) {
+        const hit = ARC_IMG_CACHE.get(url);
+        ARC_IMG_CACHE.delete(url); ARC_IMG_CACHE.set(url, hit); // LRU
+        return hit;
+    }
+    if (ARC_IMG_INFLIGHT.has(url)) return ARC_IMG_INFLIGHT.get(url);
+    const task = (async () => {
+        let host = '';
+        try { host = new URL(url).hostname; } catch (_) { return null; }
+        if (!ARC_IMG_HOSTS.test(host)) return null;
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 12000);
+        try {
+            const res = await fetch(url, {
+                signal: ctrl.signal,
+                headers: { 'User-Agent': 'Mozilla/5.0 (AnimeGame arcade)', 'Accept': 'image/avif,image/webp,image/png,image/*;q=0.8' }
+            });
+            if (!res.ok) return null;
+            const type = String(res.headers.get('content-type') || '');
+            if (!/^image\//i.test(type)) return null;
+            const buf = Buffer.from(await res.arrayBuffer());
+            if (buf.length < 800 || buf.length > 10 * 1024 * 1024) return null;
+            const item = { buf, type };
+            ARC_IMG_CACHE.set(url, item);
+            ARC_IMG_CACHE_BYTES += buf.length;
+            while (ARC_IMG_CACHE_BYTES > 90 * 1024 * 1024 && ARC_IMG_CACHE.size) {
+                const [k, v] = ARC_IMG_CACHE.entries().next().value;
+                ARC_IMG_CACHE.delete(k);
+                ARC_IMG_CACHE_BYTES -= v.buf.length;
+            }
+            return item;
+        } catch (_) {
+            return null;
+        } finally {
+            clearTimeout(timer);
+            ARC_IMG_INFLIGHT.delete(url);
+        }
+    })();
+    ARC_IMG_INFLIGHT.set(url, task);
+    return task;
+}
+
+app.get('/api/arc-img/:token', async (req, res) => {
+    const entry = ARC_IMG_TOKENS.get(String(req.params.token || ''));
+    if (!entry || entry.exp < Date.now()) return res.status(404).end();
+    const img = await arcFetchImage(entry.url);
+    if (!img) return res.status(404).end();
+    res.set('Content-Type', img.type);
+    res.set('Cache-Control', 'private, max-age=2700');
+    res.send(img.buf);
+});
+
+// Proxy d'images publiques (tier list / battle) : même origine => export PNG possible
+app.get('/api/img', async (req, res) => {
+    const u = String(req.query.u || '');
+    if (!/^https:\/\//i.test(u)) return res.status(400).end();
+    const img = await arcFetchImage(u);
+    if (!img) return res.status(404).end();
+    res.set('Content-Type', img.type);
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(img.buf);
+});
+
+async function arcCharImage(u, raw) {
+    try {
+        if (u === 'pokemon') return (typeof POKEMON_IMAGE_BY_NAME !== 'undefined' && POKEMON_IMAGE_BY_NAME[raw]) || null;
+        const r = await resolveCharacterImage(u, raw);
+        return r?.imageUrl || null;
+    } catch (_) { return null; }
+}
+async function arcUsableImage(url) {
+    if (!url) return false;
+    return !!(await arcFetchImage(url));
+}
+
+/* ---------- Construction des manches ---------- */
+function arcPickUniverse(g) {
+    if (g.universe && g.universe !== 'all') return g.universe;
+    let list = arcUniverses().filter(u => !g.usedU.includes(u));
+    if (!list.length) { g.usedU = []; list = arcUniverses(); }
+    const u = arcPick(list);
+    g.usedU.push(u);
+    return u;
+}
+
+async function arcFindCharacters(g, u, count, maxTries) {
+    const found = [];
+    const cands = arcShuffle(arcFamous(u)).filter(c => !g.used.has(u + '|' + c.display));
+    let tries = 0;
+    for (const c of cands) {
+        if (found.length >= count || tries >= maxTries) break;
+        tries++;
+        const url = await arcCharImage(u, c.raw);
+        if (url && await arcUsableImage(url)) {
+            found.push({ ...c, u, url });
+            g.used.add(u + '|' + c.display);
+        }
+    }
+    return found;
+}
+
+function arcWrongAnimes(answer, extra) {
+    const pool = [...new Set([...Object.values(ARC_UNIVERSE_ANIME), ...(extra || [])])].filter(a => a !== answer);
+    return arcShuffle(pool).slice(0, 3);
+}
+
+async function arcBuildRound(g) {
+    const game = g.game;
+
+    if (game === 'pixel' || game === 'silhouette') {
+        for (let attempt = 0; attempt < 4; attempt++) {
+            const u = arcPickUniverse(g);
+            const [c] = await arcFindCharacters(g, u, 1, 6);
+            if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display };
+        }
+        return null;
+    }
+
+    if (game === 'fusion') {
+        const targets = [];
+        if (g.universe && g.universe !== 'all') {
+            targets.push(...await arcFindCharacters(g, g.universe, 4, 14));
+        } else {
+            const us = arcShuffle(arcUniverses());
+            for (const u of us) {
+                if (targets.length >= 4) break;
+                const [c] = await arcFindCharacters(g, u, 1, 4);
+                if (c) targets.push(c);
+            }
+        }
+        if (targets.length < 4) return null;
+        return {
+            targets,
+            imgs: targets.map(t => arcToken(t.url)),
+            seed: Math.floor(Math.random() * 1e9),
+            answer: targets.map(t => t.display).join(' • ')
+        };
+    }
+
+    if (game === 'quatre') {
+        for (let attempt = 0; attempt < 4; attempt++) {
+            const u = arcPickUniverse(g);
+            const targets = await arcFindCharacters(g, u, 4, 12);
+            if (targets.length < 4) continue;
+            const answer = ARC_UNIVERSE_ANIME[u];
+            return { u, targets, imgs: targets.map(t => arcToken(t.url)), answer, choices: arcShuffle([answer, ...arcWrongAnimes(answer)]) };
+        }
+        return null;
+    }
+
+    if (game === 'mapguess') {
+        const all = [];
+        for (const [u, list] of Object.entries(ARC_PLACES)) (list || []).forEach(p => all.push([u, ...p]));
+        let cands = arcShuffle(all.filter(p => !g.used.has('place|' + p[1])));
+        if (!cands.length) { cands = arcShuffle(all); }
+        for (const [u, title, label] of cands.slice(0, 8)) {
+            g.used.add('place|' + title);
+            let url = null;
+            try { url = (await resolveCharacterImage(u, title))?.imageUrl || null; } catch (_) {}
+            if (!url || !(await arcUsableImage(url))) continue;
+            const answer = ARC_UNIVERSE_ANIME[u];
+            return { u, img: arcToken(url), answer, place: label, choices: arcShuffle([answer, ...arcWrongAnimes(answer)]) };
+        }
+        return null;
+    }
+
+    if (game === 'scene') {
+        const tracks = BLINDTEST_TRACKS.filter(t => BLINDTEST_VIDEO_IDS[t.n]);
+        let cands = arcShuffle(tracks.filter(t => !g.used.has('scene|' + t.anime)));
+        if (!cands.length) { g.used.forEach(k => { if (k.startsWith('scene|')) g.used.delete(k); }); cands = arcShuffle(tracks); }
+        for (const t of cands.slice(0, 6)) {
+            const id = BLINDTEST_VIDEO_IDS[t.n];
+            const frames = arcShuffle([1, 2, 3]);
+            let url = null;
+            for (const k of frames) {
+                for (const u of [`https://i.ytimg.com/vi/${id}/maxres${k}.jpg`, `https://i.ytimg.com/vi/${id}/hq${k}.jpg`]) {
+                    if (await arcUsableImage(u)) { url = u; break; }
+                }
+                if (url) break;
+            }
+            if (!url) continue;
+            g.used.add('scene|' + t.anime);
+            const answer = t.anime;
+            const extra = [...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES];
+            const wrong = arcShuffle([...new Set(extra)].filter(a => a !== answer)).slice(0, 3);
+            return { img: arcToken(url), answer, song: t.title, choices: arcShuffle([answer, ...wrong]) };
+        }
+        return null;
+    }
+
+    if (game === 'emoji') {
+        let cands = ARC_EMOJI.map((e, i) => i).filter(i => !g.used.has('emoji|' + i));
+        if (!cands.length) { g.used.forEach(k => { if (k.startsWith('emoji|')) g.used.delete(k); }); cands = ARC_EMOJI.map((e, i) => i); }
+        const i = arcPick(cands);
+        g.used.add('emoji|' + i);
+        const [emoji, rawAnswer, u, type] = ARC_EMOJI[i];
+        if (type === 'perso' && u) {
+            const answer = arcDisplayName(u, rawAnswer);
+            const wrong = arcShuffle(arcFamous(u).map(c => c.display).filter(d => normalizeRG(d) !== normalizeRG(answer))).slice(0, 3);
+            return { emoji, ask: `Quel personnage de ${ARC_UNIVERSE_ANIME[u]} ?`, answer, choices: arcShuffle([answer, ...wrong]) };
+        }
+        const wrong = arcShuffle(ARC_ANIME_NAMES.filter(a => a !== rawAnswer)).slice(0, 3);
+        return { emoji, ask: 'Quel anime ?', answer: rawAnswer, choices: arcShuffle([rawAnswer, ...wrong]) };
+    }
+    return null;
+}
+
+/* ---------- Déroulement ---------- */
+function arcClearTimers(g) {
+    if (!g) return;
+    if (g.timer) clearTimeout(g.timer);
+    if (g.ticker) clearInterval(g.ticker);
+    g.timer = null; g.ticker = null;
+}
+
+function arcStop(roomCode) {
+    const g = arcGames[roomCode];
+    if (!g) return;
+    arcClearTimers(g);
+    g.dead = true;
+    delete arcGames[roomCode];
+}
+
+function arcRevealedCount(g) {
+    if (g.game !== 'quatre') return 4;
+    if (g.phase !== 'playing') return 4;
+    const step = ARC_GAMES.quatre.roundMs / 4;
+    return Math.min(4, 1 + Math.floor((Date.now() - g.startedAt) / step));
+}
+
+function arcPlayerDone(g, pid) {
+    const cfg = ARC_GAMES[g.game];
+    if (cfg.answer === 'multi') return (g.found[pid]?.size || 0) >= (g.current?.targets?.length || 4);
+    return !!g.answers[pid];
+}
+
+function arcPublic(room, g) {
+    const cfg = ARC_GAMES[g.game];
+    const cur = g.current || {};
+    const revealed = g.phase === 'reveal' || g.phase === 'finished';
+    const stage = {};
+    if (g.phase === 'playing' || revealed) {
+        if (cur.img) stage.img = cur.img;
+        if (cur.emoji) { stage.emoji = cur.emoji; stage.ask = cur.ask; }
+        if (g.game === 'quatre' && cur.imgs) stage.imgs = cur.imgs.slice(0, arcRevealedCount(g));
+        if (g.game === 'fusion' && cur.imgs) { stage.imgs = cur.imgs; stage.seed = cur.seed; }
+    }
+    return {
+        game: g.game,
+        gameLabel: cfg.label,
+        icon: cfg.icon,
+        answerType: cfg.answer,
+        universe: g.universe,
+        universeLabel: g.universe && g.universe !== 'all' ? ARC_UNIVERSE_ANIME[g.universe] : (cfg.universe ? 'Tous les animes' : ''),
+        roundUniverse: revealed && cur.u ? ARC_UNIVERSE_ANIME[cur.u] : null,
+        round: g.round,
+        totalRounds: g.totalRounds,
+        phase: g.phase,
+        roundMs: cfg.roundMs,
+        startedAt: g.startedAt,
+        endsAt: g.endsAt,
+        serverNow: Date.now(),
+        revealEndsAt: g.revealEndsAt || null,
+        stage,
+        choices: cur.choices || null,
+        answer: revealed ? (cur.answer || null) : null,
+        reveal: revealed ? {
+            place: cur.place || null,
+            song: cur.song || null,
+            items: (cur.targets || []).map((t, i) => ({ name: t.display, img: cur.imgs ? cur.imgs[i] : cur.img }))
+        } : null,
+        players: room.players.map(p => {
+            const a = g.answers[p.id];
+            return {
+                id: p.id,
+                name: p.name,
+                offline: !!p.disconnected,
+                score: g.scores[p.id] || 0,
+                done: arcPlayerDone(g, p.id),
+                progress: cfg.answer === 'multi' ? (g.found[p.id]?.size || 0) : null,
+                choice: revealed && a ? a.choice : null,
+                correct: revealed ? (cfg.answer === 'multi' ? (g.found[p.id]?.size || 0) > 0 : !!(a && a.correct)) : null,
+                gained: revealed ? (g.gainedRound[p.id] || 0) : 0
+            };
+        }),
+        hostId: room.host,
+        winnerNames: g.winnerNames || null,
+        message: g.message || null
+    };
+}
+
+function arcEmit(room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g) return;
+    io.to(roomCode).emit('arc_state', arcPublic(room, g));
+}
+
+function arcNamesFor(g) {
+    const cfg = ARC_GAMES[g.game];
+    if (cfg.answer === 'choice') return [];
+    const us = g.universe && g.universe !== 'all' ? [g.universe] : arcUniverses();
+    const names = new Set();
+    us.forEach(u => arcFamous(u).forEach(c => names.add(c.display)));
+    return [...names].sort((a, b) => a.localeCompare(b, 'fr'));
+}
+
+async function arcNextRound(room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g || g.dead) return;
+    arcClearTimers(g);
+
+    if (g.round >= g.totalRounds) return arcFinish(room, roomCode);
+
+    g.phase = 'loading';
+    g.message = null;
+    const loadingTimer = setTimeout(() => { if (!g.dead && g.phase === 'loading') arcEmit(room, roomCode); }, 400);
+
+    let next = null;
+    try {
+        next = g.nextPromise ? await g.nextPromise : null;
+        g.nextPromise = null;
+        if (!next) next = await arcBuildRound(g);
+        if (!next) next = await arcBuildRound(g);
+    } catch (e) {
+        console.warn('[Arcade] manche impossible :', e.message);
+    }
+    clearTimeout(loadingTimer);
+    if (g.dead || arcGames[roomCode] !== g || rooms[roomCode] !== room) return;
+
+    if (!next) {
+        g.fails = (g.fails || 0) + 1;
+        if (g.fails >= 3 || g.round === 0) {
+            g.message = "Images indisponibles pour le moment (serveur d'images injoignable). Réessaie dans un instant ou choisis un autre univers.";
+            return arcFinish(room, roomCode);
+        }
+        return arcNextRound(room, roomCode);
+    }
+
+    const cfg = ARC_GAMES[g.game];
+    g.current = next;
+    g.round += 1;
+    g.phase = 'playing';
+    g.answers = {};
+    g.found = {};
+    g.gainedRound = {};
+    g.startedAt = Date.now();
+    g.endsAt = g.startedAt + cfg.roundMs;
+    g.revealEndsAt = null;
+    arcEmit(room, roomCode);
+
+    const roundNo = g.round;
+    g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, cfg.roundMs + 250);
+    if (g.game === 'quatre') {
+        let shown = 1;
+        g.ticker = setInterval(() => {
+            if (g.dead || g.phase !== 'playing') return;
+            const n = arcRevealedCount(g);
+            if (n !== shown) { shown = n; arcEmit(room, roomCode); }
+        }, 500);
+    }
+    // On prépare la manche suivante pendant que celle-ci se joue
+    if (g.round < g.totalRounds) g.nextPromise = arcBuildRound(g).catch(() => null);
+}
+
+function arcReveal(room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g || g.dead || g.phase !== 'playing') return;
+    arcClearTimers(g);
+    g.phase = 'reveal';
+    g.revealEndsAt = Date.now() + ARC_REVEAL_MS;
+    arcEmit(room, roomCode);
+    g.timer = setTimeout(() => arcNextRound(room, roomCode), ARC_REVEAL_MS);
+}
+
+function arcFinish(room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g) return;
+    arcClearTimers(g);
+    g.phase = 'finished';
+    const best = Math.max(0, ...room.players.map(p => g.scores[p.id] || 0));
+    g.winnerNames = g.message ? [] : room.players.filter(p => (g.scores[p.id] || 0) === best).map(p => p.name);
+    room.status = 'arc_over';
+    arcEmit(room, roomCode);
+}
+
+function arcParseSub(subMode) {
+    const [game, universe] = String(subMode || '').split(':');
+    return { game: ARC_GAMES[game] ? game : 'emoji', universe: universe || 'all' };
+}
+
+function startArcade(room, roomCode) {
+    arcStop(roomCode);
+    const { game, universe } = arcParseSub(room.subMode);
+    const cfg = ARC_GAMES[game];
+    const u = cfg.universe && ARC_UNIVERSE_ANIME[universe] ? universe : 'all';
+    const g = {
+        game, universe: cfg.universe ? u : 'all',
+        round: 0, totalRounds: cfg.rounds, phase: 'loading',
+        current: null, answers: {}, found: {}, gainedRound: {},
+        scores: Object.fromEntries(room.players.map(p => [p.id, 0])),
+        used: new Set(), usedU: [], lastGuess: {}
+    };
+    arcGames[roomCode] = g;
+    room.status = 'arc_playing';
+    arcEmit(room, roomCode);
+    io.to(roomCode).emit('arc_names', { names: arcNamesFor(g) });
+    arcNextRound(room, roomCode);
+}
+
+function arcCheckAllDone(room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g || g.phase !== 'playing') return;
+    const connected = room.players.filter(p => !p.disconnected);
+    if (connected.length && connected.every(p => arcPlayerDone(g, p.id))) arcReveal(room, roomCode);
+    else arcEmit(room, roomCode);
+}
+
+// Appelé par rejoin_room quand un joueur revient avec un nouvel identifiant de socket
+function arcRemap(roomCode, oldId, newId) {
+    const g = arcGames[roomCode];
+    if (!g || oldId === newId) return;
+    for (const key of ['scores', 'answers', 'found', 'gainedRound', 'lastGuess']) {
+        if (g[key] && Object.prototype.hasOwnProperty.call(g[key], oldId)) {
+            g[key][newId] = g[key][oldId];
+            delete g[key][oldId];
+        }
+    }
+}
+
+function arcSendTo(socket, room, roomCode) {
+    const g = arcGames[roomCode];
+    if (!g) return false;
+    socket.emit('arc_names', { names: arcNamesFor(g) });
+    socket.emit('arc_state', arcPublic(room, g));
+    const mine = g.found[socket.id];
+    if (mine && g.current?.targets) socket.emit('arc_private', { found: [...mine].map(i => g.current.targets[i].display) });
+    return true;
+}
+
+// Appelé quand un joueur quitte définitivement le salon
+function arcOnPlayerLeft(room, roomCode, socketId) {
+    const g = arcGames[roomCode];
+    if (!g) return false;
+    delete g.answers[socketId];
+    if (room.status === 'arc_playing') arcCheckAllDone(room, roomCode);
+    return true;
+}
+
+io.on('connection', socket => {
+    socket.on('start_game', roomCode => {
+        const room = rooms[roomCode];
+        if (!room || room.mode !== 'arcade' || room.host !== socket.id) return;
+        startArcade(room, roomCode);
+    });
+
+    socket.on('back_to_menu', roomCode => {
+        const room = rooms[roomCode];
+        if (room && room.mode === 'arcade') arcStop(roomCode);
+    });
+
+    socket.on('arc_choice', ({ roomCode, choice } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.phase !== 'playing' || ARC_GAMES[g.game].answer !== 'choice') return;
+        if (!room.players.some(p => p.id === socket.id) || g.answers[socket.id]) return;
+        if (!(g.current?.choices || []).includes(choice)) return;
+        const cfg = ARC_GAMES[g.game];
+        const correct = choice === g.current.answer;
+        let gained = 0;
+        if (correct) {
+            const left = Math.max(0, g.endsAt - Date.now());
+            gained = g.game === 'quatre'
+                ? 100 + 50 * (4 - arcRevealedCount(g)) + Math.round(20 * left / cfg.roundMs)
+                : 100 + Math.round(50 * left / cfg.roundMs);
+            g.scores[socket.id] = (g.scores[socket.id] || 0) + gained;
+        }
+        g.answers[socket.id] = { choice, correct };
+        g.gainedRound[socket.id] = gained;
+        arcCheckAllDone(room, roomCode);
+    });
+
+    socket.on('arc_guess', ({ roomCode, text } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.phase !== 'playing') return;
+        const cfg = ARC_GAMES[g.game];
+        if (cfg.answer === 'choice') return;
+        if (!room.players.some(p => p.id === socket.id) || arcPlayerDone(g, socket.id)) return;
+        const now = Date.now();
+        if (now - (g.lastGuess[socket.id] || 0) < 350) return;
+        g.lastGuess[socket.id] = now;
+        const guess = String(text || '').trim().slice(0, 80);
+        if (!guess) return;
+        const left = Math.max(0, g.endsAt - now);
+        const targets = g.current.targets || [];
+
+        if (cfg.answer === 'text') {
+            const t = targets[0];
+            if (t && arcNameMatches(t.u, t, guess)) {
+                const gained = 100 + Math.round(100 * left / cfg.roundMs);
+                g.scores[socket.id] = (g.scores[socket.id] || 0) + gained;
+                g.answers[socket.id] = { choice: t.display, correct: true };
+                g.gainedRound[socket.id] = gained;
+                socket.emit('arc_feedback', { ok: true, message: `✅ ${t.display} ! +${gained}` });
+                arcCheckAllDone(room, roomCode);
+            } else {
+                socket.emit('arc_feedback', { ok: false, message: `❌ Ce n'est pas « ${guess} »` });
+            }
+            return;
+        }
+
+        // Fusion : 4 persos à retrouver
+        const mine = g.found[socket.id] || (g.found[socket.id] = new Set());
+        const idx = targets.findIndex((t, i) => !mine.has(i) && arcNameMatches(t.u, t, guess));
+        if (idx >= 0) {
+            mine.add(idx);
+            const gained = 50 + Math.round(50 * left / cfg.roundMs);
+            g.scores[socket.id] = (g.scores[socket.id] || 0) + gained;
+            g.gainedRound[socket.id] = (g.gainedRound[socket.id] || 0) + gained;
+            socket.emit('arc_feedback', { ok: true, message: `✅ ${targets[idx].display} (${mine.size}/${targets.length}) +${gained}` });
+            socket.emit('arc_private', { found: [...mine].map(i => targets[i].display) });
+            arcCheckAllDone(room, roomCode);
+        } else {
+            const already = targets.some((t, i) => mine.has(i) && arcNameMatches(t.u, t, guess));
+            socket.emit('arc_feedback', { ok: false, message: already ? '↺ Déjà trouvé' : `❌ Personne ne s'appelle « ${guess} » ici` });
+        }
+    });
+
+    socket.on('arc_skip', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || room.host !== socket.id || g.phase !== 'reveal') return;
+        arcNextRound(room, roomCode);
+    });
+});
+
+/* ---------- Tier list & Battle : listes, affiches d'animes, classement mondial ---------- */
+const ARC_ANIME_COVER_CACHE = new Map();
+let arcJikanChain = Promise.resolve();
+
+function arcJikanQueued(fn) {
+    // Jikan (API MyAnimeList) limite à ~3 requêtes/s : on les enchaîne avec un petit délai
+    const run = arcJikanChain.then(() => fn()).catch(() => null);
+    arcJikanChain = run.then(() => new Promise(r => setTimeout(r, 420)));
+    return run;
+}
+
+async function arcAnimeCover(name) {
+    const entry = ARC_ANIMES.find(a => a[0] === name);
+    if (!entry) return null;
+    if (ARC_ANIME_COVER_CACHE.has(name)) return ARC_ANIME_COVER_CACHE.get(name);
+    const cached = await getCachedCharacterImage('_anime', name);
+    if (cached && cached.imageUrl) { ARC_ANIME_COVER_CACHE.set(name, cached.imageUrl); return cached.imageUrl; }
+
+    const url = await arcJikanQueued(async () => {
+        const q = entry[1];
+        const data = await fetchJsonWithTimeout(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=8&sfw=true`, 12000);
+        const list = Array.isArray(data?.data) ? data.data : [];
+        const nq = normalizeImageKey(q), nn = normalizeImageKey(name);
+        let best = null, bestScore = -1e9;
+        list.forEach((a, i) => {
+            const titles = [a.title, a.title_english, a.title_japanese, ...(a.titles || []).map(t => t.title), ...(a.title_synonyms || [])]
+                .filter(Boolean).map(normalizeImageKey);
+            let s = -i * 2;
+            if (titles.includes(nq) || titles.includes(nn)) s += 60;
+            else if (titles.some(t => t.startsWith(nq) || t.startsWith(nn))) s += 25;
+            if (a.type === 'TV') s += 12; else if (a.type === 'Movie') s += 4;
+            s += Math.min(20, Math.log10((a.members || 0) + 1) * 3);
+            if (s > bestScore) { bestScore = s; best = a; }
+        });
+        return best?.images?.webp?.large_image_url || best?.images?.jpg?.large_image_url || null;
+    });
+    if (url) {
+        ARC_ANIME_COVER_CACHE.set(name, url);
+        saveCachedCharacterImage('_anime', name, { imageUrl: url, sourceUrl: null, status: 'ok' }).catch(() => {});
+    }
+    return url;
+}
+
+function arcItemsFor(source) {
+    if (source === 'animes') return ARC_ANIMES.map(a => ({ name: a[0] }));
+    if (!ARC_UNIVERSE_ANIME[source]) return null;
+    if (source === 'pokemon') {
+        return arcFamous('pokemon').slice(0, 251).map(c => ({ name: c.display, img: POKEMON_IMAGE_BY_NAME?.[c.raw] || null }));
+    }
+    const src = (typeof DLE_TARGET_NAMES !== 'undefined' && DLE_TARGET_NAMES[source]) || [];
+    const seen = new Set(); const out = [];
+    for (const raw of src) {
+        if (out.length >= 64) break;
+        const display = arcDisplayName(source, raw);
+        const k = normalizeRG(display);
+        if (seen.has(k)) continue;
+        seen.add(k); out.push({ name: display, raw });
+    }
+    return out;
+}
+
+app.get('/api/arcade/items', (req, res) => {
+    const source = String(req.query.source || '');
+    const items = arcItemsFor(source);
+    if (!items) return res.status(400).json({ ok: false });
+    res.json({
+        ok: true,
+        source,
+        label: source === 'animes' ? 'Animes' : ARC_UNIVERSE_ANIME[source],
+        items: items.map(i => ({ name: i.name, img: i.img || null }))
+    });
+});
+
+app.get('/api/arcade/item-image', async (req, res) => {
+    const source = String(req.query.source || '');
+    const name = String(req.query.name || '');
+    let url = null;
+    try {
+        if (source === 'animes') url = await arcAnimeCover(name);
+        else {
+            const it = (arcItemsFor(source) || []).find(i => i.name === name);
+            if (it) url = it.img || await arcCharImage(source, it.raw || it.name);
+        }
+    } catch (_) {}
+    res.set('Cache-Control', url ? 'public, max-age=3600' : 'no-store');
+    res.json({ ok: !!url, imageUrl: url });
+});
+
+// Classement mondial des battles (comme uwufufu : % de victoires en duel + nombre de sacres)
+const ARC_BATTLE_MEM = new Map(); // theme -> Map(name -> {wins, matches, champions})
+const ARC_BATTLE_IP = new Map();
+if (process.env.DATABASE_URL) {
+    pool.query(`CREATE TABLE IF NOT EXISTS battle_stats (
+        theme TEXT NOT NULL, name TEXT NOT NULL,
+        wins INTEGER NOT NULL DEFAULT 0, matches INTEGER NOT NULL DEFAULT 0, champions INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (theme, name))`).catch(e => console.warn('[Battle] table :', e.message));
+}
+
+app.post('/api/battle/result', express.json({ limit: '40kb' }), async (req, res) => {
+    const theme = String(req.body?.theme || '');
+    const items = arcItemsFor(theme);
+    if (!items) return res.status(400).json({ ok: false });
+    const ip = String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+    const last = ARC_BATTLE_IP.get(ip) || 0;
+    if (Date.now() - last < 8000) return res.json({ ok: false, message: 'Trop rapide' });
+    ARC_BATTLE_IP.set(ip, Date.now());
+
+    const valid = new Set(items.map(i => i.name));
+    const duels = Array.isArray(req.body?.duels) ? req.body.duels.slice(0, 127) : [];
+    const champion = String(req.body?.champion || '');
+    const agg = new Map();
+    const bump = (n, k) => { const o = agg.get(n) || { wins: 0, matches: 0, champions: 0 }; o[k]++; agg.set(n, o); };
+    for (const d of duels) {
+        if (!Array.isArray(d)) continue;
+        const [w, l] = d.map(String);
+        if (!valid.has(w) || !valid.has(l) || w === l) continue;
+        bump(w, 'wins'); bump(w, 'matches'); bump(l, 'matches');
+    }
+    if (!valid.has(champion) || duels.length < 7) return res.json({ ok: false });
+    bump(champion, 'champions');
+
+    const mem = ARC_BATTLE_MEM.get(theme) || new Map();
+    ARC_BATTLE_MEM.set(theme, mem);
+    for (const [n, o] of agg) {
+        const m = mem.get(n) || { wins: 0, matches: 0, champions: 0 };
+        m.wins += o.wins; m.matches += o.matches; m.champions += o.champions;
+        mem.set(n, m);
+    }
+    if (process.env.DATABASE_URL) {
+        try {
+            for (const [n, o] of agg) {
+                await pool.query(`INSERT INTO battle_stats (theme, name, wins, matches, champions) VALUES ($1,$2,$3,$4,$5)
+                    ON CONFLICT (theme, name) DO UPDATE SET wins = battle_stats.wins + EXCLUDED.wins,
+                    matches = battle_stats.matches + EXCLUDED.matches, champions = battle_stats.champions + EXCLUDED.champions`,
+                    [theme, n, o.wins, o.matches, o.champions]);
+            }
+        } catch (e) { console.warn('[Battle] enregistrement :', e.message); }
+    }
+    res.json({ ok: true });
+});
+
+app.get('/api/battle/ranking', async (req, res) => {
+    const theme = String(req.query.theme || '');
+    if (!arcItemsFor(theme)) return res.status(400).json({ ok: false });
+    let rows = [];
+    if (process.env.DATABASE_URL) {
+        try {
+            const r = await pool.query('SELECT name, wins, matches, champions FROM battle_stats WHERE theme=$1', [theme]);
+            rows = r.rows;
+        } catch (_) {}
+    }
+    if (!rows.length) rows = [...(ARC_BATTLE_MEM.get(theme) || new Map())].map(([name, o]) => ({ name, ...o }));
+    rows = rows.map(r => ({ name: r.name, wins: +r.wins, matches: +r.matches, champions: +r.champions, rate: r.matches ? Math.round(1000 * r.wins / r.matches) / 10 : 0 }))
+        .sort((a, b) => b.champions - a.champions || b.rate - a.rate || b.matches - a.matches)
+        .slice(0, 100);
+    res.json({ ok: true, theme, rows });
+});
