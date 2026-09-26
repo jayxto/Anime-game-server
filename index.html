@@ -395,6 +395,21 @@
         .arc-video-shield{position:absolute;inset:0;z-index:2;}
         .arc-video-cover{position:absolute;inset:0;z-index:3;background:#000;display:flex;align-items:center;justify-content:center;}
         .arc-video-badge{position:absolute;left:10px;top:10px;z-index:4;background:rgba(0,0,0,.65);border-radius:99px;padding:4px 10px;font-size:.72rem;color:var(--text-muted);}
+        .arc-fav{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);border:1px solid var(--accent-yellow);color:var(--accent-yellow);border-radius:99px;padding:5px 12px;font-weight:800;font-size:.9rem;white-space:nowrap;}
+        .arc-bac{width:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px;}
+        .arc-bac-letter{font-family:'Bangers',cursive;font-size:4.5rem;line-height:1;text-align:center;color:var(--accent-yellow);text-shadow:0 0 30px rgba(255,230,0,.35);margin-bottom:6px;animation:arcPop .35s ease-out;}
+        .arc-bac-row{display:grid;grid-template-columns:minmax(120px,40%) 1fr;gap:10px;align-items:center;}
+        .arc-bac-row span{font-weight:800;font-size:.88rem;color:var(--accent-cyan);}
+        .arc-bac-input{background:#0d0d15;border:2px solid #34344a;color:#fff;border-radius:10px;padding:10px 12px;font-size:1rem;min-width:0;}
+        .arc-bac-input:focus{outline:none;border-color:var(--accent-cyan);}
+        .arc-bac-table-wrap{overflow-x:auto;}
+        .arc-bac-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+        .arc-bac-table th{color:var(--accent-cyan);text-align:left;padding:6px;border-bottom:1px solid #34344a;}
+        .arc-bac-table td{padding:6px;border-bottom:1px solid #22222f;vertical-align:top;}
+        .arc-bac-table td b{display:block;font-size:.75rem;margin-top:2px;}
+        .arc-bac-table td small{display:block;color:var(--text-muted);font-size:.7rem;}
+        .arc-bac-table td.ok b{color:#00ff88;} .arc-bac-table td.ko{color:var(--accent-pink);text-decoration:line-through;} .arc-bac-table td.ko b{text-decoration:none;} .arc-bac-table td.empty{color:#555;}
+        @media (max-width:560px){.arc-bac-row{grid-template-columns:1fr;gap:4px;}}
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -564,6 +579,9 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('mapguess')"><span class="arc-ico">🗺️</span><b>Map Guess</b><span>Un lieu culte → de quel univers vient-il ?</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('fusion')"><span class="arc-ico">🧪</span><b>Fusion Anime</b><span>4 persos mélangés en une image → retrouve les 4</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Une scène culte (combat, moment fort) en vidéo → trouve l'anime</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('link')"><span class="arc-ico">🔗</span><b>Common Link</b><span>4 persos → trouve leur point commun</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('popularite')"><span class="arc-ico">👥</span><b>Popularity Guess</b><span>Qui a le plus de fans ? (favoris MyAnimeList)</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('bac')"><span class="arc-ico">🔤</span><b>Petit bac anime</b><span>Une lettre, 5 catégories : anime, perso, Pokémon…</span></button>
                     </div>
                 </div>
 
@@ -1580,6 +1598,7 @@
             dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' },
             arc_pixel:      { title:'🖼️ PIXEL ANIME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_popularite: { title:'👥 POPULARITY GUESS', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
         function openUniverseSelection(mode) {
@@ -3669,6 +3688,9 @@
             quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
             mapguess:{ title:'🗺️ MAP GUESS', sub:'De quel univers vient ce lieu ?', universe:false },
             fusion:{ title:'🧪 FUSION ANIME', sub:'4 persos sont mélangés dans cette image : retrouve-les tous', universe:true },
+            link:{ title:'🔗 COMMON LINK', sub:'Quel est le point commun entre ces 4 personnages ?', universe:false },
+            popularite:{ title:'👥 POPULARITY GUESS', sub:'Qui a le plus de fans ? (nombre de favoris sur MyAnimeList)', universe:true },
+            bac:{ title:'🔤 PETIT BAC ANIME', sub:'Un mot par catégorie qui commence par la lettre. Réponse unique = 10 pts, partagée = 5 pts', universe:false },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
@@ -3836,6 +3858,51 @@
             const reveal = q.phase !== 'playing';
             const st = q.stage || {};
 
+            if (q.game === 'link') {
+                stage.innerHTML = '';
+                const grid = document.createElement('div'); grid.className = 'arc-grid4';
+                (st.names || []).forEach((n, i) => {
+                    const tile = document.createElement('div'); tile.className = 'arc-tile';
+                    const src = (st.imgs || [])[i];
+                    if (src) { const im = document.createElement('img'); im.src = src; im.alt = ''; tile.appendChild(im); }
+                    else { const qm = document.createElement('div'); qm.className = 'arc-q'; qm.textContent = '👤'; tile.appendChild(qm); }
+                    const cap = document.createElement('div'); cap.className = 'arc-cap'; cap.textContent = n; tile.appendChild(cap);
+                    grid.appendChild(tile);
+                });
+                stage.appendChild(grid);
+                return;
+            }
+            if (q.game === 'popularite') {
+                stage.innerHTML = '';
+                const wrap = document.createElement('div'); wrap.style.cssText = 'width:100%;';
+                const ask = document.createElement('div'); ask.className = 'arc-ask'; ask.style.marginBottom = '10px'; ask.textContent = st.question || '';
+                const duel = document.createElement('div'); duel.className = 'bb-duel'; duel.style.margin = '0';
+                (st.names || []).forEach((n, i) => {
+                    const card = document.createElement('div'); card.className = 'bb-card';
+                    const im = document.createElement('img'); im.src = st.imgs[i]; im.alt = ''; card.appendChild(im);
+                    const cap = document.createElement('div'); cap.className = 'bb-name'; cap.textContent = n; card.appendChild(cap);
+                    if (reveal && q.reveal && q.reveal.favs) {
+                        const f = document.createElement('div'); f.className = 'arc-fav'; f.textContent = '❤ ' + q.reveal.favs[i].toLocaleString('fr-FR') + ' fans'; card.appendChild(f);
+                        card.classList.add(n === q.answer ? 'win' : 'lose');
+                    } else if (!reveal) {
+                        card.onclick = () => {
+                            const me = (arcState.players || []).find(p => p.id === socket.id);
+                            if (me && me.done) return;
+                            arcMyChoice = n; socket.emit('arc_choice', { roomCode: currentRoomCode, choice: n });
+                            card.style.borderColor = 'var(--accent-yellow)';
+                        };
+                    }
+                    duel.appendChild(card);
+                    if (i === 0) { const vs = document.createElement('div'); vs.className = 'bb-vs'; vs.textContent = 'VS'; duel.appendChild(vs); }
+                });
+                wrap.append(ask, duel);
+                stage.appendChild(wrap);
+                return;
+            }
+            if (q.game === 'bac') {
+                arcRenderBac(q, stage, reveal);
+                return;
+            }
             if (q.game === 'emoji') {
                 stage.innerHTML = '';
                 const e = document.createElement('div'); e.className = 'arc-emoji'; e.textContent = st.emoji || '';
@@ -3946,6 +4013,70 @@
             });
         }
 
+        let arcBacTimer = null;
+        function arcBacValues() { return [...document.querySelectorAll('.arc-bac-input')].map(i => i.value); }
+        function arcRenderBac(q, stage, reveal) {
+            const st = q.stage || {};
+            stage.innerHTML = '';
+            const box = document.createElement('div'); box.className = 'arc-bac';
+            const letter = document.createElement('div'); letter.className = 'arc-bac-letter'; letter.textContent = st.letter || '?';
+            box.appendChild(letter);
+            if (!reveal) {
+                const me = (q.players || []).find(p => p.id === socket.id) || {};
+                (st.cats || []).forEach((c, i) => {
+                    const row = document.createElement('label'); row.className = 'arc-bac-row';
+                    const lab = document.createElement('span'); lab.textContent = c;
+                    const inp = document.createElement('input'); inp.className = 'arc-bac-input'; inp.autocomplete = 'off';
+                    inp.placeholder = (st.letter || '') + '…';
+                    inp.disabled = !!me.done;
+                    inp.addEventListener('input', () => {
+                        clearTimeout(arcBacTimer);
+                        arcBacTimer = setTimeout(() => socket.emit('arc_bac', { roomCode: currentRoomCode, answers: arcBacValues() }), 400);
+                        document.getElementById('arc-bac-stop').disabled = arcBacValues().some(v => !v.trim());
+                    });
+                    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const all = [...document.querySelectorAll('.arc-bac-input')]; const nx = all[i + 1]; if (nx) nx.focus(); else arcBacStop(); } });
+                    row.append(lab, inp); box.appendChild(row);
+                });
+                const stop = document.createElement('button'); stop.id = 'arc-bac-stop'; stop.className = 'btn-action'; stop.textContent = '🛑 STOP !';
+                stop.disabled = true; stop.onclick = arcBacStop; stop.style.cssText = 'background:var(--accent-pink);margin-top:10px;';
+                box.appendChild(stop);
+                stage.appendChild(box);
+                setTimeout(() => { const f = document.querySelector('.arc-bac-input'); if (f && window.innerWidth > 700) f.focus(); }, 60);
+                return;
+            }
+            const res = q.bac;
+            if (res) {
+                const wrap = document.createElement('div'); wrap.className = 'arc-bac-table-wrap';
+                const t = document.createElement('table'); t.className = 'arc-bac-table';
+                const head = document.createElement('tr');
+                ['Joueur', ...res.cats, 'Total'].forEach(h => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
+                t.appendChild(head);
+                res.rows.forEach(r => {
+                    const tr = document.createElement('tr');
+                    const td0 = document.createElement('td'); td0.textContent = r.name; td0.style.fontWeight = '800'; tr.appendChild(td0);
+                    r.cells.forEach(c => {
+                        const td = document.createElement('td');
+                        td.className = c.ok ? 'ok' : (c.text ? 'ko' : 'empty');
+                        td.textContent = c.text || '—';
+                        if (c.display) { const sm = document.createElement('small'); sm.textContent = '= ' + c.display; td.appendChild(sm); }
+                        const pts = document.createElement('b'); pts.textContent = c.ok ? `+${c.pts}` : '0'; td.appendChild(pts);
+                        tr.appendChild(td);
+                    });
+                    const tot = document.createElement('td'); tot.textContent = r.total; tot.style.cssText = 'font-weight:800;color:var(--accent-yellow);'; tr.appendChild(tot);
+                    t.appendChild(tr);
+                });
+                wrap.appendChild(t); box.appendChild(wrap);
+            }
+            stage.appendChild(box);
+        }
+        function arcBacStop() {
+            const vals = arcBacValues();
+            if (vals.some(v => !v.trim())) return;
+            socket.emit('arc_bac_stop', { roomCode: currentRoomCode, answers: vals });
+            document.querySelectorAll('.arc-bac-input').forEach(i => i.disabled = true);
+            const b = document.getElementById('arc-bac-stop'); if (b) b.disabled = true;
+        }
+
         function arcTickFn() {
             const q = arcState;
             if (!q) return;
@@ -3994,7 +4125,7 @@
                 const row = document.createElement('div'); row.className = 'quote-score';
                 const name = document.createElement('span');
                 let mark = '';
-                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : (p.done ? ' ✔️' : ' …');
+                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : q.answerType === 'bac' ? ` ${p.filled || 0}/5${p.done ? ' 🛑' : ''}` : (p.done ? ' ✔️' : ' …');
                 else if (q.phase === 'reveal') mark = p.gained ? ` ✅ +${p.gained}` : ' ❌';
                 name.textContent = (p.offline ? '📡 ' : '') + p.name + mark;
                 const sc = document.createElement('strong'); sc.style.color = 'var(--accent-yellow)'; sc.textContent = `${p.score} pts`;
@@ -4008,7 +4139,7 @@
             const inputWrap = document.getElementById('arc-input-wrap');
             const input = document.getElementById('arc-input');
             choices.innerHTML = '';
-            if (q.answerType === 'choice' && q.choices && q.phase !== 'loading' && q.phase !== 'finished') {
+            if (q.answerType === 'choice' && q.choices && q.phase !== 'loading' && q.phase !== 'finished' && q.game !== 'popularite') {
                 choices.style.display = 'grid';
                 inputWrap.style.display = 'none';
                 q.choices.forEach(c => {
@@ -4030,6 +4161,7 @@
             } else {
                 choices.style.display = 'none';
                 const typing = (q.answerType === 'text' || q.answerType === 'multi') && q.phase === 'playing' && !me.done;
+                if (q.answerType === 'bac' || q.game === 'popularite') { inputWrap.style.display = 'none'; }
                 inputWrap.style.display = typing ? 'block' : 'none';
                 input.placeholder = q.answerType === 'multi' ? 'Un des 4 persos…' : 'Nom du personnage…';
                 if (newRound) { input.value = ''; arcHideSugg(); if (typing && window.innerWidth > 700) setTimeout(() => input.focus(), 60); }
@@ -4056,11 +4188,12 @@
             } else if (q.phase === 'playing') {
                 if (me.done) { result.style.color = 'var(--accent-cyan)'; result.textContent = arcLastFeedback?.ok ? arcLastFeedback.message + ' — attends les autres…' : 'Réponse envoyée, attends les autres…'; }
                 else if (arcLastFeedback) { result.style.color = arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = arcLastFeedback.message; }
-                else { result.style.color = 'var(--text-color)'; result.textContent = q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
+                else if (q.answerType === 'bac') { result.style.color = q.notice ? 'var(--accent-pink)' : 'var(--text-color)'; result.textContent = q.notice || `Lettre ${q.stage.letter} : remplis les 5 cases puis appuie sur STOP !`; }
+                else { result.style.color = 'var(--text-color)'; result.textContent = q.game === 'popularite' ? 'Clique sur le perso le plus populaire !' : q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
             } else if (q.phase === 'reveal') {
                 const ok = !!me.gained;
                 result.style.color = ok ? '#00ff88' : 'var(--accent-pink)';
-                result.textContent = (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
+                result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
                 const bits = [];
                 if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
                 if (q.reveal?.place) bits.push('📍 ' + q.reveal.place);

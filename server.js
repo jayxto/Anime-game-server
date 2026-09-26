@@ -11754,3 +11754,372 @@ app.get('/api/battle/ranking', async (req, res) => {
         .slice(0, 100);
     res.json({ ok: true, theme, rows });
 });
+
+// Common Link : [point commun, [[univers, nom], ...]] (au moins 4 persos par lien)
+const ARC_LINKS = [
+    ['Ils maîtrisent la glace', [['onepiece','Kuzan'],['bleach','Toshiro Hitsugaya'],['fairy','Gray Fullbuster'],['fairy','Lyon Vastia'],['naruto','Haku'],['rezero','Emilia'],['bleach','Rukia Kuchiki'],['demonslayer','Doma']]],
+    ['Ils maîtrisent le feu', [['onepiece','Portgas D. Ace'],['onepiece','Sabo'],['fairy','Natsu Dragneel'],['bleach','Genryusai Shigekuni Yamamoto'],['fma','Roy Mustang'],['fireforce','Shinra Kusakabe'],['clover','Fuegoleon Vermillion'],['clover','Mereoleona Vermillion'],['jjk','Jogo'],['demonslayer','Kyojuro Rengoku']]],
+    ['Ils maîtrisent la foudre', [['hxh','Killua Zoldyck'],['onepiece','Enel'],['fairy','Laxus Dreyar'],['demonslayer','Zenitsu Agatsuma'],['naruto','Kakashi Hatake'],['naruto','Sasuke Uchiha']]],
+    ["Ils maîtrisent l'eau", [['demonslayer','Tanjiro Kamado'],['demonslayer','Giyu Tomioka'],['fairy','Juvia Lockser'],['naruto','Kisame Hoshigaki'],['onepiece','Jinbe'],['naruto','Tobirama Senju']]],
+    ['Ils maîtrisent le vent', [['naruto','Temari'],['clover','Yuno'],['demonslayer','Sanemi Shinazugawa'],['fairy','Wendy Marvell'],['naruto','Naruto Uzumaki']]],
+    ['Ils contrôlent les ombres', [['jjk','Megumi Fushiguro'],['solo','Sung Jinwoo'],['naruto','Shikamaru Nara'],['fairy','Rogue Cheney']]],
+    ['Ils peuvent se téléporter', [['naruto','Minato Namikaze'],['dragonball','Son Goku'],['clover','Finral Roulacase'],['wakfu','Yugo'],['naruto','Obito Uchiha']]],
+    ['Ils ont les cheveux blancs', [['naruto','Kakashi Hatake'],['hxh','Killua Zoldyck'],['jjk','Satoru Gojo'],['bleach','Toshiro Hitsugaya'],['naruto','Jiraiya'],['tokyoghoul','Ken Kaneki']]],
+    ['Ils ont les cheveux roses', [['fairy','Natsu Dragneel'],['naruto','Sakura Haruno'],['demonslayer','Mitsuri Kanroji'],['rezero','Ram'],['jjk','Yuji Itadori']]],
+    ['Ils sont chauves', [['opm','Saitama'],['dragonball','Krillin'],['bleach','Ikkaku Madarame'],['dragonball','Master Roshi'],['dragonball','Piccolo']]],
+    ['Ils portent des lunettes', [['naruto','Kabuto Yakushi'],['bleach','Uryu Ishida'],['jjk','Kento Nanami'],['naruto','Shino Aburame'],['bleach','Sosuke Aizen']]],
+    ['Ils mangent énormément', [['onepiece','Monkey D. Luffy'],['dragonball','Son Goku'],['demonslayer','Mitsuri Kanroji'],['naruto','Choji Akimichi']]],
+    ['Ils sont médecins / soigneurs', [['onepiece','Tony Tony Chopper'],['onepiece','Trafalgar D. Water Law'],['naruto','Tsunade'],['bleach','Retsu Unohana'],['jjk','Shoko Ieiri']]],
+    ['Ce sont des scientifiques', [['bleach','Mayuri Kurotsuchi'],['naruto','Orochimaru'],['onepiece','Vegapunk'],['dragonball','Dr. Gero']]],
+    ['Ce sont des maîtres / mentors', [['naruto','Jiraiya'],['jjk','Satoru Gojo'],['dragonball','Master Roshi'],['demonslayer','Sakonji Urokodaki'],['fma','Izumi Curtis'],['opm','Bang'],['hxh','Biscuit Krueger']]],
+    ['Ils ont trahi leur camp', [['bleach','Sosuke Aizen'],['snk','Reiner Braun'],['onepiece','Marshall D. Teach'],['demonslayer','Kokushibo'],['jjk','Suguru Geto']]],
+    ['Ils se régénèrent (quasi immortels)', [['sds','Ban'],['naruto','Hidan'],['dragonball','Cell'],['demonslayer','Muzan Kibutsuji'],['dragonball','Majin Buu']]],
+    ['Ce sont des rois', [['hxh','Meruem'],['onepiece','Gol D. Roger'],['jjk','Ryomen Sukuna'],['sds','King'],['tensura','Rimuru Tempest']]],
+    ['Ce sont des princes / princesses', [['dragonball','Vegeta'],['onepiece','Nefertari Vivi'],['sds','Elizabeth Liones'],['onepiece','Shirahoshi'],['clover','Noelle Silva']]],
+    ['Ils ont une cicatrice au visage', [['onepiece','Shanks'],['naruto','Iruka Umino'],['demonslayer','Sanemi Shinazugawa'],['onepiece','Roronoa Zoro'],['fma','Scar']]],
+    ['Ils combattent avec plusieurs sabres', [['onepiece','Roronoa Zoro'],['demonslayer','Inosuke Hashibira'],['demonslayer','Tengen Uzui'],['sao','Kirito'],['clover','Asta']]],
+    ['Ce sont des robots / cyborgs', [['opm','Genos'],['onepiece','Franky'],['dragonball','Android 17'],['dragonball','Android 16'],['jjk','Mechamaru'],['dragonball','Android 18']]],
+    ['Inséparables de leur compagnon animal', [['naruto','Kiba Inuzuka'],['fairy','Natsu Dragneel'],['chainsaw','Denji'],['sds','Meliodas'],['pokemon','Sacha']]],
+    ["Ce sont des capitaines d'escouade", [['bleach','Byakuya Kuchiki'],['snk','Levi Ackerman'],['clover','Yami Sukehiro'],['bleach','Toshiro Hitsugaya'],['fireforce','Akitaru Obi']]],
+    ['Ils ont des yeux spéciaux', [['naruto','Sasuke Uchiha'],['naruto','Neji Hyuga'],['jjk','Satoru Gojo'],['hxh','Kurapika'],['naruto','Nagato']]],
+    ['Ce sont des voleurs', [['onepiece','Nami'],['hxh','Chrollo Lucilfer'],['sds','Ban'],['hxh','Feitan Portor']]],
+    ['Ce sont des dragons', [['tensura','Veldora Tempest'],['fairy','Igneel'],['fairy','Acnologia'],['wakfu','Grougaloragran']]],
+    ['Ils ont perdu un bras', [['onepiece','Shanks'],['fma','Edward Elric'],['snk','Erwin Smith'],['demonslayer','Tengen Uzui'],['naruto','Sasuke Uchiha']]],
+    ['Ce sont des démons', [['demonslayer','Muzan Kibutsuji'],['demonslayer','Nezuko Kamado'],['sds','Meliodas'],['sds','Zeldris'],['chainsaw','Makima'],['chainsaw','Power']]],
+    ['Ils portent un masque', [['naruto','Kakashi Hatake'],['naruto','Obito Uchiha'],['demonslayer','Sakonji Urokodaki'],['tokyoghoul','Ken Kaneki'],['demonslayer','Hotaru Haganezuka']]],
+    ['Un être est scellé en eux', [['naruto','Naruto Uzumaki'],['naruto','Gaara'],['naruto','Killer Bee'],['jjk','Yuji Itadori'],['chainsaw','Denji'],['clover','Asta']]],
+    ['Ils ont été envoyés dans un autre monde', [['mushoku','Rudeus Greyrat'],['tensura','Rimuru Tempest'],['rezero','Subaru Natsuki'],['sao','Kirito']]],
+    ['Ce sont des grands frères', [['naruto','Itachi Uchiha'],['onepiece','Portgas D. Ace'],['demonslayer','Tanjiro Kamado'],['fma','Edward Elric'],['snk','Zeke Yeager']]],
+    ["Ils portent le nom d'un péché capital", [['fma','Greed'],['fma','Envy'],['fma','Lust'],['fma','Gluttony'],['fma','Sloth']]],
+    ['Ils ont été Hokage', [['naruto','Minato Namikaze'],['naruto','Hiruzen Sarutobi'],['naruto','Tsunade'],['naruto','Kakashi Hatake'],['naruto','Naruto Uzumaki'],['naruto','Hashirama Senju']]],
+    ["Membres de l'Akatsuki", [['naruto','Itachi Uchiha'],['naruto','Kisame Hoshigaki'],['naruto','Deidara'],['naruto','Sasori'],['naruto','Hidan'],['naruto','Kakuzu'],['naruto','Konan']]],
+    ["Membres de l'équipage du Chapeau de paille", [['onepiece','Nami'],['onepiece','Usopp'],['onepiece','Brook'],['onepiece','Franky'],['onepiece','Tony Tony Chopper'],['onepiece','Nico Robin'],['onepiece','Sanji']]],
+    ['Ce sont des Espada', [['bleach','Ulquiorra Cifer'],['bleach','Grimmjow Jaegerjaquez'],['bleach','Coyote Starrk'],['bleach','Nnoitra Gilga'],['bleach','Baraggan Louisenbairn'],['bleach','Tier Harribel']]],
+    ['Ce sont des Piliers (Hashira)', [['demonslayer','Giyu Tomioka'],['demonslayer','Kyojuro Rengoku'],['demonslayer','Shinobu Kocho'],['demonslayer','Mitsuri Kanroji'],['demonslayer','Sanemi Shinazugawa'],['demonslayer','Muichiro Tokito']]],
+    ['Membres de la Brigade Fantôme', [['hxh','Chrollo Lucilfer'],['hxh','Hisoka Morow'],['hxh','Feitan Portor'],['hxh','Machi Komacine'],['hxh','Nobunaga Hazama'],['hxh','Shizuku Murasaki']]],
+    ['Ce sont les Sept Péchés capitaux', [['sds','Meliodas'],['sds','Ban'],['sds','King'],['sds','Diane'],['sds','Gowther'],['sds','Merlin'],['sds','Escanor']]],
+    ['Ce sont des héros de classe S', [['opm','Tatsumaki'],['opm','Bang'],['opm','King'],['opm','Genos'],['opm','Metal Bat'],['opm','Atomic Samurai']]],
+    ['Membres du Taureau noir', [['clover','Asta'],['clover','Noelle Silva'],['clover','Magna Swing'],['clover','Vanessa Enoteca'],['clover','Finral Roulacase'],['clover','Gauche Adlai'],['clover','Charmy Pappitson']]],
+    ['Ce sont des Saiyans', [['dragonball','Son Goku'],['dragonball','Vegeta'],['dragonball','Son Gohan'],['dragonball','Trunks'],['dragonball','Broly'],['dragonball','Bardock'],['dragonball','Raditz']]],
+    ['Ce sont des Lunes supérieures', [['demonslayer','Kokushibo'],['demonslayer','Doma'],['demonslayer','Akaza'],['demonslayer','Hantengu'],['demonslayer','Gyokko'],['demonslayer','Gyutaro']]],
+    ["Membres du Bataillon d'exploration", [['snk','Erwin Smith'],['snk','Levi Ackerman'],['snk','Hange Zoë'],['snk','Mikasa Ackerman'],['snk','Armin Arlert'],['snk','Jean Kirstein']]],
+    ['Membres du Tokyo Manji Gang', [['tokyorevengers','Manjiro Sano'],['tokyorevengers','Ken Ryuguji'],['tokyorevengers','Keisuke Baji'],['tokyorevengers','Takashi Mitsuya'],['tokyorevengers','Chifuyu Matsuno'],['tokyorevengers','Takemichi Hanagaki']]],
+    ['Ce sont des Empereurs (Yonko)', [['onepiece','Shanks'],['onepiece','Charlotte Linlin'],['onepiece','Kaido'],['onepiece','Edward Newgate'],['onepiece','Marshall D. Teach'],['onepiece','Buggy']]],
+    ['Ce sont des amiraux de la Marine', [['onepiece','Sakazuki'],['onepiece','Kuzan'],['onepiece','Borsalino'],['onepiece','Issho'],['onepiece','Aramaki']]],
+    ['Ce sont des Homonculus', [['fma','Greed'],['fma','Envy'],['fma','Lust'],['fma','Gluttony'],['fma','Pride'],['fma','King Bradley']]],
+    ['Ils possèdent le Haki des rois', [['onepiece','Monkey D. Luffy'],['onepiece','Shanks'],['onepiece','Roronoa Zoro'],['onepiece','Edward Newgate'],['onepiece','Kaido'],['onepiece','Boa Hancock']]],
+    ['Ce sont des Dragon Slayers', [['fairy','Natsu Dragneel'],['fairy','Gajeel Redfox'],['fairy','Wendy Marvell'],['fairy','Laxus Dreyar'],['fairy','Sting Eucliffe'],['fairy','Rogue Cheney']]],
+    ["Ce sont des Chevaliers-mages capitaines", [['clover','Yami Sukehiro'],['clover','William Vangeance'],['clover','Fuegoleon Vermillion'],['clover','Nozel Silva'],['clover','Charlotte Roselei'],['clover','Rill Boismortier']]],
+    ['Ce sont des exorcistes de grade spécial', [['jjk','Satoru Gojo'],['jjk','Yuta Okkotsu'],['jjk','Suguru Geto'],['jjk','Yuki Tsukumo']]],
+    ['Ils ont été Shinigami remplaçants / Shinigami', [['bleach','Ichigo Kurosaki'],['bleach','Rukia Kuchiki'],['bleach','Renji Abarai'],['bleach','Byakuya Kuchiki'],['bleach','Kenpachi Zaraki']]],
+    ['Ce sont des Stand users de la famille Joestar', [['jojo','Jotaro Kujo'],['jojo','Joseph Joestar'],['jojo','Josuke Higashikata'],['jojo','Jolyne Cujoh'],['jojo','Giorno Giovanna']]],
+    ['Ils sont passés par Greed Island', [['hxh','Gon Freecss'],['hxh','Killua Zoldyck'],['hxh','Biscuit Krueger'],['hxh','Genthru']]],
+    ['Membres de la Section 4 de Sécurité publique', [['chainsaw','Denji'],['chainsaw','Power'],['chainsaw','Aki Hayakawa'],['chainsaw','Himeno'],['chainsaw','Kobeni Higashiyama']]],
+    ['Membres de Fairy Tail (guilde)', [['fairy','Erza Scarlet'],['fairy','Lucy Heartfilia'],['fairy','Mirajane Strauss'],['fairy','Gildarts Clive'],['fairy','Makarov Dreyar']]],
+    ['Joueurs de Karasuno', [['haikyuu','Shoyo Hinata'],['haikyuu','Tobio Kageyama'],['haikyuu','Kei Tsukishima'],['haikyuu','Yu Nishinoya'],['haikyuu','Daichi Sawamura'],['haikyuu','Asahi Azumane']]],
+    ['Participants du projet Blue Lock', [['bluelock','Yoichi Isagi'],['bluelock','Meguru Bachira'],['bluelock','Seishiro Nagi'],['bluelock','Rin Itoshi'],['bluelock','Shoei Barou'],['bluelock','Hyoma Chigiri']]],
+    ['Ce sont des Pokémon légendaires', [['pokemon','Mewtwo'],['pokemon','Artikodin'],['pokemon','Électhor'],['pokemon','Sulfura'],['pokemon','Lugia'],['pokemon','Ho-Oh'],['pokemon','Rayquaza']]],
+    ['Ce sont des starters Pokémon', [['pokemon','Bulbizarre'],['pokemon','Salamèche'],['pokemon','Carapuce'],['pokemon','Germignon'],['pokemon','Héricendre'],['pokemon','Kaiminus'],['pokemon','Poussifeu']]],
+    ['Ce sont des Pokémon de type Spectre', [['pokemon','Ectoplasma'],['pokemon','Fantominus'],['pokemon','Spectrum'],['pokemon','Feuforêve'],['pokemon','Mimiqui'],['pokemon','Polichombr']]]
+];
+
+/* ===== Mini-jeux 2 : Common Link, Popularity Guess, Petit bac ===== */
+ARC_GAMES.link       = { label:'Common Link',     icon:'🔗', universe:false, rounds:10, roundMs:25000, answer:'choice' };
+ARC_GAMES.popularite = { label:'Popularity Guess', icon:'👥', universe:true,  rounds:12, roundMs:15000, answer:'choice' };
+ARC_GAMES.bac        = { label:'Petit bac anime', icon:'🔤', universe:false, rounds:5,  roundMs:75000, answer:'bac'    };
+
+// Titres acceptés pour la catégorie "Anime" du petit bac (en plus des listes du site)
+const ARC_BAC_ANIME_EXTRA = [
+    'Akira','Air Gear','Ajin','Aldnoah Zero','Angel Beats','Another','Ao Haru Ride','Arcane','Ashita no Joe','Astro Boy','Attack on Titan','Azumanga Daioh',
+    'Baccano','Bakemonogatari','Bakuman','Banana Fish','Barakamon','Beelzebub','Beyblade','Black Lagoon','Bleach','Blood-C','Bokurano','Bungou Stray Dogs',
+    'Btooom','Captain Harlock','Card Captor Sakura','Castlevania','Chobits','Clannad','Claymore','Cobra','Cells at Work','Charlotte','Chihayafuru','Cromartie High School',
+    'D.Gray-man','Darker than Black','Deadman Wonderland','Demon Slayer','Devilman Crybaby','Digimon','Doraemon','Dorohedoro','Dragon Quest Dai no Daibouken','Durarara',
+    'Eden of the East','Elfen Lied','Eureka Seven','Eyeshield 21','Fate Zero','Fate Stay Night','Fire Force','Fist of the North Star','Hokuto no Ken','Food Wars','Shokugeki no Soma',
+    'Free','Fullmetal Alchemist','Future Diary','Mirai Nikki','Gachiakuta','Gantz','Ghost in the Shell','Gintama','Goblin Slayer','Golden Kamuy','Gosick','Grand Blue',
+    'Great Pretender','Guilty Crown','Gundam','Haikyuu','Hajime no Ippo','Hellsing','Heroes','Higurashi','Hikaru no Go','Horimiya','Hunter x Hunter','Hyouka',
+    'Ichigo 100%','Ikebukuro West Gate Park','Initial D','Inuyasha','Inuyashiki','Jojo','Jormungand','Jujutsu Kaisen','Kaiji','Kakegurui','Kamisama Hajimemashita',
+    'Kenshin','Rurouni Kenshin','Kimi ni Todoke','Kingdom','Kiki la petite sorcière','K-On','Kuroko','Kurokos Basket','Kill la Kill','Kobayashi','Konosuba','Lain',
+    'Log Horizon','Love Live','Lucky Star','Lupin III','Macross','Magi','Mahoromatic','Major','Mashle','Medaka Box','Megalo Box','Mob Psycho','Monster','Mononoke',
+    'Mon voisin Totoro','Nana','Naruto','Naruto Shippuden','Neon Genesis Evangelion','Nichijou','Nisekoi','No Game No Life','Noragami','Nodame Cantabile','Nicky Larson',
+    'One Piece','One Punch Man','Ouran High School Host Club','Overlord','Oshi no Ko','Paprika','Parasyte','Perfect Blue','Ping Pong','Planetes','Plunderer','Pokemon',
+    'Princesse Mononoke','Psycho Pass','Puella Magi Madoka Magica','Madoka Magica','Quintessential Quintuplets','Ranma','Record of Ragnarok','Re Zero','Sakamoto Days',
+    'Samurai Champloo','Samurai X','Sailor Moon','Saint Seiya','School Rumble','Seven Deadly Sins','Shaman King','Shiki','Slam Dunk','Soul Eater','Space Dandy',
+    'Spirited Away','Le Voyage de Chihiro','Spy x Family','Steins Gate','Sword Art Online','Tengen Toppa Gurren Lagann','Terror in Resonance','Tokyo Ghoul','Tokyo Revengers',
+    'Toradora','Tower of God','Trigun','Tsubasa','Tokyo Mew Mew','Uchouten Kazoku','Ulysses 31','Undead Unluck','Urusei Yatsura','Vampire Knight','Vinland Saga',
+    'Violet Evergarden','Wakfu','Welcome to the NHK','Wolfs Rain','Wotakoi','Wind Breaker','X','xxxHolic','Yakitate Japan','Yona','Yowamushi Pedal','Yu-Gi-Oh','Yu Yu Hakusho',
+    'Yuri on Ice','Zetsuen no Tempest','Zom 100','Zombieland Saga','Zatch Bell','Blue Lock','Black Clover','Chainsaw Man','Dandadan','Frieren','Kaiju No 8','Dr Stone',
+    'Dragon Ball','Dragon Ball Z','Dragon Ball Super','Dragon Ball GT','Détective Conan','Death Note','Death Parade','Erased','Elfen Lied','Ergo Proxy','Emma','Evangelion',
+    'Olympus','Orange','Oggy','Ordinal Scale','Ushio to Tora','Umamusume','Usagi Drop','Ulysse 31','Inazuma Eleven','Ippo','Isekai Ojisan','Id Invaded','Ikoku Meiro',
+    'Hell s Paradise','Jigokuraku','Mushoku Tensei','Tensura','Solo Leveling','Classroom of the Elite','Fairy Tail','My Hero Academia','Boku no Hero Academia','Boruto'
+];
+
+const ARC_BAC_LETTERS = 'ABCDEGHIJKLMNOPRSTUY'.split('');
+let ARC_BAC_ANIME_NORMS = null;
+function arcBacAnimeList() {
+    if (ARC_BAC_ANIME_NORMS) return ARC_BAC_ANIME_NORMS;
+    const set = new Map();
+    const add = n => { const k = normalizeRG(String(n || '')); if (k) set.set(k, n); };
+    ARC_ANIMES.forEach(a => { add(a[0]); add(a[1]); });
+    (typeof BLINDTEST_ANIMES !== 'undefined' ? BLINDTEST_ANIMES : []).forEach(add);
+    Object.values(ARC_UNIVERSE_ANIME).forEach(add);
+    ARC_BAC_ANIME_EXTRA.forEach(add);
+    ARC_BAC_ANIME_NORMS = set;
+    return set;
+}
+function arcStripArticle(k) { return k.replace(/^(the|le|la|les|l|un|une) /, ''); }
+
+// Vérifie une réponse du petit bac. Renvoie { ok, canon } (canon sert à repérer les réponses identiques)
+function arcBacCheck(cat, letter, input) {
+    const x = normalizeRG(String(input || ''));
+    const L = letter.toLowerCase();
+    if (!x) return { ok: false };
+    const startsOk = x[0] === L || arcStripArticle(x)[0] === L;
+    if (!startsOk) return { ok: false, why: 'lettre' };
+    if (cat.type === 'anime') {
+        const list = arcBacAnimeList();
+        if (list.has(x)) return { ok: true, canon: 'a|' + x, display: list.get(x) };
+        for (const [k, v] of list) {
+            if ((k[0] === L || arcStripArticle(k)[0] === L) && distanceRG(k, x) <= toleranceRG(Math.max(k.length, x.length))) return { ok: true, canon: 'a|' + k, display: v };
+        }
+        return { ok: false };
+    }
+    const universes = cat.type === 'perso' ? Object.keys(RG_POOLS_V2) : [cat.u];
+    for (const u of universes) {
+        const pool = RG_POOLS_V2[u] || [];
+        if (!pool.length) continue;
+        let c = null;
+        try { c = rgCanonicalInput(u, input, pool); } catch (_) {}
+        let hit = c ? pool.find(n => normalizeRG(n) === c) : null;
+        if (!hit) hit = pool.find(n => { const k = normalizeRG(n); return distanceRG(k, x) <= toleranceRG(Math.max(k.length, x.length)); });
+        if (hit) return { ok: true, canon: u + '|' + normalizeRG(hit), display: hit };
+    }
+    return { ok: false };
+}
+
+function arcBacLetterOk(letter, cats) {
+    const L = letter.toLowerCase();
+    return cats.every(cat => {
+        if (cat.type === 'anime') return [...arcBacAnimeList().keys()].some(k => k[0] === L);
+        const us = cat.type === 'perso' ? Object.keys(RG_POOLS_V2) : [cat.u];
+        return us.some(u => (RG_POOLS_V2[u] || []).filter(n => normalizeRG(n)[0] === L).length >= 2);
+    });
+}
+
+/* ---------- Popularity Guess : favoris MyAnimeList (API Jikan) ---------- */
+const ARC_POP_CACHE = new Map(); // univers -> [{ name, favorites, img }]
+const ARC_POP_INFLIGHT = new Map();
+async function arcMalAnimeId(u) {
+    const label = ARC_UNIVERSE_ANIME[u];
+    const entry = ARC_ANIMES.find(a => a[0] === label);
+    const q = entry ? entry[1] : label;
+    const data = await arcJikanQueued(() => fetchJsonWithTimeout(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=6&sfw=true`, 12000));
+    const list = Array.isArray(data?.data) ? data.data : [];
+    const nq = normalizeImageKey(q);
+    let best = null, bestScore = -1e9;
+    list.forEach((a, i) => {
+        const titles = [a.title, a.title_english, ...(a.titles || []).map(t => t.title)].filter(Boolean).map(normalizeImageKey);
+        let s = -i * 2 + Math.min(25, Math.log10((a.members || 0) + 1) * 3);
+        if (titles.includes(nq)) s += 60; else if (titles.some(t => t.startsWith(nq))) s += 20;
+        if (a.type === 'TV') s += 10;
+        if (s > bestScore) { bestScore = s; best = a; }
+    });
+    return best?.mal_id || null;
+}
+async function arcPopList(u) {
+    if (ARC_POP_CACHE.has(u)) return ARC_POP_CACHE.get(u);
+    if (ARC_POP_INFLIGHT.has(u)) return ARC_POP_INFLIGHT.get(u);
+    const task = (async () => {
+        try {
+            const id = await arcMalAnimeId(u);
+            if (!id) return [];
+            const data = await arcJikanQueued(() => fetchJsonWithTimeout(`https://api.jikan.moe/v4/anime/${id}/characters`, 15000));
+            const seen = new Set();
+            const list = (Array.isArray(data?.data) ? data.data : [])
+                .map(c => {
+                    const raw = String(c.character?.name || '');
+                    const name = raw.includes(',') ? raw.split(',').map(s => s.trim()).reverse().join(' ') : raw;
+                    return { name: arcDisplayName(u, name), favorites: +c.favorites || 0, img: c.character?.images?.webp?.image_url || c.character?.images?.jpg?.image_url || null, u };
+                })
+                .filter(c => c.name && c.favorites >= 30 && c.img && !/questionmark/.test(c.img))
+                .sort((a, b) => b.favorites - a.favorites)
+                .filter(c => { const k = normalizeRG(c.name); if (seen.has(k)) return false; seen.add(k); return true; })
+                .slice(0, 45);
+            if (list.length) ARC_POP_CACHE.set(u, list);
+            return list;
+        } catch (e) {
+            console.warn('[Popularity] ' + u + ' :', e.message);
+            return [];
+        } finally { ARC_POP_INFLIGHT.delete(u); }
+    })();
+    ARC_POP_INFLIGHT.set(u, task);
+    return task;
+}
+
+const arcBuildRoundV1 = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game === 'link') {
+        let cands = ARC_LINKS.map((l, i) => i).filter(i => !g.used.has('link|' + i));
+        if (!cands.length) { g.used.forEach(k => { if (k.startsWith('link|')) g.used.delete(k); }); cands = ARC_LINKS.map((l, i) => i); }
+        for (const i of arcShuffle(cands).slice(0, 4)) {
+            g.used.add('link|' + i);
+            const [label, chars] = ARC_LINKS[i];
+            const picked = [];
+            for (const [u, n] of arcShuffle(chars)) {
+                if (picked.length >= 4) break;
+                const display = arcDisplayName(u, n);
+                const url = await arcCharImage(u, n);
+                picked.push({ u, raw: n, display, url: url && await arcUsableImage(url) ? url : null });
+            }
+            if (picked.length < 4) continue;
+            const shownKeys = new Set(picked.map(p => p.u + '|' + normalizeRG(p.display)));
+            const wrong = arcShuffle(ARC_LINKS.filter((l, j) => j !== i && !l[1].some(([u, n]) => shownKeys.has(u + '|' + normalizeRG(arcDisplayName(u, n))))).map(l => l[0])).slice(0, 3);
+            return {
+                targets: picked,
+                imgs: picked.map(p => p.url ? arcToken(p.url) : null),
+                names: picked.map(p => p.display + ' (' + ARC_UNIVERSE_ANIME[p.u] + ')'),
+                answer: label,
+                choices: arcShuffle([label, ...wrong])
+            };
+        }
+        return null;
+    }
+
+    if (g.game === 'popularite') {
+        for (let attempt = 0; attempt < 5; attempt++) {
+            const u = arcPickUniverse(g);
+            const list = await arcPopList(u);
+            if (list.length < 6) continue;
+            for (let t = 0; t < 30; t++) {
+                const a = arcPick(list), b = arcPick(list);
+                if (a === b) continue;
+                const hi = Math.max(a.favorites, b.favorites), lo = Math.min(a.favorites, b.favorites);
+                if (hi < lo * 1.25) continue; // écart trop faible : pas jouable
+                const key = 'pop|' + [a.name, b.name].sort().join('|');
+                if (g.used.has(key)) continue;
+                g.used.add(key);
+                const winner = a.favorites > b.favorites ? a : b;
+                return {
+                    u,
+                    pair: [a, b],
+                    imgs: [arcToken(a.img), arcToken(b.img)],
+                    names: [a.name, b.name],
+                    answer: winner.name,
+                    choices: [a.name, b.name],
+                    favs: [a.favorites, b.favorites]
+                };
+            }
+        }
+        return null;
+    }
+
+    if (g.game === 'bac') {
+        const us = arcShuffle(Object.keys(ARC_UNIVERSE_ANIME).filter(u => u !== 'pokemon'));
+        const cats = [
+            { type: 'anime', label: 'Anime' },
+            { type: 'perso', label: 'Personnage (tous animes)' },
+            { type: 'univers', u: 'pokemon', label: 'Pokémon' },
+            { type: 'univers', u: us[0], label: 'Perso de ' + ARC_UNIVERSE_ANIME[us[0]] },
+            { type: 'univers', u: us[1], label: 'Perso de ' + ARC_UNIVERSE_ANIME[us[1]] }
+        ];
+        const letters = arcShuffle(ARC_BAC_LETTERS.filter(l => !g.used.has('bac|' + l)));
+        for (const letter of letters) {
+            if (!arcBacLetterOk(letter, cats)) continue;
+            g.used.add('bac|' + letter);
+            return { letter, cats, answer: null };
+        }
+        return null;
+    }
+    return arcBuildRoundV1(g);
+};
+
+// État public : on ajoute les infos des nouveaux jeux
+const arcPublicV1 = arcPublic;
+arcPublic = function (room, g) {
+    const out = arcPublicV1(room, g);
+    const cur = g.current || {};
+    const revealed = g.phase === 'reveal' || g.phase === 'finished';
+    if ((g.game === 'link' || g.game === 'popularite') && cur.names && g.phase !== 'loading') {
+        out.stage.imgs = cur.imgs;
+        out.stage.names = cur.names;
+        if (g.game === 'popularite') out.stage.question = 'Qui a le plus de fans sur MyAnimeList ?';
+        if (revealed && cur.favs) out.reveal = { ...(out.reveal || {}), favs: cur.favs, items: [] };
+        if (revealed && g.game === 'link') out.reveal = { ...(out.reveal || {}), items: [] };
+    }
+    if (g.game === 'bac' && cur.letter && g.phase !== 'loading') {
+        out.stage.letter = cur.letter;
+        out.stage.cats = cur.cats.map(c => c.label);
+        out.players.forEach(p => { p.filled = (g.bac?.[p.id] || []).filter(v => String(v || '').trim()).length; p.done = !!g.bacStop?.[p.id]; });
+        if (revealed && g.bacResult) out.bac = g.bacResult;
+        out.notice = g.phase === 'playing' ? (g.notice || null) : null;
+    }
+    return out;
+};
+
+// Petit bac : correction à la fin de la manche
+const arcRevealV1 = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.game === 'bac' && g.phase === 'playing' && g.current?.cats) {
+        const cats = g.current.cats, letter = g.current.letter;
+        const rows = room.players.map(p => {
+            const ans = (g.bac?.[p.id] || []).slice(0, cats.length);
+            return { id: p.id, name: p.name, cells: cats.map((c, i) => ({ text: String(ans[i] || '').trim().slice(0, 60), ...arcBacCheck(c, letter, ans[i]) })) };
+        });
+        cats.forEach((c, i) => {
+            const counts = {};
+            rows.forEach(r => { const cell = r.cells[i]; if (cell.ok) counts[cell.canon] = (counts[cell.canon] || 0) + 1; });
+            rows.forEach(r => { const cell = r.cells[i]; cell.pts = cell.ok ? (counts[cell.canon] > 1 ? 5 : 10) : 0; });
+        });
+        g.gainedRound = {};
+        rows.forEach(r => {
+            const pts = r.cells.reduce((s, c) => s + c.pts, 0);
+            g.gainedRound[r.id] = pts;
+            g.scores[r.id] = (g.scores[r.id] || 0) + pts;
+            r.total = pts;
+            r.cells = r.cells.map(c => ({ text: c.text, ok: c.ok, pts: c.pts, display: c.ok && c.display && normalizeRG(c.display) !== normalizeRG(c.text) ? c.display : null }));
+        });
+        g.bacResult = { letter, cats: cats.map(c => c.label), rows };
+        g.answers = Object.fromEntries(rows.map(r => [r.id, { correct: r.total > 0 }]));
+    }
+    return arcRevealV1(room, roomCode);
+};
+
+// Réinitialise l'état du petit bac à chaque nouvelle manche
+const arcNextRoundV1 = arcNextRound;
+arcNextRound = async function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.game === 'bac') { g.bac = {}; g.bacStop = {}; g.bacResult = null; g.notice = null; }
+    return arcNextRoundV1(room, roomCode);
+};
+
+io.on('connection', socket => {
+    socket.on('arc_bac', ({ roomCode, answers } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'bac' || g.phase !== 'playing' || !Array.isArray(answers)) return;
+        if (!room.players.some(p => p.id === socket.id)) return;
+        g.bac = g.bac || {};
+        g.bac[socket.id] = answers.slice(0, 5).map(a => String(a || '').slice(0, 60));
+    });
+    socket.on('arc_bac_stop', ({ roomCode, answers } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'bac' || g.phase !== 'playing' || !Array.isArray(answers)) return;
+        if (!room.players.some(p => p.id === socket.id)) return;
+        g.bac = g.bac || {}; g.bacStop = g.bacStop || {};
+        g.bac[socket.id] = answers.slice(0, 5).map(a => String(a || '').slice(0, 60));
+        if (g.bac[socket.id].filter(a => a.trim()).length < g.current.cats.length) return; // STOP seulement si tout est rempli
+        g.bacStop[socket.id] = true;
+        const connected = room.players.filter(p => !p.disconnected);
+        if (connected.every(p => g.bacStop[p.id])) { arcReveal(room, roomCode); return; }
+        const newEnd = Date.now() + 6000;
+        if (newEnd < g.endsAt) {
+            g.endsAt = newEnd;
+            if (g.timer) clearTimeout(g.timer);
+            const roundNo = g.round;
+            g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, 6250);
+            g.notice = `🛑 ${room.players.find(p => p.id === socket.id)?.name || 'Un joueur'} a dit STOP ! Plus que quelques secondes…`;
+        }
+        arcEmit(room, roomCode);
+    });
+});
