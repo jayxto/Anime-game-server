@@ -9502,7 +9502,7 @@ function btPublicState(room) {
     const revealed = bt.phase !== 'playing';
     return {
         round:bt.round,
-        totalRounds:bt.totalRounds,
+        totalRounds:Number.isFinite(bt.totalRounds) ? bt.totalRounds : null,
         phase:bt.phase, // playing | reveal | finished
         src:bt.current?.src || null,
         ytId:bt.phase === 'playing' || bt.phase === 'reveal' ? (bt.current?.ytId || null) : null,
@@ -9616,7 +9616,7 @@ function startBlindTest(room, roomCode) {
     room.status = 'bt_playing';
     room.blindtest = {
         round:0,
-        totalRounds:BLINDTEST_ROUNDS,
+        totalRounds:arcRoundsFor(room, BLINDTEST_ROUNDS),
         phase:'playing',
         current:null,
         offset:0,
@@ -11106,7 +11106,7 @@ const ARC_IMG_TOKENS = new Map();   // jeton -> { url, exp }
 const ARC_IMG_CACHE = new Map();    // url -> { buf, type }
 const ARC_IMG_INFLIGHT = new Map();
 let ARC_IMG_CACHE_BYTES = 0;
-const ARC_IMG_HOSTS = /(^|\.)(wikia\.nocookie\.net|githubusercontent\.com|ytimg\.com|myanimelist\.net|fandom\.com)$/i;
+const ARC_IMG_HOSTS = /(^|\.)(wikia\.nocookie\.net|githubusercontent\.com|ytimg\.com|myanimelist\.net|fandom\.com|anilist\.co)$/i;
 
 function arcToken(url) {
     const token = ARC_CRYPTO.randomBytes(10).toString('hex');
@@ -11366,7 +11366,7 @@ function arcPublic(room, g) {
         universeLabel: g.universe && g.universe !== 'all' ? ARC_UNIVERSE_ANIME[g.universe] : (cfg.universe ? 'Tous les animes' : ''),
         roundUniverse: revealed && cur.u ? ARC_UNIVERSE_ANIME[cur.u] : null,
         round: g.round,
-        totalRounds: g.totalRounds,
+        totalRounds: Number.isFinite(g.totalRounds) ? g.totalRounds : null,
         phase: g.phase,
         roundMs: cfg.roundMs,
         startedAt: g.startedAt,
@@ -11442,7 +11442,9 @@ async function arcNextRound(room, roomCode) {
     if (!next) {
         g.fails = (g.fails || 0) + 1;
         if (g.fails >= 3 || g.round === 0) {
-            g.message = "Images indisponibles pour le moment (serveur d'images injoignable). Réessaie dans un instant ou choisis un autre univers.";
+            g.message = g.game === 'popularite'
+                ? "Impossible de récupérer les stats de popularité pour le moment (AniList injoignable). Réessaie dans un instant."
+                : "Images indisponibles pour le moment (serveur d'images injoignable). Réessaie dans un instant ou choisis un autre univers.";
             return arcFinish(room, roomCode);
         }
         return arcNextRound(room, roomCode);
@@ -11507,7 +11509,7 @@ function startArcade(room, roomCode) {
     const u = cfg.universe && ARC_UNIVERSE_ANIME[universe] ? universe : 'all';
     const g = {
         game, universe: cfg.universe ? u : 'all',
-        round: 0, totalRounds: cfg.rounds, phase: 'loading',
+        round: 0, totalRounds: arcRoundsFor(room, cfg.rounds), phase: 'loading',
         current: null, answers: {}, found: {}, gainedRound: {},
         scores: Object.fromEntries(room.players.map(p => [p.id, 0])),
         used: new Set(), usedU: [], lastGuess: {}
@@ -12213,5 +12215,173 @@ io.on('connection', socket => {
             g.notice = `🛑 ${room.players.find(p => p.id === socket.id)?.name || 'Un joueur'} a dit STOP ! Plus que quelques secondes…`;
         }
         arcEmit(room, roomCode);
+    });
+});
+
+/* ===== Réglages de partie + sources de données fiables (AniList) ===== */
+// Nombre de manches choisi par l'hôte dans le salon (0 = infini)
+function arcRoundsFor(room, def) {
+    const n = room ? room.arcRounds : undefined;
+    if (n === 0) return Infinity;
+    return Number.isFinite(n) && n > 0 ? n : def;
+}
+
+// AniList (API publique très fiable) : favoris des persos + affiches des animes
+let arcAniChain = Promise.resolve();
+function arcAniList(query, variables) {
+    const run = arcAniChain.then(async () => {
+        for (let attempt = 0; attempt < 3; attempt++) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 15000);
+            try {
+                const res = await fetch('https://graphql.anilist.co', {
+                    method: 'POST', signal: ctrl.signal,
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ query, variables })
+                });
+                if (res.status === 429 || res.status >= 500) { await new Promise(r => setTimeout(r, 1500 * (attempt + 1))); continue; }
+                const data = await res.json();
+                return data?.data || null;
+            } catch (e) {
+                if (attempt === 2) throw e;
+                await new Promise(r => setTimeout(r, 800));
+            } finally { clearTimeout(timer); }
+        }
+        return null;
+    }).catch(e => { console.warn('[AniList]', e.message); return null; });
+    arcAniChain = run.then(() => new Promise(r => setTimeout(r, 700)));
+    return run;
+}
+
+const ARC_POP_TOP = { list: null, at: 0 };
+async function arcPopTop() {
+    if (ARC_POP_TOP.list && Date.now() - ARC_POP_TOP.at < 6 * 3600 * 1000) return ARC_POP_TOP.list;
+    const q = `query($p:Int){ Page(page:$p, perPage:50){ characters(sort:FAVOURITES_DESC){ name{ full } favourites image{ large }
+        media(perPage:1, sort:POPULARITY_DESC, type:ANIME){ nodes{ title{ romaji english } } } } } }`;
+    const out = [];
+    for (let p = 1; p <= 4; p++) {
+        const d = await arcAniList(q, { p });
+        (d?.Page?.characters || []).forEach(c => {
+            const anime = c.media?.nodes?.[0]?.title;
+            if (!c.image?.large || !c.name?.full || !anime) return;
+            out.push({ name: c.name.full, favorites: +c.favourites || 0, img: c.image.large, anime: anime.english || anime.romaji });
+        });
+    }
+    if (out.length >= 20) { ARC_POP_TOP.list = out; ARC_POP_TOP.at = Date.now(); }
+    return out;
+}
+
+arcPopList = async function (u) {
+    const hit = ARC_POP_CACHE.get(u);
+    if (hit && hit.length) return hit;
+    if (ARC_POP_INFLIGHT.has(u)) return ARC_POP_INFLIGHT.get(u);
+    const task = (async () => {
+        const label = ARC_UNIVERSE_ANIME[u];
+        const entry = ARC_ANIMES.find(a => a[0] === label);
+        const search = entry ? entry[1] : label;
+        const q = `query($s:String){ Media(search:$s, type:ANIME, sort:POPULARITY_DESC){ characters(sort:FAVOURITES_DESC, perPage:50){ nodes{ name{ full } favourites image{ large } } } } }`;
+        const d = await arcAniList(q, { s: search });
+        const seen = new Set();
+        const list = (d?.Media?.characters?.nodes || [])
+            .filter(c => c.name?.full && c.image?.large && !/default/.test(c.image.large) && (+c.favourites || 0) >= 20)
+            .map(c => ({ name: arcDisplayName(u, c.name.full), favorites: +c.favourites || 0, img: c.image.large, u }))
+            .filter(c => { const k = normalizeRG(c.name); if (seen.has(k)) return false; seen.add(k); return true; })
+            .slice(0, 45);
+        if (list.length) ARC_POP_CACHE.set(u, list);
+        return list;
+    })().finally(() => ARC_POP_INFLIGHT.delete(u));
+    ARC_POP_INFLIGHT.set(u, task);
+    return task;
+};
+
+const arcBuildRoundV2 = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game !== 'popularite') return arcBuildRoundV2(g);
+    for (let attempt = 0; attempt < 4; attempt++) {
+        let u = null, list;
+        if (g.universe && g.universe !== 'all') { u = g.universe; list = await arcPopList(u); }
+        else list = await arcPopTop();
+        if (!list || list.length < 6) continue;
+        for (let t = 0; t < 40; t++) {
+            const a = arcPick(list), b = arcPick(list);
+            if (a === b) continue;
+            const hi = Math.max(a.favorites, b.favorites), lo = Math.min(a.favorites, b.favorites);
+            if (hi < lo * 1.2) continue;
+            const key = 'pop|' + [a.name, b.name].sort().join('|');
+            if (g.used.has(key)) continue;
+            g.used.add(key);
+            const label = x => x.anime ? `${x.name} (${x.anime})` : x.name;
+            const winner = a.favorites > b.favorites ? a : b;
+            return { u, imgs: [arcToken(a.img), arcToken(b.img)], names: [label(a), label(b)], answer: label(winner), choices: [label(a), label(b)], favs: [a.favorites, b.favorites] };
+        }
+        // Toutes les paires déjà jouées (partie infinie) : on recommence le tirage
+        g.used.forEach(k => { if (k.startsWith('pop|')) g.used.delete(k); });
+    }
+    return null;
+};
+
+// Affiches : AniList d'abord (fiable), MyAnimeList ensuite
+const arcAnimeCoverV1 = arcAnimeCover;
+arcAnimeCover = async function (name) {
+    const entry = ARC_ANIMES.find(a => a[0] === name);
+    if (!entry) return null;
+    if (ARC_ANIME_COVER_CACHE.has(name)) return ARC_ANIME_COVER_CACHE.get(name);
+    const cached = await getCachedCharacterImage('_anime', name);
+    if (cached && cached.imageUrl) { ARC_ANIME_COVER_CACHE.set(name, cached.imageUrl); return cached.imageUrl; }
+    const d = await arcAniList(`query($s:String){ Media(search:$s, type:ANIME, sort:SEARCH_MATCH){ coverImage{ extraLarge large } } }`, { s: entry[1] });
+    const url = d?.Media?.coverImage?.extraLarge || d?.Media?.coverImage?.large || null;
+    if (url) {
+        ARC_ANIME_COVER_CACHE.set(name, url);
+        saveCachedCharacterImage('_anime', name, { imageUrl: url, sourceUrl: null, status: 'ok' }).catch(() => {});
+        return url;
+    }
+    return arcAnimeCoverV1(name);
+};
+
+// Battle de préférence : les openings / endings (miniature YouTube + écoute)
+function arcOpeningItems() {
+    const seen = new Set();
+    return BLINDTEST_TRACKS
+        .filter(t => BLINDTEST_VIDEO_IDS[t.n] && !BT_BAD_IDS.has(BLINDTEST_VIDEO_IDS[t.n]))
+        .map(t => {
+            const id = BLINDTEST_VIDEO_IDS[t.n];
+            const song = String(t.title || '').replace(/\s*\((Lo-fi|Remix)\)\s*$/i, '');
+            return { name: `${song} — ${t.anime}`, img: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, video: id };
+        })
+        .filter(i => { if (seen.has(i.name)) return false; seen.add(i.name); return true; });
+}
+const arcItemsForV1 = arcItemsFor;
+arcItemsFor = function (source) {
+    if (source === 'openings') return arcOpeningItems();
+    return arcItemsForV1(source);
+};
+app.get('/api/arcade/openings', (req, res) => {
+    const items = arcOpeningItems();
+    res.json({ ok: true, source: 'openings', label: 'Openings & endings', items });
+});
+
+io.on('connection', socket => {
+    // L'hôte choisit le nombre de manches (5, 10, 15, 20 ou infini) dans le salon d'attente
+    socket.on('set_arc_rounds', ({ roomCode, rounds } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || room.status !== 'waiting') return;
+        const n = Number(rounds);
+        room.arcRounds = [0, 5, 10, 15, 20, 30].includes(n) ? n : undefined;
+        io.to(roomCode).emit('update_room', room);
+    });
+    // Partie infinie : l'hôte arrête quand il veut
+    socket.on('arc_end', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || room.host !== socket.id || g.phase === 'finished') return;
+        arcFinish(room, roomCode);
+    });
+    socket.on('bt_end', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        const bt = room?.blindtest;
+        if (!room || !bt || room.host !== socket.id || bt.phase === 'finished') return;
+        bt.totalRounds = bt.round;
+        btClearTimer(roomCode);
+        btNextRound(room, roomCode);
     });
 });

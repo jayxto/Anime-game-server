@@ -370,7 +370,7 @@
         @keyframes arcPop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
         .arc-grid4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;max-width:440px;}
         .arc-tile{position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#11111a;border:2px solid #2c2c44;display:flex;align-items:center;justify-content:center;}
-        .arc-tile img{width:100%;height:100%;object-fit:cover;object-position:top;animation:arcPop .3s ease-out;}
+        .arc-tile img{width:100%;height:100%;object-fit:contain;background:#0b0b12;animation:arcPop .3s ease-out;}
         .arc-tile .arc-q{font-family:'Bangers',cursive;font-size:3rem;color:#34344a;}
         .arc-tile .arc-cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:14px 6px 5px;font-size:.74rem;font-weight:800;text-align:center;}
         .arc-loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--text-muted);}
@@ -419,6 +419,12 @@
         .bt-yt-box.tap{border-color:var(--accent-yellow);}
         .bt-yt-box.tap .bt-yt-veil{color:var(--accent-yellow);animation:btPulse 1.2s ease-in-out infinite;}
         @keyframes btPulse{50%{opacity:.6}}
+        .room-rounds{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:.85rem;}
+        .room-rounds select{background:#0d0d15;color:#fff;border:1px solid var(--accent-cyan);border-radius:8px;padding:6px 10px;font-weight:700;}
+        .bb-card.bb-op{aspect-ratio:16/12;}
+        .bb-card.bb-op img{object-position:center;}
+        .bb-play{position:absolute;top:10px;right:10px;z-index:3;background:rgba(0,0,0,.75);color:#fff;border:1px solid var(--accent-cyan);border-radius:99px;padding:6px 12px;font-weight:800;cursor:pointer;font-size:.8rem;}
+        .bb-video{position:absolute;inset:0 0 70px 0;width:100%;height:calc(100% - 70px);border:0;z-index:2;}
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -601,8 +607,8 @@
                 </div>
 
                 <div class="quote-mode-card" style="border-color:var(--accent-pink);">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle de préférence <span class="quote-new">NOUVEAU</span></h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">Tournoi en duels : choisis ton préféré à chaque fois jusqu'au champion (8 à 64 participants) • classement mondial des votes</p>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle d'openings <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Tournoi entre 210 openings / endings : écoute, choisis ton préféré à chaque duel jusqu'au champion (8 à 64) • classement mondial des votes</p>
                     <button class="btn-action" style="margin-top:0;background:var(--accent-pink);" onclick="openBattleSelection()">Lancer une battle</button>
                 </div>
 
@@ -696,6 +702,14 @@
             <p>Donne ce code à tes amis :</p>
             <div class="room-code-box" id="display-room-code">#----</div>
             
+            <div id="room-rounds-box" class="room-rounds" style="display:none;">
+                <span>🔁 Nombre de manches :</span>
+                <select id="room-rounds-select" onchange="setArcRounds(this.value)">
+                    <option value="">Par défaut</option><option value="5">5</option><option value="10">10</option><option value="15">15</option>
+                    <option value="20">20</option><option value="30">30</option><option value="0">♾️ Infini</option>
+                </select>
+                <b id="room-rounds-text"></b>
+            </div>
             <div id="room-visibility-box" class="room-visibility">
                 <label id="room-public-label" class="room-public-toggle" style="display:none;">
                     <input type="checkbox" id="room-public-checkbox" onchange="setRoomPublic(this.checked)">
@@ -975,6 +989,7 @@
                         <button id="bt-skip-btn" onclick="btSkip()" style="display:none;">⏭ Manche suivante</button>
                     </div>
                 </div>
+                <button id="bt-end-infinite" class="arc-host-skip" style="display:none;border-color:var(--accent-pink);color:var(--accent-pink);" onclick="socket.emit('bt_end',{roomCode:currentRoomCode})">⏹ Terminer la partie</button>
                 <div id="bt-end-buttons" style="display:none;margin-top:18px;flex-direction:column;gap:10px;">
                     <button id="bt-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                     <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
@@ -1009,6 +1024,7 @@
                 <div id="arc-extra" class="arc-sub"></div>
                 <div id="arc-reveal" class="arc-reveal-items"></div>
                 <button id="arc-skip" class="arc-host-skip" style="display:none;" onclick="arcSkip()">⏭ Manche suivante</button>
+                <button id="arc-end-infinite" class="arc-host-skip" style="display:none;border-color:var(--accent-pink);color:var(--accent-pink);" onclick="socket.emit('arc_end',{roomCode:currentRoomCode})">⏹ Terminer la partie</button>
                 <div id="arc-end-buttons" style="display:none;margin-top:18px;flex-direction:column;gap:10px;">
                     <button id="arc-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                     <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
@@ -1826,7 +1842,22 @@
             if (pubLabel) pubLabel.style.display = isHost ? 'flex' : 'none';
             if (pubBox) pubBox.checked = !!room.isPublic;
             if (badge) badge.textContent = room.isPublic ? '🌍 Salon public : n\'importe qui peut rejoindre' : '🔒 Salon privé : seulement avec le code';
+            // Nombre de manches (mini-jeux et blind test)
+            const rbox = document.getElementById('room-rounds-box');
+            if (rbox) {
+                const withRounds = room.mode === 'arcade' || room.mode === 'blindtest';
+                rbox.style.display = withRounds ? 'flex' : 'none';
+                const sel = document.getElementById('room-rounds-select'), txt = document.getElementById('room-rounds-text');
+                const v = room.arcRounds === 0 ? '0' : (room.arcRounds ? String(room.arcRounds) : '');
+                sel.value = v; sel.style.display = isHost ? '' : 'none';
+                txt.textContent = isHost ? '' : (v === '0' ? '♾️ Infini' : (v || 'Par défaut'));
+            }
         });
+
+        function setArcRounds(v) {
+            if (!currentRoomCode) return;
+            socket.emit('set_arc_rounds', { roomCode: currentRoomCode, rounds: v === '' ? null : Number(v) });
+        }
 
         function startGame() {
             socket.emit('start_game', currentRoomCode);
@@ -3627,7 +3658,9 @@
             // (sinon le choix de la manche précédente les laissait désactivés une manche sur deux)
             if (q.phase === 'playing' && btLoadedKey !== `${q.round}|${q.key || q.src}`) btMyChoice = null;
 
-            document.getElementById('bt-round').textContent = `Manche ${q.round}/${q.totalRounds}`;
+            document.getElementById('bt-round').textContent = `Manche ${q.round}/${q.totalRounds ?? '∞'}`;
+            const btEnd = document.getElementById('bt-end-infinite');
+            if (btEnd) btEnd.style.display = q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none';
             const answeredCount = q.players.filter(p => p.answered).length;
             document.getElementById('bt-answered').textContent = `Réponses : ${answeredCount}/${q.players.length}`;
 
@@ -3899,26 +3932,23 @@
         }
 
         // Fusion : bandes verticales entrelacées des 4 persos
+        // Fusion : les 4 persos superposés en transparence (chacun compte pour 25 %)
         function arcDrawFusion(canvas, imgs, seed) {
             const ctx = canvas.getContext('2d');
             const W = canvas.width, H = canvas.height;
+            ctx.globalAlpha = 1;
             ctx.fillStyle = '#0b0b12'; ctx.fillRect(0, 0, W, H);
             let s = seed || 1;
             const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
-            const order = [0, 1, 2, 3].sort(() => rnd() - .5);
-            const strips = 8, sw = W / strips;
-            for (let k = 0; k < strips; k++) {
-                const img = imgs[order[k % 4]];
-                if (!img) continue;
+            const list = imgs.filter(Boolean).sort(() => rnd() - .5);
+            list.forEach((img, k) => {
                 const r = Math.max(W / img.width, H / img.height);
                 const w = img.width * r, h = img.height * r;
-                ctx.save();
-                ctx.beginPath(); ctx.rect(k * sw, 0, sw, H); ctx.clip();
-                ctx.drawImage(img, (W - w) / 2, 0, w, h); // cadré en haut : les visages restent visibles
-                ctx.restore();
-            }
-            ctx.fillStyle = 'rgba(11,11,18,.9)';
-            for (let k = 1; k < strips; k++) ctx.fillRect(k * sw - 1, 0, 2, H);
+                ctx.globalAlpha = 1 / (k + 1); // moyenne progressive : poids égal pour chaque image
+                ctx.drawImage(img, (W - w) / 2, 0, w, h); // cadré en haut : les visages se superposent
+            });
+            ctx.globalAlpha = 1;
+            canvas.style.filter = 'contrast(1.25) saturate(1.25)';
         }
 
         function arcNow() { return Date.now() + arcClock; }
@@ -4194,7 +4224,9 @@
             const ui = ARC_UI[q.game] || {};
             document.getElementById('arc-title').textContent = ui.title || q.gameLabel;
             document.getElementById('arc-subtitle').textContent = (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
-            document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds}`;
+            document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds ?? '∞'}`;
+            const arcEnd = document.getElementById('arc-end-infinite');
+            if (arcEnd) arcEnd.style.display = q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none';
             const doneCount = q.players.filter(p => p.done).length;
             document.getElementById('arc-answered').textContent = `Réponses : ${doneCount}/${q.players.length}`;
             const me = q.players.find(p => p.id === socket.id) || {};
@@ -4357,7 +4389,6 @@
 
         socket.on('arc_state', q => {
             if (!q) return;
-            if (q.phase !== 'finished' && typeof btPauseBackground === 'function') btPauseBackground();
             hideAllPanels();
             document.getElementById('arcade-room').style.display = 'block';
             renderArcade(q);
@@ -4406,7 +4437,7 @@
             }
         }
         async function loadItems(source) {
-            const r = await fetch('/api/arcade/items?source=' + encodeURIComponent(source));
+            const r = await fetch(source === 'openings' ? '/api/arcade/openings' : '/api/arcade/items?source=' + encodeURIComponent(source));
             const d = await r.json();
             if (!d.ok) throw new Error('liste introuvable');
             return d;
@@ -4606,7 +4637,7 @@
         const BB_ROUND_NAMES = { 2: 'FINALE', 4: 'DEMI-FINALES', 8: 'QUARTS DE FINALE', 16: 'HUITIÈMES DE FINALE', 32: 'SEIZIÈMES DE FINALE', 64: 'TOUR DES 64', 128: 'TOUR DES 128' };
 
         function openBattleSelection() {
-            openSourceSelection('⚔️ BATTLE DE PRÉFÉRENCE', 'Choisis le thème de ton tournoi.', startBattleSetup);
+            startBattleSetup('openings');
         }
         async function startBattleSetup(source) {
             hideAllPanels();
@@ -4616,7 +4647,7 @@
             let data;
             try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
             bb = { source, label: data.label, all: data.items };
-            document.getElementById('bb-subtitle').textContent = `${data.label} • ${data.items.length} participants possibles`;
+            document.getElementById('bb-subtitle').textContent = `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
             h.innerHTML = '<div class="bb-round">COMBIEN DE PARTICIPANTS ?</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Ils sont tirés au hasard. À chaque duel, clique sur ton préféré (ou flèches ← →).</p>';
@@ -4654,6 +4685,24 @@
                 card.insertBefore(im, cap);
             });
             if (onClick) card.onclick = onClick;
+            const it = bbItem(name);
+            if (it.video) card.classList.add('bb-op');
+            if (it.video && onClick) {
+                const play = document.createElement('button'); play.className = 'bb-play'; play.textContent = '▶ Écouter';
+                play.onclick = e => {
+                    e.stopPropagation();
+                    if (typeof btPauseBackground === 'function') btPauseBackground();
+                    document.querySelectorAll('.bb-card iframe').forEach(f => f.remove());
+                    document.querySelectorAll('.bb-play').forEach(b => b.textContent = '▶ Écouter');
+                    const f = document.createElement('iframe');
+                    f.src = `https://www.youtube-nocookie.com/embed/${it.video}?autoplay=1&start=35&rel=0&playsinline=1`;
+                    f.allow = 'autoplay; encrypted-media';
+                    f.className = 'bb-video';
+                    card.appendChild(f);
+                    play.textContent = '🔊 En cours';
+                };
+                card.appendChild(play);
+            }
             return card;
         }
         function bbRenderDuel() {
@@ -4750,7 +4799,7 @@
             showMine();
             const again = document.createElement('div'); again.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;';
             const b1 = document.createElement('button'); b1.className = 'btn-action'; b1.style.cssText = 'width:auto;margin:0;'; b1.textContent = '🔁 Rejouer'; b1.onclick = () => bbStart(bb.size);
-            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer de thème'; b2.onclick = openBattleSelection;
+            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer le nombre'; b2.onclick = () => startBattleSetup(bb.source);
             again.append(b1, b2);
             body.appendChild(again);
             fetch('/api/battle/result', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: bb.source, champion, duels: bb.duels }) }).catch(() => {});
