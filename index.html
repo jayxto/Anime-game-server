@@ -2940,24 +2940,30 @@
             const visible=box&&box.style.display!=='none'&&box.children.length;
             if(e.key==='ArrowDown'&&visible){e.preventDefault();dleSuggestIndex=(dleSuggestIndex+1)%box.children.length;renderDleSuggestions();return;}
             if(e.key==='ArrowUp'&&visible){e.preventDefault();dleSuggestIndex=(dleSuggestIndex-1+box.children.length)%box.children.length;renderDleSuggestions();return;}
-            if(e.key==='Enter'){
+            if(e.key==='Enter'||e.keyCode===13){
                 e.preventDefault();
-                // Entrée = on valide la suggestion surlignée (la 1re par défaut)
-                const list=dleSuggestionList();
-                const input=document.getElementById('dle-input');
-                if(list.length){
-                    const exact=list.find(c=>dleNorm(c.label)===dleNorm(input.value));
-                    input.value=(exact||list[dleSuggestIndex]||list[0]).label;
-                }
                 submitDleGuess();
             }
         }
+        // Saisie incomplète -> on prend la suggestion surlignée (la 1re par défaut)
+        function dleResolveInput(){
+            const input=document.getElementById('dle-input');
+            const typed=(input?.value||'').trim();
+            if(!typed)return '';
+            const list=dleSuggestionList();
+            if(!list.length)return typed;
+            const exact=list.find(c=>dleNorm(c.label)===dleNorm(typed));
+            return (exact||list[dleSuggestIndex]||list[0]).label;
+        }
         function submitDleGuess(){
-            const input=document.getElementById('dle-input'),guess=(input?.value||'').trim();
+            const input=document.getElementById('dle-input');
+            const box=document.getElementById('dle-suggestions');
+            const guess=dleResolveInput();
             if(!guess||!currentRoomCode)return;
-            if(dleGuessedNames.has(dleNorm(guess))){input.value='';document.getElementById('dle-suggestions').style.display='none';return;}
+            input.value=''; dleSuggestIndex=0; box.style.display='none'; box.innerHTML='';
+            if(dleGuessedNames.has(dleNorm(guess)))return;
+            dleGuessedNames.add(dleNorm(guess)); // retiré tout de suite des suggestions
             socket.emit('dle_guess',{roomCode:currentRoomCode,guess});
-            input.value=''; dleSuggestIndex=0; document.getElementById('dle-suggestions').style.display='none';
         }
         function renderDleState(room){
             if(!room?.dle)return;

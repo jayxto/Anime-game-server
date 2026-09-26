@@ -8851,8 +8851,19 @@ async function startDle(room, roomCode) {
 function resolveDleGuess(room, rawGuess) {
     const u = dleExpandedUniverse(room.dle.universeKey);
     const canonical = dleMasterCanonicalNorm(room.dle.universeKey, rawGuess);
-    if (!canonical) return null;
-    return u.characters.find(c => dleMasterCanonicalNorm(room.dle.universeKey, c.name) === canonical) || null;
+    if (canonical) {
+        const exact = u.characters.find(c => dleMasterCanonicalNorm(room.dle.universeKey, c.name) === canonical);
+        if (exact) return exact;
+    }
+    // Saisie incomplète ("pika", "sasu") : 1er perso pas encore proposé qui commence par la saisie
+    const q = normalizeDle(rawGuess);
+    if (!q) return null;
+    const guessed = new Set((room.dle.guesses || []).map(g => normalizeDle(g.name)));
+    const pool = u.characters.filter(c => !guessed.has(normalizeDle(c.name)))
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    return pool.find(c => normalizeDle(c.name).startsWith(q))
+        || pool.find(c => normalizeDle(c.name).split(' ').some(w => w.startsWith(q)))
+        || null;
 }
 
 // Synonymes de jetons : une valeur "Cinq natures" partage bien "Vent" avec Naruto, etc.
@@ -10515,3 +10526,79 @@ server.listen(PORT, () => {
     startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
     console.log(`Serveur démarré sur le port ${PORT}`);
 });
+/* ===== CORRECTIF ANTI-GEL (laisser tout en bas du fichier) ===== */
+// Remplace les versions lentes déclarées plus haut (la dernière déclaration gagne).
+
+var __dleNames, __dleStatic;
+
+function __dleIndex(u) {
+    if (!__dleNames) __dleNames = new Map();
+    const t = DLE_TARGET_NAMES[u] || [], m = DLE_MASTER_NAMES[u] || [];
+    const sig = t.length + '|' + m.length;
+    let idx = __dleNames.get(u);
+    if (idx && idx.sig === sig) return idx;
+    const al = DLE_MASTER_ALIASES[u] || {}, display = new Map();
+    for (const x of [...t, ...m]) {
+        const xn = normalizeDle(x), c = al[xn] || xn;
+        if (c && !display.has(c)) display.set(c, x);
+    }
+    idx = { sig, display };
+    __dleNames.set(u, idx);
+    return idx;
+}
+
+function dleMasterCanonicalNorm(u, rawName) {
+    const n = normalizeDle(rawName);
+    if (!n) return null;
+    const c = (DLE_MASTER_ALIASES[u] || {})[n] || n;
+    return __dleIndex(u).display.has(c) ? c : null;
+}
+
+function dleMasterDisplayName(u, canon) {
+    return __dleIndex(u).display.get(canon) || null;
+}
+
+function dleProfileExists(u, raw) {
+    const c = dleMasterCanonicalNorm(u, raw);
+    if (!c) return false;
+    if (DLE_VERIFIED_PROFILES[u]?.has(c)) return true;
+    if (!__dleStatic) __dleStatic = new Map();
+    let set = __dleStatic.get(u);
+    if (!set) {
+        set = new Set();
+        const base = DLE_UNIVERSES[u];
+        const add = name => { const k = dleMasterCanonicalNorm(u, name); if (k) set.add(k); };
+        (base?.characters || []).forEach(ch => add(ch.name));
+        Object.keys(DLE_STATIC_PROFILES[u] || {}).forEach(name => add(name));
+        for (const [key, attrs] of Object.entries(DLE_MANUAL_OVERRIDES || {})) {
+            const [uk, n] = key.split('|');
+            if (uk === u && isCompleteDleAttrs(attrs, base?.categories)) add(n);
+        }
+        __dleStatic.set(u, set);
+    }
+    return set.has(c);
+}
+
+async function enrichDleUniverse(u, { delayMs = 350 } = {}) {
+    if (u === 'pokemon') return; // Pokédex déjà complet, rien à chercher
+    DLE_ENRICHMENT_STATE.currentUniverse = u;
+    for (const [normName, displayName] of getDleMasterNames(u)) {
+        await new Promise(r => setImmediate(r)); // laisse le serveur répondre entre deux persos
+        if (dleProfileExists(u, normName)) continue;
+        DLE_ENRICHMENT_STATE.checked++;
+        try {
+            if (await enrichOneDleProfile(u, displayName)) DLE_ENRICHMENT_STATE.completed++;
+            else DLE_ENRICHMENT_STATE.skipped++;
+        } catch (e) {
+            DLE_ENRICHMENT_STATE.skipped++;
+            DLE_ENRICHMENT_STATE.lastError = e.message;
+        }
+        if (delayMs > 0) await sleepDle(delayMs);
+    }
+}
+
+// Désactivé : téléchargeait une énorme base de persos jamais utilisée en jeu
+async function startDleLiveExpansion() { return null; }
+
+// Connexion Neon coupée pendant l'inactivité : simple message au lieu d'un gros log
+pool.on('error', err => console.error('[PG] connexion perdue :', err.message));
