@@ -11307,9 +11307,9 @@ function arcStop(roomCode) {
 }
 
 function arcRevealedCount(g) {
-    if (g.game !== 'quatre' && g.game !== 'link') return 4;
+    if (g.game !== 'quatre') return 4;
     if (g.phase !== 'playing') return 4;
-    const step = (g.game === 'link' ? 20000 : ARC_GAMES.quatre.roundMs) / 4;
+    const step = ARC_GAMES.quatre.roundMs / 4;
     return Math.min(4, 1 + Math.floor((Date.now() - g.startedAt) / step));
 }
 
@@ -11438,7 +11438,7 @@ async function arcNextRound(room, roomCode) {
 
     const roundNo = g.round;
     g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, cfg.roundMs + 250);
-    if (g.game === 'quatre' || g.game === 'link') {
+    if (g.game === 'quatre') {
         let shown = 1;
         g.ticker = setInterval(() => {
             if (g.dead || g.phase !== 'playing') return;
@@ -11557,7 +11557,7 @@ io.on('connection', socket => {
         let gained = 0;
         if (correct) {
             const left = Math.max(0, g.endsAt - Date.now());
-            gained = (g.game === 'quatre' || g.game === 'link')
+            gained = g.game === 'quatre'
                 ? 100 + 50 * (4 - arcRevealedCount(g)) + Math.round(20 * left / cfg.roundMs)
                 : 100 + Math.round(50 * left / cfg.roundMs);
             g.scores[socket.id] = (g.scores[socket.id] || 0) + gained;
@@ -13338,7 +13338,6 @@ arcBuildRound = async function (g) {
 };
 
 /* ===== Common Link plus dur =====
-   - les 4 persos apparaissent un par un (plus tu réponds tôt, plus tu gagnes)
    - 6 propositions au lieu de 4
    - les fausses réponses sont des pièges : elles collent à 2 ou 3 des persos affichés, ou sont du même type */
 function arcLinkCategory(label) {
@@ -13413,7 +13412,7 @@ arcBuildRound = async function (g) {
 const _arcPublicLink = arcPublic;
 arcPublic = function (room, g) {
     const out = _arcPublicLink(room, g);
-    if (g.game === 'link' && g.phase === 'playing' && out.stage && out.stage.names) {
+    if (false && g.game === 'link' && g.phase === 'playing' && out.stage && out.stage.names) {
         const n = arcRevealedCount(g);
         out.stage.names = out.stage.names.map((x, k) => k < n ? x : null);
         out.stage.imgs = (out.stage.imgs || []).map((x, k) => k < n ? x : null);

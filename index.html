@@ -1532,7 +1532,14 @@
             socket.emit('rejoin_room', { roomCode });
         });
 
+        function arcStopMedia() {
+            try { arcDestroyVideo(); arcStageKey = ''; } catch (_) {}
+            const st = document.getElementById('arc-stage'); if (st) st.innerHTML = '';
+            document.querySelectorAll('.bb-card iframe').forEach(f => f.remove());
+        }
+
         function goToMenuSelection() {
+            arcStopMedia();
             if (typeof btStopAudio === 'function') btStopAudio();
             returningToWaitingRoom = false;
             hideAllPanels();
@@ -1960,6 +1967,7 @@
 
             returningToWaitingRoom = false;
             if (typeof btStopAudio === 'function') btStopAudio();
+            arcStopMedia();
             hideAllPanels();
             document.getElementById('waiting-room').style.display = 'block';
             document.getElementById('display-room-code').innerText = "#" + room.code;
@@ -2831,6 +2839,7 @@
         let returningToWaitingRoom = false;
 
         function backToMenu() {
+            arcStopMedia();
             if (typeof btStopAudio === 'function') btStopAudio();
             if (!currentRoomCode) {
                 goToMenuSelection();
@@ -3944,7 +3953,7 @@
             quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
             mapguess:{ title:'🗺️ MAP GUESS', sub:'De quel univers vient ce lieu ?', universe:false },
             fusion:{ title:'🧪 FUSION ANIME', sub:'4 persos sont mélangés dans cette image : retrouve-les tous', universe:true },
-            link:{ title:'🔗 COMMON LINK', sub:'Les persos arrivent un par un : trouve leur point commun le plus tôt possible (6 choix, attention aux pièges)', universe:false },
+            link:{ title:'🔗 COMMON LINK', sub:'Quel est le point commun entre ces 4 personnages ? (6 choix, attention aux pièges)', universe:false },
             popularite:{ title:'👥 POPULARITY GUESS', sub:'Qui a le plus de fans ? (nombre de favoris sur MyAnimeList)', universe:true },
             bac:{ title:'🔤 PETIT BAC ANIME', sub:'Un mot par catégorie qui commence par la lettre. Réponse unique = 10 pts, partagée = 5 pts', universe:false },
             imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
