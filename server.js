@@ -12385,3 +12385,63 @@ io.on('connection', socket => {
         btNextRound(room, roomCode);
     });
 });
+
+/* ===== Galerie : tous les persos du jeu avec leur image ===== */
+let ARC_ALIAS_REVERSE = null;
+function arcAliasesOf(u, display) {
+    if (!ARC_ALIAS_REVERSE) {
+        ARC_ALIAS_REVERSE = {};
+        for (const [uk, map] of Object.entries(typeof RG_ALIASES_V3 !== 'undefined' ? RG_ALIASES_V3 : {})) {
+            const r = ARC_ALIAS_REVERSE[uk] = {};
+            for (const [alias, target] of Object.entries(map)) {
+                const k = normalizeRG(target);
+                (r[k] = r[k] || []).push(alias);
+            }
+        }
+    }
+    const list = (ARC_ALIAS_REVERSE[u] || {})[normalizeRG(display)] || [];
+    // on privilégie les alias de plusieurs mots (souvent le nom anglais / d'origine complet)
+    return list.filter(a => a.includes(' ')).concat(list.filter(a => !a.includes(' ')))
+        .map(a => a.replace(/\b\w/g, c => c.toUpperCase()));
+}
+
+app.get('/api/persos', (req, res) => {
+    const universes = Object.keys(ARC_UNIVERSE_ANIME)
+        .filter(u => (RG_POOLS_V2[u] || []).length)
+        .map(u => ({ key: u, name: ARC_UNIVERSE_ANIME[u], count: RG_POOLS_V2[u].length }));
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json({ ok: true, total: universes.reduce((s, x) => s + x.count, 0), universes });
+});
+
+app.get('/api/persos/:u', (req, res) => {
+    const u = String(req.params.u || '');
+    const pool = RG_POOLS_V2[u];
+    if (!pool) return res.status(404).json({ ok: false });
+    const famous = new Set(arcFamous(u).map(c => normalizeRG(c.display)));
+    const items = pool.map(name => {
+        let img = null;
+        if (u === 'pokemon' && typeof POKEMON_IMAGE_BY_NAME !== 'undefined') img = POKEMON_IMAGE_BY_NAME[name] || null;
+        return { name, img, famous: famous.has(normalizeRG(name)) };
+    });
+    // les persos connus d'abord, puis ordre alphabétique
+    items.sort((a, b) => (b.famous - a.famous) || a.name.localeCompare(b.name, 'fr'));
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json({ ok: true, key: u, name: ARC_UNIVERSE_ANIME[u], items });
+});
+
+app.get('/api/persos-image', async (req, res) => {
+    const u = String(req.query.u || '');
+    const name = String(req.query.name || '').slice(0, 80);
+    if (!RG_POOLS_V2[u] || !name) return res.status(400).json({ ok: false });
+    let url = null;
+    try {
+        const famous = arcFamous(u).find(c => normalizeRG(c.display) === normalizeRG(name));
+        const tries = [famous ? famous.raw : null, name, ...arcAliasesOf(u, name).slice(0, 2)].filter(Boolean);
+        for (const n of [...new Set(tries)]) {
+            url = await arcCharImage(u, n);
+            if (url) break;
+        }
+    } catch (_) {}
+    res.set('Cache-Control', url ? 'public, max-age=86400' : 'no-store');
+    res.json({ ok: !!url, imageUrl: url });
+});

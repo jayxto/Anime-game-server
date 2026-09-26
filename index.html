@@ -425,6 +425,18 @@
         .bb-card.bb-op img{object-position:center;}
         .bb-play{position:absolute;top:10px;right:10px;z-index:3;background:rgba(0,0,0,.75);color:#fff;border:1px solid var(--accent-cyan);border-radius:99px;padding:6px 12px;font-weight:800;cursor:pointer;font-size:.8rem;}
         .bb-video{position:absolute;inset:0 0 70px 0;width:100%;height:calc(100% - 70px);border:0;z-index:2;}
+        .gal-universes{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px;}
+        .gal-chip{background:#11111a;color:#fff;border:1px solid #34344a;border-radius:99px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:.78rem;}
+        .gal-chip.on,.gal-chip:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+        .gal-search{width:100%;background:#0d0d15;border:2px solid #34344a;color:#fff;border-radius:10px;padding:11px 14px;font-size:.95rem;}
+        .gal-search:focus{outline:none;border-color:var(--accent-cyan);}
+        .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:8px;}
+        .gal-card{background:#11111a;border:1px solid #2c2c44;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;}
+        .gal-img{aspect-ratio:3/4;background:#0b0b12;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+        .gal-img img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .gal-ph{font-size:1.6rem;opacity:.5;}
+        .gal-name{padding:6px 6px 8px;font-size:.74rem;font-weight:800;text-align:center;line-height:1.2;}
+        @media (max-width:560px){.gal-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));}}
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -610,6 +622,12 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle d'openings <span class="quote-new">NOUVEAU</span></h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Tournoi entre 210 openings / endings : écoute, choisis ton préféré à chaque duel jusqu'au champion (8 à 64) • classement mondial des votes</p>
                     <button class="btn-action" style="margin-top:0;background:var(--accent-pink);" onclick="openBattleSelection()">Lancer une battle</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:var(--accent-cyan);">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">📚 Galerie des persos <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Tous les personnages du jeu, univers par univers, avec leur image • recherche par nom (VF ou anglais)</p>
+                    <button class="btn-action" style="margin-top:0;background:var(--accent-cyan);color:#111;" onclick="openGallery()">Voir tous les persos</button>
                 </div>
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
@@ -1048,6 +1066,17 @@
             <div class="tl-hint">Glisse les images dans les rangs. Sur téléphone : touche une image puis touche le rang. Clique sur la lettre d'un rang pour la renommer. Ta liste est sauvegardée automatiquement.</div>
         </div>
 
+        <div id="gallery-room" class="game-panel" style="display:none;max-width:1100px;margin:0 auto;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <div><h2 style="margin:0;">📚 GALERIE DES PERSOS</h2><div id="gal-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
+                <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Menu</button>
+            </div>
+            <div id="gal-universes" class="gal-universes"></div>
+            <input id="gal-search" class="gal-search" type="text" autocomplete="off" placeholder="🔎 Chercher un perso dans cet univers…" oninput="galFilter()">
+            <div id="gal-count" class="tl-hint" style="text-align:left;margin:6px 2px;"></div>
+            <div id="gal-grid" class="gal-grid"></div>
+        </div>
+
         <div id="battle-room" class="game-panel" style="display:none;max-width:900px;margin:0 auto;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                 <div><h2 style="margin:0;">⚔️ BATTLE DE PRÉFÉRENCE</h2><div id="bb-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
@@ -1364,7 +1393,7 @@
             document.getElementById('dle-room').style.display = 'none';
             document.getElementById('quote-room').style.display = 'none';
             document.getElementById('blindtest-room').style.display = 'none';
-            ['arcade-room','tierlist-room','battle-room'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+            ['arcade-room','tierlist-room','battle-room','gallery-room'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
             document.getElementById('quote-universe-selection').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
@@ -4630,6 +4659,113 @@
                 a.href = c.toDataURL('image/png');
                 document.body.appendChild(a); a.click(); a.remove();
             } catch (e) { alert("Export impossible sur ce navigateur. Fais une capture d'écran à la place."); }
+        }
+
+        /* ===================== GALERIE DES PERSOS ===================== */
+        let gal = { universes: [], key: null, items: [], obs: null, queue: [], running: 0, cache: {} };
+        async function openGallery() {
+            hideAllPanels();
+            document.getElementById('gallery-room').style.display = 'block';
+            window.scrollTo(0, 0);
+            if (!gal.universes.length) {
+                try {
+                    const d = await (await fetch('/api/persos')).json();
+                    gal.universes = d.universes || [];
+                    document.getElementById('gal-subtitle').textContent = `${d.total} personnages dans ${gal.universes.length} univers`;
+                } catch (e) { document.getElementById('gal-grid').innerHTML = '<p>Impossible de charger la liste.</p>'; return; }
+            }
+            const box = document.getElementById('gal-universes');
+            box.innerHTML = '';
+            gal.universes.forEach(u => {
+                const b = document.createElement('button');
+                b.className = 'gal-chip' + (u.key === gal.key ? ' on' : '');
+                b.textContent = `${u.name} (${u.count})`;
+                b.onclick = () => galLoad(u.key);
+                box.appendChild(b);
+            });
+            galLoad(gal.key || gal.universes[0]?.key);
+        }
+        async function galLoad(key) {
+            if (!key) return;
+            gal.key = key;
+            gal.queue = [];
+            document.querySelectorAll('.gal-chip').forEach((b, i) => b.classList.toggle('on', gal.universes[i]?.key === key));
+            document.getElementById('gal-grid').innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div></div>';
+            try {
+                const d = await (await fetch('/api/persos/' + encodeURIComponent(key))).json();
+                if (gal.key !== key) return;
+                gal.items = d.items || [];
+            } catch (e) { gal.items = []; }
+            document.getElementById('gal-search').value = '';
+            galRender(gal.items);
+        }
+        function galNorm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9 ]/g, ''); }
+        function galFilter() {
+            const q = galNorm(document.getElementById('gal-search').value);
+            galRender(q ? gal.items.filter(i => galNorm(i.name).includes(q)) : gal.items);
+        }
+        function galRender(items) {
+            const grid = document.getElementById('gal-grid');
+            grid.innerHTML = '';
+            document.getElementById('gal-count').textContent = `${items.length} perso${items.length > 1 ? 's' : ''}`;
+            if (gal.obs) gal.obs.disconnect();
+            gal.obs = new IntersectionObserver(entries => {
+                entries.forEach(en => {
+                    if (!en.isIntersecting) return;
+                    gal.obs.unobserve(en.target);
+                    galQueue(en.target);
+                });
+            }, { rootMargin: '300px' });
+            const frag = document.createDocumentFragment();
+            items.forEach(it => {
+                const card = document.createElement('div');
+                card.className = 'gal-card';
+                card.dataset.name = it.name;
+                if (it.img) card.dataset.img = it.img;
+                card.innerHTML = '<div class="gal-img"><div class="gal-ph">⏳</div></div>';
+                const n = document.createElement('div'); n.className = 'gal-name'; n.textContent = it.name;
+                card.appendChild(n);
+                frag.appendChild(card);
+            });
+            grid.appendChild(frag);
+            grid.querySelectorAll('.gal-card').forEach(c => gal.obs.observe(c));
+        }
+        function galQueue(card) { gal.queue.push(card); galPump(); }
+        function galPump() {
+            while (gal.running < 6 && gal.queue.length) {
+                const card = gal.queue.shift();
+                if (!card.isConnected) continue;
+                gal.running++;
+                galImage(gal.key, card).finally(() => { gal.running--; galPump(); });
+            }
+        }
+        async function galImage(key, card) {
+            const name = card.dataset.name;
+            const ck = key + '|' + name;
+            let url = card.dataset.img || gal.cache[ck];
+            if (url === undefined) {
+                try { const s = localStorage.getItem('galimg:' + ck); if (s !== null) url = s || null; } catch (e) {}
+            }
+            if (url === undefined) {
+                try {
+                    const d = await (await fetch(`/api/persos-image?u=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}`)).json();
+                    url = d.imageUrl || null;
+                } catch (e) { url = null; }
+                try { localStorage.setItem('galimg:' + ck, url || ''); } catch (e) {}
+            }
+            gal.cache[ck] = url;
+            const box = card.querySelector('.gal-img');
+            if (!url) { box.innerHTML = '<div class="gal-ph">❔</div>'; return; }
+            await new Promise(res => {
+                const im = new Image();
+                im.alt = name; im.decoding = 'async'; im.referrerPolicy = 'no-referrer';
+                im.onload = () => { box.innerHTML = ''; box.appendChild(im); res(); };
+                im.onerror = () => {
+                    if (!im.dataset.proxy) { im.dataset.proxy = '1'; im.src = '/api/img?u=' + encodeURIComponent(url); return; }
+                    box.innerHTML = '<div class="gal-ph">❔</div>'; res();
+                };
+                im.src = url;
+            });
         }
 
         /* ===================== BATTLE DE PRÉFÉRENCE ===================== */
