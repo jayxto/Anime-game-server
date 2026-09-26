@@ -11307,9 +11307,9 @@ function arcStop(roomCode) {
 }
 
 function arcRevealedCount(g) {
-    if (g.game !== 'quatre') return 4;
+    if (g.game !== 'quatre' && g.game !== 'link') return 4;
     if (g.phase !== 'playing') return 4;
-    const step = ARC_GAMES.quatre.roundMs / 4;
+    const step = (g.game === 'link' ? 20000 : ARC_GAMES.quatre.roundMs) / 4;
     return Math.min(4, 1 + Math.floor((Date.now() - g.startedAt) / step));
 }
 
@@ -11438,7 +11438,7 @@ async function arcNextRound(room, roomCode) {
 
     const roundNo = g.round;
     g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, cfg.roundMs + 250);
-    if (g.game === 'quatre') {
+    if (g.game === 'quatre' || g.game === 'link') {
         let shown = 1;
         g.ticker = setInterval(() => {
             if (g.dead || g.phase !== 'playing') return;
@@ -11557,7 +11557,7 @@ io.on('connection', socket => {
         let gained = 0;
         if (correct) {
             const left = Math.max(0, g.endsAt - Date.now());
-            gained = g.game === 'quatre'
+            gained = (g.game === 'quatre' || g.game === 'link')
                 ? 100 + 50 * (4 - arcRevealedCount(g)) + Math.round(20 * left / cfg.roundMs)
                 : 100 + Math.round(50 * left / cfg.roundMs);
             g.scores[socket.id] = (g.scores[socket.id] || 0) + gained;
@@ -11874,7 +11874,7 @@ const ARC_LINKS = [
     ['Membres du Tokyo Manji Gang', [['tokyorevengers','Manjiro Sano'],['tokyorevengers','Ken Ryuguji'],['tokyorevengers','Keisuke Baji'],['tokyorevengers','Takashi Mitsuya'],['tokyorevengers','Chifuyu Matsuno'],['tokyorevengers','Takemichi Hanagaki']]],
     ['Ce sont des Empereurs (Yonko)', [['onepiece','Shanks'],['onepiece','Charlotte Linlin'],['onepiece','Kaido'],['onepiece','Edward Newgate'],['onepiece','Marshall D. Teach'],['onepiece','Buggy']]],
     ['Ce sont des amiraux de la Marine', [['onepiece','Sakazuki'],['onepiece','Kuzan'],['onepiece','Borsalino'],['onepiece','Issho'],['onepiece','Aramaki']]],
-    ['Ce sont des Homonculus', [['fma','Greed'],['fma','Envy'],['fma','Lust'],['fma','Gluttony'],['fma','Pride'],['fma','King Bradley']]],
+    ['Ce sont des Homonculus', [['fma','Greed'],['fma','Envy'],['fma','Lust'],['fma','Gluttony'],['fma','Pride'],['fma','King Bradley'],['fma','Sloth']]],
     ['Ils possèdent le Haki des rois', [['onepiece','Monkey D. Luffy'],['onepiece','Shanks'],['onepiece','Roronoa Zoro'],['onepiece','Edward Newgate'],['onepiece','Kaido'],['onepiece','Boa Hancock']]],
     ['Ce sont des Dragon Slayers', [['fairy','Natsu Dragneel'],['fairy','Gajeel Redfox'],['fairy','Wendy Marvell'],['fairy','Laxus Dreyar'],['fairy','Sting Eucliffe'],['fairy','Rogue Cheney']]],
     ["Ce sont des Chevaliers-mages capitaines", [['clover','Yami Sukehiro'],['clover','William Vangeance'],['clover','Fuegoleon Vermillion'],['clover','Nozel Silva'],['clover','Charlotte Roselei'],['clover','Rill Boismortier']]],
@@ -12388,7 +12388,7 @@ const ARC_ANI_MEDIA = {
     cote: ['Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e']
 };
 const ARC_ANI_MAPS = new Map();
-function arcAniMap(u) {
+function arcAniMap(u, low) {
     if (ARC_ANI_MAPS.has(u)) return ARC_ANI_MAPS.get(u);
     const task = (async () => {
         const map = new Map();
@@ -12402,8 +12402,8 @@ function arcAniMap(u) {
         const q = `query($s:String,$p:Int){ Media(search:$s, type:ANIME, sort:SEARCH_MATCH){ characters(sort:FAVOURITES_DESC, page:$p, perPage:50){
             pageInfo{ hasNextPage } nodes{ name{ full alternative native } image{ large } } } } }`;
         for (const s of medias) {
-            for (let p = 1; p <= 3; p++) {
-                const d = await arcAniList(q, { s, p });
+            for (let p = 1; p <= 2; p++) {
+                const d = await arcAniList(q, { s, p }, low);
                 const conn = d?.Media?.characters;
                 for (const c of (conn?.nodes || [])) {
                     const img = c.image?.large;
@@ -12443,14 +12443,7 @@ resolveCharacterImage = async function (universeKey, displayName) {
     return resolveCharacterImageFandom(universeKey, displayName);
 };
 
-// Préchargement discret des listes AniList après le démarrage (les premières parties sont ainsi plus rapides)
-setTimeout(async () => {
-    for (const u of Object.keys(ARC_UNIVERSE_ANIME)) {
-        if (u === 'pokemon') continue;
-        try { await arcAniMap(u); } catch (_) {}
-        await new Promise(r => setTimeout(r, 1500));
-    }
-}, 20000);
+
 
 /* =====================================================================
    PROGRESSION : XP, niveaux, badges, stats, classements hebdo
@@ -13179,4 +13172,251 @@ arcReveal = function (room, roomCode) {
         });
     }
     return _arcRevealT(room, roomCode);
+};
+
+/* =====================================================================
+   FIABILITÉ DES IMAGES : plus jamais de chargement infini
+   - AniList : file d'attente prioritaire (les parties passent avant le préchargement), délais courts
+   - Fandom : si le serveur est bloqué, on arrête d'essayer pendant 10 min (au lieu d'attendre 12 s par perso)
+   - Recherche des persos en parallèle + délai max par image et par manche
+   ===================================================================== */
+const ANI_Q = { high: [], low: [], active: 0 };
+arcAniList = function (query, variables, low) {
+    return new Promise(resolve => {
+        (low ? ANI_Q.low : ANI_Q.high).push({ query, variables, resolve });
+        aniPump();
+    });
+};
+function aniPump() {
+    while (ANI_Q.active < 2 && (ANI_Q.high.length || ANI_Q.low.length)) {
+        const job = ANI_Q.high.shift() || ANI_Q.low.shift();
+        ANI_Q.active++;
+        aniRun(job).then(r => job.resolve(r)).catch(() => job.resolve(null))
+            .finally(() => setTimeout(() => { ANI_Q.active--; aniPump(); }, 600));
+    }
+}
+async function aniRun(job) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 8000);
+        try {
+            const res = await fetch('https://graphql.anilist.co', {
+                method: 'POST', signal: ctrl.signal,
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ query: job.query, variables: job.variables })
+            });
+            if (res.status === 429) {
+                const wait = Math.min(8000, (Number(res.headers.get('retry-after')) || 2) * 1000);
+                await new Promise(r => setTimeout(r, wait));
+                continue;
+            }
+            if (res.status >= 500) { await new Promise(r => setTimeout(r, 1000)); continue; }
+            const data = await res.json();
+            return data?.data || null;
+        } catch (e) {
+            if (attempt === 1) return null;
+        } finally { clearTimeout(timer); }
+    }
+    return null;
+}
+
+// Fandom : disjoncteur
+const FANDOM_BREAKER = { fails: 0, downUntil: 0 };
+const _fetchJsonWithTimeoutF = fetchJsonWithTimeout;
+fetchJsonWithTimeout = async function (url, timeoutMs = 15000) {
+    const isFandom = /fandom\.com/.test(String(url));
+    if (!isFandom) return _fetchJsonWithTimeoutF(url, timeoutMs);
+    if (Date.now() < FANDOM_BREAKER.downUntil) throw new Error('fandom indisponible (pause)');
+    try {
+        const r = await _fetchJsonWithTimeoutF(url, Math.min(timeoutMs, 6000));
+        FANDOM_BREAKER.fails = 0;
+        return r;
+    } catch (e) {
+        if (++FANDOM_BREAKER.fails >= 4) { FANDOM_BREAKER.downUntil = Date.now() + 10 * 60 * 1000; FANDOM_BREAKER.fails = 0; console.warn('[Fandom] injoignable depuis le serveur : pause de 10 min'); }
+        throw e;
+    }
+};
+
+// Image d'un perso : 8 s maximum
+const _arcCharImageT = arcCharImage;
+arcCharImage = function (u, raw) {
+    return Promise.race([_arcCharImageT(u, raw).catch(() => null), new Promise(r => setTimeout(() => r(null), 8000))]);
+};
+
+// Recherche des persos avec image : en parallèle (6 à la fois)
+arcFindCharacters = async function (g, u, count, maxTries) {
+    const cands = arcShuffle(arcFamous(u)).filter(c => !g.used.has(u + '|' + c.display)).slice(0, Math.max(maxTries, count));
+    const out = [];
+    for (let i = 0; i < cands.length && out.length < count; i += 6) {
+        const batch = await Promise.all(cands.slice(i, i + 6).map(async c => {
+            const url = await arcCharImage(u, c.raw);
+            return url && await arcUsableImage(url) ? { ...c, u, url } : null;
+        }));
+        batch.filter(Boolean).forEach(c => { if (out.length < count) { out.push(c); g.used.add(u + '|' + c.display); } });
+    }
+    return out;
+};
+arcFindCharactersFast = arcFindCharacters;
+
+// Persos sans image en dernier recours (Imposteur / Draft restent jouables)
+function arcNamesOnly(g, u, count, exclude = new Set()) {
+    return arcShuffle(arcFamous(u).slice(0, 40)).filter(c => !exclude.has(c.display) && !g.used.has(u + '|' + c.display)).slice(0, count)
+        .map(c => { g.used.add(u + '|' + c.display); return { ...c, u, url: null }; });
+}
+const tok = url => url ? arcToken(url) : null;
+
+const _arcBuildRoundR = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game === 'imposteur') {
+        const us = arcShuffle(arcUniverses().filter(u => u !== 'pokemon'));
+        const [main, other] = us;
+        let three = await arcFindCharacters(g, main, 3, 8);
+        if (three.length < 3) three = three.concat(arcNamesOnly(g, main, 3 - three.length, new Set(three.map(c => c.display))));
+        let [odd] = await arcFindCharacters(g, other, 1, 4);
+        if (!odd) [odd] = arcNamesOnly(g, other, 1);
+        if (three.length < 3 || !odd) return null;
+        const all = arcShuffle([...three, odd]);
+        return {
+            imgs: all.map(c => tok(c.url)),
+            names: all.map(c => c.display),
+            answer: odd.display,
+            choices: all.map(c => c.display),
+            place: `${odd.display} vient de ${ARC_UNIVERSE_ANIME[other]} — les 3 autres de ${ARC_UNIVERSE_ANIME[main]}`
+        };
+    }
+    if (g.game === 'draft') {
+        const n = Math.max(1, g.playerCount || 2);
+        const size = Math.min(40, n * 5 + 6);
+        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(arcUniverses());
+        let pool = [];
+        if (us.length === 1) pool = await arcFindCharacters(g, us[0], size, size + 10);
+        else {
+            const per = Math.ceil(size / 6);
+            const parts = await Promise.all(us.slice(0, 7).map(u => arcFindCharacters(g, u, per, per + 3)));
+            pool = arcShuffle(parts.flat());
+        }
+        if (pool.length < size) {
+            const have = new Set(pool.map(c => c.display));
+            for (const u of us) { if (pool.length >= size) break; pool.push(...arcNamesOnly(g, u, size - pool.length, have)); }
+        }
+        if (pool.length < n * 3) return null;
+        return { draftPool: pool.slice(0, size).map(c => ({ name: c.display, u: c.u, img: tok(c.url) })), answer: null };
+    }
+    return _arcBuildRoundR(g);
+};
+
+// Une manche ne peut plus bloquer : 35 s maximum pour la préparer
+const _arcBuildRoundTO = arcBuildRound;
+arcBuildRound = function (g) {
+    return Promise.race([
+        _arcBuildRoundTO(g).catch(e => { console.warn('[Arcade] manche :', e.message); return null; }),
+        new Promise(r => setTimeout(() => r(null), 35000))
+    ]);
+};
+
+// Préchargement discret (priorité basse : ne ralentit jamais une partie en cours)
+setTimeout(async () => {
+    for (const u of Object.keys(ARC_UNIVERSE_ANIME)) {
+        if (u === 'pokemon') continue;
+        try { await arcAniMap(u, true); } catch (_) {}
+    }
+}, 30000);
+
+// Tournoi : si une épreuve ne peut pas se préparer (images indisponibles), on la remplace par une épreuve sans image
+const _arcBuildRoundTour = arcBuildRound;
+arcBuildRound = async function (g) {
+    const r = await _arcBuildRoundTour(g);
+    if (r || !g.tour) return r;
+    for (const alt of ['emoji', 'imposteur', 'link']) {
+        if (alt === g.game) continue;
+        g.game = alt;
+        g.tour.games[g.tour.idx] = alt;
+        const r2 = await _arcBuildRoundTour(g);
+        if (r2) return r2;
+    }
+    return null;
+};
+
+/* ===== Common Link plus dur =====
+   - les 4 persos apparaissent un par un (plus tu réponds tôt, plus tu gagnes)
+   - 6 propositions au lieu de 4
+   - les fausses réponses sont des pièges : elles collent à 2 ou 3 des persos affichés, ou sont du même type */
+function arcLinkCategory(label) {
+    if (/pokémon/i.test(label)) return 'pokemon';
+    if (/maîtris|contrôl|téléport|haki|yeux spéciaux|dragon slayer/i.test(label)) return 'pouvoir';
+    if (/cheveux|chauve|lunettes|cicatrice|bras|masque|mangent/i.test(label)) return 'physique';
+    if (/membres|espada|piliers|brigade|péchés capitaux|classe s|taureau|saiyans|lunes|bataillon|manji|empereurs|amiraux|homonculus|chevaliers|exorcistes|shinigami|joestar|greed island|section|karasuno|blue lock|hokage|akatsuki|chapeau/i.test(label)) return 'groupe';
+    return 'role';
+}
+ARC_GAMES.link.roundMs = 25000;
+// Liens qui peuvent être vrais en même temps : jamais proposés l'un comme piège de l'autre
+const ARC_LINK_CONFLICT_GROUPS = [
+    ['Ce sont des Lunes supérieures', 'Ce sont des démons', 'Ils se régénèrent (quasi immortels)'],
+    ['Ce sont des Homonculus', 'Ils se régénèrent (quasi immortels)', "Ils portent le nom d'un péché capital"],
+    ['Ce sont les Sept Péchés capitaux', "Ils portent le nom d'un péché capital"],
+    ['Membres de la Brigade Fantôme', 'Ce sont des voleurs'],
+    ['Ce sont des Empereurs (Yonko)', 'Ils possèdent le Haki des rois', 'Ce sont des rois'],
+    ["Ce sont des capitaines d'escouade", 'Ce sont des Chevaliers-mages capitaines', 'Ils ont été Shinigami remplaçants / Shinigami', 'Membres du Taureau noir'],
+    ['Ce sont des Piliers (Hashira)', 'Ce sont des maîtres / mentors'],
+    ['Ils ont été Hokage', 'Ce sont des maîtres / mentors'],
+    ['Ce sont des exorcistes de grade spécial', 'Ce sont des maîtres / mentors'],
+    ['Ce sont des Saiyans', 'Ils mangent énormément', 'Ce sont des princes / princesses'],
+    ['Ce sont des Dragon Slayers', 'Ils maîtrisent le feu', 'Inséparables de leur compagnon animal'],
+    ['Ce sont des héros de classe S', 'Ce sont des robots / cyborgs'],
+    ['Ce sont des Espada', 'Ils ont trahi leur camp'],
+    ['Ce sont des amiraux de la Marine', 'Ils maîtrisent la glace', 'Ils maîtrisent le feu']
+];
+const ARC_LINK_CONFLICTS = new Map();
+ARC_LINK_CONFLICT_GROUPS.forEach(group => group.forEach(a => {
+    const set = ARC_LINK_CONFLICTS.get(a) || new Set();
+    group.forEach(b => { if (b !== a) set.add(b); });
+    ARC_LINK_CONFLICTS.set(a, set);
+}));
+const _arcBuildRoundLink = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game !== 'link') return _arcBuildRoundLink(g);
+    let cands = ARC_LINKS.map((l, i) => i).filter(i => !g.used.has('link|' + i));
+    if (!cands.length) { g.used.forEach(k => { if (k.startsWith('link|')) g.used.delete(k); }); cands = ARC_LINKS.map((l, i) => i); }
+    const i = arcPick(cands);
+    g.used.add('link|' + i);
+    const [label, chars] = ARC_LINKS[i];
+    const pickedRaw = arcShuffle(chars).slice(0, 4);
+    const picked = await Promise.all(pickedRaw.map(async ([u, n]) => {
+        const url = await arcCharImage(u, n);
+        return { u, raw: n, display: arcDisplayName(u, n), url: url && await arcUsableImage(url) ? url : null };
+    }));
+    const key = (u, n) => u + '|' + normalizeRG(arcDisplayName(u, n));
+    const shown = new Set(picked.map(p => key(p.u, p.raw)));
+    const shownU = new Set(picked.map(p => p.u));
+    const cat = arcLinkCategory(label);
+    const banned = ARC_LINK_CONFLICTS.get(label) || new Set();
+    const scored = ARC_LINKS.map((l, j) => {
+        if (j === i || l[0] === label || banned.has(l[0])) return null;
+        const members = l[1].map(([u, n]) => key(u, n));
+        const overlap = members.filter(k => shown.has(k)).length;
+        if (overlap >= 4) return null;                      // vraie aussi : pas une fausse réponse
+        const sameU = l[1].some(([u]) => shownU.has(u));
+        const score = overlap * 10 + (arcLinkCategory(l[0]) === cat ? 4 : 0) + (sameU ? 6 : 0) + Math.random() * 3;
+        return { label: l[0], score };
+    }).filter(Boolean).sort((a, b) => b.score - a.score);
+    const wrong = [...new Set(scored.map(x => x.label))].slice(0, 5);
+    // les persos de One Piece deviennent "Luffy (One Piece)" etc. uniquement à la révélation
+    return {
+        targets: picked,
+        imgs: picked.map(p => p.url ? arcToken(p.url) : null),
+        names: picked.map(p => p.display + ' (' + ARC_UNIVERSE_ANIME[p.u] + ')'),
+        answer: label,
+        choices: arcShuffle([label, ...wrong])
+    };
+};
+// Affichage progressif des 4 persos
+const _arcPublicLink = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicLink(room, g);
+    if (g.game === 'link' && g.phase === 'playing' && out.stage && out.stage.names) {
+        const n = arcRevealedCount(g);
+        out.stage.names = out.stage.names.map((x, k) => k < n ? x : null);
+        out.stage.imgs = (out.stage.imgs || []).map((x, k) => k < n ? x : null);
+    }
+    return out;
 };
