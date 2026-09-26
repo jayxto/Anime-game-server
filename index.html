@@ -563,7 +563,7 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('quatre')"><span class="arc-ico">🧩</span><b>4 images = 1 anime</b><span>Les images arrivent une à une → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('mapguess')"><span class="arc-ico">🗺️</span><b>Map Guess</b><span>Un lieu culte → de quel univers vient-il ?</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('fusion')"><span class="arc-ico">🧪</span><b>Fusion Anime</b><span>4 persos mélangés en une image → retrouve les 4</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Un extrait vidéo muet d'un anime → trouve lequel</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Une scène culte (combat, moment fort) en vidéo → trouve l'anime</span></button>
                     </div>
                 </div>
 
@@ -3669,7 +3669,7 @@
             quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
             mapguess:{ title:'🗺️ MAP GUESS', sub:'De quel univers vient ce lieu ?', universe:false },
             fusion:{ title:'🧪 FUSION ANIME', sub:'4 persos sont mélangés dans cette image : retrouve-les tous', universe:true },
-            scene:{ title:"🎬 SCENE GUESSR", sub:"Un extrait vidéo (sans le son) : de quel anime vient cette scène ?", universe:false }
+            scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
         let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null, arcYt = null;
@@ -4064,7 +4064,7 @@
                 const bits = [];
                 if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
                 if (q.reveal?.place) bits.push('📍 ' + q.reveal.place);
-                if (q.reveal?.song) bits.push('🎶 ' + q.reveal.song);
+                if (q.reveal?.song) bits.push(q.game === 'scene' ? q.reveal.song : '🎶 ' + q.reveal.song);
                 extra.textContent = bits.join(' • ');
             } else {
                 if (q.message) { result.style.color = 'var(--accent-pink)'; result.textContent = q.message; }
