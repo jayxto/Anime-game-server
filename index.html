@@ -390,6 +390,11 @@
         .arc-sub{text-align:center;color:var(--text-muted);font-size:.85rem;}
         .arc-reveal-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;max-width:560px;margin:12px auto 0;}
         .arc-host-skip{display:block;margin:10px auto 0;background:none;border:1px solid var(--accent-cyan);color:var(--accent-cyan);border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:700;}
+        .arc-video{position:relative;width:100%;max-width:720px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:2px solid #2c2c44;box-shadow:0 10px 40px rgba(0,0,0,.45);}
+        .arc-video iframe{position:absolute;left:-14%;top:-20%;width:128%;height:140%;border:0;pointer-events:none;}
+        .arc-video-shield{position:absolute;inset:0;z-index:2;}
+        .arc-video-cover{position:absolute;inset:0;z-index:3;background:#000;display:flex;align-items:center;justify-content:center;}
+        .arc-video-badge{position:absolute;left:10px;top:10px;z-index:4;background:rgba(0,0,0,.65);border-radius:99px;padding:4px 10px;font-size:.72rem;color:var(--text-muted);}
         /* Tier list */
         .tl-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0;}
         .tl-toolbar button{width:auto;margin:0;padding:9px 14px;font-size:.85rem;}
@@ -544,7 +549,7 @@
 
                 <div class="quote-mode-card" style="border-color:var(--accent-pink);">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime <span class="quote-new">NOUVEAU</span></h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 210 openings / endings • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
                     <button class="btn-action" style="margin-top:0;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button>
                 </div>
 
@@ -558,7 +563,7 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('quatre')"><span class="arc-ico">🧩</span><b>4 images = 1 anime</b><span>Les images arrivent une à une → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('mapguess')"><span class="arc-ico">🗺️</span><b>Map Guess</b><span>Un lieu culte → de quel univers vient-il ?</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('fusion')"><span class="arc-ico">🧪</span><b>Fusion Anime</b><span>4 persos mélangés en une image → retrouve les 4</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Une capture d'opening → trouve l'anime</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('scene')"><span class="arc-ico">🎬</span><b>Scene Guessr</b><span>Un extrait vidéo muet d'un anime → trouve lequel</span></button>
                     </div>
                 </div>
 
@@ -3280,6 +3285,7 @@
         function btSetVolume(v) {
             btVolume = Math.max(0, Math.min(1, Number(v) || 0));
             btAudio.volume = btVolume;
+            try { if (btYt && btYtKey) btYt.setVolume(Math.round(btVolume * 100)); } catch (_) {}
             try { localStorage.setItem('bt_volume', String(btVolume)); } catch (_) {}
         }
 
@@ -3293,6 +3299,7 @@
 
         function btStopAudio() {
             if (typeof btClearVideo === 'function') btClearVideo();
+            if (typeof btYtStop === 'function') btYtStop();
             btAudio.pause();
             btAudio.removeAttribute('src');
             btAudio.load();
@@ -3310,6 +3317,7 @@
         }
 
         async function btForcePlay() {
+            if (btYtKey && btYt) { try { btYt.playVideo(); btYt.unMute(); btYt.setVolume(Math.round(btVolume * 100)); } catch (_) {} document.getElementById('bt-play-btn').style.display = 'none'; return; }
             try { await btAudio.play(); document.getElementById('bt-play-btn').style.display = 'none'; } catch (_) {}
         }
 
@@ -3326,12 +3334,14 @@
         }
 
         function btLoadRound(q) {
-            const key = `${q.round}|${q.src}`;
+            const key = `${q.round}|${q.key || q.src}`;
             if (btLoadedKey === key) return;
             btLoadedKey = key;
             btMyChoice = null;
             btPauseBackground();
             btAudio.pause();
+            if (q.ytId && !q.src) { btYtLoad(q, key); return; }
+            btYtStop();
             btAudio.src = q.src;
             btAudio.volume = btVolume;
             const elapsed = Math.max(0, (Date.now() + btClockOffset) - (q.endsAt - q.roundMs)) / 1000;
@@ -3350,6 +3360,86 @@
             };
             if (btAudio.readyState >= 1) seek();
             else btAudio.addEventListener('loadedmetadata', seek, { once:true });
+        }
+
+        /* ---- Lecteur YouTube caché (openings sans fichier mp3) ---- */
+        let __ytApiPromise = null;
+        function ytApi() {
+            if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+            if (__ytApiPromise) return __ytApiPromise;
+            __ytApiPromise = new Promise(resolve => {
+                const prev = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = () => { try { prev && prev(); } catch (_) {} resolve(window.YT); };
+                const sc = document.createElement('script');
+                sc.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(sc);
+            });
+            return __ytApiPromise;
+        }
+        let btYt = null, btYtKey = null, btYtFade = null, btYtReady = null;
+        function btYtStop() {
+            btYtKey = null;
+            if (btYtFade) { clearInterval(btYtFade); btYtFade = null; }
+            try { if (btYt && btYt.stopVideo) btYt.stopVideo(); } catch (_) {}
+        }
+        function btYtFadeIn() {
+            if (!btYt) return;
+            if (btYtFade) clearInterval(btYtFade);
+            let step = 0;
+            try { btYt.setVolume(0); btYt.unMute(); } catch (_) {}
+            btYtFade = setInterval(() => {
+                step++;
+                try { btYt.setVolume(Math.round(btVolume * 100 * Math.min(1, step / 10))); } catch (_) {}
+                if (step >= 10) { clearInterval(btYtFade); btYtFade = null; }
+            }, 60);
+        }
+        async function btYtLoad(q, key) {
+            const YT = await ytApi();
+            if (btLoadedKey !== key) return;
+            btYtKey = key;
+            let seeked = false;
+            const handlers = {
+                state: e => {
+                    if (btYtKey !== key || seeked || e.data !== YT.PlayerState.PLAYING) return;
+                    seeked = true;
+                    const dur = btYt.getDuration() || 90;
+                    const elapsed = Math.max(0, (Date.now() + btClockOffset) - (q.endsAt - q.roundMs)) / 1000;
+                    let start = dur * (q.offsetFrac || 0.3) + elapsed;
+                    if (start > dur - 4) start = dur * 0.3;
+                    btYt.seekTo(start, true);
+                    btYtFadeIn();
+                    document.getElementById('bt-play-btn').style.display = 'none';
+                },
+                error: () => { if (btYtKey === key) socket.emit('bt_media_error', { roomCode: currentRoomCode, round: q.round }); }
+            };
+            if (!btYt) {
+                let host = document.getElementById('bt-yt-host');
+                if (!host) {
+                    host = document.createElement('div');
+                    host.id = 'bt-yt-host';
+                    host.style.cssText = 'position:fixed;left:-9999px;top:0;width:320px;height:180px;opacity:0;pointer-events:none;';
+                    host.innerHTML = '<div id="bt-yt-player"></div>';
+                    document.body.appendChild(host);
+                }
+                btYtReady = new Promise(res => {
+                    btYt = new YT.Player('bt-yt-player', {
+                        width: 320, height: 180, videoId: q.ytId,
+                        playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0, disablekb: 1 },
+                        events: {
+                            onReady: e => { e.target.mute(); e.target.playVideo(); res(); },
+                            onStateChange: e => btYt.__h && btYt.__h.state(e),
+                            onError: e => btYt.__h && btYt.__h.error(e)
+                        }
+                    });
+                });
+                btYt.__h = handlers;
+            } else {
+                btYt.__h = handlers;
+                await btYtReady;
+                if (btLoadedKey !== key) return;
+                try { btYt.mute(); btYt.loadVideoById(q.ytId); } catch (_) {}
+            }
+            setTimeout(() => { if (btYtKey === key && !seeked) document.getElementById('bt-play-btn').style.display = 'inline-block'; }, 4000);
         }
 
         function btTick() {
@@ -3399,6 +3489,7 @@
             if (q.videoId) {
                 // La vidéo prend le relais de l'extrait audio
                 btAudio.pause();
+                btYtStop();
                 document.getElementById('bt-play-btn').style.display = 'none';
                 const f = document.createElement('iframe');
                 f.src = `https://www.youtube-nocookie.com/embed/${q.videoId}?autoplay=1&rel=0&playsinline=1`;
@@ -3432,7 +3523,7 @@
 
             // Nouvelle manche : on réinitialise le choix AVANT de dessiner les boutons
             // (sinon le choix de la manche précédente les laissait désactivés une manche sur deux)
-            if (q.phase === 'playing' && btLoadedKey !== `${q.round}|${q.src}`) btMyChoice = null;
+            if (q.phase === 'playing' && btLoadedKey !== `${q.round}|${q.key || q.src}`) btMyChoice = null;
 
             document.getElementById('bt-round').textContent = `Manche ${q.round}/${q.totalRounds}`;
             const answeredCount = q.players.filter(p => p.answered).length;
@@ -3578,10 +3669,11 @@
             quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
             mapguess:{ title:'🗺️ MAP GUESS', sub:'De quel univers vient ce lieu ?', universe:false },
             fusion:{ title:'🧪 FUSION ANIME', sub:'4 persos sont mélangés dans cette image : retrouve-les tous', universe:true },
-            scene:{ title:"🎬 SCENE GUESSR", sub:"Une capture tirée d'un opening : de quel anime vient-elle ?", universe:false }
+            scene:{ title:"🎬 SCENE GUESSR", sub:"Un extrait vidéo (sans le son) : de quel anime vient cette scène ?", universe:false }
         };
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
-        let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null;
+        let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null, arcYt = null;
+        function arcDestroyVideo() { if (arcYt) { try { arcYt.destroy(); } catch (_) {} arcYt = null; } }
 
         function openArcadeGame(game) {
             if (ARC_UI[game].universe) {
@@ -3728,7 +3820,10 @@
 
         function arcRenderStage(q) {
             const stage = document.getElementById('arc-stage');
-            const key = `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}`;
+            const key = q.game === 'scene' && q.stage && q.stage.video
+                ? `${q.round}|scene|${q.stage.video}`
+                : `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}`;
+            if (q.game === 'scene' && q.phase === 'reveal' && arcYt) { try { arcYt.unMute(); arcYt.setVolume(60); } catch (_) {} }
             if (q.phase === 'loading') {
                 if (arcStageKey !== 'loading') stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation de la manche…</div></div>';
                 arcStageKey = 'loading';
@@ -3737,6 +3832,7 @@
             if (key === arcStageKey) return;
             arcStageKey = key;
             if (arcRaf) { cancelAnimationFrame(arcRaf); arcRaf = null; }
+            arcDestroyVideo();
             const reveal = q.phase !== 'playing';
             const st = q.stage || {};
 
@@ -3763,6 +3859,38 @@
                     grid.appendChild(tile);
                 }
                 stage.appendChild(grid);
+                return;
+            }
+            if (q.game === 'scene' && st.video) {
+                stage.innerHTML = '';
+                const box = document.createElement('div'); box.className = 'arc-video';
+                const holder = document.createElement('div'); holder.id = 'arc-yt-' + q.round + '-' + st.video;
+                const shield = document.createElement('div'); shield.className = 'arc-video-shield';
+                const cover = document.createElement('div'); cover.className = 'arc-video-cover'; cover.innerHTML = '<div class="arc-spin"></div>';
+                const badge = document.createElement('div'); badge.className = 'arc-video-badge'; badge.textContent = '🔇 scène sans le son';
+                box.append(holder, shield, cover, badge);
+                stage.appendChild(box);
+                const myKey = arcStageKey, round = q.round;
+                ytApi().then(YT => {
+                    if (arcStageKey !== myKey) return;
+                    let seeked = false;
+                    arcYt = new YT.Player(holder.id, {
+                        videoId: st.video,
+                        playerVars: { autoplay: 1, mute: 1, controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1, iv_load_policy: 3, modestbranding: 1 },
+                        events: {
+                            onReady: e => { e.target.mute(); e.target.playVideo(); },
+                            onStateChange: e => {
+                                if (arcStageKey !== myKey || seeked || e.data !== YT.PlayerState.PLAYING) return;
+                                seeked = true;
+                                const dur = e.target.getDuration() || 90;
+                                const elapsed = Math.max(0, arcNow() - arcState.startedAt) / 1000;
+                                e.target.seekTo(Math.min(dur - 3, dur * (st.frac || 0.4) + elapsed), true);
+                                setTimeout(() => cover.remove(), 700);
+                            },
+                            onError: () => { if (arcStageKey === myKey && arcState && arcState.phase === 'playing') socket.emit('arc_media_error', { roomCode: currentRoomCode, round }); }
+                        }
+                    });
+                });
                 return;
             }
             if (q.game === 'mapguess' || q.game === 'scene') {
@@ -3945,6 +4073,7 @@
                     result.style.color = 'var(--accent-yellow)';
                     result.textContent = w.length > 1 ? `Égalité : ${w.join(', ')} !` : `🏆 ${w[0] || '---'} gagne la partie !`;
                 }
+                arcDestroyVideo();
                 document.getElementById('arc-stage').innerHTML = '<div style="font-size:4rem;">🏆</div>';
                 arcStageKey = 'finished';
             }

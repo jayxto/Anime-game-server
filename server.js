@@ -9356,7 +9356,7 @@ const BLINDTEST_TRACKS = [
     { n:83, anime:"Oshi no Ko", title:"YOASOBI - Idol" },
     { n:85, anime:"Beastars", title:"YOASOBI - Kaibutsu" },
     { n:86, anime:"Frieren", title:"Yorushika - Haru" },
-    { n:87, anime:"Fullmetal Alchemist: Brotherhood", title:"YUI - again" }
+    { n:87, anime:"Fullmetal Alchemist", title:"YUI - again" }
 ].map(t => {
     // Requête YouTube pour retrouver la vidéo de l'opening/ending (version sans générique si possible)
     const song = t.title.replace(/\s*\((Lo-fi|Remix)\)\s*$/i, '');
@@ -9373,11 +9373,21 @@ const BLINDTEST_VIDEO_IDS = {"1": "l9X96XcW9FI", "2": "U_12r32cM8o", "3": "DCCRN
 const BLINDTEST_DURATIONS = {1:227,2:184,3:197,4:328,5:218,6:203,7:222,8:242,9:224,10:244,11:203,12:261,13:168,14:185,15:174,16:247,17:221,18:223,19:218,20:238,21:236,22:180,23:324,24:230,25:206,26:170,27:215,28:244,29:262,30:241,31:151,32:193,33:238,34:239,35:179,36:94,37:90,38:281,39:248,40:234,41:237,42:185,43:207,44:223,45:257,46:249,47:211,48:288,49:94,50:94,51:226,52:241,53:214,54:102,55:111,56:104,57:107,58:96,59:103,60:109,61:105,62:117,63:96,64:108,65:114,66:104,67:241,68:388,69:344,70:285,71:129,72:269,73:256,74:267,75:359,76:121,77:196,78:251,79:284,80:238,81:226,82:258,83:213,84:258,85:205,86:270,87:257};
 
 const BLINDTEST_EXTRA_CHOICES = [
-    'One Piece','Dragon Ball Z','Black Clover','Fairy Tail','Blue Lock','One Punch Man',
+    'One Piece','Black Clover','Fairy Tail','Blue Lock','One Punch Man',
     'Mob Psycho 100','Vinland Saga','Re:Zero','Mushoku Tensei','Tensura','Hell\'s Paradise',
     'Bungo Stray Dogs','Classroom of the Elite','Kaiju No. 8','Sakamoto Days','Gachiakuta'
 ];
 
+
+// ===== Openings joués directement depuis YouTube (pas de fichier mp3 à héberger) =====
+// footage = la vidéo montre des images de l'anime (utilisée aussi par le mini-jeu Scene Guessr)
+const BT_BAD_IDS = new Set(); // vidéos non intégrables détectées en jeu
+const BLINDTEST_YT_TRACKS = [{"anime": "One Piece", "title": "Hiroshi Kitadani - We Are!", "id": "gcjdXMfYIe4", "footage": true}, {"anime": "One Piece", "title": "Folder5 - Believe", "id": "QwSkErUIF9k", "footage": true}, {"anime": "One Piece", "title": "D-51 - Brand New World", "id": "0uh9U5CXgso", "footage": true}, {"anime": "One Piece", "title": "The Babystars - Hikari e", "id": "GXkN2Du52j4", "footage": true}, {"anime": "One Piece", "title": "BOYSTYLE - Kokoro no Chizu", "id": "lj6tjz5VkQM", "footage": true}, {"anime": "One Piece", "title": "TVXQ - Share the World", "id": "6y5mvWkI7TE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Over the Top", "id": "pAI961THYkE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Us!", "id": "NYryrD9lpsw", "footage": true}, {"anime": "One Piece", "title": "SEKAI NO OWARI - Saikou Toutatsuten", "id": "kXNwlScpt_c", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Aaaassu!", "id": "r7zV2RtNlw0", "footage": true}, {"anime": "One Piece", "title": "Maki Otsuki - Memories", "id": "T1_gMAN4TjA", "footage": false}, {"anime": "One Piece", "title": "Ado - New Genesis", "id": "6lnnPnr_0SU", "footage": true}, {"anime": "Bleach", "title": "ORANGE RANGE - Asterisk", "id": "wW9TwZdWpjw", "footage": true}, {"anime": "Bleach", "title": "High and Mighty Color - Ichirin no Hana", "id": "eIm0dpBjQPg", "footage": true}, {"anime": "Bleach", "title": "UVERworld - D-tecnoLife", "id": "h1MoLQ9Wcv0", "footage": true}, {"anime": "Bleach", "title": "Aqua Timez - Alones", "id": "WEN4qOcVKeM", "footage": true}, {"anime": "Bleach", "title": "Beat Crusaders - Tonight, Tonight, Tonight", "id": "oi3wY1-EwDs", "footage": true}, {"anime": "Bleach", "title": "Tatsuya Kitani - Scar", "id": "mjeR7vUrDvM", "footage": true}, {"anime": "Naruto", "title": "nobodyknows+ - Hero's Come Back!!", "id": "vxvP9zSOL7s", "footage": true}, {"anime": "Naruto", "title": "HOME MADE Kazoku - Kanashimi wo Yasashisa ni (little by little)", "id": "XwJEFzsqNoY", "footage": true}, {"anime": "Naruto", "title": "HEARTS GROW - Yura Yura", "id": "-m8kR0FQ7Wk", "footage": true}, {"anime": "Naruto", "title": "NICO Touches the Walls - Diver", "id": "P1yJ51DH-18", "footage": true}, {"anime": "Naruto", "title": "The Cro-Magnons - Totsugeki Rock", "id": "ZR5ZCVQ0puE", "footage": true}, {"anime": "Naruto", "title": "tacica - newsong", "id": "yu12tTrkJ-g", "footage": true}, {"anime": "Naruto", "title": "7!! - Lovers", "id": "KmrTuNXVrf4", "footage": true}, {"anime": "Naruto", "title": "Daisuke - Moshimo", "id": "PBsMuTPEJ_A", "footage": true}, {"anime": "Boruto", "title": "KANA-BOON - Baton Road", "id": "48wCQXl83-s", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - Cha-La Head-Cha-La", "id": "-CebN43ppk8", "footage": true}, {"anime": "Dragon Ball", "title": "Hiroki Takahashi - Makafushigi Adventure!", "id": "M4fM1GdUCbU", "footage": true}, {"anime": "Dragon Ball", "title": "FIELD OF VIEW - Dan Dan Kokoro Hikareteku", "id": "Hm1hM_Ljcsk", "footage": true}, {"anime": "Dragon Ball", "title": "Kazuya Yoshii - Chozetsu Dynamic!", "id": "ASA8NsKQywU", "footage": true}, {"anime": "Dragon Ball", "title": "Kiyoshi Hikawa - Limit Break x Survivor", "id": "BMgpnQcQPok", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - We Gotta Power", "id": "1KCturR5CIk", "footage": true}, {"anime": "Hunter x Hunter", "title": "Keno - Ohayou", "id": "QNwxM1uy8wg", "footage": true}, {"anime": "Hunter x Hunter", "title": "Fear, and Loathing in Las Vegas - Just Awake", "id": "R9kgxfc8tOg", "footage": true}, {"anime": "Death Note", "title": "Maximum the Hormone - What's up, people?!", "id": "ZXDtsF9jmZU", "footage": true}, {"anime": "Death Note", "title": "Nightmare - Alumina", "id": "3YDFjbNVUGI", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Porno Graffitti - Melissa", "id": "jwslD4qNn9U", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Sukima Switch - Golden Time Lover", "id": "uvHyMazZ29I", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Chemistry - Period", "id": "86VlDpO0qo0", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "SID - Rain", "id": "cMsDqVx777k", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "NICO Touches the Walls - Hologram", "id": "K071t7ockJk", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Homura", "id": "N2p1K-UAtfA", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Akeboshi", "id": "XIUDjQ5sVKk", "footage": true}, {"anime": "Demon Slayer", "title": "MY FIRST STORY x HYDE - Mugen", "id": "Hk6qHGRgK-s", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "Who-ya Extended - VIVID VICE", "id": "MWUuLV1oGks", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "King Gnu - Ichizu", "id": "9qwULTpB-mk", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Red Swan (YOSHIKI feat. HYDE)", "id": "gg0Xg6H9Obw", "footage": true}, {"anime": "L'Attaque des Titans", "title": "SiM - The Rumbling", "id": "6MuAxGB3o_4", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Shinsei Kamattechan - Boku no Sensou", "id": "pQgJCloa6wM", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Jiyuu no Tsubasa", "id": "ErgcCrXU0Ig", "footage": true}, {"anime": "Spy x Family", "title": "BUMP OF CHICKEN - SOUVENIR", "id": "C1G0rBB6fnY", "footage": true}, {"anime": "Spy x Family", "title": "Ado - Kura Kura", "id": "kLhPtrXMb7w", "footage": true}, {"anime": "Frieren", "title": "YOASOBI - Yuusha", "id": "GcliqznvOc4", "footage": true}, {"anime": "Oshi no Ko", "title": "GEMN - Fatal", "id": "vyis0G1jEIo", "footage": true}, {"anime": "Solo Leveling", "title": "SawanoHiroyuki[nZk]:TOMORROW X TOGETHER - LEveL", "id": "sSyUREZzGc4", "footage": true}, {"anime": "Blue Lock", "title": "UNISON SQUARE GARDEN - Chaos ga Kiwamaru", "id": "oX2HOWzc7mA", "footage": true}, {"anime": "Kaiju No. 8", "title": "YUNGBLUD - Abyss", "id": "OcpgYeSdp4c", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR - 99", "id": "F5OJPUXJvHk", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 99.9", "id": "D6g-qbYEEX8", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 1", "id": "xRIOnDruOZM", "footage": true}, {"anime": "One Punch Man", "title": "JAM Project - THE HERO!!", "id": "atxYe-nOa9w", "footage": true}, {"anime": "Tokyo Ghoul", "title": "TK from Ling tosite sigure - katharsis", "id": "S2H_YNYRw2E", "footage": true}, {"anime": "Re:Zero", "title": "Konomi Suzuki - Redo", "id": "V5cW93SRfW4", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - Paradisus-Paradoxum", "id": "LEiQ11iagns", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - STYX HELIX", "id": "IiaeDOO113A", "footage": true}, {"anime": "Mushoku Tensei", "title": "Yuiko Ohara - Tabibito no Uta", "id": "pEoCT-Kv5CI", "footage": true}, {"anime": "Tensura", "title": "Takuma Terashima - Nameless story", "id": "ZhvUomsfG8o", "footage": true}, {"anime": "Black Clover", "title": "Kankaku Piero - Haruka Mirai", "id": "SaKb0tOt32Q", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Catcher", "id": "8-6tfOK47uc", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Rover", "id": "AmWsVoF_vDo", "footage": true}, {"anime": "Fairy Tail", "title": "FUNKIST - Snow Fairy", "id": "9jvVBVcZ0-Y", "footage": true}, {"anime": "Fairy Tail", "title": "BoA - MASAYUME CHASING", "id": "zrP9PnyCUnw", "footage": true}, {"anime": "Sword Art Online", "title": "LiSA - ADAMAS", "id": "MMuAqR_MjS8", "footage": true}, {"anime": "Sword Art Online", "title": "ASCA - Resister", "id": "UuEjcECCfKQ", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - Imagination", "id": "yq4xb6fSflw", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - I'm a Believer", "id": "f0pv9dZ8g8Q", "footage": true}, {"anime": "Haikyuu", "title": "Sukima Switch - Ah Yeah!!", "id": "WYpwBsdRBmY", "footage": true}, {"anime": "Haikyuu", "title": "BURNOUT SYNDROMES - Phoenix", "id": "-ws5iQDK814", "footage": true}, {"anime": "My Hero Academia", "title": "Lenny code fiction - Make my story", "id": "mGic3vNgl9E", "footage": true}, {"anime": "Blue Exorcist", "title": "UVERworld - CORE PRIDE", "id": "s99s4VCtCP8", "footage": true}, {"anime": "Soul Eater", "title": "T.M.Revolution - resonance", "id": "wD9nWYaVZuA", "footage": true}, {"anime": "Akame ga Kill!", "title": "Sora Amamiya - Skyreach", "id": "wVFWBoKP-lQ", "footage": true}, {"anime": "Neon Genesis Evangelion", "title": "Yoko Takahashi - Zankoku na Tenshi no These", "id": "1Y9Y1tRAJJM", "footage": false}, {"anime": "Cowboy Bebop", "title": "The Seatbelts - Tank!", "id": "0hfOyOBHIq4", "footage": true}, {"anime": "Fate/Zero", "title": "LiSA - oath sign", "id": "t1Wkgj7mntM", "footage": true}, {"anime": "Guilty Crown", "title": "supercell - My Dearest", "id": "W10RXr9c44Y", "footage": true}, {"anime": "Gintama", "title": "Tommy heavenly6 - Pray", "id": "trD3YCDToVM", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - I Wanna Be...", "id": "1cFsA6Qt34s", "footage": true}, {"anime": "Gintama", "title": "DOES - Donten", "id": "UBAaakDXruQ", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Sakura Mitsutsuki", "id": "xzEL6XQHFfw", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Samurai Heart (Some Like It Hot!!)", "id": "wA0UX2NDDwA", "footage": true}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Rikka Ihara - Love Dramatic", "id": "kpL0ozexEPo", "footage": true}, {"anime": "Steins;Gate", "title": "Kanako Itou - Hacking to the Gate", "id": "dy7gr0vaNho", "footage": true}, {"anime": "Code Geass", "title": "FLOW - WORLD END", "id": "SrxKIQhBBN4", "footage": true}, {"anime": "Dororo", "title": "QUEEN BEE - Kaen", "id": "T0vyOdp5iuk", "footage": true}, {"anime": "Vinland Saga", "title": "Survive Said The Prophet - MUKANJYO", "id": "48jwtvQ7X6o", "footage": true}, {"anime": "Vinland Saga", "title": "MAN WITH A MISSION - Dark Crow", "id": "c2L6D1-Dif8", "footage": true}, {"anime": "Yuri!!! on Ice", "title": "DEAN FUJIOKA - History Maker", "id": "5u3RGhznctE", "footage": true}, {"anime": "K-On!", "title": "Sakurakou K-ON Bu - Cagayake! GIRLS", "id": "Sz2Hw6SCLy8", "footage": true}, {"anime": "Anohana", "title": "Galileo Galilei - Aoi Shiori", "id": "sDPiBP9AGvA", "footage": true}, {"anime": "Anohana", "title": "ZONE (cast) - secret base ~Kimi ga Kureta Mono~", "id": "zyO5Mj6tLoU", "footage": true}, {"anime": "Toradora!", "title": "Yui Horie - Vanilla Salt", "id": "fD4jOs8Y_aQ", "footage": true}, {"anime": "No Game No Life", "title": "Konomi Suzuki - This game", "id": "cxTMiloKCJg", "footage": true}, {"anime": "Magi", "title": "Porno Graffitti - Matataku Hoshi no Shita de", "id": "huAlCl7hS60", "footage": true}, {"anime": "Death Parade", "title": "BRADIO - Flyers", "id": "RmyeBnIKQ38", "footage": true}, {"anime": "Kekkai Sensen", "title": "UNISON SQUARE GARDEN - Sugar Song to Bitter Step", "id": "vZ6aZdfQepw", "footage": true}, {"anime": "Bakemonogatari", "title": "Kana Hanazawa - Renai Circulation", "id": "AW7_dqi9X7M", "footage": true}, {"anime": "Tower of God", "title": "Stray Kids - TOP", "id": "apII5VFTce0", "footage": true}, {"anime": "Slam Dunk", "title": "BAAD - Kimi ga Suki da to Sakebitai", "id": "ec2lT4VzLdw", "footage": true}, {"anime": "Slam Dunk", "title": "WANDS - Sekai ga Owaru made wa", "id": "oB4XV1RBU9o", "footage": true}, {"anime": "Détective Conan", "title": "The High-Lows - Mune ga Dokidoki", "id": "cr-L2iLsUOY", "footage": true}, {"anime": "Sailor Moon", "title": "DALI - Moonlight Densetsu", "id": "IuZfkCvPEPI", "footage": true}, {"anime": "Yu Yu Hakusho", "title": "Matsuko Mawatari - Hohoemi no Bakudan", "id": "urZWmEgm72Q", "footage": true}, {"anime": "Saint Seiya", "title": "MAKE-UP - Pegasus Fantasy", "id": "Bu533OKYHyc", "footage": true}, {"anime": "Inuyasha", "title": "V6 - Change the World", "id": "0OWjGrUOKrI", "footage": true}, {"anime": "City Hunter", "title": "TM NETWORK - Get Wild", "id": "i6DSE6L1pXM", "footage": true}, {"anime": "Nana", "title": "Anna Inspi'Nana (Black Stones) - Rose", "id": "ALOUUQ6s1DU", "footage": true}, {"anime": "Great Teacher Onizuka", "title": "L'Arc~en~Ciel - Driver's High", "id": "_aWO-8j0kqM", "footage": true}, {"anime": "Samurai Champloo", "title": "Nujabes feat. Shing02 - Battlecry", "id": "2mwU7X7qCkk", "footage": true}, {"anime": "Psycho-Pass", "title": "Ling tosite sigure - abnormalize", "id": "yXKPtn_LSds", "footage": true}, {"anime": "Erased", "title": "ASIAN KUNG-FU GENERATION - Re:Re:", "id": "6GLdwo1032s", "footage": true}, {"anime": "Kill la Kill", "title": "Eir Aoi - Sirius", "id": "a81JGBKAX5U", "footage": true}, {"anime": "Gurren Lagann", "title": "Shoko Nakagawa - Sorairo Days", "id": "ZqXP_hEC4yE", "footage": true}, {"anime": "Made in Abyss", "title": "Miyu Tomita & Mariya Ise - Deep in Abyss", "id": "-NaNX1xAtSg", "footage": true}, {"anime": "Violet Evergarden", "title": "TRUE - Sincerely", "id": "ZAKuyZEyZjY", "footage": true}, {"anime": "Your Lie in April", "title": "Goose house - Hikaru Nara", "id": "fBsfD0Eytjw", "footage": true}, {"anime": "Dr. Stone", "title": "BURNOUT SYNDROMES - Good Morning World!", "id": "ot8QwURRCDs", "footage": true}, {"anime": "Assassination Classroom", "title": "3-nen E-gumi Utatan - Seishun Satsubatsu-ron", "id": "3cdZ9tIkVLI", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - Can Do", "id": "0lDNmBmb0Dg", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - The Other self", "id": "aiwgCaFkYZI", "footage": true}, {"anime": "Bocchi the Rock!", "title": "Kessoku Band - Seishun Complex", "id": "vIpzAad2f8k", "footage": true}, {"anime": "Horimiya", "title": "Yoh Kamiyama - Iro Kousui", "id": "Cmd31U5g3Lo", "footage": true}, {"anime": "Fruits Basket", "title": "Beverly - Again", "id": "ad7E-dgeYIA", "footage": true}, {"anime": "Bungo Stray Dogs", "title": "GRANRODEO - TRASH CANDY", "id": "tx_TZEAPI0k", "footage": true}, {"anime": "Hell's Paradise", "title": "millennium parade x Ringo Sheena - W●RK", "id": "Rr1UQlJxXB8", "footage": true}, {"anime": "Classroom of the Elite", "title": "ZAQ - Caste Room", "id": "AhJxfSt5jN8", "footage": true}, {"anime": "Pokémon", "title": "Rica Matsumoto - Mezase Pokémon Master", "id": "Y38TXKeC1Jk", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Hiroaki \"Tommy\" Tominaga - JoJo Sono Chi no Sadame", "id": "wPdX66-Ag2s", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "THE DU - Crazy Noisy Bizarre Town", "id": "QUVeKcAT1CI", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Coda - Fighting Gold", "id": "b7JJ0cHk2ew", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Karen Aoki & Daisuke Hasegawa - Great Days", "id": "ATYTLw-Nl0s", "footage": true}, {"anime": "Seven Deadly Sins", "title": "FLOW x GRANRODEO - Howling", "id": "VYd8M3Iw5_A", "footage": true}, {"anime": "Rent-a-Girlfriend", "title": "the peggies - Centimeter", "id": "eNV0koBJ0uU", "footage": true}, {"anime": "Ao Haru Ride", "title": "CHiCO with HoneyWorks - Sekai wa Koi ni Ochiteiru", "id": "IACs-yJoXKM", "footage": true}, {"anime": "Lucky Star", "title": "Aya Hirano et al. - Motteke! Sailor Fuku", "id": "J5wCUB5u6_s", "footage": true}, {"anime": "Durarara!!", "title": "THEATRE BROOK - Uragiri no Yuuyake", "id": "wJqJuv_omGE", "footage": true}];
+BLINDTEST_YT_TRACKS.forEach((t, i) => {
+    const n = 1000 + i;
+    BLINDTEST_TRACKS.push({ n, anime: t.anime, title: t.title, yt: `${t.anime} ${t.title}`, src: null, ytId: t.id, footage: t.footage !== false });
+    BLINDTEST_VIDEO_IDS[n] = t.id;
+});
 const BLINDTEST_ANIMES = [...new Set(BLINDTEST_TRACKS.map(t => t.anime))];
 const BLINDTEST_ROUNDS = 10;
 const BLINDTEST_ROUND_MS = 20000;
@@ -9455,6 +9465,9 @@ function btPublicState(room) {
         totalRounds:bt.totalRounds,
         phase:bt.phase, // playing | reveal | finished
         src:bt.current?.src || null,
+        ytId:bt.phase === 'playing' || bt.phase === 'reveal' ? (bt.current?.ytId || null) : null,
+        offsetFrac:bt.offsetFrac ?? null,
+        key:bt.pickId || 0,
         offset:bt.offset,
         choices:bt.choices,
         endsAt:bt.endsAt,
@@ -9502,11 +9515,13 @@ function btNextRound(room, roomCode) {
     }
 
     // On tire d'abord un anime (pour ne pas avoir 10 fois SNK), puis une de ses musiques
-    let pool = BLINDTEST_ANIMES.filter(a => !bt.usedAnimes.includes(a));
-    if (!pool.length) { bt.usedAnimes = []; pool = BLINDTEST_ANIMES.slice(); }
+    const playable = t => !(t.ytId && BT_BAD_IDS.has(t.ytId));
+    const playableAnimes = BLINDTEST_ANIMES.filter(a => BLINDTEST_TRACKS.some(t => t.anime === a && playable(t)));
+    let pool = playableAnimes.filter(a => !bt.usedAnimes.includes(a));
+    if (!pool.length) { bt.usedAnimes = []; pool = playableAnimes.slice(); }
     const anime = pool[Math.floor(Math.random() * pool.length)];
     bt.usedAnimes.push(anime);
-    const tracks = BLINDTEST_TRACKS.filter(t => t.anime === anime);
+    const tracks = BLINDTEST_TRACKS.filter(t => t.anime === anime && playable(t));
     const track = tracks[Math.floor(Math.random() * tracks.length)];
 
     const wrongPool = btShuffle([...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES].filter(a => a !== anime));
@@ -9520,6 +9535,9 @@ function btNextRound(room, roomCode) {
     const [lo, hi] = dur < 130 ? [0.08, 0.30] : [0.15, 0.32];
     bt.offset = Math.round(dur * (lo + Math.random() * (hi - lo)));
     bt.offset = Math.max(0, Math.min(bt.offset, dur - (BLINDTEST_ROUND_MS / 1000) - 5));
+    // Musiques jouées depuis YouTube : on donne une position relative (le client connaît la durée de la vidéo)
+    bt.offsetFrac = track.ytId ? 0.28 + Math.random() * 0.22 : null;
+    bt.pickId = (bt.pickId || 0) + 1;
     bt.choices = btShuffle([anime, ...wrong]);
     bt.answers = {};
     bt.startedAt = Date.now();
@@ -10774,7 +10792,7 @@ const ARC_GAMES = {
     quatre:     { label:'4 images = 1 anime',   icon:'🧩', universe:false, rounds:10, roundMs:24000, answer:'choice' },
     mapguess:   { label:'Map Guess',            icon:'🗺️', universe:false, rounds:10, roundMs:20000, answer:'choice' },
     fusion:     { label:'Fusion Anime',         icon:'🧪', universe:true,  rounds:6,  roundMs:60000, answer:'multi'  },
-    scene:      { label:'Scene Guessr',         icon:'🎬', universe:false, rounds:10, roundMs:20000, answer:'choice' }
+    scene:      { label:'Scene Guessr',         icon:'🎬', universe:false, rounds:10, roundMs:22000, answer:'choice' }
 };
 const ARC_REVEAL_MS = 7000;
 
@@ -11193,27 +11211,17 @@ async function arcBuildRound(g) {
     }
 
     if (game === 'scene') {
-        const tracks = BLINDTEST_TRACKS.filter(t => BLINDTEST_VIDEO_IDS[t.n]);
+        // Vrais extraits vidéo : un passage de l'opening (images de l'anime) joué quelques secondes, sans le son
+        const tracks = BLINDTEST_TRACKS.filter(t => BLINDTEST_VIDEO_IDS[t.n] && t.footage !== false && !BT_BAD_IDS.has(BLINDTEST_VIDEO_IDS[t.n]));
         let cands = arcShuffle(tracks.filter(t => !g.used.has('scene|' + t.anime)));
         if (!cands.length) { g.used.forEach(k => { if (k.startsWith('scene|')) g.used.delete(k); }); cands = arcShuffle(tracks); }
-        for (const t of cands.slice(0, 6)) {
-            const id = BLINDTEST_VIDEO_IDS[t.n];
-            const frames = arcShuffle([1, 2, 3]);
-            let url = null;
-            for (const k of frames) {
-                for (const u of [`https://i.ytimg.com/vi/${id}/maxres${k}.jpg`, `https://i.ytimg.com/vi/${id}/hq${k}.jpg`]) {
-                    if (await arcUsableImage(u)) { url = u; break; }
-                }
-                if (url) break;
-            }
-            if (!url) continue;
-            g.used.add('scene|' + t.anime);
-            const answer = t.anime;
-            const extra = [...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES];
-            const wrong = arcShuffle([...new Set(extra)].filter(a => a !== answer)).slice(0, 3);
-            return { img: arcToken(url), answer, song: t.title, choices: arcShuffle([answer, ...wrong]) };
-        }
-        return null;
+        const t = cands[0];
+        if (!t) return null;
+        g.used.add('scene|' + t.anime);
+        const answer = t.anime;
+        const extra = [...BLINDTEST_ANIMES, ...BLINDTEST_EXTRA_CHOICES];
+        const wrong = arcShuffle([...new Set(extra)].filter(a => a !== answer)).slice(0, 3);
+        return { video: BLINDTEST_VIDEO_IDS[t.n], frac: 0.22 + Math.random() * 0.5, answer, song: t.title, choices: arcShuffle([answer, ...wrong]) };
     }
 
     if (game === 'emoji') {
@@ -11269,6 +11277,7 @@ function arcPublic(room, g) {
     const stage = {};
     if (g.phase === 'playing' || revealed) {
         if (cur.img) stage.img = cur.img;
+        if (cur.video) { stage.video = cur.video; stage.frac = cur.frac; }
         if (cur.emoji) { stage.emoji = cur.emoji; stage.ask = cur.ask; }
         if (g.game === 'quatre' && cur.imgs) stage.imgs = cur.imgs.slice(0, arcRevealedCount(g));
         if (g.game === 'fusion' && cur.imgs) { stage.imgs = cur.imgs; stage.seed = cur.seed; }
@@ -11552,6 +11561,29 @@ io.on('connection', socket => {
             const already = targets.some((t, i) => mine.has(i) && arcNameMatches(t.u, t, guess));
             socket.emit('arc_feedback', { ok: false, message: already ? '↺ Déjà trouvé' : `❌ Personne ne s'appelle « ${guess} » ici` });
         }
+    });
+
+    // Vidéo YouTube non intégrable chez un joueur : on remplace la manche (scène) ou la musique (blind test)
+    socket.on('arc_media_error', ({ roomCode, round } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'scene' || g.phase !== 'playing' || g.round !== round || !g.current?.video) return;
+        if (Date.now() - g.startedAt > 15000) return;
+        BT_BAD_IDS.add(g.current.video);
+        arcClearTimers(g);
+        g.round -= 1;
+        arcNextRound(room, roomCode);
+    });
+
+    socket.on('bt_media_error', ({ roomCode, round } = {}) => {
+        const room = rooms[roomCode];
+        const bt = room?.blindtest;
+        if (!room || !bt || room.status !== 'bt_playing' || bt.phase !== 'playing' || bt.round !== round || !bt.current?.ytId) return;
+        if (Date.now() - bt.startedAt > 12000) return;
+        BT_BAD_IDS.add(bt.current.ytId);
+        bt.round -= 1;
+        bt.usedAnimes.pop();
+        btNextRound(room, roomCode);
     });
 
     socket.on('arc_skip', ({ roomCode } = {}) => {
