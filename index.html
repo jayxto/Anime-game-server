@@ -2258,6 +2258,7 @@
         }
 
         async function playMusicAtOrderPosition(pos) {
+            if (window.__btActive) return; // jamais de musique de fond pendant un Blind Test
             if (!AVAILABLE_MUSIC_TRACKS.length || !musicEnabled) {
                 updateMusicUI();
                 return;
@@ -2287,6 +2288,7 @@
         }
 
         function startBackgroundMusicIfAllowed() {
+            if (window.__btActive) return;
             if (!musicEnabled || musicStarted || !AVAILABLE_MUSIC_TRACKS.length) return;
             if (!musicOrder.length) shuffleMusicOrder();
             playMusicAtOrderPosition(0);
@@ -2351,6 +2353,12 @@
         let consecutiveMusicErrors = 0;
 
         backgroundMusic.addEventListener('play', () => {
+            // Pendant un Blind Test, la musique de fond est coupée d'office (sinon 2 sons en même temps)
+            if (window.__btActive) {
+                backgroundMusic.pause();
+                window.__btBgBlocked = true;
+                return;
+            }
             consecutiveMusicErrors = 0;
             updateMusicUI();
         });
@@ -3021,6 +3029,7 @@
         }
 
         function btPauseBackground() {
+            window.__btActive = true;
             if (!backgroundMusic.paused) {
                 btBgWasPlaying = true;
                 backgroundMusic.pause();
@@ -3034,14 +3043,31 @@
             btAudio.load();
             btLoadedKey = null;
             if (btTimerInterval) { clearInterval(btTimerInterval); btTimerInterval = null; }
-            if (btBgWasPlaying && musicEnabled) {
+            if (btFadeTimer) { clearInterval(btFadeTimer); btFadeTimer = null; }
+            const wasActive = window.__btActive;
+            window.__btActive = false;
+            if ((btBgWasPlaying || window.__btBgBlocked) && wasActive && musicEnabled) {
                 btBgWasPlaying = false;
-                backgroundMusic.play().catch(()=>{});
+                window.__btBgBlocked = false;
+                if (musicStarted) backgroundMusic.play().catch(()=>{});
+                else startBackgroundMusicIfAllowed();
             }
         }
 
         async function btForcePlay() {
             try { await btAudio.play(); document.getElementById('bt-play-btn').style.display = 'none'; } catch (_) {}
+        }
+
+        let btFadeTimer = null;
+        function btFadeIn() {
+            if (btFadeTimer) clearInterval(btFadeTimer);
+            btAudio.volume = 0;
+            let step = 0;
+            btFadeTimer = setInterval(() => {
+                step++;
+                btAudio.volume = Math.min(btVolume, btVolume * step / 10);
+                if (step >= 10) { clearInterval(btFadeTimer); btFadeTimer = null; }
+            }, 60);
         }
 
         function btLoadRound(q) {
@@ -3055,10 +3081,12 @@
             btAudio.volume = btVolume;
             const elapsed = Math.max(0, (Date.now() + btClockOffset) - (q.endsAt - q.roundMs)) / 1000;
             const seek = () => {
+                if (btLoadedKey !== key) return; // une autre manche a démarré entre-temps
                 let start = q.offset + elapsed;
                 const d = btAudio.duration;
-                if (Number.isFinite(d) && d > 0 && start > d - 25) start = Math.max(0, d * 0.3);
+                if (Number.isFinite(d) && d > 0 && start > d - 3) start = Math.max(0, d * 0.25);
                 try { btAudio.currentTime = start; } catch (_) {}
+                btFadeIn();
                 btAudio.play().then(()=>{
                     document.getElementById('bt-play-btn').style.display = 'none';
                 }).catch(()=>{
@@ -3239,6 +3267,7 @@
 
         socket.on('bt_state', q => {
             if (!q) return;
+            if (q.phase !== 'finished') btPauseBackground();
             hideAllPanels();
             const panel = document.getElementById('blindtest-room');
             if (panel) panel.style.display = 'block';

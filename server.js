@@ -9133,14 +9133,13 @@ function quoteScheduleNext(roomCode) {
 
 /* ================= Blind Test Anime (QCM : trouver l'anime) ================= */
 // Chaque musique du dossier /music est associée à son anime.
-// Les pistes qui ne viennent pas d'un anime (ou dont l'anime est incertain) sont exclues.
+// Exclues : pistes hors anime, anime incertain, reprises lo-fi et remix (trop durs à reconnaître).
 const BLINDTEST_TRACKS = [
     { n:1,  anime:"L'Attaque des Titans", title:"Ai Higuchi - Akuma no Ko" },
     { n:2,  anime:"Demon Slayer", title:"Aimer - Zankyou Sanka" },
     { n:3,  anime:"Dandadan", title:"AiNA THE END - Kakumei Douchuu" },
     { n:4,  anime:"Jujutsu Kaisen", title:"ALI, AKLO - LOST IN PARADISE" },
     { n:5,  anime:"My Hero Academia", title:"amazarashi - Sora ni Utaeba" },
-    { n:6,  anime:"86 Eighty-Six", title:"amazarashi - Kyoukaisen (Remix)" },
     { n:7,  anime:"Naruto", title:"ASIAN KUNG-FU GENERATION - Blood Circulator" },
     { n:8,  anime:"Naruto", title:"ASIAN KUNG-FU GENERATION - Haruka Kanata" },
     { n:9,  anime:"My Hero Academia", title:"BLUE ENCOUNT - Polaris" },
@@ -9179,32 +9178,15 @@ const BLINDTEST_TRACKS = [
     { n:45, anime:"Hunter x Hunter", title:"Masatoshi Ono - Departure!" },
     { n:46, anime:"Darling in the Franxx", title:"Mika Nakashima - KISS OF DEATH" },
     { n:47, anime:"Fire Force", title:"Mrs. GREEN APPLE - Inferno" },
-    { n:49, anime:"L'Attaque des Titans", title:"Ner Leva - My War (Remix)" },
-    { n:50, anime:"L'Attaque des Titans", title:"Ner Leva - The Rumbling (Remix)" },
     { n:51, anime:"Death Note", title:"NIGHTMARE - the WORLD" },
     { n:52, anime:"Tokyo Revengers", title:"OFFICIAL HIGE DANDISM - Cry Baby" },
     { n:53, anime:"Spy x Family", title:"OFFICIAL HIGE DANDISM - Mixed Nuts" },
-    { n:54, anime:"Bleach", title:"Asterisk (Lo-fi)" },
-    { n:55, anime:"Naruto", title:"Blue Bird (Lo-fi)" },
-    { n:56, anime:"Assassination Classroom", title:"Bye Bye Yesterday (Lo-fi)" },
-    { n:57, anime:"Hunter x Hunter", title:"Departure! (Lo-fi)" },
-    { n:58, anime:"L'Attaque des Titans", title:"Guren no Yumiya (Lo-fi)" },
-    { n:59, anime:"L'Attaque des Titans", title:"Jiyuu no Tsubasa (Lo-fi)" },
-    { n:60, anime:"Noragami", title:"Kyouran Hey Kids!! (Lo-fi)" },
-    { n:61, anime:"Soul Eater", title:"Resonance (Lo-fi)" },
-    { n:62, anime:"Death Note", title:"The World (Lo-fi)" },
-    { n:63, anime:"JoJo's Bizarre Adventure", title:"Bloody Stream (Lo-fi)" },
-    { n:64, anime:"Steins;Gate", title:"Hacking to the Gate (Lo-fi)" },
-    { n:65, anime:"Naruto", title:"Silhouette (Lo-fi)" },
-    { n:66, anime:"Cowboy Bebop", title:"Tank! (Lo-fi)" },
     { n:67, anime:"My Hero Academia", title:"PornoGraffitti - THE DAY" },
     { n:69, anime:"Your Name", title:"RADWIMPS - Nandemonaiya" },
     { n:70, anime:"Your Name", title:"RADWIMPS - Zenzenzense" },
     { n:71, anime:"Your Name", title:"RADWIMPS - Yumetourou" },
-    { n:72, anime:"L'Ère des Cristaux (Houseki no Kuni)", title:"Ryuven, Ner Leva - Kyoumen no Nami" },
     { n:73, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - Attack on Titan" },
     { n:74, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - The Reluctant Heroes" },
-    { n:75, anime:"L'Attaque des Titans", title:"Hiroyuki Sawano - YouSeeBIGGIRL/T:T" },
     { n:76, anime:"L'Attaque des Titans", title:"SiM - Under the Tree" },
     { n:77, anime:"Jujutsu Kaisen", title:"Tatsuya Kitani - Ao no Sumika" },
     { n:78, anime:"Noragami", title:"THE ORAL CIGARETTES - Kyouran Hey Kids!!" },
@@ -9224,7 +9206,13 @@ const BLINDTEST_TRACKS = [
     return { ...t, yt, src:`/music/track_${String(t.n).padStart(3,'0')}.mp3` };
 });
 
+// Vidéo YouTube vérifiée pour chaque musique (opening/ending/clip de l'anime correspondant)
+const BLINDTEST_VIDEO_IDS = {"1": "l9X96XcW9FI", "2": "U_12r32cM8o", "3": "DCCRNzKvWRg", "4": "sICsoDFLG-I", "5": "-owtG3xsQAg", "7": "cxbnTMrU3H0", "8": "RiQrbSuLrsU", "9": "6cgdg7V3cAY", "10": "7aNg8cV65Os", "11": "MM8RufZr5lw", "12": "SJkCLcnGB-c", "13": "FZN98D5_N4M", "14": "A1dnxXrpN-o", "15": "dwRM_Q5nfOw", "17": "1dDvMEisEC8", "18": "hdpHyrneZgo", "19": "mFCZDChGf8Y", "20": "GBE1VkrL8b0", "21": "97dkzVU4p-M", "23": "6BmbucPRURU", "24": "OoJBMjjIXY4", "25": "X9LyVVYx-zI", "26": "XeIfPMTndU4", "27": "2upuBiEiXDk", "28": "H3aqR_n3sM4", "30": "zVgKnfN9i34", "31": "QXwdy4UpHrg", "32": "5LVgkQj3EEU", "33": "7TzaEHUWvpM", "34": "hsezdivb7Nk", "35": "S0Ozf393ulY", "36": "bHUcvHx9zlA", "37": "CID-sYQNCew", "38": "GC1igLEsa8I", "39": "ovkHHiXPN3M", "40": "fBWWmDLM9-U", "41": "YkJvHe3KK2c", "42": "vXLFNFvdcHg", "43": "lD-nLjQE9SU", "44": "OWBCIRhly4U", "45": "PxYnfesUCs0", "46": "b6eaBqI7YrI", "47": "ucrH_LKxAA8", "51": "lnVDIA0QIvY", "52": "2qbHikwRimU", "53": "kaiLGNrKMtY", "67": "p65nNUgyQ7g", "69": "n89SKAymNfA", "70": "PVv6vlU9sZg", "71": "p9VMkwP04nM", "73": "kinW1Ytm1Zg", "74": "60KpE8iTBA8", "76": "HJMpBII5zmE", "77": "tUHqVM80SZg", "78": "aZenmeRytEM", "79": "PeYHU_qMQuI", "80": "RrfyrqvQ_Wk", "81": "F8ikrOqqAuE", "82": "nQQ1IYESt4I", "83": "X8TqiN2RNQQ", "85": "gH0f-yj9H64", "86": "AequpWIt-gQ", "87": "elyXcwunIYA"};
+
 // Leurres supplémentaires pour varier les propositions
+// Durée (secondes) de chaque fichier audio, pour démarrer l'extrait au bon endroit
+const BLINDTEST_DURATIONS = {1:227,2:184,3:197,4:328,5:218,6:203,7:222,8:242,9:224,10:244,11:203,12:261,13:168,14:185,15:174,16:247,17:221,18:223,19:218,20:238,21:236,22:180,23:324,24:230,25:206,26:170,27:215,28:244,29:262,30:241,31:151,32:193,33:238,34:239,35:179,36:94,37:90,38:281,39:248,40:234,41:237,42:185,43:207,44:223,45:257,46:249,47:211,48:288,49:94,50:94,51:226,52:241,53:214,54:102,55:111,56:104,57:107,58:96,59:103,60:109,61:105,62:117,63:96,64:108,65:114,66:104,67:241,68:388,69:344,70:285,71:129,72:269,73:256,74:267,75:359,76:121,77:196,78:251,79:284,80:238,81:226,82:258,83:213,84:258,85:205,86:270,87:257};
+
 const BLINDTEST_EXTRA_CHOICES = [
     'One Piece','Dragon Ball Z','Black Clover','Fairy Tail','Blue Lock','One Punch Man',
     'Mob Psycho 100','Vinland Saga','Re:Zero','Mushoku Tensei','Tensura','Hell\'s Paradise',
@@ -9238,7 +9226,7 @@ const BLINDTEST_REVEAL_MS = 25000; // le temps de regarder l'opening (l'hôte pe
 const btVideoCache = new Map(); // requête -> videoId (ou null)
 
 // Recherche le premier résultat YouTube (sans clé API) — résultat mis en cache
-async function btFindVideo(query) {
+async function btFindVideo(query, track) {
     if (btVideoCache.has(query)) return btVideoCache.get(query);
     let id = null;
     try {
@@ -9255,8 +9243,26 @@ async function btFindVideo(query) {
         });
         clearTimeout(to);
         const html = await r.text();
-        const m = html.match(/"videoRenderer":\{"videoId":"([A-Za-z0-9_-]{11})"/) || html.match(/"videoId":"([A-Za-z0-9_-]{11})"/);
-        id = m ? m[1] : null;
+        // On ne prend plus le 1er résultat au hasard : le titre doit contenir le nom de la chanson,
+        // et on écarte reprises, lo-fi, réactions, versions 1 h, etc.
+        const norm = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        const song = norm(String(track?.title || '').split(' - ').slice(1).join(' ').replace(/\((lo-fi|remix)\)/i, ''));
+        const anime = norm(track?.anime);
+        let best = null, bestScore = -1;
+        html.split('"videoRenderer":{"videoId":"').slice(1, 16).forEach((chunk, idx) => {
+            const vid = chunk.slice(0, 11);
+            const tm = chunk.match(/"title":\{"runs":\[\{"text":"((?:[^"\\]|\\.)*)"/);
+            const t = norm(tm ? tm[1] : '');
+            if (!/^[A-Za-z0-9_-]{11}$/.test(vid) || !t) return;
+            let sc = 0;
+            if (song && t.includes(song)) sc += 6;
+            if (anime && anime.split(' ').some(w => w.length > 3 && t.includes(w))) sc += 3;
+            if (/\b(opening|op|ending|ed|ncop|nced|creditless|theme)\b/.test(t)) sc += 2;
+            if (/\b(cover|lofi|lo fi|remix|reaction|piano|guitar|8 bit|slowed|nightcore|hour|hours|karaoke|instrumental|amv|tutorial|english ver|english version)\b/.test(t)) sc -= 10;
+            sc -= idx * 0.3;
+            if (sc > bestScore) { bestScore = sc; best = vid; }
+        });
+        id = bestScore >= 6 ? best : null;
     } catch (e) {
         console.warn('[BlindTest] Recherche YouTube impossible :', e.message);
     }
@@ -9350,7 +9356,11 @@ function btNextRound(room, roomCode) {
     bt.round += 1;
     bt.phase = 'playing';
     bt.current = track;
-    bt.offset = 15 + Math.floor(Math.random() * 40); // on démarre entre 15s et 55s dans la musique
+    // Extrait pris là où la musique est reconnaissable (couplet / refrain), jamais dans l'intro ni la fin
+    const dur = BLINDTEST_DURATIONS[track.n] || 200;
+    const [lo, hi] = dur < 130 ? [0.08, 0.30] : [0.15, 0.32];
+    bt.offset = Math.round(dur * (lo + Math.random() * (hi - lo)));
+    bt.offset = Math.max(0, Math.min(bt.offset, dur - (BLINDTEST_ROUND_MS / 1000) - 5));
     bt.choices = btShuffle([anime, ...wrong]);
     bt.answers = {};
     bt.startedAt = Date.now();
@@ -9359,7 +9369,9 @@ function btNextRound(room, roomCode) {
     bt.revealEndsAt = null;
     // On cherche la vidéo dès le début de la manche pour qu'elle soit prête à la révélation
     const roundNo = bt.round;
-    btFindVideo(track.yt).then(id => {
+    if (BLINDTEST_VIDEO_IDS[track.n]) {
+        bt.videoId = BLINDTEST_VIDEO_IDS[track.n];
+    } else btFindVideo(track.yt, track).then(id => {
         if (!room.blindtest || room.blindtest !== bt || bt.round !== roundNo) return;
         bt.videoId = id;
         if (bt.phase === 'reveal' && id) emitBlindState(room, roomCode);
