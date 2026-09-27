@@ -6791,7 +6791,7 @@
             for (let i = 0; i < D.W * D.H; i++) {
                 if (D.alpha[i] <= 127) { labels[i] = -1; continue; }
                 const k = map[colNearest(C, D.lab[i * 3], D.lab[i * 3 + 1], D.lab[i * 3 + 2])];
-                labels[i] = zoneOf[k] === undefined ? -1 : zoneOf[k];
+                labels[i] = zoneOf[k] === undefined ? 100 + map[k] : zoneOf[k]; // 100+ : couleur classée « fond » par les k-moyennes
             }
             const fgArea = keep.reduce((a, k) => a + area[k], 0) || 1;
             col.zones = keep.map((k, z) => {
@@ -6803,44 +6803,166 @@
             colPickPart();
             return true;
         }
-        // Choisit la partie à colorier : les CHEVEUX (manches impaires) ou les VÊTEMENTS (manches paires).
+        // Choisit la partie à colorier : TOUS les cheveux (manches impaires) ou TOUT l'habit (manches paires).
         // Même image + même manche => même choix chez tous les joueurs.
         const colIsSkin = l => l[0] > 45 && l[0] < 93 && l[1] > 3 && l[1] < 32 && l[2] > 7 && l[2] < 42 && l[2] > l[1] * 0.55;
+        const colHue = (a, b) => { const h = Math.atan2(b, a) * 180 / Math.PI; return h < 0 ? h + 360 : h; };
+        const colHueDiff = (h1, h2) => { const d = Math.abs(h1 - h2) % 360; return d > 180 ? 360 - d : d; };
+        // Fond : couleurs présentes sur au moins 3 bords de l'image, remplies depuis les bords
+        function colBackground() {
+            const { W, H } = col, lab = col.D.lab, rgba = col.D.rgba, N = W * H;
+            const bg = new Uint8Array(N);
+            const de = (i, c) => Math.hypot(lab[i * 3] - c[0], lab[i * 3 + 1] - c[1], lab[i * 3 + 2] - c[2]);
+            const buckets = [];
+            const side = (x, y) => y === 0 ? 0 : y === H - 1 ? 1 : x === 0 ? 2 : 3;
+            const border = [];
+            for (let x = 0; x < W; x++) { border.push(x); border.push((H - 1) * W + x); }
+            for (let y = 1; y < H - 1; y++) { border.push(y * W); border.push(y * W + W - 1); }
+            border.forEach(i => {
+                if (rgba[i * 4 + 3] < 128) return;
+                let bk = buckets.find(bu => de(i, bu.c) < 10);
+                if (!bk) { bk = { c: [lab[i * 3], lab[i * 3 + 1], lab[i * 3 + 2]], n: 0, s: [0, 0, 0, 0] }; buckets.push(bk); }
+                bk.n++; bk.s[side(i % W, (i / W) | 0)]++;
+            });
+            const per = [W, W, H - 2, H - 2];
+            const bgc = buckets.filter(bu => bu.s.filter((n, k) => n / per[k] >= 0.08).length >= 3).map(bu => bu.c);
+            const stack = [];
+            for (let i = 0; i < N; i++) if (rgba[i * 4 + 3] < 128) bg[i] = 1;
+            border.forEach(i => { if (!bg[i] && bgc.some(c => de(i, c) < 14)) { bg[i] = 1; stack.push(i); } });
+            border.forEach(i => { if (bg[i]) stack.push(i); });
+            while (stack.length) {
+                const k = stack.pop(), x = k % W, y = (k / W) | 0;
+                const nb = [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1];
+                for (const j of nb) {
+                    if (j < 0 || bg[j]) continue;
+                    if (rgba[j * 4 + 3] < 128 || (bgc.some(c => de(j, c) < 14) && Math.hypot(lab[j * 3] - lab[k * 3], lab[j * 3 + 1] - lab[k * 3 + 1], lab[j * 3 + 2] - lab[k * 3 + 2]) < 9)) { bg[j] = 1; stack.push(j); }
+                }
+            }
+            return bg;
+        }
         function colPickPart() {
-            const { W, H } = col, labels = col.labels, lab = col.D.lab, N = W * H;
-            let fg = 0; for (let i = 0; i < N; i++) if (labels[i] >= 0) fg++;
-            if (!fg) return;
-            // morceaux d'un seul tenant (même couleur, pixels voisins)
-            const comp = new Int32Array(N).fill(-1), comps = [], stack = [];
+            const { W, H } = col, lab = col.D.lab, N = W * H;
+            const bg = colBackground();
+            let fg = 0; for (let i = 0; i < N; i++) if (!bg[i]) fg++;
+            if (fg < N * 0.05) { col.part = 'main'; return; }
+            // 1) graines : morceaux d'une même couleur (zones k-moyennes) hors fond
+            const labels = col.labels, comp = new Int32Array(N).fill(-1), comps = [], stack = [];
             for (let i = 0; i < N; i++) {
-                if (labels[i] < 0 || comp[i] >= 0) continue;
+                if (bg[i] || labels[i] < 0 || comp[i] >= 0) continue;
                 const z = labels[i], id = comps.length;
-                const c = { id, z, n: 0, ys: 0, ymin: H, L: 0, A: 0, B: 0, px: [] };
+                const c = { z, n: 0, ys: 0, ymin: H, L: 0, A: 0, B: 0, px: [] };
                 comp[i] = id; stack.push(i);
                 while (stack.length) {
                     const k = stack.pop(), x = k % W, y = (k / W) | 0;
                     c.n++; c.ys += y; if (y < c.ymin) c.ymin = y; c.L += lab[k * 3]; c.A += lab[k * 3 + 1]; c.B += lab[k * 3 + 2]; c.px.push(k);
-                    if (x > 0 && comp[k - 1] < 0 && labels[k - 1] === z) { comp[k - 1] = id; stack.push(k - 1); }
-                    if (x < W - 1 && comp[k + 1] < 0 && labels[k + 1] === z) { comp[k + 1] = id; stack.push(k + 1); }
-                    if (y > 0 && comp[k - W] < 0 && labels[k - W] === z) { comp[k - W] = id; stack.push(k - W); }
-                    if (y < H - 1 && comp[k + W] < 0 && labels[k + W] === z) { comp[k + W] = id; stack.push(k + W); }
+                    for (const j of [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1])
+                        if (j >= 0 && comp[j] < 0 && !bg[j] && labels[j] === z) { comp[j] = id; stack.push(j); }
                 }
                 c.cy = c.ys / c.n / H; c.top = c.ymin / H; c.lab = [c.L / c.n, c.A / c.n, c.B / c.n]; c.share = c.n / fg;
                 comps.push(c);
             }
-            const usable = comps.filter(c => !colIsSkin(c.lab) && !colIsSkin(col.zones[c.z].lab));
-            const hair = usable.filter(c => c.cy < 0.45 && c.top < 0.3 && c.share >= 0.03).sort((a, b) => b.n - a.n);
-            const clothes = usable.filter(c => c.cy > 0.5 && c.share >= 0.04).sort((a, b) => b.n - a.n);
+            const usable = comps.filter(c => !colIsSkin(c.lab) && c.lab[0] > 6);
+            const hair = usable.filter(c => c.cy < 0.45 && c.top < 0.32 && c.share >= 0.02).sort((a, b) => b.n - a.n);
+            const clothes = usable.filter(c => c.cy > 0.55 && c.share >= 0.03).sort((a, b) => b.n - a.n);
             const wantHair = (col.round || 1) % 2 === 1;
-            let part = wantHair ? 'hair' : 'clothes', pick = (wantHair ? hair : clothes)[0];
-            if (!pick) { part = wantHair ? 'clothes' : 'hair'; pick = (wantHair ? clothes : hair)[0]; }
-            if (!pick) { col.part = 'main'; return; }
-            // on regroupe les autres morceaux de la même couleur dans la même région (ex : mèches, manches)
-            const group = comps.filter(c => c.z === pick.z && c.n >= fg * 0.004 && (part === 'hair' ? c.cy < 0.5 : c.cy > 0.4));
-            const t = col.zones.length;
+            let part = wantHair ? 'hair' : 'clothes', seed = (wantHair ? hair : clothes)[0];
+            if (!seed) { part = wantHair ? 'clothes' : 'hair'; seed = (wantHair ? clothes : hair)[0]; }
+            if (!seed) { col.part = 'main'; return; }
+            // 2) on fait grandir la zone : même teinte, ombres et reflets compris
+            const [sL, sa, sb] = seed.lab, sC = Math.hypot(sa, sb), sH = colHue(sa, sb);
+            const colored = sC >= 12;
+            const yMin = part === 'hair' ? 0 : Math.floor(H * 0.3), yMax = part === 'hair' ? Math.floor(H * 0.8) : H;
+            const ok = j => {
+                const y = (j / W) | 0;
+                if (bg[j] || y < yMin || y >= yMax) return false;
+                const L = lab[j * 3], a = lab[j * 3 + 1], b = lab[j * 3 + 2], C = Math.hypot(a, b);
+                if (colored) {
+                    if (L < 10 || C < Math.max(5, sC * 0.28) || C > sC * 1.9 + 10) return false;
+                    if (colHueDiff(colHue(a, b), sH) > 20) return false;
+                    return !(colIsSkin([L, a, b]) && colHueDiff(colHue(a, b), sH) > 10);
+                }
+                return C < 16 && L - sL < 30 && sL - L < 24 && !colIsSkin([L, a, b]);
+            };
+            // pixels « épais » seulement : la zone ne peut pas s'échapper le long des traits fins (contours, yeux…)
+            const E = new Uint8Array(N); for (let i = 0; i < N; i++) E[i] = ok(i) ? 1 : 0;
+            const S = new Int32Array((W + 1) * (H + 1));
+            for (let y = 0; y < H; y++) { let row = 0; for (let x = 0; x < W; x++) { row += E[y * W + x]; S[(y + 1) * (W + 1) + x + 1] = S[y * (W + 1) + x + 1] + row; } }
+            const R = 2, box = (x, y) => { const x0 = Math.max(0, x - R), y0 = Math.max(0, y - R), x1 = Math.min(W, x + R + 1), y1 = Math.min(H, y + R + 1); return { s: S[y1 * (W + 1) + x1] - S[y0 * (W + 1) + x1] - S[y1 * (W + 1) + x0] + S[y0 * (W + 1) + x0], a: (x1 - x0) * (y1 - y0) }; };
+            const thick = new Uint8Array(N);
+            for (let i = 0; i < N; i++) if (E[i]) { const b2 = box(i % W, (i / W) | 0); thick[i] = b2.s >= b2.a * 0.7 ? 1 : 0; }
+            const reg = new Uint8Array(N);
+            const grow = px => {
+                px.forEach(k => { if (thick[k] && !reg[k]) { reg[k] = 1; stack.push(k); } });
+                while (stack.length) {
+                    const k = stack.pop(), x = k % W, y = (k / W) | 0;
+                    for (const j of [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1])
+                        if (j >= 0 && !reg[j] && thick[j]) { reg[j] = 1; stack.push(j); }
+                }
+            };
+            grow(seed.px);
+            // les autres morceaux de même teinte dans la même région (mèches séparées, manches…)
+            usable.forEach(c => {
+                if (c === seed || c.share < 0.002 || reg[c.px[0]]) return;
+                if (part === 'hair' ? (c.cy > 0.5 || c.top > 0.3) : c.cy < 0.6) return;
+                if (c.px.filter(k => E[k]).length / c.n < 0.85) return;
+                grow(c.px);
+                if (!c.px.some(k => reg[k])) c.px.forEach(k => { if (E[k]) reg[k] = 1; }); // petite mèche fine
+            });
+            // bords : 2 pixels de plus sur les pixels de même teinte (reflets fins, anti-crénelage)
+            for (let pass = 0; pass < 2; pass++) {
+                const add = [];
+                for (let k = 0; k < N; k++) {
+                    if (reg[k] || !E[k]) continue;
+                    if (!colored && sL < 35 && lab[k * 3] < sL - 3) continue; // cheveux noirs : on garde les contours noirs
+                    const x = k % W, y = (k / W) | 0;
+                    if ((x > 0 && reg[k - 1]) || (x < W - 1 && reg[k + 1]) || (y > 0 && reg[k - W]) || (y < H - 1 && reg[k + W])) add.push(k);
+                }
+                add.forEach(k => { reg[k] = 1; });
+            }
+            // 3) nettoyage : trous bouchés (reflets, boutons, anti-crénelage) pour une zone bien pleine
+            const out = new Uint8Array(N); // extérieur de la zone, rempli depuis les bords
+            for (let i = 0; i < N; i++) { const x = i % W, y = (i / W) | 0; if (!reg[i] && (x === 0 || y === 0 || x === W - 1 || y === H - 1)) { out[i] = 1; stack.push(i); } }
+            while (stack.length) {
+                const k = stack.pop(), x = k % W, y = (k / W) | 0;
+                for (const j of [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1])
+                    if (j >= 0 && !reg[j] && !out[j]) { out[j] = 1; stack.push(j); }
+            }
+            let rn = 0; for (let i = 0; i < N; i++) if (reg[i]) rn++;
+            // trous intérieurs : petits trous bouchés (si ce n'est pas de la peau : yeux, visage restent intacts)
+            const seen = new Uint8Array(N);
+            for (let i = 0; i < N; i++) {
+                if (reg[i] || out[i] || seen[i]) continue;
+                const hole = []; seen[i] = 1; stack.push(i);
+                while (stack.length) { const k = stack.pop(), x = k % W, y = (k / W) | 0; hole.push(k); for (const j of [x > 0 ? k - 1 : -1, x < W - 1 ? k + 1 : -1, y > 0 ? k - W : -1, y < H - 1 ? k + W : -1]) if (j >= 0 && !reg[j] && !out[j] && !seen[j]) { seen[j] = 1; stack.push(j); } }
+                const skin = hole.filter(k => colIsSkin([lab[k * 3], lab[k * 3 + 1], lab[k * 3 + 2]])).length;
+                if (hole.length < rn * 0.04 && skin < hole.length * 0.3) hole.forEach(k => { reg[k] = 1; });
+            }
+            // petites encoches d'1 à 2 pixels entre la zone et les traits
+            for (let pass = 0; pass < 2; pass++) {
+                const add = [];
+                for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+                    const k = y * W + x;
+                    if (reg[k] || bg[k]) continue;
+                    if (!colored && sL < 35 && lab[k * 3] < sL - 3) continue;
+                    const n = reg[k - 1] + reg[k + 1] + reg[k - W] + reg[k + W];
+                    if (n >= 3 || (n === 2 && lab[k * 3] < sL && !colIsSkin([lab[k * 3], lab[k * 3 + 1], lab[k * 3 + 2]]))) add.push(k);
+                }
+                add.forEach(k => { reg[k] = 1; });
+            }
+            // 4) couleur de référence : les tons moyens de la zone (sans les ombres ni les reflets)
+            const Ls = []; for (let i = 0; i < N; i++) if (reg[i]) Ls.push(lab[i * 3]);
+            if (Ls.length < fg * 0.015) { col.part = 'main'; return; }
+            Ls.sort((a, b) => a - b);
+            const lo = Ls[Math.floor(Ls.length * 0.3)], hi = Ls[Math.floor(Ls.length * 0.7)];
             let L = 0, A = 0, B = 0, n = 0;
-            group.forEach(c => { c.px.forEach(k => { labels[k] = t; }); L += c.L; A += c.A; B += c.B; n += c.n; });
-            col.zones.push({ lab: [L / n, A / n, B / n], share: n / fg, where: part });
+            const t = col.zones.length;
+            for (let i = 0; i < N; i++) {
+                if (!reg[i]) continue;
+                labels[i] = t;
+                const l = lab[i * 3]; if (l >= lo && l <= hi) { L += l; A += lab[i * 3 + 1]; B += lab[i * 3 + 2]; n++; }
+            }
+            n = Math.max(1, n);
+            col.zones.push({ lab: [L / n, A / n, B / n], share: Ls.length / fg, where: part });
             col.sel = col.target = t;
             col.part = part;
             const q = document.querySelector('.cr-part');
@@ -6863,7 +6985,8 @@
                 let r, g, b;
                 if (z !== col.target) { r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
                 else if (c) {
-                    const nl = Math.max(0, Math.min(100, c[0] + (L - zl) * 0.85));
+                    // ombres : assombries en proportion (les traits noirs restent noirs) ; reflets : éclaircis
+                    const nl = Math.max(0, Math.min(100, L < zl ? c[0] * Math.max(0, L) / Math.max(1, zl) : c[0] + (L - zl) * 0.85));
                     [r, g, b] = lab2rgb(nl, c[1], c[2]);
                 } else {
                     const v = Math.round(Math.max(0, Math.min(255, 200 + (L - zl) * 1.2))); r = g = b = v;
