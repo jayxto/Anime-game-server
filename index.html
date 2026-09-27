@@ -594,6 +594,149 @@
         .bb-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
         @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}}
 </style>
+
+    <style>
+        /* ===== V7 : pseudos stylés, cadres, avatars ===== */
+        .cn{font-weight:800;}
+        .cn-cyan{color:#00f0ff;} .cn-rose{color:#ff5fa2;} .cn-jaune{color:#ffe600;} .cn-vert{color:#00ff88;}
+        .cn-violet{color:#b77bff;} .cn-orange{color:#ff9a3c;}
+        .cn-rainbow{background:linear-gradient(90deg,#ff4d4d,#ffd84d,#4dff88,#4da3ff,#b77bff,#ff4d4d);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 3s linear infinite;}
+        .cn-gold{background:linear-gradient(90deg,#b8860b,#ffd700,#fff6c2,#ffd700,#b8860b);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 2.2s linear infinite;text-shadow:0 0 10px rgba(255,215,0,.25);}
+        @keyframes cnMove{to{background-position:200% 0}}
+        .av{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;vertical-align:middle;border:2px solid #3a3a55;background:#1b1b2a;flex:0 0 auto;font-size:.8rem;font-weight:800;color:#aaa;margin-right:6px;}
+        .av img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .av.big{width:74px;height:74px;font-size:1.6rem;border-width:3px;margin:0;}
+        .fr-neon{border-color:#00f0ff;box-shadow:0 0 8px #00f0ff;}
+        .fr-fire{border-color:#ff7a00;box-shadow:0 0 10px #ff4d00,0 0 3px #ffd84d inset;animation:frFire 1.2s ease-in-out infinite alternate;}
+        .fr-sakura{border-color:#ffb7d5;box-shadow:0 0 9px #ff8fc4;}
+        .fr-thunder{border-color:#ffe600;box-shadow:0 0 10px #ffe600;animation:frThunder 2.4s infinite;}
+        .fr-dragon{border-color:#ffd700;box-shadow:0 0 12px #ffb300,0 0 2px #fff inset;}
+        .fr-cosmic{border-color:#8a5cff;box-shadow:0 0 12px #8a5cff,0 0 22px rgba(0,212,255,.6);animation:frCosmic 4s linear infinite;}
+        @keyframes frFire{to{box-shadow:0 0 16px #ff4d00,0 0 5px #ffd84d inset}}
+        @keyframes frThunder{0%,90%,100%{box-shadow:0 0 10px #ffe600}93%{box-shadow:0 0 22px #fff,0 0 30px #ffe600}}
+        @keyframes frCosmic{to{filter:hue-rotate(360deg)}}
+        .pl-name{display:inline-flex;align-items:center;min-width:0;}
+        .pl-btns{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+        .host-btn{background:transparent;border:1px solid var(--accent-yellow);color:var(--accent-yellow);border-radius:8px;padding:4px 8px;font-size:.75rem;font-weight:800;cursor:pointer;}
+        .team-tag{display:inline-block;font-size:.7rem;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:6px;color:#111;}
+
+        /* ===== Équipes ===== */
+        .team-lobby{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0;}
+        .team-col{background:#101018;border:2px solid #2c2c44;border-radius:10px;padding:8px;text-align:left;}
+        .team-col h4{margin:0 0 6px;font-size:.9rem;}
+        .team-col div{font-size:.82rem;padding:2px 0;}
+        .team-col button{margin-top:6px;width:100%;background:#2a2a40;color:#fff;border:0;border-radius:6px;padding:6px;font-weight:700;cursor:pointer;font-size:.78rem;}
+        .team-board{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0 10px;}
+        .team-board .tb{border-radius:10px;padding:6px 12px;font-weight:800;font-size:.85rem;background:#101018;border:2px solid;}
+
+        /* ===== Quêtes / historique / profil ===== */
+        .quest-row{display:flex;align-items:center;gap:10px;background:#101018;border-radius:8px;padding:8px 10px;margin-bottom:6px;text-align:left;}
+        .quest-row .qb{flex:1;min-width:0;}
+        .quest-row .qt{font-size:.85rem;font-weight:700;}
+        .quest-row .qbar{height:6px;background:#23233a;border-radius:99px;margin-top:5px;overflow:hidden;}
+        .quest-row .qbar div{height:100%;background:linear-gradient(90deg,var(--accent-cyan),#00ff88);}
+        .quest-row .qx{font-size:.75rem;font-weight:800;color:var(--accent-yellow);white-space:nowrap;}
+        .quest-row.done{outline:1px solid #00ff88;}
+        .quest-row.done .qt::after{content:' ✅';}
+        .hist-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;background:#101018;border-radius:8px;padding:7px 10px;margin-bottom:5px;font-size:.82rem;text-align:left;}
+        .hist-row small{color:var(--text-muted);}
+        .hist-row .w{color:#00ff88;font-weight:800;} .hist-row .l{color:var(--text-muted);font-weight:700;}
+        .anime-stat{display:grid;grid-template-columns:1fr 110px 44px;align-items:center;gap:8px;font-size:.8rem;padding:3px 0;text-align:left;}
+        .anime-stat .ab{height:8px;background:#23233a;border-radius:99px;overflow:hidden;}
+        .anime-stat .ab div{height:100%;background:linear-gradient(90deg,var(--accent-pink),var(--accent-yellow),#00ff88);}
+        .best-worst{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;}
+        .best-worst div{background:#101018;border-radius:10px;padding:10px;text-align:center;font-size:.8rem;}
+        .best-worst b{display:block;font-size:1rem;margin:4px 0;}
+        .cos-grid{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px;}
+        .cos-chip{background:#101018;border:2px solid #2c2c44;border-radius:10px;padding:6px 10px;font-size:.8rem;font-weight:700;cursor:pointer;color:#fff;}
+        .cos-chip.on{border-color:var(--accent-cyan);}
+        .cos-chip.lock{opacity:.45;cursor:not-allowed;}
+        .cos-preview{display:flex;align-items:center;gap:12px;background:#101018;border-radius:12px;padding:12px;margin-bottom:10px;}
+        .cos-preview .cn{font-size:1.2rem;}
+        .v7-modal{position:fixed;inset:0;z-index:10001;background:rgba(5,5,10,.85);display:flex;align-items:center;justify-content:center;padding:14px;}
+        .v7-box{width:100%;max-width:520px;max-height:88vh;overflow:auto;background:#161622;border:2px solid var(--accent-cyan);border-radius:14px;padding:16px;text-align:left;}
+        .v7-box h3{margin:0 0 10px;color:var(--accent-yellow);}
+        .v7-close{float:right;background:none;border:0;color:#fff;font-size:1.3rem;cursor:pointer;}
+        .av-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:10px;}
+        .av-item{background:#101018;border:2px solid #2c2c44;border-radius:10px;padding:4px;cursor:pointer;text-align:center;font-size:.68rem;color:#ddd;}
+        .av-item img{width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:8px;background:#1b1b2a;}
+        .av-item:hover{border-color:var(--accent-cyan);}
+        .friend-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#101018;border-radius:10px;padding:8px 10px;margin-bottom:6px;}
+        .friend-row .fs{font-size:.72rem;color:var(--text-muted);}
+        .friend-row .on{color:#00ff88;}
+        .friend-row button{background:#2a2a40;color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:.75rem;font-weight:800;cursor:pointer;}
+        .friend-row button.go{background:var(--accent-cyan);color:#000;}
+        .v7-input{width:100%;background:#0b0b10;border:1px solid #2c2c44;border-radius:8px;color:#fff;padding:10px;font-size:.9rem;margin-bottom:8px;box-sizing:border-box;font-family:inherit;}
+        .sugg-row{background:#101018;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:.8rem;text-align:left;}
+        .sugg-row b{color:var(--accent-cyan);}
+
+        /* ===== Bouton hôte en partie ===== */
+        #host-fab{position:fixed;right:12px;bottom:74px;z-index:9995;background:var(--accent-yellow);color:#111;border:0;border-radius:99px;padding:9px 13px;font-weight:800;font-size:.85rem;box-shadow:0 4px 18px rgba(0,0,0,.5);cursor:pointer;display:none;}
+
+        /* ===== Dessine le perso ===== */
+        .draw-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+        .draw-timer{font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow);min-width:52px;text-align:center;background:#101018;border-radius:10px;padding:2px 10px;}
+        .draw-timer.low{color:var(--accent-pink);animation:arcPop .5s infinite alternate;}
+        .draw-word{font-family:monospace;font-size:clamp(1.2rem,4.5vw,1.9rem);letter-spacing:.28em;text-align:center;font-weight:800;margin:8px 0 2px;color:#fff;word-break:break-word;}
+        .draw-word.me{letter-spacing:.04em;font-family:inherit;color:#00ff88;}
+        .draw-anime{text-align:center;color:var(--accent-cyan);font-size:.85rem;min-height:1.2em;}
+        .draw-main{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px;margin-top:10px;}
+        .draw-canvas-wrap{position:relative;width:100%;aspect-ratio:1;background:#fff;border-radius:12px;overflow:hidden;border:3px solid #2c2c44;touch-action:none;}
+        #draw-canvas{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;}
+        .draw-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(11,11,16,.88);color:#fff;text-align:center;padding:14px;}
+        .draw-overlay.on{display:flex;}
+        .draw-overlay .opt{background:#1d1d2c;border:2px solid var(--accent-cyan);color:#fff;border-radius:12px;padding:12px 16px;font-weight:800;cursor:pointer;width:min(320px,90%);font-size:1rem;}
+        .draw-overlay .opt small{display:block;color:var(--accent-cyan);font-weight:600;font-size:.75rem;}
+        .draw-overlay img{max-width:60%;max-height:48%;border-radius:12px;object-fit:contain;}
+        .draw-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin-top:8px;}
+        .draw-tools .sw{width:26px;height:26px;border-radius:50%;border:2px solid #2c2c44;cursor:pointer;padding:0;}
+        .draw-tools .sw.on{border-color:#fff;transform:scale(1.15);box-shadow:0 0 0 2px var(--accent-cyan);}
+        .draw-tools .tb{background:#1d1d2c;color:#fff;border:2px solid #2c2c44;border-radius:8px;padding:5px 9px;font-weight:800;cursor:pointer;font-size:.85rem;}
+        .draw-tools .tb.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+        .draw-tools input[type=color]{width:32px;height:30px;border:0;background:none;padding:0;cursor:pointer;}
+        .draw-side{display:flex;flex-direction:column;gap:8px;min-width:0;}
+        .draw-chat{background:#0b0b10;border:1px solid #2a2a40;border-radius:10px;height:260px;overflow-y:auto;padding:8px;font-size:.82rem;text-align:left;}
+        .draw-chat div{margin-bottom:4px;word-break:break-word;}
+        .draw-chat .sys{color:var(--accent-yellow);font-weight:700;}
+        .draw-chat .ok{color:#00ff88;font-weight:800;}
+        .draw-chat .found{opacity:.6;}
+        .draw-input{display:flex;gap:6px;}
+        .draw-input input{flex:1;min-width:0;background:#0b0b10;border:2px solid #2c2c44;border-radius:10px;color:#fff;padding:10px;font-size:1rem;}
+        .draw-input button{background:var(--accent-cyan);color:#000;border:0;border-radius:10px;padding:0 14px;font-weight:800;font-size:1.1rem;cursor:pointer;}
+        @media (max-width:760px){.draw-main{grid-template-columns:1fr;}.draw-chat{height:150px;}}
+
+        /* ===== Colorie le perso ===== */
+        .col-wrap{width:100%;max-width:760px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:start;}
+        .col-head{grid-column:1/-1;text-align:center;font-size:1.05rem;}
+        .col-head b{color:var(--accent-yellow);font-size:1.25rem;}
+        .col-canvas-wrap{position:relative;background:#0b0b10;border-radius:12px;border:2px solid #2c2c44;display:flex;justify-content:center;align-items:center;padding:6px;}
+        .col-canvas{max-width:100%;touch-action:manipulation;cursor:pointer;border-radius:8px;}
+        .col-side{display:flex;flex-direction:column;gap:8px;}
+        .col-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+        .col-zone{border:2px solid #2c2c44;border-radius:10px;background:#101018;color:#fff;padding:5px 4px;font-size:.7rem;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;}
+        .col-zone i{width:100%;height:18px;border-radius:6px;display:block;background:repeating-linear-gradient(45deg,#555 0 5px,#777 5px 10px);}
+        .col-zone.on{border-color:var(--accent-cyan);box-shadow:0 0 0 2px rgba(0,240,255,.3);}
+        .col-sv{width:100%;height:130px;border-radius:10px;cursor:crosshair;touch-action:none;display:block;}
+        .col-hue{width:100%;height:22px;border-radius:99px;cursor:pointer;touch-action:none;display:block;}
+        .col-sw{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;}
+        .col-sw button{aspect-ratio:1;border-radius:6px;border:1px solid #2c2c44;cursor:pointer;padding:0;}
+        .col-hex{display:flex;gap:6px;align-items:center;}
+        .col-hex span{width:34px;height:30px;border-radius:8px;border:2px solid #fff;display:block;flex:0 0 auto;}
+        .col-hex input{flex:1;min-width:0;background:#0b0b10;border:1px solid #2c2c44;border-radius:8px;color:#fff;padding:6px 8px;font-family:monospace;}
+        .col-submit{margin-top:4px !important;background:#00ff88 !important;color:#111 !important;}
+        .col-reveal{width:100%;max-width:820px;}
+        .col-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+        .col-pair figure{margin:0;background:#0b0b10;border-radius:12px;padding:8px;text-align:center;border:2px solid #2c2c44;}
+        .col-pair img,.col-pair canvas{max-width:100%;max-height:300px;border-radius:8px;object-fit:contain;}
+        .col-pair figcaption{font-weight:800;margin-top:6px;}
+        .col-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+        .col-gallery div{background:#101018;border-radius:10px;padding:6px;text-align:center;font-size:.75rem;border:2px solid #2c2c44;}
+        .col-gallery div.me{border-color:var(--accent-cyan);}
+        .col-gallery img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:6px;background:#0b0b10;}
+        .col-gallery b{display:block;font-size:1rem;color:var(--accent-yellow);}
+        .col-pct{font-family:'Bangers',cursive;font-size:2rem;color:#00ff88;}
+        @media (max-width:760px){.col-wrap{grid-template-columns:1fr;}.col-zones{grid-template-columns:repeat(6,1fr);}.col-zone{font-size:.6rem;}}
+    </style>
 </head>
 <body>
 
@@ -680,6 +823,11 @@
                 <div id="daily-board" class="daily-board" style="display:none;"></div>
             </div>
 
+            <div id="quest-card" class="daily-card">
+                <div class="daily-head"><h3>📜 Quêtes du jour</h3><span class="tl-hint">XP bonus</span></div>
+                <div id="quest-list"><p class="tl-hint">Chargement…</p></div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; display: flex; justify-content: space-between; align-items: center; text-align: left;">
                     <div>
@@ -734,8 +882,15 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve les vraies couleurs d'un perso de mémoire</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ff9a3c;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">✏️ Dessine le perso <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Chacun son tour, un joueur dessine un perso et les autres devinent le plus vite possible • indices au fil du temps • 2 joueurs min.</p>
+                    <button class="btn-action" style="margin-top:0;background:#ff9a3c;color:#111;" onclick="openUniverseSelection('draw')">Créer une partie</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#00ff88;">
@@ -857,6 +1012,17 @@
                 </select>
                 <b id="room-rounds-text"></b>
             </div>
+            <div id="room-teams-box" class="room-rounds" style="display:none;">
+                <span>👥 Équipes :</span>
+                <select id="room-teams-select" onchange="setTeams(this.value)"><option value="0">Chacun pour soi</option><option value="2">2 équipes</option><option value="3">3 équipes</option><option value="4">4 équipes</option></select>
+                <b id="room-teams-text"></b>
+            </div>
+            <div id="room-draw-box" class="room-rounds" style="display:none;">
+                <span>✏️ Tours de dessin :</span>
+                <select id="room-draw-select" onchange="setDrawTours(this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+                <b id="room-draw-text"></b>
+            </div>
+            <button class="invite-btn" id="invite-friend-btn" style="display:none;" onclick="openFriendInvite()">📨 Inviter un ami</button>
             <div id="room-visibility-box" class="room-visibility">
                 <label id="room-public-label" class="room-public-toggle" style="display:none;">
                     <input type="checkbox" id="room-public-checkbox" onchange="setRoomPublic(this.checked)">
@@ -866,6 +1032,7 @@
             </div>
 
             <p>Joueurs connectés :</p>
+            <div id="team-lobby" class="team-lobby" style="display:none;"></div>
             <ul class="player-list" id="waiting-players-list"></ul>
 
             <div id="dle-enrichment-progress"></div>
@@ -1144,6 +1311,31 @@
             </div>
         </div>
 
+        <div id="draw-room" class="game-panel" style="display:none;max-width:1000px;margin:0 auto;">
+            <div class="draw-top">
+                <button class="btn-action" style="width:auto;margin:0;padding:6px 12px;background:#2a2a40;" onclick="backToMenu()">🔙 Salon</button>
+                <div id="draw-status" style="font-weight:800;"></div>
+                <div id="draw-timer" class="draw-timer">--</div>
+            </div>
+            <div id="draw-word" class="draw-word"></div>
+            <div id="draw-anime" class="draw-anime"></div>
+            <div class="draw-main">
+                <div>
+                    <div class="draw-canvas-wrap"><canvas id="draw-canvas" width="700" height="700"></canvas><div id="draw-overlay" class="draw-overlay"></div></div>
+                    <div id="draw-tools" class="draw-tools" style="display:none;"></div>
+                </div>
+                <div class="draw-side">
+                    <div id="draw-scores" class="quote-scoreboard" style="display:block;"></div>
+                    <div id="draw-chat" class="draw-chat"></div>
+                    <div class="draw-input"><input id="draw-input" maxlength="60" autocomplete="off" placeholder="Ta réponse…" onkeydown="if(event.key==='Enter')drawSendGuess()"><button onclick="drawSendGuess()">➤</button></div>
+                </div>
+            </div>
+            <div id="draw-end" style="display:none;gap:10px;margin-top:12px;">
+                <button id="draw-replay" class="btn-action" style="background:#00ff88;color:#111;margin-top:0;" onclick="drawReplay()">Rejouer</button>
+                <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
+            </div>
+        </div>
+
         <div id="arcade-room" class="game-panel" style="display:none;max-width:950px;margin:0 auto;">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                 <div><h2 id="arc-title" style="margin:0;">MINI-JEU</h2><div id="arc-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
@@ -1300,6 +1492,32 @@
         <div class="opt-panel">
             <h2>⭐ Progression</h2>
             <div id="prog-box"><p class="tl-hint">Chargement…</p></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>✨ Mon style, quêtes & historique</h2>
+            <div id="v7-profile"><p class="tl-hint">Chargement…</p></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>👥 Amis</h2>
+            <div id="v7-friends"><p class="tl-hint">Chargement…</p></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>💡 Proposer un ajout</h2>
+            <p class="tl-hint" style="text-align:left;">Un opening, un perso ou une citation manque ? Un bug ? Dis-le ici.</p>
+            <select id="sg-kind" class="v7-input"><option value="opening">🎵 Opening / ending</option><option value="perso">👤 Perso manquant</option><option value="citation">💬 Citation</option><option value="scene">🎬 Scène culte</option><option value="anime">🎌 Nouvel anime</option><option value="bug">🐛 Bug</option><option value="autre">💡 Autre idée</option></select>
+            <input id="sg-anime" class="v7-input" maxlength="80" placeholder="Anime (ex : Frieren)">
+            <input id="sg-name" class="v7-input" maxlength="120" placeholder="Nom (opening, perso, citation…)">
+            <input id="sg-link" class="v7-input" maxlength="300" placeholder="Lien YouTube (facultatif)">
+            <textarea id="sg-note" class="v7-input" maxlength="500" rows="3" placeholder="Détails (facultatif)"></textarea>
+            <button class="btn-action" style="margin-top:0;" onclick="sendSuggestion()">Envoyer</button>
+        </div>
+
+        <div class="opt-panel" id="v7-admin" style="display:none;">
+            <h2>📬 Propositions reçues</h2>
+            <div id="v7-admin-list"></div>
         </div>
 
         <div class="opt-panel">
@@ -1847,6 +2065,8 @@
             arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_popularite: { title:'👥 POPULARITY GUESS', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_couleur:    { title:'🎨 COLORIE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
         function openUniverseSelection(mode) {
@@ -2015,7 +2235,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room','draw-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -2032,16 +2252,7 @@
 
             const list = document.getElementById('waiting-players-list');
             list.innerHTML = "";
-            const _iAmHost = room.host === socket.id;
-            const _esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-            room.players.forEach(p => {
-                const crown = p.id === room.host ? ' 👑' : '';
-                const me = p.id === socket.id ? ' <span style="color:var(--text-muted);font-size:.8rem;">(toi)</span>' : '';
-                const right = (_iAmHost && p.id !== socket.id)
-                    ? `<span style="display:flex;align-items:center;gap:8px;"><span style="color:#00ff88">Prêt</span><button class="kick-btn" onclick="kickPlayer('${p.id}', this)" data-name="${_esc(p.name)}" title="Exclure">✖ Exclure</button></span>`
-                    : `<span style="color:#00ff88">Prêt</span>`;
-                list.innerHTML += `<li><span>${_esc(p.name)}${crown}${me}</span> ${right}</li>`;
-            });
+            renderLobbyPlayers(room);
 
             if (room.host === socket.id) {
                 document.getElementById('btn-start-game').style.display = 'block';
@@ -4048,6 +4259,7 @@
             imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
             audio:{ title:'🎧 ÉCOUTE LA SCÈNE', sub:"Pas d'image, juste le son d'une scène culte : de quel anime vient-elle ?", universe:false },
             chrono:{ title:'⏱️ CHRONO-QUIZ', sub:'60 secondes pour enchaîner un max de bonnes réponses (bonus de série)', universe:false },
+            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Retrouve les vraies couleurs du perso de mémoire : le plus ressemblant gagne', universe:true },
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
@@ -5461,7 +5673,7 @@
         setInterval(() => {
             const bar = document.getElementById('fx-react-bar');
             if (!bar) return;
-            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room']
+            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room', 'draw-room']
                 .some(id => { const el = document.getElementById(id); return el && el.offsetParent !== null; });
             bar.style.display = inRoom ? 'flex' : 'none';
         }, 700);
@@ -5696,6 +5908,847 @@
 
         tryAutoLogin();
 
+
+        /* =====================================================================
+           V7 : pseudos stylés, avatars, équipes, hôte, quêtes, historique, amis,
+                propositions, Dessine le perso, Colorie le perso
+           ===================================================================== */
+        const v7esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const cosById = {};
+        function cosNameHtml(name, cos) { return `<span class="cn cn-${v7esc((cos && cos.color) || 'default')}">${v7esc(name)}</span>`; }
+        function avatarHtml(name, cos, big) {
+            const fr = (cos && cos.frame) || 'none';
+            const inner = cos && cos.avatar ? `<img src="${v7esc(cos.avatar)}" alt="" loading="lazy" decoding="async">` : v7esc(String(name || '?').charAt(0).toUpperCase());
+            return `<span class="av fr-${v7esc(fr)}${big ? ' big' : ''}">${inner}</span>`;
+        }
+        function authHeaders(json) { const h = authToken ? { Authorization: 'Bearer ' + authToken } : {}; if (json) h['Content-Type'] = 'application/json'; return h; }
+        async function v7get(url) { try { const r = await fetch(url, { headers: authHeaders() }); return await r.json(); } catch (e) { return null; } }
+        async function v7post(url, body) { try { const r = await fetch(url, { method: 'POST', headers: authHeaders(true), body: JSON.stringify(body || {}) }); return await r.json(); } catch (e) { return null; } }
+        const isAccount = () => !!authToken && !(currentUser && currentUser.isGuest);
+        let lastHostId = null, lastRoomState = null;
+
+        /* ---------- Salon d'attente : joueurs, équipes, tours de dessin ---------- */
+        const TEAM_UI = [['Rouge', '#ff4d6d', '🔴'], ['Bleue', '#4da3ff', '🔵'], ['Verte', '#2ee88a', '🟢'], ['Jaune', '#ffd84d', '🟡']];
+        function renderLobbyPlayers(room) {
+            lastRoomState = room; lastHostId = room.host;
+            const list = document.getElementById('waiting-players-list');
+            if (!list) return;
+            const iAmHost = room.host === socket.id;
+            room.players.forEach(p => { cosById[p.id] = p.cos || null; });
+            list.innerHTML = room.players.map(p => {
+                const crown = p.id === room.host ? ' 👑' : '';
+                const me = p.id === socket.id ? ' <span style="color:var(--text-muted);font-size:.8rem;">(toi)</span>' : '';
+                const team = room.teams >= 2 && p.team != null ? `<span class="team-tag" style="background:${TEAM_UI[p.team][1]}">${TEAM_UI[p.team][2]}</span>` : '';
+                const btns = iAmHost && p.id !== socket.id
+                    ? `<button class="host-btn" onclick="transferHost('${p.id}', this)" title="Donner l'hôte">👑</button><button class="kick-btn" onclick="kickPlayer('${p.id}', this)" title="Exclure">✖ Exclure</button>`
+                    : `<span style="color:#00ff88">Prêt</span>`;
+                return `<li><span class="pl-name">${avatarHtml(p.name, p.cos)}${cosNameHtml(p.name, p.cos)}${crown}${me}${team}</span><span class="pl-btns">${btns}</span></li>`;
+            }).join('');
+            // équipes
+            const tbox = document.getElementById('room-teams-box');
+            const teamsOk = room.mode === 'arcade' || room.mode === 'blindtest';
+            if (tbox) {
+                tbox.style.display = teamsOk ? 'flex' : 'none';
+                const sel = document.getElementById('room-teams-select'), txt = document.getElementById('room-teams-text');
+                sel.value = String(room.teams || 0); sel.style.display = iAmHost ? '' : 'none';
+                txt.textContent = iAmHost ? '' : (room.teams >= 2 ? room.teams + ' équipes' : 'Chacun pour soi');
+            }
+            const tl = document.getElementById('team-lobby');
+            if (tl) {
+                if (teamsOk && room.teams >= 2) {
+                    const mine = (room.players.find(p => p.id === socket.id) || {}).team;
+                    tl.style.display = 'grid';
+                    tl.innerHTML = TEAM_UI.slice(0, room.teams).map(([n, c, ic], i) => `<div class="team-col" style="border-color:${c}"><h4 style="color:${c}">${ic} Équipe ${n}</h4>${room.players.filter(p => p.team === i).map(p => `<div>${cosNameHtml(p.name, p.cos)}</div>`).join('') || '<div class="tl-hint">Personne</div>'}${mine === i ? '' : `<button onclick="joinTeam(${i})">Rejoindre</button>`}</div>`).join('');
+                } else { tl.style.display = 'none'; tl.innerHTML = ''; }
+            }
+            // tours de dessin
+            const dbox = document.getElementById('room-draw-box');
+            if (dbox) {
+                dbox.style.display = room.mode === 'draw' ? 'flex' : 'none';
+                const sel = document.getElementById('room-draw-select'), txt = document.getElementById('room-draw-text');
+                sel.value = String(room.drawTours || 2); sel.style.display = iAmHost ? '' : 'none';
+                txt.textContent = iAmHost ? '' : (room.drawTours || 2) + ' tour(s)';
+            }
+            const inv = document.getElementById('invite-friend-btn');
+            if (inv) inv.style.display = isAccount() ? '' : 'none';
+        }
+        function setTeams(v) { socket.emit('set_teams', { roomCode: currentRoomCode, teams: +v }); }
+        function joinTeam(i) { socket.emit('join_team', { roomCode: currentRoomCode, team: i }); }
+        function setDrawTours(v) { socket.emit('set_draw_tours', { roomCode: currentRoomCode, tours: +v }); }
+        function transferHost(id, btn) {
+            if (!btn.classList.contains('armed')) {
+                document.querySelectorAll('.host-btn.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '👑'; });
+                btn.classList.add('armed'); btn.textContent = 'Confirmer ?';
+                setTimeout(() => { if (btn.isConnected && btn.classList.contains('armed')) { btn.classList.remove('armed'); btn.textContent = '👑'; } }, 3000);
+                return;
+            }
+            btn.disabled = true;
+            socket.emit('transfer_host', { roomCode: currentRoomCode, targetId: id });
+        }
+        socket.on('host_changed', d => { if (d) lastHostId = d.hostId; hostFabUpdate(); });
+
+        /* ---------- Bouton hôte en pleine partie : exclure / donner l'hôte ---------- */
+        const GAME_PANELS = ['gameplay-room', 'rg-room', 'enchere-room', 'enchereaveugle-room', 'connexion-room', 'dle-room', 'quote-room', 'blindtest-room', 'arcade-room', 'draw-room'];
+        function hostFabUpdate() {
+            const fab = document.getElementById('host-fab');
+            if (!fab) return;
+            const inGame = !!currentRoomCode && GAME_PANELS.some(id => { const el = document.getElementById(id); return el && el.style.display !== 'none' && el.offsetParent !== null; });
+            fab.style.display = inGame && lastHostId === socket.id ? 'block' : 'none';
+        }
+        setInterval(hostFabUpdate, 800);
+        function openHostPanel() { socket.emit('room_players', { roomCode: currentRoomCode }); }
+        socket.on('room_players', d => {
+            if (!d || d.roomCode !== currentRoomCode) return;
+            lastHostId = d.host;
+            document.getElementById('v7-host-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'v7-host-modal';
+            m.innerHTML = `<div class="v7-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>👥 Joueurs du salon</h3>
+                ${d.players.map(p => `<div class="friend-row"><span class="pl-name">${avatarHtml(p.name, p.cos)}${cosNameHtml(p.name, p.cos)}${p.id === d.host ? ' 👑' : ''}${p.offline ? ' 📡' : ''}</span>
+                ${p.id === socket.id ? '<span class="fs">toi</span>' : `<span class="pl-btns"><button class="host-btn" onclick="transferHost('${p.id}', this)">👑 Hôte</button><button class="kick-btn" onclick="kickPlayer('${p.id}', this)">✖ Exclure</button></span>`}</div>`).join('')}
+                <p class="tl-hint">Appuie deux fois pour confirmer.</p></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+        });
+        socket.on('update_room', r => { if (r && r.code === currentRoomCode) { lastHostId = r.host; lastRoomState = r; (r.players || []).forEach(p => { cosById[p.id] = p.cos || null; }); } });
+        socket.on('kicked', () => { document.getElementById('v7-host-modal')?.remove(); });
+
+        /* ---------- Scores en jeu : pseudos stylés + équipes ---------- */
+        function v7DecorateBoard(boardId, q, sortKey) {
+            const board = document.getElementById(boardId);
+            if (!board || !q || !q.players) return;
+            (q.players || []).forEach(p => { if (p.cos) cosById[p.id] = p.cos; });
+            const sorted = [...q.players].sort((a, b) => b.score - a.score);
+            [...board.children].forEach((row, i) => {
+                const p = sorted[i];
+                if (!p || row.dataset.v7 === p.id + '|' + row.textContent) return;
+                const span = row.querySelector('span');
+                if (span && (p.cos && p.cos.color && p.cos.color !== 'default')) span.classList.add('cn', 'cn-' + p.cos.color);
+                if (p.team != null && q.teams) row.style.borderLeft = '4px solid ' + TEAM_UI[p.team][1];
+                row.dataset.v7 = p.id + '|' + row.textContent;
+            });
+            let tb = document.getElementById(boardId + '-teams');
+            if (!q.teams) { if (tb) tb.remove(); return; }
+            if (!tb) { tb = document.createElement('div'); tb.id = boardId + '-teams'; tb.className = 'team-board'; board.parentNode.insertBefore(tb, board); }
+            tb.innerHTML = q.teams.map((t, i) => `<span class="tb" style="border-color:${t.color};color:${t.color}">${i === 0 && t.score > 0 ? '👑 ' : ''}${t.icon} ${v7esc(t.name)} : ${t.score} pts</span>`).join('');
+        }
+        function v7TeamWinner(resultId, q) {
+            if (!q || !q.teams || q.phase !== 'finished') return;
+            const el = document.getElementById(resultId);
+            if (!el) return;
+            const key = 'tw|' + q.teams.map(t => t.score).join(',');
+            el.style.color = 'var(--accent-yellow)';
+            el.textContent = q.teamWinner ? `🏆 ${q.teamWinner} gagne la partie ! (${q.teams[0].score} pts)` : `🤝 Égalité entre les équipes !`;
+            if (window.__v7tw !== key) {
+                window.__v7tw = key;
+                const me = q.players.find(p => p.id === socket.id);
+                if (me && q.teamWinnerMembers && q.teamWinnerMembers.includes(me.name)) confetti();
+            }
+        }
+        socket.on('arc_state', q => {
+            if (!q) return;
+            lastHostId = q.hostId;
+            v7DecorateBoard('arc-scoreboard', q);
+            v7TeamWinner('arc-result', q);
+            if (q.game === 'couleur') colAfterRender(q);
+        });
+        socket.on('bt_state', q => {
+            if (!q) return;
+            lastHostId = q.hostId;
+            v7DecorateBoard('bt-scoreboard', q);
+            v7TeamWinner('bt-result', q);
+        });
+
+        /* ---------- Chat : pseudo stylé ---------- */
+        socket.on('chat_message', d => {
+            const box = document.getElementById('chat-messages');
+            const cos = d && cosById[d.authorId];
+            if (!box || !cos || !cos.color || cos.color === 'default') return;
+            const line = box.lastElementChild;
+            const span = line && line.querySelector('span');
+            if (span) { span.classList.add('cn', 'cn-' + cos.color); span.style.color = ''; }
+        });
+
+        /* ---------- Réactions débloquées avec le niveau ---------- */
+        let v7Emojis = [];
+        const V7_EMOJIS = [['🥶', 2], ['🤡', 4], ['👀', 6], ['🍥', 9], ['⚡', 11], ['🫡', 14], ['🗿', 17], ['👑', 22]];
+        function v7EmojisFromUser(u) {
+            const lvl = (u && (u.level || (u.cos && u.cos.lvl))) || 1;
+            v7Emojis = V7_EMOJIS.map(([emoji, need]) => ({ emoji, need, unlocked: lvl >= need }));
+            v7RenderEmojiBar();
+        }
+        socket.on('connect', () => setTimeout(() => v7EmojisFromUser(currentUser), 300));
+        socket.on('profile_updated', d => { if (d && d.user && currentUser && !currentUser.isGuest) { Object.assign(currentUser, d.user); v7EmojisFromUser(currentUser); } });
+        function v7RenderEmojiBar() {
+            const bar = document.getElementById('fx-react-bar');
+            if (!bar) return;
+            bar.querySelectorAll('.v7e').forEach(b => b.remove());
+            v7Emojis.filter(e => e.unlocked).forEach(e => {
+                const b = document.createElement('button'); b.className = 'v7e'; b.textContent = e.emoji;
+                b.onclick = () => sendReaction(e.emoji);
+                bar.appendChild(b);
+            });
+        }
+
+        /* ---------- Quêtes du jour ---------- */
+        function questHtml(list) {
+            return (list || []).map(q => `<div class="quest-row${q.done ? ' done' : ''}"><div class="qb"><div class="qt">${v7esc(q.label)}</div><div class="qbar"><div style="width:${Math.round(100 * q.progress / Math.max(1, q.n))}%"></div></div></div><span class="qx">${q.progress}/${q.n} • +${q.xp} XP</span></div>`).join('');
+        }
+        async function loadQuests() {
+            const box = document.getElementById('quest-list');
+            if (!box) return;
+            const d = await v7get('/api/quests');
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Quêtes indisponibles.</p>'; return; }
+            box.innerHTML = questHtml(d.quests) + (isAccount() ? '<p class="tl-hint">Nouvelles quêtes chaque jour à minuit.</p>' : '<p class="tl-hint">Crée un compte pour valider les quêtes et gagner l\'XP.</p>');
+        }
+        socket.on('connect', () => setTimeout(loadQuests, 400));
+        socket.on('xp_gain', d => {
+            if (!d) return;
+            (d.quests || []).forEach((q, i) => setTimeout(() => { toast(`📜 Quête terminée : <b>${v7esc(q.label)}</b><br><small>+${q.xp} XP</small>`, '#00ff88'); confetti(1200); }, 1400 + i * 900));
+            setTimeout(loadQuests, 1500);
+        });
+
+        /* ---------- Profil étendu : quêtes, cosmétiques, avatar, historique, stats par anime ---------- */
+        async function loadProfileExtra() {
+            const box = document.getElementById('v7-profile');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour débloquer les cosmétiques, l\'avatar, les amis et l\'historique.</p>'; return; }
+            const d = await v7get('/api/profile/extra');
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Indisponible pour le moment.</p>'; return; }
+            const c = d.cosmetics, cur = c.current || {};
+            v7Emojis = c.emojis || []; v7RenderEmojiBar();
+            const me = currentUser ? currentUser.pseudo : '';
+            box.innerHTML = `
+                <div class="cos-preview">${avatarHtml(me, cur, true)}<div><div>${cosNameHtml(me, cur)}</div><div class="tl-hint" style="text-align:left;">Niveau ${c.level}${cur.avatarName ? ' • avatar : ' + v7esc(cur.avatarName) : ''}</div>
+                <button class="host-btn" style="margin-top:6px;" onclick="openAvatarPicker()">🖼️ Choisir mon avatar</button></div></div>
+                <h3 style="margin:10px 0 4px;color:var(--accent-yellow);">🎨 Couleur du pseudo</h3>
+                <div class="cos-grid">${c.colors.map(x => `<button class="cos-chip${x.id === cur.color ? ' on' : ''}${x.unlocked ? '' : ' lock'}" ${x.unlocked ? `onclick="setCos('color','${x.id}')"` : ''}>${x.unlocked ? `<span class="cn cn-${x.id}">${v7esc(x.name)}</span>` : '🔒 ' + v7esc(x.name) + ' • nv ' + x.need}</button>`).join('')}</div>
+                <h3 style="margin:10px 0 4px;color:var(--accent-yellow);">🖼️ Cadre de profil</h3>
+                <div class="cos-grid">${c.frames.map(x => `<button class="cos-chip${x.id === cur.frame ? ' on' : ''}${x.unlocked ? '' : ' lock'}" ${x.unlocked ? `onclick="setCos('frame','${x.id}')"` : ''}>${x.unlocked ? v7esc(x.name) : '🔒 ' + v7esc(x.name) + ' • nv ' + x.need}</button>`).join('')}</div>
+                <h3 style="margin:10px 0 4px;color:var(--accent-yellow);">😀 Réactions bonus</h3>
+                <div class="cos-grid">${c.emojis.map(x => `<span class="cos-chip${x.unlocked ? ' on' : ' lock'}">${x.unlocked ? x.emoji : '🔒 ' + x.emoji + ' nv ' + x.need}</span>`).join('')}</div>
+                <h3 style="margin:14px 0 6px;color:var(--accent-yellow);">📜 Quêtes du jour</h3>${questHtml(d.quests)}
+                <h3 style="margin:14px 0 6px;color:var(--accent-yellow);">🎌 Tes animes</h3>
+                ${d.best || d.worst ? `<div class="best-worst"><div>💪 Ton meilleur anime<b style="color:#00ff88">${v7esc(d.best ? d.best.anime : '—')}</b>${d.best ? d.best.pct + ' % de bonnes réponses' : ''}</div><div>😵 Ton pire anime<b style="color:var(--accent-pink)">${v7esc(d.worst ? d.worst.anime : '—')}</b>${d.worst ? d.worst.pct + ' % de bonnes réponses' : ''}</div></div>` : ''}
+                ${d.animes.length ? d.animes.slice(0, 15).map(a => `<div class="anime-stat"><span>${v7esc(a.anime)} <small style="color:var(--text-muted)">(${a.n})</small></span><div class="ab"><div style="width:${a.pct}%"></div></div><b>${a.pct}%</b></div>`).join('') : '<p class="tl-hint">Joue au blind test ou aux mini-jeux pour voir tes stats par anime (5 réponses min. pour le meilleur/pire).</p>'}
+                <h3 style="margin:14px 0 6px;color:var(--accent-yellow);">🕘 Historique des parties</h3>
+                ${d.history.length ? d.history.map(h => `<div class="hist-row"><span>${v7esc(h.label)}${h.universe ? ' • ' + v7esc(h.universe) : ''}</span><span class="${h.won ? 'w' : 'l'}">${h.won ? '🏆 Victoire' : h.rank ? '#' + h.rank + (h.players ? '/' + h.players : '') : '—'}</span><small>${new Date(h.at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</small><small>${h.points} pts</small></div>`).join('') : '<p class="tl-hint">Aucune partie pour le moment.</p>'}`;
+        }
+        async function setCos(kind, id) {
+            const d = await v7post('/api/cosmetics', { [kind]: id });
+            if (d && d.ok) { toast('✨ Style mis à jour !', 'var(--accent-cyan)'); loadProfileExtra(); } else toast('🔒 ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+        function openAvatarPicker() {
+            document.getElementById('v7-av-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'v7-av-modal';
+            m.innerHTML = `<div class="v7-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>🖼️ Choisis ton perso préféré</h3>
+                <input class="v7-input" id="av-q" placeholder="Cherche un perso (ex : Gojo, Luffy…)" autocomplete="off">
+                <button class="host-btn" onclick="setAvatar(null)">Retirer mon avatar</button>
+                <div class="av-grid" id="av-grid"><div class="arc-loading"><div class="arc-spin"></div></div></div></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            let t = null;
+            const run = async () => {
+                const q = document.getElementById('av-q').value.trim();
+                const d = await v7get('/api/avatar/search?q=' + encodeURIComponent(q));
+                const grid = document.getElementById('av-grid');
+                if (!grid) return;
+                grid.innerHTML = d && d.results && d.results.length ? d.results.map(r => `<div class="av-item" onclick="setAvatar('${v7esc(r.u)}', this)" data-n="${v7esc(r.name)}"><img src="/api/avatar/img?u=${encodeURIComponent(r.u)}&n=${encodeURIComponent(r.name)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.2">${v7esc(r.name)}<br><small style="color:var(--text-muted)">${v7esc(r.anime)}</small></div>`).join('') : '<p class="tl-hint">Aucun perso trouvé.</p>';
+            };
+            document.getElementById('av-q').addEventListener('input', () => { clearTimeout(t); t = setTimeout(run, 300); });
+            run();
+        }
+        async function setAvatar(u, el) {
+            const d = await v7post('/api/avatar', u ? { u, name: el.dataset.n } : {});
+            if (d && d.ok) { document.getElementById('v7-av-modal')?.remove(); toast('🖼️ Avatar mis à jour !', 'var(--accent-cyan)'); loadProfileExtra(); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+
+        /* ---------- Amis ---------- */
+        async function loadFriends() {
+            const box = document.getElementById('v7-friends');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour ajouter des amis.</p>'; return; }
+            const d = await v7get('/api/friends');
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Indisponible.</p>'; return; }
+            box.innerHTML = `
+                <div class="draw-input" style="margin-bottom:10px;"><input id="friend-add" placeholder="Pseudo de ton pote" maxlength="20"><button onclick="addFriend()">➕</button></div>
+                ${d.incoming.length ? '<h3 style="margin:6px 0;color:var(--accent-yellow);font-size:.95rem;">📩 Demandes reçues</h3>' + d.incoming.map(f => `<div class="friend-row"><b>${v7esc(f.pseudo)}</b><span class="pl-btns"><button class="go" onclick="respondFriend(${f.id}, true)">Accepter</button><button onclick="respondFriend(${f.id}, false)">Refuser</button></span></div>`).join('') : ''}
+                ${d.friends.length ? d.friends.map(f => `<div class="friend-row"><span class="pl-name">${avatarHtml(f.pseudo, f.cos)}<span>${cosNameHtml(f.pseudo, f.cos)}<br><span class="fs ${f.online ? 'on' : ''}">${f.online ? '● En ligne' : '○ Hors ligne'} • nv ${f.level}${f.room ? ' • ' + v7esc(f.room.mode) + (f.room.waiting ? ' (salon)' : ' (en partie)') : ''}</span></span></span>
+                    <span class="pl-btns">${f.room && f.room.waiting && f.room.code !== currentRoomCode ? `<button class="go" onclick="joinFriendRoom('${v7esc(f.room.code)}')">Rejoindre</button>` : ''}${currentRoomCode && f.online ? `<button onclick="inviteFriend(${f.id})">📨 Inviter</button>` : ''}<button onclick="removeFriend(${f.id}, this)" title="Retirer">🗑️</button></span></div>`).join('') : '<p class="tl-hint">Pas encore d\'amis : ajoute ton pote avec son pseudo !</p>'}
+                ${d.outgoing.length ? '<p class="tl-hint" style="text-align:left;">En attente : ' + d.outgoing.map(f => v7esc(f.pseudo)).join(', ') + '</p>' : ''}`;
+        }
+        async function addFriend() {
+            const i = document.getElementById('friend-add');
+            const pseudo = i && i.value.trim();
+            if (!pseudo) return;
+            const d = await v7post('/api/friends/request', { pseudo });
+            toast(d && d.ok ? d.message : '❌ ' + ((d && d.error) || 'Impossible'), d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+            loadFriends();
+        }
+        async function respondFriend(id, accept) { await v7post('/api/friends/respond', { id, accept }); loadFriends(); }
+        async function removeFriend(id, btn) {
+            if (!btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = 'Sûr ?'; return; }
+            await v7post('/api/friends/remove', { id }); loadFriends();
+        }
+        function inviteFriend(id) { if (currentRoomCode) socket.emit('friend_invite', { friendId: id, roomCode: currentRoomCode }); }
+        function joinFriendRoom(code) {
+            document.getElementById('v7-fr-modal')?.remove();
+            if (currentRoomCode && currentRoomCode !== code) socket.emit('leave_room', { roomCode: currentRoomCode });
+            currentRoomCode = code;
+            switchTab('mode');
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'undercover', subMode: 'normal' });
+        }
+        async function openFriendInvite() {
+            document.getElementById('v7-fr-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'v7-fr-modal';
+            m.innerHTML = `<div class="v7-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>📨 Inviter un ami</h3><div id="v7-fr-list"><div class="arc-loading"><div class="arc-spin"></div></div></div></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            const d = await v7get('/api/friends');
+            const box = document.getElementById('v7-fr-list');
+            if (!box) return;
+            const on = d && d.ok ? d.friends.filter(f => f.online) : [];
+            box.innerHTML = on.length ? on.map(f => `<div class="friend-row"><span class="pl-name">${avatarHtml(f.pseudo, f.cos)}${cosNameHtml(f.pseudo, f.cos)}</span><button class="go" onclick="inviteFriend(${f.id});this.textContent='✅ Envoyé';this.disabled=true;">📨 Inviter</button></div>`).join('')
+                : '<p class="tl-hint">Aucun ami en ligne pour le moment. Ajoute des amis dans l\'onglet Options.</p>';
+        }
+        socket.on('friend_invite', d => {
+            if (!d) return;
+            const id = 'inv' + Date.now();
+            toast(`📨 <b>${v7esc(d.from)}</b> t'invite dans son salon (${v7esc(d.mode)})<br><button id="${id}" style="margin-top:6px;background:var(--accent-cyan);color:#000;border:0;border-radius:8px;padding:6px 12px;font-weight:800;cursor:pointer;pointer-events:auto;">Rejoindre</button>`, 'var(--accent-cyan)');
+            setTimeout(() => { const b = document.getElementById(id); if (b) b.onclick = () => joinFriendRoom(d.roomCode); }, 50);
+        });
+        socket.on('friends_changed', d => { if (d && d.message) toast(d.message, 'var(--accent-cyan)'); const o = document.getElementById('options'); if (o && o.classList.contains('active')) loadFriends(); });
+
+        /* ---------- Propositions des joueurs ---------- */
+        async function sendSuggestion() {
+            const val = id => (document.getElementById(id) || {}).value || '';
+            const d = await v7post('/api/suggest', { kind: val('sg-kind'), anime: val('sg-anime'), name: val('sg-name'), link: val('sg-link'), note: val('sg-note'), pseudo: getUsername() });
+            if (d && d.ok) { toast('💡 Merci ! Ta proposition a été envoyée.', '#00ff88'); ['sg-anime', 'sg-name', 'sg-link', 'sg-note'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+        async function loadSuggestionsAdmin() {
+            const panel = document.getElementById('v7-admin');
+            if (!panel || !isAccount()) return;
+            const d = await v7get('/api/suggestions');
+            if (!d || !d.ok) { panel.style.display = 'none'; return; }
+            panel.style.display = 'block';
+            const KIND = { opening: '🎵 Opening', perso: '👤 Perso', citation: '💬 Citation', scene: '🎬 Scène', anime: '🎌 Anime', bug: '🐛 Bug', autre: '💡 Autre' };
+            document.getElementById('v7-admin-list').innerHTML = d.rows.length ? d.rows.map(r => `<div class="sugg-row"><b>${KIND[r.kind] || r.kind}</b> ${v7esc(r.anime || '')} ${r.name ? '• ' + v7esc(r.name) : ''}<br>${r.link ? `<a href="${v7esc(r.link)}" target="_blank" rel="noopener" style="color:var(--accent-cyan)">${v7esc(r.link)}</a><br>` : ''}${r.note ? v7esc(r.note) + '<br>' : ''}<small style="color:var(--text-muted)">${v7esc(r.pseudo || '')} • ${new Date(r.created_at).toLocaleDateString('fr-FR')}</small> <button class="kick-btn" onclick="delSuggestion(${r.id})">Supprimer</button></div>`).join('') : '<p class="tl-hint">Aucune proposition.</p>';
+        }
+        async function delSuggestion(id) { await v7post('/api/suggestions/delete', { id }); loadSuggestionsAdmin(); }
+
+        (function () {
+            const orig = window.switchTab;
+            window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfileExtra(); loadFriends(); loadSuggestionsAdmin(); } return r; };
+        })();
+
+        /* ---------- Panneaux : on cache aussi Dessine le perso ---------- */
+        (function () {
+            const orig = window.hideAllPanels;
+            window.hideAllPanels = function () { const r = orig.apply(this, arguments); const d = document.getElementById('draw-room'); if (d) d.style.display = 'none'; return r; };
+        })();
+
+        /* =====================================================================
+           DESSINE LE PERSO
+           ===================================================================== */
+        const DRAW_COLORS = ['#000000', '#ffffff', '#7f7f7f', '#c3c3c3', '#e53935', '#ff8a80', '#fb8c00', '#ffcc80', '#fdd835', '#fff59d', '#43a047', '#a5d6a7', '#1e88e5', '#90caf9', '#8e24aa', '#ce93d8', '#6d4c41', '#f5cba7'];
+        const DRAW_SIZES = [3, 7, 14, 28];
+        const drw = { state: null, clock: 0, color: '#000000', size: 7, tool: 'pen', strokes: [], last: {}, cur: null, buf: [], sendT: null, word: null, tick: null, chatKey: '' };
+        const drawCanvas = () => document.getElementById('draw-canvas');
+        function drawCtx() { const c = drawCanvas(); return c ? c.getContext('2d') : null; }
+        function drawClearCanvas() { const c = drawCanvas(), x = drawCtx(); if (!x) return; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); drw.last = {}; }
+        function drawApply(s) {
+            const c = drawCanvas(), x = drawCtx();
+            if (!x || !s) return;
+            const k = c.width / 1000;
+            if (s.f) { drawFloodFill(Math.round(s.p[0][0] * k), Math.round(s.p[0][1] * k), s.c); drw.last[s.id] = null; return; }
+            x.strokeStyle = s.er ? '#ffffff' : s.c; x.fillStyle = x.strokeStyle;
+            x.lineWidth = s.w * k; x.lineCap = 'round'; x.lineJoin = 'round';
+            const pts = s.p.slice();
+            const prev = drw.last[s.id];
+            if (prev) pts.unshift(prev);
+            if (pts.length === 1) { x.beginPath(); x.arc(pts[0][0] * k, pts[0][1] * k, s.w * k / 2, 0, Math.PI * 2); x.fill(); }
+            else { x.beginPath(); x.moveTo(pts[0][0] * k, pts[0][1] * k); for (let i = 1; i < pts.length; i++) x.lineTo(pts[i][0] * k, pts[i][1] * k); x.stroke(); }
+            drw.last[s.id] = s.p[s.p.length - 1];
+        }
+        function drawFloodFill(sx, sy, hex) {
+            const c = drawCanvas(), x = drawCtx();
+            const W = c.width, H = c.height;
+            if (sx < 0 || sy < 0 || sx >= W || sy >= H) return;
+            const img = x.getImageData(0, 0, W, H), d = img.data;
+            const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            const i0 = (sy * W + sx) * 4, tr = d[i0], tg = d[i0 + 1], tb = d[i0 + 2];
+            if (Math.abs(tr - r) + Math.abs(tg - g) + Math.abs(tb - b) < 10) return;
+            const same = i => Math.abs(d[i] - tr) + Math.abs(d[i + 1] - tg) + Math.abs(d[i + 2] - tb) < 90;
+            const seen = new Uint8Array(W * H), stack = [sx + sy * W];
+            while (stack.length) {
+                const p = stack.pop();
+                if (seen[p]) continue;
+                seen[p] = 1;
+                const i = p * 4;
+                if (!same(i)) continue;
+                d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = 255;
+                const px = p % W;
+                if (px > 0) stack.push(p - 1);
+                if (px < W - 1) stack.push(p + 1);
+                if (p >= W) stack.push(p - W);
+                if (p < W * (H - 1)) stack.push(p + W);
+            }
+            x.putImageData(img, 0, 0);
+        }
+        function drawRedrawAll() { drawClearCanvas(); drw.last = {}; drw.strokes.forEach(drawApply); }
+        function drawIsMe() { return drw.state && drw.state.drawerId === socket.id; }
+        function drawCanDraw() { return drawIsMe() && drw.state.phase === 'drawing'; }
+        function drawPoint(e) {
+            const c = drawCanvas(), r = c.getBoundingClientRect();
+            return [Math.max(0, Math.min(1000, Math.round((e.clientX - r.left) / r.width * 1000))), Math.max(0, Math.min(1000, Math.round((e.clientY - r.top) / r.height * 1000)))];
+        }
+        function drawFlush() {
+            if (!drw.cur || !drw.buf.length) return;
+            const s = { id: drw.cur.id, c: drw.cur.c, w: drw.cur.w, er: drw.cur.er, p: drw.buf.splice(0, 60) };
+            socket.emit('draw_stroke', { roomCode: currentRoomCode, s });
+            drw.strokes.push(s);
+        }
+        function drawBindCanvas() {
+            const c = drawCanvas();
+            if (!c || c.__bound) return;
+            c.__bound = true;
+            c.addEventListener('pointerdown', e => {
+                if (!drawCanDraw()) return;
+                e.preventDefault();
+                const p = drawPoint(e);
+                const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+                if (drw.tool === 'fill') {
+                    const s = { id, c: drw.color, w: 1, f: true, p: [p] };
+                    drawApply(s); drw.strokes.push(s);
+                    socket.emit('draw_stroke', { roomCode: currentRoomCode, s });
+                    return;
+                }
+                try { c.setPointerCapture(e.pointerId); } catch (_) {}
+                drw.cur = { id, c: drw.color, w: drw.size, er: drw.tool === 'eraser' };
+                drw.buf = [p];
+                drawApply({ ...drw.cur, p: [p] });
+                clearInterval(drw.sendT); drw.sendT = setInterval(drawFlush, 45);
+            });
+            c.addEventListener('pointermove', e => {
+                if (!drw.cur) return;
+                e.preventDefault();
+                const p = drawPoint(e);
+                const lastLocal = drw.last[drw.cur.id];
+                if (lastLocal && Math.abs(lastLocal[0] - p[0]) + Math.abs(lastLocal[1] - p[1]) < 3) return;
+                drw.buf.push(p);
+                drawApply({ ...drw.cur, p: [p] });
+                if (drw.buf.length >= 60) drawFlush();
+            });
+            const end = () => { if (!drw.cur) return; drawFlush(); clearInterval(drw.sendT); drw.cur = null; };
+            c.addEventListener('pointerup', end); c.addEventListener('pointercancel', end); c.addEventListener('pointerleave', end);
+        }
+        function drawRenderTools() {
+            const box = document.getElementById('draw-tools');
+            if (!box) return;
+            const can = drawCanDraw();
+            box.style.display = can ? 'flex' : 'none';
+            if (!can || box.__built) { if (can) drawToolsState(); return; }
+            box.__built = true;
+            box.innerHTML = DRAW_COLORS.map(c => `<button class="sw" data-c="${c}" style="background:${c}" onclick="drawSetColor('${c}')"></button>`).join('')
+                + `<input type="color" value="#ff5fa2" oninput="drawSetColor(this.value)" title="Couleur perso">`
+                + DRAW_SIZES.map(s => `<button class="tb sz" data-s="${s}" onclick="drawSetSize(${s})"><span style="display:inline-block;width:${Math.max(4, s / 1.5)}px;height:${Math.max(4, s / 1.5)}px;border-radius:50%;background:#fff;vertical-align:middle"></span></button>`).join('')
+                + `<button class="tb tool" data-t="pen" onclick="drawSetTool('pen')">✏️</button><button class="tb tool" data-t="fill" onclick="drawSetTool('fill')">🪣</button><button class="tb tool" data-t="eraser" onclick="drawSetTool('eraser')">🧽</button>`
+                + `<button class="tb" onclick="socket.emit('draw_undo',{roomCode:currentRoomCode})">↩️</button><button class="tb" onclick="socket.emit('draw_clear',{roomCode:currentRoomCode})">🗑️</button>`;
+            drawToolsState();
+        }
+        function drawToolsState() {
+            document.querySelectorAll('#draw-tools .sw').forEach(b => b.classList.toggle('on', b.dataset.c === drw.color && drw.tool !== 'eraser'));
+            document.querySelectorAll('#draw-tools .sz').forEach(b => b.classList.toggle('on', +b.dataset.s === drw.size));
+            document.querySelectorAll('#draw-tools .tool').forEach(b => b.classList.toggle('on', b.dataset.t === drw.tool));
+        }
+        function drawSetColor(c) { drw.color = c; if (drw.tool === 'eraser') drw.tool = 'pen'; drawToolsState(); }
+        function drawSetSize(s) { drw.size = s; if (drw.tool === 'fill') drw.tool = 'pen'; drawToolsState(); }
+        function drawSetTool(t) { drw.tool = t; drawToolsState(); }
+        function drawSendGuess() {
+            const i = document.getElementById('draw-input');
+            const t = i && i.value.trim();
+            if (!t) return;
+            socket.emit('draw_guess', { roomCode: currentRoomCode, text: t });
+            i.value = '';
+        }
+        function drawChat(html, cls) {
+            const box = document.getElementById('draw-chat');
+            if (!box) return;
+            const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html;
+            box.appendChild(d);
+            while (box.children.length > 120) box.firstChild.remove();
+            box.scrollTop = box.scrollHeight;
+        }
+        function drawShow() {
+            const panel = document.getElementById('draw-room');
+            if (!panel || panel.style.display === 'block') return;
+            hideAllPanels();
+            panel.style.display = 'block';
+            drawBindCanvas();
+            drawRedrawAll();
+        }
+        function drawRender() {
+            const q = drw.state;
+            if (!q) return;
+            lastHostId = q.hostId;
+            q.players.forEach(p => { if (p.cos) cosById[p.id] = p.cos; });
+            const me = drawIsMe();
+            document.getElementById('draw-status').innerHTML = q.phase === 'finished' ? '🏁 Partie terminée' : `Tour ${q.tour}/${q.tours} • ${v7esc(q.drawerName)} ${q.phase === 'choosing' ? 'choisit' : 'dessine'}`;
+            const w = document.getElementById('draw-word');
+            if (q.phase === 'drawing' && me && drw.word) { w.className = 'draw-word me'; w.textContent = '✏️ ' + drw.word.word; }
+            else if (q.phase === 'drawing' && q.mask) { w.className = 'draw-word'; w.textContent = q.mask; }
+            else if (q.reveal) { w.className = 'draw-word me'; w.textContent = q.reveal.word; }
+            else { w.className = 'draw-word'; w.textContent = q.phase === 'choosing' ? '…' : ''; }
+            document.getElementById('draw-anime').textContent = q.phase === 'drawing' && me && drw.word ? drw.word.anime : (q.anime ? '📺 ' + q.anime : (q.phase === 'drawing' ? `${(q.mask || '').replace(/[^_]/g, '').length} lettres` : ''));
+            // scores
+            const sb = document.getElementById('draw-scores');
+            sb.innerHTML = [...q.players].sort((a, b) => b.score - a.score).map(p => `<div class="quote-score"><span class="pl-name">${avatarHtml(p.name, p.cos)}${cosNameHtml(p.name, p.cos)}${p.drawing ? ' ✏️' : ''}${p.guessed ? ' ✅' : ''}${p.offline ? ' 📡' : ''}${p.gained && (q.phase === 'reveal') ? ` <small style="color:#00ff88">+${p.gained}</small>` : ''}</span><strong style="color:var(--accent-yellow)">${p.score} pts</strong></div>`).join('');
+            // superposition
+            const ov = document.getElementById('draw-overlay');
+            ov.className = 'draw-overlay';
+            if (q.phase === 'choosing') {
+                ov.classList.add('on');
+                if (me && drw.options) ov.innerHTML = '<div style="font-weight:800;font-size:1.1rem;">🎯 Choisis le perso à dessiner</div>' + drw.options.map((o, i) => `<button class="opt" onclick="socket.emit('draw_choose',{roomCode:currentRoomCode,idx:${i}})">${v7esc(o.name)}<small>${v7esc(o.anime)}</small></button>`).join('');
+                else ov.innerHTML = `<div style="font-size:3rem;">🤔</div><div><b>${v7esc(q.drawerName)}</b> choisit un perso…</div>`;
+            } else if (q.phase === 'reveal' && q.reveal) {
+                ov.classList.add('on');
+                ov.innerHTML = `<div>C'était</div><div style="font-family:'Bangers',cursive;font-size:2rem;color:var(--accent-yellow)">${v7esc(q.reveal.word)}</div><div style="color:var(--accent-cyan)">${v7esc(q.reveal.anime)}</div>${q.reveal.img ? `<img src="${v7esc(q.reveal.img)}" alt="">` : ''}`;
+            } else if (q.phase === 'finished') {
+                ov.classList.add('on');
+                const top = [...q.players].sort((a, b) => b.score - a.score).slice(0, 3);
+                ov.innerHTML = `<div style="font-size:3rem;">🏆</div><div style="font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow)">${v7esc((q.winnerNames || []).join(' & ') || '—')}</div>${top.map((p, i) => `<div>${['🥇', '🥈', '🥉'][i]} ${cosNameHtml(p.name, p.cos)} • ${p.score} pts</div>`).join('')}`;
+                if (window.__drawFin !== q.turn + '|' + q.totalTurns && (q.winnerNames || []).includes((q.players.find(p => p.id === socket.id) || {}).name)) { window.__drawFin = q.turn + '|' + q.totalTurns; confetti(); }
+            }
+            document.getElementById('draw-end').style.display = q.phase === 'finished' ? 'flex' : 'none';
+            const replay = document.getElementById('draw-replay'); if (replay) replay.style.display = q.hostId === socket.id ? '' : 'none';
+            const inp = document.getElementById('draw-input');
+            const meP = q.players.find(p => p.id === socket.id) || {};
+            inp.placeholder = me ? 'Discute avec les autres…' : meP.guessed ? 'Trouvé ! Tu peux discuter…' : 'Ta réponse…';
+            drawRenderTools();
+            if (!drw.tick) drw.tick = setInterval(drawTickFn, 250);
+        }
+        function drawTickFn() {
+            const q = drw.state, el = document.getElementById('draw-timer');
+            const panel = document.getElementById('draw-room');
+            if (!q || !el || !panel || panel.style.display === 'none') return;
+            const left = Math.max(0, Math.ceil((q.endsAt - (Date.now() + drw.clock)) / 1000));
+            el.textContent = q.phase === 'finished' ? '🏁' : left;
+            el.classList.toggle('low', q.phase === 'drawing' && left <= 10);
+        }
+        socket.on('draw_state', q => {
+            if (!q || !currentRoomCode) return;
+            const prevPhase = drw.state && drw.state.phase, prevTurn = drw.state && drw.state.turn;
+            drw.state = q; drw.clock = q.serverNow - Date.now();
+            if (q.turn !== prevTurn) { drw.word = null; drw.options = null; }
+            drawShow();
+            if (q.phase === 'drawing' && prevPhase !== 'drawing' && q.turn === prevTurn) drawChat(`✏️ ${v7esc(q.drawerName)} dessine !`, 'sys');
+            if (q.phase === 'choosing' && q.turn !== prevTurn) { drw.strokes = []; drawRedrawAll(); drw.tool = 'pen'; }
+            if (q.phase === 'reveal' && prevPhase !== 'reveal' && q.reveal) drawChat(`🎴 C'était <b>${v7esc(q.reveal.word)}</b> (${v7esc(q.reveal.anime)})`, 'sys');
+            drawRender();
+        });
+        socket.on('draw_options', d => { drw.options = d && d.options; drawRender(); });
+        socket.on('draw_word', d => { drw.word = d; drawRender(); });
+        socket.on('draw_stroke', s => { drw.strokes.push(s); drawApply(s); });
+        socket.on('draw_redraw', d => { drw.strokes = (d && d.strokes) || []; drawRedrawAll(); });
+        socket.on('draw_chat', m => {
+            if (!m) return;
+            if (m.system) drawChat(v7esc(m.text), m.ok ? 'ok' : 'sys');
+            else drawChat(`<b>${cosNameHtml(m.name, null)}</b> : ${v7esc(m.text)}`, m.found ? 'found' : '');
+            if (m.system && m.ok) fxGood();
+        });
+        socket.on('draw_closed', () => { returningToWaitingRoom = true; drw.state = null; const p = document.getElementById('draw-room'); if (p) p.style.display = 'none'; });
+        socket.on('connect', () => { if (currentRoomCode && drw.state) setTimeout(() => socket.emit('draw_sync', { roomCode: currentRoomCode }), 600); });
+        function drawReplay() { socket.emit('start_game', currentRoomCode); }
+
+        /* =====================================================================
+           COLORIE LE PERSO
+           ===================================================================== */
+        const col = { key: '', zones: [], labels: null, lab: null, W: 0, H: 0, colors: {}, sel: 0, hue: 200, s: .8, v: .9, sent: false, myUrl: null, flash: 0, raf: 0, autoT: null, img: null };
+        function srgb2lin(c) { c /= 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+        function lin2srgb(c) { c = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; return Math.max(0, Math.min(255, Math.round(c * 255))); }
+        function rgb2lab(r, g, b) {
+            r = srgb2lin(r); g = srgb2lin(g); b = srgb2lin(b);
+            let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047, y = r * 0.2126 + g * 0.7152 + b * 0.0722, z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
+            const f = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+            x = f(x); y = f(y); z = f(z);
+            return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+        }
+        function lab2rgb(L, A, B) {
+            let y = (L + 16) / 116, x = A / 500 + y, z = y - B / 200;
+            const f = t => t * t * t > 0.008856 ? t * t * t : (t - 16 / 116) / 7.787;
+            x = f(x) * 0.95047; y = f(y); z = f(z) * 1.08883;
+            return [lin2srgb(x * 3.2406 + y * -1.5372 + z * -0.4986), lin2srgb(x * -0.9689 + y * 1.8758 + z * 0.0415), lin2srgb(x * 0.0557 + y * -0.2040 + z * 1.0570)];
+        }
+        const hex2rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+        const rgb2hex = (r, g, b) => '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('');
+        function hsv2rgb(h, s, v) { const f = n => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); }; return [f(5) * 255, f(3) * 255, f(1) * 255]; }
+        function rgb2hsv(r, g, b) { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0; if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, mx ? d / mx : 0, mx]; }
+        // Découpe l'image en zones de couleur (k-moyennes dans l'espace Lab, graine fixe)
+        function colAnalyze(img, maxSide) {
+            const sc = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const W = Math.max(1, Math.round(img.naturalWidth * sc)), H = Math.max(1, Math.round(img.naturalHeight * sc));
+            const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+            const cx = cv.getContext('2d', { willReadFrequently: true });
+            cx.drawImage(img, 0, 0, W, H);
+            const d = cx.getImageData(0, 0, W, H).data;
+            const N = W * H, lab = new Float32Array(N * 3), alpha = new Uint8Array(N);
+            for (let i = 0; i < N; i++) { const l = rgb2lab(d[i * 4], d[i * 4 + 1], d[i * 4 + 2]); lab[i * 3] = l[0]; lab[i * 3 + 1] = l[1]; lab[i * 3 + 2] = l[2]; alpha[i] = d[i * 4 + 3]; }
+            return { W, H, lab, alpha, rgba: d };
+        }
+        function colKmeans(A, K) {
+            const { lab, alpha } = A, N = A.W * A.H;
+            const idx = []; for (let i = 0; i < N; i += 2) if (alpha[i] > 127) idx.push(i);
+            if (idx.length < K) return null;
+            let seed = 12345; const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+            const C = [];
+            const first = idx[Math.floor(idx.length / 2)]; C.push([lab[first * 3], lab[first * 3 + 1], lab[first * 3 + 2]]);
+            const dist = (i, c) => { const a = lab[i * 3] - c[0], b = lab[i * 3 + 1] - c[1], e = lab[i * 3 + 2] - c[2]; return a * a + b * b + e * e; };
+            while (C.length < K) { // k-means++ déterministe
+                let tot = 0; const ds = idx.map(i => { const m = Math.min(...C.map(c => dist(i, c))); tot += m; return m; });
+                let t = rnd() * tot, pick = idx[idx.length - 1];
+                for (let j = 0; j < idx.length; j++) { t -= ds[j]; if (t <= 0) { pick = idx[j]; break; } }
+                C.push([lab[pick * 3], lab[pick * 3 + 1], lab[pick * 3 + 2]]);
+            }
+            for (let it = 0; it < 12; it++) {
+                const sum = C.map(() => [0, 0, 0, 0]);
+                idx.forEach(i => { let bi = 0, bd = Infinity; C.forEach((c, k) => { const dd = dist(i, c); if (dd < bd) { bd = dd; bi = k; } }); const s = sum[bi]; s[0] += lab[i * 3]; s[1] += lab[i * 3 + 1]; s[2] += lab[i * 3 + 2]; s[3]++; });
+                sum.forEach((s, k) => { if (s[3]) C[k] = [s[0] / s[3], s[1] / s[3], s[2] / s[3]]; });
+            }
+            return C;
+        }
+        function colNearest(C, L, a, b) { let bi = 0, bd = Infinity; for (let k = 0; k < C.length; k++) { const x = L - C[k][0], y = a - C[k][1], z = b - C[k][2], dd = x * x + y * y + z * z; if (dd < bd) { bd = dd; bi = k; } } return bi; }
+        function colBuild(img, dispSide) {
+            const A = colAnalyze(img, 140);
+            let C = colKmeans(A, 7);
+            if (!C) return false;
+            // répartition + fond (couleur dominante sur les bords)
+            const N = A.W * A.H, area = new Array(C.length).fill(0), border = new Array(C.length).fill(0), ysum = new Array(C.length).fill(0);
+            let bn = 0;
+            for (let i = 0; i < N; i++) {
+                if (A.alpha[i] <= 127) continue;
+                const k = colNearest(C, A.lab[i * 3], A.lab[i * 3 + 1], A.lab[i * 3 + 2]);
+                area[k]++; ysum[k] += Math.floor(i / A.W) / A.H;
+                const x = i % A.W, y = Math.floor(i / A.W);
+                if (x < 2 || y < 2 || x >= A.W - 2 || y >= A.H - 2) { border[k]++; bn++; }
+            }
+            const tot = area.reduce((a, b) => a + b, 0);
+            const bg = new Set();
+            C.forEach((_, k) => { if (bn && border[k] / bn >= 0.28 && area[k] / tot >= 0.06) bg.add(k); });
+            if (bg.size >= C.length - 1) bg.clear();
+            // zones : clusters restants, petits fusionnés avec le plus proche
+            let keep = C.map((_, k) => k).filter(k => !bg.has(k) && area[k] > 0);
+            const fg = keep.reduce((a, k) => a + area[k], 0) || 1;
+            const small = keep.filter(k => area[k] / fg < 0.03);
+            const map = C.map((_, k) => k);
+            keep = keep.filter(k => !small.includes(k));
+            if (!keep.length) return false;
+            small.forEach(k => { let bi = keep[0], bd = Infinity; keep.forEach(j => { const dd = (C[k][0] - C[j][0]) ** 2 + (C[k][1] - C[j][1]) ** 2 + (C[k][2] - C[j][2]) ** 2; if (dd < bd) { bd = dd; bi = j; } }); map[k] = bi; area[bi] += area[k]; ysum[bi] += ysum[k]; });
+            keep.sort((a, b) => area[b] - area[a]);
+            // étiquettes à la résolution d'affichage
+            const sc = Math.min(1, dispSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const W = Math.max(1, Math.round(img.naturalWidth * sc)), H = Math.max(1, Math.round(img.naturalHeight * sc));
+            const D = colAnalyze(img, Math.max(W, H));
+            const labels = new Int8Array(D.W * D.H);
+            const zoneOf = {}; keep.forEach((k, z) => { zoneOf[k] = z; });
+            for (let i = 0; i < D.W * D.H; i++) {
+                if (D.alpha[i] <= 127) { labels[i] = -1; continue; }
+                const k = map[colNearest(C, D.lab[i * 3], D.lab[i * 3 + 1], D.lab[i * 3 + 2])];
+                labels[i] = zoneOf[k] === undefined ? -1 : zoneOf[k];
+            }
+            const fgArea = keep.reduce((a, k) => a + area[k], 0) || 1;
+            col.zones = keep.map((k, z) => {
+                const my = ysum[k] / Math.max(1, area[k]);
+                return { lab: C[k], share: area[k] / fgArea, where: my < 0.34 ? 'haut' : my > 0.66 ? 'bas' : 'milieu' };
+            });
+            col.labels = labels; col.D = D; col.W = D.W; col.H = D.H;
+            return true;
+        }
+        function colPaint(canvas, highlight) {
+            if (!col.D || !canvas) return;
+            const { W, H, lab } = col.D;
+            canvas.width = W; canvas.height = H;
+            const cx = canvas.getContext('2d');
+            const out = cx.createImageData(W, H), o = out.data;
+            const chosen = col.zones.map((z, i) => col.colors[i] ? rgb2lab(...hex2rgb(col.colors[i])) : null);
+            for (let i = 0; i < W * H; i++) {
+                const z = col.labels[i], L = lab[i * 3];
+                let r, g, b;
+                if (z < 0) { const v = Math.round(30 + L * 0.5); r = g = b = v; }
+                else {
+                    const zl = col.zones[z].lab[0];
+                    const c = chosen[z];
+                    if (c) { const nl = Math.max(0, Math.min(100, c[0] + (L - zl) * 0.85)); [r, g, b] = lab2rgb(nl, c[1], c[2]); }
+                    else { const v = Math.round(Math.max(0, Math.min(255, 175 + (L - zl) * 1.6))); r = g = b = v; if (((i % W) + Math.floor(i / W)) % 10 < 5) { r -= 18; g -= 18; b -= 18; } }
+                    if (highlight && z === col.sel) { r = r * 0.45 + 0 * 0.55; g = g * 0.45 + 240 * 0.55; b = b * 0.45 + 255 * 0.55; }
+                }
+                o[i * 4] = r; o[i * 4 + 1] = g; o[i * 4 + 2] = b; o[i * 4 + 3] = 255;
+            }
+            cx.putImageData(out, 0, 0);
+        }
+        function colRepaint() {
+            if (col.raf) return;
+            col.raf = requestAnimationFrame(() => { col.raf = 0; colPaint(document.querySelector('.col-canvas'), Date.now() < col.flash && Math.floor(Date.now() / 250) % 2 === 0); colZonesUi(); });
+        }
+        function colFlash() {
+            col.flash = Date.now() + 1300;
+            const step = () => { colRepaint(); if (Date.now() < col.flash + 100) setTimeout(step, 250); };
+            step();
+        }
+        function colZonesUi() {
+            const box = document.querySelector('.col-zones');
+            if (!box) return;
+            if (box.children.length !== col.zones.length) box.innerHTML = col.zones.map((z, i) => `<button class="col-zone" onclick="colSelect(${i})"><i></i>Zone ${i + 1}<small style="font-weight:600;color:var(--text-muted)">${z.where}</small></button>`).join('');
+            [...box.children].forEach((b, i) => { b.classList.toggle('on', i === col.sel); b.querySelector('i').style.background = col.colors[i] || ''; });
+            const cur = col.colors[col.sel];
+            const prev = document.querySelector('.col-hex span'), inp = document.querySelector('.col-hex input');
+            if (prev) prev.style.background = cur || 'transparent';
+            if (inp && document.activeElement !== inp) inp.value = cur || '';
+        }
+        function colSelect(i) {
+            col.sel = i;
+            const c = col.colors[i];
+            if (c) { const [h, s, v] = rgb2hsv(...hex2rgb(c)); col.hue = h; col.s = s; col.v = v; colPickerPaint(); }
+            colFlash();
+        }
+        function colSetColor(hex, fromPicker) {
+            if (col.sent || !/^#[0-9a-f]{6}$/i.test(hex)) return;
+            col.colors[col.sel] = hex.toLowerCase();
+            if (!fromPicker) { const [h, s, v] = rgb2hsv(...hex2rgb(hex)); col.hue = h; col.s = s; col.v = v; colPickerPaint(); }
+            colRepaint();
+        }
+        function colPickerPaint() {
+            const sv = document.querySelector('.col-sv'), hue = document.querySelector('.col-hue');
+            if (sv) {
+                const w = sv.width = sv.clientWidth || 240, h = sv.height = sv.clientHeight || 130, x = sv.getContext('2d');
+                x.fillStyle = `hsl(${col.hue},100%,50%)`; x.fillRect(0, 0, w, h);
+                let g = x.createLinearGradient(0, 0, w, 0); g.addColorStop(0, '#fff'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+                g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, '#000'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+                x.strokeStyle = col.v > .5 ? '#000' : '#fff'; x.lineWidth = 2; x.beginPath(); x.arc(col.s * w, (1 - col.v) * h, 7, 0, Math.PI * 2); x.stroke();
+            }
+            if (hue) {
+                const w = hue.width = hue.clientWidth || 240, h = hue.height = hue.clientHeight || 22, x = hue.getContext('2d');
+                const g = x.createLinearGradient(0, 0, w, 0);
+                for (let i = 0; i <= 6; i++) g.addColorStop(i / 6, `hsl(${i * 60},100%,50%)`);
+                x.fillStyle = g; x.fillRect(0, 0, w, h);
+                x.strokeStyle = '#fff'; x.lineWidth = 3; x.strokeRect(col.hue / 360 * w - 3, 1, 6, h - 2);
+            }
+        }
+        function colBindPicker() {
+            const sv = document.querySelector('.col-sv'), hue = document.querySelector('.col-hue');
+            const drag = (el, fn) => {
+                let on = false;
+                const go = e => { const r = el.getBoundingClientRect(); fn(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))); };
+                el.addEventListener('pointerdown', e => { on = true; try { el.setPointerCapture(e.pointerId); } catch (_) {} go(e); e.preventDefault(); });
+                el.addEventListener('pointermove', e => { if (on) { go(e); e.preventDefault(); } });
+                el.addEventListener('pointerup', () => { on = false; }); el.addEventListener('pointercancel', () => { on = false; });
+            };
+            const apply = () => { colPickerPaint(); colSetColor(rgb2hex(...hsv2rgb(col.hue, col.s, col.v)), true); };
+            if (sv) drag(sv, (x, y) => { col.s = x; col.v = 1 - y; apply(); });
+            if (hue) drag(hue, x => { col.hue = x * 360; apply(); });
+        }
+        function colScore() {
+            let sum = 0;
+            col.zones.forEach((z, i) => {
+                if (!col.colors[i]) return;
+                const c = rgb2lab(...hex2rgb(col.colors[i]));
+                const dE = Math.sqrt((c[0] - z.lab[0]) ** 2 + (c[1] - z.lab[1]) ** 2 + (c[2] - z.lab[2]) ** 2);
+                sum += z.share * Math.max(0, 1 - dE / 55);
+            });
+            return Math.round(100 * sum);
+        }
+        function colSubmit(auto) {
+            if (col.sent || !col.zones.length) return;
+            col.sent = true;
+            clearTimeout(col.autoT);
+            const big = document.createElement('canvas'); colPaint(big, false);
+            col.myUrl = big.toDataURL('image/jpeg', 0.85);
+            const th = document.createElement('canvas'); const s = 150 / Math.max(big.width, big.height);
+            th.width = Math.round(big.width * s); th.height = Math.round(big.height * s);
+            th.getContext('2d').drawImage(big, 0, 0, th.width, th.height);
+            socket.emit('arc_color', { roomCode: currentRoomCode, pct: colScore(), thumb: th.toDataURL('image/jpeg', 0.7) });
+            const btn = document.querySelector('.col-submit'); if (btn) { btn.disabled = true; btn.textContent = auto ? '⏱️ Temps écoulé : envoyé !' : '✅ Envoyé ! Attends les autres…'; }
+        }
+        const COL_SWATCHES = ['#000000', '#3b3b3b', '#8a8a8a', '#ffffff', '#f5d0b0', '#e0a57a', '#a0674a', '#5a3a28', '#ff0000', '#ff7a00', '#ffd400', '#7ed957', '#00a651', '#00c3ff', '#1e5bd8', '#0b1f5c', '#8e44ad', '#ff5fa2', '#ffb7d5', '#f2e6c9', '#c0392b', '#d4a017', '#2e7d32', '#4a4a8a'];
+        function arcRenderColor(q, stage) {
+            const key = q.round + '|' + (q.phase === 'playing' ? 'p' : 'r');
+            if (col.key === key) return;
+            const newRound = !col.key.startsWith(q.round + '|');
+            col.key = key;
+            if (q.phase === 'playing') {
+                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.sent = false; col.myUrl = null; col.D = null; }
+                const info = q.stage.color || {};
+                stage.innerHTML = `<div class="col-wrap">
+                    <div class="col-head">🎨 Colorie <b>${v7esc(info.name || '?')}</b> <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">Choisis une zone, puis sa couleur. Touche l'image pour sélectionner une zone.</div></div>
+                    <div class="col-canvas-wrap"><canvas class="col-canvas"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation du coloriage…</div></div></div>
+                    <div class="col-side">
+                        <div class="col-zones"></div>
+                        <canvas class="col-sv"></canvas><canvas class="col-hue"></canvas>
+                        <div class="col-sw">${COL_SWATCHES.map(c => `<button style="background:${c}" onclick="colSetColor('${c}')"></button>`).join('')}</div>
+                        <div class="col-hex"><span></span><input maxlength="7" placeholder="#rrggbb" oninput="if(/^#[0-9a-f]{6}$/i.test(this.value))colSetColor(this.value)"></div>
+                        <button class="btn-action col-submit" onclick="colSubmit(false)">✅ Valider mon coloriage</button>
+                    </div></div>`;
+                colBindPicker(); colPickerPaint();
+                const canvas = stage.querySelector('.col-canvas');
+                canvas.addEventListener('click', e => {
+                    if (!col.labels) return;
+                    const r = canvas.getBoundingClientRect();
+                    const x = Math.floor((e.clientX - r.left) / r.width * col.W), y = Math.floor((e.clientY - r.top) / r.height * col.H);
+                    const z = col.labels[y * col.W + x];
+                    if (z >= 0) colSelect(z);
+                });
+                const myKey = key;
+                arcLoadImage(q.stage.img).then(img => {
+                    if (col.key !== myKey) return;
+                    const load = stage.querySelector('.col-load');
+                    if (!img || !colBuild(img, Math.min(420, Math.max(260, (stage.clientWidth || 360) - 20)))) { if (load) load.innerHTML = 'Image indisponible 😕'; return; }
+                    if (load) load.remove();
+                    col.img = img;
+                    colRepaint(); colFlash();
+                });
+                // envoi auto juste avant la fin
+                clearTimeout(col.autoT);
+                const localEnd = Date.now() + (q.endsAt - q.serverNow);
+                col.autoT = setTimeout(() => colSubmit(true), Math.max(0, localEnd - Date.now() - 900));
+                return;
+            }
+            // révélation
+            const me = q.players.find(p => p.id === socket.id) || {};
+            const gal = q.stage.gallery || [];
+            stage.innerHTML = `<div class="col-reveal">
+                <div class="col-pair"><figure><img src="${v7esc(q.stage.img || '')}" alt=""><figcaption>🎴 ${v7esc((q.stage.color || {}).name || q.answer || '')}</figcaption></figure>
+                <figure>${col.myUrl ? `<img src="${col.myUrl}" alt="">` : '<div style="padding:40px 0;">😶 Pas de coloriage</div>'}<figcaption>Toi : <span class="col-pct">${me.pct != null ? me.pct + ' %' : '—'}</span></figcaption></figure></div>
+                <div class="col-gallery">${gal.map((g, i) => `<div class="${g.id === socket.id ? 'me' : ''}">${g.thumb ? `<img src="${g.thumb}" alt="">` : ''}<b>${['🥇', '🥈', '🥉'][i] || ''} ${g.pct} %</b>${v7esc(g.name)}</div>`).join('')}</div></div>`;
+        }
+        function colAfterRender(q) {
+            const result = document.getElementById('arc-result');
+            if (!result) return;
+            if (q.phase === 'playing') {
+                const me = q.players.find(p => p.id === socket.id) || {};
+                result.style.color = me.done ? 'var(--accent-cyan)' : 'var(--text-color)';
+                result.textContent = me.done ? 'Coloriage envoyé ! Attends les autres…' : 'Retrouve les vraies couleurs de mémoire : le plus ressemblant gagne !';
+            } else if (q.phase === 'reveal') {
+                const me = q.players.find(p => p.id === socket.id) || {};
+                const gal = (q.stage && q.stage.gallery) || [];
+                result.style.color = 'var(--accent-yellow)';
+                result.textContent = gal.length ? `🏆 ${gal[0].name} est le plus ressemblant (${gal[0].pct} %)` + (me.gained ? ` • tu gagnes +${me.gained}` : '') : 'Personne n\'a colorié…';
+            }
+        }
+        (function () {
+            const orig = window.arcRenderStage;
+            if (typeof orig !== 'function') return;
+            window.arcRenderStage = function (q) {
+                if (q && q.game === 'couleur' && (q.phase === 'playing' || q.phase === 'reveal')) {
+                    const stage = document.getElementById('arc-stage');
+                    try { arcDestroyVideo(); } catch (_) {}
+                    arcStageKey = 'couleur|' + q.round + '|' + q.phase;
+                    return arcRenderColor(q, stage);
+                }
+                if (q && (q.game !== 'couleur' || q.phase === 'finished' || q.phase === 'loading')) { if (q.phase !== 'loading' || q.round === 0) col.key = ''; }
+                return orig.apply(this, arguments);
+            };
+        })();
+
         /* ===== 7 barré dans la police Bangers (sinon on le confond avec le 1) ===== */
         (function () {
             const pending = new Set(); let raf = 0;
@@ -5732,6 +6785,7 @@
     <canvas id="fx-confetti" style="display:none;"></canvas>
     <div id="fx-toasts"></div>
     <div id="fx-reactions"></div>
+    <button id="host-fab" onclick="openHostPanel()">👑 Joueurs</button>
     <div id="fx-react-bar" style="display:none;">
         <button onclick="sendReaction('😂')">😂</button><button onclick="sendReaction('🔥')">🔥</button><button onclick="sendReaction('😭')">😭</button>
         <button onclick="sendReaction('😱')">😱</button><button onclick="sendReaction('👏')">👏</button><button onclick="sendReaction('💀')">💀</button>
