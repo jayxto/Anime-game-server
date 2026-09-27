@@ -705,6 +705,26 @@
         .draw-input button{background:var(--accent-cyan);color:#000;border:0;border-radius:10px;padding:0 14px;font-weight:800;font-size:1.1rem;cursor:pointer;}
         @media (max-width:760px){.draw-main{grid-template-columns:1fr;}.draw-chat{height:150px;}}
 
+        /* ===== Admin, bannière, thèmes ===== */
+        .adm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+        .adm-cards div{background:#101018;border-radius:10px;padding:10px 6px;text-align:center;font-size:.72rem;color:var(--text-muted);}
+        .adm-cards b{display:block;font-size:1.4rem;color:var(--accent-cyan);}
+        .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
+        #bug-fab{position:fixed;right:12px;bottom:120px;z-index:9995;background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:99px;width:42px;height:42px;font-size:1.1rem;cursor:pointer;display:none;box-shadow:0 4px 14px rgba(0,0,0,.5);}
+        #site-banner{position:fixed;top:0;left:0;right:0;z-index:10002;background:linear-gradient(90deg,#ff9a3c,#ff2a5f);color:#fff;font-weight:800;text-align:center;padding:8px 12px;font-size:.88rem;box-shadow:0 2px 12px rgba(0,0,0,.5);}
+        #theme-layer{position:fixed;inset:0;pointer-events:none;z-index:9990;overflow:hidden;}
+        .theme-p{position:absolute;top:-40px;animation:themeFall linear forwards;opacity:.85;}
+        .theme-p.halloween{animation-name:themeFly;}
+        @keyframes themeFall{to{transform:translateY(110vh) rotate(360deg);}}
+        @keyframes themeFly{0%{transform:translate(0,0)}25%{transform:translate(40px,30vh)}50%{transform:translate(-30px,55vh)}75%{transform:translate(30px,80vh)}100%{transform:translate(0,110vh)}}
+        html.theme-halloween{--accent-pink:#ff7a00;--accent-cyan:#b77bff;--accent-yellow:#ffb300;}
+        html.theme-halloween body{background:radial-gradient(circle at 50% -10%,#2a1240 0%,#0b0b10 55%) fixed;}
+        html.theme-noel{--accent-pink:#e53935;--accent-cyan:#7fd4ff;--accent-yellow:#ffd54f;}
+        html.theme-noel body{background:radial-gradient(circle at 50% -10%,#123024 0%,#0b0b10 55%) fixed;}
+        html.theme-halloween header .logo::after{content:' 🎃';}
+        html.theme-noel header .logo::after{content:' 🎄';}
+        .theme-card{border:2px solid var(--accent-pink);}
+
         /* ===== Devine le perso ===== */
         .gs-card{background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:12px;text-align:left;}
         .gs-secret{display:flex;gap:12px;align-items:center;}
@@ -807,6 +827,7 @@
             <ul>
                 <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
                 <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
+                <li style="display:none;"><button onclick="switchTab('admin')" id="btn-admin">🛠️ Admin</button></li>
             </ul>
         </nav>
     </header>
@@ -844,6 +865,7 @@
                 <div id="daily-board" class="daily-board" style="display:none;"></div>
             </div>
 
+            <div id="theme-card" class="daily-card theme-card" style="display:none;"></div>
             <div id="quest-card" class="daily-card">
                 <div class="daily-head"><h3>📜 Quêtes du jour</h3><span class="tl-hint">XP bonus</span></div>
                 <div id="quest-list"><p class="tl-hint">Chargement…</p></div>
@@ -903,7 +925,7 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve les vraies couleurs d'un perso de mémoire</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Une zone du perso est grise : retrouve sa vraie couleur</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
                 </div>
@@ -1515,6 +1537,44 @@
         </div>
     </section>
 
+    <section id="admin" class="tab-content">
+        <div class="opt-panel">
+            <h2>🛠️ Tableau de bord</h2>
+            <button class="host-btn" onclick="loadAdmin()" style="margin-bottom:8px;">↻ Actualiser</button>
+            <div id="adm-stats"><p class="tl-hint">Chargement…</p></div>
+        </div>
+        <div class="opt-panel">
+            <h2>🚧 Mode maintenance</h2>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="checkbox" id="adm-maint"> Afficher le message à tout le monde</label>
+            <input id="adm-maint-msg" class="v7-input" maxlength="300" placeholder="Ex : Mise à jour dans 5 minutes, finissez vos parties !">
+            <button class="btn-action" style="margin-top:0;" onclick="saveMaintenance()">Appliquer</button>
+        </div>
+        <div class="opt-panel">
+            <h2>🎃 Thème du site</h2>
+            <select id="adm-theme" class="v7-input"><option value="none">Normal</option><option value="halloween">🎃 Halloween</option><option value="noel">🎄 Noël</option></select>
+            <p class="tl-hint" style="text-align:left;">Change la déco pour tout le monde et ajoute une carte « Pixel / Silhouette spécial » avec des persos du thème.</p>
+            <button class="btn-action" style="margin-top:0;" onclick="saveTheme()">Appliquer</button>
+        </div>
+        <div class="opt-panel">
+            <h2>🎵 Ajouter un opening</h2>
+            <p class="tl-hint" style="text-align:left;">Ajouté direct au blind test et au battle d'openings, sans toucher au code.</p>
+            <input id="adm-t-anime" class="v7-input" list="adm-anime-list" maxlength="80" placeholder="Anime (ex : Frieren)"><datalist id="adm-anime-list"></datalist>
+            <input id="adm-t-title" class="v7-input" maxlength="120" placeholder="Artiste - Titre (ex : YOASOBI - Yuusha)">
+            <input id="adm-t-link" class="v7-input" maxlength="300" placeholder="Lien YouTube">
+            <select id="adm-t-kind" class="v7-input"><option value="opening">Opening</option><option value="ending">Ending</option></select>
+            <button class="btn-action" style="margin-top:0;" onclick="addTrack()">Ajouter</button>
+            <div id="adm-tracks" style="margin-top:10px;"></div>
+        </div>
+        <div class="opt-panel">
+            <h2>🐞 Bugs signalés</h2>
+            <div id="adm-bugs"></div>
+        </div>
+        <div class="opt-panel" id="v7-admin" style="display:none;">
+            <h2>📬 Propositions reçues</h2>
+            <div id="v7-admin-list"></div>
+        </div>
+    </section>
+
     <section id="options" class="tab-content">
         <div style="max-width: 400px; margin: 0 auto; background: var(--panel-color); padding: 20px; border-radius: 8px;">
             <h2>Mon compte</h2>
@@ -1568,11 +1628,6 @@
             <input id="sg-link" class="v7-input" maxlength="300" placeholder="Lien YouTube (facultatif)">
             <textarea id="sg-note" class="v7-input" maxlength="500" rows="3" placeholder="Détails (facultatif)"></textarea>
             <button class="btn-action" style="margin-top:0;" onclick="sendSuggestion()">Envoyer</button>
-        </div>
-
-        <div class="opt-panel" id="v7-admin" style="display:none;">
-            <h2>📬 Propositions reçues</h2>
-            <div id="v7-admin-list"></div>
         </div>
 
         <div class="opt-panel">
@@ -2124,6 +2179,8 @@
             draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
+        let QUOTE_COUNTS = {};
+        fetch('/api/quote-counts').then(r => r.json()).then(d => { if (d && d.counts) QUOTE_COUNTS = d.counts; }).catch(() => {});
         function openUniverseSelection(mode) {
             const cfg = UNIVERSE_SELECT_MODES[mode] || UNIVERSE_SELECT_MODES.quote;
             hideAllPanels();
@@ -2150,7 +2207,7 @@
                     b.appendChild(document.createElement('br'));
                     const t = document.createElement('span');
                     t.style.cssText = 'font-size:.65rem;color:var(--text-muted);';
-                    t.textContent = cfg.tag;
+                    t.textContent = mode === 'quote' && QUOTE_COUNTS[key] ? QUOTE_COUNTS[key] + ' citations' : cfg.tag;
                     b.appendChild(t);
                 }
                 b.onclick = () => pick(key);
@@ -4314,7 +4371,7 @@
             imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
             audio:{ title:'🎧 ÉCOUTE LA SCÈNE', sub:"Pas d'image, juste le son d'une scène culte : de quel anime vient-elle ?", universe:false },
             chrono:{ title:'⏱️ CHRONO-QUIZ', sub:'60 secondes pour enchaîner un max de bonnes réponses (bonus de série)', universe:false },
-            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Retrouve les vraies couleurs du perso de mémoire : le plus ressemblant gagne', universe:true },
+            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Une zone du perso est grise : retrouve sa vraie couleur, le plus proche gagne', universe:true },
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
@@ -6619,6 +6676,10 @@
                 return { lab: C[k], share: area[k] / fgArea, where: my < 0.34 ? 'haut' : my > 0.66 ? 'bas' : 'milieu' };
             });
             col.labels = labels; col.D = D; col.W = D.W; col.H = D.H;
+            // une seule zone à deviner : choisie pareil pour tout le monde (même image + même manche)
+            const big = col.zones.map((z, i) => i).filter(i => col.zones[i].share >= 0.12);
+            const pool = big.length ? big : col.zones.map((z, i) => i);
+            col.sel = col.target = pool[((col.round || 1) * 7 + 3) % pool.length];
             return true;
         }
         function colPaint(canvas, highlight) {
@@ -6631,7 +6692,7 @@
             for (let i = 0; i < W * H; i++) {
                 const z = col.labels[i], L = lab[i * 3];
                 let r, g, b;
-                if (z < 0) { const v = Math.round(30 + L * 0.5); r = g = b = v; }
+                if (z !== col.target) { const q = col.D.rgba; r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
                 else {
                     const zl = col.zones[z].lab[0];
                     const c = chosen[z];
@@ -6655,8 +6716,9 @@
         function colZonesUi() {
             const box = document.querySelector('.col-zones');
             if (!box) return;
-            if (box.children.length !== col.zones.length) box.innerHTML = col.zones.map((z, i) => `<button class="col-zone" onclick="colSelect(${i})"><i></i>Zone ${i + 1}<small style="font-weight:600;color:var(--text-muted)">${z.where}</small></button>`).join('');
-            [...box.children].forEach((b, i) => { b.classList.toggle('on', i === col.sel); b.querySelector('i').style.background = col.colors[i] || ''; });
+            const z = col.zones[col.target];
+            if (z && !box.__one) { box.__one = true; box.innerHTML = `<button class="col-zone on" style="grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px;font-size:.85rem;padding:8px;" onclick="colFlash()"><i style="width:40px;"></i>Zone à colorier : en ${z.where === 'milieu' ? 'milieu' : z.where} 👁️</button>`; }
+            const zb = box.querySelector('i'); if (zb) zb.style.background = col.colors[col.target] || '';
             const cur = col.colors[col.sel];
             const prev = document.querySelector('.col-hex span'), inp = document.querySelector('.col-hex input');
             if (prev) prev.style.background = cur || 'transparent';
@@ -6705,14 +6767,11 @@
             if (hue) drag(hue, x => { col.hue = x * 360; apply(); });
         }
         function colScore() {
-            let sum = 0;
-            col.zones.forEach((z, i) => {
-                if (!col.colors[i]) return;
-                const c = rgb2lab(...hex2rgb(col.colors[i]));
-                const dE = Math.sqrt((c[0] - z.lab[0]) ** 2 + (c[1] - z.lab[1]) ** 2 + (c[2] - z.lab[2]) ** 2);
-                sum += z.share * Math.max(0, 1 - dE / 55);
-            });
-            return Math.round(100 * sum);
+            const z = col.zones[col.target], hex = col.colors[col.target];
+            if (!z || !hex) return 0;
+            const c = rgb2lab(...hex2rgb(hex));
+            const dE = Math.sqrt((c[0] - z.lab[0]) ** 2 + (c[1] - z.lab[1]) ** 2 + (c[2] - z.lab[2]) ** 2);
+            return Math.round(100 * Math.max(0, 1 - dE / 50));
         }
         function colSubmit(auto) {
             if (col.sent || !col.zones.length) return;
@@ -6733,10 +6792,11 @@
             const newRound = !col.key.startsWith(q.round + '|');
             col.key = key;
             if (q.phase === 'playing') {
-                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.sent = false; col.myUrl = null; col.D = null; }
+                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.D = null; }
+                col.round = q.round;
                 const info = q.stage.color || {};
                 stage.innerHTML = `<div class="col-wrap">
-                    <div class="col-head">🎨 Colorie <b>${v7esc(info.name || '?')}</b> <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">Choisis une zone, puis sa couleur. Touche l'image pour sélectionner une zone.</div></div>
+                    <div class="col-head">🎨 Colorie <b>${v7esc(info.name || '?')}</b> <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">Une seule zone est en gris : retrouve sa vraie couleur de mémoire !</div></div>
                     <div class="col-canvas-wrap"><canvas class="col-canvas"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation du coloriage…</div></div></div>
                     <div class="col-side">
                         <div class="col-zones"></div>
@@ -6751,8 +6811,7 @@
                     if (!col.labels) return;
                     const r = canvas.getBoundingClientRect();
                     const x = Math.floor((e.clientX - r.left) / r.width * col.W), y = Math.floor((e.clientY - r.top) / r.height * col.H);
-                    const z = col.labels[y * col.W + x];
-                    if (z >= 0) colSelect(z);
+                    colFlash();
                 });
                 const myKey = key;
                 arcLoadImage(q.stage.img).then(img => {
@@ -6783,7 +6842,7 @@
             if (q.phase === 'playing') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 result.style.color = me.done ? 'var(--accent-cyan)' : 'var(--text-color)';
-                result.textContent = me.done ? 'Coloriage envoyé ! Attends les autres…' : 'Retrouve les vraies couleurs de mémoire : le plus ressemblant gagne !';
+                result.textContent = me.done ? 'Coloriage envoyé ! Attends les autres…' : 'Retrouve la vraie couleur de la zone grise : le plus proche gagne !';
             } else if (q.phase === 'reveal') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 const gal = (q.stage && q.stage.gallery) || [];
@@ -6940,6 +6999,173 @@
             window.hideAllPanels = function () { const r = orig.apply(this, arguments); const d = document.getElementById('guess-room'); if (d) d.style.display = 'none'; return r; };
         })();
 
+
+        /* =====================================================================
+           ADMIN, SIGNALEMENTS, MAINTENANCE, THÈMES
+           ===================================================================== */
+        let SITE_STATE = { maintenance: { on: false, msg: '' }, theme: 'none' };
+        const lastStates = {};
+        ['arc_state', 'bt_state', 'quote_state', 'dle_state', 'draw_state', 'guess_state', 'rg_state'].forEach(ev => socket.on(ev, d => { lastStates[ev] = { at: Date.now(), d }; }));
+
+        // --- bannière maintenance + thème ---
+        function applySite(s) {
+            SITE_STATE = s || SITE_STATE;
+            const ban = document.getElementById('site-banner');
+            if (ban) { const m = SITE_STATE.maintenance || {}; ban.style.display = m.on ? 'block' : 'none'; ban.textContent = '🛠️ ' + (m.msg || 'Mise à jour du site en cours, les parties peuvent être coupées.'); document.body.style.paddingTop = m.on ? (ban.offsetHeight || 36) + 'px' : ''; }
+            document.documentElement.classList.toggle('theme-halloween', SITE_STATE.theme === 'halloween');
+            document.documentElement.classList.toggle('theme-noel', SITE_STATE.theme === 'noel');
+            const card = document.getElementById('theme-card');
+            if (card) {
+                if (SITE_STATE.theme === 'halloween' || SITE_STATE.theme === 'noel') {
+                    const h = SITE_STATE.theme === 'halloween';
+                    card.style.display = 'block';
+                    card.innerHTML = `<h3 style="color:var(--accent-yellow);margin-bottom:5px;">${h ? '🎃 Spécial Halloween' : '🎄 Spécial Noël'} <span class="quote-new">ÉVÈNEMENT</span></h3>
+                        <p style="margin:0 0 12px;font-size:.85rem;">${h ? 'Démons, shinigamis, goules et monstres : devine les persos les plus effrayants !' : 'Persos de glace, rennes et esprit de Noël : devine les persos de saison !'}</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','pixel:${SITE_STATE.theme}')">🖼️ Pixel</button><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','silhouette:${SITE_STATE.theme}')">👤 Silhouette</button></div>`;
+                } else card.style.display = 'none';
+            }
+            themeParticles();
+            const f = document.getElementById('adm-maint'); if (f) { f.checked = !!(SITE_STATE.maintenance || {}).on; }
+        }
+        socket.on('site_settings', applySite);
+        let themeTimer = null;
+        function themeParticles() {
+            const layer = document.getElementById('theme-layer');
+            if (!layer) return;
+            clearInterval(themeTimer); layer.innerHTML = '';
+            const t = SITE_STATE.theme;
+            if (t !== 'halloween' && t !== 'noel') return;
+            const set = t === 'halloween' ? ['🦇', '🎃', '👻', '🕸️', '🦇'] : ['❄️', '❄️', '❅', '🎁', '⭐', '❄️'];
+            const spawn = () => {
+                if (layer.children.length > 18) return;
+                const e = document.createElement('span');
+                e.className = 'theme-p ' + t;
+                e.textContent = set[Math.floor(Math.random() * set.length)];
+                e.style.left = Math.random() * 100 + 'vw';
+                e.style.fontSize = (12 + Math.random() * 16) + 'px';
+                e.style.animationDuration = (7 + Math.random() * 7) + 's';
+                layer.appendChild(e);
+                setTimeout(() => e.remove(), 14500);
+            };
+            for (let i = 0; i < 6; i++) setTimeout(spawn, i * 400);
+            themeTimer = setInterval(spawn, 1100);
+        }
+
+        // --- signaler un bug depuis une partie ---
+        function bugSnapshot() {
+            const ent = Object.entries(lastStates).sort((a, b) => b[1].at - a[1].at)[0];
+            if (!ent) return { mode: 'menu', info: {} };
+            const [ev, { d }] = ent;
+            const q = d || {};
+            const info = { ev, room: currentRoomCode || null, game: q.game || q.mode || null, round: q.round ?? q.turn ?? null, phase: q.phase || null,
+                answer: q.answer || (q.reveal && (q.reveal.word || q.reveal.name)) || q.songTitle || null, choices: q.choices || null,
+                img: (q.stage && (q.stage.img || (q.stage.imgs || []).join(' | '))) || null, video: (q.stage && q.stage.video) || q.ytId || q.videoId || null,
+                label: q.gameLabel || null, universe: q.universeLabel || null };
+            Object.keys(info).forEach(k => { if (info[k] == null) delete info[k]; });
+            return { mode: ev.replace('_state', '') + (q.game ? ':' + q.game : ''), info };
+        }
+        function openBugReport() {
+            document.getElementById('v7-bug-modal')?.remove();
+            const snap = bugSnapshot();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'v7-bug-modal';
+            m.innerHTML = `<div class="v7-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>🐞 Signaler un problème</h3>
+                <p class="tl-hint" style="text-align:left;">La manche en cours est jointe automatiquement (image, réponse attendue…).</p>
+                <pre style="background:#0b0b10;border-radius:8px;padding:8px;font-size:.72rem;max-height:120px;overflow:auto;white-space:pre-wrap;">${v7esc(JSON.stringify(snap.info, null, 1))}</pre>
+                <textarea id="bug-note" class="v7-input" rows="3" maxlength="500" placeholder="Qu'est-ce qui ne va pas ? (mauvaise réponse, image cassée, son qui ne marche pas…)"></textarea>
+                <button class="btn-action" style="margin-top:0;" id="bug-send">Envoyer</button></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            document.getElementById('bug-send').onclick = async () => {
+                const d = await v7post('/api/bug', { ...snap, note: document.getElementById('bug-note').value, pseudo: getUsername() });
+                m.remove();
+                toast(d && d.ok ? '🐞 Merci, le signalement est envoyé !' : '❌ ' + ((d && d.error) || 'Impossible'), d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+            };
+        }
+        setInterval(() => {
+            const b = document.getElementById('bug-fab');
+            if (!b) return;
+            const inGame = !!currentRoomCode && GAME_PANELS.some(id => { const el = document.getElementById(id); return el && el.style.display !== 'none' && el.offsetParent !== null; });
+            b.style.display = inGame ? 'block' : 'none';
+        }, 900);
+
+        // --- tableau de bord admin ---
+        async function checkAdmin() {
+            const btn = document.getElementById('btn-admin');
+            if (!btn) return;
+            const d = isAccount() ? await v7get('/api/admin/me') : null;
+            btn.parentElement.style.display = d && d.ok ? '' : 'none';
+        }
+        socket.on('connect', () => setTimeout(checkAdmin, 700));
+        async function loadAdmin() {
+            const box = document.getElementById('adm-stats');
+            if (!box) return;
+            const d = await v7get('/api/admin/stats');
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Accès refusé.</p>'; return; }
+            const maxM = Math.max(1, ...d.modes.map(m => m.n));
+            box.innerHTML = `
+                <div class="adm-cards">
+                    <div><b>${d.online}</b>connectés</div><div><b>${d.accountsOnline}</b>comptes en ligne</div><div><b>${d.inGame}</b>en partie</div>
+                    <div><b>${d.rooms}</b>salons</div><div><b>${d.gamesToday}</b>parties aujourd'hui</div><div><b>${d.gamesWeek}</b>parties (7 j)</div>
+                    <div><b>${d.accounts ?? '—'}</b>comptes</div><div><b>${d.tracks}</b>musiques</div><div><b>${d.bugs}</b>bugs signalés</div>
+                </div>
+                <h3 class="adm-h">🎮 En ce moment</h3>
+                ${d.byMode.length ? d.byMode.map(m => `<div class="daily-row"><span>${v7esc(m.mode)}</span><span>${m.players} joueur(s) • ${m.rooms} salon(s) • ${m.playing} en partie</span></div>`).join('') : '<p class="tl-hint">Aucun salon ouvert.</p>'}
+                <h3 class="adm-h">📊 Modes les plus joués (7 jours)</h3>
+                ${d.modes.length ? d.modes.map(m => `<div class="anime-stat"><span>${v7esc(m.label)}</span><div class="ab"><div style="width:${Math.round(100 * m.n / maxM)}%"></div></div><b>${m.n}</b></div>`).join('') : '<p class="tl-hint">Pas encore de partie enregistrée.</p>'}`;
+            const s = d.site;
+            document.getElementById('adm-maint').checked = !!s.maintenance.on;
+            document.getElementById('adm-maint-msg').value = s.maintenance.msg || '';
+            document.getElementById('adm-theme').value = s.theme || 'none';
+            loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin();
+        }
+        async function saveMaintenance() {
+            const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, msg: document.getElementById('adm-maint-msg').value } });
+            toast(d && d.ok ? '✅ Maintenance mise à jour pour tout le monde' : '❌ Impossible', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+        }
+        async function saveTheme() {
+            const d = await v7post('/api/admin/settings', { theme: document.getElementById('adm-theme').value });
+            toast(d && d.ok ? '✅ Thème appliqué à tout le site' : '❌ Impossible', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+        }
+        async function loadAdminTracks() {
+            const d = await v7get('/api/admin/tracks');
+            const box = document.getElementById('adm-tracks');
+            if (!box || !d || !d.ok) return;
+            const dl = document.getElementById('adm-anime-list');
+            if (dl) dl.innerHTML = d.animes.map(a => `<option value="${v7esc(a)}">`).join('');
+            box.innerHTML = d.rows.length ? d.rows.map(t => `<div class="friend-row"><span style="font-size:.82rem;"><b>${v7esc(t.anime)}</b> • ${v7esc(t.title)} <small style="color:var(--text-muted)">(${t.kind || 'opening'})</small><br><a href="https://youtu.be/${v7esc(t.yt_id)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);font-size:.75rem;">youtu.be/${v7esc(t.yt_id)}</a></span><button onclick="delTrack(${t.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucun opening ajouté depuis ici pour le moment.</p>';
+        }
+        async function addTrack() {
+            const v = id => document.getElementById(id).value;
+            const d = await v7post('/api/admin/tracks', { anime: v('adm-t-anime'), title: v('adm-t-title'), link: v('adm-t-link'), kind: v('adm-t-kind') });
+            if (d && d.ok) { toast('🎵 Ajouté au blind test et au battle !', '#00ff88'); ['adm-t-title', 'adm-t-link'].forEach(id => { document.getElementById(id).value = ''; }); loadAdminTracks(); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+        async function delTrack(id, btn) {
+            if (!btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = 'Sûr ?'; return; }
+            await v7post('/api/admin/tracks/delete', { id }); loadAdminTracks();
+        }
+        async function loadAdminBugs() {
+            const d = await v7get('/api/admin/bugs');
+            const box = document.getElementById('adm-bugs');
+            if (!box || !d || !d.ok) return;
+            box.innerHTML = d.rows.length ? d.rows.map(r => {
+                const i = r.info || {};
+                const img = String(i.img || '').split(' | ')[0];
+                return `<div class="sugg-row"><b>${v7esc(r.mode || '?')}</b> • ${v7esc(r.pseudo || '')} <small style="color:var(--text-muted)">${new Date(r.created_at).toLocaleString('fr-FR')}</small><br>
+                    ${r.note ? `💬 ${v7esc(r.note)}<br>` : ''}${i.label ? v7esc(i.label) + ' • ' : ''}${i.round != null ? 'manche ' + v7esc(i.round) + ' • ' : ''}${i.answer ? 'réponse : <b>' + v7esc(i.answer) + '</b>' : ''}
+                    ${i.choices ? '<br><small>choix : ' + i.choices.map(v7esc).join(' / ') + '</small>' : ''}
+                    ${img && img.startsWith('/api/') ? `<br><small style="color:var(--text-muted)">(image temporaire, peut avoir expiré)</small><br><img src="${v7esc(img)}" style="max-width:120px;border-radius:8px;margin-top:4px;" onerror="this.remove()">` : ''}
+                    ${i.video ? `<br><a href="https://youtu.be/${v7esc(i.video)}" target="_blank" rel="noopener" style="color:var(--accent-cyan)">▶️ vidéo</a>` : ''}
+                    <br><button class="kick-btn" style="margin-top:4px;" onclick="delBug(${r.id})">Supprimer</button></div>`;
+            }).join('') : '<p class="tl-hint">Aucun bug signalé 🎉</p>';
+        }
+        async function delBug(id) { await v7post('/api/admin/bugs/delete', { id }); loadAdminBugs(); }
+        (function () {
+            const orig = window.switchTab;
+            window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'admin') loadAdmin(); return r; };
+        })();
+        fetch('/api/site').then(r => r.json()).then(applySite).catch(() => {});
+
         /* ===== 7 barré dans la police Bangers (sinon on le confond avec le 1) ===== */
         (function () {
             const pending = new Set(); let raf = 0;
@@ -6977,6 +7203,9 @@
     <div id="fx-toasts"></div>
     <div id="fx-reactions"></div>
     <button id="host-fab" onclick="openHostPanel()">👑 Joueurs</button>
+    <button id="bug-fab" onclick="openBugReport()" title="Signaler un bug">🐞</button>
+    <div id="site-banner" style="display:none;"></div>
+    <div id="theme-layer"></div>
     <div id="fx-react-bar" style="display:none;">
         <button onclick="sendReaction('😂')">😂</button><button onclick="sendReaction('🔥')">🔥</button><button onclick="sendReaction('😭')">😭</button>
         <button onclick="sendReaction('😱')">😱</button><button onclick="sendReaction('👏')">👏</button><button onclick="sendReaction('💀')">💀</button>

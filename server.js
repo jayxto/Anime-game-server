@@ -14825,3 +14825,199 @@ io.on('connection', socket => {
     socket.on('rejoin_room', sync);
     socket.on('guess_sync', sync);
 });
+
+/* =====================================================================
+   ADMIN : tableau de bord, openings ajoutés sans code, signalements de bug,
+           mode maintenance, thèmes Halloween / Noël
+   ===================================================================== */
+const SITE = { maintenance: { on: false, msg: '' }, theme: 'none' };
+const CUSTOM_TRACKS_MEM = [], BUGS_MEM = [];
+function customTrackAdd(t) {
+    const n = 5000 + t.id;
+    if (BLINDTEST_TRACKS.some(x => x.n === n)) return;
+    BLINDTEST_TRACKS.push({ n, anime: t.anime, title: t.title, yt: `${t.anime} ${t.title}`, src: null, ytId: t.yt_id, footage: true, custom: true });
+    BLINDTEST_VIDEO_IDS[n] = t.yt_id;
+    if (!BLINDTEST_ANIMES.includes(t.anime)) BLINDTEST_ANIMES.push(t.anime);
+}
+function customTrackRemove(id) {
+    const n = 5000 + id;
+    const i = BLINDTEST_TRACKS.findIndex(x => x.n === n);
+    if (i >= 0) {
+        const anime = BLINDTEST_TRACKS[i].anime;
+        BLINDTEST_TRACKS.splice(i, 1);
+        delete BLINDTEST_VIDEO_IDS[n];
+        if (!BLINDTEST_TRACKS.some(x => x.anime === anime)) { const j = BLINDTEST_ANIMES.indexOf(anime); if (j >= 0) BLINDTEST_ANIMES.splice(j, 1); }
+    }
+}
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value JSONB)`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS custom_tracks (id SERIAL PRIMARY KEY, anime TEXT NOT NULL, title TEXT NOT NULL, yt_id TEXT NOT NULL, kind TEXT, added_by TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS bug_reports (id SERIAL PRIMARY KEY, pseudo TEXT, mode TEXT, info JSONB, note TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            (await pool.query('SELECT key, value FROM site_settings')).rows.forEach(r => { if (r.key in SITE) SITE[r.key] = r.value; });
+            (await pool.query('SELECT * FROM custom_tracks ORDER BY id')).rows.forEach(customTrackAdd);
+        } catch (e) { console.warn('[Admin] tables :', e.message); }
+    })();
+}
+async function siteSave(key) {
+    io.emit('site_settings', SITE);
+    if (HAS_DB) { try { await pool.query('INSERT INTO site_settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO UPDATE SET value=$2', [key, JSON.stringify(SITE[key])]); } catch (_) {} }
+}
+io.on('connection', socket => { socket.emit('site_settings', SITE); });
+app.get('/api/site', (req, res) => res.json({ ok: true, ...SITE }));
+app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.fromEntries(Object.entries(QUOTE_UNIVERSES).map(([k, v]) => [k, v.quotes.length])) }));
+
+const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
+app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
+app.get('/api/admin/stats', adminOnly(async (req, res) => {
+    const socketsN = io.sockets && io.sockets.sockets ? io.sockets.sockets.size : 0;
+    const roomsList = Object.values(rooms);
+    const byMode = {};
+    roomsList.forEach(r => { const k = roomLabel(r); const o = byMode[k] = byMode[k] || { rooms: 0, players: 0, playing: 0 }; o.rooms++; o.players += r.players.length; if (r.status !== 'waiting') o.playing++; });
+    let modes = [], accounts = null, gamesToday = 0, gamesWeek = 0, suggestions = 0, bugs = 0;
+    if (HAS_DB) {
+        modes = (await pool.query(`SELECT mode, count(*)::int AS n FROM game_results WHERE created_at > now() - interval '7 days' GROUP BY mode ORDER BY n DESC LIMIT 20`)).rows;
+        accounts = (await pool.query('SELECT count(*)::int AS n FROM users')).rows[0].n;
+        gamesToday = (await pool.query('SELECT count(*)::int AS n FROM game_results WHERE created_at >= $1', [parisDayStart()])).rows[0].n;
+        gamesWeek = (await pool.query(`SELECT count(*)::int AS n FROM game_results WHERE created_at > now() - interval '7 days'`)).rows[0].n;
+        suggestions = (await pool.query('SELECT count(*)::int AS n FROM suggestions')).rows[0].n;
+        bugs = (await pool.query('SELECT count(*)::int AS n FROM bug_reports')).rows[0].n;
+    } else {
+        const agg = {}; PROG_MEM.results.forEach(r => { agg[r.mode] = (agg[r.mode] || 0) + 1; });
+        modes = Object.entries(agg).map(([mode, n]) => ({ mode, n })).sort((a, b) => b.n - a.n);
+        gamesWeek = PROG_MEM.results.length; suggestions = SUGG_MEM.length; bugs = BUGS_MEM.length;
+    }
+    res.json({ ok: true, online: socketsN, accountsOnline: userSockets.size, rooms: roomsList.length,
+        inGame: roomsList.filter(r => r.status !== 'waiting').reduce((a, r) => a + r.players.length, 0),
+        byMode: Object.entries(byMode).map(([mode, o]) => ({ mode, ...o })).sort((a, b) => b.players - a.players),
+        modes: modes.map(m => ({ ...m, label: MODE_LABELS[m.mode] || m.mode })), accounts, gamesToday, gamesWeek, suggestions, bugs,
+        tracks: BLINDTEST_TRACKS.length, animes: BLINDTEST_ANIMES.length, site: SITE });
+}));
+app.post('/api/admin/settings', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (b.maintenance) { SITE.maintenance = { on: !!b.maintenance.on, msg: String(b.maintenance.msg || '').slice(0, 300) }; await siteSave('maintenance'); }
+    if (b.theme !== undefined) { SITE.theme = ['none', 'halloween', 'noel'].includes(b.theme) ? b.theme : 'none'; await siteSave('theme'); }
+    res.json({ ok: true, site: SITE });
+}));
+function ytIdFrom(s) {
+    s = String(s || '').trim();
+    const m = s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : null;
+}
+app.get('/api/admin/tracks', adminOnly(async (req, res) => {
+    let rows = CUSTOM_TRACKS_MEM.slice();
+    if (HAS_DB) rows = (await pool.query('SELECT * FROM custom_tracks ORDER BY id DESC')).rows;
+    res.json({ ok: true, rows, animes: BLINDTEST_ANIMES.slice().sort((a, b) => a.localeCompare(b, 'fr')) });
+}));
+app.post('/api/admin/tracks', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const anime = String(b.anime || '').trim().slice(0, 80), title = String(b.title || '').trim().slice(0, 120), yt = ytIdFrom(b.link);
+    if (!anime || !title) return res.json({ ok: false, error: "Mets l'anime et le titre." });
+    if (!yt) return res.json({ ok: false, error: 'Lien YouTube invalide.' });
+    if (BLINDTEST_TRACKS.some(t => (t.ytId || BLINDTEST_VIDEO_IDS[t.n]) === yt)) return res.json({ ok: false, error: 'Cette vidéo est déjà dans le blind test.' });
+    const kind = b.kind === 'ending' ? 'ending' : 'opening';
+    let row;
+    if (HAS_DB) row = (await pool.query('INSERT INTO custom_tracks (anime, title, yt_id, kind, added_by) VALUES ($1,$2,$3,$4,$5) RETURNING *', [anime, title, yt, kind, 'admin'])).rows[0];
+    else { row = { id: CUSTOM_TRACKS_MEM.length + 1, anime, title, yt_id: yt, kind, created_at: new Date() }; CUSTOM_TRACKS_MEM.push(row); }
+    customTrackAdd(row);
+    res.json({ ok: true, row });
+}));
+app.post('/api/admin/tracks/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM custom_tracks WHERE id=$1', [id]);
+    else { const i = CUSTOM_TRACKS_MEM.findIndex(t => t.id === id); if (i >= 0) CUSTOM_TRACKS_MEM.splice(i, 1); }
+    customTrackRemove(id);
+    res.json({ ok: true });
+}));
+const bugLast = new Map();
+app.post('/api/bug', async (req, res) => {
+    const b = req.body || {};
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0];
+    const now = Date.now();
+    const hist = (bugLast.get(ip) || []).filter(t => now - t < 3600000);
+    if (hist.length >= 15) return res.json({ ok: false, error: 'Trop de signalements, réessaie plus tard.' });
+    hist.push(now); bugLast.set(ip, hist);
+    let info = b.info && typeof b.info === 'object' ? b.info : {};
+    if (JSON.stringify(info).length > 6000) info = { trop_long: true };
+    const item = { pseudo: String(b.pseudo || 'Invité').slice(0, 20), mode: String(b.mode || '').slice(0, 40), info, note: String(b.note || '').slice(0, 500) };
+    if (HAS_DB) { try { await pool.query('INSERT INTO bug_reports (pseudo, mode, info, note) VALUES ($1,$2,$3,$4)', [item.pseudo, item.mode, item.info, item.note]); } catch (e) { return res.json({ ok: false }); } }
+    else BUGS_MEM.push({ id: BUGS_MEM.length + 1, ...item, created_at: new Date() });
+    res.json({ ok: true });
+});
+app.get('/api/admin/bugs', adminOnly(async (req, res) => {
+    let rows = BUGS_MEM.slice().reverse();
+    if (HAS_DB) rows = (await pool.query('SELECT * FROM bug_reports ORDER BY created_at DESC LIMIT 200')).rows;
+    res.json({ ok: true, rows });
+}));
+app.post('/api/admin/bugs/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM bug_reports WHERE id=$1', [id]);
+    else { const i = BUGS_MEM.findIndex(t => t.id === id); if (i >= 0) BUGS_MEM.splice(i, 1); }
+    res.json({ ok: true });
+}));
+
+/* ---------- Thèmes : Pixel / Silhouette spéciaux avec des persos du thème ---------- */
+const THEME_CHARS = {
+    halloween: [['deathnote', 'Ryuk'], ['deathnote', 'Rem'], ['tokyoghoul', 'Ken Kaneki'], ['tokyoghoul', 'Rize Kamishiro'], ['tokyoghoul', 'Eto Yoshimura'], ['demonslayer', 'Muzan Kibutsuji'],
+        ['demonslayer', 'Akaza'], ['demonslayer', 'Kokushibo'], ['demonslayer', 'Doma'], ['demonslayer', 'Rui'], ['jjk', 'Ryomen Sukuna'], ['jjk', 'Mahito'], ['jjk', 'Jogo'], ['naruto', 'Orochimaru'],
+        ['naruto', 'Kisame Hoshigaki'], ['naruto', 'Hidan'], ['naruto', 'Zetsu'], ['onepiece', 'Brook'], ['onepiece', 'Gecko Moria'], ['onepiece', 'Perona'], ['hxh', 'Hisoka Morow'], ['hxh', 'Illumi Zoldyck'],
+        ['hxh', 'Neferpitou'], ['dragonball', 'Majin Buu'], ['dragonball', 'Cell'], ['chainsaw', 'Pochita'], ['chainsaw', 'Power'], ['chainsaw', 'Makima'], ['fma', 'Envy'], ['fma', 'Gluttony'],
+        ['bleach', 'Ulquiorra Cifer'], ['bleach', 'Mayuri Kurotsuchi'], ['bleach', 'Kenpachi Zaraki'], ['snk', 'Zeke Yeager'], ['fairy', 'Zeref Dragneel'], ['jojo', 'Dio Brando'], ['bluelock', 'Ryusei Shidou']],
+    noel: [['onepiece', 'Tony Tony Chopper'], ['chainsaw', 'Santa Claus'], ['bleach', 'Toshiro Hitsugaya'], ['bleach', 'Rukia Kuchiki'], ['fairy', 'Gray Fullbuster'], ['onepiece', 'Kuzan'],
+        ['naruto', 'Haku'], ['snk', 'Mikasa Ackerman'], ['fairy', 'Juvia Lockser'], ['demonslayer', 'Nezuko Kamado'], ['demonslayer', 'Kyojuro Rengoku'], ['hxh', 'Killua Zoldyck'],
+        ['naruto', 'Hinata Hyūga'], ['jjk', 'Toge Inumaki'], ['jjk', 'Panda'], ['dragonball', 'Son Goku'], ['onepiece', 'Monkey D. Luffy'], ['pokemon', 'Pikachu'], ['pokemon', 'Givrali'],
+        ['pokemon', 'Lokhlass'], ['pokemon', 'Artikodin'], ['pokemon', 'Delibird'], ['pokemon', 'Cadoizo'], ['pokemon', 'Oinkologne'], ['opm', 'Saitama'], ['haikyuu', 'Kenma Kozume']]
+};
+function themePool(theme) {
+    const list = THEME_CHARS[theme] || [];
+    const out = [];
+    list.forEach(([u, name]) => {
+        if (!ARC_UNIVERSE_ANIME[u]) return;
+        const n = normTxt(name);
+        const c = arcFamous(u).find(x => normTxt(x.display) === n) || arcFamous(u).find(x => normTxt(x.display).includes(n) || n.includes(normTxt(x.display)));
+        if (c) out.push({ ...c, u });
+    });
+    return out;
+}
+const _startArcadeTheme = startArcade;
+startArcade = function (room, roomCode) {
+    const [game, uni] = String(room.subMode || '').split(':');
+    const theme = uni === 'halloween' || uni === 'noel' ? uni : null;
+    _startArcadeTheme(room, roomCode);
+    const g = arcGames[roomCode];
+    if (g && theme) arcThemeInit(g);
+};
+const _arcBuildRoundTheme = arcBuildRound;
+function arcThemeInit(g) {
+    if (g.themePool !== undefined) return;
+    g.themePool = null;
+    const code = Object.keys(arcGames).find(k => arcGames[k] === g);
+    const room = code && rooms[code];
+    const [game, uni] = String((room && room.subMode) || '').split(':');
+    if ((uni === 'halloween' || uni === 'noel') && (game === 'pixel' || game === 'silhouette') && g.game === game) {
+        g.themePool = arcShuffle(themePool(uni));
+        g.themeName = uni;
+    }
+}
+arcBuildRound = async function (g) {
+    arcThemeInit(g);
+    if (!g.themePool || !g.themePool.length) return _arcBuildRoundTheme(g);
+    for (let tries = 0; tries < 6 && g.themePool.length; tries++) {
+        const c = g.themePool.shift();
+        g.themePool.push(c);
+        if (g.used.has(c.u + '|' + c.display) && g.used.size < g.themePool.length) continue;
+        const url = await arcCharImage(c.u, c.raw);
+        if (!url || !(await arcUsableImage(url))) continue;
+        g.used.add(c.u + '|' + c.display);
+        return { u: c.u, targets: [c], img: arcToken(url), answer: c.display };
+    }
+    return _arcBuildRoundTheme(g);
+};
+const _arcPublicTheme = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicTheme(room, g);
+    if (g.themeName) out.universeLabel = g.themeName === 'halloween' ? '🎃 Spécial Halloween' : '🎄 Spécial Noël';
+    return out;
+};
