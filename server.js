@@ -12634,7 +12634,7 @@ async function progRecord(room, mode, universe, entries) {
         const p = e.player;
         if (!p || !p.userId) continue;
         const points = Math.max(0, Math.round(e.points || 0));
-        const xpGain = 15 + (e.won ? 25 : 0) + Math.min(40, Math.round(points / 40));
+        const xpGain = (15 + (e.won ? 25 : 0) + Math.min(40, Math.round(points / 40))) * hubMult(); // x2 le week-end
         try {
             if (HAS_DB) {
                 await pool.query('INSERT INTO game_results (user_id, pseudo, mode, universe, points, won) VALUES ($1,$2,$3,$4,$5,$6)',
@@ -15808,7 +15808,7 @@ progRecord = async function (room, mode, universe, entries) {
     for (const e of entries || []) {
         const p = e.player;
         if (!p || !p.userId) continue;
-        const gain = 10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80));
+        const gain = (10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80))) * hubMult(); // x2 le week-end
         const total = await ecoAddCoins(p.userId, gain);
         io.to(p.id).emit('coins_gain', { gain, total });
     }
@@ -15984,11 +15984,12 @@ const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.sta
 app.get('/api/shop', async (req, res) => {
     const uid = authUserId(req);
     const e = uid ? await ecoGet(uid) : null;
-    res.json({ ok: true, items: SHOP, coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+    res.json({ ok: true, items: SHOP.filter(i => !i.pass || (e && e.owned.includes(i.id))), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
 });
 app.post('/api/shop/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const it = SHOP_BY_ID[String((req.body || {}).id)];
+    if (it && it.pass) return res.json({ ok: false, error: 'Objet exclusif au pass de saison.' });
     if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
     const e = await ecoGet(uid);
     if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
@@ -16045,7 +16046,8 @@ app.get('/api/cards', async (req, res) => {
         });
     }
     const all = [...mine.values()];
-    res.json({ ok: true, universes, cards, total: universes.reduce((a, x) => a + x.total, 0), owned: mine.size, shinies: all.filter(c => c.shiny > 0).length });
+    res.json({ ok: true, universes, cards, total: universes.reduce((a, x) => a + x.total, 0), owned: [...mine.keys()].filter(k => !k.startsWith('collector|')).length, shinies: all.filter(c => c.shiny > 0).length,
+        collectors: [...mine.keys()].filter(k => k.startsWith('collector|')).map(k => { const [, week, cu, display] = k.split('|'); return { week, name: display, anime: ARC_UNIVERSE_ANIME[cu], img: cardImg({ u: cu, display }) }; }) });
 });
 app.get('/api/titles', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -16178,7 +16180,49 @@ app.get(['/', '/index.html'], (req, res) => {
     if (gsv) head += `\n    <meta name="google-site-verification" content="${gsv.replace(/[^A-Za-z0-9_\-]/g, '')}">`;
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Cache-Control', 'no-cache');
+    head += `\n    <link rel="alternate" hreflang="fr" href="${url}/">\n    <link rel="alternate" hreflang="en" href="${url}/en">\n    <link rel="alternate" hreflang="x-default" href="${url}/">`;
     res.send(indexHtml().replace('<!--SEO-->', head));
+});
+// Version anglaise (même jeu, interface traduite) : page dédiée pour Google
+const SEO_EN_ABOUT = `<section id="seo-about" class="seo-about">
+        <h1>Anime Game: free multiplayer anime quizzes and party games</h1>
+        <p>Create a room, send the code to your friends and play together right in your browser, nothing to download. Perfect for game nights, Discord voice chats or live streams with your Twitch chat.</p>
+        <h2>Game modes</h2>
+        <ul>
+            <li><b>Anime openings blind test</b>: recognize the anime from its opening or ending.</li>
+            <li><b>Anime Undercover</b>: find the impostor who doesn't have the same character as everyone else.</li>
+            <li><b>Draw the character</b>: draw an anime character while the others guess (stream mode for your Twitch chat).</li>
+            <li><b>Guess the character</b>: ask yes / no questions to find the mystery character.</li>
+            <li><b>Quotes</b>: who said this iconic line?</li>
+            <li><b>AnimeDLE</b>: the Wordle of anime characters, with a daily challenge.</li>
+            <li><b>Ranked 1v1 duels</b>: face an opponent at your level and climb from Bronze to Hokage.</li>
+            <li><b>Clans, season pass and server boss</b>: team up, unlock rewards and take down the daily boss with the whole community.</li>
+            <li><b>Mini-games</b>: Pixel, Extreme zoom, Silhouette, Emoji, 4 pictures 1 anime, Tournament and more.</li>
+        </ul>
+        <p>30+ anime: Naruto, One Piece, Bleach, Hunter x Hunter, Attack on Titan, Demon Slayer, Jujutsu Kaisen, Dragon Ball, Chainsaw Man, JoJo, Pokémon, Solo Leveling… Earn coins, collect cards of your favorite characters and unlock titles.</p>
+    </section>`;
+app.get(['/en', '/en/'], (req, res) => {
+    const url = siteUrl(req);
+    let head = `<link rel="canonical" href="${url}/en">\n    <meta property="og:url" content="${url}/en">\n    <meta property="og:image" content="${url}/og.png">\n    <meta name="twitter:image" content="${url}/og.png">`;
+    head += `\n    <link rel="alternate" hreflang="fr" href="${url}/">\n    <link rel="alternate" hreflang="en" href="${url}/en">\n    <link rel="alternate" hreflang="x-default" href="${url}/">\n    <script>window.FORCE_LANG='en';</script>`;
+    const gsv = String(process.env.GOOGLE_SITE_VERIFICATION || '').trim();
+    if (gsv) head += `\n    <meta name="google-site-verification" content="${gsv.replace(/[^A-Za-z0-9_\-]/g, '')}">`;
+    const T = 'Anime Game – Free multiplayer anime quizzes and games';
+    const D = 'Play free anime games with friends or your Twitch chat: openings blind test, Undercover, Draw the character, quotes, AnimeDLE, ranked duels and 20+ mini-games on Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…';
+    let html = indexHtml().replace('<!--SEO-->', head).replace('<html lang="fr">', '<html lang="en">')
+        .replace(/<title>[^<]*<\/title>/, `<title>${T}</title>`)
+        .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${D}">`)
+        .replace('<meta property="og:locale" content="fr_FR">', '<meta property="og:locale" content="en_US">')
+        .replace(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${T}">`)
+        .replace(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${D}">`)
+        .replace(/<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${T}">`)
+        .replace(/<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${D}">`)
+        .replace('"inLanguage":"fr"', '"inLanguage":"en"');
+    const a = html.indexOf('<section id="seo-about"'), b = a >= 0 ? html.indexOf('</section>', a) : -1;
+    if (a >= 0 && b > a) html = html.slice(0, a) + SEO_EN_ABOUT + html.slice(b + '</section>'.length);
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('Cache-Control', 'no-cache');
+    res.send(html);
 });
 Object.keys(SEO_IMG).forEach(name => app.get('/' + name, (req, res) => { res.set('Content-Type', 'image/png'); res.set('Cache-Control', 'public, max-age=604800'); res.send(SEO_IMG[name]); }));
 app.get('/favicon.ico', (req, res) => { res.set('Content-Type', 'image/png'); res.set('Cache-Control', 'public, max-age=604800'); res.send(SEO_IMG['icon-192.png']); });
@@ -16187,7 +16231,7 @@ app.get('/robots.txt', (req, res) => {
 });
 app.get('/sitemap.xml', (req, res) => {
     const day = new Date().toISOString().slice(0, 10);
-    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl(req)}/</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n`);
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${siteUrl(req)}/</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n  <url><loc>${siteUrl(req)}/en</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n`);
 });
 app.get('/manifest.webmanifest', (req, res) => {
     res.type('application/manifest+json').send(JSON.stringify({
@@ -16203,6 +16247,963 @@ app.get(/^\/google[a-z0-9]+\.html$/i, (req, res, next) => {
     if (!f || req.path.slice(1) !== f) return next();
     res.type('text/html').send(`google-site-verification: ${f}`);
 });
+
+/* =====================================================================
+   HUB : Zoom extrême, duel classé, clans, salon vocal, mode spectateur,
+   pass de saison, échange et fusion de cartes, coffre du jour, maîtrise
+   des animes, week-end x2, boss du serveur, anime de la semaine,
+   tournoi du dimanche
+   ===================================================================== */
+const HUB_SHIFT = +(process.env.HUB_TIME_SHIFT_MS || 0); // pour tester les horaires
+const hubNow = () => Date.now() + HUB_SHIFT;
+function parisParts(ms = hubNow()) {
+    const o = {};
+    new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+        .formatToParts(new Date(ms)).forEach(p => { o[p.type] = p.value; });
+    return { wd: o.weekday, y: +o.year, m: +o.month, d: +o.day, h: +o.hour, min: +o.minute };
+}
+function isWeekend(ms) { const w = parisParts(ms).wd; return w === 'Sat' || w === 'Sun'; }
+function hubMult() { return isWeekend() ? 2 : 1; }
+function weekKey(ms = hubNow()) { // lundi de la semaine (heure de Paris)
+    const p = parisParts(ms);
+    const d = new Date(Date.UTC(p.y, p.m - 1, p.d));
+    d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    return d.toISOString().slice(0, 10);
+}
+function seasonKey(ms = hubNow()) { const p = parisParts(ms); return p.y + '-' + String(p.m).padStart(2, '0'); }
+function seasonEndsAt(ms = hubNow()) { // approximatif : 1er du mois suivant à minuit (Paris ≈ UTC+1/2)
+    const p = parisParts(ms);
+    return Date.UTC(p.m === 12 ? p.y + 1 : p.y, p.m === 12 ? 0 : p.m, 1) - 3600 * 1000;
+}
+function hubHash(s) { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+/* ---------- petit stockage clé / valeur (table hub_kv, cache mémoire) ---------- */
+const KV = new Map();
+const KV_READY = HAS_DB
+    ? pool.query(`CREATE TABLE IF NOT EXISTS hub_kv (ns TEXT NOT NULL, k TEXT NOT NULL, v JSONB, updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY (ns, k))`).catch(e => console.warn('[Hub] table :', e.message))
+    : Promise.resolve();
+const kvClone = v => v === undefined ? null : JSON.parse(JSON.stringify(v));
+async function kvGet(ns, k, def) {
+    const key = ns + '|' + k;
+    if (KV.has(key)) return KV.get(key);
+    let v;
+    if (HAS_DB) {
+        await KV_READY;
+        try { const r = (await pool.query('SELECT v FROM hub_kv WHERE ns=$1 AND k=$2', [ns, String(k)])).rows[0]; if (r) v = r.v; } catch (_) {}
+    }
+    if (KV.has(key)) return KV.get(key); // chargé entre-temps par un autre appel
+    if (v === undefined || v === null) v = def === undefined ? null : kvClone(def);
+    KV.set(key, v);
+    return v;
+}
+async function kvSet(ns, k, v) {
+    KV.set(ns + '|' + k, v);
+    if (!HAS_DB) return;
+    await KV_READY;
+    try { await pool.query('INSERT INTO hub_kv (ns, k, v, updated_at) VALUES ($1,$2,$3,now()) ON CONFLICT (ns, k) DO UPDATE SET v=$3, updated_at=now()', [ns, String(k), JSON.stringify(v)]); }
+    catch (e) { console.warn('[Hub] kvSet', ns, e.message); }
+}
+async function kvDel(ns, k) {
+    KV.delete(ns + '|' + k);
+    if (HAS_DB) { await KV_READY; try { await pool.query('DELETE FROM hub_kv WHERE ns=$1 AND k=$2', [ns, String(k)]); } catch (_) {} }
+}
+async function kvList(ns) { // [{k, v}]
+    const out = new Map();
+    if (HAS_DB) {
+        await KV_READY;
+        try { (await pool.query('SELECT k, v FROM hub_kv WHERE ns=$1', [ns])).rows.forEach(r => { if (!KV.has(ns + '|' + r.k)) KV.set(ns + '|' + r.k, r.v); }); } catch (_) {}
+    }
+    for (const [key, v] of KV) if (key.startsWith(ns + '|') && v !== null) out.set(key.slice(ns.length + 1), v);
+    return [...out].map(([k, v]) => ({ k, v }));
+}
+async function pseudoOf(uid) {
+    if (HAS_DB) { try { const r = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]; if (r) return r.pseudo; } catch (_) {} }
+    for (const s of io.sockets.sockets.values()) if (s.user && s.user.id === uid) return s.user.pseudo;
+    return 'Joueur';
+}
+async function ownAdd(uid, id) {
+    const e = await ecoGet(uid);
+    if (!e || e.owned.includes(id)) return false;
+    e.owned.push(id);
+    if (HAS_DB) { try { await pool.query('UPDATE users SET owned=$2 WHERE id=$1', [uid, JSON.stringify(e.owned)]); } catch (_) {} }
+    else await ecoSave(uid, e);
+    return true;
+}
+function emitUser(uid, ev, data) { socketsOfUser(uid).forEach(sid => io.to(sid).emit(ev, data)); }
+async function areFriends(a, b) {
+    if (!HAS_DB) return true;
+    try { return !!(await pool.query(`SELECT 1 FROM friends WHERE user_id=$1 AND friend_id=$2 AND status='accepted'`, [a, b])).rows[0]; } catch (_) { return false; }
+}
+async function friendsOf(uid) {
+    if (!HAS_DB) return [];
+    try { return (await pool.query(`SELECT u.id, u.pseudo FROM friends f JOIN users u ON u.id=f.friend_id WHERE f.user_id=$1 AND f.status='accepted' ORDER BY u.pseudo`, [uid])).rows; } catch (_) { return []; }
+}
+function newRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    for (let t = 0; t < 50; t++) { let c = ''; for (let i = 0; i < 4; i++) c += chars[Math.floor(Math.random() * chars.length)]; if (!rooms[c]) return c; }
+    return 'X' + Date.now().toString(36).slice(-3).toUpperCase();
+}
+function serverRoom(code, mode, subMode, extra) {
+    rooms[code] = Object.assign({ code, mode, subMode, host: '__server__', status: 'waiting', players: [], currentTheme: '', currentTurnIndex: 0, noImpostor: false, votes: {}, lockHost: '__server__' }, extra || {});
+    return rooms[code];
+}
+// salons tenus par le serveur (duel classé, tournoi du dimanche) : personne ne peut lancer ou exclure
+setInterval(() => { for (const r of Object.values(rooms)) if (r && r.lockHost && r.host !== r.lockHost) r.host = r.lockHost; }, 1000);
+
+/* =====================================================================
+   ZOOM EXTRÊME : l'image part d'un détail et dézoome petit à petit
+   ===================================================================== */
+ARC_GAMES.zoom = { label: 'Zoom extrême', icon: '🔍', universe: true, rounds: 10, roundMs: 25000, answer: 'text' };
+MODE_LABELS['arcade:zoom'] = 'Zoom extrême';
+const _arcBuildRoundZoom = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game !== 'zoom') return _arcBuildRoundZoom(g);
+    for (let attempt = 0; attempt < 4; attempt++) {
+        const u = arcPickUniverse(g);
+        const [c] = await arcFindCharacters(g, u, 1, 6);
+        // point de départ : un détail du perso (visage, main, arme…) vers le centre de l'image
+        if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display, focus: { x: +(0.28 + Math.random() * 0.44).toFixed(3), y: +(0.18 + Math.random() * 0.45).toFixed(3) } };
+    }
+    return null;
+};
+const _arcPublicZoom = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicZoom(room, g);
+    if (g && g.game === 'zoom' && g.current && g.current.focus && out.stage) out.stage.focus = g.current.focus;
+    return out;
+};
+if (typeof TOUR_POOL !== 'undefined' && !TOUR_POOL.includes('zoom')) TOUR_POOL.push('zoom');
+
+/* =====================================================================
+   WEEK-END x2 + PASS DE SAISON (XP) + POINTS DE CLAN : accroche sur les fins de partie
+   ===================================================================== */
+const _progRecordHub = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordHub(room, mode, universe, entries);
+    const mult = hubMult();
+    for (const e of entries || []) {
+        const p = e.player;
+        if (!p || !p.userId) continue;
+        const points = Math.max(0, Math.round(e.points || 0));
+        try {
+            const xp = (15 + (e.won ? 25 : 0) + Math.min(40, Math.round(points / 40))) * mult;
+            await passAddXp(p.userId, xp, p.id);
+            await clanAddPoints(p.userId, (10 + (e.won ? 20 : 0) + Math.min(30, Math.round(points / 80))) * mult);
+        } catch (err) { console.warn('[Hub] fin de partie', err.message); }
+    }
+    try { await rankedOnFinish(room, entries); } catch (err) { console.warn('[Classé]', err.message); }
+    try { await weeklyOnFinish(room, entries); } catch (err) { console.warn('[Tournoi hebdo]', err.message); }
+    return r;
+};
+
+/* =====================================================================
+   PASS DE SAISON : 30 paliers par mois, piste gratuite + piste premium
+   ===================================================================== */
+const PASS_TIERS = 30, PASS_XP = 150, PASS_PRICE = 1200;
+SHOP.push(
+    { id: 'color:aurora', kind: 'color', key: 'aurora', name: 'Aurore 🌌 (Pass)', price: 0, pass: true },
+    { id: 'frame:flame', kind: 'frame', key: 'flame', name: 'Flammes 🔥 (Pass)', price: 0, pass: true },
+    { id: 'effect:aurora', kind: 'effect', key: 'aurora', name: 'Aurore boréale 🌌 (Pass)', price: 0, pass: true }
+);
+SHOP.forEach(i => { SHOP_BY_ID[i.id] = i; });
+TITLES.push(
+    { id: 'legende', name: 'Légende de la saison', desc: 'Palier 30 du pass premium', need: s => (s.owned || []).includes('title:legende') },
+    { id: 'champion', name: 'Champion du dimanche', desc: 'Gagner le tournoi du dimanche', need: s => (s.owned || []).includes('title:champion') },
+    { id: 'hokage', name: 'Hokage', desc: 'Atteindre le rang Hokage en duel classé', need: s => (s.owned || []).includes('title:hokage') },
+    { id: 'tueur', name: 'Tueur de boss', desc: 'Participer à la chute de 5 boss du serveur', need: s => (s.bossKills || 0) >= 5, prog: s => [s.bossKills || 0, 5] },
+    { id: 'maitre', name: 'Grand maître', desc: 'Maîtriser 3 animes (100 bonnes réponses chacun)', need: s => (s.masteries || 0) >= 3, prog: s => [s.masteries || 0, 3] }
+);
+const _titleStatsHub = titleStats;
+titleStats = async function (uid) {
+    const s = await _titleStatsHub(uid);
+    s.owned = ((await ecoGet(uid)) || {}).owned || [];
+    s.bossKills = ((await kvGet('bosskills', uid, { n: 0 })) || {}).n || 0;
+    s.masteries = Object.keys((await kvGet('mastery', uid, {})) || {}).length;
+    return s;
+};
+function passReward(tier, track) {
+    if (track === 'free') {
+        if (tier === PASS_TIERS) return { booster: 10, label: 'Booster 10 cartes' };
+        if (tier % 5 === 0) return { booster: 3, label: 'Booster 3 cartes' };
+        return { coins: 20 + tier * 2, label: `${20 + tier * 2} pièces` };
+    }
+    if (tier === 10) return { item: 'color:aurora', label: 'Couleur Aurore 🌌' };
+    if (tier === 20) return { item: 'frame:flame', label: 'Cadre Flammes 🔥' };
+    if (tier === 25) return { item: 'effect:aurora', label: 'Effet Aurore boréale' };
+    if (tier === PASS_TIERS) return { item: 'title:legende', label: 'Titre « Légende de la saison »', coins: 300 };
+    if (tier % 5 === 0) return { booster: 10, label: 'Booster 10 cartes' };
+    return { coins: 40 + tier * 3, label: `${40 + tier * 3} pièces` };
+}
+async function passGet(uid, season = seasonKey()) { return kvGet('pass', season + '|' + uid, { xp: 0, premium: false, free: [], prem: [] }); }
+async function passAddXp(uid, xp, sid) {
+    const season = seasonKey();
+    const p = await passGet(uid, season);
+    const before = Math.min(PASS_TIERS, Math.floor(p.xp / PASS_XP));
+    p.xp += Math.max(0, Math.round(xp));
+    const after = Math.min(PASS_TIERS, Math.floor(p.xp / PASS_XP));
+    await kvSet('pass', season + '|' + uid, p);
+    if (after > before) (sid ? io.to(sid) : { emit() {} }).emit('pass_tier', { tier: after });
+}
+async function grantReward(uid, rw) {
+    const out = { coins: 0, cards: null, item: null };
+    if (rw.coins) { await ecoAddCoins(uid, rw.coins); out.coins = rw.coins; }
+    if (rw.booster) out.cards = await openBooster(uid, rw.booster);
+    if (rw.item) { await ownAdd(uid, rw.item); out.item = rw.item; }
+    return out;
+}
+app.get('/api/pass', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const p = await passGet(uid);
+    const tiers = [];
+    for (let t = 1; t <= PASS_TIERS; t++) tiers.push({ tier: t, free: passReward(t, 'free').label, prem: passReward(t, 'prem').label });
+    res.json({ ok: true, season: seasonKey(), endsAt: seasonEndsAt(), xp: p.xp, perTier: PASS_XP, tier: Math.min(PASS_TIERS, Math.floor(p.xp / PASS_XP)), premium: !!p.premium, claimed: { free: p.free, prem: p.prem }, tiers, price: PASS_PRICE, weekend: isWeekend() });
+});
+app.post('/api/pass/buy', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const p = await passGet(uid);
+    if (p.premium) return res.json({ ok: false, error: 'Tu as déjà le pass premium.' });
+    const e = await ecoGet(uid);
+    if (e.coins < PASS_PRICE) return res.json({ ok: false, error: `Il te manque ${PASS_PRICE - e.coins} pièces.` });
+    if (HAS_DB) {
+        const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, PASS_PRICE])).rows[0];
+        if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' });
+    } else e.coins -= PASS_PRICE;
+    p.premium = true;
+    await kvSet('pass', seasonKey() + '|' + uid, p);
+    res.json({ ok: true, coins: ((await ecoGet(uid)) || {}).coins });
+});
+app.post('/api/pass/claim', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const tier = +(req.body || {}).tier, track = (req.body || {}).track === 'prem' ? 'prem' : 'free';
+    const p = await passGet(uid);
+    const reached = Math.min(PASS_TIERS, Math.floor(p.xp / PASS_XP));
+    if (!(tier >= 1 && tier <= reached)) return res.json({ ok: false, error: 'Palier pas encore atteint.' });
+    if (track === 'prem' && !p.premium) return res.json({ ok: false, error: 'Réservé au pass premium.' });
+    if (p[track].includes(tier)) return res.json({ ok: false, error: 'Déjà récupéré.' });
+    p[track].push(tier);
+    await kvSet('pass', seasonKey() + '|' + uid, p);
+    const got = await grantReward(uid, passReward(tier, track));
+    if (got.item && got.item.startsWith('title:')) { /* titre débloqué : visible dans l'onglet Titres */ }
+    res.json({ ok: true, got, label: passReward(tier, track).label, coins: ((await ecoGet(uid)) || {}).coins });
+});
+
+/* =====================================================================
+   COFFRE DU JOUR : gratuit toutes les 24 h, série de jours consécutifs
+   ===================================================================== */
+const CHEST_COINS = [30, 40, 50, 60, 80, 100, 150];
+async function chestInfo(uid) {
+    const c = await kvGet('chest', uid, { day: null, streak: 0 });
+    const today = dailyKey(new Date(hubNow())), yest = dailyKey(new Date(hubNow() - 86400000));
+    const ready = c.day !== today;
+    const streakNext = c.day === yest ? c.streak + 1 : (c.day === today ? c.streak : 1);
+    return { c, today, ready, streak: c.day === today || c.day === yest ? c.streak : 0, dayNext: ((streakNext - 1) % 7) + 1 };
+}
+app.get('/api/chest', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const i = await chestInfo(uid);
+    res.json({ ok: true, ready: i.ready, streak: i.streak, day: i.dayNext, rewards: CHEST_COINS.map((n, k) => k === 6 ? `${n} 🪙 + booster` : `${n} 🪙`) });
+});
+app.post('/api/chest/open', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const i = await chestInfo(uid);
+    if (!i.ready) return res.json({ ok: false, error: 'Reviens demain pour un nouveau coffre !' });
+    const yest = dailyKey(new Date(hubNow() - 86400000));
+    i.c.streak = i.c.day === yest ? i.c.streak + 1 : 1;
+    i.c.day = i.today;
+    await kvSet('chest', uid, i.c);
+    const d = ((i.c.streak - 1) % 7);
+    const coins = CHEST_COINS[d] * hubMult();
+    await ecoAddCoins(uid, coins);
+    let cards = null;
+    if (d === 6) cards = await openBooster(uid, 3);
+    else if (Math.random() < 0.3) cards = await openBooster(uid, 1);
+    res.json({ ok: true, streak: i.c.streak, coins, cards, total: ((await ecoGet(uid)) || {}).coins });
+});
+
+/* =====================================================================
+   CARTES : fusion de doublons, échanges entre amis, carte collector
+   ===================================================================== */
+const RAR_ORDER = ['commune', 'rare', 'epique', 'legendaire'];
+function keyRarity(key) {
+    const [u, display] = String(key).split('|');
+    if (!ARC_UNIVERSE_ANIME[u]) return null;
+    const list = arcFamous(u);
+    const idx = list.findIndex(c => c.display === display);
+    return idx < 0 ? null : cardRarity(idx, list.length);
+}
+async function cardSpares(uid) {
+    const mine = await cardsOf(uid);
+    const out = { commune: [], rare: [], epique: [], legendaire: [] };
+    mine.forEach((v, k) => { if (k.startsWith('collector|') || v.n < 2) return; const r = keyRarity(k); if (r) out[r].push({ k, spare: v.n - 1 }); });
+    return out;
+}
+async function cardTake(uid, key, count = 1) { // retire des exemplaires ; renvoie {shiny} ou null
+    if (HAS_DB) {
+        const row = (await pool.query('SELECT n, shiny FROM cards WHERE user_id=$1 AND ckey=$2', [uid, key])).rows[0];
+        if (!row || row.n < count) return null;
+        const left = row.n - count, shinyMove = left === 0 && row.shiny > 0;
+        if (left === 0) await pool.query('DELETE FROM cards WHERE user_id=$1 AND ckey=$2', [uid, key]);
+        else await pool.query('UPDATE cards SET n=$3, shiny=LEAST(shiny, $3) WHERE user_id=$1 AND ckey=$2', [uid, key, left]);
+        return { shiny: shinyMove };
+    }
+    const m = await cardsOf(uid), o = m.get(key);
+    if (!o || o.n < count) return null;
+    const left = o.n - count, shinyMove = left === 0 && o.shiny > 0;
+    if (left === 0) m.delete(key); else { o.n = left; o.shiny = Math.min(o.shiny, left); }
+    return { shiny: shinyMove };
+}
+function randomCardOfRarity(rar) {
+    const us = arcShuffle(arcUniverses());
+    for (const u of us) {
+        const list = arcFamous(u);
+        const pool2 = list.filter((c, i) => cardRarity(i, list.length) === rar);
+        if (pool2.length) return { u, display: pool2[Math.floor(Math.random() * pool2.length)].display };
+    }
+    return null;
+}
+app.get('/api/cards/fuse', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const sp = await cardSpares(uid);
+    res.json({ ok: true, spares: Object.fromEntries(RAR_ORDER.map(r => [r, sp[r].reduce((a, x) => a + x.spare, 0)])) });
+});
+app.post('/api/cards/fuse', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const rar = String((req.body || {}).rarity || '');
+    if (!RAR_ORDER.includes(rar)) return res.json({ ok: false, error: 'Rareté inconnue.' });
+    const sp = (await cardSpares(uid))[rar].sort((a, b) => b.spare - a.spare);
+    if (sp.reduce((a, x) => a + x.spare, 0) < 5) return res.json({ ok: false, error: 'Il faut 5 doublons de cette rareté.' });
+    let need = 5; const used = [];
+    for (const x of sp) {
+        if (!need) break;
+        const n = Math.min(need, x.spare);
+        if (await cardTake(uid, x.k, n)) { need -= n; used.push({ name: x.k.split('|')[1], n }); }
+    }
+    if (need > 0) return res.json({ ok: false, error: 'Fusion impossible, réessaie.' });
+    const target = rar === 'legendaire' ? 'legendaire' : RAR_ORDER[RAR_ORDER.indexOf(rar) + 1];
+    const pick = randomCardOfRarity(target);
+    const card = pick ? await cardAward({ userId: uid, id: null }, pick.u, pick.display, { silent: true, shinyRate: rar === 'legendaire' ? 1 : 1 / 10 }) : null;
+    res.json({ ok: true, used, card });
+});
+// Échanges
+app.get('/api/trade', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const all = (await kvList('trade')).map(x => x.v).filter(t => (t.from === uid || t.to === uid) && (t.status === 'open' || hubNow() - t.at < 3 * 86400000));
+    const view = t => ({ ...t, giveName: t.give.split('|')[1], giveAnime: ARC_UNIVERSE_ANIME[t.give.split('|')[0]], wantName: t.want.split('|')[1], wantAnime: ARC_UNIVERSE_ANIME[t.want.split('|')[0]],
+        giveImg: cardImg({ u: t.give.split('|')[0], display: t.give.split('|')[1] }), wantImg: cardImg({ u: t.want.split('|')[0], display: t.want.split('|')[1] }) });
+    res.json({ ok: true, incoming: all.filter(t => t.to === uid).sort((a, b) => b.at - a.at).map(view), outgoing: all.filter(t => t.from === uid).sort((a, b) => b.at - a.at).map(view), friends: await friendsOf(uid) });
+});
+async function cardListOf(uid) {
+    const mine = await cardsOf(uid);
+    const out = [];
+    mine.forEach((v, k) => { if (k.startsWith('collector|')) return; const [u, display] = k.split('|'); const r = keyRarity(k); if (!r) return; out.push({ key: k, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: r, n: v.n, shiny: v.shiny, img: cardImg({ u, display }) }); });
+    return out.sort((a, b) => a.anime.localeCompare(b.anime, 'fr') || a.name.localeCompare(b.name, 'fr'));
+}
+app.get('/api/trade/cards', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const fid = +req.query.friend || 0;
+    if (fid && !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Ce joueur n’est pas ton ami.' });
+    res.json({ ok: true, cards: await cardListOf(fid || uid) });
+});
+app.post('/api/trade/propose', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const { friendId, give, want } = req.body || {};
+    const fid = +friendId;
+    if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Tu ne peux échanger qu’avec tes amis.' });
+    const mine = await cardsOf(uid), theirs = await cardsOf(fid);
+    if (!mine.get(String(give))) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' });
+    if (!theirs.get(String(want))) return res.json({ ok: false, error: 'Ton ami n’a pas cette carte.' });
+    const open = (await kvList('trade')).filter(x => x.v.from === uid && x.v.status === 'open').length;
+    if (open >= 10) return res.json({ ok: false, error: '10 propositions en attente maximum.' });
+    const t = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), from: uid, fromName: await pseudoOf(uid), to: fid, toName: await pseudoOf(fid), give: String(give), want: String(want), status: 'open', at: hubNow() };
+    await kvSet('trade', t.id, t);
+    emitUser(fid, 'trade_new', { from: t.fromName, give: t.give.split('|')[1], want: t.want.split('|')[1] });
+    res.json({ ok: true });
+});
+app.post('/api/trade/respond', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const { id, accept } = req.body || {};
+    const t = await kvGet('trade', String(id));
+    if (!t || t.status !== 'open' || (t.to !== uid && t.from !== uid)) return res.json({ ok: false, error: 'Échange introuvable.' });
+    if (!accept || t.from === uid) {
+        t.status = t.from === uid ? 'cancelled' : 'refused';
+        await kvSet('trade', t.id, t);
+        if (t.status === 'refused') emitUser(t.from, 'trade_done', { text: `❌ ${t.toName} a refusé ton échange` });
+        return res.json({ ok: true });
+    }
+    // on vérifie que chacun a encore sa carte, puis on échange un exemplaire
+    const mine = await cardsOf(t.to), theirs = await cardsOf(t.from);
+    if (!mine.get(t.want) || !theirs.get(t.give)) { t.status = 'failed'; await kvSet('trade', t.id, t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' }); }
+    t.status = 'done';
+    await kvSet('trade', t.id, t);
+    const a = await cardTake(t.from, t.give), b = await cardTake(t.to, t.want);
+    if (a) await cardGive(t.to, { key: t.give }, a.shiny);
+    if (b) await cardGive(t.from, { key: t.want }, b.shiny);
+    emitUser(t.from, 'trade_done', { text: `🔁 ${t.toName} a accepté : tu reçois ${t.want.split('|')[1]} !` });
+    res.json({ ok: true, got: t.give.split('|')[1] });
+});
+
+/* =====================================================================
+   ANIME DE LA SEMAINE : brillantes x3 + carte collector après 15 persos trouvés
+   ===================================================================== */
+const WEEK_GOAL = 15;
+function weekAnime(wk = weekKey()) {
+    const us = arcUniverses().filter(u => u !== 'pokemon');
+    const u = us[hubHash('semaine' + wk) % us.length];
+    const main = arcFamous(u)[0];
+    return { week: wk, u, name: ARC_UNIVERSE_ANIME[u], main: main.display, img: cardImg({ u, display: main.display }) };
+}
+const _cardAwardHub = cardAward;
+cardAward = async function (p, u, name, opts) {
+    const wa = weekAnime();
+    const o = Object.assign({}, opts || {});
+    if (u === wa.u && !o.shinyRate) o.shinyRate = 1 / 4;
+    const out = await _cardAwardHub(p, u, name, o);
+    if (out && u === wa.u && p && p.userId && !(opts && opts.silent)) {
+        const key = wa.week + '|' + p.userId;
+        const wp = await kvGet('weekprog', key, { n: 0, done: false });
+        wp.n++;
+        if (wp.n >= WEEK_GOAL && !wp.done) {
+            wp.done = true;
+            await cardGive(p.userId, { key: `collector|${wa.week}|${wa.u}|${wa.main}` }, false);
+            emitUser(p.userId, 'collector_gain', { name: wa.main, anime: wa.name, img: wa.img });
+        }
+        await kvSet('weekprog', key, wp);
+    }
+    // boss du serveur : sa carte compte double
+    return out;
+};
+
+/* =====================================================================
+   MAÎTRISE : 100 bonnes réponses sur un anime = badge doré
+   BOSS DU SERVEUR : chaque bonne réponse lui enlève des PV
+   ===================================================================== */
+const MASTERY_GOAL = 100;
+async function animeCounts(uid) {
+    let c = await kvGet('animecnt', uid);
+    if (c) return c;
+    c = {};
+    if (HAS_DB) { try { (await pool.query('SELECT anime, count(*)::int AS n FROM round_stats WHERE user_id=$1 AND correct AND anime IS NOT NULL GROUP BY anime', [uid])).rows.forEach(r => { c[r.anime] = r.n; }); } catch (_) {} }
+    else (PROG_MEM.rounds || []).filter(r => r.user_id === uid && r.correct && r.anime).forEach(r => { c[r.anime] = (c[r.anime] || 0) + 1; });
+    KV.set('animecnt|' + uid, c); // cache seulement (recalculable)
+    return c;
+}
+const _progTrackRoundHub = progTrackRound;
+progTrackRound = async function (p, mode, anime, correct, ms) {
+    await _progTrackRoundHub(p, mode, anime, correct, ms);
+    if (!p || !p.userId || !correct) return;
+    try {
+        if (anime) {
+            const c = await animeCounts(p.userId);
+            c[anime] = (c[anime] || 0) + 1;
+            if (c[anime] >= MASTERY_GOAL) {
+                const m = await kvGet('mastery', p.userId, {});
+                if (!m[anime]) { m[anime] = hubNow(); await kvSet('mastery', p.userId, m); io.to(p.id).emit('mastery_gain', { anime }); }
+            }
+        }
+        await bossHit(p, ms);
+    } catch (e) { console.warn('[Hub] manche', e.message); }
+};
+app.get('/api/hub/stats', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    let rows = [];
+    if (HAS_DB) {
+        try { rows = (await pool.query(`SELECT anime, count(*)::int AS n, count(*) FILTER (WHERE correct)::int AS ok, round(avg(ms) FILTER (WHERE correct))::int AS ms FROM round_stats WHERE user_id=$1 AND anime IS NOT NULL GROUP BY anime`, [uid])).rows; } catch (_) {}
+    } else {
+        const by = {};
+        (PROG_MEM.rounds || []).filter(r => r.user_id === uid && r.anime).forEach(r => { const o = by[r.anime] = by[r.anime] || { anime: r.anime, n: 0, ok: 0 }; o.n++; if (r.correct) o.ok++; });
+        rows = Object.values(by);
+    }
+    const m = await kvGet('mastery', uid, {});
+    const list = rows.map(r => ({ anime: r.anime, n: r.n, ok: r.ok, ms: r.ms || null, pct: r.n ? Math.round(100 * r.ok / r.n) : 0, mastery: !!m[r.anime] || r.ok >= MASTERY_GOAL })).sort((a, b) => b.ok - a.ok);
+    const rated = list.filter(a => a.n >= 5);
+    const best = rated.slice().sort((a, b) => b.pct - a.pct || b.n - a.n)[0] || null;
+    const worst = rated.length >= 2 ? rated.slice().sort((a, b) => a.pct - b.pct || b.n - a.n)[0] : null;
+    res.json({ ok: true, list, best, worst, goal: MASTERY_GOAL });
+});
+
+// --- Boss ---
+const BOSS_VILLAINS = {
+    naruto: ['Madara', 'Pain', 'Orochimaru', 'Obito', 'Kaguya'], onepiece: ['Barbe Noire', 'Doflamingo', 'Kaido', 'Big Mom', 'Crocodile'], dragonball: ['Freezer', 'Cell', 'Buu', 'Broly'],
+    bleach: ['Aizen', 'Yhwach', 'Ulquiorra'], demonslayer: ['Muzan', 'Akaza', 'Kokushibo', 'Doma'], jjk: ['Sukuna', 'Mahito', 'Kenjaku'], hxh: ['Meruem', 'Hisoka', 'Chrollo'],
+    snk: ['Zeke', 'Reiner'], deathnote: ['Light'], tokyoghoul: ['Eto Yoshimura', 'Kisho Arima'], fma: ['Pride', 'Envy', 'Father'], sds: ['Estarossa', 'Zeldris'], fairy: ['Zeref', 'Acnologia'],
+    chainsaw: ['Makima'], opm: ['Boros', 'Garou'], jojo: ['Dio', 'Kira', 'Diavolo'], clover: ['Dante', 'Lucius'], solo: ['Antares'], tensura: ['Clayman']
+};
+const BOSS_HP = 1500;
+function bossOfDay(day) {
+    const us = Object.keys(BOSS_VILLAINS).filter(u => ARC_UNIVERSE_ANIME[u] && arcFamous(u).length);
+    const h = hubHash('boss' + day);
+    for (let t = 0; t < us.length; t++) {
+        const u = us[(h + t) % us.length];
+        const names = BOSS_VILLAINS[u];
+        for (let k = 0; k < names.length; k++) {
+            const c = cardResolve(u, names[(h + k) % names.length]);
+            if (c) return { u, display: c.display };
+        }
+    }
+    const u = arcUniverses()[h % arcUniverses().length];
+    return { u, display: arcFamous(u)[1].display };
+}
+async function bossGet() {
+    const day = dailyKey(new Date(hubNow()));
+    const b = await kvGet('boss', day, null);
+    if (b) return b;
+    const who = bossOfDay(day);
+    const nb = { day, u: who.u, display: who.display, hp: BOSS_HP, max: BOSS_HP, hits: {}, dead: false };
+    KV.set('boss|' + day, nb);
+    await kvSet('boss', day, nb);
+    return nb;
+}
+function bossPublic(b) {
+    const top = Object.entries(b.hits).map(([uid, h]) => ({ name: h.name, dmg: h.dmg })).sort((a, b2) => b2.dmg - a.dmg).slice(0, 5);
+    return { name: b.display, anime: ARC_UNIVERSE_ANIME[b.u], img: cardImg({ u: b.u, display: b.display }), hp: b.hp, max: b.max, dead: b.dead, fighters: Object.keys(b.hits).length, top };
+}
+let bossEmitT = null, bossSave = null;
+function bossBroadcast(b) {
+    if (bossEmitT) return;
+    bossEmitT = setTimeout(() => { bossEmitT = null; io.emit('boss_state', bossPublic(b)); }, 1500);
+}
+async function bossHit(p, ms) {
+    const b = await bossGet();
+    if (b.dead) return;
+    const dmg = 10 + (ms != null && ms < 3000 ? 5 : 0);
+    const h = b.hits[p.userId] = b.hits[p.userId] || { name: p.name, dmg: 0 };
+    h.dmg += dmg; h.name = p.name;
+    b.hp = Math.max(0, b.hp - dmg);
+    if (b.hp <= 0 && !b.dead) {
+        b.dead = true; b.deadAt = hubNow();
+        await kvSet('boss', b.day, b);
+        io.emit('boss_down', { name: b.display, anime: ARC_UNIVERSE_ANIME[b.u], killer: p.name });
+        for (const uid of Object.keys(b.hits)) {
+            const id = +uid;
+            await ecoAddCoins(id, 100);
+            await cardAward({ userId: id, id: null }, b.u, b.display, { silent: true });
+            const k = await kvGet('bosskills', id, { n: 0 }); k.n++; await kvSet('bosskills', id, k);
+            emitUser(id, 'boss_reward', { coins: 100, name: b.display });
+        }
+    } else {
+        clearTimeout(bossSave); bossSave = setTimeout(() => kvSet('boss', b.day, b), 3000);
+    }
+    bossBroadcast(b);
+}
+
+/* =====================================================================
+   DUEL 1V1 CLASSÉ : file d'attente, rang de Bronze à Hokage
+   ===================================================================== */
+const RANKED_TIERS = [['Bronze', 0, '#cd7f32'], ['Argent', 1100, '#c0c0c0'], ['Or', 1250, '#ffd700'], ['Platine', 1400, '#6fe3d6'], ['Diamant', 1550, '#7ab8ff'], ['Kage', 1700, '#b77bff'], ['Hokage', 1900, '#ff5a2a']];
+const RANKED_GAMES = ['pixel', 'silhouette', 'zoom', 'emoji', 'quatre', 'imposteur', 'mapguess'];
+function rankedTier(elo) { let t = RANKED_TIERS[0]; for (const x of RANKED_TIERS) if (elo >= x[1]) t = x; const i = RANKED_TIERS.indexOf(t), nx = RANKED_TIERS[i + 1]; return { name: t[0], color: t[2], min: t[1], next: nx ? nx[1] : null, nextName: nx ? nx[0] : null }; }
+async function rankedGet(uid) { return kvGet('ranked', uid, { elo: 1000, w: 0, l: 0, d: 0 }); }
+const rankedQueue = []; // { sid, uid, name, elo, at }
+function rankedTryMatch() {
+    rankedQueue.sort((a, b) => a.at - b.at);
+    for (let i = 0; i < rankedQueue.length; i++) {
+        const a = rankedQueue[i];
+        const waitA = (hubNow() - a.at) / 1000;
+        for (let j = i + 1; j < rankedQueue.length; j++) {
+            const b = rankedQueue[j];
+            if (a.uid === b.uid) continue;
+            const window = 150 + 25 * Math.max(waitA, (hubNow() - b.at) / 1000);
+            if (Math.abs(a.elo - b.elo) > window) continue;
+            rankedQueue.splice(j, 1); rankedQueue.splice(i, 1);
+            rankedStart(a, b);
+            return rankedTryMatch();
+        }
+    }
+}
+setInterval(rankedTryMatch, 3000);
+function rankedStart(a, b) {
+    const game = RANKED_GAMES[Math.floor(Math.random() * RANKED_GAMES.length)];
+    const code = newRoomCode();
+    const room = serverRoom(code, 'arcade', game, { arcRounds: 7, ranked: { a: a.uid, b: b.uid, names: { [a.uid]: a.name, [b.uid]: b.name }, elo: { [a.uid]: a.elo, [b.uid]: b.elo }, done: false, at: hubNow() } });
+    const payload = x => ({ roomCode: code, subMode: game, game: ARC_GAMES[game].label, opponent: x === a ? { name: b.name, elo: b.elo, tier: rankedTier(b.elo) } : { name: a.name, elo: a.elo, tier: rankedTier(a.elo) } });
+    io.to(a.sid).emit('ranked_found', payload(a));
+    io.to(b.sid).emit('ranked_found', payload(b));
+    // si l'un des deux ne vient pas, on annule
+    setTimeout(() => {
+        const r = rooms[code];
+        if (r && r.status === 'waiting' && !r.rankedStarting) {
+            r.players.forEach(p => io.to(p.id).emit('ranked_cancel', { message: 'Ton adversaire ne s’est pas présenté. Relance la recherche.' }));
+            delete rooms[code];
+        }
+    }, 25000);
+}
+async function rankedOnFinish(room, entries) {
+    if (!room || !room.ranked || room.ranked.done) return;
+    const R = room.ranked;
+    const pa = (entries || []).find(e => e.player && e.player.userId === R.a), pb = (entries || []).find(e => e.player && e.player.userId === R.b);
+    if (!pa && !pb) return;
+    R.done = true;
+    const sa = pa ? pa.points || 0 : -1, sb = pb ? pb.points || 0 : -1;
+    const ra = await rankedGet(R.a), rb = await rankedGet(R.b);
+    const ea = 1 / (1 + Math.pow(10, (rb.elo - ra.elo) / 400));
+    const resA = sa > sb ? 1 : sa < sb ? 0 : 0.5;
+    const K = 32;
+    const da = Math.round(K * (resA - ea)), db = -da;
+    const apply = async (uid, r, d, res, e) => {
+        const before = rankedTier(r.elo).name;
+        r.elo = Math.max(0, r.elo + d);
+        if (res === 1) r.w++; else if (res === 0) r.l++; else r.d++;
+        await kvSet('ranked', uid, r);
+        const t = rankedTier(r.elo);
+        if (t.name === 'Hokage') await ownAdd(uid, 'title:hokage');
+        if (res === 1) await ecoAddCoins(uid, 25);
+        if (e && e.player) io.to(e.player.id).emit('ranked_result', { result: res === 1 ? 'win' : res === 0 ? 'lose' : 'draw', delta: d, elo: r.elo, tier: t, promoted: t.name !== before ? t.name : null, coins: res === 1 ? 25 : 0 });
+    };
+    await apply(R.a, ra, da, resA, pa);
+    await apply(R.b, rb, db, 1 - resA, pb);
+}
+app.get('/api/ranked', async (req, res) => {
+    const uid = authUserId(req);
+    const me = uid ? await rankedGet(uid) : null;
+    const all = (await kvList('ranked')).map(x => ({ uid: +x.k, ...x.v })).filter(x => x.w + x.l + x.d > 0).sort((a, b) => b.elo - a.elo).slice(0, 20);
+    for (const x of all) x.name = await pseudoOf(x.uid);
+    res.json({ ok: true, me: me ? { ...me, tier: rankedTier(me.elo) } : null, top: all.map(x => ({ name: x.name, elo: x.elo, w: x.w, l: x.l, tier: rankedTier(x.elo), me: x.uid === uid })), tiers: RANKED_TIERS.map(t => ({ name: t[0], min: t[1], color: t[2] })), queue: rankedQueue.length });
+});
+
+/* =====================================================================
+   CLANS : logo, membres, points de la semaine, classement hebdo
+   ===================================================================== */
+const CLAN_PRICE = 300, CLAN_MAX = 30;
+const CLAN_TAG = new Map(); // uid -> { tag, color }
+(async () => {
+    try {
+        for (const { v } of await kvList('clan')) (v.members || []).forEach(uid => CLAN_TAG.set(uid, { tag: v.tag, color: v.color }));
+    } catch (_) {}
+})();
+const _cosOfClan = cosOf;
+cosOf = function (row) {
+    const o = _cosOfClan(row);
+    const t = row && row.id ? CLAN_TAG.get(row.id) : null;
+    if (t) o.clan = t;
+    return o;
+};
+async function clanRefreshCos(uid) {
+    const t = CLAN_TAG.get(uid) || null;
+    socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) s.user.cos = Object.assign({}, s.user.cos, { clan: t || undefined }); });
+    for (const [code, r] of Object.entries(rooms)) {
+        const p = r.players.find(x => x.userId === uid);
+        if (!p) continue;
+        p.cos = Object.assign({}, p.cos, { clan: t || undefined });
+        if (r.status === 'waiting') io.to(code).emit('update_room', r);
+    }
+}
+async function clanAddPoints(uid, pts) {
+    const cid = await kvGet('clanof', uid, null);
+    if (!cid) return;
+    const key = weekKey() + '|' + cid;
+    const w = await kvGet('clanpts', key, { pts: 0, by: {} });
+    w.pts += pts; w.by[uid] = (w.by[uid] || 0) + pts;
+    await kvSet('clanpts', key, w);
+}
+async function clanBoard(wk = weekKey()) {
+    const clans = (await kvList('clan')).map(x => x.v);
+    const out = [];
+    for (const c of clans) { const w = await kvGet('clanpts', wk + '|' + c.id, { pts: 0, by: {} }); out.push({ id: c.id, name: c.name, tag: c.tag, emblem: c.emblem, color: c.color, members: c.members.length, pts: w.pts }); }
+    return out.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name, 'fr'));
+}
+const CLAN_EMBLEMS = ['🐉', '🦊', '🐺', '🦅', '🔥', '⚡', '🌙', '☀️', '💀', '👑', '🗡️', '🛡️', '🌸', '🍥', '🏴‍☠️', '👁️', '🌀', '❄️', '🎴', '🐍'];
+app.get('/api/clans', async (req, res) => {
+    const uid = authUserId(req);
+    const board = await clanBoard();
+    let mine = null;
+    if (uid) {
+        const cid = await kvGet('clanof', uid, null);
+        const c = cid ? await kvGet('clan', cid, null) : null;
+        if (c) {
+            const w = await kvGet('clanpts', weekKey() + '|' + c.id, { pts: 0, by: {} });
+            const members = [];
+            for (const m of c.members) members.push({ id: m, name: c.names[m] || await pseudoOf(m), pts: w.by[m] || 0, owner: m === c.owner, me: m === uid });
+            members.sort((a, b) => b.pts - a.pts);
+            mine = { ...c, members, pts: w.pts, rank: board.findIndex(x => x.id === c.id) + 1, isOwner: c.owner === uid };
+        }
+    }
+    const lastWeek = weekKey(hubNow() - 7 * 86400000);
+    res.json({ ok: true, mine, board: board.slice(0, 30), emblems: CLAN_EMBLEMS, price: CLAN_PRICE, max: CLAN_MAX, week: weekKey(), rewards: [300, 200, 100], lastWinners: (await kvGet('clanrew', lastWeek, null)) || null });
+});
+app.post('/api/clans/create', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {};
+    const name = String(b.name || '').trim().replace(/\s+/g, ' ').slice(0, 20);
+    const tag = String(b.tag || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    const emblem = CLAN_EMBLEMS.includes(b.emblem) ? b.emblem : '🐉';
+    const color = /^#[0-9a-f]{6}$/i.test(b.color || '') ? b.color : '#ffd700';
+    if (name.length < 3) return res.json({ ok: false, error: 'Nom trop court (3 caractères min).' });
+    if (tag.length < 2) return res.json({ ok: false, error: 'Tag de 2 à 4 lettres/chiffres.' });
+    if (await kvGet('clanof', uid, null)) return res.json({ ok: false, error: 'Quitte d’abord ton clan actuel.' });
+    const clans = (await kvList('clan')).map(x => x.v);
+    if (clans.some(c => c.tag === tag)) return res.json({ ok: false, error: 'Ce tag est déjà pris.' });
+    if (clans.some(c => c.name.toLowerCase() === name.toLowerCase())) return res.json({ ok: false, error: 'Ce nom est déjà pris.' });
+    const e = await ecoGet(uid);
+    if (e.coins < CLAN_PRICE) return res.json({ ok: false, error: `Créer un clan coûte ${CLAN_PRICE} pièces.` });
+    if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, CLAN_PRICE])).rows[0]; if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' }); }
+    else e.coins -= CLAN_PRICE;
+    const c = { id: 'c' + Date.now().toString(36), name, tag, emblem, color, owner: uid, members: [uid], names: { [uid]: await pseudoOf(uid) }, open: true, created: hubNow() };
+    await kvSet('clan', c.id, c);
+    await kvSet('clanof', uid, c.id);
+    CLAN_TAG.set(uid, { tag, color });
+    await clanRefreshCos(uid);
+    res.json({ ok: true });
+});
+app.post('/api/clans/join', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const c = await kvGet('clan', String((req.body || {}).id || ''), null);
+    if (!c) return res.json({ ok: false, error: 'Clan introuvable.' });
+    if (await kvGet('clanof', uid, null)) return res.json({ ok: false, error: 'Quitte d’abord ton clan actuel.' });
+    if (c.members.length >= CLAN_MAX) return res.json({ ok: false, error: 'Ce clan est complet.' });
+    if (c.open === false) return res.json({ ok: false, error: 'Ce clan est fermé.' });
+    c.members.push(uid); c.names[uid] = await pseudoOf(uid);
+    await kvSet('clan', c.id, c);
+    await kvSet('clanof', uid, c.id);
+    CLAN_TAG.set(uid, { tag: c.tag, color: c.color });
+    await clanRefreshCos(uid);
+    c.members.filter(m => m !== uid).forEach(m => emitUser(m, 'clan_event', { text: `🛡️ ${c.names[uid]} a rejoint ton clan !` }));
+    res.json({ ok: true });
+});
+async function clanRemove(c, uid) {
+    c.members = c.members.filter(m => m !== uid);
+    delete c.names[uid];
+    await kvSet('clanof', uid, null);
+    CLAN_TAG.delete(uid);
+    await clanRefreshCos(uid);
+    if (!c.members.length) { await kvDel('clan', c.id); return; }
+    if (c.owner === uid) c.owner = c.members[0];
+    await kvSet('clan', c.id, c);
+}
+app.post('/api/clans/leave', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const cid = await kvGet('clanof', uid, null);
+    const c = cid ? await kvGet('clan', cid, null) : null;
+    if (!c) { await kvSet('clanof', uid, null); return res.json({ ok: true }); }
+    await clanRemove(c, uid);
+    res.json({ ok: true });
+});
+app.post('/api/clans/kick', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const cid = await kvGet('clanof', uid, null);
+    const c = cid ? await kvGet('clan', cid, null) : null;
+    const target = +(req.body || {}).id;
+    if (!c || c.owner !== uid || !c.members.includes(target) || target === uid) return res.json({ ok: false, error: 'Action impossible.' });
+    await clanRemove(c, target);
+    emitUser(target, 'clan_event', { text: `🛡️ Tu as été retiré du clan ${c.name}.` });
+    res.json({ ok: true });
+});
+app.post('/api/clans/edit', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const cid = await kvGet('clanof', uid, null);
+    const c = cid ? await kvGet('clan', cid, null) : null;
+    if (!c || c.owner !== uid) return res.json({ ok: false, error: 'Seul le chef peut modifier le clan.' });
+    const b = req.body || {};
+    if (CLAN_EMBLEMS.includes(b.emblem)) c.emblem = b.emblem;
+    if (/^#[0-9a-f]{6}$/i.test(b.color || '')) c.color = b.color;
+    if (typeof b.open === 'boolean') c.open = b.open;
+    await kvSet('clan', c.id, c);
+    for (const m of c.members) { CLAN_TAG.set(m, { tag: c.tag, color: c.color }); await clanRefreshCos(m); }
+    res.json({ ok: true });
+});
+// récompenses du classement de la semaine précédente (une seule fois)
+async function clanWeeklyRewards() {
+    const last = weekKey(hubNow() - 7 * 86400000);
+    if (await kvGet('clanrew', last, null)) return;
+    const board = (await clanBoard(last)).filter(c => c.pts > 0).slice(0, 3);
+    const rew = [300, 200, 100];
+    const winners = [];
+    for (let i = 0; i < board.length; i++) {
+        const c = await kvGet('clan', board[i].id, null);
+        if (!c) continue;
+        for (const m of c.members) { await ecoAddCoins(m, rew[i]); emitUser(m, 'clan_event', { text: `🏆 Ton clan a fini ${i + 1}${i ? 'e' : 'er'} de la semaine : +${rew[i]} pièces !` }); }
+        winners.push({ name: c.name, tag: c.tag, emblem: c.emblem, pts: board[i].pts });
+    }
+    await kvSet('clanrew', last, { winners, at: hubNow() });
+}
+setInterval(() => clanWeeklyRewards().catch(() => {}), 10 * 60 * 1000);
+setTimeout(() => clanWeeklyRewards().catch(() => {}), 30000);
+
+/* =====================================================================
+   TOURNOI DU DIMANCHE : 20 h (heure de Paris), inscriptions dès 19 h 45
+   ===================================================================== */
+const WEEKLY = { code: null, week: null, started: false, done: false, winner: null, notified: false };
+function weeklyWindow(ms = hubNow()) {
+    const p = parisParts(ms);
+    const mins = p.h * 60 + p.min;
+    return { sunday: p.wd === 'Sun', open: p.wd === 'Sun' && mins >= 19 * 60 + 45 && mins < 20 * 60 + 15, start: p.wd === 'Sun' && mins >= 20 * 60, late: p.wd === 'Sun' && mins >= 20 * 60 + 15 };
+}
+function nextWeeklyAt(ms = hubNow()) { // prochain dimanche 20 h, en ms (approximation via recherche minute par minute sur 8 jours, pas de 15 min)
+    for (let t = ms - (ms % (15 * 60000)); t < ms + 8 * 86400000; t += 15 * 60000) {
+        const p = parisParts(t);
+        if (p.wd === 'Sun' && p.h === 20 && p.min === 0) return t;
+    }
+    return null;
+}
+async function weeklyTick() {
+    const w = weeklyWindow();
+    const wk = weekKey();
+    if (WEEKLY.week !== wk) Object.assign(WEEKLY, { code: null, week: wk, started: false, done: false, winner: null, notified: false });
+    if (!w.sunday || WEEKLY.done) return;
+    if (w.open && !WEEKLY.started) {
+        if (!WEEKLY.code || !rooms[WEEKLY.code]) {
+            WEEKLY.code = WEEKLY.code && !rooms[WEEKLY.code] ? WEEKLY.code : newRoomCode();
+            serverRoom(WEEKLY.code, 'arcade', 'tournoi', { isPublic: true, weekly: true, arcRounds: 3 });
+        }
+        if (!WEEKLY.notified) { WEEKLY.notified = true; io.emit('weekly_open', { code: WEEKLY.code }); }
+    }
+    const room = WEEKLY.code && rooms[WEEKLY.code];
+    if (w.start && room && !WEEKLY.started && room.status === 'waiting') {
+        if (room.players.length >= 2) {
+            WEEKLY.started = true;
+            io.to(WEEKLY.code).emit('room_toast', { message: '🏆 Le tournoi du dimanche commence !' });
+            startArcade(room, WEEKLY.code);
+        } else if (w.late) {
+            WEEKLY.done = true;
+            room.players.forEach(p => io.to(p.id).emit('room_toast', { message: 'Pas assez de joueurs pour le tournoi du dimanche. Rendez-vous la semaine prochaine !' }));
+        }
+    }
+}
+setInterval(() => weeklyTick().catch(e => console.warn('[Tournoi hebdo]', e.message)), 15000);
+async function weeklyOnFinish(room, entries) {
+    if (!room || !room.weekly || WEEKLY.done) return;
+    WEEKLY.done = true;
+    const winners = (entries || []).filter(e => e.won && e.player);
+    for (const e of winners) {
+        if (e.player.userId) { await ecoAddCoins(e.player.userId, 500); await ownAdd(e.player.userId, 'title:champion'); }
+        io.to(e.player.id).emit('weekly_win', { coins: 500 });
+    }
+    WEEKLY.winner = winners.map(e => e.player.name).join(', ') || null;
+    if (WEEKLY.winner) io.emit('weekly_result', { winner: WEEKLY.winner });
+    room.lockHost = null; // les joueurs peuvent repartir
+}
+function weeklyPublic() {
+    const w = weeklyWindow();
+    const room = WEEKLY.code && rooms[WEEKLY.code];
+    return { open: !!(w.open && room && room.status === 'waiting' && !WEEKLY.started), code: room ? WEEKLY.code : null, players: room ? room.players.length : 0, started: WEEKLY.started && !WEEKLY.done, done: WEEKLY.done, winner: WEEKLY.winner, nextAt: nextWeeklyAt(), now: hubNow() };
+}
+
+/* =====================================================================
+   ACCUEIL : tout ce qui s'affiche en haut du menu
+   ===================================================================== */
+app.get('/api/hub/home', async (req, res) => {
+    const uid = authUserId(req);
+    const wa = weekAnime();
+    let week = null, chest = null, ranked = null, pass = null;
+    if (uid) {
+        const wp = await kvGet('weekprog', wa.week + '|' + uid, { n: 0, done: false });
+        week = { n: Math.min(wp.n, WEEK_GOAL), done: wp.done };
+        const ci = await chestInfo(uid); chest = { ready: ci.ready, streak: ci.streak, day: ci.dayNext };
+        const r = await rankedGet(uid); ranked = { ...r, tier: rankedTier(r.elo) };
+        const p = await passGet(uid); pass = { tier: Math.min(PASS_TIERS, Math.floor(p.xp / PASS_XP)), xp: p.xp, perTier: PASS_XP };
+    }
+    res.json({ ok: true, weekend: isWeekend(), mult: hubMult(), weekAnime: { ...wa, goal: WEEK_GOAL, mine: week }, boss: bossPublic(await bossGet()), weekly: weeklyPublic(), chest, ranked, pass, now: hubNow() });
+});
+
+/* =====================================================================
+   SOCKETS : duel classé, spectateurs, salon vocal
+   ===================================================================== */
+const SPECT = new Map(); // roomCode -> Set(socketId)
+function spectCount(code) { return (SPECT.get(code) || new Set()).size; }
+function roomStateFor(room, code) {
+    if (room.mode === 'arcade' && arcGames[code]) return ['arc_state', arcPublic(room, arcGames[code])];
+    return null;
+}
+function listLiveRooms() {
+    return Object.values(rooms).filter(r => r && r.isPublic && r.status !== 'waiting' && r.players.length > 0)
+        .map(r => ({ code: r.code, modeLabel: (typeof PUBLIC_MODE_LABELS !== 'undefined' && PUBLIC_MODE_LABELS[r.mode]) || r.mode, subLabel: typeof publicRoomSubLabel === 'function' ? publicRoomSubLabel(r) : '', players: r.players.length, spectators: spectCount(r.code), weekly: !!r.weekly }))
+        .sort((a, b) => (b.weekly - a.weekly) || b.players - a.players);
+}
+const VOICE = new Map(); // roomCode -> Map(socketId -> name)
+function voiceLeave(socket, code) {
+    const m = VOICE.get(code);
+    if (!m || !m.has(socket.id)) return;
+    m.delete(socket.id);
+    socket.to(code).emit('voice_peer_left', { id: socket.id });
+    if (!m.size) VOICE.delete(code);
+}
+io.on('connection', socket => {
+    const uid = () => socket.user && socket.user.id;
+    // --- duel classé ---
+    socket.on('ranked_queue', async () => {
+        if (!uid()) return socket.emit('ranked_error', { message: 'Crée un compte pour jouer en classé.' });
+        if (rankedQueue.some(q => q.uid === uid())) return;
+        const r = await rankedGet(uid());
+        rankedQueue.push({ sid: socket.id, uid: uid(), name: socket.user.pseudo, elo: r.elo, at: hubNow() });
+        socket.emit('ranked_queued', { size: rankedQueue.length });
+        rankedTryMatch();
+    });
+    socket.on('ranked_leave', () => { const i = rankedQueue.findIndex(q => q.sid === socket.id); if (i >= 0) rankedQueue.splice(i, 1); });
+    socket.on('join_room', ({ roomCode } = {}) => { // après les autres gestionnaires : le joueur est déjà dans le salon
+        const room = rooms[roomCode];
+        if (!room) return;
+        if (room.lockHost && room.host !== room.lockHost) { room.host = room.lockHost; if (room.status === 'waiting') io.to(roomCode).emit('update_room', room); }
+        if (room.ranked && !room.rankedStarting && room.status === 'waiting') {
+            const intruder = room.players.find(p => p.userId !== room.ranked.a && p.userId !== room.ranked.b);
+            if (intruder) { room.players = room.players.filter(p => p !== intruder); io.to(intruder.id).emit('game_error', { message: 'Ce salon est un duel classé privé.' }); }
+            if (room.players.length === 2) {
+                room.rankedStarting = true;
+                io.to(roomCode).emit('ranked_countdown', { seconds: 3 });
+                setTimeout(() => { const r = rooms[roomCode]; if (r && r.status === 'waiting' && r.players.length >= 1) startArcade(r, roomCode); }, 3500);
+            }
+        }
+    });
+    // --- spectateurs ---
+    socket.on('list_live_rooms', () => socket.emit('live_rooms', listLiveRooms()));
+    socket.on('spectate_room', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !room.isPublic || room.status === 'waiting') return socket.emit('spectate_error', { message: 'Cette partie n’est plus en cours.' });
+        if (room.players.some(p => p.id === socket.id)) return;
+        socket.join(roomCode);
+        if (!SPECT.has(roomCode)) SPECT.set(roomCode, new Set());
+        SPECT.get(roomCode).add(socket.id);
+        socket.data.spect = roomCode;
+        socket.emit('spectate_ok', { roomCode, label: listLiveRooms().find(r => r.code === roomCode) || null });
+        const st = roomStateFor(room, roomCode);
+        if (st) socket.emit(st[0], st[1]);
+        io.to(roomCode).emit('spectators', { roomCode, n: spectCount(roomCode) });
+    });
+    const stopSpect = () => {
+        const code = socket.data.spect;
+        if (!code) return;
+        socket.data.spect = null;
+        const s = SPECT.get(code); if (s) { s.delete(socket.id); if (!s.size) SPECT.delete(code); }
+        const room = rooms[code];
+        if (!room || !room.players.some(p => p.id === socket.id)) socket.leave(code);
+        io.to(code).emit('spectators', { roomCode: code, n: spectCount(code) });
+    };
+    socket.on('spectate_leave', stopSpect);
+    let lastReact = 0;
+    socket.on('spectate_react', ({ emoji } = {}) => {
+        const code = socket.data.spect;
+        if (!code || !REACTIONS.includes(emoji)) return;
+        const now = Date.now(); if (now - lastReact < 900) return; lastReact = now;
+        io.to(code).emit('reaction', { name: '👁️ ' + ((socket.user && socket.user.pseudo) || 'Spectateur'), emoji, id: socket.id });
+    });
+    // --- salon vocal (WebRTC, le serveur ne fait que relayer la mise en relation) ---
+    socket.on('voice_join', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !room.players.some(p => p.id === socket.id)) return;
+        if (!VOICE.has(roomCode)) VOICE.set(roomCode, new Map());
+        const m = VOICE.get(roomCode);
+        if (m.size >= 8 && !m.has(socket.id)) return socket.emit('voice_error', { message: 'Salon vocal complet (8 max).' });
+        socket.emit('voice_peers', { peers: [...m].filter(([id]) => id !== socket.id).map(([id, name]) => ({ id, name })) });
+        m.set(socket.id, socket.user.pseudo);
+        socket.data.voice = roomCode;
+        socket.to(roomCode).emit('voice_peer_joined', { id: socket.id, name: socket.user.pseudo });
+    });
+    socket.on('voice_signal', ({ to, data } = {}) => {
+        const code = socket.data.voice, m = code && VOICE.get(code);
+        if (!m || !m.has(to) || !data) return;
+        io.to(to).emit('voice_signal', { from: socket.id, name: socket.user.pseudo, data });
+    });
+    socket.on('voice_state', ({ muted, speaking } = {}) => {
+        const code = socket.data.voice;
+        if (code) socket.to(code).emit('voice_state', { id: socket.id, muted: !!muted, speaking: !!speaking });
+    });
+    socket.on('voice_leave', () => { if (socket.data.voice) { voiceLeave(socket, socket.data.voice); socket.data.voice = null; } });
+    socket.on('leave_room', () => { if (socket.data.voice) { voiceLeave(socket, socket.data.voice); socket.data.voice = null; } });
+    socket.on('disconnect', () => {
+        const i = rankedQueue.findIndex(q => q.sid === socket.id); if (i >= 0) rankedQueue.splice(i, 1);
+        stopSpect();
+        if (socket.data.voice) voiceLeave(socket, socket.data.voice);
+    });
+});
+
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
