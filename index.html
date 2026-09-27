@@ -393,6 +393,18 @@
         .arc-video{position:relative;width:100%;max-width:720px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:2px solid #2c2c44;box-shadow:0 10px 40px rgba(0,0,0,.45);}
         .arc-video iframe{position:absolute;left:-14%;top:-20%;width:128%;height:140%;border:0;pointer-events:none;}
         .arc-video-shield{position:absolute;inset:0;z-index:2;}
+        .arc-video.audio-tap iframe{pointer-events:auto;}
+        .arc-sound-btn{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);z-index:6;background:var(--accent-cyan);color:#000;border:0;border-radius:99px;padding:14px 26px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 0 28px rgba(0,242,255,.45);animation:arcPop .35s ease-out;-webkit-tap-highlight-color:transparent;}
+        .seven{position:relative;display:inline-block;}
+        .seven::after{content:'';position:absolute;left:22%;right:8%;top:50%;height:.085em;min-height:2px;background:currentColor;border-radius:2px;transform:skewX(-12deg);}
+        .vote-stamp-ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.35);animation:voteFade 1.6s ease forwards;}
+        .vote-stamp{display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .vote-stamp .vs-box{font-size:4.5rem;animation:voteDrop .5s cubic-bezier(.3,1.6,.5,1) both;}
+        .vote-stamp .vs-txt{font-family:'Bangers',cursive;font-size:3.4rem;letter-spacing:3px;color:var(--accent-pink);border:5px solid var(--accent-pink);border-radius:12px;padding:2px 22px;background:rgba(11,11,16,.85);transform:rotate(-9deg);animation:voteStamp .45s .3s cubic-bezier(.2,1.8,.4,1) both;text-shadow:0 0 18px rgba(255,42,95,.5);}
+        @keyframes voteDrop{from{transform:translateY(-60px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+        @keyframes voteStamp{from{transform:rotate(-9deg) scale(2.6);opacity:0}to{transform:rotate(-9deg) scale(1);opacity:1}}
+        @keyframes voteFade{0%,80%{opacity:1}100%{opacity:0}}
+        .vote-done-tag{display:inline-block;margin-left:6px;font-size:.72rem;font-weight:800;color:#00ff88;animation:arcPop .3s ease-out;}
         .arc-video-cover{position:absolute;inset:0;z-index:3;background:#000;display:flex;align-items:center;justify-content:center;}
         .arc-video-badge{position:absolute;left:10px;top:10px;z-index:4;background:rgba(0,0,0,.65);border-radius:99px;padding:4px 10px;font-size:.72rem;color:var(--text-muted);}
         .arc-fav{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);border:1px solid var(--accent-yellow);color:var(--accent-yellow);border-radius:99px;padding:5px 12px;font-weight:800;font-size:.9rem;white-space:nowrap;}
@@ -477,6 +489,31 @@
         .sv-row span,.sv-row b{position:relative;z-index:1;}
         .sv-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(145,70,255,.35);transition:width .3s;}
         .sv-row.good{outline:2px solid #00ff88;}
+         #stream-widget.min #stream-body{display:none;}
+        #stream-widget.min .sv-toggle{transform:rotate(-90deg);display:inline-block;}
+        #stream-widget #stream-body{max-height:45vh;overflow:auto;}
+        .kick-btn{background:transparent;border:1px solid var(--accent-pink);color:var(--accent-pink);border-radius:8px;padding:4px 9px;font-size:.75rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+        .kick-btn.armed{background:var(--accent-pink);color:#fff;}
+        .bt-choice[data-sv]{background-image:linear-gradient(90deg,rgba(145,70,255,.38) var(--sv,0%),transparent var(--sv,0%));position:relative;}
+        .bt-choice[data-sv]::after{content:'💬 ' attr(data-sv);display:block;font-size:.78rem;font-weight:800;color:#bf94ff;margin-top:4px;}
+        .bb-col{display:flex;flex-direction:column;gap:6px;min-width:0;}
+        .bb-chatpct{text-align:center;font-weight:800;color:#bf94ff;background:rgba(145,70,255,.12);border:1px solid rgba(145,70,255,.5);border-radius:10px;padding:6px 4px;font-size:.9rem;position:relative;overflow:hidden;}
+        .bb-chatpct i{position:absolute;left:0;top:0;bottom:0;background:rgba(145,70,255,.3);transition:width .3s;}
+        .bb-chatpct span{position:relative;}
+        .sv-lb{margin-top:6px;border-top:1px solid #2c2c44;padding-top:6px;}
+        .sv-lb-row{display:flex;justify-content:space-between;gap:6px;font-size:.76rem;padding:2px 0;}
+        .sv-lb-row b{color:var(--accent-yellow);}
+        .sv-lb-row em{color:#00ff88;font-style:normal;font-size:.7rem;}
+        .sv-tools{display:flex;gap:6px;margin-top:6px;}
+        .sv-tools button{flex:1;background:#2a2a40;color:#fff;border:0;border-radius:6px;padding:5px;font-size:.72rem;cursor:pointer;font-weight:700;}
+        #stream-final{position:fixed;inset:0;z-index:10000;background:rgba(5,5,10,.92);display:flex;align-items:center;justify-content:center;padding:16px;}
+        .sf-box{width:100%;max-width:520px;background:#161622;border:2px solid #9146FF;border-radius:16px;padding:18px;max-height:90vh;overflow:auto;}
+        .sf-title{font-family:'Bangers',cursive;font-size:2rem;text-align:center;color:#bf94ff;letter-spacing:1px;}
+        .sf-podium{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:8px;margin:14px 0;}
+        .sf-step{text-align:center;border-radius:10px 10px 0 0;padding:8px 4px;font-weight:800;animation:voteDrop .5s both;overflow:hidden;}
+        .sf-step .n{font-size:.85rem;word-break:break-word;}
+        .sf-step .s{font-size:.75rem;opacity:.85;}
+        .sf-row{display:flex;justify-content:space-between;background:#101018;border-radius:8px;padding:7px 10px;margin-bottom:4px;font-size:.88rem;}
         .chrono-top{display:flex;justify-content:space-between;font-weight:800;color:var(--accent-yellow);margin-bottom:8px;}
         .chrono-q{font-family:'Bangers',cursive;font-size:clamp(1.4rem,4vw,2rem);text-align:center;margin:8px 0 4px;}
         .draft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;}
@@ -670,7 +707,7 @@
 
                 <div class="quote-mode-card">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">À qui appartient cette citation ? <span class="quote-new">NOUVEAU</span></h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">775 citations • 25 par anime • 488 personnages/orateurs • solo ou multi • bonne réponse = +1 point • indice destinataire après 5 erreurs</p>
+                    <p style="margin:0 0 12px;font-size:.85rem;">986 citations • 25 à 42 par anime • 487 personnages • solo ou multi • bonne réponse = +1 point • indice destinataire après 5 erreurs</p>
                     <button class="btn-action" style="margin-top:0;" onclick="openQuoteUniverseSelection()">Choisir l'univers</button>
                 </div>
 
@@ -769,40 +806,40 @@
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
                 <div>
                     <h2 id="universe-select-title" style="margin-bottom:4px;">À QUI APPARTIENT CETTE CITATION ?</h2>
-                    <p id="universe-select-sub" style="margin:0;color:var(--text-muted);">Choisis ton univers — 25 citations dans chacun des 31 animes.</p>
+                    <p id="universe-select-sub" style="margin:0;color:var(--text-muted);">Choisis ton univers — 25 à 42 citations dans chacun des 31 animes.</p>
                 </div>
                 <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:7px 10px;cursor:pointer;">🔙 Retour</button>
             </div>
-            <div class="quote-universe-grid" id="universe-select-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('onepiece')">One Piece<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('bleach')">Bleach<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('hxh')">Hunter x Hunter<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('snk')">SNK / L'Attaque des Titans<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('sds')">Seven Deadly Sins<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('deathnote')">Death Note<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+            <div class="quote-universe-grid" id="universe-select-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">38 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('onepiece')">One Piece<br><span style="font-size:.65rem;color:var(--text-muted);">42 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('bleach')">Bleach<br><span style="font-size:.65rem;color:var(--text-muted);">39 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('hxh')">Hunter x Hunter<br><span style="font-size:.65rem;color:var(--text-muted);">34 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('snk')">SNK / L'Attaque des Titans<br><span style="font-size:.65rem;color:var(--text-muted);">37 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('sds')">Seven Deadly Sins<br><span style="font-size:.65rem;color:var(--text-muted);">31 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('deathnote')">Death Note<br><span style="font-size:.65rem;color:var(--text-muted);">35 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('cote')">Classroom of the Elite<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('solo')">Solo Leveling<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('clover')">Black Clover<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('solo')">Solo Leveling<br><span style="font-size:.65rem;color:var(--text-muted);">31 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('clover')">Black Clover<br><span style="font-size:.65rem;color:var(--text-muted);">32 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('fireforce')">Fire Force<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('mushoku')">Mushoku Tensei<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('rezero')">Re:Zero<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('fairy')">Fairy Tail<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('bluelock')">Blue Lock<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('fma')">Fullmetal Alchemist<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('chainsaw')">Chainsaw Man<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('fairy')">Fairy Tail<br><span style="font-size:.65rem;color:var(--text-muted);">35 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('bluelock')">Blue Lock<br><span style="font-size:.65rem;color:var(--text-muted);">32 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('fma')">Fullmetal Alchemist<br><span style="font-size:.65rem;color:var(--text-muted);">36 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('chainsaw')">Chainsaw Man<br><span style="font-size:.65rem;color:var(--text-muted);">33 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('wakfu')">Wakfu<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('demonslayer')">Demon Slayer<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('pokemon')">Pokémon<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('dragonball')">Dragon Ball<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('demonslayer')">Demon Slayer<br><span style="font-size:.65rem;color:var(--text-muted);">38 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('pokemon')">Pokémon<br><span style="font-size:.65rem;color:var(--text-muted);">29 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('dragonball')">Dragon Ball<br><span style="font-size:.65rem;color:var(--text-muted);">39 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('hellsparadise')">Hell's Paradise<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('gachiakuta')">Gachiakuta<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('haikyuu')">Haikyuu<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('jjk')">Jujutsu Kaisen<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('jojo')">JoJo's Bizarre Adventure<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('haikyuu')">Haikyuu<br><span style="font-size:.65rem;color:var(--text-muted);">32 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('jjk')">Jujutsu Kaisen<br><span style="font-size:.65rem;color:var(--text-muted);">40 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('jojo')">JoJo's Bizarre Adventure<br><span style="font-size:.65rem;color:var(--text-muted);">38 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('tensura')">Tensura<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('opm')">One Punch Man<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('opm')">One Punch Man<br><span style="font-size:.65rem;color:var(--text-muted);">33 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('sao')">Sword Art Online<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
-<button class="quote-universe-btn" onclick="createQuoteRoom('tokyoghoul')">Tokyo Ghoul<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button>
+<button class="quote-universe-btn" onclick="createQuoteRoom('tokyoghoul')">Tokyo Ghoul<br><span style="font-size:.65rem;color:var(--text-muted);">32 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('tokyorevengers')">Tokyo Revengers<br><span style="font-size:.65rem;color:var(--text-muted);">25 citations</span></button></div>
         </div>
 
@@ -1526,6 +1563,27 @@
             goToMenuSelection();
         }
 
+        // L'hôte exclut un joueur (2 appuis : un pour armer, un pour confirmer — pas de popup bloquante)
+        function kickPlayer(id, btn) {
+            if (!btn.classList.contains('armed')) {
+                document.querySelectorAll('.kick-btn.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '✖ Exclure'; });
+                btn.classList.add('armed'); btn.textContent = 'Confirmer ?';
+                setTimeout(() => { if (btn.isConnected && btn.classList.contains('armed')) { btn.classList.remove('armed'); btn.textContent = '✖ Exclure'; } }, 3000);
+                return;
+            }
+            btn.disabled = true;
+            socket.emit('kick_player', { roomCode: currentRoomCode, targetId: id });
+        }
+        socket.on('kicked', (d = {}) => {
+            if (d.roomCode && currentRoomCode && d.roomCode !== currentRoomCode) return;
+            if (typeof btStopAudio === 'function') btStopAudio();
+            currentRoomCode = '';
+            goToMenuSelection();
+            const msg = d.message || "Tu as été exclu du salon.";
+            if (typeof toast === 'function') toast('🚫 ' + msg, 'var(--accent-pink)'); else alert(msg);
+        });
+        socket.on('room_toast', (d = {}) => { if (d.message && typeof toast === 'function') toast(d.message, 'var(--accent-pink)'); });
+
         socket.on('force_rejoin', ({ roomCode } = {}) => {
             if (!roomCode) return;
             currentRoomCode = roomCode;
@@ -1780,7 +1838,7 @@
             ['opm','One Punch Man'],['sao','Sword Art Online'],['tokyoghoul','Tokyo Ghoul'],['tokyorevengers','Tokyo Revengers']
         ];
         const UNIVERSE_SELECT_MODES = {
-            quote:          { title:'À QUI APPARTIENT CETTE CITATION ?', sub:'Choisis ton univers — 25 citations dans chacun des 31 animes.', tag:'25 citations' },
+            quote:          { title:'À QUI APPARTIENT CETTE CITATION ?', sub:'Choisis ton univers — 25 à 42 citations dans chacun des 31 animes.', tag:'25 citations' },
             rollandgaros:   { title:'ROLLAND GAROS', sub:'Choisis ton univers — trouvez un max de persos à tour de rôle.', tag:'' },
             enchere:        { title:'ENCHÈRE', sub:'Choisis ton univers — 1v1, 50M chacun, 4 persos par équipe.', tag:'' },
             enchereaveugle: { title:"ENCHÈRE À L'AVEUGLE", sub:"Choisis ton univers — un seul voit le perso, l'autre mise à l'aveugle.", tag:'' },
@@ -1974,8 +2032,15 @@
 
             const list = document.getElementById('waiting-players-list');
             list.innerHTML = "";
+            const _iAmHost = room.host === socket.id;
+            const _esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
             room.players.forEach(p => {
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:#00ff88">Prêt</span></li>`;
+                const crown = p.id === room.host ? ' 👑' : '';
+                const me = p.id === socket.id ? ' <span style="color:var(--text-muted);font-size:.8rem;">(toi)</span>' : '';
+                const right = (_iAmHost && p.id !== socket.id)
+                    ? `<span style="display:flex;align-items:center;gap:8px;"><span style="color:#00ff88">Prêt</span><button class="kick-btn" onclick="kickPlayer('${p.id}', this)" data-name="${_esc(p.name)}" title="Exclure">✖ Exclure</button></span>`
+                    : `<span style="color:#00ff88">Prêt</span>`;
+                list.innerHTML += `<li><span>${_esc(p.name)}${crown}${me}</span> ${right}</li>`;
             });
 
             if (room.host === socket.id) {
@@ -2356,7 +2421,8 @@
 
         // À chaque nouveau mot/note attribué, on repart en mode visible
         function setSecretText(text) {
-            document.getElementById('my-secret-display').innerText = text;
+            const _el = document.getElementById('my-secret-display');
+            _el.innerHTML = String(text).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/7/g, '<span class="seven">7</span>');
             secretHidden = false;
             clearFandomImage('my-secret-image', 'my-secret-image-source');
 
@@ -2523,6 +2589,7 @@
         }
 
         socket.on('start_voting', (room) => {
+            window.__voted = !!(room.votes && room.votes[socket.id]);
             document.getElementById('game-phase-title').innerText = "Phase de Vote";
             document.getElementById('game-info-text').innerText = "Vérifie les indices et choisis qui éliminer :";
             document.getElementById('clue-input-container').style.display = 'none';
@@ -2543,7 +2610,7 @@
                 let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
                 
                 if (p.id !== socket.id && me && me.isAlive) {
-                    list.innerHTML += `<li>
+                    list.innerHTML += `<li data-pid="${p.id}">
                         <div>
                             <strong>${p.name}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
@@ -2551,7 +2618,7 @@
                         <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
                     </li>`;
                 } else {
-                    list.innerHTML += `<li>
+                    list.innerHTML += `<li data-pid="${p.id}">
                         <div>
                             <strong>${p.name} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
@@ -2560,6 +2627,8 @@
                     </li>`;
                 }
             });
+            if (room.votes) Object.keys(room.votes).forEach(vid => { const st = list.querySelector(`li[data-pid="${vid}"] strong`); if (st) st.insertAdjacentHTML('beforeend', '<span class="vote-done-tag">✔ a voté</span>'); });
+            if (window.__voted) list.querySelectorAll('button').forEach(b => { b.disabled = true; b.style.opacity = '.35'; });
 
             if (room.mode === 'undercover' && room.subMode === 'hardcore' && me && me.isAlive) {
                 list.innerHTML += `<li style="border-left-color: var(--accent-yellow);">
@@ -2570,11 +2639,30 @@
         });
 
         function castVote(targetId) {
+            if (window.__voted) return;
+            window.__voted = true;
             socket.emit('cast_vote', { roomCode: currentRoomCode, targetId: targetId });
             document.getElementById('game-info-text').innerText = "Vote enregistré ! En attente des autres joueurs...";
             document.getElementById('pass-vote-container').style.display = 'none';
-            document.querySelectorAll('.player-list button').forEach(b => b.disabled = true);
+            document.querySelectorAll('#gameplay-players-list button, .player-list button').forEach(b => { b.disabled = true; b.style.opacity = '.35'; });
+            showVoteStamp();
         }
+        function showVoteStamp() {
+            document.querySelectorAll('.vote-stamp-ov').forEach(x => x.remove());
+            const ov = document.createElement('div'); ov.className = 'vote-stamp-ov';
+            ov.innerHTML = '<div class="vote-stamp"><div class="vs-box">🗳️</div><div class="vs-txt">A VOTÉ !</div></div>';
+            document.body.appendChild(ov);
+            try { if (typeof sfxValide === 'function') sfxValide(); } catch (_) {}
+            try { if (navigator.vibrate) navigator.vibrate(40); } catch (_) {}
+            setTimeout(() => ov.remove(), 1700);
+        }
+        socket.on('vote_progress', d => {
+            if (!d) return;
+            const t = document.getElementById('game-phase-title');
+            if (t && t.innerText.startsWith('Phase de Vote')) t.innerText = `Phase de Vote (${d.voted}/${d.total})`;
+            const btn = document.querySelector(`#gameplay-players-list li[data-pid="${d.voterId}"] strong`);
+            if (btn && !btn.querySelector('.vote-done-tag')) btn.insertAdjacentHTML('beforeend', '<span class="vote-done-tag">✔ a voté</span>');
+        });
 
         socket.on('show_results', (data) => {
             document.getElementById('game-phase-title').innerText = data.gameOver ? "Fin de la Partie" : "Résultats du Tour";
@@ -2585,7 +2673,7 @@
             
             let resultMessage = "";
             if (data.eliminatedPlayer) {
-                let roleInfo = data.gameOver ? (data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>") : "<span style='color:var(--text-muted)'>Rôle secret masqué</span>";
+                let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
                 resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote « Pas d'imposteur » validé.<br><br>`;
@@ -2595,7 +2683,8 @@
                 resultMessage += `<strong style="font-size: 1.2rem; color: var(--accent-yellow);">${data.winnerMessage}</strong><br><br>`;
                 document.getElementById('end-game-buttons').style.display = 'flex';
             } else {
-                resultMessage += `<span style="color: var(--accent-cyan);">Prochain tour dans 4 secondes...</span>`;
+                if (data.winnerMessage) resultMessage += `<strong style="color: var(--accent-yellow);">${data.winnerMessage}</strong><br>`;
+                resultMessage += `<span style="color: var(--accent-cyan);">Nouveau tour d'indices dans 4 secondes...</span>`;
                 setTimeout(() => { socket.emit('next_step_game', currentRoomCode); }, 4000);
             }
 
@@ -2607,7 +2696,7 @@
                 let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
                 let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
-                let secretTxt = p.secretData ? ` (${p.secretData})` : '';
+                let secretTxt = (p.secretData && (data.gameOver || !p.isAlive)) ? ` (${p.secretData})` : '';
                 list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
@@ -3964,6 +4053,26 @@
         };
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
         let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null, arcYt = null;
+        // Bouton « Activer le son » pour Écoute la scène (mobile : le son doit partir d'un vrai toucher)
+        function arcAudioButton(box, player, key) {
+            if (!box || box.querySelector('.arc-sound-btn')) return;
+            const h = document.getElementById('arc-audio-hint'); if (h) h.textContent = '';
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'arc-sound-btn'; b.innerHTML = '🔊 Activer le son';
+            const go = ev => {
+                if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+                try { player.unMute(); player.setVolume(85); player.playVideo(); } catch (_) {}
+                setTimeout(() => {
+                    if (arcStageKey !== key) return;
+                    let ok = false; try { ok = !player.isMuted() && player.getPlayerState() === 1; } catch (_) {}
+                    b.remove();
+                    const hint = document.getElementById('arc-audio-hint');
+                    if (ok) { if (hint) hint.textContent = 'Écoute bien…'; box.classList.remove('audio-tap'); }
+                    else { box.classList.add('audio-tap'); if (hint) hint.textContent = '👆 Touche encore l\'écran pour le son'; }
+                }, 700);
+            };
+            b.addEventListener('click', go);
+            box.appendChild(b);
+        }
         function arcDestroyVideo() { if (arcYt) { try { arcYt.destroy(); } catch (_) {} arcYt = null; } }
 
         function openArcadeGame(game) {
@@ -4236,7 +4345,13 @@
                         playerVars: { autoplay: 1, mute: audioOnly ? 0 : 1, controls: 0, disablekb: 1, fs: 0, rel: 0, playsinline: 1, iv_load_policy: 3, modestbranding: 1 },
                         events: {
                             onReady: e => { if (audioOnly) { e.target.unMute(); e.target.setVolume(85); } else e.target.mute(); e.target.playVideo();
-                                if (audioOnly) setTimeout(() => { const h = document.getElementById('arc-audio-hint'); if (h && !seeked) h.textContent = '👆 Touche ici pour lancer le son'; }, 1800); },
+                                if (audioOnly) setTimeout(() => {
+                                    if (arcStageKey !== myKey) return;
+                                    let muted = true; try { muted = e.target.isMuted(); } catch (_) {}
+                                    // téléphone : lecture avec son bloquée → on lance en muet et on propose un bouton son
+                                    if (!seeked) { try { e.target.mute(); e.target.playVideo(); } catch (_) {} }
+                                    if (!seeked || muted) arcAudioButton(box, e.target, myKey);
+                                }, 1500); },
                             onStateChange: e => {
                                 if (arcStageKey !== myKey || seeked || e.data !== YT.PlayerState.PLAYING) return;
                                 seeked = true;
@@ -5385,7 +5500,9 @@
         try { applyTheme(localStorage.getItem('theme') || 'dark'); } catch (e) {}
 
         /* ===================== MODE STREAMER : votes du chat Twitch ===================== */
-        const stream = { ws: null, channel: '', key: null, labels: [], votes: new Map(), revealed: null };
+        const stream = { ws: null, channel: '', key: null, labels: [], votes: new Map(), revealed: null, t0: 0, answered: false, board: {}, lastGain: {}, rounds: 0 };
+        function streamBoardLoad() { try { stream.board = JSON.parse(localStorage.getItem('stream_board_' + stream.channel) || '{}') || {}; } catch (e) { stream.board = {}; } }
+        function streamBoardSave() { try { localStorage.setItem('stream_board_' + stream.channel, JSON.stringify(stream.board)); } catch (e) {} }
         function streamConnect() {
             const input = document.getElementById('stream-channel');
             const ch = String(input.value || '').trim().toLowerCase().replace(/^#/, '').replace(/[^a-z0-9_]/g, '');
@@ -5393,6 +5510,7 @@
             streamDisconnect();
             try { localStorage.setItem('stream_channel', ch); } catch (e) {}
             stream.channel = ch;
+            streamBoardLoad();
             const ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
             stream.ws = ws;
             streamStatus('Connexion au chat…');
@@ -5407,26 +5525,33 @@
                 if (line.startsWith('PING')) { ws.send('PONG :tmi.twitch.tv'); return; }
                 if (line.includes(' 366 ') || line.includes('JOIN #' + ch)) streamStatus(`✅ Connecté au chat de ${ch} — les viewers votent avec !1 !2 !3 !4`);
                 const m = line.match(/:([^!\s]+)![^\s]+ PRIVMSG #[^\s]+ :(.*)$/);
-                if (m) streamVote(m[1], m[2].trim());
+                if (!m) return;
+                const dn = (line.match(/(?:^@|;)display-name=([^;\s]*)/) || [])[1];
+                streamVote(m[1], m[2].trim(), dn ? dn.replace(/\\s/g, ' ') : m[1]);
             });
             ws.onclose = () => { if (stream.ws === ws) streamStatus('Déconnecté du chat.'); };
             ws.onerror = () => streamStatus('❌ Impossible de joindre le chat Twitch.');
             document.getElementById('stream-widget').style.display = 'block';
+            streamRender();
         }
         function streamDisconnect() {
             if (stream.ws) { try { stream.ws.close(); } catch (e) {} }
             stream.ws = null;
             streamStatus('Mode streamer désactivé.');
             const w = document.getElementById('stream-widget'); if (w) w.style.display = 'none';
+            streamDecorate();
         }
         function streamStatus(t) { const el = document.getElementById('stream-status'); if (el) el.textContent = t; }
-        function streamVote(user, msg) {
+        const streamIsBattle = () => String(stream.key || '').startsWith('bb|');
+        function streamVote(user, msg, display) {
             if (!stream.key || stream.revealed) return;
             let m = msg.match(/^!?\s*([1-9])\b/);
             let idx = m ? Number(m[1]) - 1 : -1;
             if (idx < 0) { m = msg.match(/^!([a-dA-D])\b/); if (m) idx = m[1].toLowerCase().charCodeAt(0) - 97; }
             if (idx < 0 || idx >= stream.labels.length) return;
-            stream.votes.set(user, idx);
+            // comme Kahoot : seule la 1re réponse compte (sauf battle d'openings où on peut changer d'avis)
+            if (stream.votes.has(user) && !streamIsBattle()) return;
+            stream.votes.set(user, { idx, t: Date.now(), name: display || user });
             streamRender();
         }
         function streamPoll(key, labels) {
@@ -5434,40 +5559,174 @@
             if (key === null) { if (stream.key && !stream.revealed) { stream.key = null; streamRender(); } return; }
             if (stream.key === key) return;
             stream.key = key; stream.labels = labels.slice(0, 9); stream.votes = new Map(); stream.revealed = null;
+            stream.t0 = Date.now(); stream.answered = streamIsBattle(); stream.lastGain = {};
             streamRender();
         }
+        // Points façon Kahoot : 1000 max, moitié perdue si on répond à la toute fin, + bonus de série
         function streamPollReveal(answer) {
             if (!stream.ws || !stream.key || stream.revealed) return;
             stream.revealed = answer || '—';
+            stream.answered = true;
+            if (!streamIsBattle()) {
+                stream.rounds++;
+                const dur = 20000;
+                stream.votes.forEach((v, user) => {
+                    const e = stream.board[user] || (stream.board[user] = { name: v.name, pts: 0, good: 0, streak: 0 });
+                    e.name = v.name;
+                    if (stream.labels[v.idx] === stream.revealed) {
+                        e.streak++; e.good++;
+                        const speed = Math.max(0, Math.min(1, (v.t - stream.t0) / dur));
+                        const gain = Math.round(1000 * (1 - speed / 2)) + Math.min(500, 100 * (e.streak - 1));
+                        e.pts += gain; stream.lastGain[user] = gain;
+                    } else e.streak = 0;
+                });
+                streamBoardSave();
+            }
             streamRender();
+        }
+        function streamTop(n) {
+            return Object.entries(stream.board).sort((a, b) => b[1].pts - a[1].pts).slice(0, n);
+        }
+        function streamResetBoard() { stream.board = {}; stream.rounds = 0; streamBoardSave(); streamRender(); toast('🔄 Classement du chat remis à zéro', '#9146FF'); }
+        function streamPct() {
+            const counts = stream.labels.map(() => 0);
+            stream.votes.forEach(v => counts[v.idx]++);
+            const total = stream.votes.size;
+            return { counts, total, pct: counts.map(c => total ? Math.round(100 * c / total) : 0) };
         }
         function streamRender() {
             const w = document.getElementById('stream-widget');
-            if (!w || !stream.ws) return;
+            if (!w || !stream.ws) { streamDecorate(); return; }
             const body = document.getElementById('stream-body');
-            if (!stream.key) { body.innerHTML = '<div class="tl-hint">En attente d\'une question…</div>'; return; }
-            const counts = stream.labels.map(() => 0);
-            stream.votes.forEach(i => counts[i]++);
-            const total = Math.max(1, stream.votes.size);
-            body.innerHTML = stream.labels.map((l, i) => {
-                const pct = Math.round(100 * counts[i] / total);
-                const good = stream.revealed && l === stream.revealed;
-                return `<div class="sv-row${good ? ' good' : ''}"><div class="sv-bar" style="width:${pct}%"></div><span>!${i + 1} ${escHtml(l)}</span><b>${pct}%</b></div>`;
-            }).join('') + `<div class="tl-hint">${stream.votes.size} vote(s) du chat${stream.revealed ? ' • réponse : ' + escHtml(stream.revealed) : ''}</div>`;
+            const tools = `<div class="sv-tools"><button onclick="streamShowFinal()">🏆 Classement</button><button onclick="streamResetBoard()">🔄 Remettre à 0</button></div>`;
+            let lbHtml = '';
+            const top = streamTop(5);
+            if (top.length && (stream.revealed || !stream.key)) {
+                lbHtml = '<div class="sv-lb">' + top.map(([u, e], i) =>
+                    `<div class="sv-lb-row"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(e.name)} ${stream.lastGain[u] ? `<em>+${stream.lastGain[u]}</em>` : ''}</span><b>${e.pts}</b></div>`).join('') + '</div>';
+            }
+            if (!stream.key) { body.innerHTML = '<div class="tl-hint">En attente d\'une question…</div>' + lbHtml + tools; streamDecorate(); return; }
+            const { pct, total } = streamPct();
+            if (!stream.answered) {
+                // le streamer n'a pas encore répondu : on cache les % pour ne pas l'influencer
+                body.innerHTML = `<div class="tl-hint" style="font-size:.85rem;">🔒 ${total} vote(s) du chat<br>Réponds pour voir leurs choix !</div>` + tools;
+            } else {
+                body.innerHTML = stream.labels.map((l, i) => {
+                    const good = stream.revealed && l === stream.revealed;
+                    return `<div class="sv-row${good ? ' good' : ''}"><div class="sv-bar" style="width:${pct[i]}%"></div><span>!${i + 1} ${escHtml(l)}</span><b>${pct[i]}%</b></div>`;
+                }).join('') + `<div class="tl-hint">${total} vote(s) du chat${stream.revealed && !streamIsBattle() ? ' • réponse : ' + escHtml(stream.revealed) : ''}</div>` + lbHtml + tools;
+            }
+            streamDecorate();
         }
+        // Affiche le % du chat directement sur les boutons de réponse, et sous chaque opening en battle
+        function streamDecorate() {
+            const on = !!(stream.ws && stream.key);
+            const { pct } = on ? streamPct() : { pct: [] };
+            document.querySelectorAll('#arc-choices .bt-choice, #bt-choices .bt-choice').forEach(b => {
+                const i = on && !streamIsBattle() ? stream.labels.indexOf(b.textContent) : -1;
+                if (i >= 0 && stream.answered) { if (b.dataset.sv !== pct[i] + '%') b.dataset.sv = pct[i] + '%'; b.style.setProperty('--sv', pct[i] + '%'); }
+                else if (b.dataset.sv !== undefined) { delete b.dataset.sv; b.style.removeProperty('--sv'); }
+            });
+            document.querySelectorAll('.bb-chatpct').forEach(el => {
+                const i = Number(el.dataset.i);
+                if (!on || !streamIsBattle()) { el.style.display = 'none'; return; }
+                el.style.display = '';
+                const v = pct[i] || 0;
+                const html = `<i style="width:${v}%"></i><span>💬 Chat : ${v}%</span>`;
+                if (el.innerHTML !== html) el.innerHTML = html;
+            });
+        }
+        // Le streamer a cliqué une réponse → on dévoile les % du chat
+        document.addEventListener('click', e => {
+            const b = e.target.closest && e.target.closest('#arc-choices .bt-choice, #bt-choices .bt-choice');
+            if (!b || !stream.ws || !stream.key || stream.answered) return;
+            stream.answered = true;
+            setTimeout(streamRender, 0);
+        }, true);
+        // Les boutons sont recréés à chaque état : on remet les % dessus
+        (function () {
+            let raf = 0;
+            const mo = new MutationObserver(() => { if (!stream.ws || raf) return; raf = requestAnimationFrame(() => { raf = 0; streamDecorate(); }); });
+            const start = () => ['arc-choices', 'bt-choices'].forEach(id => { const el = document.getElementById(id); if (el) mo.observe(el, { childList: true }); });
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+        })();
+        // Classement final du chat (façon Kahoot)
+        function streamShowFinal() {
+            document.getElementById('stream-final')?.remove();
+            const top = streamTop(10);
+            const ov = document.createElement('div'); ov.id = 'stream-final';
+            const pod = [top[1], top[0], top[2]];
+            const cols = ['#c0c0d0', '#ffd700', '#cd7f32'], hs = [90, 125, 70];
+            const podium = top.length ? `<div class="sf-podium">${pod.map((x, i) => x ? `<div class="sf-step" style="background:${cols[i]};color:#111;height:${hs[i]}px;animation-delay:${[.3, .6, 0][i]}s"><div style="font-size:1.4rem">${['🥈', '🥇', '🥉'][i]}</div><div class="n">${escHtml(x[1].name)}</div><div class="s">${x[1].pts} pts</div></div>` : '<div></div>').join('')}</div>` : '<p class="tl-hint">Aucun vote du chat pour l\'instant.</p>';
+            const rest = top.slice(3).map(([u, e], i) => `<div class="sf-row"><span>${i + 4}. ${escHtml(e.name)}</span><b style="color:var(--accent-yellow)">${e.pts} pts</b></div>`).join('');
+            ov.innerHTML = `<div class="sf-box"><div class="sf-title">🏆 Classement du chat</div><div class="tl-hint">${Object.keys(stream.board).length} viewer(s) • bonne réponse = jusqu'à 1000 pts selon la rapidité, + bonus de série</div>${podium}${rest}<div class="sv-tools" style="margin-top:12px;"><button onclick="document.getElementById('stream-final').remove()">Fermer</button><button onclick="streamResetBoard();document.getElementById('stream-final').remove()">🔄 Nouveau classement</button></div></div>`;
+            ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+            document.body.appendChild(ov);
+            if (top.length) confetti(2000);
+        }
+        let streamFinalKey = '';
+        function streamFinal(key) {
+            if (!stream.ws || streamFinalKey === key || !Object.keys(stream.board).length) return;
+            streamFinalKey = key;
+            setTimeout(streamShowFinal, 1200);
+        }
+        socket.on('arc_state', q => { if (q && q.phase === 'finished' && q.answerType === 'choice') streamFinal('arc|' + (q.totalRounds || '') + '|' + (q.startedAt || '') + '|' + currentRoomCode); });
+        socket.on('bt_state', q => { if (q && q.phase === 'finished') streamFinal('bt|' + (q.round || '') + '|' + currentRoomCode + '|' + (q.totalRounds || '')); });
         try { const ch = localStorage.getItem('stream_channel'); if (ch) setTimeout(() => { const i = document.getElementById('stream-channel'); if (i) i.value = ch; }, 50); } catch (e) {}
-        // Battle d'openings : le chat vote aussi (!1 gauche / !2 droite)
+        // Battle d'openings : le chat vote aussi (!1 gauche / !2 droite), % écrit sous chaque opening
         (function () {
             const orig = window.bbRenderDuel;
             if (typeof orig !== 'function') return;
             window.bbRenderDuel = function () {
                 const r = orig.apply(this, arguments);
-                try { if (bb && bb.current) streamPoll('bb|' + bb.current.length + '|' + bb.idx, [bb.current[bb.idx], bb.current[bb.idx + 1]]); } catch (e) {}
+                try {
+                    const duel = document.querySelector('#bb-body .bb-duel');
+                    if (duel) duel.querySelectorAll(':scope > .bb-card').forEach((card, i) => {
+                        const col = document.createElement('div'); col.className = 'bb-col';
+                        card.replaceWith(col); col.appendChild(card);
+                        const pc = document.createElement('div'); pc.className = 'bb-chatpct'; pc.dataset.i = i; pc.style.display = 'none';
+                        col.appendChild(pc);
+                    });
+                    if (bb && bb.current) streamPoll('bb|' + bb.current.length + '|' + bb.idx + '|' + bb.duels.length, [bb.current[bb.idx], bb.current[bb.idx + 1]]);
+                    streamDecorate();
+                } catch (e) {}
                 return r;
             };
         })();
 
         tryAutoLogin();
+
+        /* ===== 7 barré dans la police Bangers (sinon on le confond avec le 1) ===== */
+        (function () {
+            const pending = new Set(); let raf = 0;
+            const isBangers = el => { try { return /bangers/i.test(getComputedStyle(el).fontFamily); } catch (_) { return false; } };
+            function fixNode(t) {
+                const el = t.parentElement;
+                if (!el || !t.isConnected || !t.nodeValue || t.nodeValue.indexOf('7') < 0) return;
+                if (el.classList.contains('seven') || el.isContentEditable || /^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION|TITLE)$/.test(el.tagName)) return;
+                if (!isBangers(el)) return;
+                const frag = document.createDocumentFragment();
+                t.nodeValue.split(/(7)/).forEach(part => {
+                    if (!part) return;
+                    if (part === '7') { const sp = document.createElement('span'); sp.className = 'seven'; sp.textContent = '7'; frag.appendChild(sp); }
+                    else frag.appendChild(document.createTextNode(part));
+                });
+                t.replaceWith(frag);
+            }
+            function scan(root) {
+                if (root.nodeType === 3) { pending.add(root); return; }
+                if (root.nodeType !== 1) return;
+                const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                let n; while ((n = w.nextNode())) if (n.nodeValue.indexOf('7') >= 0) pending.add(n);
+            }
+            function flush() { raf = 0; const list = [...pending]; pending.clear(); list.forEach(fixNode); }
+            const mo = new MutationObserver(muts => {
+                muts.forEach(m => { if (m.type === 'characterData') pending.add(m.target); else m.addedNodes.forEach(scan); });
+                if (pending.size && !raf) raf = requestAnimationFrame(flush);
+            });
+            const start = () => { scan(document.body); flush(); mo.observe(document.body, { childList: true, subtree: true, characterData: true }); };
+            if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+        })();
     </script>
 
     <canvas id="fx-confetti" style="display:none;"></canvas>
@@ -5486,7 +5745,7 @@
             <button class="btn-action" style="background:#2a2a40;" onclick="document.getElementById('fx-share').style.display='none'">Fermer</button>
         </div>
     </div>
-    <div id="stream-widget" style="display:none;"><div class="sv-head">🎥 Vote du chat</div><div id="stream-body"></div></div>
+    <div id="stream-widget" style="display:none;"><div class="sv-head" onclick="this.parentNode.classList.toggle('min')" style="cursor:pointer;display:flex;justify-content:space-between;">🎥 Vote du chat <span class="sv-toggle">▾</span></div><div id="stream-body"></div></div>
     <div id="music-player">
         <div class="music-player-head">
             <button class="music-mini-btn" onclick="previousMusicTrack()" title="Précédent">⏮</button>
