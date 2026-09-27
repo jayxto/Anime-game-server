@@ -15675,3 +15675,474 @@ arcPublic = function (room, g) {
     if (g.uniList) out.universeLabel = g.uniList.map(k => ARC_UNIVERSE_ANIME[k]).join(' + ');
     return out;
 };
+
+/* =====================================================================
+   PIÈCES, BOUTIQUE, COLLECTION DE CARTES, TITRES, EMOTES DE VICTOIRE,
+   DÉFIS ENTRE AMIS
+   ===================================================================== */
+const SHOP = [
+    // couleurs de pseudo
+    { id: 'color:ocean', kind: 'color', key: 'ocean', name: 'Océan 🌊', price: 250 },
+    { id: 'color:toxic', kind: 'color', key: 'toxic', name: 'Toxique ☢️', price: 250 },
+    { id: 'color:sakura', kind: 'color', key: 'sakurac', name: 'Sakura 🌸', price: 300 },
+    { id: 'color:lava', kind: 'color', key: 'lava', name: 'Lave 🌋', price: 350 },
+    { id: 'color:holo', kind: 'color', key: 'holo', name: 'Holographique 💿', price: 900 },
+    // cadres d'avatar
+    { id: 'frame:ice', kind: 'frame', key: 'ice', name: 'Glace ❄️', price: 300 },
+    { id: 'frame:shadow', kind: 'frame', key: 'shadow', name: 'Ombre 🌑', price: 400 },
+    { id: 'frame:glitch', kind: 'frame', key: 'glitch', name: 'Glitch 👾', price: 450 },
+    { id: 'frame:galaxy', kind: 'frame', key: 'galaxy', name: 'Galaxie 🌠', price: 700 },
+    { id: 'frame:crown', kind: 'frame', key: 'crown', name: 'Couronne 👑', price: 1200 },
+    // effets de victoire (fin de partie gagnée)
+    { id: 'effect:snow', kind: 'effect', key: 'snow', name: 'Neige ❄️', price: 250 },
+    { id: 'effect:sakura', kind: 'effect', key: 'sakura', name: 'Pétales 🌸', price: 300 },
+    { id: 'effect:fireworks', kind: 'effect', key: 'fireworks', name: "Feu d'artifice 🎆", price: 400 },
+    { id: 'effect:lightning', kind: 'effect', key: 'lightning', name: 'Éclairs ⚡', price: 450 },
+    { id: 'effect:coins', kind: 'effect', key: 'coins', name: 'Pluie de pièces 🪙', price: 500 },
+    // emotes de victoire (manche gagnée)
+    { id: 'emote:kamehameha', kind: 'emote', key: 'kamehameha', name: 'Kamehameha', price: 350 },
+    { id: 'emote:rasengan', kind: 'emote', key: 'rasengan', name: 'Rasengan', price: 350 },
+    { id: 'emote:getsuga', kind: 'emote', key: 'getsuga', name: 'Getsuga Tensho', price: 350 },
+    { id: 'emote:gomu', kind: 'emote', key: 'gomu', name: 'Gomu Gomu no Pistol', price: 350 },
+    { id: 'emote:hinokami', kind: 'emote', key: 'hinokami', name: 'Hinokami Kagura', price: 400 },
+    { id: 'emote:chidori', kind: 'emote', key: 'chidori', name: 'Chidori', price: 400 },
+    { id: 'emote:ora', kind: 'emote', key: 'ora', name: 'ORA ORA ORA', price: 450 },
+    { id: 'emote:domaine', kind: 'emote', key: 'domaine', name: 'Extension du territoire', price: 500 },
+    // boosters de cartes
+    { id: 'booster:3', kind: 'booster', key: '3', name: 'Booster 3 cartes 🃏', price: 150, consumable: true },
+    { id: 'booster:10', kind: 'booster', key: '10', name: 'Booster 10 cartes 🎴 (1 rare min.)', price: 450, consumable: true }
+];
+const SHOP_BY_ID = Object.fromEntries(SHOP.map(i => [i.id, i]));
+const RARITIES = [['commune', 'Commune'], ['rare', 'Rare'], ['epique', 'Épique'], ['legendaire', 'Légendaire']];
+
+/* ---------- stockage ---------- */
+const ECO_MEM = new Map();     // uid -> { coins, earned, owned: [], sel: {}, cos: {} }
+const CARDS_MEM = new Map();   // uid -> Map(ckey -> { n, shiny })
+const CHALL_MEM = [];
+let CHALL_SEQ = 0;
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER NOT NULL DEFAULT 0`);
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS coins_earned INTEGER NOT NULL DEFAULT 0`);
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS owned JSONB`);
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS shopsel JSONB`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS cards (user_id INTEGER NOT NULL, ckey TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 1, shiny INTEGER NOT NULL DEFAULT 0,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY (user_id, ckey))`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS challenges (id SERIAL PRIMARY KEY, from_id INTEGER NOT NULL, from_pseudo TEXT, to_id INTEGER NOT NULL, to_pseudo TEXT,
+                day TEXT NOT NULL, game TEXT NOT NULL, score INTEGER, attempts INTEGER, to_score INTEGER, to_attempts INTEGER, result TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+        } catch (e) { console.warn('[Eco] tables :', e.message); }
+    })();
+}
+async function ecoGet(uid) {
+    if (!uid) return null;
+    if (HAS_DB) {
+        try {
+            const r = (await pool.query('SELECT coins, coins_earned, owned, shopsel, cosmetics FROM users WHERE id=$1', [uid])).rows[0];
+            if (r) return { coins: r.coins || 0, earned: r.coins_earned || 0, owned: r.owned || [], sel: r.shopsel || {}, cos: r.cosmetics || {} };
+        } catch (_) {}
+        return { coins: 0, earned: 0, owned: [], sel: {}, cos: {} };
+    }
+    if (!ECO_MEM.has(uid)) ECO_MEM.set(uid, { coins: 0, earned: 0, owned: [], sel: {}, cos: {} });
+    return ECO_MEM.get(uid);
+}
+async function ecoSave(uid, e) {
+    if (HAS_DB) {
+        try { await pool.query('UPDATE users SET coins=$2, coins_earned=$3, owned=$4, shopsel=$5 WHERE id=$1', [uid, e.coins, e.earned, JSON.stringify(e.owned), JSON.stringify(e.sel)]); } catch (_) {}
+    } else ECO_MEM.set(uid, e);
+}
+async function ecoAddCoins(uid, n, gift) { // gift = pièces offertes (admin) : ne comptent pas pour le titre Millionnaire
+    if (!uid || !n) return 0;
+    const earn = gift ? 0 : n;
+    if (HAS_DB) {
+        try { const r = (await pool.query('UPDATE users SET coins = coins + $2, coins_earned = coins_earned + $3 WHERE id=$1 RETURNING coins', [uid, n, earn])).rows[0]; return r ? r.coins : 0; } catch (_) { return 0; }
+    }
+    const e = await ecoGet(uid); e.coins += n; e.earned += earn; return e.coins;
+}
+
+/* ---------- cosmétiques de la boutique dans le pseudo stylé ---------- */
+const _cosOfShop = cosOf;
+cosOf = function (row) {
+    const o = _cosOfShop(row);
+    const mem = !HAS_DB && row && row.id ? ECO_MEM.get(row.id) : null;
+    const owned = HAS_DB ? (row.owned || []) : (mem ? mem.owned : []);
+    const sel = HAS_DB ? (row.shopsel || {}) : (mem ? mem.sel : {});
+    const c = HAS_DB ? (row.cosmetics || {}) : (mem ? mem.cos : {});
+    const shopKey = (kind, key) => SHOP.find(i => i.kind === kind && i.key === key);
+    const col = c.color && shopKey('color', c.color); if (col && owned.includes(col.id)) o.color = col.key;
+    const fr = c.frame && shopKey('frame', c.frame); if (fr && owned.includes(fr.id)) o.frame = fr.key;
+    if (sel.emote && owned.includes('emote:' + sel.emote)) o.emote = sel.emote;
+    if (sel.effect && owned.includes('effect:' + sel.effect)) o.effect = sel.effect;
+    if (sel.title && TITLES.some(t => t.id === sel.title)) o.title = TITLES.find(t => t.id === sel.title).name;
+    return o;
+};
+// renvoie le style à jour partout (sockets, salons)
+async function ecoPushCos(uid) {
+    if (HAS_DB) return refreshUserCos(uid);
+    const e = await ecoGet(uid);
+    const shop = {};
+    const col = SHOP.find(i => i.kind === 'color' && i.key === e.cos.color && e.owned.includes(i.id));
+    const fr = SHOP.find(i => i.kind === 'frame' && i.key === e.cos.frame && e.owned.includes(i.id));
+    shop.color = col ? col.key : undefined; shop.frame = fr ? fr.key : undefined;
+    shop.emote = e.sel.emote && e.owned.includes('emote:' + e.sel.emote) ? e.sel.emote : null;
+    shop.effect = e.sel.effect && e.owned.includes('effect:' + e.sel.effect) ? e.sel.effect : null;
+    shop.title = e.sel.title ? (TITLES.find(t => t.id === e.sel.title) || {}).name || null : null;
+    const merge = cos => { const out = { ...(cos || {}) }; Object.entries(shop).forEach(([k, v]) => { if (v !== undefined) out[k] = v; }); return out; };
+    socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) s.user.cos = merge(s.user.cos); });
+    for (const [code, r] of Object.entries(rooms)) {
+        const p = r.players.find(x => x.userId === uid);
+        if (!p) continue;
+        p.cos = merge(p.cos);
+        if (r.status === 'waiting') io.to(code).emit('update_room', r);
+    }
+}
+
+/* ---------- pièces gagnées à chaque partie ---------- */
+const _progRecordEco = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordEco(room, mode, universe, entries);
+    for (const e of entries || []) {
+        const p = e.player;
+        if (!p || !p.userId) continue;
+        const gain = 10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80));
+        const total = await ecoAddCoins(p.userId, gain);
+        io.to(p.id).emit('coins_gain', { gain, total });
+    }
+    return r;
+};
+
+/* ---------- collection de cartes ---------- */
+function cardResolve(u, name) {
+    if (!ARC_UNIVERSE_ANIME[u] || !name) return null;
+    const list = arcFamous(u);
+    const n = normalizeRG(name);
+    let idx = list.findIndex(c => normalizeRG(c.display) === n);
+    if (idx < 0) idx = list.findIndex(c => normalizeRG(c.display).includes(n) || n.includes(normalizeRG(c.display)));
+    if (idx < 0) return null;
+    return { u, display: list[idx].display, idx, total: list.length, key: u + '|' + list[idx].display };
+}
+function cardRarity(idx, total) {
+    const f = idx / Math.max(1, total);
+    return f < 0.35 ? 'commune' : f < 0.65 ? 'rare' : f < 0.88 ? 'epique' : 'legendaire';
+}
+async function cardsOf(uid) {
+    if (HAS_DB) {
+        try { return new Map((await pool.query('SELECT ckey, n, shiny FROM cards WHERE user_id=$1', [uid])).rows.map(r => [r.ckey, { n: r.n, shiny: r.shiny }])); } catch (_) { return new Map(); }
+    }
+    if (!CARDS_MEM.has(uid)) CARDS_MEM.set(uid, new Map());
+    return CARDS_MEM.get(uid);
+}
+async function cardGive(uid, c, shiny) {
+    let isNew = true;
+    if (HAS_DB) {
+        try {
+            const r = (await pool.query(`INSERT INTO cards (user_id, ckey, n, shiny) VALUES ($1,$2,1,$3)
+                ON CONFLICT (user_id, ckey) DO UPDATE SET n = cards.n + 1, shiny = cards.shiny + $3 RETURNING n`, [uid, c.key, shiny ? 1 : 0])).rows[0];
+            isNew = !r || r.n === 1;
+        } catch (_) {}
+    } else {
+        const m = await cardsOf(uid);
+        const o = m.get(c.key);
+        if (o) { o.n++; o.shiny += shiny ? 1 : 0; isNew = false; } else m.set(c.key, { n: 1, shiny: shiny ? 1 : 0 });
+    }
+    return isNew;
+}
+const cardImg = c => '/api/avatar/img?u=' + encodeURIComponent(c.u) + '&n=' + encodeURIComponent(c.display);
+// Donne la carte d'un perso trouvé (brillante 1 fois sur 12). Doublon = quelques pièces.
+async function cardAward(p, u, name, opts) {
+    if (!p || !p.userId) return null;
+    const c = cardResolve(u, name);
+    if (!c) return null;
+    const shiny = Math.random() < ((opts && opts.shinyRate) || 1 / 12);
+    const isNew = await cardGive(p.userId, c, shiny);
+    const rarity = cardRarity(c.idx, c.total);
+    let coins = 0;
+    if (!isNew) { coins = shiny ? 10 : 2; await ecoAddCoins(p.userId, coins); }
+    const out = { name: c.display, anime: ARC_UNIVERSE_ANIME[u], u, rarity, shiny, isNew, coins, img: cardImg(c) };
+    if (!(opts && opts.silent)) io.to(p.id).emit('card_gain', out);
+    return out;
+}
+function playerBySocket(sid) {
+    for (const r of Object.values(rooms)) { const p = r.players.find(x => x.id === sid); if (p) return { p, room: r }; }
+    return null;
+}
+// Mini-jeux : Pixel, Silhouette, Fusion, Colorie
+const _arcRevealCards = arcReveal;
+arcReveal = function (room, roomCode) {
+    try {
+        const g = arcGames[roomCode];
+        const cfg = g && ARC_GAMES[g.game];
+        if (g && cfg && g.phase === 'playing' && g.current) {
+            const ts = g.current.targets || [];
+            room.players.forEach(p => {
+                if (!p.userId) return;
+                const a = g.answers[p.id];
+                if (cfg.answer === 'text' && a && a.correct && ts[0]) cardAward(p, ts[0].u, ts[0].display);
+                else if (cfg.answer === 'multi') ((g.found || {})[p.id] || new Set()).forEach(i => { if (ts[i]) cardAward(p, ts[i].u, ts[i].display); });
+                else if (cfg.answer === 'color' && a && a.pct >= 50 && ts[0]) cardAward(p, ts[0].u, ts[0].display);
+            });
+        }
+    } catch (e) { console.warn('[cartes]', e.message); }
+    return _arcRevealCards(room, roomCode);
+};
+// Dessine le perso : ceux qui ont trouvé
+const _drawRevealCards = drawReveal;
+drawReveal = function (room, roomCode) {
+    try {
+        const d = room.draw;
+        if (d && d.phase === 'drawing' && d.word) room.players.forEach(p => { if (d.guessed[pkeyOf(p)] != null) cardAward(p, d.word.u, d.word.display); });
+    } catch (_) {}
+    return _drawRevealCards(room, roomCode);
+};
+// Devine le perso : celui qui trouve
+const _guessRevealCards = guessReveal;
+guessReveal = function (room, roomCode, finder) {
+    try { const g = room.guess; if (finder && g && g.target && g.target.u) cardAward(finder, g.target.u, g.target.name); } catch (_) {}
+    return _guessRevealCards(room, roomCode, finder);
+};
+// Citations : le perso qui a dit la phrase
+const _quoteMatchCards = quoteAnswerMatches;
+quoteAnswerMatches = function (answerRaw, quote, universeKey) {
+    const ok = _quoteMatchCards(answerRaw, quote, universeKey);
+    if (ok && quote && CUR_SID) {
+        const f = playerBySocket(CUR_SID);
+        if (f) {
+            const keys = String(universeKey || '').split('+');
+            const u = keys.find(k => cardResolve(k, quote.speaker)) || keys[0];
+            cardAward(f.p, u, quote.speaker);
+        }
+    }
+    return ok;
+};
+// AnimeDLE : le perso mystère trouvé
+const _dleCompareCards = makeDleComparison;
+makeDleComparison = function (character, target, player, categories) {
+    const r = _dleCompareCards(character, target, player, categories);
+    try {
+        if (r && r.correct && player && player.userId) {
+            const f = playerBySocket(player.id);
+            const key = f && f.room.dle ? String(f.room.dle.universeKey || '') : '';
+            if (ARC_UNIVERSE_ANIME[key]) cardAward(player, key, target.name);
+        }
+    } catch (_) {}
+    return r;
+};
+async function openBooster(uid, n) {
+    const us = arcUniverses();
+    const out = [];
+    for (let i = 0; i < n; i++) {
+        const u = us[Math.floor(Math.random() * us.length)];
+        const list = arcFamous(u);
+        // les cartes connues tombent plus souvent, les rares moins
+        let idx = Math.floor(Math.pow(Math.random(), 1.6) * list.length);
+        if (n >= 10 && i === n - 1 && !out.some(c => c.rarity !== 'commune')) idx = Math.floor(list.length * (0.4 + Math.random() * 0.6));
+        const c = list[idx];
+        const r = await cardAward({ userId: uid, id: null }, u, c.display, { silent: true, shinyRate: 1 / 10 });
+        if (r) out.push(r);
+    }
+    return out;
+}
+
+/* ---------- titres (selon les stats) ---------- */
+const TITLES = [
+    { id: 'debutant', name: 'Débutant', desc: 'Titre de départ', need: () => true },
+    { id: 'opening', name: 'Maître des openings', desc: '100 bonnes réponses au Blind test', need: s => (s.mode.blindtest || 0) >= 100, prog: s => [s.mode.blindtest || 0, 100] },
+    { id: 'lynx', name: 'Œil de lynx', desc: '50 bonnes réponses en Pixel ou Silhouette', need: s => (s.mode['arcade:pixel'] || 0) + (s.mode['arcade:silhouette'] || 0) >= 50, prog: s => [(s.mode['arcade:pixel'] || 0) + (s.mode['arcade:silhouette'] || 0), 50] },
+    { id: 'flash', name: 'Flash', desc: '10 bonnes réponses en moins de 2 secondes', need: s => (s.fast2 || 0) >= 10, prog: s => [s.fast2 || 0, 10] },
+    { id: 'encyclo', name: 'Encyclopédie vivante', desc: '500 bonnes réponses au total', need: s => (s.correctTotal || 0) >= 500, prog: s => [s.correctTotal || 0, 500] },
+    { id: 'specialiste', name: 'Spécialiste', desc: '50 bonnes réponses sur un même anime', need: s => (s.maxAnimeCorrect || 0) >= 50, prog: s => [s.maxAnimeCorrect || 0, 50] },
+    { id: 'boss', name: 'Le Boss', desc: '50 victoires', need: s => (s.wins || 0) >= 50, prog: s => [s.wins || 0, 50] },
+    { id: 'picasso', name: 'Picasso', desc: 'Succès « Picasso » dans Colorie le perso', need: s => s.badges.includes('artist') },
+    { id: 'mangaka', name: 'Mangaka', desc: 'Succès « Mangaka » dans Dessine le perso', need: s => s.badges.includes('mangaka') },
+    { id: 'collection', name: 'Collectionneur', desc: '100 cartes différentes', need: s => s.cards >= 100, prog: s => [s.cards, 100] },
+    { id: 'shiny', name: 'Chasseur de brillantes', desc: '10 cartes brillantes', need: s => s.shinies >= 10, prog: s => [s.shinies, 10] },
+    { id: 'album', name: 'Album complet', desc: "Compléter l'album d'un anime", need: s => s.albums >= 1 },
+    { id: 'riche', name: 'Millionnaire', desc: '5 000 pièces gagnées au total', need: s => s.earned >= 5000, prog: s => [s.earned, 5000] },
+    { id: 'nuit', name: 'Oiseau de nuit', desc: 'Succès « Oiseau de nuit »', need: s => s.badges.includes('nightowl') },
+    { id: 'marathon', name: 'Marathonien', desc: 'Succès « Marathonien »', need: s => s.badges.includes('marathon') }
+];
+async function titleStats(uid) {
+    const s = await progStats(uid).catch(() => ({}));
+    s.badges = await progBadges(uid).catch(() => []);
+    s.mode = {};
+    if (HAS_DB) {
+        try { (await pool.query('SELECT mode, count(*)::int AS n FROM round_stats WHERE user_id=$1 AND correct GROUP BY mode', [uid])).rows.forEach(r => { s.mode[r.mode] = r.n; }); } catch (_) {}
+    } else (PROG_MEM.rounds || []).filter(r => r.user_id === uid && r.correct).forEach(r => { s.mode[r.mode] = (s.mode[r.mode] || 0) + 1; });
+    const cards = await cardsOf(uid);
+    s.cards = cards.size; s.shinies = [...cards.values()].filter(c => c.shiny > 0).length;
+    const per = {}; cards.forEach((v, k) => { const u = k.split('|')[0]; per[u] = (per[u] || 0) + 1; });
+    s.albums = Object.entries(per).filter(([u, n]) => n >= arcFamous(u).length).length;
+    s.earned = ((await ecoGet(uid)) || {}).earned || 0;
+    return s;
+}
+
+/* ---------- API ---------- */
+const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.status(401).json({ ok: false, error: 'Connecte-toi à un compte.' }); return null; } return uid; };
+app.get('/api/shop', async (req, res) => {
+    const uid = authUserId(req);
+    const e = uid ? await ecoGet(uid) : null;
+    res.json({ ok: true, items: SHOP, coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+});
+app.post('/api/shop/buy', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const it = SHOP_BY_ID[String((req.body || {}).id)];
+    if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
+    const e = await ecoGet(uid);
+    if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
+    if (e.coins < it.price) return res.json({ ok: false, error: `Il te manque ${it.price - e.coins} pièces.` });
+    if (HAS_DB) {
+        const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, it.price])).rows[0];
+        if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' });
+        e.coins = r.coins;
+        if (!it.consumable) { e.owned.push(it.id); await pool.query('UPDATE users SET owned=$2 WHERE id=$1', [uid, JSON.stringify(e.owned)]); }
+    } else { e.coins -= it.price; if (!it.consumable) e.owned.push(it.id); }
+    let cards = null;
+    if (it.kind === 'booster') cards = await openBooster(uid, +it.key);
+    const after = await ecoGet(uid);
+    res.json({ ok: true, coins: after.coins, owned: after.owned, cards });
+});
+app.post('/api/shop/equip', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const { kind, key } = req.body || {};
+    if (!['color', 'frame', 'effect', 'emote', 'title'].includes(kind)) return res.json({ ok: false });
+    const e = await ecoGet(uid);
+    const k = key == null || key === '' ? null : String(key);
+    if (kind === 'title') {
+        if (k) { const s = await titleStats(uid); const t = TITLES.find(x => x.id === k); if (!t || !t.need(s)) return res.json({ ok: false, error: 'Titre pas encore débloqué.' }); }
+        e.sel.title = k;
+    } else if (kind === 'effect' || kind === 'emote') {
+        if (k && !e.owned.includes(kind + ':' + k)) return res.json({ ok: false, error: 'Achète-le d’abord dans la boutique.' });
+        e.sel[kind] = k;
+    } else {
+        const it = k && SHOP.find(i => i.kind === kind && i.key === k);
+        if (k && (!it || !e.owned.includes(it.id))) return res.json({ ok: false, error: 'Achète-le d’abord dans la boutique.' });
+        e.cos[kind] = k || (kind === 'color' ? 'default' : 'none');
+        if (HAS_DB) { try { const row = (await pool.query('SELECT cosmetics FROM users WHERE id=$1', [uid])).rows[0]; const c = (row && row.cosmetics) || {}; c[kind] = e.cos[kind]; await pool.query('UPDATE users SET cosmetics=$2 WHERE id=$1', [uid, c]); } catch (_) {} }
+    }
+    await ecoSave(uid, e);
+    await ecoPushCos(uid);
+    res.json({ ok: true, sel: e.sel, cos: e.cos });
+});
+app.get('/api/cards', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid);
+    const u = String(req.query.u || '');
+    const universes = arcUniverses().map(k => {
+        const list = arcFamous(k);
+        let owned = 0; list.forEach(c => { if (mine.has(k + '|' + c.display)) owned++; });
+        return { u: k, name: ARC_UNIVERSE_ANIME[k], total: list.length, owned };
+    }).sort((a, b) => (b.owned / b.total) - (a.owned / a.total) || a.name.localeCompare(b.name, 'fr'));
+    let cards = null;
+    if (ARC_UNIVERSE_ANIME[u]) {
+        const list = arcFamous(u);
+        cards = list.map((c, i) => {
+            const m = mine.get(u + '|' + c.display);
+            const rarity = cardRarity(i, list.length);
+            return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0 };
+        });
+    }
+    const all = [...mine.values()];
+    res.json({ ok: true, universes, cards, total: universes.reduce((a, x) => a + x.total, 0), owned: mine.size, shinies: all.filter(c => c.shiny > 0).length });
+});
+app.get('/api/titles', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await titleStats(uid);
+    const e = await ecoGet(uid);
+    res.json({ ok: true, sel: e.sel.title || null, titles: TITLES.map(t => ({ id: t.id, name: t.name, desc: t.desc, ok: !!t.need(s), prog: t.prog ? t.prog(s) : null })) });
+});
+
+/* ---------- défis entre amis (Défi du jour) ---------- */
+const DAILY_GAMES = { dle: 'AnimeDLE', blindtest: 'Blind test', pixel: 'Pixel' };
+async function dailyScoreOf(uid, day, game) {
+    if (HAS_DB) { try { return (await pool.query('SELECT score, attempts FROM daily_results WHERE day=$1 AND game=$2 AND user_id=$3', [day, game, uid])).rows[0] || null; } catch (_) { return null; } }
+    const d = PROG_MEM.daily.find(x => x.day === day && x.game === game && x.user_id === uid);
+    return d ? { score: d.score, attempts: d.attempts } : null;
+}
+function challResult(game, a, b) { // a = celui qui défie, b = le défié
+    if (game === 'dle') { const x = a.attempts || 99, y = b.attempts || 99; return y < x ? 'win' : y > x ? 'lose' : 'draw'; }
+    return b.score > a.score ? 'win' : b.score < a.score ? 'lose' : 'draw';
+}
+async function challList(uid) {
+    if (HAS_DB) { try { return (await pool.query('SELECT * FROM challenges WHERE (from_id=$1 OR to_id=$1) AND created_at > now() - interval \'3 days\' ORDER BY created_at DESC LIMIT 40', [uid])).rows; } catch (_) { return []; } }
+    return CHALL_MEM.filter(c => c.from_id === uid || c.to_id === uid).slice(-40).reverse();
+}
+async function challResolve(c, mine) {
+    c.to_score = mine.score; c.to_attempts = mine.attempts; c.result = challResult(c.game, c, mine);
+    if (HAS_DB) { try { await pool.query('UPDATE challenges SET to_score=$2, to_attempts=$3, result=$4 WHERE id=$1', [c.id, c.to_score, c.to_attempts, c.result]); } catch (_) {} }
+    const txt = c.result === 'win' ? `${c.to_pseudo} a battu ton score au ${DAILY_GAMES[c.game]} du jour !` : c.result === 'lose' ? `${c.to_pseudo} n’a pas réussi à battre ton score au ${DAILY_GAMES[c.game]} du jour 💪` : `Égalité avec ${c.to_pseudo} au ${DAILY_GAMES[c.game]} du jour !`;
+    socketsOfUser(c.from_id).forEach(sid => io.to(sid).emit('challenge_update', { text: txt, result: c.result }));
+    if (c.result === 'win') await ecoAddCoins(c.to_id, 30);
+}
+app.post('/api/challenge', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const { friendId, game } = req.body || {};
+    if (!DAILY_GAMES[game]) return res.json({ ok: false, error: 'Défi inconnu.' });
+    const day = dailyKey();
+    const mine = await dailyScoreOf(uid, day, game);
+    if (!mine) return res.json({ ok: false, error: 'Joue d’abord ce défi du jour.' });
+    const fid = +friendId;
+    let me = null, fr = null;
+    if (HAS_DB) {
+        const ok = (await pool.query(`SELECT 1 FROM friends WHERE user_id=$1 AND friend_id=$2 AND status='accepted'`, [uid, fid])).rows[0];
+        if (!ok) return res.json({ ok: false, error: 'Tu ne peux défier que tes amis.' });
+        me = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]; fr = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [fid])).rows[0];
+    }
+    const c = { from_id: uid, from_pseudo: (me && me.pseudo) || String((req.body || {}).fromPseudo || 'Un ami').slice(0, 20), to_id: fid, to_pseudo: (fr && fr.pseudo) || String((req.body || {}).toPseudo || 'ton ami').slice(0, 20),
+        day, game, score: mine.score, attempts: mine.attempts, result: null };
+    if (HAS_DB) c.id = (await pool.query('INSERT INTO challenges (from_id, from_pseudo, to_id, to_pseudo, day, game, score, attempts) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',
+        [c.from_id, c.from_pseudo, c.to_id, c.to_pseudo, c.day, c.game, c.score, c.attempts])).rows[0].id;
+    else { c.id = ++CHALL_SEQ; c.created_at = new Date(); CHALL_MEM.push(c); }
+    const theirs = await dailyScoreOf(fid, day, game);
+    if (theirs) await challResolve(c, theirs);
+    else socketsOfUser(fid).forEach(sid => io.to(sid).emit('challenge_new', { from: c.from_pseudo, game: c.game, label: DAILY_GAMES[c.game], score: c.score, attempts: c.attempts }));
+    res.json({ ok: true, challenge: c });
+});
+app.get('/api/challenges', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const day = dailyKey();
+    const list = (await challList(uid)).map(c => ({ id: c.id, mine: c.from_id === uid, from: c.from_pseudo, to: c.to_pseudo, game: c.game, label: DAILY_GAMES[c.game], day: c.day, today: c.day === day,
+        score: c.score, attempts: c.attempts, to_score: c.to_score, to_attempts: c.to_attempts, result: c.result }));
+    res.json({ ok: true, list });
+});
+// quand le défié finit son défi du jour, on compare
+const _dailyRecordChall = dailyRecord;
+dailyRecord = async function (game, players, scoreOf) {
+    const r = await _dailyRecordChall(game, players, scoreOf);
+    const day = dailyKey();
+    for (const p of players) {
+        if (!p.userId) continue;
+        const mine = await dailyScoreOf(p.userId, day, game);
+        if (!mine) continue;
+        const open = HAS_DB ? await pool.query('SELECT * FROM challenges WHERE to_id=$1 AND day=$2 AND game=$3 AND result IS NULL', [p.userId, day, game]).then(x => x.rows).catch(() => [])
+            : CHALL_MEM.filter(c => c.to_id === p.userId && c.day === day && c.game === game && !c.result);
+        for (const c of open) await challResolve(c, mine);
+        if (open.length) io.to(p.id).emit('challenge_update', { text: open.map(c => challResult(c.game, c, mine) === 'win' ? `✅ Défi de ${c.from_pseudo} battu ! +30 pièces` : `❌ Tu n’as pas battu ${c.from_pseudo}`).join(' • ') });
+    }
+    return r;
+};
+
+/* ---------- emotes de victoire : diffusées au salon ---------- */
+io.on('connection', socket => {
+    let lastEmote = 0;
+    socket.on('victory_emote', async ({ roomCode } = {}) => {
+        const uid = socket.user && socket.user.id;
+        const room = rooms[roomCode];
+        if (!uid || !room || !room.players.some(p => p.id === socket.id)) return;
+        const now = Date.now();
+        if (now - lastEmote < 6000) return;
+        lastEmote = now;
+        const e = await ecoGet(uid);
+        const em = e && e.sel.emote && e.owned.includes('emote:' + e.sel.emote) ? e.sel.emote : null;
+        if (!em) return;
+        io.to(roomCode).emit('victory_emote', { pid: socket.id, name: socket.user.pseudo, emote: em });
+    });
+});
+// Admin : se donner des pièces (pour tester la boutique)
+app.post('/api/admin/coins', adminOnly(async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid) return res.json({ ok: false, error: 'Connecte-toi à ton compte.' });
+    const n = Math.max(1, Math.min(100000, +(req.body || {}).n || 1000));
+    const total = await ecoAddCoins(uid, n, true);
+    socketsOfUser(uid).forEach(sid => io.to(sid).emit('coins_gain', { gain: n, total }));
+    res.json({ ok: true, total });
+}));

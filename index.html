@@ -724,6 +724,89 @@
         .quote-universe-btn.uni-dim{opacity:.35;pointer-events:none;}
         .uni-multi-go{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:900;background:#00ff88;color:#111;border:none;border-radius:99px;padding:14px 28px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.5);}
         .uni-multi-go:disabled{background:#555;color:#ddd;cursor:default;}
+        .coin-badge{list-style:none;display:flex;align-items:center;gap:4px;background:#2a2410;border:2px solid #ffd700;color:#ffd700;border-radius:99px;padding:6px 12px;font-weight:800;cursor:pointer;}
+        .eco-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+        .eco-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:9px 6px;font-weight:800;cursor:pointer;}
+        .eco-tabs button.on{border-color:#ffd700;color:#ffd700;}
+        .shop-head{background:#1a1608;border:1px solid #6b5a10;border-radius:10px;padding:8px 12px;margin-bottom:6px;}
+        .shop-head b{color:#ffd700;font-size:1.2rem;}
+        .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}
+        .shop-item{background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;}
+        .shop-item.own{border-color:#3a6;}
+        .shop-item.on{border-color:#00ff88;box-shadow:0 0 0 2px rgba(0,255,136,.3);}
+        .shop-item button{width:100%;background:#2a2a40;color:#fff;border:none;border-radius:8px;padding:7px;font-weight:800;cursor:pointer;}
+        .shop-item button.buy{background:#ffd700;color:#111;}
+        .shop-item button:disabled{opacity:.45;cursor:default;}
+        .shop-prev{min-height:48px;display:flex;align-items:center;justify-content:center;}
+        .shop-try{background:#1e1e30 !important;color:var(--accent-cyan) !important;width:auto !important;padding:6px 12px !important;}
+        .cn-title{display:block;font-size:.62rem;color:#ffd700;font-weight:700;letter-spacing:.3px;line-height:1.1;opacity:.9;}
+        .cn-ocean{background:linear-gradient(90deg,#00c6ff,#0072ff,#00e5ff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 3s linear infinite;}
+        .cn-toxic{color:#9dff00;text-shadow:0 0 8px rgba(157,255,0,.6);}
+        .cn-sakurac{background:linear-gradient(90deg,#ffb7d5,#ff6fa8,#ffe0ef);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 3s linear infinite;}
+        .cn-lava{background:linear-gradient(90deg,#ff2a00,#ff9a00,#ffe000,#ff2a00);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 1.8s linear infinite;}
+        .cn-holo{background:linear-gradient(90deg,#ff9ff3,#feca57,#48dbfb,#1dd1a1,#ff9ff3);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 2s linear infinite;filter:drop-shadow(0 0 4px rgba(255,255,255,.4));}
+        .fr-ice{border-color:#bdf3ff;box-shadow:0 0 10px #7fe3ff,0 0 3px #fff inset;}
+        .fr-shadow{border-color:#222;box-shadow:0 0 12px #000,0 0 18px rgba(120,0,255,.5);}
+        .fr-glitch{border-color:#0ff;box-shadow:-3px 0 0 #f0f,3px 0 0 #0ff;animation:frGlitch 1.2s steps(2) infinite;}
+        @keyframes frGlitch{50%{box-shadow:3px 0 0 #f0f,-3px 0 0 #0ff;}}
+        .fr-galaxy{border-color:#c77dff;box-shadow:0 0 14px #7b2cbf,0 0 26px rgba(72,219,251,.5);animation:frCosmic 3s linear infinite;}
+        .fr-crown{border-color:#ffd700;box-shadow:0 0 16px #ffd700,0 0 4px #fff inset;position:relative;}
+        .fr-crown::after{content:'👑';position:absolute;top:-0.9em;left:50%;transform:translateX(-50%);font-size:.8em;}
+        .tcard{position:relative;background:#15151f;border:3px solid #6b6b80;border-radius:12px;padding:5px;text-align:center;overflow:hidden;}
+        .tcard .tc-img{aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:#0b0b10;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#444;}
+        .tcard .tc-img img{width:100%;height:100%;object-fit:cover;}
+        .tcard .tc-name{font-weight:800;font-size:.72rem;margin-top:4px;line-height:1.15;}
+        .tcard .tc-rar{font-size:.62rem;color:var(--text-muted);}
+        .tcard.r-rare{border-color:#3fa7ff;} .tcard.r-epique{border-color:#b44dff;box-shadow:0 0 8px rgba(180,77,255,.4);} .tcard.r-legendaire{border-color:#ffb300;box-shadow:0 0 12px rgba(255,179,0,.5);}
+        .tcard.empty{opacity:.45;border-style:dashed;}
+        .tcard.shiny::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.55) 35%,rgba(255,0,200,.25) 45%,rgba(0,255,255,.25) 55%,transparent 70%);background-size:250% 100%;animation:tcShine 2.4s linear infinite;pointer-events:none;mix-blend-mode:screen;}
+        @keyframes tcShine{from{background-position:120% 0}to{background-position:-120% 0}}
+        .tc-new{position:absolute;top:6px;left:6px;background:#ff2a5f;color:#fff;font-style:normal;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:99px;}
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px;}
+        .card-grid.booster{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+        .card-grid .flip{animation:tcFlip .6s both;}
+        @keyframes tcFlip{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+        .album-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;}
+        .album-list button{background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:8px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px;}
+        .ab{display:block;height:8px;background:#222236;border-radius:99px;overflow:hidden;}
+        .ab i{display:block;height:100%;background:linear-gradient(90deg,#00f0ff,#00ff88);}
+        .card-pop{position:fixed;right:16px;bottom:150px;z-index:1200;width:130px;animation:cpIn .4s both;}
+        .card-pop.out{animation:cpOut .5s both;}
+        .card-pop .cp-txt{text-align:center;font-weight:800;font-size:.75rem;background:#101018;border-radius:8px;margin-top:4px;padding:3px;}
+        @keyframes cpIn{from{transform:translateX(160px) rotate(12deg);opacity:0}to{transform:none;opacity:1}}
+        @keyframes cpOut{to{transform:translateY(40px);opacity:0}}
+        .title-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101018;border:2px solid #2c2c44;border-radius:10px;padding:8px 10px;margin-bottom:6px;}
+        .title-row.lock{opacity:.6;} .title-row.on{border-color:#ffd700;}
+        .title-row button,.chal-row button{background:#ffd700;color:#111;border:none;border-radius:8px;padding:6px 12px;font-weight:800;cursor:pointer;}
+        .title-row small{color:var(--text-muted);}
+        .chal-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101018;border-radius:10px;padding:8px 10px;margin-bottom:6px;}
+        .emote-fx{position:fixed;inset:0;z-index:1300;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:emFade 2.2s both;}
+        .emote-fx .em-ico{font-size:7rem;filter:drop-shadow(0 0 30px var(--ec));animation:emPop 2.2s both;}
+        .emote-fx .em-txt{font-family:'Bangers',cursive;font-size:clamp(2rem,7vw,4.5rem);color:#fff;-webkit-text-stroke:2px var(--ec);text-shadow:0 0 20px var(--ec),0 4px 0 #000;letter-spacing:2px;text-align:center;animation:emTxt 2.2s both;}
+        .emote-fx .em-name{font-weight:800;color:var(--ec);background:rgba(0,0,0,.6);padding:2px 12px;border-radius:99px;margin-top:6px;}
+        .em-beam::before{content:'';position:absolute;left:0;top:45%;height:60px;width:100%;background:linear-gradient(90deg,transparent,var(--ec),#fff,var(--ec));box-shadow:0 0 40px var(--ec);transform-origin:left;animation:emBeam 1.4s .3s both;border-radius:30px;}
+        .em-orb .em-ico{animation:emSpin 2.2s both;}
+        .em-slash::before{content:'';position:absolute;width:140vmax;height:18px;background:linear-gradient(90deg,transparent,#000,var(--ec),#000,transparent);transform:rotate(-25deg);box-shadow:0 0 30px var(--ec);animation:emSlash .8s .2s both;}
+        .em-zap::before,.em-fire::before,.em-domain::before{content:'';position:absolute;inset:0;animation:emFlash 2.2s both;}
+        .em-zap::before{background:radial-gradient(circle,rgba(159,216,255,.35),transparent 60%);}
+        .em-fire::before{background:radial-gradient(circle at 50% 70%,rgba(255,122,26,.45),transparent 65%);}
+        .em-domain::before{background:radial-gradient(circle,rgba(20,0,40,.1),rgba(20,0,40,.85) 70%);}
+        .em-ora .em-ico,.em-punch .em-ico{animation:emShake .12s linear 12,emPop 2.2s both;}
+        @keyframes emFade{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
+        @keyframes emPop{0%{transform:scale(.2)}20%{transform:scale(1.2)}35%,80%{transform:scale(1)}100%{transform:scale(1.4)}}
+        @keyframes emTxt{0%{transform:scale(2);opacity:0}20%{transform:scale(1);opacity:1}85%{opacity:1}100%{opacity:0}}
+        @keyframes emBeam{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+        @keyframes emSpin{from{transform:rotate(0) scale(.3)}to{transform:rotate(900deg) scale(1.3)}}
+        @keyframes emSlash{from{transform:rotate(-25deg) translateX(-100%)}to{transform:rotate(-25deg) translateX(0)}}
+        @keyframes emFlash{0%,100%{opacity:0}15%,70%{opacity:1}}
+        @keyframes emShake{50%{transform:translate(6px,-4px)}}
+        .recap-box{max-width:420px;}
+        .recap-card{background:linear-gradient(160deg,#1a1030,#0b1a2e);border:3px solid #00f0ff;border-radius:14px;padding:14px;}
+        .rc-top{font-family:'Bangers',cursive;font-size:2rem;color:#ffe600;text-align:center;}
+        .rc-game{text-align:center;color:#00f0ff;font-weight:800;}
+        .rc-who{text-align:center;font-size:1.2rem;font-weight:800;margin:6px 0 10px;}
+        .rc-row{display:flex;justify-content:space-between;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:7px 10px;margin-bottom:5px;font-size:.85rem;}
+        .rc-row span{color:#aab;} .rc-row b{text-align:right;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -919,7 +1002,9 @@
         <nav>
             <ul>
                 <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
+                <li><button onclick="switchTab('collection')" id="btn-collection">🃏 Collection</button></li>
                 <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
+                <li id="coin-badge" class="coin-badge" style="display:none;" onclick="switchTab('collection')">🪙 <b>0</b></li>
                 <li style="display:none;"><button onclick="switchTab('admin')" id="btn-admin">🛠️ Admin</button></li>
             </ul>
         </nav>
@@ -1668,6 +1753,11 @@
             <div id="adm-tracks" style="margin-top:10px;"></div>
         </div>
         <div class="opt-panel">
+            <h2>🪙 Pièces de test</h2>
+            <p class="tl-hint" style="text-align:left;">Ajoute des pièces sur TON compte pour tester la boutique et les boosters.</p>
+            <div style="display:flex;gap:6px;"><button class="btn-action" style="margin-top:0;" onclick="adminCoins(500)">+500</button><button class="btn-action" style="margin-top:0;" onclick="adminCoins(5000)">+5 000</button></div>
+        </div>
+        <div class="opt-panel">
             <h2>🤖 Bots de test</h2>
             <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
         </div>
@@ -1714,6 +1804,16 @@
         <div class="opt-panel" id="v7-admin" style="display:none;">
             <h2>📬 Propositions reçues</h2>
             <div id="v7-admin-list"></div>
+        </div>
+    </section>
+
+    <section id="collection" class="tab-content">
+        <div class="opt-panel" style="max-width:900px;">
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button></div>
+            <div id="eco-shop"></div>
+            <div id="eco-album" style="display:none;"></div>
+            <div id="eco-titles" style="display:none;"></div>
+            <div id="eco-challenges" style="display:none;"></div>
         </div>
     </section>
 
@@ -6197,7 +6297,7 @@
            ===================================================================== */
         const v7esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const cosById = {};
-        function cosNameHtml(name, cos) { return `<span class="cn cn-${v7esc((cos && cos.color) || 'default')}">${v7esc(name)}</span>`; }
+        function cosNameHtml(name, cos) { return `<span class="cn cn-${v7esc((cos && cos.color) || 'default')}">${v7esc(name)}</span>${cos && cos.title ? `<small class="cn-title">${v7esc(cos.title)}</small>` : ''}`; }
         function avatarHtml(name, cos, big) {
             const fr = (cos && cos.frame) || 'none';
             const inner = cos && cos.avatar ? `<img src="${v7esc(cos.avatar)}" alt="" loading="lazy" decoding="async">` : v7esc(String(name || '?').charAt(0).toUpperCase());
@@ -7618,7 +7718,356 @@
             }).join('') : '<p class="tl-hint">Aucun bug signalé 🎉</p>';
         }
         async function delBug(id) { await v7post('/api/admin/bugs/delete', { id }); loadAdminBugs(); }
+
+        /* =====================================================================
+           PIÈCES, BOUTIQUE, CARTES, TITRES, EMOTES, EFFETS, DÉFIS, RÉCAP
+           ===================================================================== */
+        const eco = { coins: 0, items: [], owned: [], sel: {}, cos: {}, tab: 'shop', albumU: null };
+        const RAR_LABEL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire' };
+        function ecoCoinsUi() {
+            const b = document.getElementById('coin-badge');
+            if (b) { b.style.display = isAccount() ? '' : 'none'; b.querySelector('b').textContent = eco.coins; }
+            const s = document.getElementById('shop-coins'); if (s) s.textContent = eco.coins;
+        }
+        async function ecoLoad() {
+            const d = await v7get('/api/shop');
+            if (!d || !d.ok) return;
+            Object.assign(eco, { coins: d.coins, items: d.items, owned: d.owned, sel: d.sel || {}, cos: d.cos || {} });
+            ecoCoinsUi();
+        }
+        socket.on('connect', () => setTimeout(ecoLoad, 900));
+        socket.on('coins_gain', d => { if (!d) return; eco.coins = d.total; ecoCoinsUi(); toast(`🪙 +${d.gain} pièces`, '#ffd700'); });
+        function ecoTab(t) {
+            eco.tab = t;
+            document.querySelectorAll('.eco-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+            ['shop', 'album', 'titles', 'challenges'].forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = k === t ? '' : 'none'; });
+            if (t === 'shop') renderShop(); else if (t === 'album') loadAlbum(); else if (t === 'titles') loadTitles(); else loadChallenges();
+        }
+        (function () { const orig = window.switchTab; window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'collection') { ecoLoad().then(() => ecoTab(eco.tab)); } return r; }; })();
+        // --- boutique ---
+        const SHOP_KINDS = [['color', '🎨 Couleurs de pseudo'], ['frame', '🖼️ Cadres d\'avatar'], ['emote', '💥 Emotes de victoire (manche gagnée)'], ['effect', '🎆 Effets de victoire (partie gagnée)'], ['booster', '🃏 Boosters de cartes']];
+        function shopPreview(it) {
+            if (it.kind === 'color') return `<span class="cn cn-${it.key}" style="font-weight:800;font-size:1.05rem;">${v7esc(getUsername())}</span>`;
+            if (it.kind === 'frame') return avatarHtml(getUsername(), { frame: it.key, avatar: (currentUser && currentUser.cos && currentUser.cos.avatar) || null }, true);
+            if (it.kind === 'emote') return `<button class="shop-try" onclick="event.stopPropagation();playEmote('${it.key}','${v7esc(getUsername())}')">▶ Voir</button>`;
+            if (it.kind === 'effect') return `<button class="shop-try" onclick="event.stopPropagation();playEffect('${it.key}')">▶ Voir</button>`;
+            return '<span style="font-size:2rem;">🎴</span>';
+        }
+        function renderShop() {
+            const box = document.getElementById('eco-shop');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour gagner des pièces et acheter des objets.</p>'; return; }
+            const equipped = it => it.kind === 'color' ? eco.cos.color === it.key : it.kind === 'frame' ? eco.cos.frame === it.key : eco.sel[it.kind] === it.key;
+            box.innerHTML = `<div class="shop-head">🪙 <b id="shop-coins">${eco.coins}</b> pièces <span class="tl-hint">• gagne des pièces à chaque partie (plus si tu gagnes), et avec les doublons de cartes</span></div>`
+                + SHOP_KINDS.map(([kind, label]) => `<h3 class="adm-h">${label}</h3><div class="shop-grid">${eco.items.filter(i => i.kind === kind).map(it => {
+                    const own = eco.owned.includes(it.id) && !it.consumable, on = own && equipped(it);
+                    return `<div class="shop-item${own ? ' own' : ''}${on ? ' on' : ''}"><div class="shop-prev">${shopPreview(it)}</div><b>${v7esc(it.name)}</b>
+                        ${own ? `<button onclick="shopEquip('${it.kind}','${on ? '' : it.key}')">${on ? '✔ Équipé (retirer)' : 'Équiper'}</button>` : `<button class="buy" ${eco.coins < it.price ? 'disabled' : ''} onclick="shopBuy('${it.id}')">🪙 ${it.price}</button>`}</div>`;
+                }).join('')}</div>`).join('');
+        }
+        async function shopBuy(id) {
+            const d = await v7post('/api/shop/buy', { id });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            eco.coins = d.coins; eco.owned = d.owned; ecoCoinsUi();
+            if (d.cards) showBooster(d.cards);
+            else { const it = eco.items.find(i => i.id === id); toast(`🛒 ${v7esc(it ? it.name : 'Objet')} acheté !`, '#00ff88'); if (it) await shopEquip(it.kind, it.key, true); }
+            renderShop();
+        }
+        async function shopEquip(kind, key, quiet) {
+            const d = await v7post('/api/shop/equip', { kind, key: key || null });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            eco.sel = d.sel || eco.sel; eco.cos = d.cos || eco.cos;
+            if (currentUser) {
+                currentUser.cos = currentUser.cos || {};
+                if (kind === 'color' || kind === 'frame') currentUser.cos[kind] = key || (kind === 'color' ? 'default' : 'none');
+                else if (kind !== 'title') currentUser.cos[kind] = key || null;
+            }
+            if (!quiet) toast(key ? '✔ Équipé' : 'Retiré', '#00ff88');
+            if (eco.tab === 'shop') renderShop(); else if (eco.tab === 'titles') loadTitles();
+        }
+        // --- cartes ---
+        function cardHtml(c, big) {
+            if (!c.name) return `<div class="tcard empty r-${c.rarity}"><div class="tc-img">?</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
+            return `<div class="tcard r-${c.rarity}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}"><div class="tc-img"><img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15"></div>
+                <div class="tc-name">${v7esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity]}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}</div>`;
+        }
+        async function loadAlbum(u) {
+            const box = document.getElementById('eco-album');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour collectionner les cartes.</p>'; return; }
+            if (u !== undefined) eco.albumU = u;
+            const d = await v7get('/api/cards' + (eco.albumU ? '?u=' + encodeURIComponent(eco.albumU) : ''));
+            if (!d || !d.ok) return;
+            const head = `<div class="shop-head">🃏 <b>${d.owned}</b> / ${d.total} cartes • ✨ ${d.shinies} brillantes <span class="tl-hint">• trouve des persos en jouant pour gagner leur carte</span></div>`;
+            if (!eco.albumU || !d.cards) {
+                box.innerHTML = head + `<div class="album-list">${d.universes.map(x => `<button onclick="loadAlbum('${x.u}')"><b>${v7esc(x.name)}</b><span class="ab"><i style="width:${Math.round(100 * x.owned / x.total)}%"></i></span><small>${x.owned}/${x.total}${x.owned >= x.total ? ' 🏆' : ''}</small></button>`).join('')}</div>`;
+                return;
+            }
+            const uni = d.universes.find(x => x.u === eco.albumU) || {};
+            box.innerHTML = head + `<div style="display:flex;align-items:center;gap:8px;margin:8px 0;"><button class="host-btn" onclick="loadAlbum(null)">🔙 Albums</button><b>${v7esc(uni.name || '')}</b><span class="tl-hint">${uni.owned}/${uni.total}</span></div>
+                <div class="card-grid">${d.cards.map(c => cardHtml(c)).join('')}</div>`;
+        }
+        function showBooster(cards) {
+            document.getElementById('booster-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'booster-modal';
+            m.innerHTML = `<div class="v7-box" style="max-width:720px;"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>🎴 Ton booster</h3>
+                <div class="card-grid booster">${cards.map((c, i) => `<div class="flip" style="animation-delay:${i * 0.15}s">${cardHtml(c, true)}</div>`).join('')}</div>
+                <p class="tl-hint">${cards.filter(c => c.isNew).length} nouvelle(s) carte(s)${cards.some(c => c.coins) ? ` • doublons : +${cards.reduce((a, c) => a + (c.coins || 0), 0)} 🪙` : ''}</p></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            if (cards.some(c => c.shiny || c.rarity === 'legendaire')) confetti(1500);
+        }
+        let cardQueue = [], cardTimer = null;
+        socket.on('card_gain', c => {
+            if (!c) return;
+            cardQueue.push(c);
+            if (cardTimer) return;
+            const next = () => {
+                const x = cardQueue.shift();
+                if (!x) { cardTimer = null; return; }
+                const el = document.createElement('div'); el.className = 'card-pop'; el.innerHTML = cardHtml(x) + `<div class="cp-txt">${x.isNew ? '🃏 Nouvelle carte !' : `Doublon : +${x.coins} 🪙`}</div>`;
+                document.body.appendChild(el);
+                setTimeout(() => el.classList.add('out'), 2600); setTimeout(() => el.remove(), 3100);
+                cardTimer = setTimeout(next, 1200);
+            };
+            next();
+        });
+        // --- titres ---
+        async function loadTitles() {
+            const box = document.getElementById('eco-titles');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour débloquer des titres.</p>'; return; }
+            const d = await v7get('/api/titles');
+            if (!d || !d.ok) return;
+            box.innerHTML = `<p class="tl-hint" style="text-align:left;">Ton titre s'affiche sous ton pseudo pour tout le monde. Débloque-les avec tes stats.</p>` + d.titles.map(t => `<div class="title-row${t.ok ? '' : ' lock'}${d.sel === t.id ? ' on' : ''}">
+                <div><b>${t.ok ? '🏷️' : '🔒'} ${v7esc(t.name)}</b><br><small>${v7esc(t.desc)}</small>${t.prog && !t.ok ? `<span class="ab" style="margin-top:4px;"><i style="width:${Math.min(100, Math.round(100 * t.prog[0] / t.prog[1]))}%"></i></span><small>${t.prog[0]}/${t.prog[1]}</small>` : ''}</div>
+                ${t.ok ? `<button onclick="shopEquip('title','${d.sel === t.id ? '' : t.id}')">${d.sel === t.id ? '✔ Porté' : 'Porter'}</button>` : ''}</div>`).join('');
+        }
+        // --- défis entre amis ---
+        async function loadChallenges() {
+            const box = document.getElementById('eco-challenges');
+            if (!box) return;
+            if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour défier tes amis.</p>'; return; }
+            const d = await v7get('/api/challenges');
+            if (!d || !d.ok) return;
+            const fmt = (g, s, a) => g === 'dle' ? `${a ?? '—'} essais` : `${s ?? '—'} pts`;
+            box.innerHTML = `<p class="tl-hint" style="text-align:left;">Fais un défi du jour, puis envoie ton score à un ami avec « ⚔️ Défier un ami ». S'il te bat, il gagne 30 🪙.</p>`
+                + (d.list.length ? d.list.map(c => {
+                    const res = c.result ? (c.mine ? { win: `❌ ${v7esc(c.to)} t'a battu`, lose: `✅ ${v7esc(c.to)} ne t'a pas battu`, draw: '🤝 Égalité' }[c.result] : { win: '✅ Tu as gagné (+30 🪙)', lose: '❌ Perdu', draw: '🤝 Égalité' }[c.result]) : (c.mine ? '⏳ En attente' : '⚔️ À toi de jouer !');
+                    return `<div class="chal-row"><div><b>${c.mine ? `Toi → ${v7esc(c.to)}` : `${v7esc(c.from)} → toi`}</b> • ${v7esc(c.label)} du ${c.day.slice(8, 10)}/${c.day.slice(5, 7)}<br>
+                        <small>Score à battre : ${fmt(c.game, c.score, c.attempts)}${c.result ? ` • réponse : ${fmt(c.game, c.to_score, c.to_attempts)}` : ''}</small></div>
+                        <div>${!c.mine && !c.result && c.today ? `<button onclick="startDaily('${c.game}')">Relever</button>` : `<small>${res}</small>`}</div></div>`;
+                }).join('') : '<p class="tl-hint">Aucun défi pour le moment.</p>');
+        }
+        async function openChallengeFriend(game) {
+            if (!isAccount()) return toast('Crée un compte pour défier tes amis.', 'var(--accent-pink)');
+            const d = await v7get('/api/friends');
+            document.getElementById('chal-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'chal-modal';
+            const fr = (d && d.friends) || [];
+            m.innerHTML = `<div class="v7-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>⚔️ Défier un ami</h3>
+                ${fr.length ? fr.map(f => `<div class="friend-row"><span>${v7esc(f.pseudo)} ${f.online ? '🟢' : ''}</span><button onclick="sendChallenge(${f.id},'${game}',this)">Défier</button></div>`).join('') : '<p class="tl-hint">Ajoute des amis dans Options → Amis.</p>'}</div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+        }
+        async function sendChallenge(fid, game, btn) {
+            btn.disabled = true;
+            const d = await v7post('/api/challenge', { friendId: fid, game });
+            if (!d || !d.ok) { btn.disabled = false; return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); }
+            btn.textContent = d.challenge.result ? 'Déjà joué !' : '✔ Envoyé';
+            toast(d.challenge.result ? 'Ton ami avait déjà joué : résultat dans Collection → Défis' : '⚔️ Défi envoyé !', '#00ff88');
+        }
+        socket.on('challenge_new', d => { if (!d) return; toast(`⚔️ ${v7esc(d.from)} te défie au ${v7esc(d.label)} du jour (${d.game === 'dle' ? d.attempts + ' essais' : d.score + ' pts'}) ! <button onclick="startDaily('${d.game}')" style="margin-left:6px;">Relever</button>`, '#ff9a3c'); });
+        socket.on('challenge_update', d => { if (d && d.text) toast('⚔️ ' + v7esc(d.text), '#ff9a3c'); });
+        // bouton « Défier un ami » dans le partage du défi du jour
+        (function () {
+            const orig = window.dailyShowShare;
+            if (typeof orig !== 'function') return;
+            window.dailyShowShare = function (game) {
+                const r = orig.apply(this, arguments);
+                setTimeout(() => {
+                    const card = document.querySelector('#fx-share .fx-share-card');
+                    if (!card) return;
+                    let b = card.querySelector('.chal-btn');
+                    if (!b) { b = document.createElement('button'); b.className = 'btn-action chal-btn'; b.style.background = '#ff9a3c'; b.textContent = '⚔️ Défier un ami'; card.insertBefore(b, card.lastElementChild); }
+                    b.style.display = isAccount() ? '' : 'none';
+                    b.onclick = () => openChallengeFriend(game);
+                }, 1300);
+                return r;
+            };
+        })();
+        // --- emotes de victoire ---
+        const EMOTES = {
+            kamehameha: { txt: 'KA-ME-HA-ME-HAAA !', ico: '🔵', cls: 'beam', col: '#4fc3ff' },
+            rasengan: { txt: 'RASENGAN !', ico: '🌀', cls: 'orb', col: '#6fd3ff' },
+            getsuga: { txt: 'GETSUGA TENSHŌ !', ico: '🌙', cls: 'slash', col: '#ff3b3b' },
+            gomu: { txt: 'GOMU GOMU NO… PISTOL !', ico: '👊', cls: 'punch', col: '#ffcc33' },
+            hinokami: { txt: 'HINOKAMI KAGURA !', ico: '🔥', cls: 'fire', col: '#ff7a1a' },
+            chidori: { txt: 'CHIDORI !', ico: '⚡', cls: 'zap', col: '#9fd8ff' },
+            ora: { txt: 'ORA ORA ORA ORA !', ico: '👊', cls: 'ora', col: '#c77dff' },
+            domaine: { txt: 'EXTENSION DU TERRITOIRE !', ico: '🤞', cls: 'domain', col: '#b100ff' }
+        };
+        function playEmote(key, name) {
+            const e = EMOTES[key]; if (!e) return;
+            const el = document.createElement('div'); el.className = 'emote-fx em-' + e.cls; el.style.setProperty('--ec', e.col);
+            el.innerHTML = `<div class="em-ico">${e.ico}</div><div class="em-txt">${v7esc(e.txt)}</div><div class="em-name">${v7esc(name || '')}</div>`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2200);
+        }
+        socket.on('victory_emote', d => { if (d && d.emote) playEmote(d.emote, d.name); });
+        let lastWinKey = '';
+        function myRoundWin(key) {
+            if (!currentRoomCode || key === lastWinKey) return;
+            lastWinKey = key;
+            if (currentUser && currentUser.cos && currentUser.cos.emote) socket.emit('victory_emote', { roomCode: currentRoomCode });
+        }
+        socket.on('arc_state', q => {
+            if (!q || q.phase !== 'reveal') return;
+            const me = (q.players || []).find(p => p.id === socket.id);
+            const col = q.game === 'couleur' && q.stage && q.stage.gallery && q.stage.gallery[0];
+            if ((me && me.correct && q.game !== 'couleur') || (col && col.id === socket.id && (q.stage.gallery.length > 1))) myRoundWin('arc|' + q.round + '|' + (q.startedAt || ''));
+        });
+        socket.on('bt_state', q => { if (q && q.phase === 'reveal') { const me = (q.players || []).find(p => p.id === socket.id); if (me && me.correct) myRoundWin('bt|' + q.round + '|' + q.key); } });
+        socket.on('draw_chat', m => { if (m && m.system && m.ok && /^✅ Bravo/.test(m.text || '')) myRoundWin('draw|' + (drw.state && drw.state.turn)); });
+        socket.on('quote_state', q => { if (q && q.resolved && q.lastResult && q.lastResult.correct && q.lastResult.playerName === getUsername()) myRoundWin('quote|' + q.round); });
+        socket.on('guess_state', q => { if (q && q.phase === 'reveal' && q.reveal && q.reveal.finder === getUsername()) myRoundWin('guess|' + q.turn); });
+        // --- effets de victoire (remplacent les confettis quand tu gagnes) ---
+        function playEffect(key, ms = 3200) {
+            const c = document.getElementById('fx-confetti');
+            if (!c) return;
+            const ctx = c.getContext('2d');
+            c.width = innerWidth; c.height = innerHeight; c.style.display = 'block';
+            const W = c.width, H = c.height, R = Math.random;
+            let parts = [];
+            const spawn = () => {
+                if (key === 'snow') for (let i = 0; i < 3; i++) parts.push({ x: R() * W, y: -10, vx: (R() - .5) * .8, vy: 1 + R() * 1.5, r: 2 + R() * 4, t: 'snow' });
+                if (key === 'sakura') for (let i = 0; i < 2; i++) parts.push({ x: R() * W, y: -10, vx: 1 + R(), vy: 1 + R() * 1.5, r: 5 + R() * 5, a: R() * 6, t: 'petal' });
+                if (key === 'coins') for (let i = 0; i < 2; i++) parts.push({ x: R() * W, y: -20, vx: (R() - .5), vy: 3 + R() * 3, r: 8 + R() * 6, a: R() * 6, t: 'coin' });
+            };
+            const bursts = [];
+            const t0 = performance.now();
+            let lastBurst = 0, flash = 0;
+            const step = t => {
+                const el = t - t0;
+                ctx.clearRect(0, 0, W, H);
+                if (el < ms - 800) spawn();
+                if (key === 'fireworks' && el - lastBurst > 350 && el < ms - 600) {
+                    lastBurst = el; const x = W * (.15 + R() * .7), y = H * (.15 + R() * .4), hue = Math.floor(R() * 360);
+                    for (let i = 0; i < 60; i++) { const a = i / 60 * Math.PI * 2, s = 2 + R() * 3; bursts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 60, hue }); }
+                }
+                if (key === 'lightning' && el - lastBurst > 420 && el < ms - 600) { lastBurst = el; flash = 1; bursts.push({ bolt: true, x: W * (.1 + R() * .8), life: 14 }); }
+                if (flash > 0) { ctx.fillStyle = `rgba(200,230,255,${flash * .35})`; ctx.fillRect(0, 0, W, H); flash -= .08; }
+                bursts.forEach(b => {
+                    b.life--;
+                    if (b.bolt) {
+                        ctx.strokeStyle = `rgba(190,230,255,${b.life / 14})`; ctx.lineWidth = 4; ctx.shadowColor = '#9fd8ff'; ctx.shadowBlur = 20;
+                        ctx.beginPath(); let x = b.x, y = 0; ctx.moveTo(x, y); while (y < H) { x += (R() - .5) * 60; y += 30 + R() * 40; ctx.lineTo(x, y); } ctx.stroke(); ctx.shadowBlur = 0;
+                    } else { b.x += b.vx; b.y += b.vy; b.vy += .04; ctx.fillStyle = `hsla(${b.hue},100%,60%,${b.life / 60})`; ctx.fillRect(b.x, b.y, 3, 3); }
+                });
+                for (let i = bursts.length - 1; i >= 0; i--) if (bursts[i].life <= 0) bursts.splice(i, 1);
+                parts.forEach(p => {
+                    p.x += p.vx; p.y += p.vy; if (p.a != null) p.a += .05;
+                    if (p.t === 'snow') { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
+                    else if (p.t === 'petal') { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = '#ffb7d5'; ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r / 2, 0, 0, 7); ctx.fill(); ctx.restore(); }
+                    else if (p.t === 'coin') { ctx.save(); ctx.translate(p.x, p.y); ctx.scale(Math.abs(Math.cos(p.a)), 1); ctx.fillStyle = '#ffd700'; ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, p.r, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); }
+                });
+                parts = parts.filter(p => p.y < H + 30);
+                if (el < ms) requestAnimationFrame(step); else { ctx.clearRect(0, 0, W, H); c.style.display = 'none'; }
+            };
+            requestAnimationFrame(step);
+        }
+        (function () {
+            const orig = window.confetti;
+            window.confetti = function (ms) {
+                const eff = currentUser && currentUser.cos && currentUser.cos.effect;
+                if (eff) return playEffect(eff, Math.max(2600, ms || 0));
+                return orig.apply(this, arguments);
+            };
+        })();
+        // --- récap de fin de partie (mini-jeux et blind test) ---
+        const recap = { key: '', rounds: [], start: 0, shown: '' };
+        function recapTrack(kind, q) {
+            if (typeof dailyMode !== 'undefined' && dailyMode) return;
+            const gameKey = kind + '|' + currentRoomCode + '|' + (q.totalRounds || '') + '|' + (kind === 'arc' ? q.game : '');
+            if (recap.key !== gameKey || (q.round === 1 && q.phase === 'playing' && recap.rounds.length > 1)) { recap.key = gameKey; recap.rounds = []; recap.shown = ''; }
+            const me = (q.players || []).find(p => p.id === socket.id);
+            if (!me) return;
+            const r = recap.rounds[q.round] = recap.rounds[q.round] || { round: q.round };
+            if (q.phase === 'playing') {
+                if (!r.t0) r.t0 = Date.now() - Math.max(0, (q.serverNow || Date.now()) - (q.startedAt || (q.endsAt ? q.endsAt - (q.roundMs || 0) : Date.now())));
+                if ((me.done || me.answered) && !r.t) r.t = Date.now() - r.t0;
+            } else if (q.phase === 'reveal' && r.correct == null) {
+                r.correct = !!me.correct; r.choice = me.choice; r.answer = q.answer || (q.reveal && q.reveal.items && q.reveal.items[0] && q.reveal.items[0].name) || null; r.gained = me.gained || 0;
+                if (q.game === 'couleur') { r.correct = me.pct != null && me.pct >= 50; r.choice = me.pct != null ? me.pct.toFixed(1) + '%' : null; }
+            } else if (q.phase === 'finished' && recap.shown !== gameKey) {
+                recap.shown = gameKey;
+                const players = [...(q.players || [])].sort((a, b) => b.score - a.score);
+                const rank = players.findIndex(p => p.id === socket.id) + 1;
+                setTimeout(() => showRecap({ title: kind === 'arc' ? (q.gameLabel || 'Mini-jeu') : 'Blind test', score: me.score, rank, total: players.length }), 2600);
+            }
+        }
+        socket.on('arc_state', q => { if (q && !q.daily && q.answerType !== 'draft' && q.answerType !== 'chrono' && q.answerType !== 'bac') recapTrack('arc', q); });
+        socket.on('bt_state', q => { if (q) recapTrack('bt', q); });
+        function showRecap(info) {
+            const rs = recap.rounds.filter(r => r && r.correct != null);
+            if (rs.length < 2) return;
+            const good = rs.filter(r => r.correct);
+            const fastest = good.filter(r => r.t).sort((a, b) => a.t - b.t)[0];
+            const bad = rs.filter(r => !r.correct && r.choice && r.answer);
+            const worst = bad[bad.length - 1];
+            let streak = 0, best = 0; rs.forEach(r => { streak = r.correct ? streak + 1 : 0; best = Math.max(best, streak); });
+            const best1 = good.slice().sort((a, b) => (b.gained || 0) - (a.gained || 0))[0];
+            const stats = [
+                ['🏆', 'Classement', info.total > 1 ? `${info.rank}${info.rank === 1 ? 'er' : 'e'} / ${info.total}` : 'Solo'],
+                ['⭐', 'Score', `${info.score} pts`],
+                ['✅', 'Bonnes réponses', `${good.length} / ${rs.length} (${Math.round(100 * good.length / rs.length)} %)`],
+                ['🔥', 'Meilleure série', `${best} d'affilée`],
+                ['⚡', 'Plus rapide', fastest ? `${(fastest.t / 1000).toFixed(1)} s${fastest.answer ? ' • ' + fastest.answer : ''}` : '—'],
+                ['💎', 'Meilleure réponse', best1 ? `${best1.answer || '—'}${best1.gained ? ' (+' + best1.gained + ')' : ''}` : '—'],
+                ['💀', 'Pire erreur', worst ? `« ${worst.choice} » au lieu de ${worst.answer}` : 'Aucune 😎']
+            ];
+            document.getElementById('recap-modal')?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'recap-modal';
+            m.innerHTML = `<div class="v7-box recap-box"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button>
+                <div class="recap-card" id="recap-card"><div class="rc-top">ANIME GAME</div><div class="rc-game">${v7esc(info.title)}</div><div class="rc-who">${cosNameHtml(getUsername(), currentUser && currentUser.cos)}</div>
+                ${stats.map(([i, l, v]) => `<div class="rc-row"><span>${i} ${l}</span><b>${v7esc(v)}</b></div>`).join('')}</div>
+                <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn-action" style="margin-top:0;background:#9146FF;" onclick="shareRecap()">📤 Partager</button><button class="btn-action" style="margin-top:0;background:var(--text-muted);" onclick="this.closest('.v7-modal').remove()">Fermer</button></div></div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            recap.last = { info, stats };
+        }
+        function recapCanvas() {
+            const { info, stats } = recap.last || {};
+            if (!info) return null;
+            const c = document.createElement('canvas'); c.width = 720; c.height = 960;
+            const x = c.getContext('2d');
+            const g = x.createLinearGradient(0, 0, 720, 960); g.addColorStop(0, '#1a1030'); g.addColorStop(1, '#0b1a2e');
+            x.fillStyle = g; x.fillRect(0, 0, 720, 960);
+            x.strokeStyle = '#00f0ff'; x.lineWidth = 6; x.strokeRect(20, 20, 680, 920);
+            x.textAlign = 'center';
+            x.fillStyle = '#ffe600'; x.font = 'bold 64px Bangers, Impact, sans-serif'; x.fillText('ANIME GAME', 360, 110);
+            x.fillStyle = '#00f0ff'; x.font = 'bold 34px sans-serif'; x.fillText(info.title, 360, 165);
+            x.fillStyle = '#fff'; x.font = 'bold 40px sans-serif'; x.fillText(getUsername(), 360, 230);
+            x.textAlign = 'left';
+            stats.forEach(([i, l, v], k) => {
+                const y = 310 + k * 88;
+                x.fillStyle = 'rgba(255,255,255,.07)'; x.fillRect(50, y - 50, 620, 72);
+                x.fillStyle = '#aab'; x.font = '26px sans-serif'; x.fillText(`${i} ${l}`, 70, y - 8);
+                x.fillStyle = '#fff'; x.font = 'bold 28px sans-serif'; x.textAlign = 'right'; x.fillText(String(v).slice(0, 38), 650, y - 8); x.textAlign = 'left';
+            });
+            x.textAlign = 'center'; x.fillStyle = '#ff5fa2'; x.font = '24px sans-serif'; x.fillText(location.host, 360, 920);
+            return c;
+        }
+        async function shareRecap() {
+            const c = recapCanvas(); if (!c) return;
+            const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+            const file = new File([blob], 'anime-game-recap.png', { type: 'image/png' });
+            try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Mon récap Anime Game' }); return; } } catch (_) {}
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'anime-game-recap.png'; a.click();
+            toast('📥 Image du récap téléchargée', '#00ff88');
+        }
         // --- bots de test ---
+        async function adminCoins(n) { const d = await v7post('/api/admin/coins', { n }); if (!d || !d.ok) toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); }
         async function adminBots(n) {
             if (!currentRoomCode) return;
             const skill = (document.getElementById('bot-skill') || {}).value || 0.5;
