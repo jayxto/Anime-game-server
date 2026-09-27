@@ -13937,8 +13937,12 @@ btPublicState = function (room) {
     return bt ? withTeamsAndCos(room, out, bt.scores, bt.phase === 'finished') : out;
 };
 
-/* ---------- Colorie le perso ---------- */
-ARC_GAMES.couleur = { label: 'Colorie le perso', icon: '🎨', universe: true, rounds: 5, roundMs: 75000, answer: 'color' };
+/* ---------- Colorie le perso (comme « Devine la couleur » sur Roblox) ----------
+   Chaque joueur a des cœurs. À chaque manche, le moins proche de la vraie couleur perd un cœur.
+   Le dernier joueur avec des cœurs gagne. En solo : 5 manches sans cœurs. */
+ARC_GAMES.couleur = { label: 'Colorie le perso', icon: '🎨', universe: true, rounds: 5, roundMs: 30000, answer: 'color' };
+const COLOR_LIVES = 3;
+const colAlive = (room, g) => room.players.filter(p => (g.lives[p.id] || 0) > 0);
 const _arcBuildRound7 = arcBuildRound;
 arcBuildRound = async function (g) {
     if (g.game !== 'couleur') return _arcBuildRound7(g);
@@ -13951,38 +13955,82 @@ arcBuildRound = async function (g) {
 };
 const _arcNamesFor7 = arcNamesFor;
 arcNamesFor = function (g) { return g.game === 'couleur' ? [] : _arcNamesFor7(g); };
+const _startArcadeColor = startArcade;
+startArcade = function (room, roomCode) {
+    _startArcadeColor(room, roomCode);
+    const g = arcGames[roomCode];
+    if (g && g.game === 'couleur') {
+        g.duel = room.players.length >= 2;
+        g.lives = {};
+        room.players.forEach(p => { g.lives[p.id] = g.duel ? COLOR_LIVES : 0; });
+        if (g.duel) g.totalRounds = 60;   // on joue jusqu'à ce qu'il ne reste qu'un joueur
+        arcEmit(room, roomCode);
+    }
+};
+const _arcPlayerDoneColor = arcPlayerDone;
+arcPlayerDone = function (g, pid) {
+    if (g && g.game === 'couleur' && g.duel && !((g.lives || {})[pid] > 0)) return true; // éliminé : spectateur
+    return _arcPlayerDoneColor(g, pid);
+};
 const _arcReveal7 = arcReveal;
 arcReveal = function (room, roomCode) {
     const g = arcGames[roomCode];
-    if (g && g.phase === 'playing') {
-        if (g.game === 'couleur') {
-            const list = room.players.filter(p => g.answers[p.id]).sort((a, b) => g.answers[b.id].pct - g.answers[a.id].pct);
-            const bonus = [100, 50, 25];
-            g.gainedRound = {};
-            list.forEach((p, i) => {
-                const a = g.answers[p.id];
-                const pts = Math.round(a.pct * 3) + (list.length > 1 && a.pct > 0 ? (bonus[i] || 0) : 0);
-                g.scores[p.id] = (g.scores[p.id] || 0) + pts;
-                g.gainedRound[p.id] = pts;
-                a.correct = a.pct >= 50;
-                if (a.pct >= 90) progAward(p, 'artist');
-            });
-        } else {
-            try { arcTrackRound(room, g); } catch (_) {}
+    if (g && g.phase === 'playing' && g.game === 'couleur') {
+        const inGame = g.duel ? colAlive(room, g) : room.players;
+        const list = inGame.slice().sort((a, b) => ((g.answers[b.id] || {}).pct || 0) - ((g.answers[a.id] || {}).pct || 0));
+        const bonus = [100, 50, 25];
+        g.gainedRound = {};
+        list.forEach((p, i) => {
+            const a = g.answers[p.id];
+            if (!a) return;
+            const pts = Math.round(a.pct * 3) + (list.length > 1 && a.pct > 0 ? (bonus[i] || 0) : 0);
+            g.scores[p.id] = (g.scores[p.id] || 0) + pts;
+            g.gainedRound[p.id] = pts;
+            a.correct = a.pct >= 50;
+            if (a.pct >= 90) progAward(p, 'artist');
+        });
+        g.lost = [];
+        if (g.duel && list.length >= 2) {
+            const pctOf = p => (g.answers[p.id] || {}).pct || 0;
+            const low = Math.min(...list.map(pctOf)), high = Math.max(...list.map(pctOf));
+            if (high > low) list.filter(p => pctOf(p) === low).forEach(p => { g.lives[p.id] = Math.max(0, (g.lives[p.id] || 0) - 1); g.lost.push(p.id); });
         }
     }
     return _arcReveal7(room, roomCode);
 };
+const _arcNextRoundColor = arcNextRound;
+arcNextRound = async function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.game === 'couleur' && g.duel && g.round > 0) {
+        const alive = colAlive(room, g).filter(p => !p.disconnected);
+        if (alive.length <= 1) {
+            // bonus de survie pour que le dernier debout gagne la partie
+            alive.forEach(p => { g.scores[p.id] = (g.scores[p.id] || 0) + 10000; });
+            g.survivor = alive.map(p => p.name);
+            return arcFinish(room, roomCode);
+        }
+    }
+    return _arcNextRoundColor(room, roomCode);
+};
 const _arcPublic7b = arcPublic;
 arcPublic = function (room, g) {
     const out = _arcPublic7b(room, g);
-    if (g.game === 'couleur' && g.current && g.phase !== 'loading') {
-        const t = (g.current.targets || [])[0];
-        out.stage.color = { name: t ? t.display : '', anime: ARC_UNIVERSE_ANIME[g.current.u] || '' };
-        if (g.phase === 'reveal' || g.phase === 'finished') {
-            out.stage.gallery = room.players.filter(p => g.answers[p.id]).map(p => ({ id: p.id, name: p.name, pct: g.answers[p.id].pct, thumb: g.answers[p.id].thumb || null, hex: g.answers[p.id].hex || null, target: g.answers[p.id].target || null }))
-                .sort((a, b) => b.pct - a.pct).slice(0, 16);
-            out.players.forEach(x => { const a = g.answers[x.id]; x.pct = a ? a.pct : null; });
+    if (g.game === 'couleur') {
+        out.duel = !!g.duel; out.maxLives = COLOR_LIVES; out.survivor = g.survivor || null;
+        if (g.duel) out.totalRounds = null;
+        out.players.forEach(x => {
+            x.lives = g.lives ? (g.lives[x.id] || 0) : 0;
+            x.lost = g.phase === 'reveal' && (g.lost || []).includes(x.id);
+            if (g.survivor) x.score = Math.max(0, x.score - (g.survivor.includes(x.name) ? 10000 : 0));
+        });
+        if (g.current && g.phase !== 'loading') {
+            const t = (g.current.targets || [])[0];
+            out.stage.color = { name: t ? t.display : '', anime: ARC_UNIVERSE_ANIME[g.current.u] || '' };
+            if (g.phase === 'reveal' || g.phase === 'finished') {
+                out.stage.gallery = room.players.filter(p => g.answers[p.id]).map(p => ({ id: p.id, name: p.name, pct: g.answers[p.id].pct, thumb: g.answers[p.id].thumb || null, hex: g.answers[p.id].hex || null, target: g.answers[p.id].target || null }))
+                    .sort((a, b) => b.pct - a.pct).slice(0, 16);
+                out.players.forEach(x => { const a = g.answers[x.id]; x.pct = a ? a.pct : null; });
+            }
         }
     }
     return out;
@@ -14207,7 +14255,8 @@ io.on('connection', socket => {
         const g = arcGames[roomCode];
         if (!room || !g || g.game !== 'couleur' || g.phase !== 'playing' || g.answers[socket.id]) return;
         if (!room.players.some(p => p.id === socket.id)) return;
-        const v = Math.max(0, Math.min(100, Math.round(+pct || 0)));
+        const v = Math.max(0, Math.min(100, Math.round((+pct || 0) * 100) / 100));
+        if (g.duel && !(g.lives[socket.id] > 0)) return;
         const th = typeof thumb === 'string' && /^data:image\/(jpeg|webp|png);base64,/.test(thumb) && thumb.length < 90000 ? thumb : null;
         const hx = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : null;
         g.answers[socket.id] = { pct: v, thumb: th, hex: hx(hex), target: hx(target), correct: false };
@@ -14785,9 +14834,19 @@ io.on('connection', socket => {
         if (now - (c.p.lastGuessTry || 0) < 2500) return socket.emit('guess_notice', { text: '⏳ Attends un peu avant de proposer un autre nom.' });
         c.p.lastGuessTry = now;
         const ok = guessMatches(c.g.target, t);
-        c.g.feed.push({ id: ++c.g.seq, type: 'g', k: c.k, pid: socket.id, name: c.p.name, text: t, ok });
+        // bon nom : trouvé direct. Sinon : en attente, c'est le choisisseur qui répond Oui / Non
+        c.g.feed.push({ id: ++c.g.seq, type: 'g', k: c.k, pid: socket.id, name: c.p.name, text: t, ok: ok ? true : null });
         if (ok) return guessReveal(c.room, roomCode, c.p);
         progTrackRound(c.p, 'guess', c.g.target.anime || null, false, null);
+        guessEmit(c.room, roomCode);
+    });
+    // le choisisseur répond « Non » à une proposition
+    socket.on('guess_deny', ({ roomCode, id } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || !c.isChooser || c.g.phase !== 'asking') return;
+        const e = c.g.feed.find(f => f.id === +id && f.type === 'g' && f.ok == null);
+        if (!e) return;
+        e.ok = false;
         guessEmit(c.room, roomCode);
     });
     // le choisisseur valide lui-même une proposition (nom écrit autrement, perso libre…)
@@ -15368,7 +15427,16 @@ function botTick(b) {
         } else if (cfg.answer === 'multi') {
             (g.current.targets || []).forEach((t, i) => once(k + 'm' + i, 4000 + i * 4000, 12000 + i * 6000, () => { if (lucky(0.7)) emit('arc_guess', { roomCode: b.room, text: t.display }); }));
         } else if (cfg.answer === 'color' && !g.answers[id]) {
-            once(k, 6000, Math.min(25000, span), () => emit('arc_color', { roomCode: b.room, pct: Math.round(rnd(15, 45) + b.skill * 50), hex: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0') }));
+            // le bot vise la vraie couleur (connue dès qu'un joueur a répondu) avec plus ou moins d'erreur
+            const ref = Object.values(g.answers).map(a => a.target).find(Boolean);
+            if (ref || g.endsAt - now < 5000) once(k, 1500, 5000, () => {
+                const base = ref ? [1, 3, 5].map(i => parseInt(ref.slice(i, i + 2), 16)) : [128, 128, 128];
+                const err = rnd(10, 150) * (1.2 - b.skill);
+                const c = base.map(v => Math.max(0, Math.min(255, Math.round(v + rnd(-1, 1) * err))));
+                const d = Math.sqrt(c.reduce((a, v, i) => a + (v - base[i]) ** 2, 0));
+                const pct = ref ? Math.round(10000 * Math.pow(Math.max(0, 1 - d / 160), 1.5)) / 100 : Math.round(rnd(0, 20) * 100) / 100;
+                emit('arc_color', { roomCode: b.room, pct, hex: '#' + c.map(v => v.toString(16).padStart(2, '0')).join(''), target: ref || null });
+            });
         }
         return;
     }
@@ -15441,6 +15509,7 @@ function botTick(b) {
         if (chooser && chooser.id === id) {
             if (gs.phase === 'choosing') once('gp' + gs.turn, 2000, 4000, () => { const u = pickOne(arcUniverses()); const c = pickOne(arcFamous(u).slice(0, 30)); emit('guess_pick', { roomCode: b.room, u, name: c.display }); });
             if (gs.phase === 'asking') gs.feed.filter(f => f.type === 'q' && !f.answer).forEach(f => once('ga' + f.id, 1500, 4000, () => emit('guess_answer', { roomCode: b.room, id: f.id, answer: pickOne(['yes', 'no', 'no', 'idk']) })));
+            if (gs.phase === 'asking') gs.feed.filter(f => f.type === 'g' && f.ok == null).forEach(f => once('gd' + f.id, 1500, 3500, () => emit('guess_deny', { roomCode: b.room, id: f.id })));
         } else if (gs.phase === 'asking') {
             const k = pkeyOf(me);
             const pending = gs.feed.some(f => f.type === 'q' && f.k === k && !f.answer);
