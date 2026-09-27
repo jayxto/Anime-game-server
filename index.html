@@ -828,6 +828,153 @@
         .seo-about h2{font-size:1rem;color:var(--accent-cyan);margin:14px 0 6px;}
         .seo-about ul{padding-left:18px;margin:0;}
         .seo-about b{color:var(--text-color);}
+
+        /* ===== HUB : accueil, classé, pass, échanges, fusion, clans, stats, vocal, spectateur ===== */
+        #hub-home{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;text-align:left;}
+        .hub-weekend{background:linear-gradient(90deg,#ff9a3c,#ff2a5f,#b77bff);background-size:200% 100%;animation:cnMove 4s linear infinite;color:#fff;border-radius:12px;padding:10px 14px;font-size:.9rem;text-align:center;}
+        .hub-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .hub-chest,.hub-pass-mini{display:flex;align-items:center;gap:10px;background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:10px 12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;}
+        .hub-chest .hc-ico{font-size:1.8rem;}
+        .hub-chest b,.hub-chest small{display:block;} .hub-chest small{color:var(--text-muted);font-size:.75rem;}
+        .hub-chest.ready{border-color:#ffd700;box-shadow:0 0 18px rgba(255,215,0,.25);animation:hubPulse 1.8s ease-in-out infinite;}
+        @keyframes hubPulse{50%{box-shadow:0 0 26px rgba(255,215,0,.45);}}
+        .hub-pass-mini{flex-direction:column;align-items:stretch;gap:4px;font-size:.8rem;border-color:#6a3fb5;}
+        .hub-pass-mini b{font-size:.95rem;color:#d9c3ff;}
+        .ab{display:block;height:6px;background:#22223a;border-radius:99px;overflow:hidden;} .ab i{display:block;height:100%;background:linear-gradient(90deg,#b77bff,#ffd700);border-radius:99px;}
+        .hub-card{display:flex;gap:12px;background:linear-gradient(135deg,rgba(255,90,42,.10),rgba(22,22,34,.9));border:2px solid #3a2a40;border-radius:14px;padding:12px;}
+        .hub-card.week{background:linear-gradient(135deg,rgba(255,215,0,.10),rgba(22,22,34,.9));border-color:#5a4a1a;}
+        .hub-card.weekly{background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(22,22,34,.9));border-color:#1f4a38;}
+        .hub-card.boss{border-color:#6a2020;}
+        .hub-card.boss.dead{filter:saturate(.5);}
+        .hb-img{flex:0 0 78px;height:98px;border-radius:10px;overflow:hidden;background:#0b0b10;}
+        .hb-img img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .hub-card.boss .hb-img{box-shadow:0 0 16px rgba(255,60,40,.4);}
+        .hub-card.boss.dead .hb-img img{filter:grayscale(1);}
+        .hb-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;text-align:left;} .hub-card .tl-hint,#eco-pass .tl-hint,#eco-clan .tl-hint,#eco-stats .tl-hint,#eco-fuse .tl-hint{text-align:left;}
+        .hb-h{font-size:.78rem;font-weight:800;color:var(--accent-yellow);text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;gap:6px;}
+        .hb-h small{color:var(--text-muted);text-transform:none;font-weight:600;}
+        .hb-name{font-size:1.1rem;} .hb-name small{font-size:.75rem;color:var(--text-muted);font-weight:600;}
+        .hb-bar{position:relative;height:18px;background:#1c1c2c;border-radius:99px;overflow:hidden;border:1px solid #33334a;}
+        .hb-bar i{display:block;height:100%;background:linear-gradient(90deg,#ff2a2a,#ff9a3c);transition:width .6s;}
+        .hb-bar.week i{background:linear-gradient(90deg,#ffd700,#ff9a3c);} .hb-bar.rk i{transition:width .8s;}
+        .hb-bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;text-shadow:0 1px 2px #000;}
+        .hb-top{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.72rem;color:var(--text-muted);} .hb-top b{color:#fff;}
+        .hb-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+        .hb-btns button{background:#1d1d2e;border:1px solid #3a3a55;color:#fff;border-radius:9px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:.8rem;font-family:inherit;}
+        .hb-btns button.go{background:var(--accent-yellow);color:#111;border-color:transparent;}
+        .hb-weekly{font-size:.85rem;}
+        .toast-btn{margin-left:6px;background:var(--accent-yellow);color:#111;border:none;border-radius:6px;padding:3px 8px;font-weight:800;cursor:pointer;pointer-events:auto;}
+        .rk-card{border-color:#ff5a2a!important;background:linear-gradient(135deg,rgba(255,90,42,.14),rgba(183,123,255,.08))!important;}
+        .rk-me{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+        .rk-tier{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--tc);border:1px solid var(--tc);border-radius:99px;padding:2px 9px;font-size:.85rem;background:rgba(0,0,0,.25);}
+        .rk-tier small{color:#fff;opacity:.8;font-size:.72rem;}
+        .rk-ovl{position:fixed;inset:0;z-index:10050;background:rgba(5,5,10,.82);display:flex;align-items:center;justify-content:center;padding:16px;}
+        .rk-box{background:#14141f;border:2px solid #ff5a2a;border-radius:16px;padding:22px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;}
+        .rk-box button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;}
+        .rk-spin{font-size:3rem;animation:rkSpin 1.4s ease-in-out infinite;}
+        @keyframes rkSpin{50%{transform:scale(1.2) rotate(-12deg);}}
+        .rk-wait{font-family:'Bangers',cursive;font-size:1.6rem;color:var(--accent-yellow);}
+        .rk-vs{display:flex;align-items:center;justify-content:space-around;width:100%;gap:8px;}
+        .rk-vs>div{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;} .rk-vs b{font-size:1.1rem;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+        .rk-x{font-family:'Bangers',cursive;font-size:2.4rem;color:#ff5a2a;animation:rkSpin 1s infinite;}
+        .rk-game{font-weight:800;color:var(--accent-cyan);}
+        .rk-res{font-family:'Bangers',cursive;font-size:2.4rem;margin:0;} .rk-res.win{color:#ffd700;} .rk-res.lose{color:var(--accent-pink);}
+        .rk-delta{font-family:'Bangers',cursive;font-size:2rem;} .rk-delta.up{color:#00ff88;} .rk-delta.down{color:var(--accent-pink);}
+        .rk-promo{font-weight:800;animation:hubPulse 1.5s infinite;}
+        .rk-tiers{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;} .rk-tiers span{color:var(--tc);border:1px solid var(--tc);border-radius:99px;padding:2px 8px;font-size:.78rem;font-weight:800;}
+        .rk-list>div,.clan-board>div,.clan-members>div{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:.85rem;}
+        .rk-list>div:nth-child(odd),.clan-board>div:nth-child(odd),.clan-members>div:nth-child(odd){background:#101018;}
+        .rk-list>div.me,.clan-board>div.me,.clan-members>div.me{outline:2px solid var(--accent-yellow);}
+        .rk-list b,.clan-board b:first-of-type{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .clan-board button,.clan-members button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:7px;padding:4px 8px;cursor:pointer;font-size:.75rem;}
+        .clan-members b{flex:1;}
+        .hub-box.wide{max-width:760px;}
+        .chest-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;}
+        .chest-days div{background:#101018;border:1px solid #2c2c44;border-radius:8px;padding:6px 2px;text-align:center;font-size:.7rem;}
+        .chest-days div.past{opacity:.45;} .chest-days div.next{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,.35);}
+        .chest-days b{display:block;color:var(--accent-yellow);}
+        .chest-open{font-size:4rem;animation:rkSpin 1s ease-in-out 2;}
+        .tcard.collector{outline:2px solid #ffd700;box-shadow:0 0 18px rgba(255,215,0,.5);}
+        .collector-sec{margin-bottom:10px;}
+        /* pass */
+        .ps-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;} .ps-head h3{margin:0;} .ps-head h3 small{color:var(--text-muted);font-size:.75rem;}
+        .ps-buy{background:linear-gradient(90deg,#ffd700,#ff9a3c);color:#111;border:none;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer;}
+        .ps-prem-on{color:#ffd700;font-weight:800;border:1px solid #ffd700;border-radius:99px;padding:4px 10px;}
+        .ps-prog{display:flex;align-items:center;gap:10px;margin:10px 0;} .ps-prog .hb-bar{flex:1;} .ps-prog .hb-bar i{background:linear-gradient(90deg,#b77bff,#48dbfb);}
+        .ps-grid{display:flex;gap:6px;overflow-x:auto;padding:8px 2px 12px;scroll-snap-type:x proximity;}
+        .ps-lab{display:flex;flex-direction:column;gap:6px;position:sticky;left:0;background:var(--panel-color);z-index:1;padding-right:4px;}
+        .ps-lab span{height:78px;display:flex;align-items:center;font-size:.72rem;font-weight:800;color:var(--text-muted);} .ps-lab span:first-child{height:22px;}
+        .ps-col{display:flex;flex-direction:column;gap:6px;flex:0 0 96px;scroll-snap-align:center;}
+        .ps-n{height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;border-radius:99px;background:#1d1d2e;font-size:.8rem;}
+        .ps-col.on .ps-n{background:#b77bff;color:#111;} .ps-col.cur .ps-n{outline:2px solid #ffd700;}
+        .ps-cell{height:78px;border-radius:10px;background:#101018;border:1px solid #2c2c44;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;text-align:center;}
+        .ps-cell small{font-size:.66rem;line-height:1.15;}
+        .ps-cell.prem{background:linear-gradient(160deg,rgba(255,215,0,.12),#101018);border-color:#5a4a1a;}
+        .ps-cell.locked{opacity:.55;} .ps-cell.got{opacity:.6;} .ps-cell.got b{color:#00ff88;}
+        .ps-cell.ready{border-color:#00ff88;box-shadow:0 0 10px rgba(0,255,136,.3);}
+        .ps-cell button{background:#00ff88;color:#111;border:none;border-radius:6px;font-size:.66rem;font-weight:800;padding:3px 6px;cursor:pointer;}
+        /* échanges */
+        .trd-row{background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;margin-bottom:8px;display:flex;flex-direction:column;gap:8px;}
+        .trd-swap{display:flex;align-items:center;justify-content:center;gap:10px;} .trd-swap>span{font-size:1.6rem;color:var(--accent-cyan);}
+        .trd-c{display:flex;flex-direction:column;align-items:center;width:110px;text-align:center;font-size:.78rem;} .trd-c img{width:70px;height:88px;object-fit:cover;object-position:top;border-radius:8px;background:#0b0b10;} .trd-c small{color:var(--text-muted);font-size:.68rem;}
+        .trd-act{display:flex;gap:6px;justify-content:center;} .trd-act button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;} .trd-act button.go{background:#00ff88;color:#111;border:none;}
+        .trd-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0;} .trd-cols>div{display:flex;flex-direction:column;gap:6px;min-width:0;}
+        .trd-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;max-height:320px;overflow:auto;padding:2px;}
+        .trd-mini{background:#101018;border:2px solid #2c2c44;border-radius:9px;padding:4px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;font-size:.68rem;text-align:center;font-family:inherit;}
+        .trd-mini img{width:100%;height:70px;object-fit:cover;object-position:top;border-radius:6px;} .trd-mini small{color:var(--text-muted);font-size:.6rem;}
+        .trd-mini.on{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,.45);}
+        /* fusion */
+        .fuse-grid{display:flex;flex-direction:column;gap:8px;}
+        .fuse-row{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;font-size:.85rem;}
+        .fuse-row.r-rare{border-color:#2f6fd6;} .fuse-row.r-epique{border-color:#8a3fd1;} .fuse-row.r-legendaire{border-color:#d4a017;}
+        .fuse-arrow{font-family:'Bangers',cursive;color:var(--accent-cyan);font-size:1.1rem;}
+        .fuse-row button{background:linear-gradient(90deg,#b77bff,#48dbfb);color:#111;border:none;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer;} .fuse-row button:disabled{opacity:.35;cursor:default;}
+        .fuse-res{margin:10px 0;}
+        /* clans */
+        .clan-head{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--cc) 22%,transparent),#101018);border:2px solid var(--cc);border-radius:14px;padding:12px;} .clan-head h3{margin:0;}
+        .clan-emb{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#0b0b10;border:2px solid var(--cc,#ffd700);flex-shrink:0;}
+        .clan-emb.big{width:58px;height:58px;font-size:1.8rem;}
+        .clan-create{display:flex;flex-direction:column;gap:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:12px;} .clan-create h3{margin:0;}
+        .clan-embs{display:flex;flex-wrap:wrap;gap:4px;} .clan-embs button{background:#1d1d2e;border:2px solid #2c2c44;border-radius:8px;font-size:1.2rem;width:40px;height:40px;cursor:pointer;} .clan-embs button.on{border-color:#ffd700;}
+        .clan-edit{margin:10px 0;background:#101018;border-radius:10px;padding:8px;} .clan-edit summary{cursor:pointer;font-weight:700;} .clan-edit label{display:inline-flex;gap:6px;align-items:center;margin:6px 10px 0 0;font-size:.85rem;}
+        .cn-clan{font-weight:800;font-size:.8em;margin-right:3px;}
+        /* stats */
+        .stat-list{display:flex;flex-direction:column;gap:6px;}
+        .stat-list>div{background:#101018;border:1px solid #2c2c44;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;}
+        .stat-list>div.gold{border-color:#d4a017;background:linear-gradient(135deg,rgba(255,215,0,.10),#101018);}
+        .sl-top{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;} .sl-top span{color:var(--text-muted);font-size:.75rem;white-space:nowrap;}
+        .sl-bar{height:8px;background:#22223a;border-radius:99px;overflow:hidden;} .sl-bar i{display:block;height:100%;}
+        .sl-mst{display:flex;align-items:center;gap:8px;} .sl-mst .ab{flex:1;height:4px;} .sl-mst .ab i{background:linear-gradient(90deg,#d4a017,#ffe66d);} .sl-mst small{font-size:.66rem;color:var(--text-muted);white-space:nowrap;}
+        .mastery-badges{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px;}
+        .mst-badge{background:linear-gradient(135deg,#ffe66d,#d4a017);color:#111;font-weight:800;border-radius:99px;padding:4px 10px;font-size:.78rem;box-shadow:0 0 12px rgba(255,215,0,.35);}
+        /* cosmétiques du pass */
+        .cn-aurora{background:linear-gradient(90deg,#00ffa3,#48dbfb,#b77bff,#00ffa3);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 3s linear infinite;filter:drop-shadow(0 0 4px rgba(72,219,251,.6));}
+        .fr-flame{border-color:#ff7a00;box-shadow:0 0 10px #ff4d00,0 -4px 16px rgba(255,160,0,.7),0 0 26px rgba(255,60,0,.4);animation:frFlame 1.2s ease-in-out infinite alternate;}
+        @keyframes frFlame{from{box-shadow:0 0 10px #ff4d00,0 -4px 14px rgba(255,160,0,.6);}to{box-shadow:0 0 16px #ff7a00,0 -8px 22px rgba(255,200,0,.8),0 0 30px rgba(255,60,0,.5);}}
+        /* spectateur */
+        #spect-bar{position:fixed;top:0;left:0;right:0;z-index:10010;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:rgba(20,10,40,.95);border-bottom:2px solid #9146FF;padding:8px 12px;font-size:.85rem;}
+        #spect-bar small{color:var(--text-muted);} .sp-react{display:flex;gap:2px;} .sp-react button{background:none;border:none;font-size:1.25rem;cursor:pointer;} .sp-react button:active{transform:scale(1.3);}
+        .sp-quit{background:var(--accent-pink);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-weight:800;cursor:pointer;}
+        body.spectating{padding-top:48px;}
+        body.spectating #arcade-room input,body.spectating #arcade-room button,body.spectating #blindtest-room button,body.spectating #quote-room input,body.spectating #quote-room button,body.spectating #draw-room input,body.spectating #draw-room button,body.spectating #draw-room canvas,body.spectating #guess-room button,body.spectating #guess-room input,body.spectating #dle-room input,body.spectating #dle-room button{pointer-events:none;opacity:.55;}
+        body.spectating #fx-react-bar,body.spectating #voice-fab{display:none!important;}
+        #spect-wait{display:none;text-align:center;padding:60px 16px;color:var(--text-muted);} #spect-wait .arc-spin{margin:0 auto 12px;position:static;}
+        .public-room.live{border-left:3px solid #ff2a2a;}
+        /* vocal */
+        #voice-fab{position:fixed;right:12px;bottom:172px;z-index:9995;width:46px;height:46px;border-radius:50%;background:#2a2a40;color:#fff;border:2px solid #44446a;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;}
+        #voice-fab.on{background:#1f6f4a;border-color:#00ff88;} #voice-fab.muted{background:#6a2020;border-color:var(--accent-pink);}
+        #voice-fab small{position:absolute;top:-4px;right:-4px;background:#00ff88;color:#111;border-radius:99px;font-size:.62rem;font-weight:800;padding:1px 5px;}
+        #voice-panel{position:fixed;right:12px;bottom:226px;z-index:9996;width:250px;background:#14141f;border:2px solid #44446a;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:.85rem;box-shadow:0 8px 30px rgba(0,0,0,.6);}
+        #voice-panel>button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:9px;padding:7px;font-weight:700;cursor:pointer;} #voice-panel>button.go{background:#00ff88;color:#111;border:none;}
+        .vc-list{display:flex;flex-direction:column;gap:4px;} .vc-p{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:8px;background:#101018;}
+        .vc-dot{width:10px;height:10px;border-radius:50%;background:#44446a;flex-shrink:0;transition:background .1s,box-shadow .1s;}
+        .vc-p.talk .vc-dot{background:#00ff88;box-shadow:0 0 8px #00ff88;}
+        /* accessibilité */
+        .a11y-panel{margin-top:18px;border-top:1px solid #2c2c44;padding-top:12px;display:flex;flex-direction:column;gap:8px;text-align:left;}
+        .a11y-panel h3{margin:0;} .a11y-panel label{display:flex;gap:8px;align-items:center;flex-wrap:wrap;cursor:pointer;}
+        html.big-text body{zoom:1.15;}
+        html.cb{--accent-pink:#ff9f1c;}
+        @media (max-width:560px){.hub-row{grid-template-columns:1fr;}.trd-cols{grid-template-columns:1fr;}.fuse-row{grid-template-columns:1fr 1fr;}.hb-img{flex-basis:64px;height:84px;}}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -1064,7 +1211,9 @@
             <li><b>Devine le perso</b> : pose des questions oui / non pour trouver le perso mystère.</li>
             <li><b>Citations</b> : à qui appartient cette réplique culte ?</li>
             <li><b>AnimeDLE</b> : le Wordle des persos d'anime, avec un défi du jour.</li>
-            <li><b>Mini-jeux</b> : Pixel, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
+            <li><b>Duel 1v1 classé</b> : affronte un adversaire à ta hauteur et monte de Bronze à Hokage.</li>
+            <li><b>Clans, pass de saison et boss du serveur</b> : joue en équipe, débloque des récompenses et abats le boss du jour avec toute la communauté.</li>
+            <li><b>Mini-jeux</b> : Pixel, Zoom extrême, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
         </ul>
         <p>Plus de 30 animes : Naruto, One Piece, Bleach, Hunter x Hunter, L'Attaque des Titans, Demon Slayer, Jujutsu Kaisen, Dragon Ball, Chainsaw Man, JoJo, Pokémon, Solo Leveling… Gagne des pièces, collectionne les cartes de tes persos préférés et débloque des titres.</p>
     </section>
@@ -1107,6 +1256,12 @@
                 </div>
             </div>
 
+            <div id="hub-home"></div>
+            <div class="quote-mode-card rk-card" style="margin-bottom:18px;text-align:left;">
+                <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Duel 1v1 classé</h3>
+                <p style="margin:0 0 10px;font-size:.85rem;">Un adversaire de ton niveau, un mini-jeu tiré au sort, 7 manches. Gagne pour monter de Bronze à <b>Hokage</b> !</p>
+                <div id="ranked-card-body"><p class="tl-hint">Chargement…</p></div>
+            </div>
             <div id="daily-card" class="daily-card">
                 <div class="daily-head"><h3>📅 Défi du jour</h3><span id="daily-countdown"></span></div>
                 <p style="margin:0 0 10px;font-size:.85rem;">Le même défi pour tout le monde • un seul essai compté • partage ton score !</p>
@@ -1168,6 +1323,7 @@
                     <div class="arc-menu-grid">
                         <button class="arc-game-btn" onclick="openArcadeGame('pixel')"><span class="arc-ico">🖼️</span><b>Pixel Anime</b><span>Image ultra pixelisée qui se précise → devine le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('silhouette')"><span class="arc-ico">👤</span><b>Silhouette</b><span>Ombre noire d'un perso → trouve son nom</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('zoom')"><span class="arc-ico">🔍</span><b>Zoom extrême</b><span>L'image part d'un détail et dézoome petit à petit → trouve le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('emoji')"><span class="arc-ico">😀</span><b>Emoji Anime</b><span>🍥 🦊 🍃 → devine l'anime ou le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('quatre')"><span class="arc-ico">🧩</span><b>4 images = 1 anime</b><span>Les images arrivent une à une → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('mapguess')"><span class="arc-ico">🗺️</span><b>Map Guess</b><span>Un lieu culte → de quel univers vient-il ?</span></button>
@@ -1884,11 +2040,16 @@
 
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
-            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button></div>
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
             <div id="eco-challenges" style="display:none;"></div>
+            <div id="eco-pass" style="display:none;"></div>
+            <div id="eco-trade" style="display:none;"></div>
+            <div id="eco-fuse" style="display:none;"></div>
+            <div id="eco-clan" style="display:none;"></div>
+            <div id="eco-stats" style="display:none;"></div>
         </div>
     </section>
 
@@ -2491,6 +2652,7 @@
             enchereaveugle: { title:"ENCHÈRE À L'AVEUGLE", sub:"Choisis ton univers — un seul voit le perso, l'autre mise à l'aveugle.", tag:'' },
             dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' },
             arc_pixel:      { title:'🖼️ PIXEL ANIME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            arc_zoom:       { title:'🔍 ZOOM EXTRÊME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_popularite: { title:'👥 POPULARITY GUESS', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
@@ -4706,6 +4868,7 @@
         /* ===================== MINI-JEUX ARCADE ===================== */
         const ARC_UI = {
             pixel:{ title:'🖼️ PIXEL ANIME', sub:"L'image se précise avec le temps : trouve le perso le plus vite possible", universe:true },
+            zoom:{ title:'🔍 ZOOM EXTRÊME', sub:"On part d'un détail (un œil, une arme…) et l'image dézoome : trouve le perso le plus vite possible", universe:true },
             silhouette:{ title:'👤 SILHOUETTE', sub:'Qui se cache derrière cette ombre ?', universe:true },
             emoji:{ title:'😀 EMOJI ANIME', sub:'Décode les emojis : anime ou personnage', universe:false },
             quatre:{ title:'🧩 4 IMAGES = 1 ANIME', sub:'Les images arrivent une par une : moins tu en vois, plus tu gagnes', universe:false },
@@ -5034,6 +5197,25 @@
                             onError: () => { if (arcStageKey === myKey && arcState && arcState.phase === 'playing') socket.emit('arc_media_error', { roomCode: currentRoomCode, round }); }
                         }
                     });
+                });
+                return;
+            }
+            if (q.game === 'zoom') {
+                stage.innerHTML = '';
+                const zc = document.createElement('canvas');
+                zc.className = 'arc-canvas'; zc.width = 480; zc.height = 480; zc.style.imageRendering = 'auto';
+                stage.appendChild(zc);
+                const zKey = arcStageKey;
+                arcLoadImage(st.img).then(img => {
+                    if (arcStageKey !== zKey) return;
+                    if (!img) { const ctx = zc.getContext('2d'); ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.fillText('Image indisponible', 150, 240); return; }
+                    if (reveal) { arcDrawZoom(zc, img, 1, st.focus); return; }
+                    const loop = () => {
+                        if (arcStageKey !== zKey || !arcState || arcState.phase !== 'playing') return;
+                        arcDrawZoom(zc, img, (arcNow() - arcState.startedAt) / (arcState.roundMs * 0.92), st.focus);
+                        arcRaf = requestAnimationFrame(loop);
+                    };
+                    loop();
                 });
                 return;
             }
@@ -8400,5 +8582,748 @@
             <span id="music-counter">0/0</span>
         </div>
     </div>
+<script>
+
+        /* =====================================================================
+           HUB : accueil (boss, anime de la semaine, tournoi, coffre, week-end x2),
+           duel classé, pass de saison, échanges, fusion, clans, stats, zoom,
+           spectateurs, salon vocal, reconnexion, accessibilité
+           ===================================================================== */
+        const hub = { home: null, boss: null, rk: { queued: false, t0: 0, timer: null }, passData: null };
+        const hubEsc = v7esc;
+        function hubModal(id, html, wide) {
+            document.getElementById(id)?.remove();
+            const m = document.createElement('div'); m.className = 'v7-modal'; m.id = id;
+            m.innerHTML = `<div class="v7-box hub-box${wide ? ' wide' : ''}"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button>${html}</div>`;
+            m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+            document.body.appendChild(m);
+            return m;
+        }
+        function hubFmtLeft(ms) {
+            if (ms <= 0) return 'maintenant';
+            const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+            return d ? `${d} j ${h} h` : h ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min ${String(s % 60).padStart(2, '0')} s`;
+        }
+        function tierBadge(t, elo) { return `<span class="rk-tier" style="--tc:${t.color}">${rkIcon(t.name)} ${hubEsc(t.name)}${elo != null ? ` <small>${elo}</small>` : ''}</span>`; }
+        function rkIcon(n) { return { Bronze: '🥉', Argent: '🥈', Or: '🥇', Platine: '💠', Diamant: '💎', Kage: '🌀', Hokage: '🔥' }[n] || '🎖️'; }
+
+        /* ---------- accueil ---------- */
+        async function hubLoadHome() {
+            const d = await v7get('/api/hub/home');
+            if (!d || !d.ok) return;
+            hub.home = d; hub.boss = d.boss; hub.homeAt = Date.now(); hub.skew = d.now - Date.now();
+            hubRenderHome();
+        }
+        function hubRenderHome() {
+            const box = document.getElementById('hub-home');
+            const d = hub.home;
+            if (!box || !d) return;
+            const acc = isAccount();
+            const wa = d.weekAnime, w = d.weekly, b = hub.boss || d.boss;
+            const now = Date.now() + (hub.skew || 0);
+            const weekendBar = d.weekend ? `<div class="hub-weekend">🎉 <b>WEEK-END x2</b> : pièces et XP doublées jusqu'à dimanche minuit !</div>` : '';
+            const chest = acc && d.chest ? `<button class="hub-chest${d.chest.ready ? ' ready' : ''}" onclick="hubChest()"><span class="hc-ico">${d.chest.ready ? '🎁' : '📦'}</span><span><b>${d.chest.ready ? 'Coffre du jour prêt !' : 'Coffre du jour ouvert'}</b><small>${d.chest.ready ? `Jour ${d.chest.day}/7 de ta série` : `Série : ${d.chest.streak} jour${d.chest.streak > 1 ? 's' : ''} • reviens demain`}</small></span></button>` : '';
+            const pass = acc && d.pass ? `<button class="hub-pass-mini" onclick="switchTab('collection');ecoTab('pass')"><span>🎟️ Pass de saison</span><b>Palier ${d.pass.tier}/30</b><span class="ab"><i style="width:${d.pass.tier >= 30 ? 100 : Math.round(100 * (d.pass.xp % d.pass.perTier) / d.pass.perTier)}%"></i></span></button>` : '';
+            const bossHtml = b ? `<div class="hub-card boss${b.dead ? ' dead' : ''}" id="hub-boss">
+                <div class="hb-img"><img src="${hubEsc(b.img)}" alt="" onerror="this.style.opacity=.2"></div>
+                <div class="hb-main"><div class="hb-h">👹 Boss du serveur <small>${b.fighters} combattant${b.fighters > 1 ? 's' : ''}</small></div>
+                <b class="hb-name">${hubEsc(b.name)} <small>${hubEsc(b.anime)}</small></b>
+                <div class="hb-bar"><i style="width:${Math.round(100 * b.hp / b.max)}%"></i><span>${b.dead ? 'VAINCU !' : `${b.hp} / ${b.max} PV`}</span></div>
+                <div class="tl-hint">${b.dead ? 'Tous les participants ont reçu 100 pièces et sa carte. Nouveau boss demain !' : 'Chaque bonne réponse, dans n’importe quel mode, lui enlève 10 PV (15 si tu réponds en moins de 3 s). S’il tombe aujourd’hui : 100 🪙 + sa carte pour tous les participants.'}</div>
+                ${b.top && b.top.length ? `<div class="hb-top">${b.top.map((x, i) => `<span>${['🥇', '🥈', '🥉', '4.', '5.'][i]} ${hubEsc(x.name)} <b>${x.dmg}</b></span>`).join('')}</div>` : ''}</div></div>` : '';
+            const mine = wa.mine;
+            const weekHtml = `<div class="hub-card week"><div class="hb-img"><img src="${hubEsc(wa.img)}" alt="" onerror="this.style.opacity=.2"></div><div class="hb-main">
+                <div class="hb-h">⭐ Anime de la semaine</div><b class="hb-name">${hubEsc(wa.name)}</b>
+                <div class="tl-hint">Cartes brillantes x3 sur cet anime. Trouve ${wa.goal} persos cette semaine pour gagner la carte <b>Collector</b> de ${hubEsc(wa.main)} !</div>
+                ${mine ? `<div class="hb-bar week"><i style="width:${Math.round(100 * mine.n / wa.goal)}%"></i><span>${mine.done ? '✅ Collector obtenue !' : `${mine.n} / ${wa.goal} persos`}</span></div>` : ''}
+                <div class="hb-btns"><button onclick="createRoom('arcade','pixel:${wa.u}')">🖼️ Pixel</button><button onclick="createRoom('arcade','silhouette:${wa.u}')">👤 Silhouette</button><button onclick="createRoom('arcade','zoom:${wa.u}')">🔍 Zoom</button></div></div></div>`;
+            let wk;
+            if (w.open) wk = `<b>Inscriptions ouvertes !</b> ${w.players} joueur${w.players > 1 ? 's' : ''} inscrit${w.players > 1 ? 's' : ''} • départ à 20 h<div class="hb-btns"><button class="go" onclick="hubJoinWeekly('${w.code}')">🏆 Rejoindre le tournoi</button></div>`;
+            else if (w.started) wk = `<b>Le tournoi est en cours !</b><div class="hb-btns"><button onclick="spectateRoom('${w.code}')">👁️ Regarder</button></div>`;
+            else if (w.done && w.winner) wk = `🏆 Vainqueur de cette semaine : <b>${hubEsc(w.winner)}</b>`;
+            else wk = w.nextAt && w.nextAt > now ? `Prochain tournoi dans <b data-hub-left="${w.nextAt}">${hubFmtLeft(w.nextAt - now)}</b> • inscriptions dès 19 h 45` : 'Tous les dimanches à 20 h (heure de Paris)';
+            const weeklyHtml = `<div class="hub-card weekly"><div class="hb-main"><div class="hb-h">🏆 Tournoi du dimanche <small>20 h</small></div>
+                <div class="tl-hint">Tournoi automatique chaque dimanche : 500 🪙 + le titre « Champion du dimanche » pour le vainqueur.</div><div class="hb-weekly">${wk}</div></div></div>`;
+            box.innerHTML = weekendBar + (chest || pass ? `<div class="hub-row">${chest}${pass}</div>` : '') + bossHtml + weekHtml + weeklyHtml;
+            hubRenderRankedCard();
+        }
+        setInterval(() => {
+            document.querySelectorAll('[data-hub-left]').forEach(el => { el.textContent = hubFmtLeft(+el.dataset.hubLeft - (Date.now() + (hub.skew || 0))); });
+            const rk = document.getElementById('rk-wait'); if (rk && hub.rk.queued) rk.textContent = hubFmtLeft(Date.now() - hub.rk.t0).replace('min', 'min');
+        }, 1000);
+        setInterval(() => { if (document.getElementById('menu-selection')?.style.display !== 'none' && !document.hidden) hubLoadHome(); }, 60000);
+        socket.on('connect', () => setTimeout(hubLoadHome, 1100));
+        (function () { const orig = window.switchTab; window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'mode') hubLoadHome(); return r; }; })();
+        socket.on('boss_state', b => { hub.boss = b; if (hub.home) hubRenderHome(); });
+        socket.on('boss_down', d => { toast(`👹 <b>${hubEsc(d.name)}</b> est vaincu ! Coup final : ${hubEsc(d.killer)}`, '#ff5a2a'); hubLoadHome(); });
+        socket.on('boss_reward', d => { toast(`👹 Boss vaincu : +${d.coins} 🪙 et la carte de ${hubEsc(d.name)} !`, '#ffd700'); confetti(1500); });
+        socket.on('collector_gain', d => { hubModal('collector-modal', `<h3>⭐ Carte Collector !</h3><div class="card-grid booster" style="justify-content:center;"><div class="flip">${collectorCard(d)}</div></div><p class="tl-hint">Tu as trouvé 15 persos de ${hubEsc(d.anime)} cette semaine. Elle est dans ton album.</p>`); confetti(2000); });
+        socket.on('mastery_gain', d => { toast(`🏅 <b>Maîtrise ${hubEsc(d.anime)}</b> : 100 bonnes réponses ! Badge doré débloqué`, '#ffd700'); confetti(1800); });
+        socket.on('pass_tier', d => toast(`🎟️ Pass de saison : palier <b>${d.tier}</b> atteint ! Récupère ta récompense`, '#b77bff'));
+        socket.on('weekly_open', d => toast(`🏆 Le tournoi du dimanche ouvre ! <button class="toast-btn" onclick="hubJoinWeekly('${d.code}')">Rejoindre</button>`, '#00ff88'));
+        socket.on('weekly_result', d => toast(`🏆 <b>${hubEsc(d.winner)}</b> remporte le tournoi du dimanche !`, '#ffd700'));
+        socket.on('weekly_win', d => { toast(`🏆 Tu as gagné le tournoi du dimanche ! +${d.coins} 🪙 + titre « Champion du dimanche »`, '#ffd700'); confetti(3000); });
+        socket.on('clan_event', d => toast(d.text, '#ffd700'));
+        socket.on('trade_new', d => toast(`🔁 <b>${hubEsc(d.from)}</b> te propose un échange : ${hubEsc(d.give)} contre ${hubEsc(d.want)} <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Voir</button>`, '#48dbfb'));
+        socket.on('trade_done', d => toast(d.text, '#48dbfb'));
+        function hubJoinWeekly(code) {
+            if (currentRoomCode && currentRoomCode !== code) socket.emit('leave_room', { roomCode: currentRoomCode });
+            switchTab('mode');
+            currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'arcade', subMode: 'tournoi' });
+        }
+        async function hubChest() {
+            if (!hub.home || !hub.home.chest || !hub.home.chest.ready) { const d = await v7get('/api/chest'); if (d && d.ok) hubModal('chest-modal', `<h3>📦 Coffre du jour</h3><p>Série actuelle : <b>${d.streak}</b> jour${d.streak > 1 ? 's' : ''}. Reviens demain pour le jour ${d.day} !</p><div class="chest-days">${d.rewards.map((r, i) => `<div class="${i + 1 < d.day ? 'past' : i + 1 === d.day ? 'next' : ''}"><b>J${i + 1}</b><small>${r}</small></div>`).join('')}</div>`); return; }
+            const d = await v7post('/api/chest/open', {});
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (typeof eco !== 'undefined') { eco.coins = d.total; ecoCoinsUi(); }
+            hubModal('chest-modal', `<h3>🎁 Coffre du jour</h3><div class="chest-open">🎁</div><p style="font-size:1.2rem;"><b>+${d.coins} 🪙</b></p><p class="tl-hint">Série : ${d.streak} jour${d.streak > 1 ? 's' : ''} d’affilée${d.streak % 7 === 6 ? ' • demain : booster offert !' : ''}</p>${d.cards && d.cards.length ? `<div class="card-grid booster" style="justify-content:center;">${d.cards.map((c, i) => `<div class="flip" style="animation-delay:${i * .15}s">${cardHtml(c, true)}</div>`).join('')}</div>` : ''}`);
+            confetti(1400);
+            hubLoadHome();
+        }
+
+        /* ---------- duel classé ---------- */
+        function hubRenderRankedCard() {
+            const box = document.getElementById('ranked-card-body');
+            if (!box) return;
+            const r = hub.home && hub.home.ranked;
+            if (!isAccount()) { box.innerHTML = `<p class="tl-hint">Crée un compte pour jouer en classé.</p>`; return; }
+            if (!r) { box.innerHTML = ''; return; }
+            const t = r.tier, pct = t.next ? Math.round(100 * (r.elo - t.min) / (t.next - t.min)) : 100;
+            box.innerHTML = `<div class="rk-me">${tierBadge(t, r.elo)}<span class="tl-hint">${r.w} V • ${r.l} D${r.d ? ` • ${r.d} N` : ''}</span></div>
+                <div class="hb-bar rk"><i style="width:${pct}%;background:${t.color}"></i><span>${t.next ? `${t.next - r.elo} pts avant ${hubEsc(t.nextName)}` : 'Rang maximum !'}</span></div>
+                <div class="hb-btns"><button class="go" id="rk-btn" onclick="rankedToggle()">${hub.rk.queued ? '✖ Annuler la recherche' : '⚔️ Chercher un adversaire'}</button><button onclick="rankedBoard()">🏆 Classement</button></div>`;
+        }
+        function rankedToggle() {
+            if (!isAccount()) return toast('Crée un compte pour jouer en classé.', 'var(--accent-pink)');
+            if (hub.rk.queued) { socket.emit('ranked_leave'); hub.rk.queued = false; document.getElementById('rk-ovl')?.remove(); hubRenderRankedCard(); return; }
+            if (currentRoomCode) { socket.emit('leave_room', { roomCode: currentRoomCode }); currentRoomCode = ''; }
+            socket.emit('ranked_queue');
+        }
+        socket.on('ranked_queued', () => {
+            hub.rk.queued = true; hub.rk.t0 = Date.now();
+            document.getElementById('rk-ovl')?.remove();
+            const o = document.createElement('div'); o.id = 'rk-ovl'; o.className = 'rk-ovl';
+            o.innerHTML = `<div class="rk-box"><div class="rk-spin">⚔️</div><b>Recherche d'un adversaire…</b><div class="tl-hint">Mini-jeu tiré au sort • 7 manches • tu peux continuer à naviguer</div><div id="rk-wait" class="rk-wait">0 min 00 s</div><button onclick="rankedToggle()">Annuler</button></div>`;
+            document.body.appendChild(o);
+            hubRenderRankedCard();
+        });
+        socket.on('ranked_error', d => toast('❌ ' + d.message, 'var(--accent-pink)'));
+        socket.on('ranked_found', d => {
+            hub.rk.queued = false;
+            const o = document.getElementById('rk-ovl') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'rk-ovl', className: 'rk-ovl' }));
+            const me = hub.home && hub.home.ranked;
+            o.innerHTML = `<div class="rk-box vs"><div class="rk-vs"><div><b>${hubEsc(getUsername())}</b>${me ? tierBadge(me.tier, me.elo) : ''}</div><span class="rk-x">VS</span><div><b>${hubEsc(d.opponent.name)}</b>${tierBadge(d.opponent.tier, d.opponent.elo)}</div></div>
+                <div class="rk-game">🎮 ${hubEsc(d.game)} • 7 manches</div><div class="tl-hint">La partie démarre…</div></div>`;
+            if (currentRoomCode && currentRoomCode !== d.roomCode) socket.emit('leave_room', { roomCode: currentRoomCode });
+            switchTab('mode');
+            currentRoomCode = d.roomCode;
+            socket.emit('join_room', { roomCode: d.roomCode, username: getUsername(), mode: 'arcade', subMode: d.subMode });
+            setTimeout(() => document.getElementById('rk-ovl')?.remove(), 12000);
+        });
+        socket.on('ranked_countdown', () => setTimeout(() => document.getElementById('rk-ovl')?.remove(), 3300));
+        socket.on('ranked_cancel', d => { document.getElementById('rk-ovl')?.remove(); toast(d.message, 'var(--accent-pink)'); currentRoomCode = ''; goToMenuSelection(); });
+        socket.on('ranked_result', d => {
+            const t = d.tier, pct = t.next ? Math.round(100 * (d.elo - t.min) / (t.next - t.min)) : 100;
+            const title = d.result === 'win' ? '🏆 Victoire !' : d.result === 'lose' ? '💀 Défaite' : '🤝 Match nul';
+            setTimeout(() => {
+                hubModal('rk-result', `<h3 class="rk-res ${d.result}">${title}</h3><div class="rk-delta ${d.delta >= 0 ? 'up' : 'down'}">${d.delta >= 0 ? '+' : ''}${d.delta} pts</div>
+                    ${d.promoted ? `<div class="rk-promo">⬆️ Nouveau rang : ${tierBadge(t)}</div>` : ''}
+                    <div style="margin:10px 0;">${tierBadge(t, d.elo)}</div><div class="hb-bar rk"><i style="width:${pct}%;background:${t.color}"></i><span>${t.next ? `${t.next - d.elo} pts avant ${hubEsc(t.nextName)}` : 'Rang maximum !'}</span></div>
+                    ${d.coins ? `<p>+${d.coins} 🪙</p>` : ''}<div class="hb-btns" style="justify-content:center;"><button class="go" onclick="document.getElementById('rk-result').remove();leaveRoom();setTimeout(rankedToggle,300)">⚔️ Rejouer en classé</button><button onclick="document.getElementById('rk-result').remove();leaveRoom()">Menu</button></div>`);
+                if (d.result === 'win') confetti(2000);
+                hubLoadHome();
+            }, 2500);
+        });
+        async function rankedBoard() {
+            const d = await v7get('/api/ranked');
+            if (!d || !d.ok) return;
+            hubModal('rk-board', `<h3>🏆 Classement duel classé</h3><div class="rk-tiers">${d.tiers.map(t => `<span style="--tc:${t.color}">${rkIcon(t.name)} ${hubEsc(t.name)} <small>${t.min}+</small></span>`).join('')}</div>
+                ${d.top.length ? `<div class="rk-list">${d.top.map((x, i) => `<div class="${x.me ? 'me' : ''}"><span>${i + 1}.</span><b>${hubEsc(x.name)}</b>${tierBadge(x.tier, x.elo)}<small>${x.w}V ${x.l}D</small></div>`).join('')}</div>` : '<p class="tl-hint">Personne n’a encore joué en classé cette saison. Sois le premier !</p>'}
+                <p class="tl-hint">${d.queue} joueur${d.queue > 1 ? 's' : ''} en recherche en ce moment • victoire = +25 🪙</p>`);
+        }
+
+        /* ---------- onglets de la Collection ---------- */
+        (function () {
+            const orig = ecoTab;
+            const NEW = ['pass', 'trade', 'fuse', 'clan', 'stats'];
+            ecoTab = function (t) {
+                if (!NEW.includes(t)) { NEW.forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = 'none'; }); return orig(t); }
+                eco.tab = t;
+                document.querySelectorAll('.eco-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+                ['shop', 'album', 'titles', 'challenges', ...NEW].forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = k === t ? '' : 'none'; });
+                const box = document.getElementById('eco-' + t);
+                if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour accéder à cette partie.</p>'; return; }
+                ({ pass: loadPass, trade: loadTrade, fuse: loadFuse, clan: loadClan, stats: loadStats })[t]();
+            };
+        })();
+        function collectorCard(c) {
+            return `<div class="tcard r-legendaire shiny collector"><div class="tc-img"><img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"></div><div class="tc-name">${hubEsc(c.name)}</div><div class="tc-rar">⭐ Collector${c.week ? ' • ' + hubEsc(c.week) : ''}</div></div>`;
+        }
+        // album : section collector
+        (function () {
+            const orig = loadAlbum;
+            loadAlbum = async function (u) {
+                await orig.apply(this, arguments);
+                if (eco.albumU) return;
+                const d = await v7get('/api/cards');
+                const box = document.getElementById('eco-album');
+                if (!d || !d.ok || !box || !(d.collectors || []).length || box.querySelector('.collector-sec')) return;
+                const sec = document.createElement('div'); sec.className = 'collector-sec';
+                sec.innerHTML = `<h3 class="adm-h">⭐ Cartes Collector</h3><div class="card-grid">${d.collectors.map(collectorCard).join('')}</div>`;
+                box.insertBefore(sec, box.querySelector('.album-list'));
+            };
+        })();
+
+        // --- pass de saison ---
+        async function loadPass() {
+            const box = document.getElementById('eco-pass');
+            const d = await v7get('/api/pass');
+            if (!d || !d.ok) return;
+            hub.passData = d;
+            const inTier = d.tier >= 30 ? d.perTier : d.xp % d.perTier;
+            const cell = (t, track) => {
+                const got = d.claimed[track].includes(t.tier), reached = t.tier <= d.tier, locked = track === 'prem' && !d.premium;
+                const lab = track === 'free' ? t.free : t.prem;
+                return `<div class="ps-cell ${track}${got ? ' got' : reached && !locked ? ' ready' : ''}${locked ? ' locked' : ''}"><small>${hubEsc(lab)}</small>${got ? '<b>✔</b>' : reached && !locked ? `<button onclick="passClaim(${t.tier},'${track}')">Récupérer</button>` : locked ? '<b>🔒</b>' : ''}</div>`;
+            };
+            box.innerHTML = `<div class="ps-head"><div><h3>🎟️ Pass de saison <small>${hubEsc(d.season)}</small></h3><div class="tl-hint">Gagne de l’XP de pass en jouant (x2 le week-end) • fin de saison dans <b data-hub-left="${d.endsAt}">${hubFmtLeft(d.endsAt - Date.now())}</b></div></div>
+                ${d.premium ? '<span class="ps-prem-on">⭐ Premium actif</span>' : `<button class="ps-buy" onclick="passBuy()">⭐ Pass premium : 🪙 ${d.price}</button>`}</div>
+                <div class="ps-prog"><b>Palier ${d.tier}/30</b><div class="hb-bar"><i style="width:${Math.round(100 * inTier / d.perTier)}%"></i><span>${d.tier >= 30 ? 'Pass terminé !' : `${inTier} / ${d.perTier} XP`}</span></div></div>
+                <div class="tl-hint">Premium : couleur <b>Aurore</b> (palier 10), cadre <b>Flammes</b> (20), effet <b>Aurore boréale</b> (25), titre <b>Légende de la saison</b> (30) + plus de pièces et de boosters.</div>
+                <div class="ps-grid"><div class="ps-lab"><span></span><span>Gratuit</span><span>⭐ Premium</span></div>${d.tiers.map(t => `<div class="ps-col${t.tier <= d.tier ? ' on' : ''}${t.tier === d.tier + 1 ? ' cur' : ''}"><span class="ps-n">${t.tier}</span>${cell(t, 'free')}${cell(t, 'prem')}</div>`).join('')}</div>`;
+            const cur = box.querySelector('.ps-col.cur') || box.querySelector('.ps-col.on:last-of-type');
+            if (cur) cur.scrollIntoView({ block: 'nearest', inline: 'center' });
+        }
+        async function passBuy() {
+            if (!confirm(`Acheter le pass premium pour ${hub.passData ? hub.passData.price : 1200} pièces ?`)) return;
+            const d = await v7post('/api/pass/buy', {});
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            eco.coins = d.coins; ecoCoinsUi(); toast('⭐ Pass premium activé !', '#ffd700'); confetti(1500); loadPass();
+        }
+        async function passClaim(tier, track) {
+            const d = await v7post('/api/pass/claim', { tier, track });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            eco.coins = d.coins; ecoCoinsUi();
+            if (d.got.cards) showBooster(d.got.cards); else toast(`🎟️ ${hubEsc(d.label)} récupéré !`, '#b77bff');
+            if (d.got.item) { await ecoLoad(); if (d.got.item.startsWith('title:')) toast('🏷️ Nouveau titre dans l’onglet Titres !', '#ffd700'); }
+            loadPass();
+        }
+
+        // --- échanges ---
+        const trd = { friend: null, mine: [], theirs: [], give: null, want: null, q1: '', q2: '' };
+        async function loadTrade() {
+            const box = document.getElementById('eco-trade');
+            const d = await v7get('/api/trade');
+            if (!d || !d.ok) return;
+            const tcard = (name, anime, img) => `<div class="trd-c"><img src="${hubEsc(img)}" alt="" onerror="this.style.opacity=.15"><b>${hubEsc(name)}</b><small>${hubEsc(anime || '')}</small></div>`;
+            const row = (t, inc) => `<div class="trd-row"><div class="trd-who">${inc ? `<b>${hubEsc(t.fromName)}</b> te propose` : `Tu proposes à <b>${hubEsc(t.toName)}</b>`}</div>
+                <div class="trd-swap">${tcard(t.giveName, t.giveAnime, t.giveImg)}<span>⇄</span>${tcard(t.wantName, t.wantAnime, t.wantImg)}</div>
+                <div class="trd-act">${t.status === 'open' ? (inc ? `<button class="go" onclick="tradeRespond('${t.id}',true)">✔ Accepter</button><button onclick="tradeRespond('${t.id}',false)">Refuser</button>` : `<button onclick="tradeRespond('${t.id}',false)">Annuler</button>`) : `<span class="tl-hint">${{ done: '✅ Échange fait', refused: '❌ Refusé', cancelled: 'Annulé', failed: 'Carte plus disponible' }[t.status] || t.status}</span>`}</div></div>`;
+            box.innerHTML = `<h3 class="adm-h">📨 Propositions reçues</h3>${d.incoming.length ? d.incoming.map(t => row(t, true)).join('') : '<p class="tl-hint">Aucune proposition pour le moment.</p>'}
+                <h3 class="adm-h">🔁 Proposer un échange</h3>
+                ${d.friends.length ? `<select id="trd-friend" class="v7-input" onchange="tradePickFriend(this.value)"><option value="">Choisis un ami…</option>${d.friends.map(f => `<option value="${f.id}"${trd.friend == f.id ? ' selected' : ''}>${hubEsc(f.pseudo)}</option>`).join('')}</select><div id="trd-pick"></div>` : '<p class="tl-hint">Ajoute des amis (Options → Amis) pour pouvoir échanger des cartes.</p>'}
+                ${d.outgoing.length ? `<h3 class="adm-h">📤 Tes propositions</h3>${d.outgoing.map(t => row(t, false)).join('')}` : ''}`;
+            if (trd.friend) tradePickFriend(trd.friend);
+        }
+        async function tradePickFriend(fid) {
+            trd.friend = fid || null; trd.give = null; trd.want = null;
+            const pick = document.getElementById('trd-pick'); if (!pick) return;
+            if (!fid) { pick.innerHTML = ''; return; }
+            pick.innerHTML = '<p class="tl-hint">Chargement…</p>';
+            const [m, t] = await Promise.all([v7get('/api/trade/cards'), v7get('/api/trade/cards?friend=' + fid)]);
+            trd.mine = (m && m.cards) || []; trd.theirs = (t && t.cards) || [];
+            tradeRenderPick();
+        }
+        function tradeRenderPick() {
+            const pick = document.getElementById('trd-pick'); if (!pick) return;
+            pick.innerHTML = `<div class="trd-cols"><div><b>Tu donnes</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()"><div class="trd-list" id="trd-l-give"></div></div>
+                <div><b>Tu reçois</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q2)}" oninput="trd.q2=this.value;tradeLists()"><div class="trd-list" id="trd-l-want"></div></div></div>
+                <button class="btn-action" id="trd-send" disabled onclick="tradePropose()">🔁 Envoyer la proposition</button>`;
+            tradeLists();
+        }
+        function tradeLists() {
+            const list = (arr, sel, side, q) => arr.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, 60).map(c => `<button class="trd-mini r-${c.rarity}${sel === c.key ? ' on' : ''}" onclick="tradeSel('${side}',${JSON.stringify(c.key).replace(/"/g, '&quot;')})"><img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${hubEsc(c.name)}</b><small>${hubEsc(c.anime)}${c.n > 1 ? ' • x' + c.n : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
+            const g = document.getElementById('trd-l-give'), w = document.getElementById('trd-l-want'), b = document.getElementById('trd-send');
+            if (g) g.innerHTML = list(trd.mine, trd.give, 'give', trd.q1);
+            if (w) w.innerHTML = list(trd.theirs, trd.want, 'want', trd.q2);
+            if (b) b.disabled = !(trd.give && trd.want);
+        }
+        function tradeSel(side, key) { trd[side] = trd[side] === key ? null : key; tradeLists(); }
+        async function tradePropose() {
+            const d = await v7post('/api/trade/propose', { friendId: +trd.friend, give: trd.give, want: trd.want });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast('🔁 Proposition envoyée !', '#48dbfb'); trd.give = trd.want = null; loadTrade();
+        }
+        async function tradeRespond(id, accept) {
+            const d = await v7post('/api/trade/respond', { id, accept });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (d.got) { toast(`🔁 Échange fait : tu reçois ${hubEsc(d.got)} !`, '#48dbfb'); confetti(900); }
+            loadTrade();
+        }
+
+        // --- fusion ---
+        async function loadFuse(result) {
+            const box = document.getElementById('eco-fuse');
+            const d = await v7get('/api/cards/fuse');
+            if (!d || !d.ok) return;
+            const R = [['commune', 'rare', 'Commune', 'Rare'], ['rare', 'epique', 'Rare', 'Épique'], ['epique', 'legendaire', 'Épique', 'Légendaire'], ['legendaire', 'legendaire', 'Légendaire', 'Légendaire brillante ✨']];
+            box.innerHTML = `<div class="shop-head">⚗️ Fusion de cartes <span class="tl-hint">• 5 doublons de la même rareté = 1 carte de la rareté au-dessus (tu gardes toujours un exemplaire de chaque carte)</span></div>
+                ${result ? `<div class="fuse-res"><div class="card-grid booster" style="justify-content:center;"><div class="flip">${cardHtml(result, true)}</div></div></div>` : ''}
+                <div class="fuse-grid">${R.map(([r, to, a, b]) => `<div class="fuse-row r-${r}"><div class="fuse-from"><b>${d.spares[r]}</b> doublon${d.spares[r] > 1 ? 's' : ''} ${a}</div><div class="fuse-arrow">5 ➜ 1</div><div class="fuse-to">${b}</div><button ${d.spares[r] >= 5 ? '' : 'disabled'} onclick="fuseGo('${r}')">⚗️ Fusionner</button></div>`).join('')}</div>`;
+        }
+        async function fuseGo(r) {
+            const d = await v7post('/api/cards/fuse', { rarity: r });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (d.card && (d.card.shiny || d.card.rarity === 'legendaire')) confetti(1600);
+            loadFuse(d.card);
+        }
+
+        // --- clans ---
+        const clanDraft = { emblem: '🐉', color: '#ffd700' };
+        async function loadClan() {
+            const box = document.getElementById('eco-clan');
+            const d = await v7get('/api/clans');
+            if (!d || !d.ok) return;
+            const boardHtml = `<h3 class="adm-h">🏆 Classement de la semaine</h3><div class="tl-hint">Chaque partie jouée par un membre rapporte des points au clan (10 à 60, x2 le week-end). Récompenses le lundi : ${d.rewards.map((r, i) => `${i + 1}${i ? 'e' : 'er'} : ${r} 🪙`).join(' • ')} pour chaque membre.</div>
+                ${d.lastWinners && d.lastWinners.winners && d.lastWinners.winners.length ? `<div class="tl-hint">Semaine dernière : ${d.lastWinners.winners.map((w, i) => `${['🥇', '🥈', '🥉'][i]} ${hubEsc(w.emblem)} ${hubEsc(w.name)}`).join(' • ')}</div>` : ''}
+                <div class="clan-board">${d.board.length ? d.board.map((c, i) => `<div class="${d.mine && d.mine.id === c.id ? 'me' : ''}"><span>${i + 1}.</span><span class="clan-emb" style="--cc:${c.color}">${hubEsc(c.emblem)}</span><b>${hubEsc(c.name)} <small style="color:${c.color}">[${hubEsc(c.tag)}]</small></b><small>${c.members} 👥</small><b>${c.pts} pts</b>${!d.mine ? `<button onclick="clanJoin('${c.id}')">Rejoindre</button>` : ''}</div>`).join('') : '<p class="tl-hint">Aucun clan pour le moment : crée le premier !</p>'}</div>`;
+            if (d.mine) {
+                const c = d.mine;
+                box.innerHTML = `<div class="clan-head" style="--cc:${c.color}"><span class="clan-emb big">${hubEsc(c.emblem)}</span><div><h3>${hubEsc(c.name)} <span style="color:${c.color}">[${hubEsc(c.tag)}]</span></h3><div class="tl-hint">${c.members.length}/${d.max} membres • ${c.rank ? `${c.rank}${c.rank > 1 ? 'e' : 'er'} cette semaine` : ''} • <b>${c.pts} pts</b></div></div></div>
+                    <h3 class="adm-h">👥 Membres (points de la semaine)</h3><div class="clan-members">${c.members.map(m => `<div class="${m.me ? 'me' : ''}"><b>${m.owner ? '👑 ' : ''}${hubEsc(m.name)}</b><span>${m.pts} pts</span>${c.isOwner && !m.me ? `<button onclick="clanKick(${m.id})">Retirer</button>` : ''}</div>`).join('')}</div>
+                    ${c.isOwner ? `<details class="clan-edit"><summary>⚙️ Modifier le clan</summary><div class="clan-embs">${d.emblems.map(e => `<button class="${e === c.emblem ? 'on' : ''}" onclick="clanEdit({emblem:'${e}'})">${e}</button>`).join('')}</div><label>Couleur <input type="color" value="${c.color}" onchange="clanEdit({color:this.value})"></label> <label><input type="checkbox" ${c.open !== false ? 'checked' : ''} onchange="clanEdit({open:this.checked})"> Ouvert à tous</label></details>` : ''}
+                    <div class="hb-btns"><button onclick="clanLeave()">🚪 Quitter le clan</button></div>` + boardHtml;
+                return;
+            }
+            box.innerHTML = `<div class="clan-create"><h3>🛡️ Créer un clan <small>🪙 ${d.price}</small></h3>
+                <input id="clan-name" class="v7-input" maxlength="20" placeholder="Nom du clan (ex : Akatsuki)"><input id="clan-tag" class="v7-input" maxlength="4" placeholder="Tag (2 à 4 lettres, ex : AKA)" style="text-transform:uppercase">
+                <div class="clan-embs">${d.emblems.map(e => `<button class="${e === clanDraft.emblem ? 'on' : ''}" onclick="clanDraft.emblem='${e}';this.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===this))">${e}</button>`).join('')}</div>
+                <label>Couleur du tag <input type="color" value="${clanDraft.color}" onchange="clanDraft.color=this.value"></label>
+                <button class="btn-action" onclick="clanCreate()">🛡️ Créer mon clan</button></div>` + boardHtml;
+        }
+        async function clanAct(url, body, okMsg) {
+            const d = await v7post(url, body);
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (okMsg) toast(okMsg, '#ffd700');
+            ecoLoad(); loadClan();
+        }
+        function clanCreate() { clanAct('/api/clans/create', { name: document.getElementById('clan-name').value, tag: document.getElementById('clan-tag').value, emblem: clanDraft.emblem, color: clanDraft.color }, '🛡️ Clan créé !'); }
+        function clanJoin(id) { clanAct('/api/clans/join', { id }, '🛡️ Bienvenue dans le clan !'); }
+        function clanLeave() { if (confirm('Quitter ton clan ?')) clanAct('/api/clans/leave', {}, 'Tu as quitté le clan.'); }
+        function clanKick(id) { if (confirm('Retirer ce membre ?')) clanAct('/api/clans/kick', { id }); }
+        function clanEdit(o) { clanAct('/api/clans/edit', o); }
+        // tag du clan devant le pseudo, partout
+        (function () {
+            const orig = cosNameHtml;
+            cosNameHtml = function (name, cos) { const c = cos && cos.clan; return (c && c.tag ? `<span class="cn-clan" style="color:${hubEsc(c.color || '#ffd700')}">[${hubEsc(c.tag)}]</span>` : '') + orig(name, cos); };
+        })();
+
+        // --- stats par anime + maîtrise ---
+        async function loadStats() {
+            const box = document.getElementById('eco-stats');
+            const d = await v7get('/api/hub/stats');
+            if (!d || !d.ok) return;
+            const masters = d.list.filter(a => a.mastery);
+            box.innerHTML = `${d.best || d.worst ? `<div class="best-worst"><div>💪 Tu es fort sur<b style="color:#00ff88">${hubEsc(d.best ? d.best.anime : '—')}</b>${d.best ? d.best.pct + ' % de bonnes réponses' : ''}</div><div>😵 Tu galères sur<b style="color:var(--accent-pink)">${hubEsc(d.worst ? d.worst.anime : '—')}</b>${d.worst ? d.worst.pct + ' % de bonnes réponses' : ''}</div></div>` : ''}
+                <div class="shop-head">🏅 <b>${masters.length}</b> anime${masters.length > 1 ? 's' : ''} maîtrisé${masters.length > 1 ? 's' : ''} <span class="tl-hint">• ${d.goal} bonnes réponses sur un anime = badge doré</span></div>
+                ${masters.length ? `<div class="mastery-badges">${masters.map(a => `<span class="mst-badge">🏅 ${hubEsc(a.anime)}</span>`).join('')}</div>` : ''}
+                ${d.list.length ? `<div class="stat-list">${d.list.map(a => `<div class="${a.mastery ? 'gold' : ''}"><div class="sl-top"><b>${a.mastery ? '🏅 ' : ''}${hubEsc(a.anime)}</b><span>${a.pct} % • ${a.ok}/${a.n}${a.ms ? ` • ${(a.ms / 1000).toFixed(1)} s` : ''}</span></div>
+                    <div class="sl-bar"><i style="width:${a.pct}%;background:${a.pct >= 70 ? '#00ff88' : a.pct >= 40 ? '#ffd700' : 'var(--accent-pink)'}"></i></div>
+                    <div class="sl-mst"><span class="ab"><i style="width:${Math.min(100, Math.round(100 * a.ok / d.goal))}%"></i></span><small>${a.mastery ? 'Maîtrisé !' : `Maîtrise : ${a.ok}/${d.goal}`}</small></div></div>`).join('')}</div>` : '<p class="tl-hint">Joue quelques parties pour voir tes stats par anime.</p>'}`;
+        }
+
+        /* ---------- Zoom extrême : dessin ---------- */
+        function arcDrawZoom(canvas, img, t, focus) {
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.fillStyle = '#0b0b10'; ctx.fillRect(0, 0, W, H);
+            const base = Math.min(W / img.width, H / img.height);
+            const e = Math.min(1, Math.max(0, t));
+            const zoom = Math.pow(9, 1 - Math.pow(e, 0.85)); // x9 au début → x1 à la fin
+            const fx = focus ? focus.x : 0.5, fy = focus ? focus.y : 0.4;
+            const k = Math.min(1, (zoom - 1) / 8);          // on se recentre en dézoomant
+            const cx = 0.5 + (fx - 0.5) * k, cy = 0.5 + (fy - 0.5) * k;
+            const s = base * zoom, dw = img.width * s, dh = img.height * s;
+            let x = W / 2 - cx * dw, y = H / 2 - cy * dh;
+            if (dw >= W) x = Math.min(0, Math.max(W - dw, x)); else x = (W - dw) / 2;
+            if (dh >= H) y = Math.min(0, Math.max(H - dh, y)); else y = (H - dh) / 2;
+            ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, x, y, dw, dh);
+        }
+
+        /* ---------- mode spectateur ---------- */
+        const spect = { code: null };
+        socket.on('public_rooms', () => socket.emit('list_live_rooms'));
+        socket.on('live_rooms', list => {
+            const panel = document.getElementById('public-rooms-panel');
+            if (!panel) return;
+            let box = document.getElementById('live-rooms-list');
+            if (!box) { box = document.createElement('div'); box.id = 'live-rooms-list'; box.className = 'public-rooms-list'; panel.appendChild(box); }
+            box.innerHTML = `<div class="public-rooms-head"><span>🔴 Parties en cours (mode spectateur)</span></div>` + (list && list.length ? list.map(r => `<div class="public-room live"><div class="public-room-info"><span class="public-room-mode">${r.weekly ? '🏆 ' : ''}${hubEsc(r.modeLabel)}${r.subLabel ? ' · ' + hubEsc(r.subLabel) : ''}</span><span class="public-room-meta">👥 ${r.players} joueur${r.players > 1 ? 's' : ''} · 👁️ ${r.spectators} · #${hubEsc(r.code)}</span></div><button class="btn-action" onclick="spectateRoom('${r.code}')">👁️ Regarder</button></div>`).join('') : '<div class="public-empty">Aucune partie publique en cours.</div>');
+        });
+        function spectateRoom(code) {
+            if (currentRoomCode) { socket.emit('leave_room', { roomCode: currentRoomCode }); currentRoomCode = ''; }
+            socket.emit('spectate_room', { roomCode: code });
+        }
+        socket.on('spectate_error', d => toast('👁️ ' + d.message, 'var(--accent-pink)'));
+        socket.on('spectate_ok', d => {
+            spect.code = d.roomCode;
+            document.body.classList.add('spectating');
+            switchTab('mode');
+            hideAllPanels();
+            const ms = document.getElementById('menu-selection'); if (ms) ms.style.display = 'none';
+            let bar = document.getElementById('spect-bar');
+            if (!bar) { bar = document.createElement('div'); bar.id = 'spect-bar'; document.body.appendChild(bar); }
+            const lab = d.label ? `${d.label.modeLabel}${d.label.subLabel ? ' · ' + d.label.subLabel : ''}` : 'Partie';
+            bar.innerHTML = `<span>👁️ <b>Tu regardes</b> ${hubEsc(lab)} <small id="spect-n"></small></span><span class="sp-react">${['😂', '🔥', '😱', '👏', '💀', '🤯', '🐐'].map(e => `<button onclick="socket.emit('spectate_react',{emoji:'${e}'})">${e}</button>`).join('')}</span><button class="sp-quit" onclick="spectateLeave()">✖ Quitter</button>`;
+            const wait = document.getElementById('spect-wait') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'spect-wait' }));
+            wait.innerHTML = '<div class="arc-spin"></div><div>La partie s’affiche dès la prochaine manche…</div>';
+            wait.style.display = 'block';
+        });
+        ['arc_state', 'bt_state', 'quote_state', 'dle_state', 'draw_state', 'guess_state', 'rg_state'].forEach(ev => socket.on(ev, () => { if (spect.code) { const w = document.getElementById('spect-wait'); if (w) w.style.display = 'none'; } }));
+        socket.on('spectators', d => { const el = document.getElementById('spect-n'); if (el && spect.code === d.roomCode) el.textContent = `• ${d.n} spectateur${d.n > 1 ? 's' : ''}`; });
+        function spectateLeave() {
+            socket.emit('spectate_leave');
+            spect.code = null;
+            document.body.classList.remove('spectating');
+            document.getElementById('spect-bar')?.remove(); document.getElementById('spect-wait')?.remove();
+            goToMenuSelection();
+        }
+
+        /* ---------- salon vocal (WebRTC) ---------- */
+        const vc = { on: false, stream: null, peers: new Map(), muted: false, code: null, ctx: null };
+        const VC_ICE = { iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302', 'stun:stun.cloudflare.com:3478'] }] };
+        function vcUi() {
+            let fab = document.getElementById('voice-fab');
+            if (!fab) { fab = document.createElement('button'); fab.id = 'voice-fab'; fab.onclick = () => vcPanel(true); document.body.appendChild(fab); }
+            const inRoom = !!currentRoomCode && !spect.code;
+            fab.style.display = inRoom || vc.on ? '' : 'none';
+            fab.className = vc.on ? (vc.muted ? 'on muted' : 'on') : '';
+            fab.innerHTML = vc.on ? (vc.muted ? '🔇' : '🎙️') + `<small>${vc.peers.size + 1}</small>` : '🎙️';
+            fab.title = vc.on ? 'Salon vocal' : 'Rejoindre le salon vocal';
+            const p = document.getElementById('voice-panel');
+            if (p) vcPanel(false);
+        }
+        function vcPanel(toggle) {
+            let p = document.getElementById('voice-panel');
+            if (toggle && p) { p.remove(); return; }
+            if (!p) { if (!toggle) return; p = document.createElement('div'); p.id = 'voice-panel'; document.body.appendChild(p); }
+            if (!vc.on) {
+                p.innerHTML = `<b>🎙️ Salon vocal</b><p class="tl-hint">Parle avec les joueurs de ton salon, sans Discord. Ton micro n’est utilisé que pendant que tu es connecté au vocal.</p><button class="go" onclick="vcStart()">Rejoindre le vocal</button><button onclick="document.getElementById('voice-panel').remove()">Fermer</button>`;
+                return;
+            }
+            p.innerHTML = `<b>🎙️ Salon vocal</b><div class="vc-list"><div class="vc-p me" id="vc-me"><span class="vc-dot"></span>${hubEsc(getUsername())} (toi)${vc.muted ? ' 🔇' : ''}</div>${[...vc.peers].map(([id, pr]) => `<div class="vc-p" id="vc-${id}"><span class="vc-dot"></span>${hubEsc(pr.name)}${pr.muted ? ' 🔇' : ''}${pr.state && pr.state !== 'connected' ? ` <small>(${pr.state === 'failed' ? 'connexion impossible' : 'connexion…'})</small>` : ''}</div>`).join('')}</div>
+                <div class="hb-btns"><button onclick="vcMute()">${vc.muted ? '🔊 Réactiver le micro' : '🔇 Couper le micro'}</button><button onclick="vcStop()">📴 Quitter</button></div>`;
+        }
+        async function vcStart() {
+            if (!currentRoomCode) return toast('Rejoins d’abord un salon.', 'var(--accent-pink)');
+            if (!navigator.mediaDevices || !window.RTCPeerConnection) return toast('Ton navigateur ne gère pas le vocal.', 'var(--accent-pink)');
+            try { vc.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+            catch (e) { return toast('🎙️ Accès au micro refusé.', 'var(--accent-pink)'); }
+            vc.on = true; vc.muted = false; vc.code = currentRoomCode;
+            socket.emit('voice_join', { roomCode: currentRoomCode });
+            vcMeter('me', vc.stream);
+            vcUi(); vcPanel(false);
+        }
+        function vcStop() {
+            if (vc.on) socket.emit('voice_leave');
+            vc.peers.forEach(p => { try { p.pc.close(); } catch (_) {} if (p.audio) p.audio.remove(); });
+            vc.peers.clear();
+            if (vc.stream) vc.stream.getTracks().forEach(t => t.stop());
+            vc.stream = null; vc.on = false; vc.code = null;
+            document.getElementById('voice-panel')?.remove();
+            vcUi();
+        }
+        function vcMute() {
+            vc.muted = !vc.muted;
+            if (vc.stream) vc.stream.getAudioTracks().forEach(t => { t.enabled = !vc.muted; });
+            socket.emit('voice_state', { muted: vc.muted });
+            vcUi();
+        }
+        function vcMeter(id, stream) {
+            try {
+                vc.ctx = vc.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                const an = vc.ctx.createAnalyser(); an.fftSize = 512;
+                vc.ctx.createMediaStreamSource(stream).connect(an);
+                const buf = new Uint8Array(an.fftSize);
+                const tick = () => {
+                    if (!vc.on || (id !== 'me' && !vc.peers.has(id))) return;
+                    an.getByteTimeDomainData(buf);
+                    let s = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; s += v * v; }
+                    const el = document.getElementById(id === 'me' ? 'vc-me' : 'vc-' + id);
+                    if (el) el.classList.toggle('talk', Math.sqrt(s / buf.length) > 0.04 && !(id === 'me' && vc.muted));
+                    setTimeout(tick, 120);
+                };
+                tick();
+            } catch (_) {}
+        }
+        function vcPeer(id, name, initiator) {
+            if (vc.peers.has(id)) return vc.peers.get(id);
+            const pc = new RTCPeerConnection(VC_ICE);
+            const pr = { pc, name, audio: null, ice: [], state: 'new', muted: false };
+            vc.peers.set(id, pr);
+            vc.stream.getTracks().forEach(t => pc.addTrack(t, vc.stream));
+            pc.onicecandidate = e => { if (e.candidate) socket.emit('voice_signal', { to: id, data: { ice: e.candidate } }); };
+            pc.ontrack = e => {
+                if (!pr.audio) { pr.audio = document.createElement('audio'); pr.audio.autoplay = true; pr.audio.playsInline = true; pr.audio.style.display = 'none'; document.body.appendChild(pr.audio); }
+                pr.audio.srcObject = e.streams[0];
+                pr.audio.play().catch(() => toast('🔊 Touche l’écran pour entendre le vocal', '#48dbfb'));
+                vcMeter(id, e.streams[0]);
+            };
+            pc.onconnectionstatechange = () => { pr.state = pc.connectionState; vcUi(); };
+            if (initiator) pc.createOffer().then(o => pc.setLocalDescription(o)).then(() => socket.emit('voice_signal', { to: id, data: { sdp: pc.localDescription } })).catch(() => {});
+            vcUi();
+            return pr;
+        }
+        socket.on('voice_peers', d => { if (vc.on) (d.peers || []).forEach(p => vcPeer(p.id, p.name, true)); });
+        socket.on('voice_peer_joined', d => { if (vc.on) { vcPeer(d.id, d.name, false); toast(`🎙️ ${hubEsc(d.name)} a rejoint le vocal`, '#48dbfb'); } });
+        socket.on('voice_peer_left', d => { const p = vc.peers.get(d.id); if (!p) return; try { p.pc.close(); } catch (_) {} if (p.audio) p.audio.remove(); vc.peers.delete(d.id); vcUi(); });
+        socket.on('voice_state', d => { const p = vc.peers.get(d.id); if (p) { p.muted = d.muted; vcUi(); } });
+        socket.on('voice_error', d => { toast('🎙️ ' + d.message, 'var(--accent-pink)'); vcStop(); });
+        socket.on('voice_signal', async ({ from, name, data } = {}) => {
+            if (!vc.on || !data) return;
+            const p = vc.peers.get(from) || vcPeer(from, name, false);
+            try {
+                if (data.sdp) {
+                    await p.pc.setRemoteDescription(data.sdp);
+                    if (data.sdp.type === 'offer') { const a = await p.pc.createAnswer(); await p.pc.setLocalDescription(a); socket.emit('voice_signal', { to: from, data: { sdp: p.pc.localDescription } }); }
+                    for (const c of p.ice.splice(0)) await p.pc.addIceCandidate(c).catch(() => {});
+                } else if (data.ice) {
+                    if (p.pc.remoteDescription) await p.pc.addIceCandidate(data.ice).catch(() => {}); else p.ice.push(data.ice);
+                }
+            } catch (e) { console.warn('[vocal]', e); }
+        });
+        socket.on('disconnect', () => { if (vc.on) { vc.peers.forEach(p => { try { p.pc.close(); } catch (_) {} if (p.audio) p.audio.remove(); }); vc.peers.clear(); vc.rejoin = true; } });
+        socket.on('connect', () => { if (vc.on && vc.rejoin && currentRoomCode) setTimeout(() => { vc.rejoin = false; socket.emit('voice_join', { roomCode: currentRoomCode }); }, 1500); });
+        setInterval(() => { if (vc.on && currentRoomCode !== vc.code) vcStop(); else vcUi(); }, 1500);
+
+        /* ---------- reconnexion auto : même après un rechargement de la page ---------- */
+        setInterval(() => {
+            try {
+                if (currentRoomCode) localStorage.setItem('lastRoom', JSON.stringify({ code: currentRoomCode, at: Date.now() }));
+                else if (!document.hidden) localStorage.removeItem('lastRoom');
+            } catch (_) {}
+        }, 2000);
+        socket.on('connect', () => {
+            if (currentRoomCode) return;
+            try {
+                const lr = JSON.parse(localStorage.getItem('lastRoom') || 'null');
+                if (lr && lr.code && Date.now() - lr.at < 140000) {
+                    currentRoomCode = lr.code;
+                    socket.emit('rejoin_room', { roomCode: lr.code });
+                    const el = document.getElementById('connection-banner');
+                    if (el) { el.textContent = '🔄 On te remet dans ta partie…'; el.style.display = 'block'; setTimeout(() => { if (el.textContent.startsWith('🔄')) el.style.display = 'none'; }, 4000); }
+                }
+            } catch (_) {}
+        });
+        socket.on('rejoin_failed', () => { try { localStorage.removeItem('lastRoom'); } catch (_) {} });
+        // si la connexion ne revient pas toute seule, on relance régulièrement
+        setInterval(() => { if (!socket.connected && !document.hidden && (authToken || socket.auth) && navigator.onLine !== false) { try { socket.connect(); } catch (_) {} } }, 4000);
+
+        /* ---------- accessibilité : gros texte, mode daltonien ---------- */
+        const A11Y_GREEN = /(#00ff88|rgb\(0,\s*255,\s*136\))/gi;
+        function a11yPatchEl(el) {
+            if (!el || !el.getAttribute) return;
+            const st = el.getAttribute('style');
+            if (st && /#00ff88|rgb\(0,\s*255,\s*136\)/i.test(st)) el.setAttribute('style', st.replace(A11Y_GREEN, '#3d9bff'));
+        }
+        let a11yObs = null;
+        function a11yApply() {
+            let big = false, cb = false;
+            try { big = localStorage.getItem('a11y_big') === '1'; cb = localStorage.getItem('a11y_cb') === '1'; } catch (_) {}
+            document.documentElement.classList.toggle('big-text', big);
+            document.documentElement.classList.toggle('cb', cb);
+            if (cb && !a11yObs) {
+                // vert (bonne réponse) → bleu, rouge/rose (erreur) → orange : lisible pour les daltoniens
+                for (const sh of document.styleSheets) { let rules; try { rules = sh.cssRules; } catch (_) { continue; } for (const r of rules || []) { if (r.style && r.style.cssText && /0, 255, 136|#00ff88/i.test(r.style.cssText)) { for (let i = 0; i < r.style.length; i++) { const p = r.style[i], v = r.style.getPropertyValue(p); if (/0, 255, 136|#00ff88/i.test(v)) r.style.setProperty(p, v.replace(/rgb\(0, 255, 136\)|#00ff88/gi, '#3d9bff'), r.style.getPropertyPriority(p)); } } } }
+                document.querySelectorAll('[style]').forEach(a11yPatchEl);
+                a11yObs = new MutationObserver(ms => ms.forEach(m => { if (m.type === 'attributes') a11yPatchEl(m.target); else m.addedNodes.forEach(n => { if (n.nodeType === 1) { a11yPatchEl(n); n.querySelectorAll && n.querySelectorAll('[style]').forEach(a11yPatchEl); } }); }));
+                a11yObs.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style'] });
+            }
+        }
+        function a11ySet(k, on) { try { localStorage.setItem(k, on ? '1' : '0'); } catch (_) {} if (k === 'a11y_cb' && !on) return location.reload(); a11yApply(); }
+        a11yApply();
+
+        /* ---------- effet de victoire « Aurore boréale » (pass de saison) ---------- */
+        (function () {
+            const orig = playEffect;
+            playEffect = function (key, ms = 3200) {
+                if (key !== 'aurora') return orig.apply(this, arguments);
+                const c = document.getElementById('fx-confetti'); if (!c) return;
+                const ctx = c.getContext('2d'); c.width = innerWidth; c.height = innerHeight; c.style.display = 'block';
+                const W = c.width, H = c.height, t0 = performance.now();
+                const step = t => {
+                    const el = t - t0, fade = Math.min(1, el / 500, (ms - el) / 700);
+                    ctx.clearRect(0, 0, W, H);
+                    if (el > ms) { c.style.display = 'none'; return; }
+                    for (let band = 0; band < 3; band++) {
+                        const hue = [150, 185, 290][band];
+                        ctx.beginPath();
+                        for (let x = 0; x <= W; x += 12) { const y = H * (0.18 + band * 0.08) + Math.sin(x / 140 + el / 600 + band) * 40 + Math.sin(x / 57 + el / 380) * 14; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+                        ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+                        const g = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+                        g.addColorStop(0, `hsla(${hue},100%,60%,0)`); g.addColorStop(0.7, `hsla(${hue},100%,60%,${0.35 * fade})`); g.addColorStop(1, `hsla(${hue},100%,70%,0)`);
+                        ctx.fillStyle = g; ctx.fill();
+                    }
+                    requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            };
+        })();
+
+        /* ---------- options : accessibilité ---------- */
+        (function () {
+            const opt = document.querySelector('#options > div');
+            if (!opt || document.getElementById('a11y-panel')) return;
+            const p = document.createElement('div'); p.id = 'a11y-panel'; p.className = 'a11y-panel';
+            let big = false, cb = false; try { big = localStorage.getItem('a11y_big') === '1'; cb = localStorage.getItem('a11y_cb') === '1'; } catch (_) {}
+            p.innerHTML = `<h3>♿ Accessibilité</h3><label><input type="checkbox" ${big ? 'checked' : ''} onchange="a11ySet('a11y_big',this.checked)"> 🔠 Gros texte</label>
+                <label><input type="checkbox" ${cb ? 'checked' : ''} onchange="a11ySet('a11y_cb',this.checked)"> 🎨 Mode daltonien <small class="tl-hint">(bonnes réponses en bleu, erreurs en orange)</small></label><div id="lang-slot"></div>`;
+            opt.appendChild(p);
+        })();
+
+</script>
+<script>
+
+        /* =====================================================================
+           VERSION ANGLAISE : traduction de l'interface (dictionnaire + règles)
+           ===================================================================== */
+        const LANG = (() => {
+            if (window.FORCE_LANG) return window.FORCE_LANG;
+            try { const s = localStorage.getItem('lang'); if (s === 'fr' || s === 'en') return s; } catch (_) {}
+            return /^fr/i.test(navigator.language || 'fr') ? 'fr' : 'en';
+        })();
+        const I18N_EN = {
+            'Connexion': 'Log in', 'Pseudo': 'Username', 'Email': 'Email', 'Mot de passe': 'Password', 'Se connecter': 'Log in', 'Pas de compte ?': 'No account?', 'Créer un compte': 'Create an account',
+            'Jouer en invité': 'Play as guest', 'Pseudo (invité, pas de compte)': 'Username (guest, no account)',
+            'Anime Game : quiz et jeux anime en multijoueur, gratuits': 'Anime Game: free multiplayer anime quizzes and party games',
+            'Les modes de jeu': 'Game modes',
+            '⚠️ Connexion perdue — reconnexion en cours…': '⚠️ Connection lost — reconnecting…',
+            'Jouer': 'Play', '🃏 Collection': '🃏 Collection', 'Options': 'Options',
+            'Mode Multijoueur': 'Multiplayer', 'Crée ou rejoins une salle avec tes amis.': 'Create or join a room with your friends.', 'Rejoindre une salle': 'Join a room', 'Rejoindre': 'Join',
+            '🔎 Chercher un salon public': '🔎 Find a public room', 'Salons publics en attente de joueurs': 'Public rooms waiting for players', '↻ Actualiser': '↻ Refresh',
+            '⚔️ Duel 1v1 classé': '⚔️ Ranked 1v1 duel', 'Chargement…': 'Loading…',
+            '📅 Défi du jour': '📅 Daily challenge', 'Le même défi pour tout le monde • un seul essai compté • partage ton score !': 'Same challenge for everyone • only one attempt counts • share your score!',
+            '5 musiques': '5 songs', '5 persos': '5 characters', '🏆 Classement du jour': "🏆 Today's leaderboard", '📜 Quêtes du jour': '📜 Daily quests', 'XP bonus': 'Bonus XP',
+            'Paires classiques': 'Classic pairs', 'Créer': 'Create', 'Multi-animes + Sans imposteur': 'Multi-anime + no impostor', 'Devine la note': 'Guess the rating', 'Mode classique': 'Classic mode',
+            'À qui appartient cette citation ?': 'Who said this quote?', "Choisir l'univers": 'Pick the anime', 'Créer un Blind Test': 'Create a Blind Test', '🕹️ Mini-jeux': '🕹️ Mini-games',
+            'Solo ou multi • 4 à 12 manches • plus tu réponds vite, plus tu gagnes de points': 'Solo or multiplayer • 4 to 12 rounds • the faster you answer, the more points you get',
+            'Image ultra pixelisée qui se précise → devine le perso': 'A super pixelated picture gets clearer → guess the character',
+            'Silhouette': 'Silhouette', "Ombre noire d'un perso → trouve son nom": "A character's black shadow → find their name",
+            'Zoom extrême': 'Extreme zoom', "L'image part d'un détail et dézoome petit à petit → trouve le perso": 'The picture starts on a detail and slowly zooms out → find the character',
+            "🍥 🦊 🍃 → devine l'anime ou le perso": '🍥 🦊 🍃 → guess the anime or character', 'Les images arrivent une à une → trouve l\'anime': 'Pictures appear one by one → find the anime',
+            'Un lieu culte → de quel univers vient-il ?': 'An iconic place → which anime is it from?', '4 persos mélangés en une image → retrouve les 4': '4 characters blended into one picture → find all 4',
+            "Une scène culte (combat, moment fort) en vidéo → trouve l'anime": 'An iconic scene (fight, big moment) on video → find the anime', '4 persos → trouve leur point commun': '4 characters → find what they have in common',
+            'Qui a le plus de fans ? (favoris MyAnimeList)': 'Who has more fans? (MyAnimeList favorites)', 'Petit bac anime': 'Anime Scattergories', 'Une lettre, 5 catégories : anime, perso, Pokémon…': 'One letter, 5 categories: anime, character, Pokémon…',
+            'Imposteur': 'Impostor', '3 persos du même anime + 1 intrus : trouve-le': '3 characters from the same anime + 1 intruder: find it', 'Écoute la scène': 'Listen to the scene',
+            "Juste le son d'une scène culte → trouve l'anime": 'Just the sound of an iconic scene → find the anime', '60 s pour enchaîner un max de bonnes réponses': '60 s to chain as many right answers as possible',
+            'Compose ton équipe chacun son tour, puis votez': 'Take turns building your team, then vote', '🕵️ Devine le perso': '🕵️ Guess the character', 'Créer une partie': 'Create a game',
+            '✏️ Dessine le perso': '✏️ Draw the character', 'NOUVEAU': 'NEW', '🏆 Tournoi': '🏆 Tournament', 'Créer un tournoi': 'Create a tournament', 'Faire ma tier list': 'Make my tier list',
+            "⚔️ Battle d'openings": '⚔️ Openings battle', 'Lancer une battle': 'Start a battle', 'Enchère': 'Auction', "Enchère à l'aveugle": 'Blind auction', 'Jeu de connexion': 'Connection game',
+            '2 joueurs min — écrivez le même mot pour gagner': '2 players min — write the same word to win', 'Un grand merci à': 'Huge thanks to', 'et à sa communauté pour leur soutien 💜': 'and his community for their support 💜',
+            'Voir sa chaîne Twitch': 'See his Twitch channel', '🔙 Retour': '🔙 Back', '☑️ Choisir plusieurs animes': '☑️ Pick several anime',
+            "Salon d'attente": 'Waiting room', 'Donne ce code à tes amis :': 'Give this code to your friends:', "🔗 Copier le lien d'invitation": '🔗 Copy invite link', '🔁 Nombre de manches :': '🔁 Number of rounds:',
+            'Par défaut': 'Default', '♾️ Infini': '♾️ Endless', '👥 Équipes :': '👥 Teams:', 'Chacun pour soi': 'Free for all', '2 équipes': '2 teams', '3 équipes': '3 teams', '4 équipes': '4 teams',
+            '✏️ Tours de dessin :': '✏️ Drawing turns:', '📨 Inviter un ami': '📨 Invite a friend', '🌍 Salon public — visible dans « Chercher un salon »': '🌍 Public room — visible in "Find a room"', '🔒 Salon privé': '🔒 Private room',
+            'Joueurs connectés :': 'Players online:', 'Lancer la partie': 'Start the game', 'Quitter le salon': 'Leave the room', 'Partie en cours': 'Game in progress', '🔙 Menu': '🔙 Menu',
+            "C'est à toi de choisir le thème de ce tour !": "It's your turn to pick this round's theme!", 'Valider': 'Confirm', 'Ton mot secret / Rôle :': 'Your secret word / role:', '🙈 Cacher': '🙈 Hide',
+            '🔄 Changer de thème': '🔄 Change theme', '⚖️ Passer au vote': '⚖️ Go to vote', '🔄 Réécrire un mot': '🔄 Rewrite a word', 'Passer mon vote': 'Skip my vote', 'Rejouer (Nouvelle manche)': 'Play again (new round)',
+            'Retour au menu': 'Back to menu', '💬 CHAT — débattez librement, ça n\'impacte pas le jeu': "💬 CHAT — debate freely, it doesn't affect the game", 'Envoyer': 'Send',
+            'SCORE': 'SCORE', 'EN VIE': 'ALIVE', 'TEMPS': 'TIME', 'En attente…': 'Waiting…', 'Rejouer': 'Play again', 'TOI': 'YOU', 'ADVERSAIRE': 'OPPONENT', 'PERSONNAGE EN VENTE': 'CHARACTER FOR SALE',
+            'Enchère actuelle': 'Current bid', 'Laisser': 'Pass', 'Ton équipe': 'Your team', 'Équipe adverse': 'Opponent team', '🔙 Salon': '🔙 Room', 'Premier à 10 points': 'First to 10 points',
+            '💡 Indice : afficher le destinataire': '💡 Hint: show who it was said to', 'De quel anime vient cette musique ?': 'Which anime is this song from?', '🎵 Écoute bien…': '🎵 Listen carefully…',
+            '🔊 Activer le son': '🔊 Turn sound on', 'Ouvrir sur YouTube ↗': 'Open on YouTube ↗', '⏭ Manche suivante': '⏭ Next round', '⏹ Terminer la partie': '⏹ End the game', 'Retour au salon': 'Back to room',
+            '🏳️ Abandonner': '🏳️ Give up', '⏭️ Passer (hôte)': '⏭️ Skip (host)', 'MINI-JEU': 'MINI-GAME', '📸 Télécharger en image': '📸 Download as image', '📋 Copier en texte': '📋 Copy as text',
+            '↺ Tout remettre en bas': '↺ Reset all', '🔁 Changer de liste': '🔁 Change list', '⚔️ BATTLE DE PRÉFÉRENCE': '⚔️ PREFERENCE BATTLE', 'Trouve le personnage mystère.': 'Find the mystery character.',
+            'Nouveau personnage': 'New character', 'TOUR': 'TURN', 'Écris ton mot !': 'Write your word!', 'TON MOT (secret)': 'YOUR WORD (secret)', 'Historique des tours': 'Turn history',
+            '🛒 Boutique': '🛒 Shop', '🃏 Cartes': '🃏 Cards', '🏷️ Titres': '🏷️ Titles', '⚔️ Défis': '⚔️ Challenges', '🎟️ Pass': '🎟️ Pass', '🔁 Échanges': '🔁 Trades', '⚗️ Fusion': '⚗️ Fusion', '🛡️ Clan': '🛡️ Clan', '📊 Stats': '📊 Stats',
+            'Mon compte': 'My account', 'Rang': 'Rank', 'VICTOIRES': 'WINS', 'DÉFAITES': 'LOSSES', 'Se déconnecter': 'Log out', '⭐ Progression': '⭐ Progress', '✨ Mon style, quêtes & historique': '✨ My style, quests & history',
+            '👥 Amis': '👥 Friends', '💡 Proposer un ajout': '💡 Suggest something', 'Un opening, un perso ou une citation manque ? Un bug ? Dis-le ici.': 'Missing an opening, character or quote? Found a bug? Tell us here.',
+            '👤 Perso manquant': '👤 Missing character', '💬 Citation': '💬 Quote', '🎬 Scène culte': '🎬 Iconic scene', '🎌 Nouvel anime': '🎌 New anime', '💡 Autre idée': '💡 Other idea', '🏆 Classement': '🏆 Leaderboard',
+            'Cette semaine': 'This week', 'Depuis toujours': 'All time', '🎥 Mode streamer': '🎥 Streamer mode', 'Connecter': 'Connect', 'Désactiver': 'Disable', 'Mode streamer désactivé.': 'Streamer mode off.',
+            '🎨 Apparence': '🎨 Appearance', '☀️ Passer en clair': '☀️ Light mode', '🌙 Passer en sombre': '🌙 Dark mode', 'Sons': 'Sounds', 'Effets sonores (Rolland Garos)': 'Sound effects (Rolland Garos)', '🔊 Activés': '🔊 On',
+            'Musique de fond': 'Background music', '🎵 Activée': '🎵 On', 'Aucune musique lancée': 'No music playing', '👑 Joueurs': '👑 Players', '🎉 Défi terminé !': '🎉 Challenge complete!',
+            '📋 Partager mon résultat': '📋 Share my result', 'Fermer': 'Close', '🎥 Vote du chat': '🎥 Chat vote', '🎵 Playlist Anime — prête': '🎵 Anime playlist — ready',
+            'Code (ex: AB12)': 'Code (e.g. AB12)', 'Écris ton indice...': 'Write your clue...', 'Écris un message…': 'Write a message…', 'Nom du personnage…': 'Character name…', 'Qui a dit cette citation ?': 'Who said this quote?',
+            'Pose une question oui / non (ex : il a des cheveux blancs ?)': 'Ask a yes / no question (e.g. does he have white hair?)', '🎯 Tu penses savoir ? Écris le perso': '🎯 Think you know? Type the character',
+            'Ta réponse…': 'Your answer…', 'Tape un personnage…': 'Type a character…', 'Ton mot…': 'Your word…', 'Signaler un bug': 'Report a bug', 'Précédent': 'Previous', 'Lecture / pause': 'Play / pause', 'Suivant': 'Next', 'Réduire': 'Minimize',
+            'Soumettre': 'Submit', 'Menu': 'Menu', 'Quitter': 'Leave', 'Annuler': 'Cancel', 'Partager': 'Share', 'Équiper': 'Equip', 'Retirer': 'Remove', 'Récupérer': 'Claim', 'Temps écoulé !': "Time's up!",
+            'Bonne réponse !': 'Correct!', 'Mauvaise réponse': 'Wrong answer', 'Hôte': 'Host', 'Partie terminée': 'Game over', '🏁 Partie terminée': '🏁 Game over',
+            // hub
+            '⭐ Anime de la semaine': '⭐ Anime of the week', '👹 Boss du serveur': '👹 Server boss', '🏆 Tournoi du dimanche': '🏆 Sunday tournament', '🎟️ Pass de saison': '🎟️ Season pass',
+            'Coffre du jour prêt !': 'Daily chest ready!', 'Coffre du jour ouvert': 'Daily chest opened', '📦 Coffre du jour': '📦 Daily chest', '🎁 Coffre du jour': '🎁 Daily chest',
+            '⚔️ Chercher un adversaire': '⚔️ Find an opponent', '✖ Annuler la recherche': '✖ Cancel search', "Recherche d'un adversaire…": 'Looking for an opponent…', 'La partie démarre…': 'The game is starting…',
+            '🏆 Victoire !': '🏆 Victory!', '💀 Défaite': '💀 Defeat', '🤝 Match nul': '🤝 Draw', '⚔️ Rejouer en classé': '⚔️ Play ranked again', '🏆 Classement duel classé': '🏆 Ranked duel leaderboard',
+            '🏆 Rejoindre le tournoi': '🏆 Join the tournament', '👁️ Regarder': '👁️ Watch', 'Inscriptions ouvertes !': 'Registration open!', 'Le tournoi est en cours !': 'The tournament is live!',
+            '📨 Propositions reçues': '📨 Offers received', '🔁 Proposer un échange': '🔁 Offer a trade', '📤 Tes propositions': '📤 Your offers', 'Choisis un ami…': 'Pick a friend…', 'Tu donnes': 'You give', 'Tu reçois': 'You get',
+            '🔁 Envoyer la proposition': '🔁 Send offer', '✔ Accepter': '✔ Accept', 'Refuser': 'Decline', '⚗️ Fusionner': '⚗️ Fuse', 'Aucune proposition pour le moment.': 'No offers yet.',
+            '🛡️ Créer mon clan': '🛡️ Create my clan', '🏆 Classement de la semaine': "🏆 This week's leaderboard", '🚪 Quitter le clan': '🚪 Leave the clan', '⚙️ Modifier le clan': '⚙️ Edit the clan', 'Ouvert à tous': 'Open to everyone',
+            'Couleur du tag': 'Tag color', 'Couleur': 'Color', '👥 Membres (points de la semaine)': "👥 Members (this week's points)", 'Aucun clan pour le moment : crée le premier !': 'No clans yet: create the first one!',
+            'Tu es fort sur': "You're great at", 'Tu galères sur': 'You struggle with', 'Maîtrisé !': 'Mastered!', '⭐ Cartes Collector': '⭐ Collector cards', '⭐ Carte Collector !': '⭐ Collector card!',
+            '🎙️ Salon vocal': '🎙️ Voice chat', 'Rejoindre le vocal': 'Join voice chat', '🔇 Couper le micro': '🔇 Mute mic', '🔊 Réactiver le micro': '🔊 Unmute mic', '📴 Quitter': '📴 Leave',
+            '👁️ Tu regardes': '👁️ Watching', '✖ Quitter': '✖ Leave', '🔴 Parties en cours (mode spectateur)': '🔴 Live games (spectator mode)', 'Aucune partie publique en cours.': 'No public game in progress.',
+            '♿ Accessibilité': '♿ Accessibility', '🔠 Gros texte': '🔠 Large text', '🎨 Mode daltonien': '🎨 Color-blind mode', '(bonnes réponses en bleu, erreurs en orange)': '(right answers in blue, mistakes in orange)',
+            '🌍 Langue': '🌍 Language', 'Crée un compte pour jouer en classé.': 'Create an account to play ranked.', 'Crée un compte pour accéder à cette partie.': 'Create an account to access this.',
+            '⭐ Premium actif': '⭐ Premium active', 'Gratuit': 'Free', '⭐ Premium': '⭐ Premium', 'Pass terminé !': 'Pass complete!', 'Rang maximum !': 'Max rank!',
+            'La partie s’affiche dès la prochaine manche…': 'The game will show up at the next round…', 'Joue quelques parties pour voir tes stats par anime.': 'Play a few games to see your stats per anime.',
+            'Chaque bonne réponse, dans n’importe quel mode, lui enlève 10 PV (15 si tu réponds en moins de 3 s). S’il tombe aujourd’hui : 100 🪙 + sa carte pour tous les participants.': 'Every right answer, in any mode, deals 10 damage (15 if you answer in under 3 s). If it falls today: 100 🪙 + its card for every participant.',
+            'Tous les participants ont reçu 100 pièces et sa carte. Nouveau boss demain !': 'Every participant got 100 coins and its card. New boss tomorrow!',
+            'Tournoi automatique chaque dimanche : 500 🪙 + le titre « Champion du dimanche » pour le vainqueur.': 'Automatic tournament every Sunday: 500 🪙 + the "Sunday Champion" title for the winner.',
+            'Tous les dimanches à 20 h (heure de Paris)': 'Every Sunday at 8 pm (Paris time)',
+            ": pièces et XP doublées jusqu'à dimanche minuit !": ': coins and XP doubled until Sunday midnight!', 'Prochain tournoi dans': 'Next tournament in', '• inscriptions dès 19 h 45': '• registration from 7:45 pm',
+            'Cartes brillantes x3 sur cet anime. Trouve 15 persos cette semaine pour gagner la carte': 'Shiny cards x3 on this anime. Find 15 characters this week to win the', 'Collector': 'Collector',
+            'Gagne de l’XP de pass en jouant (x2 le week-end) • fin de saison dans': 'Earn pass XP by playing (x2 on weekends) • season ends in', '👥 Membres': '👥 Members', 'Un adversaire de ton niveau, un mini-jeu tiré au sort, 7 manches. Gagne pour monter de Bronze à': 'An opponent at your level, a random mini-game, 7 rounds. Win to climb from Bronze to'
+        };
+        const I18N_RULES = [
+            [/^(\d+) citations$/, '$1 quotes'], [/^Manche (\d+)\/(\d+)$/, 'Round $1/$2'], [/^Manche (\d+)$/, 'Round $1'], [/^Réponses : (\d+)\/(\d+)$/, 'Answers: $1/$2'],
+            [/^Palier (\d+)\/30$/, 'Tier $1/30'], [/^(\d+) \/ (\d+) PV$/, '$1 / $2 HP'], [/^(\d+) pts$/, '$1 pts'], [/^Erreurs : (\d+)\/(\d+)$/, 'Mistakes: $1/$2'],
+            [/^(\d+) joueurs? en recherche en ce moment/, '$1 player(s) searching right now'], [/^Série : (\d+) jours?/, 'Streak: $1 day(s)'], [/^Jour (\d+)\/7 de ta série$/, 'Day $1/7 of your streak'],
+            [/^(\d+) \/ (\d+) persos$/, '$1 / $2 characters'], [/^(\d+) pièces$/, '$1 coins'], [/^Booster (\d+) cartes$/, 'Booster $1 cards'], [/^Univers : (.*)$/, 'Anime: $1'], [/^Tour : (.*)$/, 'Turn: $1'], [/^(\d+) combattants?$/, '$1 fighters'], [/^de (.+) !$/, 'card of $1!'], [/^(\d+) V • (\d+) D/, '$1 W • $2 L'], [/^(\d+) pts avant (.+)$/, '$1 pts to $2']
+        ];
+        function i18nText(t) {
+            const s = t.trim();
+            if (!s) return null;
+            if (I18N_EN[s]) return t.replace(s, I18N_EN[s]);
+            for (const [re, to] of I18N_RULES) if (re.test(s)) return t.replace(s, s.replace(re, to));
+            const m = s.match(/^([^A-Za-zÀ-ÿ0-9]+\s*)(.+)$/u); // emoji devant
+            if (m && I18N_EN[m[2]]) return t.replace(s, m[1] + I18N_EN[m[2]]);
+            const c = s.match(/^(.+?)\s*:$/); // « Texte : »
+            if (c && I18N_EN[c[1]]) return t.replace(s, I18N_EN[c[1]] + ':');
+            return null;
+        }
+        function i18nNode(root) {
+            if (!root) return;
+            if (root.nodeType === 3) { const r = i18nText(root.nodeValue); if (r != null && r !== root.nodeValue) root.nodeValue = r; return; }
+            if (root.nodeType !== 1 || root.tagName === 'SCRIPT' || root.tagName === 'STYLE' || root.isContentEditable) return;
+            ['placeholder', 'title', 'aria-label'].forEach(a => { const v = root.getAttribute && root.getAttribute(a); if (v) { const r = i18nText(v); if (r != null && r !== v) root.setAttribute(a, r); } });
+            const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+            let n; while ((n = w.nextNode())) {
+                if (n.nodeType === 3) { if (n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.tagName)) continue; const r = i18nText(n.nodeValue); if (r != null && r !== n.nodeValue) n.nodeValue = r; }
+                else ['placeholder', 'title', 'aria-label'].forEach(a => { const v = n.getAttribute(a); if (v) { const r = i18nText(v); if (r != null && r !== v) n.setAttribute(a, r); } });
+            }
+        }
+        if (LANG === 'en') {
+            document.documentElement.lang = 'en';
+            i18nNode(document.body);
+            new MutationObserver(ms => ms.forEach(m => {
+                if (m.type === 'characterData') { const r = i18nText(m.target.nodeValue); if (r != null && r !== m.target.nodeValue) m.target.nodeValue = r; }
+                else m.addedNodes.forEach(i18nNode);
+            })).observe(document.body, { childList: true, subtree: true, characterData: true });
+        }
+        function setLang(l) {
+            try { localStorage.setItem('lang', l); } catch (_) {}
+            if (l === 'fr' && location.pathname.startsWith('/en')) location.href = '/';
+            else if (l === 'en' && !location.pathname.startsWith('/en')) location.href = '/en';
+            else location.reload();
+        }
+        (function () {
+            const slot = document.getElementById('lang-slot');
+            if (!slot) return;
+            slot.innerHTML = `<h3 style="margin-top:6px;">🌍 Langue</h3><div class="hb-btns"><button class="${LANG === 'fr' ? 'go' : ''}" onclick="setLang('fr')">🇫🇷 Français</button><button class="${LANG === 'en' ? 'go' : ''}" onclick="setLang('en')">🇬🇧 English</button></div>`;
+            if (LANG === 'en') i18nNode(slot);
+        })();
+
+</script>
 </body>
 </html>
