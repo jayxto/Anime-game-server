@@ -975,6 +975,89 @@
         html.big-text body{zoom:1.15;}
         html.cb{--accent-pink:#ff9f1c;}
         @media (max-width:560px){.hub-row{grid-template-columns:1fr;}.trd-cols{grid-template-columns:1fr;}.fuse-row{grid-template-columns:1fr 1fr;}.hb-img{flex-basis:64px;height:84px;}}
+
+        /* ===== HUB 2 ===== */
+        .nav-badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:#00ff88;color:#111;font-size:.7rem;font-weight:800;line-height:18px;text-align:center;}
+        .nav-badge.alert{background:var(--accent-yellow);}
+        .friends-page{max-width:560px;margin:0 auto;}
+        #friends-head{margin:0 0 10px;font-size:.9rem;}
+        .h2-panel{max-width:1000px;margin:0 auto;}
+        .h2-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:12px;} .h2-head h2{margin:0;}
+        .h2-sub{color:var(--accent-cyan);font-size:.85rem;margin-top:2px;}
+        .h2-hbtns{display:flex;gap:6px;} .h2-hbtns button{background:#1d1d2e;border:1px solid #3a3a55;color:#fff;border-radius:9px;padding:7px 11px;font-weight:700;cursor:pointer;}
+        .h2-players{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+        .h2-players>div{display:flex;align-items:center;gap:6px;background:#101018;border:1px solid #2c2c44;border-radius:99px;padding:3px 10px 3px 3px;font-size:.82rem;}
+        .h2-players>div.me{border-color:var(--accent-cyan);} .h2-players>div.turn{border-color:var(--accent-yellow);box-shadow:0 0 10px rgba(255,230,0,.35);} .h2-players>div.out{opacity:.4;text-decoration:line-through;}
+        .h2-players b{color:var(--accent-yellow);}
+        .h2-log{margin-top:10px;font-size:.8rem;color:var(--text-muted);background:#101018;border-radius:10px;padding:8px 10px;}
+        /* chaîne */
+        .ch-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:#101018;border:2px solid #2c2c44;border-radius:16px;padding:14px;}
+        .ch-letter{position:relative;width:110px;height:110px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .ch-letter span{font-family:'Bangers',cursive;font-size:4rem;color:var(--accent-yellow);text-shadow:3px 3px 0 var(--accent-pink);}
+        .ch-letter.me span{animation:hubPulse 1s infinite;}
+        .ch-letter svg{position:absolute;inset:0;transform:rotate(-90deg);} .ch-letter circle{fill:none;stroke:var(--accent-cyan);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .2s linear;}
+        .ch-letter circle.hurry,.hurry{stroke:var(--accent-pink);color:var(--accent-pink);}
+        .ch-turn{flex:1;min-width:220px;display:flex;flex-direction:column;gap:6px;} .ch-who{font-size:1.15rem;}
+        .ch-in{display:flex;gap:6px;align-items:stretch;} .ch-in input{flex:1;margin:0;} .ch-in .btn-action,.ch-in button{width:auto;margin:0;padding:8px 14px;}
+        .ch-in button:not(.btn-action){background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:9px;font-weight:800;cursor:pointer;}
+        .go-btn{background:var(--accent-yellow)!important;color:#111!important;border:none!important;white-space:nowrap;}
+        .ch-fb{min-height:1.2em;font-size:.85rem;font-weight:700;} .ch-fb.ok{color:#00ff88;} .ch-fb.ko{color:var(--accent-pink);}
+        .shake{animation:chShake .35s;} @keyframes chShake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+        .ch-chain{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:12px 2px;scroll-behavior:smooth;}
+        .ch-link{display:flex;align-items:center;gap:8px;background:#15151f;border:2px solid #2c2c44;border-radius:12px;padding:5px 10px 5px 5px;flex-shrink:0;}
+        .ch-link img{width:38px;height:48px;object-fit:cover;object-position:top;border-radius:7px;background:#0b0b10;}
+        .ch-link b{display:block;font-size:.85rem;} .ch-link small{font-size:.68rem;color:var(--text-muted);}
+        .ch-link.last{border-color:var(--accent-yellow);animation:chPop .4s;} @keyframes chPop{from{transform:scale(.7);opacity:0}}
+        .ch-arrow{color:var(--accent-cyan);font-weight:800;flex-shrink:0;}
+        .ch-end{text-align:center;padding:16px;background:#101018;border-radius:16px;} .ch-end-t{font-family:'Bangers',cursive;font-size:2rem;color:var(--accent-yellow);margin-bottom:8px;}
+        /* loup-garou */
+        .lg-wrap{display:grid;grid-template-columns:1fr 300px;gap:12px;border-radius:16px;padding:12px;transition:background .6s;}
+        .lg-wrap.night{background:linear-gradient(180deg,#0b1030,#0b0b10);} .lg-wrap.day{background:linear-gradient(180deg,rgba(255,200,80,.10),#0b0b10);} .lg-wrap.fin{background:#101018;}
+        .lg-role{display:flex;gap:10px;align-items:flex-start;border:2px solid #3a3a55;border-radius:14px;padding:10px;background:#101018;margin-bottom:10px;}
+        .lg-role.t-demons{border-color:#b91c1c;background:linear-gradient(135deg,rgba(185,28,28,.18),#101018);} .lg-role.t-village{border-color:#15803d;}
+        .lg-ri{font-size:2.4rem;} .lg-role b{display:block;font-size:1.05rem;} .lg-role small{display:block;color:var(--text-muted);font-size:.78rem;margin-top:2px;}
+        .lg-mates{color:#ffb3b3!important;} .lg-dead{color:var(--accent-pink)!important;font-weight:800;}
+        .lg-hint{background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.3);border-radius:10px;padding:8px 10px;font-size:.85rem;margin-bottom:10px;}
+        .lg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+        .lg-p{position:relative;background:#15151f;border:2px solid #2c2c44;border-radius:12px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:.8rem;}
+        .lg-p.me{border-color:var(--accent-cyan);} .lg-p.dead{opacity:.45;filter:grayscale(1);} .lg-p.picked{border-color:var(--accent-yellow);box-shadow:0 0 12px rgba(255,230,0,.4);}
+        .lg-p small{color:var(--text-muted);font-size:.68rem;}
+        .lg-p button{background:#b91c1c;color:#fff;border:none;border-radius:8px;padding:5px 8px;font-weight:800;font-size:.72rem;cursor:pointer;width:100%;}
+        .lg-wrap.day .lg-p button{background:var(--accent-yellow);color:#111;}
+        .lg-votes{position:absolute;top:4px;right:6px;font-style:normal;font-weight:800;color:var(--accent-yellow);font-size:.75rem;} .lg-voted{position:absolute;top:4px;left:6px;font-style:normal;color:#00ff88;}
+        .lg-skip{margin-top:10px;background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:9px;padding:7px 12px;font-weight:700;cursor:pointer;}
+        .lg-side{display:flex;flex-direction:column;gap:8px;min-width:0;}
+        .lg-log{background:#101018;border-radius:10px;padding:8px;font-size:.78rem;max-height:220px;overflow:auto;color:#ddd;line-height:1.45;}
+        .lg-chat{background:#101018;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;} #lg-chat-list{max-height:220px;overflow:auto;font-size:.8rem;}
+        /* quiz */
+        .uq-q{background:#101018;border:2px solid #2c2c44;border-radius:16px;padding:14px;text-align:center;} .uq-q small{color:var(--accent-cyan);font-weight:800;} .uq-q b{display:block;font-size:1.25rem;margin:6px 0 10px;}
+        .uq-bar{height:6px;background:#22223a;border-radius:99px;overflow:hidden;} .uq-bar i{display:block;height:100%;background:linear-gradient(90deg,#00ff88,#ffd700,#ff2a5f);transition:width .15s linear;}
+        .uq-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+        .uq-choices button{background:#15151f;border:2px solid #3a3a55;color:#fff;border-radius:12px;padding:14px 10px;font-weight:800;font-size:.95rem;cursor:pointer;text-align:left;}
+        .uq-choices button.picked{border-color:var(--accent-cyan);} .uq-choices button.good{border-color:#00ff88;background:rgba(0,255,136,.15);} .uq-choices button.bad{border-color:var(--accent-pink);background:rgba(255,42,95,.15);}
+        .uq-rank>div{display:flex;gap:10px;justify-content:center;font-size:.95rem;padding:3px;} .uq-rank em{color:var(--accent-yellow);font-style:normal;font-weight:800;}
+        .uq-rate{margin:12px 0;display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:wrap;} .uq-rate button{background:none;border:none;font-size:1.5rem;cursor:pointer;filter:grayscale(.3);} .uq-rate button:hover{transform:scale(1.2);}
+        .uq-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;margin-top:8px;} .uq-row small{display:block;color:var(--text-muted);font-size:.75rem;}
+        .uqe-q{background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;margin:8px 0;display:flex;flex-direction:column;gap:6px;}
+        .uqe-ch{display:grid;grid-template-columns:1fr 1fr;gap:6px;} .uqe-ch label{display:flex;align-items:center;gap:6px;} .uqe-ch input.v7-input{margin:0;flex:1;}
+        /* salon perso */
+        .room-rounds.rules{flex-wrap:wrap;gap:6px;} .room-rounds.rules label{display:flex;align-items:center;gap:4px;font-size:.85rem;}
+        /* deck */
+        .dk-slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0;}
+        .dk-slot{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;} .dk-slot small{font-weight:800;color:#00ff88;font-size:.75rem;}
+        .dk-slot.empty{border:2px dashed #3a3a55;border-radius:12px;aspect-ratio:3/4.4;justify-content:center;font-size:2rem;color:#555;cursor:default;} .dk-slot.empty small{color:var(--text-muted);font-weight:600;}
+        .dk-list{max-height:420px;margin-top:8px;}
+        /* cartes animées : les légendaires brillantes bougent */
+        .tcard.r-legendaire.shiny{animation:cardFloat 4.5s ease-in-out infinite;transform-style:preserve-3d;}
+        .tcard.r-legendaire.shiny::before{content:'';position:absolute;inset:-40%;z-index:1;pointer-events:none;background:conic-gradient(from 0deg,transparent 0 70%,rgba(255,215,0,.35) 80%,transparent 90%);animation:cardSpin 3.5s linear infinite;mix-blend-mode:screen;}
+        .tcard.r-legendaire.shiny .tc-img img{animation:cardZoom 4.5s ease-in-out infinite;}
+        @keyframes cardFloat{0%,100%{transform:perspective(600px) rotateY(-7deg) rotateX(2deg) translateY(0);}50%{transform:perspective(600px) rotateY(7deg) rotateX(-2deg) translateY(-4px);}}
+        @keyframes cardSpin{to{transform:rotate(360deg);}}
+        @keyframes cardZoom{50%{transform:scale(1.06);}}
+        @media (prefers-reduced-motion:reduce){.tcard.r-legendaire.shiny,.tcard.r-legendaire.shiny::before,.tcard.r-legendaire.shiny .tc-img img{animation:none;}}
+        .cn-prest{margin-left:3px;font-size:.85em;filter:drop-shadow(0 0 4px rgba(255,215,0,.8));}
+        .hub-card.theme{background:linear-gradient(135deg,color-mix(in srgb,var(--ta) 20%,transparent),color-mix(in srgb,var(--tb) 12%,#161622));border-color:var(--ta);}
+        @media (max-width:760px){.lg-wrap{grid-template-columns:1fr;}.uq-choices{grid-template-columns:1fr;}.dk-slots{grid-template-columns:repeat(3,1fr);}.uqe-ch{grid-template-columns:1fr;}}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -1211,6 +1294,8 @@
             <li><b>Devine le perso</b> : pose des questions oui / non pour trouver le perso mystère.</li>
             <li><b>Citations</b> : à qui appartient cette réplique culte ?</li>
             <li><b>AnimeDLE</b> : le Wordle des persos d'anime, avec un défi du jour.</li>
+            <li><b>Loup-garou anime et Chaîne de persos</b> : bluffe avec le Sharingan et le Death Note, ou enchaîne les persos lettre après lettre.</li>
+            <li><b>Quiz des joueurs</b> : crée ton propre quiz anime et joue ceux de la communauté.</li>
             <li><b>Duel 1v1 classé</b> : affronte un adversaire à ta hauteur et monte de Bronze à Hokage.</li>
             <li><b>Clans, pass de saison et boss du serveur</b> : joue en équipe, débloque des récompenses et abats le boss du jour avec toute la communauté.</li>
             <li><b>Mini-jeux</b> : Pixel, Zoom extrême, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
@@ -1228,6 +1313,7 @@
             <ul>
                 <li><button onclick="switchTab('mode')" id="btn-mode" class="active">Jouer</button></li>
                 <li><button onclick="switchTab('collection')" id="btn-collection">🃏 Collection</button></li>
+                <li><button onclick="switchTab('amis')" id="btn-amis">👥 Amis<span id="friends-badge" class="nav-badge" style="display:none;"></span></button></li>
                 <li><button onclick="switchTab('options')" id="btn-options">Options</button></li>
                 <li id="coin-badge" class="coin-badge" style="display:none;" onclick="switchTab('collection')">🪙 <b>0</b></li>
                 <li style="display:none;"><button onclick="switchTab('admin')" id="btn-admin">🛠️ Admin</button></li>
@@ -1314,7 +1400,7 @@
                 <div class="quote-mode-card" style="border-color:var(--accent-pink);">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 210 openings / endings • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
-                    <button class="btn-action" style="margin-top:0;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button><button class="btn-action" style="margin-top:0;flex:1;background:#00ff88;color:#111;" onclick="createRoom('blindtest','facile')">🟢 Facile : openings cultes</button></div>
                 </div>
 
                 <div class="arc-menu">
@@ -1337,6 +1423,24 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#48dbfb;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⛓️ Chaîne de persos</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Chacun son tour, donne un perso dont le nom commence par la dernière lettre du précédent (Naruto → Obito → Oden…) • le temps diminue • celui qui bloque est éliminé • solo possible</p>
+                    <button class="btn-action" style="margin-top:0;background:#48dbfb;color:#111;" onclick="openUniverseSelection('chaine')">Choisir l'univers</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#b91c1c;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🐺 Loup-garou anime</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Démons de Muzan 👹, Sharingan 👁️, Médecin ninja 💚, Death Note 📓 et villageois de Konoha 🍃 • nuit / jour, débats et votes • 4 joueurs min., parfait en vocal</p>
+                    <button class="btn-action" style="margin-top:0;background:#b91c1c;" onclick="createRoom('loupgarou','all')">Créer une partie</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ffd700;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">📝 Quiz des joueurs</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Crée ton propre quiz de 10 questions, joue ceux des autres et note-les de 1 à 5 étoiles • solo ou multi</p>
+                    <button class="btn-action" style="margin-top:0;" onclick="openQuizBrowser()">Voir les quiz</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#b77bff;">
@@ -2040,7 +2144,7 @@
 
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
-            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button></div>
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -2050,6 +2154,18 @@
             <div id="eco-fuse" style="display:none;"></div>
             <div id="eco-clan" style="display:none;"></div>
             <div id="eco-stats" style="display:none;"></div>
+            <div id="eco-deck" style="display:none;"></div>
+        </div>
+    </section>
+
+    <section id="amis" class="tab-content">
+        <div class="friends-page">
+        <div class="opt-panel">
+            <h2>👥 Mes amis</h2>
+            <div id="friends-head"></div>
+            <p class="tl-hint" style="text-align:left;">Ajoute tes potes avec leur pseudo, vois qui est en ligne, rejoins leur salon ou invite-les dans le tien. Dans la Collection, tu peux aussi les défier et échanger des cartes avec eux.</p>
+            <div id="v7-friends"><p class="tl-hint">Chargement…</p></div>
+        </div>
         </div>
     </section>
 
@@ -2092,10 +2208,6 @@
             <div id="v7-profile"><p class="tl-hint">Chargement…</p></div>
         </div>
 
-        <div class="opt-panel">
-            <h2>👥 Amis</h2>
-            <div id="v7-friends"><p class="tl-hint">Chargement…</p></div>
-        </div>
 
         <div class="opt-panel">
             <h2>💡 Proposer un ajout</h2>
@@ -2653,6 +2765,7 @@
             dle:            { title:'ANIMEDLE', sub:'Choisis ton univers — devinez le personnage mystère.', tag:'' },
             arc_pixel:      { title:'🖼️ PIXEL ANIME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_zoom:       { title:'🔍 ZOOM EXTRÊME', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            chaine:         { title:'⛓️ CHAÎNE DE PERSOS', sub:'Choisis un univers (ou plusieurs), ou mélange tous les animes.', tag:'', all:true },
             arc_silhouette: { title:'👤 SILHOUETTE', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_popularite: { title:'👥 POPULARITY GUESS', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
@@ -2855,7 +2968,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room','draw-room','guess-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room','draw-room','guess-room','chaine-room','lg-room','uq-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -6313,7 +6426,7 @@
         setInterval(() => {
             const bar = document.getElementById('fx-react-bar');
             if (!bar) return;
-            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room', 'draw-room', 'guess-room']
+            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room', 'draw-room', 'guess-room', 'chaine-room', 'lg-room', 'uq-room']
                 .some(id => { const el = document.getElementById(id); return el && el.offsetParent !== null; });
             bar.style.display = inRoom ? 'flex' : 'none';
         }, 700);
@@ -6645,7 +6758,7 @@
         socket.on('host_changed', d => { if (d) lastHostId = d.hostId; hostFabUpdate(); });
 
         /* ---------- Bouton hôte en pleine partie : exclure / donner l'hôte ---------- */
-        const GAME_PANELS = ['gameplay-room', 'rg-room', 'enchere-room', 'enchereaveugle-room', 'connexion-room', 'dle-room', 'quote-room', 'blindtest-room', 'arcade-room', 'draw-room', 'guess-room'];
+        const GAME_PANELS = ['gameplay-room', 'rg-room', 'enchere-room', 'enchereaveugle-room', 'connexion-room', 'dle-room', 'quote-room', 'blindtest-room', 'arcade-room', 'draw-room', 'guess-room', 'chaine-room', 'lg-room', 'uq-room'];
         function hostFabUpdate() {
             const fab = document.getElementById('host-fab');
             if (!fab) return;
@@ -9187,6 +9300,385 @@
 <script>
 
         /* =====================================================================
+           HUB 2 : onglet Amis, Chaîne de persos, Loup-garou, quiz des joueurs,
+           règles perso, deck, prestige, heure de pointe, saison à thème
+           ===================================================================== */
+        const h2 = { extra: null, ch: null, lg: null, lgp: null, uq: null, chatLg: [] };
+        const h2esc = v7esc;
+        const h2Left = (endsAt, serverNow) => Math.max(0, Math.ceil(((endsAt - serverNow) - (Date.now() - (h2._recv || Date.now()))) / 1000));
+
+        /* ---------- panneaux de jeu ---------- */
+        (function () {
+            const anchor = document.getElementById('guess-room');
+            if (!anchor) return;
+            [['chaine-room', 'ch'], ['lg-room', 'lg'], ['uq-room', 'uq']].forEach(([id]) => {
+                const d = document.createElement('div'); d.id = id; d.className = 'game-panel h2-panel'; d.style.display = 'none';
+                anchor.parentNode.insertBefore(d, anchor.nextSibling);
+            });
+            const orig = window.hideAllPanels;
+            window.hideAllPanels = function () { const r = orig.apply(this, arguments); ['chaine-room', 'lg-room', 'uq-room'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; }); return r; };
+        })();
+        function h2Show(id) {
+            const el = document.getElementById(id);
+            if (el && el.style.display !== 'none') return el;
+            hideAllPanels();
+            el.style.display = 'block';
+            return el;
+        }
+        function h2Head(title, sub, q) {
+            const host = q && q.hostId === socket.id;
+            return `<div class="h2-head"><div><h2>${title}</h2>${sub ? `<div class="h2-sub">${sub}</div>` : ''}</div><div class="h2-hbtns">${host ? `<button onclick="h2Back()">🔙 Salon</button>` : ''}<button onclick="leaveRoom()">🚪 Quitter</button></div></div>`;
+        }
+        function h2Back() { returningToWaitingRoom = true; socket.emit('back_to_menu', currentRoomCode); }
+        function h2Replay() { socket.emit('start_game', currentRoomCode); }
+        function h2EndBtns(q) {
+            return q.hostId === socket.id ? `<div class="hb-btns" style="justify-content:center;"><button class="go" onclick="h2Replay()">🔁 Rejouer</button><button onclick="h2Back()">🔙 Retour au salon</button></div>` : `<p class="tl-hint">En attente de l’hôte…</p>`;
+        }
+        socket.on('hub2_closed', () => { returningToWaitingRoom = true; h2.ch = h2.lg = h2.uq = null; ['chaine-room', 'lg-room', 'uq-room'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; }); });
+        socket.on('connect', () => { if (currentRoomCode && (h2.ch || h2.lg || h2.uq)) setTimeout(() => socket.emit('hub2_sync', { roomCode: currentRoomCode }), 700); });
+        function h2PlayersHtml(players, extra) {
+            return `<div class="h2-players">${players.map(p => `<div class="${p.id === socket.id ? 'me' : ''}${extra && extra(p) ? ' ' + extra(p) : ''}">${avatarHtml(p.name, p.cos)}<span>${cosNameHtml(p.name, p.cos)}</span><b>${p.score != null ? p.score : ''}</b></div>`).join('')}</div>`;
+        }
+
+        /* ---------- Chaîne de persos ---------- */
+        socket.on('chaine_state', q => {
+            if (!q || !currentRoomCode) return;
+            const newTurn = !h2.ch || h2.ch.turnId !== q.turnId || h2.ch.length !== q.length;
+            h2.ch = q; h2._recv = Date.now();
+            chRender(newTurn);
+        });
+        socket.on('chaine_feedback', d => {
+            const f = document.getElementById('ch-fb');
+            if (f) { f.textContent = d.ok ? '✅' : d.msg; f.className = 'ch-fb ' + (d.ok ? 'ok' : 'ko'); }
+            if (!d.ok) { const i = document.getElementById('ch-input'); if (i) { i.classList.add('shake'); setTimeout(() => i.classList.remove('shake'), 400); i.select(); } }
+        });
+        socket.on('chaine_out', d => toast(`⛓️ ${h2esc(d.name)} est éliminé !`, 'var(--accent-pink)'));
+        function chRender(newTurn) {
+            const q = h2.ch;
+            const el = h2Show('chaine-room');
+            const mine = q.turnId === socket.id && q.phase === 'playing';
+            const meP = q.players.find(p => p.id === socket.id) || {};
+            const keepVal = document.getElementById('ch-input') && !newTurn ? document.getElementById('ch-input').value : '';
+            let body;
+            if (q.phase === 'finished') {
+                body = `<div class="ch-end"><div class="ch-end-t">${q.solo ? `⛓️ Chaîne de <b>${q.length}</b> persos !` : q.winnerNames && q.winnerNames.length ? `🏆 ${q.winnerNames.map(h2esc).join(', ')} gagne !` : 'Partie terminée'}</div>${h2EndBtns(q)}</div>`;
+            } else {
+                body = `<div class="ch-top"><div class="ch-letter${mine ? ' me' : ''}"><span>${h2esc(q.letter || '?')}</span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" id="ch-ring"/></svg></div>
+                    <div class="ch-turn"><div class="ch-who">${mine ? '👉 <b>À toi !</b>' : `C'est à <b>${h2esc(q.turnName || '')}</b>`}</div><div class="tl-hint">Un perso qui commence par <b>${h2esc(q.letter)}</b> • ${q.possible} possible${q.possible > 1 ? 's' : ''} encore • <span id="ch-timer"></span></div>
+                    ${meP.alive === false ? '<div class="ch-fb ko">💀 Tu es éliminé : regarde la suite !</div>' : `<div class="ch-in"><input id="ch-input" class="v7-input" autocomplete="off" placeholder="${mine ? `Un perso en ${h2esc(q.letter)}…` : 'Attends ton tour…'}" ${mine ? '' : 'disabled'} onkeydown="if(event.key==='Enter')chSend()"><button class="btn-action" ${mine ? '' : 'disabled'} onclick="chSend()">Valider</button></div><div id="ch-fb" class="ch-fb"></div>`}</div></div>`;
+            }
+            const chain = q.chain.slice(-14).map((c, i, a) => `<div class="ch-link${i === a.length - 1 ? ' last' : ''}"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><div><b>${h2esc(c.name)}</b><small>${h2esc(c.anime)} • ${h2esc(c.by)}</small></div></div>`).join('<span class="ch-arrow">→</span>');
+            el.innerHTML = h2Head('⛓️ CHAÎNE DE PERSOS', `${h2esc(q.universeLabel || '')} • chaîne : <b>${q.length}</b>`, q) + body
+                + `<div class="ch-chain">${chain || '<p class="tl-hint">La chaîne commence ! Premier perso en ' + h2esc(q.letter || '') + '.</p>'}</div>`
+                + h2PlayersHtml(q.players, p => (p.alive ? '' : 'out') + (p.turn ? ' turn' : ''))
+                + (q.log.length ? `<div class="h2-log">${q.log.slice(-4).map(h2esc).join('<br>')}</div>` : '');
+            const inp = document.getElementById('ch-input');
+            if (inp && mine) { inp.value = keepVal; if (window.innerWidth > 700 || newTurn) setTimeout(() => inp.focus(), 30); }
+            const cl = el.querySelector('.ch-chain'); if (cl) cl.scrollLeft = cl.scrollWidth;
+        }
+        function chSend() { const i = document.getElementById('ch-input'); if (!i || !i.value.trim()) return; socket.emit('chaine_answer', { roomCode: currentRoomCode, text: i.value.trim() }); }
+        setInterval(() => {
+            const q = h2.ch;
+            if (!q || q.phase !== 'playing') return;
+            const t = document.getElementById('ch-timer'), ring = document.getElementById('ch-ring');
+            const left = Math.max(0, (q.endsAt - q.serverNow) - (Date.now() - h2._recv));
+            if (t) { t.textContent = `⏱️ ${Math.ceil(left / 1000)} s`; t.classList.toggle('hurry', left < 5000); }
+            if (ring) { ring.style.strokeDasharray = '289'; ring.style.strokeDashoffset = String(289 * (1 - left / q.turnMs)); ring.classList.toggle('hurry', left < 5000); }
+        }, 200);
+
+        /* ---------- Loup-garou anime ---------- */
+        socket.on('lg_state', q => { if (!q || !currentRoomCode) return; h2.lg = q; h2._lgRecv = Date.now(); lgRender(); });
+        socket.on('lg_private', p => { h2.lgp = p; if (h2.lg) lgRender(); });
+        socket.on('chat_message', d => {
+            if (!h2.lg || !d) return;
+            h2.chatLg.push(d); if (h2.chatLg.length > 60) h2.chatLg.shift();
+            const box = document.getElementById('lg-chat-list'); if (box) { box.innerHTML = lgChatHtml(); box.scrollTop = box.scrollHeight; }
+        });
+        function lgChatHtml() { return h2.chatLg.map(m => `<div><b style="color:${m.authorId === socket.id ? 'var(--accent-cyan)' : 'var(--accent-pink)'}">${h2esc(m.author)}</b> ${h2esc(m.message)}</div>`).join(''); }
+        function lgRender() {
+            const q = h2.lg, me = h2.lgp;
+            if (!q) return;
+            const el = h2Show('lg-room');
+            const keepChat = document.getElementById('lg-chat-in') ? document.getElementById('lg-chat-in').value : '';
+            const alive = me && me.alive;
+            const role = me && me.role;
+            const night = q.phase === 'night', day = q.phase === 'day', fin = q.phase === 'finished';
+            const votingOpen = day && Date.now() - h2._lgRecv + q.serverNow >= q.voteOpensAt;
+            let action = null; // [verbe, cible autorisée ?]
+            if (alive && night && role) {
+                if (role.id === 'demon') action = ['👹 Dévorer', p => p.alive && !(me.mates || []).some(m => m.key === p.key) && p.key !== me.key, me.myNight];
+                else if (role.id === 'seer') action = me.myNight ? null : ['👁️ Sonder', p => p.alive && p.key !== me.key, null];
+                else if (role.id === 'doctor') action = ['💚 Protéger', p => p.alive && p.key !== me.lastProtect, me.myNight];
+                else if (role.id === 'note' && !me.noteUsed) action = ['📓 Écrire son nom', p => p.alive && p.key !== me.key, me.myNight];
+            }
+            if (alive && day && votingOpen) action = ['⚖️ Voter', p => p.alive && p.key !== me.key, me.myVote];
+            const phaseTxt = fin ? (q.winner === 'village' ? '🎉 Victoire du village !' : '👹 Victoire des démons !') : night ? `🌙 Nuit ${q.day}` : `☀️ Jour ${q.day}`;
+            const roleCard = role ? `<div class="lg-role t-${role.team}"><span class="lg-ri">${role.icon}</span><div><b>${h2esc(role.name)}</b><small>${h2esc(role.desc)}</small>
+                ${me.mates && me.mates.length ? `<small class="lg-mates">Tes alliés démons : ${me.mates.map(m => `${h2esc(m.name)}${m.alive ? '' : ' ☠️'}`).join(', ')}</small>` : ''}
+                ${me.seen && me.seen.length ? `<small class="lg-mates">Sharingan : ${me.seen.map(s => `${h2esc(s.name)} = ${s.role.icon} ${h2esc(s.role.name)}`).join(' • ')}</small>` : ''}
+                ${me.demonVotes && me.demonVotes.length ? `<small class="lg-mates">Choix des démons : ${me.demonVotes.map(v => `${h2esc(v.by)} → ${h2esc(v.target)}`).join(' • ')}</small>` : ''}
+                ${!alive && !fin ? '<small class="lg-dead">☠️ Tu es mort : tu regardes la partie en silence.</small>' : ''}</div></div>` : '';
+            let hint = '';
+            if (!fin && alive) {
+                if (night) hint = !role || role.id === 'villager' ? '😴 Tu dors… attends le lever du jour.' : role.id === 'seer' && me.myNight ? '👁️ Vision reçue. Attends le jour.' : role.id === 'note' && me.noteUsed ? '📓 Ton Death Note est déjà utilisé.' : action ? `Choisis un joueur : ${action[0]}` : '';
+                else hint = votingOpen ? (me.myVote ? `Tu as voté${me.myVote === 'skip' ? ' blanc' : ''}. Tu peux changer d’avis.` : 'Débattez puis votez pour éliminer un suspect.') : '🌅 Le village se réveille… lisez les nouvelles.';
+            }
+            const grid = q.players.map(p => {
+                const can = action && action[1](p);
+                const picked = action && action[2] === p.key;
+                return `<div class="lg-p${p.alive ? '' : ' dead'}${p.id === socket.id ? ' me' : ''}${picked ? ' picked' : ''}">${avatarHtml(p.name, p.cos)}<b>${h2esc(p.name)}</b>
+                    ${p.role ? `<small>${p.role.icon} ${h2esc(p.role.name)}</small>` : p.alive ? '' : '<small>☠️</small>'}
+                    ${day && p.votes ? `<em class="lg-votes">${p.votes} 🗳️</em>` : ''}${day && p.voted && p.alive ? '<em class="lg-voted">✔</em>' : ''}
+                    ${can ? `<button onclick="lgAct('${h2esc(p.key)}')">${picked ? '✔ ' : ''}${action[0]}</button>` : ''}</div>`;
+            }).join('');
+            const skipBtn = alive && ((day && votingOpen) || (night && role && role.id === 'note' && !me.noteUsed)) ? `<button class="lg-skip" onclick="lgAct('skip')">${day ? '🤐 Vote blanc' : '📓 Ne pas l’utiliser cette nuit'}</button>` : '';
+            const canChat = alive && day || fin;
+            const comp = Object.entries(q.rolesInGame || {}).map(([r, n]) => `${q.roleInfo[r].icon}×${n}`).join(' ');
+            el.innerHTML = h2Head('🐺 LOUP-GAROU ANIME', `${phaseTxt} • <span id="lg-timer"></span> • ${comp}`, q)
+                + `<div class="lg-wrap ${night ? 'night' : fin ? 'fin' : 'day'}"><div class="lg-main">${roleCard}${hint ? `<div class="lg-hint">${hint}</div>` : ''}<div class="lg-grid">${grid}</div>${skipBtn}${fin ? h2EndBtns(q) : ''}</div>
+                <div class="lg-side"><div class="lg-log">${q.log.slice(-12).map(h2esc).join('<br>')}</div>
+                <div class="lg-chat"><div id="lg-chat-list">${lgChatHtml()}</div>${canChat ? `<div class="ch-in"><input id="lg-chat-in" class="v7-input" maxlength="200" placeholder="Débattre…" onkeydown="if(event.key==='Enter')lgChat()"><button onclick="lgChat()">➤</button></div>` : `<div class="tl-hint">${night ? '🌙 Silence, c’est la nuit…' : '☠️ Les morts ne parlent pas.'}</div>`}</div></div></div>`;
+            const ci = document.getElementById('lg-chat-in'); if (ci && keepChat) { ci.value = keepChat; ci.focus(); }
+            const cl = document.getElementById('lg-chat-list'); if (cl) cl.scrollTop = cl.scrollHeight;
+        }
+        function lgAct(k) { socket.emit('lg_act', { roomCode: currentRoomCode, target: k }); }
+        function lgChat() { const i = document.getElementById('lg-chat-in'); if (!i || !i.value.trim()) return; socket.emit('chat_message', { roomCode: currentRoomCode, message: i.value.trim() }); i.value = ''; }
+        setInterval(() => {
+            const q = h2.lg; if (!q || q.phase === 'finished') return;
+            const t = document.getElementById('lg-timer'); if (!t) return;
+            const now = q.serverNow + (Date.now() - h2._lgRecv);
+            const left = Math.max(0, Math.ceil((q.endsAt - now) / 1000));
+            t.textContent = `⏱️ ${left} s`;
+            if (q.phase === 'day' && q.voteOpensAt && now >= q.voteOpensAt && !h2._voteOpened) { h2._voteOpened = q.day; lgRender(); }
+            if (q.phase !== 'day') h2._voteOpened = 0;
+        }, 500);
+
+        /* ---------- Quiz des joueurs : partie ---------- */
+        socket.on('uq_state', q => { if (!q || !currentRoomCode) return; h2.uq = q; h2._uqRecv = Date.now(); uqRender(); });
+        function uqRender() {
+            const q = h2.uq; const el = h2Show('uq-room');
+            const me = q.players.find(p => p.id === socket.id) || {};
+            let body;
+            if (q.phase === 'finished') {
+                const sorted = q.players.slice().sort((a, b) => b.score - a.score);
+                body = `<div class="ch-end"><div class="ch-end-t">${q.winnerNames && q.winnerNames.length ? `🏆 ${q.winnerNames.map(h2esc).join(', ')}` : '🏁 Quiz terminé'}</div>
+                    <div class="uq-rank">${sorted.map((p, i) => `<div><span>${['🥇', '🥈', '🥉'][i] || i + 1 + '.'}</span><b>${h2esc(p.name)}</b><em>${p.score} pts</em></div>`).join('')}</div>
+                    <div class="uq-rate" id="uq-rate"><span>Note ce quiz :</span>${[1, 2, 3, 4, 5].map(n => `<button onclick="uqRate('${q.quizId}',${n})">⭐</button>`).join('')}</div>${h2EndBtns(q)}</div>`;
+            } else {
+                const rev = q.phase === 'reveal';
+                body = `<div class="uq-q"><small>Question ${q.round}/${q.total}</small><b>${h2esc(q.q || '')}</b><div class="uq-bar"><i id="uq-bar"></i></div></div>
+                    <div class="uq-choices">${(q.choices || []).map((c, i) => `<button class="${rev ? (i === q.answer ? 'good' : me.pick === i ? 'bad' : '') : me.done && me.pick === i ? 'picked' : ''}" ${me.done || rev ? 'disabled' : ''} onclick="uqPick(${i})">${['🅰️', '🅱️', '©️', '🇩'][i]} ${h2esc(c)}</button>`).join('')}</div>
+                    <div class="tl-hint">${rev ? (me.correct ? `✅ Bonne réponse ! +${me.gained}` : '❌ Raté') : me.done ? 'Réponse envoyée, attends les autres…' : 'Plus tu réponds vite, plus tu gagnes de points'}</div>`;
+            }
+            el.innerHTML = h2Head('📝 ' + h2esc(q.title).toUpperCase(), `par ${h2esc(q.author)}${q.anime ? ' • ' + h2esc(q.anime) : ''}`, q) + body + h2PlayersHtml(q.players.map(p => ({ ...p, score: p.score + (p.done && q.phase === 'playing' ? ' ✔' : '') })));
+        }
+        function uqPick(i) { if (h2.uq) { const me = h2.uq.players.find(p => p.id === socket.id); if (me) { me.done = true; me.pick = i; } uqRender(); } socket.emit('uq_answer', { roomCode: currentRoomCode, idx: i }); }
+        async function uqRate(id, n) {
+            const d = await v7post('/api/quiz/rate', { id, stars: n });
+            const b = document.getElementById('uq-rate');
+            if (b) b.innerHTML = d && d.ok ? `Merci ! Note moyenne : ⭐ ${d.quiz.rating} (${d.quiz.votes} vote${d.quiz.votes > 1 ? 's' : ''})` : h2esc((d && d.error) || 'Crée un compte pour noter.');
+        }
+        setInterval(() => {
+            const q = h2.uq; if (!q || q.phase !== 'playing') return;
+            const b = document.getElementById('uq-bar'); if (!b) return;
+            const left = Math.max(0, (q.endsAt - q.serverNow) - (Date.now() - h2._uqRecv));
+            b.style.width = (100 * left / q.roundMs) + '%';
+        }, 150);
+
+        /* ---------- Quiz des joueurs : parcourir / créer ---------- */
+        const uqb = { sort: 'top', q: '' };
+        async function openQuizBrowser(tab) {
+            if (tab) uqb.sort = tab;
+            const m = hubModal('uq-browser', `<h3>📝 Quiz des joueurs</h3><div class="eco-tabs"><button data-t="top" onclick="openQuizBrowser('top')">⭐ Populaires</button><button data-t="new" onclick="openQuizBrowser('new')">🆕 Nouveaux</button><button data-t="mine" onclick="openQuizBrowser('mine')">✏️ Mes quiz</button></div>
+                <div class="ch-in"><input id="uq-search" class="v7-input" placeholder="🔎 Chercher un quiz, un anime, un auteur" value="${h2esc(uqb.q)}" onkeydown="if(event.key==='Enter'){uqb.q=this.value;openQuizBrowser()}"><button class="go-btn" onclick="openQuizEditor()">➕ Créer un quiz</button></div><div id="uq-list"><div class="arc-loading"><div class="arc-spin"></div></div></div>`, true);
+            m.querySelectorAll('.eco-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === uqb.sort));
+            const d = await v7get('/api/quiz?sort=' + (uqb.sort === 'new' ? 'new' : 'top') + '&q=' + encodeURIComponent(uqb.q));
+            const box = document.getElementById('uq-list'); if (!box || !d) return;
+            const list = uqb.sort === 'mine' ? d.mine : d.list;
+            box.innerHTML = list.length ? list.map(q => `<div class="uq-row"><div><b>${h2esc(q.title)}</b><small>${q.anime ? h2esc(q.anime) + ' • ' : ''}par ${h2esc(q.author)} • ${q.rating ? `⭐ ${q.rating} (${q.votes})` : 'pas encore noté'} • ${q.plays} partie${q.plays > 1 ? 's' : ''}</small></div>
+                <div class="hb-btns"><button class="go" onclick="document.getElementById('uq-browser').remove();createRoom('uquiz','${q.id}')">▶ Jouer</button>${q.mine ? `<button onclick="openQuizEditor('${q.id}')">✏️</button><button onclick="quizDelete('${q.id}')">🗑️</button>` : ''}</div></div>`).join('')
+                : `<p class="tl-hint">${uqb.sort === 'mine' ? 'Tu n’as pas encore créé de quiz.' : 'Aucun quiz pour le moment : crée le premier !'}</p>`;
+        }
+        async function quizDelete(id) { if (!confirm('Supprimer ce quiz ?')) return; await v7post('/api/quiz/delete', { id }); openQuizBrowser('mine'); }
+        async function openQuizEditor(id) {
+            if (!isAccount()) return toast('Crée un compte pour créer un quiz.', 'var(--accent-pink)');
+            let data = { title: '', anime: '', questions: Array.from({ length: 10 }, () => ({ q: '', choices: ['', '', '', ''], answer: 0 })) };
+            if (id) { const d = await v7get('/api/quiz/one?id=' + id); if (d && d.ok && d.questions) data = { id, title: d.quiz.title, anime: d.quiz.anime, questions: d.questions }; }
+            document.getElementById('uq-browser')?.remove();
+            hubModal('uq-editor', `<h3>${id ? '✏️ Modifier mon quiz' : '📝 Créer un quiz'}</h3><p class="tl-hint">10 questions, 4 réponses chacune : coche la bonne. Les autres joueurs pourront le jouer et le noter.</p>
+                <input id="uqe-title" class="v7-input" maxlength="60" placeholder="Titre (ex : Le quiz ultime One Piece)" value="${h2esc(data.title)}"><input id="uqe-anime" class="v7-input" maxlength="40" placeholder="Anime (facultatif)" value="${h2esc(data.anime)}">
+                ${data.questions.map((x, i) => `<div class="uqe-q"><b>Question ${i + 1}</b><input class="v7-input uqe-text" maxlength="160" placeholder="Ta question…" value="${h2esc(x.q)}">
+                    <div class="uqe-ch">${x.choices.map((c, j) => `<label><input type="radio" name="uqe-a${i}" value="${j}" ${x.answer === j ? 'checked' : ''}><input class="v7-input uqe-c" maxlength="60" placeholder="Réponse ${j + 1}" value="${h2esc(c)}"></label>`).join('')}</div></div>`).join('')}
+                <div id="uqe-err" class="ch-fb ko"></div><button class="btn-action" onclick="quizSave(${id ? `'${id}'` : ''})">💾 Enregistrer le quiz</button>`, true);
+        }
+        async function quizSave(id) {
+            const qs = [...document.querySelectorAll('.uqe-q')].map((b, i) => ({ q: b.querySelector('.uqe-text').value, choices: [...b.querySelectorAll('.uqe-c')].map(x => x.value), answer: +((b.querySelector(`input[name="uqe-a${i}"]:checked`) || {}).value || 0) }));
+            const d = await v7post('/api/quiz', { id, title: document.getElementById('uqe-title').value, anime: document.getElementById('uqe-anime').value, questions: qs });
+            if (!d || !d.ok) { const e = document.getElementById('uqe-err'); if (e) e.textContent = '❌ ' + ((d && d.error) || 'Impossible'); return; }
+            document.getElementById('uq-editor')?.remove();
+            toast('📝 Quiz enregistré !', '#00ff88');
+            openQuizBrowser('mine');
+        }
+
+        /* ---------- salon personnalisé (mini-jeux) ---------- */
+        socket.on('update_room', room => {
+            if (!room || room.status !== 'waiting' || room.code !== currentRoomCode) return;
+            let box = document.getElementById('room-rules-box');
+            const anchor = document.getElementById('room-teams-box') || document.getElementById('room-rounds-box');
+            if (!box && anchor) { box = document.createElement('div'); box.id = 'room-rules-box'; box.className = 'room-rounds rules'; anchor.parentNode.insertBefore(box, anchor.nextSibling); }
+            if (!box) return;
+            if (room.mode !== 'arcade' || String(room.subMode || '').startsWith('pixel:daily')) { box.style.display = 'none'; return; }
+            box.style.display = 'flex';
+            const r = room.rules || { time: 1, pts: 1, streak: false };
+            const host = room.host === socket.id;
+            const T = { 0.5: '⚡ Très rapide (x0,5)', 0.75: '🏃 Rapide', 1: '⏱️ Normal', 1.5: '🐢 Lent', 2: '🐌 Très lent (x2)' };
+            box.innerHTML = host ? `<span>🛠️ Règles :</span><select onchange="setRules({time:+this.value})">${Object.entries(T).map(([v, l]) => `<option value="${v}" ${+v === r.time ? 'selected' : ''}>${l}</option>`).join('')}</select>
+                <select onchange="setRules({pts:+this.value})">${[1, 2, 3].map(n => `<option value="${n}" ${n === r.pts ? 'selected' : ''}>Points x${n}</option>`).join('')}</select>
+                <label><input type="checkbox" ${r.streak ? 'checked' : ''} onchange="setRules({streak:this.checked})"> 🔥 Bonus de série</label>`
+                : `<span>🛠️ Règles :</span><b>${T[r.time] || 'Normal'} • Points x${r.pts}${r.streak ? ' • 🔥 bonus de série' : ''}</b>`;
+            box.dataset.rules = JSON.stringify(r);
+        });
+        function setRules(patch) { const box = document.getElementById('room-rules-box'); const r = Object.assign(JSON.parse((box && box.dataset.rules) || '{"time":1,"pts":1,"streak":false}'), patch); socket.emit('set_rules', { roomCode: currentRoomCode, rules: r }); }
+
+        /* ---------- onglet Amis ---------- */
+        (function () {
+            const orig = window.switchTab;
+            window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'amis') { loadFriends(); h2FriendsExtra(); } return r; };
+        })();
+        async function h2FriendsBadge() {
+            const b = document.getElementById('friends-badge'); if (!b) return;
+            if (!isAccount()) { b.style.display = 'none'; return; }
+            const d = await v7get('/api/friends');
+            if (!d || !d.ok) return;
+            const on = d.friends.filter(f => f.online).length, inc = d.incoming.length;
+            b.style.display = on || inc ? '' : 'none';
+            b.textContent = inc ? inc + ' !' : on;
+            b.classList.toggle('alert', !!inc);
+            const h = document.getElementById('friends-head');
+            if (h) h.innerHTML = `<b>${d.friends.length}</b> ami${d.friends.length > 1 ? 's' : ''} • <span style="color:#00ff88">● ${on} en ligne</span>${inc ? ` • <span style="color:var(--accent-yellow)">📩 ${inc} demande${inc > 1 ? 's' : ''}</span>` : ''}`;
+        }
+        function h2FriendsExtra() { h2FriendsBadge(); }
+        socket.on('connect', () => setTimeout(h2FriendsBadge, 1500));
+        socket.on('friends_changed', () => { h2FriendsBadge(); if (document.getElementById('amis')?.classList.contains('active')) loadFriends(); });
+        setInterval(() => { if (!document.hidden) { h2FriendsBadge(); if (document.getElementById('amis')?.classList.contains('active')) loadFriends(); } }, 30000);
+
+        /* ---------- deck de 5 cartes ---------- */
+        (function () {
+            const orig = ecoTab;
+            ecoTab = function (t) {
+                const el = document.getElementById('eco-deck');
+                if (t !== 'deck') { if (el) el.style.display = 'none'; return orig(t); }
+                eco.tab = t;
+                document.querySelectorAll('.eco-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+                document.querySelectorAll('#collection [id^="eco-"]').forEach(x => { if (x.id !== 'eco-deck' && x.id !== 'eco-tabs') x.style.display = 'none'; });
+                el.style.display = '';
+                if (!isAccount()) { el.innerHTML = '<p class="tl-hint">Crée un compte pour composer ton deck.</p>'; return; }
+                loadDeck();
+            };
+        })();
+        const dk = { keys: [], cards: [], q: '' };
+        async function loadDeck() {
+            const [d, all] = await Promise.all([v7get('/api/deck'), v7get('/api/trade/cards')]);
+            if (!d || !d.ok) return;
+            dk.keys = d.deck.map(c => c.key); dk.cards = (all && all.cards) || []; dk.rules = d.rules; dk.pct = d.pct;
+            deckRender();
+        }
+        function deckPctLocal() { let p = 0; dk.keys.forEach(k => { const c = dk.cards.find(x => x.key === k); if (c) p += (dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0); }); return Math.min(40, p); }
+        function deckRender() {
+            const el = document.getElementById('eco-deck'); if (!el) return;
+            const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${(dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
+            const q = dk.q.toLowerCase();
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, brillante +2 % • bonus doublé si la partie est sur l’anime de la carte • max +40 %</span></div>
+                <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
+                <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans ta collection" value="${h2esc(dk.q)}" oninput="dk.q=this.value;deckList()"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
+                <div class="trd-list dk-list" id="dk-list"></div>`;
+            deckList();
+        }
+        function deckList() {
+            const box = document.getElementById('dk-list'); if (!box) return;
+            const q = dk.q.toLowerCase();
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            box.innerHTML = list.map(c => `<button class="trd-mini r-${c.rarity}${dk.keys.includes(c.key) ? ' on' : ''}" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${h2esc(c.name)}</b><small>${h2esc(c.anime)}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte : joue pour en gagner !</p>';
+        }
+        function deckToggle(k) {
+            if (dk.keys.includes(k)) dk.keys = dk.keys.filter(x => x !== k);
+            else { if (dk.keys.length >= 5) return toast('Ton deck est plein (5 cartes).', 'var(--accent-pink)'); dk.keys.push(k); }
+            deckRender();
+        }
+        async function deckSave() {
+            const d = await v7post('/api/deck', { keys: dk.keys });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(`🎴 Deck enregistré : +${d.pct} % de pièces`, '#00ff88');
+        }
+        socket.on('coins_gain', d => { if (d && d.why) setTimeout(() => toast(`🪙 dont +${d.gain} grâce à ${d.why === 'deck' ? 'ton deck 🎴' : 'la ' + h2esc(d.why) + ' 🌟'}`, '#ffd700'), 600); });
+
+        /* ---------- prestige + étoiles devant le pseudo ---------- */
+        (function () {
+            const orig = cosNameHtml;
+            cosNameHtml = function (name, cos) { const n = cos && cos.prestige; return orig(name, cos) + (n ? `<span class="cn-prest" title="Prestige ${n}">⭐${n > 1 ? n : ''}</span>` : ''); };
+        })();
+        async function loadPrestige() {
+            const box = document.getElementById('prestige-panel'); if (!box) return;
+            if (!isAccount()) { box.innerHTML = ''; return; }
+            const d = await v7get('/api/prestige'); if (!d || !d.ok) return;
+            const pct = Math.min(100, Math.round(100 * (d.level - 1) / (d.need - 1)));
+            box.innerHTML = `<h3>⭐ Prestige ${d.prestige ? `<span class="cn-prest">⭐${d.prestige}</span>` : ''}</h3><div class="tl-hint">Au niveau ${d.need}, recommence au niveau 1 et gagne une étoile à côté de ton pseudo + ${d.reward} 🪙.</div>
+                <div class="hb-bar" style="margin:6px 0;"><i style="width:${pct}%;background:linear-gradient(90deg,#ffd700,#ff9a3c)"></i><span>Niveau ${d.level} / ${d.need}</span></div>
+                ${d.can ? `<button class="btn-action" onclick="doPrestige()">⭐ Passer prestige ${d.prestige + 1}</button>` : ''}`;
+        }
+        async function doPrestige() {
+            if (!confirm('Recommencer au niveau 1 pour gagner une étoile de prestige ?')) return;
+            const d = await v7post('/api/prestige', {});
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(`⭐ Prestige ${d.prestige} ! +1000 🪙`, '#ffd700'); confetti(2500); loadPrestige();
+            if (currentUser) { currentUser.cos = currentUser.cos || {}; currentUser.cos.prestige = d.prestige; }
+        }
+        (function () {
+            const opt = document.querySelector('#options > div');
+            if (opt && !document.getElementById('prestige-panel')) { const p = document.createElement('div'); p.id = 'prestige-panel'; p.className = 'a11y-panel'; opt.appendChild(p); }
+            const orig = window.switchTab;
+            window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') loadPrestige(); return r; };
+        })();
+
+        /* ---------- heure de pointe + saison à thème (accueil) ---------- */
+        function h2PaletteCss(p) {
+            let css = '';
+            Object.entries(p || {}).forEach(([u, [a, b]]) => {
+                css += `.cn-th_${u}{background:linear-gradient(90deg,${a},${b},${a});background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:cnMove 3s linear infinite;}`;
+                css += `.fr-th_${u}{border-color:${a};box-shadow:0 0 0 2px ${b},0 0 14px ${a};}`;
+            });
+            let st = document.getElementById('h2-pal'); if (!st) { st = document.createElement('style'); st.id = 'h2-pal'; document.head.appendChild(st); }
+            st.textContent = css;
+        }
+        async function h2LoadExtra() {
+            const d = await v7get('/api/hub/extra');
+            if (!d || !d.ok) return;
+            h2.extra = d; h2PaletteCss(d.palettes);
+            h2RenderExtra();
+        }
+        function h2RenderExtra() {
+            const box = document.getElementById('hub-home'); const d = h2.extra;
+            if (!box || !d) return;
+            box.querySelectorAll('.h2-extra').forEach(e => e.remove());
+            const th = d.theme, [a, b, em] = th.palette;
+            const html = (d.rush ? `<div class="hub-weekend h2-extra" style="background:linear-gradient(90deg,#ff2a2a,#ffb300);">⚡ <b>HEURE DE POINTE</b> : dégâts x2 sur le boss jusqu’à ${d.rush.until} h !</div>` : '')
+                + `<div class="hub-card h2-extra theme" style="--ta:${a};--tb:${b}"><div class="hb-main"><div class="hb-h">🌟 Saison à thème <small>${h2esc(th.season)}</small></div>
+                  <b class="hb-name">${em} ${h2esc(th.name)}</b><div class="tl-hint">Ce mois-ci : couleur de pseudo et cadre <b>${h2esc(th.name)}</b> exclusifs en boutique (disponibles seulement ce mois-ci) • +25 % de pièces sur les parties ${h2esc(th.name)}.</div>
+                  <div class="hb-btns"><button class="go" onclick="switchTab('collection');ecoTab('shop')">🛒 Voir les cosmétiques</button><button onclick="createRoom('arcade','pixel:${th.u}')">🖼️ Pixel ${h2esc(th.name)}</button><button onclick="openUniverseSelection('chaine')">⛓️ Chaîne</button></div></div></div>`;
+            const first = box.querySelector('.hub-card');
+            const tmp = document.createElement('div'); tmp.innerHTML = html;
+            [...tmp.children].forEach(c => box.insertBefore(c, first || null));
+        }
+        (function () { const orig = hubRenderHome; hubRenderHome = function () { const r = orig.apply(this, arguments); h2RenderExtra(); return r; }; })();
+        socket.on('connect', () => setTimeout(h2LoadExtra, 1300));
+        socket.on('rush_start', d => { toast(`⚡ <b>Heure de pointe !</b> Dégâts x2 sur le boss jusqu’à ${d.until} h`, '#ffb300'); h2LoadExtra(); });
+        setInterval(() => { if (!document.hidden) h2LoadExtra(); }, 5 * 60000);
+
+</script>
+<script>
+
+        /* =====================================================================
            VERSION ANGLAISE : traduction de l'interface (dictionnaire + règles)
            ===================================================================== */
         const LANG = (() => {
@@ -9264,6 +9756,11 @@
             '🎙️ Salon vocal': '🎙️ Voice chat', 'Rejoindre le vocal': 'Join voice chat', '🔇 Couper le micro': '🔇 Mute mic', '🔊 Réactiver le micro': '🔊 Unmute mic', '📴 Quitter': '📴 Leave',
             '👁️ Tu regardes': '👁️ Watching', '✖ Quitter': '✖ Leave', '🔴 Parties en cours (mode spectateur)': '🔴 Live games (spectator mode)', 'Aucune partie publique en cours.': 'No public game in progress.',
             '♿ Accessibilité': '♿ Accessibility', '🔠 Gros texte': '🔠 Large text', '🎨 Mode daltonien': '🎨 Color-blind mode', '(bonnes réponses en bleu, erreurs en orange)': '(right answers in blue, mistakes in orange)',
+            '👥 Amis': '👥 Friends', '👥 Mes amis': '👥 My friends', '⛓️ Chaîne de persos': '⛓️ Character chain', '🐺 Loup-garou anime': '🐺 Anime Werewolf', '📝 Quiz des joueurs': '📝 Player quizzes',
+            'Voir les quiz': 'Browse quizzes', '🟢 Facile : openings cultes': '🟢 Easy: iconic openings', '🎴 Deck': '🎴 Deck', '🔁 Rejouer': '🔁 Play again', '🔙 Retour au salon': '🔙 Back to room',
+            '🚪 Quitter': '🚪 Leave', '🔙 Salon': '🔙 Room', '👉 À toi !': '👉 Your turn!', '💾 Enregistrer': '💾 Save', '💾 Enregistrer le quiz': '💾 Save quiz', '➕ Créer un quiz': '➕ Create a quiz',
+            '⭐ Populaires': '⭐ Popular', '🆕 Nouveaux': '🆕 New', '✏️ Mes quiz': '✏️ My quizzes', '▶ Jouer': '▶ Play', '🤐 Vote blanc': '🤐 Abstain', '🛠️ Règles :': '🛠️ Rules:', '🔥 Bonus de série': '🔥 Streak bonus',
+            '🌟 Saison à thème': '🌟 Themed season', '🛒 Voir les cosmétiques': '🛒 See cosmetics', 'Note ce quiz :': 'Rate this quiz:', 'En attente de l’hôte…': 'Waiting for the host…',
             '🌍 Langue': '🌍 Language', 'Crée un compte pour jouer en classé.': 'Create an account to play ranked.', 'Crée un compte pour accéder à cette partie.': 'Create an account to access this.',
             '⭐ Premium actif': '⭐ Premium active', 'Gratuit': 'Free', '⭐ Premium': '⭐ Premium', 'Pass terminé !': 'Pass complete!', 'Rang maximum !': 'Max rank!',
             'La partie s’affiche dès la prochaine manche…': 'The game will show up at the next round…', 'Joue quelques parties pour voir tes stats par anime.': 'Play a few games to see your stats per anime.',
