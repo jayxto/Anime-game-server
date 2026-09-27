@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anime Game – Quiz et jeux anime multijoueur gratuits</title>
-    <meta name="description" content="Joue gratuitement à des jeux anime entre potes ou avec ton chat Twitch : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE, Colorie le perso et plus de 20 mini-jeux sur Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…">
+    <meta name="description" content="Joue gratuitement à des jeux anime entre potes ou avec ton chat Twitch : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux sur Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…">
     <meta name="theme-color" content="#0b0b10">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" href="/icon-192.png">
     <link rel="apple-touch-icon" href="/icon-192.png">
     <link rel="manifest" href="/manifest.webmanifest">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Anime Game","inLanguage":"fr","description":"Quiz et jeux anime multijoueur gratuits dans le navigateur : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE, Colorie le perso et plus de 20 mini-jeux.","genre":["Quiz","Party game","Anime"],"playMode":["MultiPlayer","SinglePlayer"],"gamePlatform":"Navigateur web","applicationCategory":"Game","operatingSystem":"Tous","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Anime Game","inLanguage":"fr","description":"Quiz et jeux anime multijoueur gratuits dans le navigateur : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux.","genre":["Quiz","Party game","Anime"],"playMode":["MultiPlayer","SinglePlayer"],"gamePlatform":"Navigateur web","applicationCategory":"Game","operatingSystem":"Tous","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -846,17 +846,56 @@
         .miss-rate{font-family:'Bangers',cursive;font-size:1.4rem;text-align:right;}
         #bug-fab{position:fixed;right:12px;bottom:120px;z-index:9995;background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:99px;width:42px;height:42px;font-size:1.1rem;cursor:pointer;display:none;box-shadow:0 4px 14px rgba(0,0,0,.5);}
         #site-banner{position:fixed;top:0;left:0;right:0;z-index:10002;background:linear-gradient(90deg,#ff9a3c,#ff2a5f);color:#fff;font-weight:800;text-align:center;padding:8px 12px;font-size:.88rem;box-shadow:0 2px 12px rgba(0,0,0,.5);}
-        #theme-layer{position:fixed;inset:0;pointer-events:none;z-index:9990;overflow:hidden;}
-        .theme-p{position:absolute;top:-40px;animation:themeFall linear forwards;opacity:.85;}
-        .theme-p.halloween{animation-name:themeFly;}
-        @keyframes themeFall{to{transform:translateY(110vh) rotate(360deg);}}
-        @keyframes themeFly{0%{transform:translate(0,0)}25%{transform:translate(40px,30vh)}50%{transform:translate(-30px,55vh)}75%{transform:translate(30px,80vh)}100%{transform:translate(0,110vh)}}
+        /* ===== Déco de saison (Halloween / Noël) : décor fixe derrière le site, rien ne tombe ===== */
+        #theme-layer{position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden;}
+        html.light #theme-layer{filter:invert(1) hue-rotate(180deg);}
+        .dk-stars{position:absolute;inset:0 0 40% 0;}
+        .dk-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.5;animation:dkTwinkle 3s ease-in-out infinite alternate;}
+        @keyframes dkTwinkle{from{opacity:.15}to{opacity:.8}}
+        .dk-moon{position:absolute;top:92px;right:6%;width:130px;height:130px;border-radius:50%;
+            background:radial-gradient(circle at 35% 38%,rgba(0,0,0,.08) 0 9%,transparent 10%),radial-gradient(circle at 62% 64%,rgba(0,0,0,.07) 0 13%,transparent 14%),radial-gradient(circle at 66% 30%,rgba(0,0,0,.06) 0 6%,transparent 7%),radial-gradient(circle at 40% 40%,#fff3d1,#ffc76b 70%,#f39a2e);
+            box-shadow:0 0 60px 18px rgba(255,160,60,.28),0 0 160px 60px rgba(255,120,40,.12);opacity:.9;}
+        .dk-bats{position:absolute;top:70px;right:3%;width:260px;height:170px;}
+        .dk-bat{transform-box:fill-box;transform-origin:center;animation:dkFlap .35s ease-in-out infinite alternate;}
+        .dk-batg{animation:dkHover 7s ease-in-out infinite alternate;}
+        .dk-batg:nth-child(2){animation-duration:9s;animation-delay:-3s;}
+        .dk-batg:nth-child(3){animation-duration:11s;animation-delay:-6s;}
+        @keyframes dkFlap{from{transform:scaleY(1)}to{transform:scaleY(.45)}}
+        @keyframes dkHover{0%{transform:translate(0,0)}50%{transform:translate(-18px,10px)}100%{transform:translate(12px,-8px)}}
+        .dk-web{position:absolute;top:0;width:190px;height:190px;opacity:.55;}
+        .dk-web.l{left:0;} .dk-web.r{right:0;transform:scaleX(-1);}
+        .dk-spider{position:absolute;left:112px;top:-260px;width:22px;animation:dkDangle 6s ease-in-out infinite alternate;}
+        .dk-spider::before{content:'';position:absolute;left:50%;top:0;width:1px;height:380px;background:rgba(230,225,255,.45);}
+        .dk-spider svg{position:absolute;top:376px;left:-5px;width:32px;height:32px;filter:drop-shadow(0 0 4px rgba(190,140,255,.6));}
+        @keyframes dkDangle{0%{transform:translateY(0)}60%{transform:translateY(46px)}100%{transform:translateY(30px)}}
+        .dk-land{position:absolute;left:0;right:0;bottom:0;width:100%;height:170px;}
+        .dk-glow{animation:dkFlicker 2.8s infinite;}
+        .dk-glow.b{animation-delay:-1.3s;animation-duration:3.6s;}
+        @keyframes dkFlicker{0%,100%{opacity:1}42%{opacity:.95}45%{opacity:.55}48%{opacity:1}70%{opacity:.85}}
+        .dk-fog{position:absolute;left:0;right:0;bottom:0;height:130px;opacity:.9;
+            background-image:radial-gradient(ellipse 50% 60% at 25% 80%,rgba(170,140,220,.14),transparent 70%),radial-gradient(ellipse 40% 50% at 75% 90%,rgba(170,140,220,.1),transparent 70%);
+            background-size:700px 130px;background-repeat:repeat-x;animation:dkFog 50s linear infinite;}
+        .dk-fog.b{animation-duration:80s;animation-direction:reverse;opacity:.6;bottom:18px;}
+        @keyframes dkFog{from{background-position:0 0}to{background-position:700px 0}}
+        @media (max-width:640px){.dk-land{height:110px}.dk-moon{width:84px;height:84px;top:84px}.dk-bats{width:180px;height:120px}.dk-web{width:120px;height:120px}.dk-spider{left:70px}.dk-moon{top:112px;right:-30px}.dk-bats{top:96px;right:-50px}html.theme-halloween header .logo::after,html.theme-noel header .logo::after{content:none!important}}
+        @media (prefers-reduced-motion:reduce){#theme-layer *{animation:none!important}}
+        body{padding-bottom:40px;}
         html.theme-halloween{--accent-pink:#ff7a00;--accent-cyan:#b77bff;--accent-yellow:#ffb300;}
-        html.theme-halloween body{background:radial-gradient(circle at 50% -10%,#2a1240 0%,#0b0b10 55%) fixed;}
+        html.theme-halloween body{background:radial-gradient(ellipse at 80% 0%,#3a1650 0%,#160b24 40%,#0b0b10 75%) fixed;}
         html.theme-noel{--accent-pink:#e53935;--accent-cyan:#7fd4ff;--accent-yellow:#ffd54f;}
-        html.theme-noel body{background:radial-gradient(circle at 50% -10%,#123024 0%,#0b0b10 55%) fixed;}
+        html.theme-noel body{background:radial-gradient(ellipse at 50% 0%,#12324a 0%,#0c1a2a 45%,#0b0b10 80%) fixed;}
+        html.theme-halloween header,html.theme-noel header{position:relative;z-index:5;}
+        html.theme-halloween header::after,html.theme-noel header::after{content:'';position:absolute;left:0;right:0;pointer-events:none;background-repeat:repeat-x;}
+        html.theme-halloween header::after{bottom:-17px;height:16px;background-size:150px 16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 16'%3E%3Cpath fill='%23ff7a00' d='M0 0h150v3c-6 0-7 2-8 5s-1 5-3 5-2-3-2-5-1-5-5-5c-9 0-10 1-12 1s-3 0-4 4-1 8-4 8-3-5-3-8-1-4-6-4H83c-5 0-5 1-6 3s0 4-3 4-2-3-3-4-2-3-7-3H45c-4 0-5 1-6 5s-1 9-4 9-3-6-3-9-1-5-6-5H13c-4 0-5 1-6 3s0 3-2 3-2-2-3-3-1-3-2-3z'/%3E%3C/svg%3E");}
+        html.theme-noel header::after{bottom:-24px;height:26px;background-size:180px 26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 26'%3E%3Cpath d='M0 3Q45 16 90 3T180 3' fill='none' stroke='%23264d33' stroke-width='2'/%3E%3Cg%3E%3Crect x='20' y='7' width='4' height='3' fill='%23555'/%3E%3Cellipse cx='22' cy='15' rx='4' ry='6' fill='%23ff4d4d'%3E%3Canimate attributeName='opacity' values='1;.35;1' dur='1.6s' repeatCount='indefinite'/%3E%3C/ellipse%3E%3Crect x='53' y='11' width='4' height='3' fill='%23555'/%3E%3Cellipse cx='55' cy='19' rx='4' ry='6' fill='%23ffd54f'%3E%3Canimate attributeName='opacity' values='.35;1;.35' dur='1.6s' repeatCount='indefinite'/%3E%3C/ellipse%3E%3Crect x='88' y='3' width='4' height='3' fill='%23555'/%3E%3Cellipse cx='90' cy='11' rx='4' ry='6' fill='%234dd2ff'%3E%3Canimate attributeName='opacity' values='1;.35;1' dur='2.1s' repeatCount='indefinite'/%3E%3C/ellipse%3E%3Crect x='123' y='11' width='4' height='3' fill='%23555'/%3E%3Cellipse cx='125' cy='19' rx='4' ry='6' fill='%2366e08a'%3E%3Canimate attributeName='opacity' values='.35;1;.35' dur='2.1s' repeatCount='indefinite'/%3E%3C/ellipse%3E%3Crect x='156' y='7' width='4' height='3' fill='%23555'/%3E%3Cellipse cx='158' cy='15' rx='4' ry='6' fill='%23ff8fd0'%3E%3Canimate attributeName='opacity' values='1;.35;1' dur='1.3s' repeatCount='indefinite'/%3E%3C/ellipse%3E%3C/g%3E%3C/svg%3E");}
         html.theme-halloween header .logo::after{content:' 🎃';}
         html.theme-noel header .logo::after{content:' 🎄';}
+        html.theme-halloween .logo{text-shadow:3px 3px 0 #6a1fa0,0 0 18px rgba(255,140,0,.45);}
+        html.theme-halloween .quote-mode-card,html.theme-halloween .daily-card,html.theme-halloween .arc-menu{box-shadow:0 0 0 1px rgba(255,122,0,.12),0 10px 30px rgba(110,30,180,.18);}
+        html.theme-halloween .quote-mode-card,html.theme-halloween .daily-card{background:linear-gradient(135deg,rgba(255,122,0,.10),rgba(120,40,200,.12));}
+        html.theme-noel .quote-mode-card,html.theme-noel .daily-card{position:relative;background:linear-gradient(135deg,rgba(127,212,255,.10),rgba(229,57,53,.08));}
+        html.theme-noel .quote-mode-card::before,html.theme-noel .daily-card::before{content:'';position:absolute;left:6px;right:6px;top:-9px;height:14px;pointer-events:none;background-repeat:repeat-x;background-size:90px 14px;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 14'%3E%3Cpath fill='%23eef5ff' d='M0 9Q4 2 12 4T26 3T42 5T58 2T74 4T90 8V11Q84 14 78 11T64 12T50 10T34 13T18 10T0 12Z'/%3E%3C/svg%3E");}
         .theme-card{border:2px solid var(--accent-pink);}
 
         /* ===== Devine le perso ===== */
@@ -1023,7 +1062,6 @@
             <li><b>Undercover anime</b> : trouve l'imposteur qui n'a pas le même perso que les autres.</li>
             <li><b>Dessine le perso</b> : dessine un perso d'anime, les autres doivent le deviner (mode stream pour ton chat Twitch).</li>
             <li><b>Devine le perso</b> : pose des questions oui / non pour trouver le perso mystère.</li>
-            <li><b>Colorie le perso</b> : retrouve de mémoire la vraie couleur des cheveux ou des vêtements.</li>
             <li><b>Citations</b> : à qui appartient cette réplique culte ?</li>
             <li><b>AnimeDLE</b> : le Wordle des persos d'anime, avec un défi du jour.</li>
             <li><b>Mini-jeux</b> : Pixel, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
@@ -1113,19 +1151,19 @@
                 </div>
 
                 <div class="quote-mode-card">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">À qui appartient cette citation ? <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">À qui appartient cette citation ?</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">986 citations • 25 à 42 par anime • 487 personnages • solo ou multi • bonne réponse = +1 point • indice destinataire après 5 erreurs</p>
                     <button class="btn-action" style="margin-top:0;" onclick="openQuoteUniverseSelection()">Choisir l'univers</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:var(--accent-pink);">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎧 Blind Test Anime</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Un extrait se lance, trouve de quel <b>anime</b> il vient parmi 4 propositions • 210 openings / endings • 10 manches • 20s chrono • +100 pts par bonne réponse + bonus de rapidité • solo ou multi</p>
                     <button class="btn-action" style="margin-top:0;" onclick="createRoom('blindtest','normal')">Créer un Blind Test</button>
                 </div>
 
                 <div class="arc-menu">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:4px;">🕹️ Mini-jeux <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:4px;">🕹️ Mini-jeux</h3>
                     <p style="margin:0;font-size:.85rem;">Solo ou multi • 4 à 12 manches • plus tu réponds vite, plus tu gagnes de points</p>
                     <div class="arc-menu-grid">
                         <button class="arc-game-btn" onclick="openArcadeGame('pixel')"><span class="arc-ico">🖼️</span><b>Pixel Anime</b><span>Image ultra pixelisée qui se précise → devine le perso</span></button>
@@ -1141,13 +1179,12 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve la vraie couleur du perso : le moins proche perd un cœur</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#b77bff;">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🕵️ Devine le perso <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🕵️ Devine le perso</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Un joueur choisit un perso, les autres posent autant de questions oui / non qu'ils veulent pour le trouver • chacun son tour • 2 joueurs min.</p>
                     <button class="btn-action" style="margin-top:0;background:#b77bff;color:#111;" onclick="createRoom('guess','all')">Créer une partie</button>
                 </div>
@@ -1159,19 +1196,19 @@
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#00ff88;">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tournoi <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tournoi</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">5 épreuves de mini-jeux à la suite, points cumulés • les derniers sont éliminés après chaque épreuve (plus vous êtes nombreux, plus il y a d'éliminés) jusqu'à la finale à 2 • jusqu'à 50 joueurs, parfait en live</p>
                     <button class="btn-action" style="margin-top:0;background:#00ff88;color:#111;" onclick="createRoom('arcade','tournoi')">Créer un tournoi</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:var(--accent-yellow);">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tier List <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tier List</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Classe tous les animes (107) ou les persos d'un univers de S à F • glisser-déposer (ou toucher sur mobile) • sauvegarde auto • export en image</p>
                     <button class="btn-action" style="margin-top:0;" onclick="openTierSelection()">Faire ma tier list</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:var(--accent-pink);">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle d'openings <span class="quote-new">NOUVEAU</span></h3>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle d'openings</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Tournoi entre 210 openings / endings : écoute, choisis ton préféré à chaque duel jusqu'au champion (8 à 64) • classement mondial des votes</p>
                     <button class="btn-action" style="margin-top:0;background:var(--accent-pink);" onclick="openBattleSelection()">Lancer une battle</button>
                 </div>
@@ -1776,7 +1813,7 @@
         </div>
         <div class="opt-panel">
             <h2>🎃 Thème du site</h2>
-            <select id="adm-theme" class="v7-input"><option value="none">Normal</option><option value="halloween">🎃 Halloween</option><option value="noel">🎄 Noël</option></select>
+            <select id="adm-theme" class="v7-input"><option value="auto">📅 Auto (Halloween en octobre, Noël en décembre)</option><option value="none">Normal</option><option value="halloween">🎃 Halloween</option><option value="noel">🎄 Noël</option></select>
             <p class="tl-hint" style="text-align:left;">Change la déco pour tout le monde et ajoute une carte « Pixel / Silhouette spécial » avec des persos du thème.</p>
             <button class="btn-action" style="margin-top:0;" onclick="saveTheme()">Appliquer</button>
         </div>
@@ -1801,7 +1838,7 @@
         </div>
         <div class="opt-panel">
             <h2>🧑‍🎤 Ajouter un perso</h2>
-            <p class="tl-hint" style="text-align:left;">Ajouté direct dans Pixel, Silhouette, Colorie, Dessine, Devine le perso, Fusion, Imposteur et les avatars.</p>
+            <p class="tl-hint" style="text-align:left;">Ajouté direct dans Pixel, Silhouette, Dessine, Devine le perso, Fusion, Imposteur et les avatars.</p>
             <select id="adm-c-u" class="v7-input"></select>
             <input id="adm-c-name" class="v7-input" maxlength="60" placeholder="Nom du perso (ex : Frieren)">
             <input id="adm-c-img" class="v7-input" maxlength="600" placeholder="Lien de l'image (https://…)" oninput="admImgPrev()">
@@ -7599,7 +7636,7 @@
         /* =====================================================================
            ADMIN, SIGNALEMENTS, MAINTENANCE, THÈMES
            ===================================================================== */
-        let SITE_STATE = { maintenance: { on: false, msg: '' }, theme: 'none' };
+        let SITE_STATE = { maintenance: { on: false, msg: '' }, theme: 'auto' };
         const lastStates = {};
         ['arc_state', 'bt_state', 'quote_state', 'dle_state', 'draw_state', 'guess_state', 'rg_state'].forEach(ev => socket.on(ev, d => { lastStates[ev] = { at: Date.now(), d }; }));
 
@@ -7608,43 +7645,119 @@
             SITE_STATE = s || SITE_STATE;
             const ban = document.getElementById('site-banner');
             if (ban) { const m = SITE_STATE.maintenance || {}; ban.style.display = m.on ? 'block' : 'none'; ban.textContent = '🛠️ ' + (m.msg || 'Mise à jour du site en cours, les parties peuvent être coupées.'); document.body.style.paddingTop = m.on ? (ban.offsetHeight || 36) + 'px' : ''; }
-            document.documentElement.classList.toggle('theme-halloween', SITE_STATE.theme === 'halloween');
-            document.documentElement.classList.toggle('theme-noel', SITE_STATE.theme === 'noel');
+            const th = siteTheme();
+            document.documentElement.classList.toggle('theme-halloween', th === 'halloween');
+            document.documentElement.classList.toggle('theme-noel', th === 'noel');
             const card = document.getElementById('theme-card');
             if (card) {
-                if (SITE_STATE.theme === 'halloween' || SITE_STATE.theme === 'noel') {
-                    const h = SITE_STATE.theme === 'halloween';
+                if (th === 'halloween' || th === 'noel') {
+                    const h = th === 'halloween';
                     card.style.display = 'block';
                     card.innerHTML = `<h3 style="color:var(--accent-yellow);margin-bottom:5px;">${h ? '🎃 Spécial Halloween' : '🎄 Spécial Noël'} <span class="quote-new">ÉVÈNEMENT</span></h3>
                         <p style="margin:0 0 12px;font-size:.85rem;">${h ? 'Démons, shinigamis, goules et monstres : devine les persos les plus effrayants !' : 'Persos de glace, rennes et esprit de Noël : devine les persos de saison !'}</p>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','pixel:${SITE_STATE.theme}')">🖼️ Pixel</button><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','silhouette:${SITE_STATE.theme}')">👤 Silhouette</button></div>`;
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','pixel:${th}')">🖼️ Pixel</button><button class="btn-action" style="margin-top:0;flex:1;" onclick="createRoom('arcade','silhouette:${th}')">👤 Silhouette</button></div>`;
                 } else card.style.display = 'none';
             }
             themeParticles();
             const f = document.getElementById('adm-maint'); if (f) { f.checked = !!(SITE_STATE.maintenance || {}).on; }
         }
         socket.on('site_settings', applySite);
-        let themeTimer = null;
-        function themeParticles() {
+        // Thème actif : « auto » = Halloween en octobre (jusqu'au 2 novembre), Noël du 1er décembre au 6 janvier
+        function siteTheme() {
+            const t = SITE_STATE.theme;
+            if (t === 'halloween' || t === 'noel') return t;
+            if (t !== 'auto') return 'none';
+            const d = new Date(), m = d.getMonth(), day = d.getDate();
+            if (m === 9 || (m === 10 && day <= 2)) return 'halloween';
+            if (m === 11 || (m === 0 && day <= 6)) return 'noel';
+            return 'none';
+        }
+        // Décor fixe derrière le site (lune, chauves-souris, toiles, cimetière / guirlande, sapins, chalet) : rien ne tombe
+        function decoWeb() {
+            let d = '';
+            const ang = [0, 18, 36, 54, 72, 90].map(a => a * Math.PI / 180), R = 190;
+            ang.forEach(a => { d += `M0 0L${(Math.cos(a) * R).toFixed(1)} ${(Math.sin(a) * R).toFixed(1)}`; });
+            [34, 62, 92, 124, 158].forEach(r => {
+                ang.forEach((a, i) => {
+                    const x = Math.cos(a) * r, y = Math.sin(a) * r;
+                    if (!i) { d += `M${x.toFixed(1)} ${y.toFixed(1)}`; return; }
+                    const m = (a + ang[i - 1]) / 2, rr = r * 0.86;
+                    d += `Q${(Math.cos(m) * rr).toFixed(1)} ${(Math.sin(m) * rr).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+                });
+            });
+            return `<svg viewBox="0 0 190 190"><path d="${d}" fill="none" stroke="rgba(230,225,255,.55)" stroke-width="1"/></svg>`;
+        }
+        function decoStars(n) {
+            let h = '';
+            for (let i = 0; i < n; i++) h += `<i style="left:${(i * 37.3) % 100}%;top:${(i * 53.7) % 100}%;animation-delay:-${(i * 0.7) % 3}s;${i % 4 ? '' : 'width:3px;height:3px;'}"></i>`;
+            return `<div class="dk-stars">${h}</div>`;
+        }
+        const DECO_BAT = '<path class="dk-bat" d="M0 6C3 1 7 0 9 3C10 1 11 0 12 2L13 0L14 2C15 0 16 1 17 3C19 0 23 1 26 6C23 4 21 5 20 7C18 5 16 6 15 8L13 11L11 8C10 6 8 5 6 7C5 5 3 4 0 6Z" fill="#12081c"/>';
+        function decoPumpkin(x, y, s, cls) {
+            return `<g transform="translate(${x} ${y}) scale(${s})">
+                <path d="M-1-15q2-6 6-8" stroke="#2f5a1f" stroke-width="3" fill="none"/>
+                <ellipse cx="-9" cy="0" rx="11" ry="14" fill="#d95f00"/><ellipse cx="9" cy="0" rx="11" ry="14" fill="#d95f00"/><ellipse cx="0" cy="0" rx="11" ry="15" fill="#ff7a00"/>
+                <g class="dk-glow ${cls || ''}" fill="#ffd23f"><path d="M-9-5l4-5 3 5z"/><path d="M9-5l-4-5-3 5z"/><path d="M-10 4h20l-3 5-2-2-2 3-2-3-2 3-2-3-2 2z"/></g></g>`;
+        }
+        function decoTomb(x, y, w, h) {
+            return `<g transform="translate(${x} ${y})"><path d="M0 ${h}V${w / 2}A${w / 2} ${w / 2} 0 0 1 ${w} ${w / 2}V${h}Z" fill="#2a2140"/><text x="${w / 2}" y="${w / 2 + 6}" font-size="${w / 3.2}" text-anchor="middle" fill="#4a3d66" font-family="serif" font-weight="700">RIP</text></g>`;
+        }
+        function decoTree(x, y, s, fill) {
+            return `<g transform="translate(${x} ${y}) scale(${s})" fill="none" stroke="${fill}" stroke-linecap="round">
+                <path d="M0 0V-60" stroke-width="7"/><path d="M0-30L-20-52L-30-54M-20-52L-22-66" stroke-width="4"/><path d="M0-42L18-64L30-66M18-64L20-78" stroke-width="4"/><path d="M0-58L-8-78M0-58L6-84" stroke-width="3"/></g>`;
+        }
+        function decoPine(x, y, s) {
+            return `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-3" y="-8" width="6" height="10" fill="#3b2a1e"/>
+                <path d="M0-70L-14-46H-6L-20-26H-8L-26-6H26L8-26H20L6-46H14Z" fill="#0f3b2b"/>
+                <path d="M0-70L-9-55L-3-57L0-52L4-57L9-55Z M-11-31L-4-33L0-29L5-33L12-31L7-38H-7Z M-16-10L-6-13L0-9L7-13L17-10L11-17H-11Z" fill="#e9f2ff" opacity=".9"/></g>`;
+        }
+        function decoHalloween() {
+            const tombs = decoTomb(292, 148, 22, 30) + decoTomb(326, 156, 18, 24) + decoTomb(470, 150, 20, 28) + decoTomb(872, 150, 22, 30) + decoTomb(905, 158, 16, 22)
+                + '<path d="M388 178V150M380 158H396" stroke="#2a2140" stroke-width="5"/><path d="M1010 176V152M1003 159H1017" stroke="#2a2140" stroke-width="5"/>';
+            const house = `<g transform="translate(640 60)">
+                <path d="M10 70V40L55 8L100 40V70Z" fill="#150c22"/><path d="M60 70V22H86V70Z" fill="#150c22"/><path d="M56 24L73-18L90 24Z" fill="#150c22"/>
+                <path d="M-4 46L55 0L114 46H104L55 10L6 46Z" fill="#1f1233"/>
+                <rect x="22" y="44" width="12" height="14" fill="#ffb347" class="dk-glow"/><rect x="42" y="44" width="12" height="14" fill="#ffb347" class="dk-glow b"/>
+                <rect x="67" y="30" width="12" height="12" fill="#ffcc66" class="dk-glow b"/><path d="M68 5H78V14H68Z" fill="#ff9a3c" class="dk-glow"/>
+                <path d="M26 44V58M22 51H34M46 44V58M42 51H54" stroke="#150c22" stroke-width="1.5"/></g>`;
+            const fence = Array.from({ length: 16 }, (_, i) => `<path d="M${520 + i * 7} 176V160L${521.5 + i * 7} 156L${523 + i * 7} 160V176" fill="#1a1028"/>`).join('') + '<path d="M518 164H632M518 172H632" stroke="#1a1028" stroke-width="2"/>';
+            const land = `<svg class="dk-land" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice">
+                <path d="M0 200V132Q140 104 300 124T600 118T900 128T1200 110V200Z" fill="#1c1030"/>
+                ${decoTree(150, 128, 1.2, '#1c1030')}${decoTree(1060, 116, 1.4, '#1c1030')}${house}
+                <path d="M0 200V170Q200 150 400 164T800 158T1200 166V200Z" fill="#0d0716"/>
+                ${decoTree(250, 170, .9, '#0d0716')}${decoTree(960, 166, 1, '#0d0716')}
+                ${tombs}${fence}
+                ${decoPumpkin(430, 176, 1, '')}${decoPumpkin(458, 182, .7, 'b')}${decoPumpkin(560, 184, .8, 'b')}${decoPumpkin(790, 178, 1.1, '')}${decoPumpkin(1120, 180, .9, 'b')}${decoPumpkin(70, 182, .9, '')}
+            </svg>`;
+            const bats = `<svg class="dk-bats" viewBox="0 0 260 170">
+                <g class="dk-batg"><g transform="translate(40 40) scale(1.6)">${DECO_BAT}</g></g>
+                <g class="dk-batg"><g transform="translate(190 20) scale(1.1)">${DECO_BAT}</g></g>
+                <g class="dk-batg"><g transform="translate(150 120) scale(.9)">${DECO_BAT}</g></g></svg>`;
+            const spider = `<div class="dk-spider"><svg viewBox="0 0 22 22"><g stroke="#3a2656" stroke-width="1.6" fill="none"><path d="M8 9L2 4M8 11L1 10M8 13L2 17M9 14L4 21M14 9L20 4M14 11L21 10M14 13L20 17M13 14L18 21"/></g><ellipse cx="11" cy="9" rx="3.5" ry="3.5" fill="#2c1d44"/><ellipse cx="11" cy="14" rx="5" ry="5.5" fill="#2c1d44"/><circle cx="10" cy="8.5" r=".8" fill="#ff3b3b"/><circle cx="12" cy="8.5" r=".8" fill="#ff3b3b"/></svg></div>`;
+            return decoStars(40) + '<div class="dk-moon"></div>' + bats + `<div class="dk-web l">${decoWeb()}</div><div class="dk-web r">${decoWeb()}</div>` + spider + land + '<div class="dk-fog"></div><div class="dk-fog b"></div>';
+        }
+        function decoNoel() {
+            const pines = [[90, 150, 1.1], [140, 158, .8], [330, 150, 1], [370, 160, .7], [820, 152, 1.2], [870, 160, .8], [1030, 146, 1.1], [1080, 156, .8], [560, 170, .6]].map(p => decoPine(...p)).join('');
+            const cabin = `<g transform="translate(640 110)">
+                <path d="M0 50V22H80V50Z" fill="#3b2418"/><path d="M-8 24L40-6L88 24Z" fill="#2a1a12"/><path d="M-10 25L40-8L90 25L86 27L40-3L-6 27Z" fill="#eef5ff"/>
+                <rect x="58" y="-4" width="10" height="16" fill="#2a1a12"/><rect x="56" y="-7" width="14" height="4" fill="#eef5ff"/>
+                <rect x="12" y="28" width="16" height="13" fill="#ffcf6b" class="dk-glow"/><rect x="50" y="28" width="16" height="13" fill="#ffcf6b" class="dk-glow b"/>
+                <path d="M20 28V41M12 34.5H28M58 28V41M50 34.5H66" stroke="#3b2418" stroke-width="1.5"/><rect x="32" y="30" width="12" height="20" fill="#2a1a12"/></g>`;
+            const land = `<svg class="dk-land" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMax slice">
+                <path d="M0 200V140Q160 112 330 132T640 124T920 136T1200 118V200Z" fill="#2d4260"/>
+                ${pines}${cabin}
+                <path d="M0 200V168Q220 150 420 162T820 158T1200 164V200Z" fill="#cddbee"/>
+                <path d="M0 200V182Q300 170 600 180T1200 178V200Z" fill="#e8f0fb"/>
+            </svg>`;
+            return decoStars(55) + '<div class="dk-moon" style="background:radial-gradient(circle at 40% 40%,#ffffff,#dfe9f7 70%,#b9c9e0);box-shadow:0 0 60px 16px rgba(180,210,255,.22),0 0 150px 50px rgba(140,180,255,.1);opacity:.75;"></div>' + land;
+        }
+        function themeParticles() { // nom gardé pour les appels existants : pose le décor de saison
             const layer = document.getElementById('theme-layer');
             if (!layer) return;
-            clearInterval(themeTimer); layer.innerHTML = '';
-            const t = SITE_STATE.theme;
-            if (t !== 'halloween' && t !== 'noel') return;
-            const set = t === 'halloween' ? ['🦇', '🎃', '👻', '🕸️', '🦇'] : ['❄️', '❄️', '❅', '🎁', '⭐', '❄️'];
-            const spawn = () => {
-                if (layer.children.length > 18) return;
-                const e = document.createElement('span');
-                e.className = 'theme-p ' + t;
-                e.textContent = set[Math.floor(Math.random() * set.length)];
-                e.style.left = Math.random() * 100 + 'vw';
-                e.style.fontSize = (12 + Math.random() * 16) + 'px';
-                e.style.animationDuration = (7 + Math.random() * 7) + 's';
-                layer.appendChild(e);
-                setTimeout(() => e.remove(), 14500);
-            };
-            for (let i = 0; i < 6; i++) setTimeout(spawn, i * 400);
-            themeTimer = setInterval(spawn, 1100);
+            const t = siteTheme();
+            if (layer.dataset.t === t) return;
+            layer.dataset.t = t;
+            layer.innerHTML = t === 'halloween' ? decoHalloween() : t === 'noel' ? decoNoel() : '';
         }
 
         // --- signaler un bug depuis une partie ---
@@ -7713,7 +7826,7 @@
             const s = d.site;
             document.getElementById('adm-maint').checked = !!s.maintenance.on;
             document.getElementById('adm-maint-msg').value = s.maintenance.msg || '';
-            document.getElementById('adm-theme').value = s.theme || 'none';
+            document.getElementById('adm-theme').value = s.theme || 'auto';
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
         async function saveMaintenance() {

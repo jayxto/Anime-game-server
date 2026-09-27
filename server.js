@@ -13608,7 +13608,6 @@ const HIDDEN_BADGES = [
     ['perfect', 'Sans faute 💯', 'Gagner une partie de 10 manches ou plus sans aucune erreur', null],
     ['underdog', 'Roi de la foule', 'Gagner une partie contre 5 joueurs ou plus', null],
     ['zero', 'Zéro pointé 🥲', 'Finir une partie de 5 manches ou plus avec 0 point', null],
-    ['artist', 'Picasso 🎨', '9/10 ou plus dans Colorie le perso', null],
     ['mangaka', 'Mangaka ✏️', 'Tous les joueurs ont trouvé ton dessin (3 joueurs min.)', null]
 ];
 HIDDEN_BADGES.forEach(([id, name, desc, cond]) => BADGES.push([id, name, desc, cond || (() => false), true]));
@@ -13721,7 +13720,6 @@ const QUEST_TEMPLATES = [
     { id: 'fast5', label: '5 bonnes réponses en moins de 3 secondes', xp: 90, kind: 'fast', n: 5 },
     { id: 'anime5', label: 'Trouve 5 bonnes réponses sur {anime}', xp: 90, kind: 'anime', n: 5 },
     { id: 'draw1', label: 'Joue une partie de Dessine le perso', xp: 70, kind: 'mode', mode: 'draw', n: 1 },
-    { id: 'color1', label: 'Joue une partie de Colorie le perso', xp: 70, kind: 'mode', mode: 'arcade:couleur', n: 1 },
     { id: 'guess1', label: 'Joue une partie de Devine le perso', xp: 70, kind: 'mode', mode: 'guess', n: 1 },
     { id: 'dle1', label: 'Gagne un AnimeDLE', xp: 80, kind: 'modewin', mode: 'dle', n: 1 }
 ];
@@ -14908,7 +14906,7 @@ io.on('connection', socket => {
    ADMIN : tableau de bord, openings ajoutés sans code, signalements de bug,
            mode maintenance, thèmes Halloween / Noël
    ===================================================================== */
-const SITE = { maintenance: { on: false, msg: '' }, theme: 'none' };
+const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto' };
 const CUSTOM_TRACKS_MEM = [], BUGS_MEM = [];
 function customTrackAdd(t) {
     const n = 5000 + t.id;
@@ -14975,7 +14973,7 @@ app.get('/api/admin/stats', adminOnly(async (req, res) => {
 app.post('/api/admin/settings', adminOnly(async (req, res) => {
     const b = req.body || {};
     if (b.maintenance) { SITE.maintenance = { on: !!b.maintenance.on, msg: String(b.maintenance.msg || '').slice(0, 300) }; await siteSave('maintenance'); }
-    if (b.theme !== undefined) { SITE.theme = ['none', 'halloween', 'noel'].includes(b.theme) ? b.theme : 'none'; await siteSave('theme'); }
+    if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
     res.json({ ok: true, site: SITE });
 }));
 function ytIdFrom(s) {
@@ -15958,7 +15956,6 @@ const TITLES = [
     { id: 'encyclo', name: 'Encyclopédie vivante', desc: '500 bonnes réponses au total', need: s => (s.correctTotal || 0) >= 500, prog: s => [s.correctTotal || 0, 500] },
     { id: 'specialiste', name: 'Spécialiste', desc: '50 bonnes réponses sur un même anime', need: s => (s.maxAnimeCorrect || 0) >= 50, prog: s => [s.maxAnimeCorrect || 0, 50] },
     { id: 'boss', name: 'Le Boss', desc: '50 victoires', need: s => (s.wins || 0) >= 50, prog: s => [s.wins || 0, 50] },
-    { id: 'picasso', name: 'Picasso', desc: 'Succès « Picasso » dans Colorie le perso', need: s => s.badges.includes('artist') },
     { id: 'mangaka', name: 'Mangaka', desc: 'Succès « Mangaka » dans Dessine le perso', need: s => s.badges.includes('mangaka') },
     { id: 'collection', name: 'Collectionneur', desc: '100 cartes différentes', need: s => s.cards >= 100, prog: s => [s.cards, 100] },
     { id: 'shiny', name: 'Chasseur de brillantes', desc: '10 cartes brillantes', need: s => s.shinies >= 10, prog: s => [s.shinies, 10] },
@@ -16206,3 +16203,6 @@ app.get(/^\/google[a-z0-9]+\.html$/i, (req, res, next) => {
     if (!f || req.path.slice(1) !== f) return next();
     res.type('text/html').send(`google-site-verification: ${f}`);
 });
+
+// Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
+delete ARC_GAMES.couleur;
