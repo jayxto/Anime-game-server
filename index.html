@@ -710,6 +710,21 @@
         .adm-cards div{background:#101018;border-radius:10px;padding:10px 6px;text-align:center;font-size:.72rem;color:var(--text-muted);}
         .adm-cards b{display:block;font-size:1.4rem;color:var(--accent-cyan);}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
+        .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+        .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
+        .cat-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+        .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;}
+        .cat-grid div{background:#101018;border-radius:10px;padding:5px;text-align:center;font-size:.72rem;border:2px solid #2c2c44;}
+        .cat-grid div.cu{border-color:#00ff88;}
+        .cat-grid img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;background:#0b0b10;}
+        .cat-row{background:#101018;border-radius:10px;padding:8px;margin-bottom:6px;font-size:.82rem;border-left:3px solid #2c2c44;}
+        .cat-row.cu{border-left-color:#00ff88;}
+        .cat-dle{width:100%;border-collapse:collapse;font-size:.72rem;}
+        .cat-dle th,.cat-dle td{border-bottom:1px solid #2c2c44;padding:4px;text-align:left;}
+        .cat-wrap{overflow-x:auto;}
+        .miss-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:8px;align-items:center;background:#101018;border-radius:10px;padding:6px;margin-bottom:6px;font-size:.8rem;}
+        .miss-row img{width:48px;height:48px;object-fit:cover;border-radius:6px;background:#0b0b10;}
+        .miss-rate{font-family:'Bangers',cursive;font-size:1.4rem;text-align:right;}
         #bug-fab{position:fixed;right:12px;bottom:120px;z-index:9995;background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:99px;width:42px;height:42px;font-size:1.1rem;cursor:pointer;display:none;box-shadow:0 4px 14px rgba(0,0,0,.5);}
         #site-banner{position:fixed;top:0;left:0;right:0;z-index:10002;background:linear-gradient(90deg,#ff9a3c,#ff2a5f);color:#fff;font-weight:800;text-align:center;padding:8px 12px;font-size:.88rem;box-shadow:0 2px 12px rgba(0,0,0,.5);}
         #theme-layer{position:fixed;inset:0;pointer-events:none;z-index:9990;overflow:hidden;}
@@ -765,6 +780,26 @@
         .col-hex span{width:34px;height:30px;border-radius:8px;border:2px solid #fff;display:block;flex:0 0 auto;}
         .col-hex input{flex:1;min-width:0;background:#0b0b10;border:1px solid #2c2c44;border-radius:8px;color:#fff;padding:6px 8px;font-family:monospace;}
         .col-submit{margin-top:4px !important;background:#00ff88 !important;color:#111 !important;}
+        .hsb-swatch{height:70px;border-radius:12px;border:3px solid #fff;box-shadow:0 4px 18px rgba(0,0,0,.4);}
+        .hsb-row{position:relative;}
+        .hsb-row label{display:flex;justify-content:space-between;font-weight:800;font-size:.85rem;margin-bottom:4px;}
+        .hsb-val{color:var(--text-muted);font-family:monospace;}
+        .hsb-track{height:26px;border-radius:99px;border:2px solid #2c2c44;}
+        .hsb-row input[type=range]{position:absolute;left:0;right:0;bottom:0;width:100%;height:26px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer;touch-action:pan-y;}
+        .hsb-row input[type=range]::-webkit-slider-runnable-track{background:transparent;height:26px;}
+        .hsb-row input[type=range]::-moz-range-track{background:transparent;height:26px;}
+        .hsb-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:34px;margin-top:-4px;border-radius:6px;background:#fff;border:3px solid #111;box-shadow:0 0 6px rgba(0,0,0,.6);}
+        .hsb-row input[type=range]::-moz-range-thumb{width:10px;height:30px;border-radius:6px;background:#fff;border:3px solid #111;}
+        .hsb-row input:disabled{cursor:not-allowed;opacity:.6;}
+        .col-big{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px;align-items:center;margin-bottom:12px;}
+        .col-split{display:grid;grid-template-columns:1fr 1fr;height:120px;border-radius:12px;overflow:hidden;border:3px solid #fff;}
+        .col-split div{display:flex;align-items:flex-end;justify-content:center;padding:6px;}
+        .col-split span{background:rgba(0,0,0,.55);color:#fff;font-weight:800;font-size:.75rem;padding:2px 8px;border-radius:99px;}
+        .col-gallery .col-split{border-width:2px;border-radius:8px;margin-bottom:4px;}
+        .col-score{text-align:center;}
+        .col-score b{font-family:'Bangers',cursive;font-size:3.4rem;color:#00ff88;line-height:1;}
+        .col-score small{font-size:1.2rem;color:var(--text-muted);font-weight:800;}
+        .col-score div{font-weight:800;margin-top:4px;}
         .col-reveal{width:100%;max-width:820px;}
         .col-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
         .col-pair figure{margin:0;background:#0b0b10;border-radius:12px;padding:8px;text-align:center;border:2px solid #2c2c44;}
@@ -776,7 +811,7 @@
         .col-gallery img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:6px;background:#0b0b10;}
         .col-gallery b{display:block;font-size:1rem;color:var(--accent-yellow);}
         .col-pct{font-family:'Bangers',cursive;font-size:2rem;color:#00ff88;}
-        @media (max-width:760px){.col-wrap{grid-template-columns:1fr;}.col-zones{grid-template-columns:repeat(6,1fr);}.col-zone{font-size:.6rem;}}
+        @media (max-width:760px){.col-wrap{grid-template-columns:1fr;}.col-big{grid-template-columns:1fr;}.col-zones{grid-template-columns:repeat(6,1fr);}.col-zone{font-size:.6rem;}}
     </style>
 </head>
 <body>
@@ -925,7 +960,7 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Une zone du perso est grise : retrouve sa vraie couleur</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve de mémoire la vraie couleur d'une zone du perso, noté sur 10</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
                 </div>
@@ -1080,6 +1115,11 @@
                 <span id="room-visibility-badge" class="room-visibility-badge">🔒 Salon privé</span>
             </div>
 
+            <div id="admin-bots-box" class="room-rounds" style="display:none;flex-wrap:wrap;gap:6px;">
+                <span>🤖 Bots de test :</span>
+                <select id="bot-skill"><option value="0.25">Faciles</option><option value="0.5" selected>Moyens</option><option value="0.8">Forts</option></select>
+                <button class="host-btn" onclick="adminBots(1)">+1</button><button class="host-btn" onclick="adminBots(3)">+3</button><button class="host-btn" onclick="adminBots(0)">Retirer</button>
+            </div>
             <p>Joueurs connectés :</p>
             <div id="team-lobby" class="team-lobby" style="display:none;"></div>
             <ul class="player-list" id="waiting-players-list"></ul>
@@ -1564,6 +1604,46 @@
             <select id="adm-t-kind" class="v7-input"><option value="opening">Opening</option><option value="ending">Ending</option></select>
             <button class="btn-action" style="margin-top:0;" onclick="addTrack()">Ajouter</button>
             <div id="adm-tracks" style="margin-top:10px;"></div>
+        </div>
+        <div class="opt-panel">
+            <h2>🤖 Bots de test</h2>
+            <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
+        </div>
+        <div class="opt-panel">
+            <h2>🧑‍🎤 Ajouter un perso</h2>
+            <p class="tl-hint" style="text-align:left;">Ajouté direct dans Pixel, Silhouette, Colorie, Dessine, Devine le perso, Fusion, Imposteur et les avatars.</p>
+            <select id="adm-c-u" class="v7-input"></select>
+            <input id="adm-c-name" class="v7-input" maxlength="60" placeholder="Nom du perso (ex : Frieren)">
+            <input id="adm-c-img" class="v7-input" maxlength="600" placeholder="Lien de l'image (https://…)" oninput="admImgPrev()">
+            <img id="adm-c-prev" alt="" style="display:none;max-height:120px;border-radius:8px;margin:0 auto 8px;" onerror="this.style.display='none'">
+            <input id="adm-c-alias" class="v7-input" maxlength="200" placeholder="Autres noms acceptés, séparés par des virgules (facultatif)">
+            <button class="btn-action" style="margin-top:0;" onclick="addChar()">Ajouter</button>
+            <div id="adm-chars" style="margin-top:10px;"></div>
+        </div>
+        <div class="opt-panel">
+            <h2>💬 Ajouter une citation</h2>
+            <select id="adm-q-u" class="v7-input" onchange="admQuoteSpeakers()"></select>
+            <textarea id="adm-q-text" class="v7-input" rows="3" maxlength="400" placeholder="La citation"></textarea>
+            <input id="adm-q-speaker" class="v7-input" list="adm-q-speakers" maxlength="60" placeholder="Qui la dit ? (ex : Levi Ackerman)"><datalist id="adm-q-speakers"></datalist>
+            <input id="adm-q-rec" class="v7-input" maxlength="80" placeholder="À qui ? (facultatif, ex : à Eren)">
+            <input id="adm-q-alias" class="v7-input" maxlength="200" placeholder="Autres réponses acceptées, séparées par des virgules (ex : Livaï, Levi)">
+            <button class="btn-action" style="margin-top:0;" onclick="addQuote()">Ajouter</button>
+            <div id="adm-quotes" style="margin-top:10px;"></div>
+        </div>
+        <div class="opt-panel">
+            <h2>❌ Questions les plus ratées</h2>
+            <p class="tl-hint" style="text-align:left;">Les manches où les joueurs se trompent le plus (bots exclus). Une réponse ratée à 100 % est souvent une erreur dans le jeu (mauvaise image, mauvais nom…).</p>
+            <div style="display:flex;gap:6px;"><select id="adm-m-mode" class="v7-input" style="flex:2;" onchange="loadMissed()"><option value="">Tous les modes</option></select>
+            <select id="adm-m-min" class="v7-input" style="flex:1;" onchange="loadMissed()"><option value="1">1+ partie</option><option value="3" selected>3+ parties</option><option value="10">10+ parties</option></select></div>
+            <div id="adm-missed"></div>
+        </div>
+        <div class="opt-panel">
+            <h2>📚 Répertoire</h2>
+            <div class="cat-tabs"><button data-t="chars" class="on" onclick="catType('chars')">🧑 Persos</button><button data-t="quotes" onclick="catType('quotes')">💬 Citations</button><button data-t="tracks" onclick="catType('tracks')">🎵 Musiques</button><button data-t="dle" onclick="catType('dle')">🔎 AnimeDLE</button></div>
+            <div style="display:flex;gap:6px;"><select id="cat-u" class="v7-input" style="flex:1;" onchange="loadCatalog()"></select>
+            <input id="cat-q" class="v7-input" style="flex:1;" placeholder="🔍 Rechercher partout" oninput="clearTimeout(window.__catT);window.__catT=setTimeout(loadCatalog,300)"></div>
+            <div id="cat-info" class="tl-hint" style="text-align:left;"></div>
+            <div id="cat-list"></div>
         </div>
         <div class="opt-panel">
             <h2>🐞 Bugs signalés</h2>
@@ -4371,7 +4451,7 @@
             imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
             audio:{ title:'🎧 ÉCOUTE LA SCÈNE', sub:"Pas d'image, juste le son d'une scène culte : de quel anime vient-elle ?", universe:false },
             chrono:{ title:'⏱️ CHRONO-QUIZ', sub:'60 secondes pour enchaîner un max de bonnes réponses (bonus de série)', universe:false },
-            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Une zone du perso est grise : retrouve sa vraie couleur, le plus proche gagne', universe:true },
+            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Le perso est en noir et blanc : retrouve la vraie couleur de la zone entourée avec les curseurs, noté sur 10', universe:true },
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
@@ -6682,137 +6762,160 @@
             col.sel = col.target = pool[((col.round || 1) * 7 + 3) % pool.length];
             return true;
         }
-        function colPaint(canvas, highlight) {
+        // Rendu : tout le perso en noir et blanc, la zone à deviner prend la couleur choisie
+        function colPaint(canvas, opts) {
             if (!col.D || !canvas) return;
+            const o2 = opts || {};
             const { W, H, lab } = col.D;
             canvas.width = W; canvas.height = H;
             const cx = canvas.getContext('2d');
-            const out = cx.createImageData(W, H), o = out.data;
-            const chosen = col.zones.map((z, i) => col.colors[i] ? rgb2lab(...hex2rgb(col.colors[i])) : null);
+            const out = cx.createImageData(W, H), o = out.data, q = col.D.rgba;
+            const hex = o2.hex !== undefined ? o2.hex : col.colors[col.target];
+            const c = hex ? rgb2lab(...hex2rgb(hex)) : null;
+            const zl = col.zones[col.target] ? col.zones[col.target].lab[0] : 50;
+            const pulse = o2.pulse || 0;
             for (let i = 0; i < W * H; i++) {
                 const z = col.labels[i], L = lab[i * 3];
                 let r, g, b;
-                if (z !== col.target) { const q = col.D.rgba; r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
-                else {
-                    const zl = col.zones[z].lab[0];
-                    const c = chosen[z];
-                    if (c) { const nl = Math.max(0, Math.min(100, c[0] + (L - zl) * 0.85)); [r, g, b] = lab2rgb(nl, c[1], c[2]); }
-                    else { const v = Math.round(Math.max(0, Math.min(255, 175 + (L - zl) * 1.6))); r = g = b = v; if (((i % W) + Math.floor(i / W)) % 10 < 5) { r -= 18; g -= 18; b -= 18; } }
-                    if (highlight && z === col.sel) { r = r * 0.45 + 0 * 0.55; g = g * 0.45 + 240 * 0.55; b = b * 0.45 + 255 * 0.55; }
+                if (z !== col.target) {
+                    if (o2.color) { r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
+                    else { const v = Math.round(0.299 * q[i * 4] + 0.587 * q[i * 4 + 1] + 0.114 * q[i * 4 + 2]); r = g = b = o2.dim ? v * 0.55 : v; }
+                } else if (c) {
+                    const nl = Math.max(0, Math.min(100, c[0] + (L - zl) * 0.85));
+                    [r, g, b] = lab2rgb(nl, c[1], c[2]);
+                } else {
+                    const v = Math.round(Math.max(0, Math.min(255, 175 + (L - zl) * 1.6))); r = g = b = v;
+                    if (((i % W) + Math.floor(i / W)) % 10 < 5) { r -= 18; g -= 18; b -= 18; }
                 }
-                o[i * 4] = r; o[i * 4 + 1] = g; o[i * 4 + 2] = b; o[i * 4 + 3] = 255;
+                if (pulse && z === col.target) { r = r * (1 - pulse) + 0 * pulse; g = g * (1 - pulse) + 240 * pulse; b = b * (1 - pulse) + 255 * pulse; }
+                o[i * 4] = r; o[i * 4 + 1] = g; o[i * 4 + 2] = b; o[i * 4 + 3] = q[i * 4 + 3];
+            }
+            // contour de la zone à deviner
+            if (!o2.noOutline) {
+                for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+                    const i = y * W + x;
+                    if (col.labels[i] !== col.target) continue;
+                    if (col.labels[i - 1] !== col.target || col.labels[i + 1] !== col.target || col.labels[i - W] !== col.target || col.labels[i + W] !== col.target) {
+                        o[i * 4] = 255; o[i * 4 + 1] = 212; o[i * 4 + 2] = 0;
+                    }
+                }
             }
             cx.putImageData(out, 0, 0);
         }
         function colRepaint() {
             if (col.raf) return;
-            col.raf = requestAnimationFrame(() => { col.raf = 0; colPaint(document.querySelector('.col-canvas'), Date.now() < col.flash && Math.floor(Date.now() / 250) % 2 === 0); colZonesUi(); });
+            col.raf = requestAnimationFrame(() => {
+                col.raf = 0;
+                const t = col.flash - Date.now();
+                colPaint(document.querySelector('.col-canvas'), { pulse: t > 0 ? 0.55 * Math.abs(Math.sin(t / 160)) : 0 });
+                colSlidersUi();
+            });
         }
         function colFlash() {
             col.flash = Date.now() + 1300;
-            const step = () => { colRepaint(); if (Date.now() < col.flash + 100) setTimeout(step, 250); };
+            const step = () => { colRepaint(); if (Date.now() < col.flash + 60) setTimeout(step, 60); };
             step();
         }
-        function colZonesUi() {
-            const box = document.querySelector('.col-zones');
-            if (!box) return;
-            const z = col.zones[col.target];
-            if (z && !box.__one) { box.__one = true; box.innerHTML = `<button class="col-zone on" style="grid-column:1/-1;flex-direction:row;justify-content:center;gap:8px;font-size:.85rem;padding:8px;" onclick="colFlash()"><i style="width:40px;"></i>Zone à colorier : en ${z.where === 'milieu' ? 'milieu' : z.where} 👁️</button>`; }
-            const zb = box.querySelector('i'); if (zb) zb.style.background = col.colors[col.target] || '';
-            const cur = col.colors[col.sel];
-            const prev = document.querySelector('.col-hex span'), inp = document.querySelector('.col-hex input');
-            if (prev) prev.style.background = cur || 'transparent';
-            if (inp && document.activeElement !== inp) inp.value = cur || '';
+        // --- curseurs Teinte / Saturation / Luminosité (comme Toon Tone) ---
+        function colCur() { return rgb2hex(...hsv2rgb(col.hue, col.s, col.v)); }
+        function colSlidersUi() {
+            const h = col.hue, s = col.s, v = col.v;
+            const set = (id, bg, val, txt) => {
+                const w = document.getElementById(id); if (!w) return;
+                const tr = w.querySelector('.hsb-track'); if (tr) tr.style.background = bg;
+                const inp = w.querySelector('input'); if (inp && document.activeElement !== inp) inp.value = val;
+                const t = w.querySelector('.hsb-val'); if (t) t.textContent = txt;
+            };
+            const hs = []; for (let i = 0; i <= 12; i++) hs.push(rgb2hex(...hsv2rgb(i * 30, Math.max(.35, s), Math.max(.45, v))));
+            set('hsb-h', `linear-gradient(90deg,${hs.join(',')})`, Math.round(h), Math.round(h) + '°');
+            set('hsb-s', `linear-gradient(90deg,${rgb2hex(...hsv2rgb(h, 0, v))},${rgb2hex(...hsv2rgb(h, 1, v))})`, Math.round(s * 100), Math.round(s * 100) + ' %');
+            set('hsb-v', `linear-gradient(90deg,#000,${rgb2hex(...hsv2rgb(h, s, 1))})`, Math.round(v * 100), Math.round(v * 100) + ' %');
+            const sw = document.querySelector('.hsb-swatch'); if (sw) sw.style.background = colCur();
         }
-        function colSelect(i) {
-            col.sel = i;
-            const c = col.colors[i];
-            if (c) { const [h, s, v] = rgb2hsv(...hex2rgb(c)); col.hue = h; col.s = s; col.v = v; colPickerPaint(); }
-            colFlash();
-        }
-        function colSetColor(hex, fromPicker) {
-            if (col.sent || !/^#[0-9a-f]{6}$/i.test(hex)) return;
-            col.colors[col.sel] = hex.toLowerCase();
-            if (!fromPicker) { const [h, s, v] = rgb2hsv(...hex2rgb(hex)); col.hue = h; col.s = s; col.v = v; colPickerPaint(); }
+        function colSlide(k, val) {
+            if (col.sent) return;
+            if (k === 'h') col.hue = +val; else if (k === 's') col.s = val / 100; else col.v = val / 100;
+            col.colors[col.target] = colCur();
             colRepaint();
         }
-        function colPickerPaint() {
-            const sv = document.querySelector('.col-sv'), hue = document.querySelector('.col-hue');
-            if (sv) {
-                const w = sv.width = sv.clientWidth || 240, h = sv.height = sv.clientHeight || 130, x = sv.getContext('2d');
-                x.fillStyle = `hsl(${col.hue},100%,50%)`; x.fillRect(0, 0, w, h);
-                let g = x.createLinearGradient(0, 0, w, 0); g.addColorStop(0, '#fff'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
-                g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, '#000'); x.fillStyle = g; x.fillRect(0, 0, w, h);
-                x.strokeStyle = col.v > .5 ? '#000' : '#fff'; x.lineWidth = 2; x.beginPath(); x.arc(col.s * w, (1 - col.v) * h, 7, 0, Math.PI * 2); x.stroke();
-            }
-            if (hue) {
-                const w = hue.width = hue.clientWidth || 240, h = hue.height = hue.clientHeight || 22, x = hue.getContext('2d');
-                const g = x.createLinearGradient(0, 0, w, 0);
-                for (let i = 0; i <= 6; i++) g.addColorStop(i / 6, `hsl(${i * 60},100%,50%)`);
-                x.fillStyle = g; x.fillRect(0, 0, w, h);
-                x.strokeStyle = '#fff'; x.lineWidth = 3; x.strokeRect(col.hue / 360 * w - 3, 1, 6, h - 2);
-            }
+        // Écart de couleur CIEDE2000
+        function deltaE2000(l1, l2) {
+            const [L1, a1, b1] = l1, [L2, a2, b2] = l2, rad = Math.PI / 180;
+            const C1 = Math.hypot(a1, b1), C2 = Math.hypot(a2, b2), Cm = (C1 + C2) / 2;
+            const G = 0.5 * (1 - Math.sqrt(Cm ** 7 / (Cm ** 7 + 25 ** 7)));
+            const a1p = a1 * (1 + G), a2p = a2 * (1 + G);
+            const C1p = Math.hypot(a1p, b1), C2p = Math.hypot(a2p, b2);
+            const h = (b, a) => { if (!b && !a) return 0; const x = Math.atan2(b, a) / rad; return x < 0 ? x + 360 : x; };
+            const h1p = h(b1, a1p), h2p = h(b2, a2p);
+            const dLp = L2 - L1, dCp = C2p - C1p;
+            let dhp = 0; if (C1p * C2p) { dhp = h2p - h1p; if (dhp > 180) dhp -= 360; else if (dhp < -180) dhp += 360; }
+            const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(dhp / 2 * rad);
+            const Lpm = (L1 + L2) / 2, Cpm = (C1p + C2p) / 2;
+            let hpm = h1p + h2p; if (C1p * C2p) { hpm = Math.abs(h1p - h2p) > 180 ? (h1p + h2p + (h1p + h2p < 360 ? 360 : -360)) / 2 : (h1p + h2p) / 2; }
+            const T = 1 - 0.17 * Math.cos((hpm - 30) * rad) + 0.24 * Math.cos(2 * hpm * rad) + 0.32 * Math.cos((3 * hpm + 6) * rad) - 0.2 * Math.cos((4 * hpm - 63) * rad);
+            const dTh = 30 * Math.exp(-(((hpm - 275) / 25) ** 2));
+            const Rc = 2 * Math.sqrt(Cpm ** 7 / (Cpm ** 7 + 25 ** 7));
+            const Sl = 1 + 0.015 * (Lpm - 50) ** 2 / Math.sqrt(20 + (Lpm - 50) ** 2), Sc = 1 + 0.045 * Cpm, Sh = 1 + 0.015 * Cpm * T;
+            const Rt = -Math.sin(2 * dTh * rad) * Rc;
+            return Math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2 + Rt * (dCp / Sc) * (dHp / Sh));
         }
-        function colBindPicker() {
-            const sv = document.querySelector('.col-sv'), hue = document.querySelector('.col-hue');
-            const drag = (el, fn) => {
-                let on = false;
-                const go = e => { const r = el.getBoundingClientRect(); fn(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))); };
-                el.addEventListener('pointerdown', e => { on = true; try { el.setPointerCapture(e.pointerId); } catch (_) {} go(e); e.preventDefault(); });
-                el.addEventListener('pointermove', e => { if (on) { go(e); e.preventDefault(); } });
-                el.addEventListener('pointerup', () => { on = false; }); el.addEventListener('pointercancel', () => { on = false; });
-            };
-            const apply = () => { colPickerPaint(); colSetColor(rgb2hex(...hsv2rgb(col.hue, col.s, col.v)), true); };
-            if (sv) drag(sv, (x, y) => { col.s = x; col.v = 1 - y; apply(); });
-            if (hue) drag(hue, x => { col.hue = x * 360; apply(); });
-        }
-        function colScore() {
+        function colTargetHex() { const z = col.zones[col.target]; return z ? rgb2hex(...lab2rgb(...z.lab)) : null; }
+        function colScore() { // note sur 100 (affichée /10)
             const z = col.zones[col.target], hex = col.colors[col.target];
             if (!z || !hex) return 0;
-            const c = rgb2lab(...hex2rgb(hex));
-            const dE = Math.sqrt((c[0] - z.lab[0]) ** 2 + (c[1] - z.lab[1]) ** 2 + (c[2] - z.lab[2]) ** 2);
-            return Math.round(100 * Math.max(0, 1 - dE / 50));
+            const dE = deltaE2000(rgb2lab(...hex2rgb(hex)), z.lab);
+            return Math.round(100 * Math.exp(-Math.pow(dE / 25, 1.4)));
+        }
+        const colNote = pct => (pct / 10).toFixed(1).replace('.', ',');
+        function colVerdict(pct) {
+            return pct >= 95 ? '🤯 Parfait !' : pct >= 85 ? '🔥 Incroyable' : pct >= 70 ? '👏 Très proche' : pct >= 50 ? '🙂 Pas mal' : pct >= 30 ? '😬 Bof' : '💀 Raté';
         }
         function colSubmit(auto) {
             if (col.sent || !col.zones.length) return;
             col.sent = true;
             clearTimeout(col.autoT);
-            const big = document.createElement('canvas'); colPaint(big, false);
-            col.myUrl = big.toDataURL('image/jpeg', 0.85);
+            const touched = !!col.colors[col.target];
+            const raw = document.createElement('canvas'); colPaint(raw, { color: true, noOutline: true });
+            const big = document.createElement('canvas'); big.width = raw.width; big.height = raw.height;
+            const bx = big.getContext('2d'); bx.fillStyle = '#0b0b10'; bx.fillRect(0, 0, big.width, big.height); bx.drawImage(raw, 0, 0);
+            col.myUrl = touched ? big.toDataURL('image/jpeg', 0.85) : null;
             const th = document.createElement('canvas'); const s = 150 / Math.max(big.width, big.height);
             th.width = Math.round(big.width * s); th.height = Math.round(big.height * s);
             th.getContext('2d').drawImage(big, 0, 0, th.width, th.height);
-            socket.emit('arc_color', { roomCode: currentRoomCode, pct: colScore(), thumb: th.toDataURL('image/jpeg', 0.7) });
+            col.myPct = touched ? colScore() : 0;
+            socket.emit('arc_color', { roomCode: currentRoomCode, pct: col.myPct, thumb: touched ? th.toDataURL('image/jpeg', 0.7) : null, hex: col.colors[col.target] || null, target: colTargetHex() });
             const btn = document.querySelector('.col-submit'); if (btn) { btn.disabled = true; btn.textContent = auto ? '⏱️ Temps écoulé : envoyé !' : '✅ Envoyé ! Attends les autres…'; }
+            document.querySelectorAll('.hsb-row input').forEach(i => { i.disabled = true; });
         }
-        const COL_SWATCHES = ['#000000', '#3b3b3b', '#8a8a8a', '#ffffff', '#f5d0b0', '#e0a57a', '#a0674a', '#5a3a28', '#ff0000', '#ff7a00', '#ffd400', '#7ed957', '#00a651', '#00c3ff', '#1e5bd8', '#0b1f5c', '#8e44ad', '#ff5fa2', '#ffb7d5', '#f2e6c9', '#c0392b', '#d4a017', '#2e7d32', '#4a4a8a'];
+        function colSplit(mine, real, size) {
+            return `<div class="col-split" style="${size ? `height:${size}px;` : ''}"><div style="background:${mine || 'repeating-linear-gradient(45deg,#333 0 6px,#444 6px 12px)'}"><span>${size ? '' : 'Ta couleur'}</span></div><div style="background:${real || '#000'}"><span>${size ? '' : 'Vraie couleur'}</span></div></div>`;
+        }
         function arcRenderColor(q, stage) {
             const key = q.round + '|' + (q.phase === 'playing' ? 'p' : 'r');
             if (col.key === key) return;
             const newRound = !col.key.startsWith(q.round + '|');
             col.key = key;
             if (q.phase === 'playing') {
-                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.D = null; }
+                if (newRound) {
+                    col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.myPct = null; col.D = null;
+                    // couleur de départ neutre, différente à chaque manche
+                    col.hue = (q.round * 137) % 360; col.s = 0.5; col.v = 0.7;
+                }
                 col.round = q.round;
                 const info = q.stage.color || {};
                 stage.innerHTML = `<div class="col-wrap">
-                    <div class="col-head">🎨 Colorie <b>${v7esc(info.name || '?')}</b> <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">Une seule zone est en gris : retrouve sa vraie couleur de mémoire !</div></div>
-                    <div class="col-canvas-wrap"><canvas class="col-canvas"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation du coloriage…</div></div></div>
+                    <div class="col-head">🎨 Quelle est la couleur de cette zone de <b>${v7esc(info.name || '?')}</b> ? <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">La zone entourée en jaune : retrouve sa vraie couleur de mémoire avec les 3 curseurs.</div></div>
+                    <div class="col-canvas-wrap"><canvas class="col-canvas" title="Touche pour voir la zone"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation…</div></div></div>
                     <div class="col-side">
-                        <div class="col-zones"></div>
-                        <canvas class="col-sv"></canvas><canvas class="col-hue"></canvas>
-                        <div class="col-sw">${COL_SWATCHES.map(c => `<button style="background:${c}" onclick="colSetColor('${c}')"></button>`).join('')}</div>
-                        <div class="col-hex"><span></span><input maxlength="7" placeholder="#rrggbb" oninput="if(/^#[0-9a-f]{6}$/i.test(this.value))colSetColor(this.value)"></div>
-                        <button class="btn-action col-submit" onclick="colSubmit(false)">✅ Valider mon coloriage</button>
+                        <div class="hsb-swatch"></div>
+                        <div class="hsb-row" id="hsb-h"><label>Teinte <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="359" step="1" oninput="colSlide('h',this.value)"></div>
+                        <div class="hsb-row" id="hsb-s"><label>Saturation <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="100" step="1" oninput="colSlide('s',this.value)"></div>
+                        <div class="hsb-row" id="hsb-v"><label>Luminosité <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="100" step="1" oninput="colSlide('v',this.value)"></div>
+                        <button class="btn-action col-submit" onclick="colSubmit(false)">✅ Valider ma couleur</button>
                     </div></div>`;
-                colBindPicker(); colPickerPaint();
+                colSlidersUi();
                 const canvas = stage.querySelector('.col-canvas');
-                canvas.addEventListener('click', e => {
-                    if (!col.labels) return;
-                    const r = canvas.getBoundingClientRect();
-                    const x = Math.floor((e.clientX - r.left) / r.width * col.W), y = Math.floor((e.clientY - r.top) / r.height * col.H);
-                    colFlash();
-                });
+                canvas.addEventListener('click', () => colFlash());
                 const myKey = key;
                 arcLoadImage(q.stage.img).then(img => {
                     if (col.key !== myKey) return;
@@ -6822,19 +6925,23 @@
                     col.img = img;
                     colRepaint(); colFlash();
                 });
-                // envoi auto juste avant la fin
                 clearTimeout(col.autoT);
                 const localEnd = Date.now() + (q.endsAt - q.serverNow);
                 col.autoT = setTimeout(() => colSubmit(true), Math.max(0, localEnd - Date.now() - 900));
                 return;
             }
-            // révélation
+            // révélation : ta couleur contre la vraie, note sur 10
             const me = q.players.find(p => p.id === socket.id) || {};
             const gal = q.stage.gallery || [];
+            const mine = gal.find(g => g.id === socket.id) || {};
+            const real = mine.target || (gal.find(g => g.target) || {}).target || colTargetHex();
+            const pct = me.pct != null ? me.pct : null;
             stage.innerHTML = `<div class="col-reveal">
+                <div class="col-big">${colSplit(mine.hex || col.colors[col.target], real)}
+                    <div class="col-score">${pct != null ? `<b>${colNote(pct)}</b><small>/10</small><div>${colVerdict(pct)}</div>` : '<div>😶 Pas de réponse</div>'}</div></div>
                 <div class="col-pair"><figure><img src="${v7esc(q.stage.img || '')}" alt=""><figcaption>🎴 ${v7esc((q.stage.color || {}).name || q.answer || '')}</figcaption></figure>
-                <figure>${col.myUrl ? `<img src="${col.myUrl}" alt="">` : '<div style="padding:40px 0;">😶 Pas de coloriage</div>'}<figcaption>Toi : <span class="col-pct">${me.pct != null ? me.pct + ' %' : '—'}</span></figcaption></figure></div>
-                <div class="col-gallery">${gal.map((g, i) => `<div class="${g.id === socket.id ? 'me' : ''}">${g.thumb ? `<img src="${g.thumb}" alt="">` : ''}<b>${['🥇', '🥈', '🥉'][i] || ''} ${g.pct} %</b>${v7esc(g.name)}</div>`).join('')}</div></div>`;
+                <figure>${col.myUrl ? `<img src="${col.myUrl}" alt="">` : '<div style="padding:40px 0;">😶 Pas de coloriage</div>'}<figcaption>Ta version</figcaption></figure></div>
+                <div class="col-gallery">${gal.map((g, i) => `<div class="${g.id === socket.id ? 'me' : ''}">${colSplit(g.hex, g.target || real, 34)}<b>${['🥇', '🥈', '🥉'][i] || ''} ${colNote(g.pct)}/10</b>${v7esc(g.name)}</div>`).join('')}</div></div>`;
         }
         function colAfterRender(q) {
             const result = document.getElementById('arc-result');
@@ -6842,12 +6949,12 @@
             if (q.phase === 'playing') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 result.style.color = me.done ? 'var(--accent-cyan)' : 'var(--text-color)';
-                result.textContent = me.done ? 'Coloriage envoyé ! Attends les autres…' : 'Retrouve la vraie couleur de la zone grise : le plus proche gagne !';
+                result.textContent = me.done ? 'Couleur envoyée ! Attends les autres…' : 'Règle Teinte, Saturation et Luminosité : le plus proche gagne !';
             } else if (q.phase === 'reveal') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 const gal = (q.stage && q.stage.gallery) || [];
                 result.style.color = 'var(--accent-yellow)';
-                result.textContent = gal.length ? `🏆 ${gal[0].name} est le plus ressemblant (${gal[0].pct} %)` + (me.gained ? ` • tu gagnes +${me.gained}` : '') : 'Personne n\'a colorié…';
+                result.textContent = gal.length ? `🏆 ${gal[0].name} est le plus proche (${colNote(gal[0].pct)}/10)` + (me.gained ? ` • tu gagnes +${me.gained}` : '') : 'Personne n\'a colorié…';
             }
         }
         (function () {
@@ -7094,6 +7201,8 @@
             if (!btn) return;
             const d = isAccount() ? await v7get('/api/admin/me') : null;
             btn.parentElement.style.display = d && d.ok ? '' : 'none';
+            window.IS_ADMIN = !!(d && d.ok);
+            const bb = document.getElementById('admin-bots-box'); if (bb) bb.style.display = window.IS_ADMIN ? 'flex' : 'none';
         }
         socket.on('connect', () => setTimeout(checkAdmin, 700));
         async function loadAdmin() {
@@ -7116,7 +7225,7 @@
             document.getElementById('adm-maint').checked = !!s.maintenance.on;
             document.getElementById('adm-maint-msg').value = s.maintenance.msg || '';
             document.getElementById('adm-theme').value = s.theme || 'none';
-            loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin();
+            loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
         async function saveMaintenance() {
             const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, msg: document.getElementById('adm-maint-msg').value } });
@@ -7160,6 +7269,112 @@
             }).join('') : '<p class="tl-hint">Aucun bug signalé 🎉</p>';
         }
         async function delBug(id) { await v7post('/api/admin/bugs/delete', { id }); loadAdminBugs(); }
+        // --- bots de test ---
+        async function adminBots(n) {
+            if (!currentRoomCode) return;
+            const skill = (document.getElementById('bot-skill') || {}).value || 0.5;
+            const d = await v7post('/api/admin/bots', n ? { roomCode: currentRoomCode, n, skill } : { roomCode: currentRoomCode, remove: true });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(n ? `🤖 ${d.names.length} bot${d.names.length > 1 ? 's' : ''} ajouté${d.names.length > 1 ? 's' : ''}` : `🤖 ${d.removed} bot(s) retiré(s)`, '#00ff88');
+        }
+        // --- persos ---
+        async function loadAdminChars() {
+            const d = await v7get('/api/admin/chars');
+            if (!d || !d.ok) return;
+            const sel = document.getElementById('adm-c-u');
+            if (sel && !sel.options.length) sel.innerHTML = '<option value="">Choisis l\'anime</option>' + d.universes.map(u => `<option value="${v7esc(u.k)}">${v7esc(u.name)}</option>`).join('');
+            const box = document.getElementById('adm-chars');
+            if (box) box.innerHTML = d.rows.length ? d.rows.map(c => `<div class="friend-row"><span style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><img src="/api/img?u=${encodeURIComponent(c.img)}" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:6px;" onerror="this.style.opacity=.2"><span><b>${v7esc(c.name)}</b><br><small style="color:var(--text-muted)">${v7esc(c.anime)}${c.aliases && c.aliases.length ? ' • ' + c.aliases.map(v7esc).join(', ') : ''}</small></span></span><button onclick="delChar(${c.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucun perso ajouté depuis ici pour le moment.</p>';
+        }
+        function admImgPrev() {
+            const v = document.getElementById('adm-c-img').value.trim(), im = document.getElementById('adm-c-prev');
+            if (/^https:\/\/\S+$/i.test(v)) { im.src = v; im.style.display = 'block'; } else im.style.display = 'none';
+        }
+        async function addChar() {
+            const v = id => document.getElementById(id).value;
+            const btn = event && event.target; if (btn) btn.disabled = true;
+            const d = await v7post('/api/admin/chars', { universe: v('adm-c-u'), name: v('adm-c-name'), img: v('adm-c-img'), aliases: v('adm-c-alias') });
+            if (btn) btn.disabled = false;
+            if (d && d.ok) { toast('🧑‍🎤 Perso ajouté aux mini-jeux !', '#00ff88'); ['adm-c-name', 'adm-c-img', 'adm-c-alias'].forEach(id => { document.getElementById(id).value = ''; }); admImgPrev(); loadAdminChars(); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+        async function delChar(id, btn) {
+            if (!btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = 'Sûr ?'; return; }
+            await v7post('/api/admin/chars/delete', { id }); loadAdminChars();
+        }
+        // --- citations ---
+        let admQuoteUnis = [];
+        async function loadAdminQuotes() {
+            const d = await v7get('/api/admin/quotes');
+            if (!d || !d.ok) return;
+            admQuoteUnis = d.universes;
+            const sel = document.getElementById('adm-q-u');
+            if (sel) { const cur = sel.value; sel.innerHTML = '<option value="">Choisis l\'anime</option>' + d.universes.map(u => `<option value="${v7esc(u.k)}">${v7esc(u.name)} (${u.n})</option>`).join(''); sel.value = cur; }
+            admQuoteSpeakers();
+            const box = document.getElementById('adm-quotes');
+            if (box) box.innerHTML = d.rows.length ? d.rows.map(q => `<div class="friend-row"><span style="font-size:.82rem;">« ${v7esc(q.text)} »<br><small style="color:var(--text-muted)"><b style="color:var(--accent-cyan)">${v7esc(q.speaker)}</b> • ${v7esc(q.anime)}${q.recipient ? ' • ' + v7esc(q.recipient) : ''}</small></span><button onclick="delQuote(${q.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucune citation ajoutée depuis ici pour le moment.</p>';
+        }
+        function admQuoteSpeakers() {
+            const k = (document.getElementById('adm-q-u') || {}).value;
+            const u = admQuoteUnis.find(x => x.k === k);
+            const dl = document.getElementById('adm-q-speakers');
+            if (dl) dl.innerHTML = u ? u.speakers.map(s => `<option value="${v7esc(s)}">`).join('') : '';
+        }
+        async function addQuote() {
+            const v = id => document.getElementById(id).value;
+            const d = await v7post('/api/admin/quotes', { universe: v('adm-q-u'), text: v('adm-q-text'), speaker: v('adm-q-speaker'), recipient: v('adm-q-rec'), aliases: v('adm-q-alias') });
+            if (d && d.ok) { toast(`💬 Citation ajoutée (${d.n} pour cet anime)`, '#00ff88'); ['adm-q-text', 'adm-q-speaker', 'adm-q-rec', 'adm-q-alias'].forEach(id => { document.getElementById(id).value = ''; }); loadAdminQuotes(); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+        }
+        async function delQuote(id, btn) {
+            if (!btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = 'Sûr ?'; return; }
+            await v7post('/api/admin/quotes/delete', { id }); loadAdminQuotes();
+        }
+        // --- questions les plus ratées ---
+        async function loadMissed() {
+            const mode = (document.getElementById('adm-m-mode') || {}).value || '', min = (document.getElementById('adm-m-min') || {}).value || 3;
+            const d = await v7get('/api/admin/missed?mode=' + encodeURIComponent(mode) + '&min=' + min);
+            const box = document.getElementById('adm-missed');
+            if (!box || !d || !d.ok) return;
+            const sel = document.getElementById('adm-m-mode');
+            if (sel) { const cur = sel.value; sel.innerHTML = '<option value="">Tous les modes</option>' + d.modes.map(m => `<option value="${v7esc(m.m)}">${v7esc(m.label)}</option>`).join(''); sel.value = cur; }
+            box.innerHTML = d.rows.length ? d.rows.map((r, i) => {
+                const f = r.info || {};
+                const img = f.u && f.name ? `/api/avatar/img?u=${encodeURIComponent(f.u)}&n=${encodeURIComponent(f.name)}` : '';
+                const col = r.rate >= 90 ? 'var(--accent-pink)' : r.rate >= 60 ? '#ff9a3c' : 'var(--accent-yellow)';
+                const extra = r.mode.startsWith('quote') ? '' : f.text ? `« ${v7esc(f.text.slice(0, 120))} »` : f.emoji ? v7esc(f.emoji) : f.choices ? 'choix : ' + f.choices.map(v7esc).join(' / ') : '';
+                return `<div class="miss-row">${img ? `<img src="${img}" alt="" loading="lazy" onerror="this.style.opacity=.15">` : `<div style="font-size:1.6rem;text-align:center;">${r.mode === 'blindtest' ? '🎵' : r.mode.startsWith('quote') ? '💬' : '❓'}</div>`}
+                    <div><b>${v7esc(r.answer)}</b><br><small style="color:var(--accent-cyan)">${v7esc(r.label)}</small>${extra ? `<br><small style="color:var(--text-muted)">${extra}</small>` : ''}${f.video ? ` <a href="https://youtu.be/${v7esc(f.video)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);font-size:.75rem;">▶️ vidéo</a>` : ''}</div>
+                    <div><div class="miss-rate" style="color:${col}">${r.rate} %</div><small style="color:var(--text-muted)">${r.fails}/${r.plays} ratés</small><br><button class="kick-btn" style="margin-top:2px;" data-m="${v7esc(r.mode)}" data-a="${v7esc(r.answer)}" onclick="delMissed(this)">Remettre à 0</button></div></div>`;
+            }).join('') : '<p class="tl-hint">Pas encore assez de parties jouées. Les stats se remplissent toutes seules pendant les parties.</p>';
+        }
+        async function delMissed(btn) { await v7post('/api/admin/missed/delete', { mode: btn.dataset.m, answer: btn.dataset.a }); loadMissed(); }
+        // --- répertoire ---
+        let catT = 'chars';
+        function catType(t) {
+            catT = t;
+            document.querySelectorAll('.cat-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+            const sel = document.getElementById('cat-u'); if (sel) { sel.innerHTML = ''; }
+            loadCatalog();
+        }
+        async function loadCatalog() {
+            const sel = document.getElementById('cat-u'), q = (document.getElementById('cat-q') || {}).value || '';
+            const box = document.getElementById('cat-list'), info = document.getElementById('cat-info');
+            if (!box) return;
+            const d = await v7get(`/api/admin/catalog?type=${catT}&u=${encodeURIComponent(sel && sel.value || '')}&q=${encodeURIComponent(q.trim())}`);
+            if (!d || !d.ok) return;
+            if (sel && !sel.options.length) {
+                const tot = d.universes.reduce((a, u) => a + u.n, 0);
+                sel.innerHTML = `<option value="">— ${d.universes.length} animes • ${tot} au total —</option>` + d.universes.map(u => `<option value="${v7esc(u.k)}">${v7esc(u.name)} (${u.n})</option>`).join('');
+            }
+            const nm = { chars: 'persos', quotes: 'citations', tracks: 'musiques', dle: 'persos AnimeDLE' }[catT];
+            if (!sel.value && !q.trim()) { info.textContent = `Choisis un anime ou fais une recherche pour afficher les ${nm}.`; box.innerHTML = ''; return; }
+            info.textContent = `${d.total} ${nm}${d.total > d.items.length ? ` (${d.items.length} affichés, affine la recherche)` : ''} • en vert : ajoutés depuis l'admin`;
+            if (catT === 'chars') box.innerHTML = `<div class="cat-grid">${d.items.map(c => `<div class="${c.custom ? 'cu' : ''}"><img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.12"><b>${v7esc(c.name)}</b>${sel.value ? '' : `<br><small style="color:var(--text-muted)">${v7esc(c.anime)}</small>`}</div>`).join('')}</div>`;
+            else if (catT === 'quotes') box.innerHTML = d.items.map(x => `<div class="cat-row ${x.custom ? 'cu' : ''}">« ${v7esc(x.text)} »<br><small><b style="color:var(--accent-cyan)">${v7esc(x.speaker)}</b>${x.recipient ? ' • ' + v7esc(x.recipient) : ''}${sel.value ? '' : ' • ' + v7esc(x.anime)}</small></div>`).join('');
+            else if (catT === 'tracks') box.innerHTML = d.items.map(x => `<div class="cat-row ${x.custom ? 'cu' : ''}" style="display:flex;justify-content:space-between;gap:8px;align-items:center;"><span><b>${v7esc(x.anime)}</b> • ${v7esc(x.title)}</span>${x.video ? `<a href="https://youtu.be/${v7esc(x.video)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);white-space:nowrap;">▶️ Écouter</a>` : '<small style="color:var(--text-muted)">pas de vidéo</small>'}</div>`).join('');
+            else box.innerHTML = `<div class="cat-wrap"><table class="cat-dle"><tr><th>Perso</th>${(d.cats || []).map(c => `<th>${v7esc(c)}</th>`).join('')}${d.cats && d.cats.length ? '' : '<th>Anime</th>'}</tr>${d.items.map(x => `<tr><td><b>${v7esc(x.name)}</b></td>${d.cats && d.cats.length ? x.vals.map(v => `<td>${v7esc(v)}</td>`).join('') : `<td>${v7esc(x.anime)}</td>`}</tr>`).join('')}</table></div>`;
+        }
         (function () {
             const orig = window.switchTab;
             window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'admin') loadAdmin(); return r; };

@@ -11157,7 +11157,7 @@ async function arcFetchImage(url) {
     const task = (async () => {
         let host = '';
         try { host = new URL(url).hostname; } catch (_) { return null; }
-        if (!ARC_IMG_HOSTS.test(host)) return null;
+        if (!ARC_IMG_HOSTS.test(host) && !(globalThis.CUSTOM_IMG_URLS && globalThis.CUSTOM_IMG_URLS.has(url))) return null;
         const ctrl = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 12000);
         try {
@@ -13591,7 +13591,7 @@ const HIDDEN_BADGES = [
     ['perfect', 'Sans faute 💯', 'Gagner une partie de 10 manches ou plus sans aucune erreur', null],
     ['underdog', 'Roi de la foule', 'Gagner une partie contre 5 joueurs ou plus', null],
     ['zero', 'Zéro pointé 🥲', 'Finir une partie de 5 manches ou plus avec 0 point', null],
-    ['artist', 'Picasso 🎨', '90 % de ressemblance ou plus dans Colorie le perso', null],
+    ['artist', 'Picasso 🎨', '9/10 ou plus dans Colorie le perso', null],
     ['mangaka', 'Mangaka ✏️', 'Tous les joueurs ont trouvé ton dessin (3 joueurs min.)', null]
 ];
 HIDDEN_BADGES.forEach(([id, name, desc, cond]) => BADGES.push([id, name, desc, cond || (() => false), true]));
@@ -13980,7 +13980,7 @@ arcPublic = function (room, g) {
         const t = (g.current.targets || [])[0];
         out.stage.color = { name: t ? t.display : '', anime: ARC_UNIVERSE_ANIME[g.current.u] || '' };
         if (g.phase === 'reveal' || g.phase === 'finished') {
-            out.stage.gallery = room.players.filter(p => g.answers[p.id]).map(p => ({ id: p.id, name: p.name, pct: g.answers[p.id].pct, thumb: g.answers[p.id].thumb || null }))
+            out.stage.gallery = room.players.filter(p => g.answers[p.id]).map(p => ({ id: p.id, name: p.name, pct: g.answers[p.id].pct, thumb: g.answers[p.id].thumb || null, hex: g.answers[p.id].hex || null, target: g.answers[p.id].target || null }))
                 .sort((a, b) => b.pct - a.pct).slice(0, 16);
             out.players.forEach(x => { const a = g.answers[x.id]; x.pct = a ? a.pct : null; });
         }
@@ -14202,14 +14202,15 @@ io.on('connection', socket => {
     });
 
     // Colorie le perso : le joueur envoie sa ressemblance + une miniature de son coloriage
-    socket.on('arc_color', ({ roomCode, pct, thumb } = {}) => {
+    socket.on('arc_color', ({ roomCode, pct, thumb, hex, target } = {}) => {
         const room = rooms[roomCode];
         const g = arcGames[roomCode];
         if (!room || !g || g.game !== 'couleur' || g.phase !== 'playing' || g.answers[socket.id]) return;
         if (!room.players.some(p => p.id === socket.id)) return;
         const v = Math.max(0, Math.min(100, Math.round(+pct || 0)));
         const th = typeof thumb === 'string' && /^data:image\/(jpeg|webp|png);base64,/.test(thumb) && thumb.length < 90000 ? thumb : null;
-        g.answers[socket.id] = { pct: v, thumb: th, correct: false };
+        const hx = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : null;
+        g.answers[socket.id] = { pct: v, thumb: th, hex: hx(hex), target: hx(target), correct: false };
         arcCheckAllDone(room, roomCode);
     });
 
@@ -15021,3 +15022,450 @@ arcPublic = function (room, g) {
     if (g.themeName) out.universeLabel = g.themeName === 'halloween' ? '🎃 Spécial Halloween' : '🎄 Spécial Noël';
     return out;
 };
+
+/* =====================================================================
+   ADMIN (2) : persos et citations ajoutés sans code, questions les plus
+               ratées, répertoire complet, bots de test
+   ===================================================================== */
+let CUR_SID = null;               // socket qui a envoyé l'évènement en cours
+const BOT_IDS = new Set();        // identifiants socket des bots
+const isBotId = id => BOT_IDS.has(id);
+io.on('connection', socket => { socket.use((pkt, next) => { CUR_SID = socket.id; next(); }); });
+
+/* ---------- Persos ajoutés depuis l'admin ---------- */
+const CUSTOM_CHARS = [];          // { id, universe, name, img, aliases }
+globalThis.CUSTOM_IMG_URLS = new Set(); // images de persos ajoutées par l'admin (autorisées dans le proxy d'images)
+const CUSTOM_QUOTES_MEM = [];
+const _arcFamousBase = arcFamous;
+arcFamous = function (u) {
+    const base = _arcFamousBase(u);
+    const extra = CUSTOM_CHARS.filter(c => c.universe === u);
+    if (!extra.length) return base;
+    const seen = new Set(base.map(c => normalizeRG(c.display)));
+    const add = extra.filter(c => !seen.has(normalizeRG(c.name))).map(c => ({ raw: c.name, display: c.name, custom: c.id }));
+    return add.length ? base.concat(add) : base;
+};
+const _arcCharImageCustom = arcCharImage;
+arcCharImage = function (u, raw) {
+    const c = CUSTOM_CHARS.find(x => x.universe === u && x.img && (x.name === raw || normalizeRG(x.name) === normalizeRG(raw)));
+    return c ? Promise.resolve(c.img) : _arcCharImageCustom(u, raw);
+};
+const _arcNameMatchesCustom = arcNameMatches;
+arcNameMatches = function (u, target, input) {
+    if (_arcNameMatchesCustom(u, target, input)) return true;
+    const c = target && CUSTOM_CHARS.find(x => x.universe === u && x.name === target.display);
+    return !!(c && c.aliases && c.aliases.some(a => normalizeRG(a) === normalizeRG(input)));
+};
+function customCharAdd(row) {
+    if (CUSTOM_CHARS.some(c => c.id === row.id)) return;
+    CUSTOM_CHARS.push({ id: row.id, universe: row.universe, name: row.name, img: row.img || null, aliases: row.aliases || [] });
+    if (row.img) globalThis.CUSTOM_IMG_URLS.add(row.img);
+    ARC_FAMOUS_CACHE.delete(row.universe);
+}
+function customCharRemove(id) {
+    const i = CUSTOM_CHARS.findIndex(c => c.id === id);
+    if (i >= 0) { ARC_FAMOUS_CACHE.delete(CUSTOM_CHARS[i].universe); CUSTOM_CHARS.splice(i, 1); }
+}
+
+/* ---------- Citations ajoutées depuis l'admin ---------- */
+function customQuoteAdd(row) {
+    const u = QUOTE_UNIVERSES[row.universe];
+    if (!u || u.quotes.some(q => q.customId === row.id)) return;
+    u.quotes.push({ text: row.text, speaker: row.speaker, recipient: row.recipient || '', aliases: row.aliases || [], customId: row.id });
+}
+function customQuoteRemove(id) {
+    Object.values(QUOTE_UNIVERSES).forEach(u => { const i = u.quotes.findIndex(q => q.customId === id); if (i >= 0) u.quotes.splice(i, 1); });
+}
+
+/* ---------- Questions les plus ratées ---------- */
+const QSTATS = new Map();         // mode|réponse -> { mode, answer, info, plays, fails }
+function qstatRecord(mode, answer, info, plays, fails) {
+    if (!answer || !plays) return;
+    answer = String(answer).slice(0, 160);
+    const k = mode + '|' + answer;
+    const o = QSTATS.get(k) || { mode, answer, info: info || {}, plays: 0, fails: 0 };
+    o.plays += plays; o.fails += fails; if (info) o.info = info;
+    QSTATS.set(k, o);
+    if (HAS_DB) pool.query(`INSERT INTO question_stats (mode, answer, info, plays, fails) VALUES ($1,$2,$3,$4,$5)
+        ON CONFLICT (mode, answer) DO UPDATE SET plays = question_stats.plays + $4, fails = question_stats.fails + $5, info = $3, updated_at = now()`,
+        [mode, answer, JSON.stringify(info || {}), plays, fails]).catch(() => {});
+}
+const humansOf = room => room.players.filter(p => !isBotId(p.id) && !p.disconnected);
+// Mini-jeux
+const _arcRevealStats = arcReveal;
+arcReveal = function (room, roomCode) {
+    try {
+        const g = arcGames[roomCode];
+        const cfg = g && ARC_GAMES[g.game];
+        if (g && cfg && g.phase === 'playing' && g.current && ['choice', 'text', 'multi', 'color'].includes(cfg.answer)) {
+            const hs = humansOf(room);
+            if (hs.length) {
+                const t = (g.current.targets || [])[0];
+                const ok = p => {
+                    const a = g.answers[p.id];
+                    if (cfg.answer === 'color') return !!(a && a.pct >= 50);
+                    if (cfg.answer === 'multi') return ((g.found || {})[p.id] || new Set()).size >= (g.current.targets || []).length;
+                    return !!(a && a.correct);
+                };
+                const fails = hs.filter(p => !ok(p)).length;
+                const info = { game: cfg.label };
+                if (t && t.u) { info.u = t.u; info.name = t.display; info.anime = ARC_UNIVERSE_ANIME[t.u]; }
+                if (cfg.answer === 'multi') info.names = (g.current.targets || []).map(x => x.display);
+                ['emoji', 'question', 'hint', 'title', 'text'].forEach(key => { if (typeof g.current[key] === 'string') info[key] = g.current[key].slice(0, 200); });
+                if (Array.isArray(g.current.choices)) info.choices = g.current.choices.slice(0, 6).map(String);
+                const ans = cfg.answer === 'multi' ? (info.names || []).join(' + ') : (g.current.answer || (t && t.display));
+                qstatRecord('arcade:' + g.game, ans, info, hs.length, fails);
+            }
+        }
+    } catch (e) { console.warn('[stats]', e.message); }
+    return _arcRevealStats(room, roomCode);
+};
+// Blind test
+const _btRevealStats = btReveal;
+btReveal = function (room, roomCode) {
+    try {
+        const bt = room.blindtest;
+        if (bt && bt.phase === 'playing' && bt.current) {
+            const hs = humansOf(room);
+            if (hs.length) qstatRecord('blindtest', bt.current.anime + (bt.current.title ? ' — ' + bt.current.title : ''),
+                { anime: bt.current.anime, title: bt.current.title || '', video: bt.current.ytId || BLINDTEST_VIDEO_IDS[bt.current.n] || null },
+                hs.length, hs.filter(p => !(bt.answers[p.id] && bt.answers[p.id].correct)).length);
+        }
+    } catch (e) { console.warn('[stats]', e.message); }
+    return _btRevealStats(room, roomCode);
+};
+// Citations : chaque proposition compte
+const _quoteMatchStats = quoteAnswerMatches;
+quoteAnswerMatches = function (answerRaw, quote, universeKey) {
+    const ok = _quoteMatchStats(answerRaw, quote, universeKey);
+    try { if (quote && CUR_SID && !isBotId(CUR_SID)) qstatRecord('quote:' + universeKey, quote.speaker + ' : « ' + String(quote.text).slice(0, 90) + ' »', { text: quote.text, speaker: quote.speaker, anime: (QUOTE_UNIVERSES[universeKey] || {}).name }, 1, ok ? 0 : 1); } catch (_) {}
+    return ok;
+};
+
+/* ---------- Tables ---------- */
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`CREATE TABLE IF NOT EXISTS custom_chars (id SERIAL PRIMARY KEY, universe TEXT NOT NULL, name TEXT NOT NULL, img TEXT, aliases JSONB, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS custom_quotes (id SERIAL PRIMARY KEY, universe TEXT NOT NULL, text TEXT NOT NULL, speaker TEXT NOT NULL, recipient TEXT, aliases JSONB, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS question_stats (mode TEXT NOT NULL, answer TEXT NOT NULL, info JSONB, plays INT NOT NULL DEFAULT 0, fails INT NOT NULL DEFAULT 0, updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY (mode, answer))`);
+            (await pool.query('SELECT * FROM custom_chars ORDER BY id')).rows.forEach(customCharAdd);
+            (await pool.query('SELECT * FROM custom_quotes ORDER BY id')).rows.forEach(customQuoteAdd);
+        } catch (e) { console.warn('[Admin2] tables :', e.message); }
+    })();
+}
+
+/* ---------- API : persos ---------- */
+const cleanAliases = a => (Array.isArray(a) ? a : String(a || '').split(',')).map(s => String(s).trim().slice(0, 60)).filter(Boolean).slice(0, 10);
+app.get('/api/admin/chars', adminOnly(async (req, res) => {
+    res.json({ ok: true, rows: CUSTOM_CHARS.slice().reverse().map(c => ({ ...c, anime: ARC_UNIVERSE_ANIME[c.universe] || c.universe })),
+        universes: Object.entries(ARC_UNIVERSE_ANIME).map(([k, v]) => ({ k, name: v })).sort((a, b) => a.name.localeCompare(b.name, 'fr')) });
+}));
+app.post('/api/admin/chars', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const universe = String(b.universe || ''), name = String(b.name || '').trim().slice(0, 60), img = String(b.img || '').trim().slice(0, 600);
+    if (!ARC_UNIVERSE_ANIME[universe]) return res.json({ ok: false, error: 'Choisis un anime.' });
+    if (name.length < 2) return res.json({ ok: false, error: 'Mets le nom du perso.' });
+    if (!/^https:\/\/\S+$/i.test(img)) return res.json({ ok: false, error: "Mets un lien d'image qui commence par https://" });
+    if (arcFamous(universe).some(c => normalizeRG(c.display) === normalizeRG(name))) return res.json({ ok: false, error: 'Ce perso existe déjà dans cet anime.' });
+    const known = globalThis.CUSTOM_IMG_URLS.has(img);
+    globalThis.CUSTOM_IMG_URLS.add(img);
+    ARC_IMG_INFLIGHT.delete(img);
+    const okImg = await Promise.race([arcUsableImage(img).catch(() => false), new Promise(r => setTimeout(() => r(false), 9000))]);
+    if (!okImg && !known) globalThis.CUSTOM_IMG_URLS.delete(img);
+    if (!okImg) return res.json({ ok: false, error: "L'image ne se charge pas : essaie un autre lien (clic droit sur l'image → copier l'adresse de l'image)." });
+    const aliases = cleanAliases(b.aliases);
+    let row;
+    if (HAS_DB) row = (await pool.query('INSERT INTO custom_chars (universe, name, img, aliases) VALUES ($1,$2,$3,$4) RETURNING *', [universe, name, img, JSON.stringify(aliases)])).rows[0];
+    else row = { id: (CUSTOM_CHARS.reduce((m, c) => Math.max(m, c.id), 0)) + 1, universe, name, img, aliases };
+    customCharAdd(row);
+    res.json({ ok: true, row });
+}));
+app.post('/api/admin/chars/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM custom_chars WHERE id=$1', [id]);
+    customCharRemove(id);
+    res.json({ ok: true });
+}));
+
+/* ---------- API : citations ---------- */
+app.get('/api/admin/quotes', adminOnly(async (req, res) => {
+    const rows = [];
+    Object.entries(QUOTE_UNIVERSES).forEach(([k, u]) => u.quotes.filter(q => q.customId).forEach(q => rows.push({ id: q.customId, universe: k, anime: u.name, text: q.text, speaker: q.speaker, recipient: q.recipient, aliases: q.aliases })));
+    rows.sort((a, b) => b.id - a.id);
+    res.json({ ok: true, rows, universes: Object.entries(QUOTE_UNIVERSES).map(([k, u]) => ({ k, name: u.name, n: u.quotes.length, speakers: quoteSpeakers(k) })).sort((a, b) => a.name.localeCompare(b.name, 'fr')) });
+}));
+app.post('/api/admin/quotes', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const universe = String(b.universe || ''), text = String(b.text || '').trim().slice(0, 400), speaker = String(b.speaker || '').trim().slice(0, 60), recipient = String(b.recipient || '').trim().slice(0, 80);
+    if (!QUOTE_UNIVERSES[universe]) return res.json({ ok: false, error: 'Choisis un anime.' });
+    if (text.length < 5) return res.json({ ok: false, error: 'Écris la citation.' });
+    if (speaker.length < 2) return res.json({ ok: false, error: 'Qui dit cette citation ?' });
+    if (QUOTE_UNIVERSES[universe].quotes.some(q => normTxt(q.text) === normTxt(text))) return res.json({ ok: false, error: 'Cette citation existe déjà.' });
+    const aliases = cleanAliases(b.aliases);
+    let row;
+    if (HAS_DB) row = (await pool.query('INSERT INTO custom_quotes (universe, text, speaker, recipient, aliases) VALUES ($1,$2,$3,$4,$5) RETURNING *', [universe, text, speaker, recipient, JSON.stringify(aliases)])).rows[0];
+    else { row = { id: CUSTOM_QUOTES_MEM.length + 1, universe, text, speaker, recipient, aliases }; CUSTOM_QUOTES_MEM.push(row); }
+    customQuoteAdd(row);
+    res.json({ ok: true, row, n: QUOTE_UNIVERSES[universe].quotes.length });
+}));
+app.post('/api/admin/quotes/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM custom_quotes WHERE id=$1', [id]);
+    customQuoteRemove(id);
+    res.json({ ok: true });
+}));
+
+/* ---------- API : questions les plus ratées ---------- */
+function qstatModeLabel(m) {
+    if (m === 'blindtest') return 'Blind Test';
+    if (m.startsWith('quote:')) return 'Citations · ' + ((QUOTE_UNIVERSES[m.slice(6)] || {}).name || m.slice(6));
+    if (m.startsWith('arcade:')) return (ARC_GAMES[m.slice(7)] || {}).label || m;
+    return MODE_LABELS[m] || m;
+}
+app.get('/api/admin/missed', adminOnly(async (req, res) => {
+    const min = Math.max(1, Math.min(50, +req.query.min || 3));
+    const mode = String(req.query.mode || '');
+    let rows = [...QSTATS.values()];
+    if (HAS_DB) { try { rows = (await pool.query('SELECT mode, answer, info, plays, fails FROM question_stats WHERE plays >= $1 ORDER BY (fails::float / plays) DESC, plays DESC LIMIT 1000', [min])).rows; } catch (_) {} }
+    const modes = [...new Set(rows.map(r => r.mode))].map(m => ({ m, label: qstatModeLabel(m) })).sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+    rows = rows.filter(r => r.plays >= min && (!mode || r.mode === mode))
+        .map(r => ({ ...r, label: qstatModeLabel(r.mode), rate: Math.round(100 * r.fails / r.plays) }))
+        .sort((a, b) => b.rate - a.rate || b.plays - a.plays).slice(0, 150);
+    res.json({ ok: true, rows, modes });
+}));
+app.post('/api/admin/missed/delete', adminOnly(async (req, res) => {
+    const { mode, answer } = req.body || {};
+    QSTATS.delete(mode + '|' + answer);
+    if (HAS_DB) await pool.query('DELETE FROM question_stats WHERE mode=$1 AND answer=$2', [String(mode), String(answer)]);
+    res.json({ ok: true });
+}));
+
+/* ---------- API : répertoire (vue d'ensemble) ---------- */
+app.get('/api/admin/catalog', adminOnly(async (req, res) => {
+    const type = String(req.query.type || 'chars'), u = String(req.query.u || ''), q = normTxt(req.query.q || '');
+    const imgOf = (uu, name) => '/api/avatar/img?u=' + encodeURIComponent(uu) + '&n=' + encodeURIComponent(name);
+    if (type === 'chars') {
+        const universes = Object.entries(ARC_UNIVERSE_ANIME).map(([k, name]) => ({ k, name, n: arcFamous(k).length })).filter(x => x.n).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        let items = [];
+        const us = u && ARC_UNIVERSE_ANIME[u] ? [u] : (q ? universes.map(x => x.k) : []);
+        us.forEach(k => arcFamous(k).forEach(c => { if (!q || normTxt(c.display).includes(q)) items.push({ name: c.display, anime: ARC_UNIVERSE_ANIME[k], img: imgOf(k, c.display), custom: !!c.custom }); }));
+        return res.json({ ok: true, universes, items: items.slice(0, 400), total: items.length });
+    }
+    if (type === 'quotes') {
+        const universes = Object.entries(QUOTE_UNIVERSES).map(([k, x]) => ({ k, name: x.name, n: x.quotes.length })).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        let items = [];
+        const us = u && QUOTE_UNIVERSES[u] ? [u] : (q ? universes.map(x => x.k) : []);
+        us.forEach(k => QUOTE_UNIVERSES[k].quotes.forEach(x => { if (!q || normTxt(x.text + ' ' + x.speaker).includes(q)) items.push({ text: x.text, speaker: x.speaker, recipient: x.recipient || '', anime: QUOTE_UNIVERSES[k].name, custom: !!x.customId }); }));
+        return res.json({ ok: true, universes, items: items.slice(0, 500), total: items.length });
+    }
+    if (type === 'tracks') {
+        const count = {}; BLINDTEST_TRACKS.forEach(t => { count[t.anime] = (count[t.anime] || 0) + 1; });
+        const universes = Object.entries(count).map(([k, n]) => ({ k, name: k, n })).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        const items = BLINDTEST_TRACKS.filter(t => (u ? t.anime === u : !!q) && (!q || normTxt(t.anime + ' ' + (t.title || '')).includes(q)))
+            .map(t => ({ anime: t.anime, title: t.title || '', video: t.ytId || BLINDTEST_VIDEO_IDS[t.n] || null, custom: !!t.custom }));
+        return res.json({ ok: true, universes, items: items.slice(0, 500), total: items.length });
+    }
+    if (type === 'dle') {
+        const universes = Object.entries(DLE_UNIVERSES).map(([k, x]) => ({ k, name: x.name, n: (dleExpandedUniverse(k).characters || []).length })).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        let items = [], cats = [];
+        const us = u && DLE_UNIVERSES[u] ? [u] : (q ? universes.map(x => x.k) : []);
+        us.forEach(k => {
+            const du = dleExpandedUniverse(k);
+            cats = (du.categories || DLE_UNIVERSES[k].categories || []).map(c => c.label);
+            (du.characters || []).forEach(c => {
+                if (q && !normTxt(c.name).includes(q)) return;
+                const vals = (du.categories || DLE_UNIVERSES[k].categories || []).map(cat => { const v = (c.attrs || {})[cat.key] !== undefined ? c.attrs[cat.key] : c[cat.key]; return Array.isArray(v) ? v.join(', ') : v == null ? '' : String(v); });
+                items.push({ name: c.name, anime: DLE_UNIVERSES[k].name, vals });
+            });
+        });
+        return res.json({ ok: true, universes, items: items.slice(0, 400), total: items.length, cats: us.length === 1 ? cats : [] });
+    }
+    res.json({ ok: false });
+}));
+
+/* =====================================================================
+   BOTS DE TEST (admin) : de vrais joueurs invités connectés au serveur
+   ===================================================================== */
+let ioClient = null;
+try { ioClient = require('socket.io-client'); } catch (_) { ioClient = null; }
+const BOTS = new Map();           // socket id -> bot
+const ALL_BOTS = new Set();
+const BOT_NAMES = ['Kakashi', 'Levi', 'Zoro', 'Killua', 'Nami', 'Rengoku', 'Gojo', 'Mikasa', 'Vegeta', 'Hisoka', 'Makima', 'Itachi', 'Sanji', 'Nezuko', 'Todo', 'Bakugo'];
+const BOT_CLUES = ['épée', 'ninja', 'pouvoir', 'rival', 'école', 'sombre', 'feu', 'vitesse', 'famille', 'trahison', 'rouge', 'cheveux', 'démon', 'capitaine', 'amitié', 'secret', 'combat', 'mer', 'ciel', 'masque'];
+const BOT_QUESTIONS = ['Est-ce un garçon ?', 'Est-ce une fille ?', 'Il est gentil ?', "C'est un méchant ?", 'Il a les cheveux noirs ?', 'Il a les cheveux blonds ?', "C'est le perso principal ?",
+    'Il utilise une épée ?', 'Il est dans un shōnen ?', 'Il meurt dans la série ?', 'Il porte un masque ?', "C'est un humain ?", 'Il a un pouvoir de feu ?', 'Il est très fort ?', 'Il est dans One Piece ?', 'Il est dans Naruto ?'];
+const pickOne = a => a[Math.floor(Math.random() * a.length)];
+const rnd = (a, b) => a + Math.random() * (b - a);
+function randomFamousName() {
+    const us = arcUniverses();
+    const u = pickOne(us);
+    return pickOne(arcFamous(u)).display;
+}
+function botSpawn(roomCode, skill) {
+    const room = rooms[roomCode];
+    if (!ioClient) return { ok: false, error: "Il manque le module socket.io-client sur le serveur (npm install)." };
+    if (!room) return { ok: false, error: 'Salon introuvable.' };
+    if (room.status !== 'waiting') return { ok: false, error: 'Ajoute les bots avant de lancer la partie.' };
+    const taken = new Set(room.players.map(p => p.name));
+    ALL_BOTS.forEach(x => { if (!x.dead && x.room === roomCode) taken.add(x.name); });
+    const base = BOT_NAMES.find(n => !taken.has('🤖 ' + n)) || ('Bot' + Math.floor(Math.random() * 999));
+    const name = '🤖 ' + base;
+    const sock = ioClient(`http://127.0.0.1:${PORT}`, { auth: { guest: true, pseudo: name }, transports: ['websocket'], reconnection: false, forceNew: true });
+    const b = { sock, room: roomCode, name, skill: Math.max(0.05, Math.min(0.95, +skill || 0.5)), done: {}, wait: {}, status: null, timer: null, strokes: 0 };
+    ALL_BOTS.add(b);
+    sock.on('connect', () => {
+        BOT_IDS.add(sock.id); BOTS.set(sock.id, b);
+        const r = rooms[roomCode];
+        if (!r || r.status !== 'waiting') return botKill(b);
+        sock.emit('join_room', { roomCode, mode: r.mode, subMode: r.subMode });
+        b.timer = setInterval(() => { try { botTick(b); } catch (e) { console.warn('[bot]', e.message); } }, 700);
+    });
+    sock.on('connect_error', e => { console.warn('[bot] connexion :', e.message); botKill(b); });
+    sock.on('disconnect', () => botKill(b, true));
+    return { ok: true, name };
+}
+function botKill(b, already) {
+    if (b.dead) return;
+    b.dead = true;
+    ALL_BOTS.delete(b);
+    clearInterval(b.timer);
+    try { if (!already && rooms[b.room]) b.sock.emit('leave_room', { roomCode: b.room }); } catch (_) {}
+    setTimeout(() => { try { b.sock.disconnect(); } catch (_) {} if (b.sock.id) { BOT_IDS.delete(b.sock.id); BOTS.delete(b.sock.id); } }, 300);
+}
+function botTick(b) {
+    const room = rooms[b.room];
+    const id = b.sock.id;
+    if (!room) return botKill(b);
+    const me = room.players.find(p => p.id === id);
+    if (!me) return;
+    if (!humansOf(room).length) return botKill(b);   // plus personne de réel : les bots s'en vont
+    if (room.status !== b.status) { b.status = room.status; b.done = {}; b.wait = {}; }
+    const now = Date.now();
+    const once = (key, min, max, fn) => {
+        if (b.done[key]) return;
+        if (!b.wait[key]) { b.wait[key] = now + rnd(min, max); return; }
+        if (now < b.wait[key]) return;
+        b.done[key] = 1;
+        fn();
+    };
+    const emit = (...a) => b.sock.emit(...a);
+    const lucky = f => Math.random() < b.skill * (f == null ? 1 : f);
+    if (Object.keys(b.done).length > 400) { b.done = {}; b.wait = {}; }
+
+    // Mini-jeux
+    const g = arcGames[b.room];
+    if (room.mode === 'arcade' && g && g.phase === 'playing' && g.current) {
+        const cfg = ARC_GAMES[g.game] || {};
+        const k = 'arc' + g.round;
+        const span = Math.max(3000, (g.endsAt - now) * 0.8);
+        if (cfg.answer === 'choice' && !g.answers[id]) {
+            once(k, 1500, Math.min(9000, span), () => { const ch = g.current.choices || []; if (ch.length) emit('arc_choice', { roomCode: b.room, choice: lucky() ? g.current.answer : pickOne(ch) }); });
+        } else if (cfg.answer === 'text' && !g.answers[id]) {
+            const t = (g.current.targets || [])[0];
+            once(k + 'a', 2500, Math.min(8000, span), () => emit('arc_guess', { roomCode: b.room, text: randomFamousName() }));
+            once(k + 'b', 5000, Math.min(15000, span), () => { if (t && lucky(0.8)) emit('arc_guess', { roomCode: b.room, text: t.display }); });
+        } else if (cfg.answer === 'multi') {
+            (g.current.targets || []).forEach((t, i) => once(k + 'm' + i, 4000 + i * 4000, 12000 + i * 6000, () => { if (lucky(0.7)) emit('arc_guess', { roomCode: b.room, text: t.display }); }));
+        } else if (cfg.answer === 'color' && !g.answers[id]) {
+            once(k, 6000, Math.min(25000, span), () => emit('arc_color', { roomCode: b.room, pct: Math.round(rnd(15, 45) + b.skill * 50), hex: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0') }));
+        }
+        return;
+    }
+    // Blind test
+    const bt = room.blindtest;
+    if (bt && room.status === 'bt_playing' && bt.phase === 'playing' && !bt.answers[id]) {
+        once('bt' + bt.round, 2500, 12000, () => emit('bt_answer', { roomCode: b.room, choice: lucky() ? bt.current.anime : pickOne(bt.choices) }));
+        return;
+    }
+    // Citations (à tour de rôle)
+    const qg = room.quoteGame;
+    if (qg && room.status === 'quote_playing' && !qg.finished && !qg.resolved && room.players[qg.currentTurnIndex] && room.players[qg.currentTurnIndex].id === id) {
+        once('q' + qg.round + '|' + qg.attempts, 2500, 6000, () => emit('quote_submit_answer', { roomCode: b.room, answer: lucky(0.7) ? qg.currentQuote.speaker : pickOne(quoteSpeakers(qg.universeKey)) }));
+        return;
+    }
+    // AnimeDLE
+    const dle = room.dle;
+    if (dle && room.status === 'dle_playing' && !dle.finished && dle.turnId === id) {
+        once('dle' + dle.guesses.length, 2500, 6000, () => {
+            const done = new Set(dle.guesses.map(x => normalizeDle(x.name)));
+            const chars = (dleExpandedUniverse(dle.universeKey).characters || []).filter(c => !done.has(normalizeDle(c.name)));
+            const pick = lucky(0.25) || !chars.length ? dle.target : pickOne(chars);
+            if (pick) emit('dle_guess', { roomCode: b.room, guess: pick.name });
+        });
+        return;
+    }
+    // Rolland Garros
+    if (room.rg && room.status === 'rg_playing' && room.players[room.rg.turnIndex] && room.players[room.rg.turnIndex].id === id) {
+        const pd = rgPools[b.room];
+        once('rg' + room.rg.found.length + '|' + room.rg.turnIndex + '|' + me.rgLives, 2000, 6500, () => {
+            if (!pd || !lucky(1.4)) return; // parfois il sèche (et perd une vie)
+            const dispo = pd.pool.filter(n => !pd.usedNorm.has(normalizeRG(n)));
+            if (dispo.length) emit('rg_submit_answer', { roomCode: b.room, answer: pickOne(dispo) });
+        });
+        return;
+    }
+    // Undercover / Devine la note : indice puis vote
+    if ((room.mode === 'undercover' || room.mode === 'note') && (room.status === 'gameplay' || room.status === 'reveal') && room.players[room.currentTurnIndex] && room.players[room.currentTurnIndex].id === id) {
+        const first = room.players.every(p => !p.clue);
+        once('clue' + room.currentTurnIndex + '|' + room.players.map(p => p.clue ? 1 : 0).join(''), first ? 6000 : 2500, first ? 9000 : 6000, () => emit('submit_clue', { roomCode: b.room, clue: room.mode === 'note' ? String(Math.ceil(Math.random() * 10)) : pickOne(BOT_CLUES) }));
+        return;
+    }
+    if (room.status === 'voting' && me.isAlive !== false && !(room.votes && room.votes[id])) {
+        once('vote', 3000, 8000, () => { const t = room.players.filter(p => p.id !== id && p.isAlive !== false); if (t.length) emit('cast_vote', { roomCode: b.room, targetId: pickOne(t).id }); });
+        return;
+    }
+    // Dessine le perso
+    const d = room.draw;
+    if (d && room.status === 'draw_playing') {
+        const drawer = drawCurrent(room);
+        if (drawer && drawer.id === id) {
+            if (d.phase === 'choosing') once('dc' + d.turn, 2000, 4000, () => emit('draw_choose', { roomCode: b.room, idx: Math.floor(Math.random() * 3) }));
+            if (d.phase === 'drawing' && b.strokes < 14 && now - (b.lastStroke || 0) > 1800) {
+                b.lastStroke = now; b.strokes++;
+                let x = rnd(250, 750), y = rnd(250, 750); const p = [];
+                for (let i = 0; i < 25; i++) { x = Math.max(50, Math.min(950, x + rnd(-60, 60))); y = Math.max(50, Math.min(950, y + rnd(-60, 60))); p.push([x, y]); }
+                emit('draw_stroke', { roomCode: b.room, s: { id: 'b' + now, c: pickOne(['#000000', '#e53935', '#1e88e5', '#43a047', '#fdd835']), w: 6, p } });
+            }
+            if (d.phase !== 'drawing') b.strokes = 0;
+        } else if (d.phase === 'drawing' && d.word && d.guessed[pkeyOf(me)] == null) {
+            once('dg' + d.turn + 'a', 6000, 20000, () => emit('draw_guess', { roomCode: b.room, text: randomFamousName() }));
+            once('dg' + d.turn + 'b', 12000, 45000, () => { if (lucky(0.8)) emit('draw_guess', { roomCode: b.room, text: d.word.display }); });
+        }
+        return;
+    }
+    // Devine le perso
+    const gs = room.guess;
+    if (gs && room.status === 'guess_playing') {
+        const chooser = guessChooser(room);
+        if (chooser && chooser.id === id) {
+            if (gs.phase === 'choosing') once('gp' + gs.turn, 2000, 4000, () => { const u = pickOne(arcUniverses()); const c = pickOne(arcFamous(u).slice(0, 30)); emit('guess_pick', { roomCode: b.room, u, name: c.display }); });
+            if (gs.phase === 'asking') gs.feed.filter(f => f.type === 'q' && !f.answer).forEach(f => once('ga' + f.id, 1500, 4000, () => emit('guess_answer', { roomCode: b.room, id: f.id, answer: pickOne(['yes', 'no', 'no', 'idk']) })));
+        } else if (gs.phase === 'asking') {
+            const k = pkeyOf(me);
+            const pending = gs.feed.some(f => f.type === 'q' && f.k === k && !f.answer);
+            if (!pending) once('gq' + gs.turn + '|' + gs.feed.filter(f => f.k === k).length, 5000, 12000, () => emit('guess_ask', { roomCode: b.room, text: pickOne(BOT_QUESTIONS) }));
+            once('gt' + gs.turn + '|' + Math.floor(gs.feed.length / 6), 15000, 30000, () => { if (gs.target) emit('guess_try', { roomCode: b.room, text: lucky(0.3) ? gs.target.name : randomFamousName() }); });
+        }
+        return;
+    }
+}
+app.post('/api/admin/bots', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const code = String(b.roomCode || '');
+    if (!rooms[code]) return res.json({ ok: false, error: 'Salon introuvable.' });
+    if (b.remove) {
+        let n = 0;
+        [...ALL_BOTS].forEach(bot => { if (bot.room === code) { botKill(bot); n++; } });
+        return res.json({ ok: true, removed: n });
+    }
+    const n = Math.max(1, Math.min(8, +b.n || 1));
+    const out = [];
+    for (let i = 0; i < n; i++) {
+        const r = botSpawn(code, b.skill);
+        if (!r.ok) return res.json(r);
+        out.push(r.name);
+        await new Promise(r2 => setTimeout(r2, 120));
+    }
+    res.json({ ok: true, names: out });
+}));
