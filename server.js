@@ -10409,6 +10409,12 @@ io.on('connection', (socket) => {
             return;
         }
 
+        if (room.mode === 'draw') {
+            if (room.host !== socket.id) return;
+            startDraw(room, roomCode);
+            return;
+        }
+
         if ((room.mode === 'undercover' || room.mode === 'note') && room.status === 'results' && room.lastGameOver === false) {
             // Élimination sans fin de partie : on continue avec les mêmes mots et les joueurs encore en vie
             room.lastGameOver = null;
@@ -10466,6 +10472,7 @@ io.on('connection', (socket) => {
                 clearTimeout(quoteTimers[roomCode]);
                 delete quoteTimers[roomCode];
             }
+            if (room.draw) { drawStop(roomCode); io.to(roomCode).emit('draw_closed'); }
             room.status = 'waiting';
             room.votes = {};
             room.players.forEach(p => {
@@ -12717,7 +12724,7 @@ app.get('/api/profile', async (req, res) => {
                 .sort((a, b) => b.games - a.games),
             universes: Object.keys(stats.byUniverse).map(u => ({ key: u, name: ARC_UNIVERSE_ANIME[u], games: stats.byUniverse[u] })).sort((a, b) => b.games - a.games)
         },
-        badges: BADGES.map(([id, name, desc]) => ({ id, name, desc, earned: have.has(id) }))
+        badges: BADGES.map(([id, name, desc, , hidden]) => ({ id, name: hidden && !have.has(id) ? '???' : name, desc: hidden && !have.has(id) ? 'Succès caché : continue de jouer pour le découvrir' : desc, earned: have.has(id), hidden: !!hidden }))
     });
 });
 
@@ -13475,3 +13482,1106 @@ arcPublic = function (room, g) {
     }
     return out;
 };
+
+/* =====================================================================
+   V7 : succès cachés, cosmétiques, historique & stats par anime, quêtes du jour,
+        amis, avatar, propositions, équipes, hôte (exclure / transférer),
+        Dessine le perso, Colorie le perso
+   ===================================================================== */
+PROG_MEM.rounds = PROG_MEM.rounds || [];
+PROG_MEM.quests = PROG_MEM.quests || new Set();
+const SUGG_MEM = [];
+
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS cosmetics JSONB`);
+            await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar JSONB`);
+            await pool.query(`ALTER TABLE game_results ADD COLUMN IF NOT EXISTS rank INTEGER`);
+            await pool.query(`ALTER TABLE game_results ADD COLUMN IF NOT EXISTS players INTEGER`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS round_stats (
+                id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, mode TEXT NOT NULL, anime TEXT, correct BOOLEAN NOT NULL,
+                ms INTEGER, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE INDEX IF NOT EXISTS round_stats_user ON round_stats(user_id, created_at)`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS friends (
+                user_id INTEGER NOT NULL, friend_id INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY (user_id, friend_id))`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS quest_claims (
+                day TEXT NOT NULL, user_id INTEGER NOT NULL, quest TEXT NOT NULL, PRIMARY KEY (day, user_id, quest))`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS suggestions (
+                id SERIAL PRIMARY KEY, kind TEXT NOT NULL, anime TEXT, name TEXT, link TEXT, note TEXT,
+                pseudo TEXT, user_id INTEGER, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+        } catch (e) { console.warn('[V7] tables :', e.message); }
+    })();
+}
+
+const normTxt = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+/* ---------- Joueurs connectés (amis en ligne, invitations) ---------- */
+const userSockets = new Map(); // userId -> Set(socketId)
+function socketsOfUser(uid) { return [...(userSockets.get(uid) || [])]; }
+function userOnline(uid) { return (userSockets.get(uid)?.size || 0) > 0; }
+function roomOfUser(uid) {
+    for (const [code, r] of Object.entries(rooms)) if (r && r.players.some(p => p.userId === uid)) return { code, room: r };
+    return null;
+}
+
+/* ---------- Cosmétiques ---------- */
+const COSMETICS = {
+    colors: [
+        ['default', 'Blanc', '#ffffff', 1], ['cyan', 'Cyan', '#00f0ff', 3], ['rose', 'Rose', '#ff5fa2', 5], ['jaune', 'Jaune', '#ffe600', 7],
+        ['vert', 'Vert', '#00ff88', 10], ['violet', 'Violet', '#b77bff', 13], ['orange', 'Orange', '#ff9a3c', 16],
+        ['rainbow', 'Arc-en-ciel', 'rainbow', 20], ['gold', 'Or brillant', 'gold', 25]
+    ],
+    frames: [
+        ['none', 'Aucun', 1], ['neon', 'Néon', 4], ['fire', 'Feu 🔥', 8], ['sakura', 'Sakura 🌸', 12],
+        ['thunder', 'Éclair ⚡', 18], ['dragon', 'Dragon doré 🐉', 24], ['cosmic', 'Cosmique 🌌', 30]
+    ],
+    emojis: [['🥶', 2], ['🤡', 4], ['👀', 6], ['🍥', 9], ['⚡', 11], ['🫡', 14], ['🗿', 17], ['👑', 22]]
+};
+COSMETICS.emojis.forEach(([e]) => { if (!REACTIONS.includes(e)) REACTIONS.push(e); });
+const EXTRA_EMOJI_LVL = Object.fromEntries(COSMETICS.emojis);
+function cosOf(row) {
+    const c = row.cosmetics || {};
+    const lvl = levelFromXp(+row.xp || 0).level;
+    const col = COSMETICS.colors.find(x => x[0] === c.color && x[3] <= lvl);
+    const fr = COSMETICS.frames.find(x => x[0] === c.frame && x[2] <= lvl);
+    const av = row.avatar && row.avatar.url ? '/api/img?u=' + encodeURIComponent(row.avatar.url) : null;
+    return { color: col ? col[0] : 'default', frame: fr ? fr[0] : 'none', avatar: av, avatarName: row.avatar?.name || null, lvl };
+}
+const _publicUserV7 = publicUser;
+publicUser = function (row) {
+    const u = _publicUserV7(row);
+    u.cos = cosOf(row);
+    return u;
+};
+// Met à jour le pseudo stylé partout où le joueur apparaît (salons en cours + sockets)
+async function refreshUserCos(uid) {
+    if (!HAS_DB || !uid) return;
+    try {
+        const row = (await pool.query('SELECT * FROM users WHERE id=$1', [uid])).rows[0];
+        if (!row) return;
+        const cos = cosOf(row);
+        socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) { s.user.cos = cos; s.user.level = cos.lvl; } });
+        for (const [code, r] of Object.entries(rooms)) {
+            const p = r.players.find(x => x.userId === uid);
+            if (!p) continue;
+            p.cos = cos;
+            if (r.status === 'waiting') io.to(code).emit('update_room', r);
+        }
+    } catch (_) {}
+}
+
+/* ---------- Succès cachés ---------- */
+const HIDDEN_BADGES = [
+    ['sniper', 'Sniper 🎯', 'Une bonne réponse en moins d\'1 seconde', s => (s.fast1 || 0) >= 1],
+    ['eclair', 'Éclair ⚡', '10 bonnes réponses en moins de 2 secondes', s => (s.fast2 || 0) >= 10],
+    ['otaku', 'Otaku ultime', '500 bonnes réponses au total', s => (s.correctTotal || 0) >= 500],
+    ['specialist', 'Spécialiste', '50 bonnes réponses sur un même anime', s => (s.maxAnimeCorrect || 0) >= 50],
+    ['marathon', 'Marathonien', '10 parties dans la même journée', s => (s.gamesToday || 0) >= 10],
+    ['nightowl', 'Oiseau de nuit 🦉', 'Jouer une partie entre 2 h et 5 h du matin', s => !!s.night],
+    ['social', 'Bien entouré', 'Avoir 5 amis', s => (s.friends || 0) >= 5],
+    ['perfect', 'Sans faute 💯', 'Gagner une partie de 10 manches ou plus sans aucune erreur', null],
+    ['underdog', 'Roi de la foule', 'Gagner une partie contre 5 joueurs ou plus', null],
+    ['zero', 'Zéro pointé 🥲', 'Finir une partie de 5 manches ou plus avec 0 point', null],
+    ['artist', 'Picasso 🎨', '90 % de ressemblance ou plus dans Colorie le perso', null],
+    ['mangaka', 'Mangaka ✏️', 'Tous les joueurs ont trouvé ton dessin (3 joueurs min.)', null]
+];
+HIDDEN_BADGES.forEach(([id, name, desc, cond]) => BADGES.push([id, name, desc, cond || (() => false), true]));
+
+function parisDayStart(day = dailyKey()) {
+    const now = new Date();
+    const paris = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    const utc = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+    return new Date(Date.parse(day + 'T00:00:00Z') - (paris - utc));
+}
+function parisHour() { return +new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris', hour: 'numeric', hour12: false }) % 24; }
+
+const _progStats7 = progStats;
+progStats = async function (userId) {
+    const s = await _progStats7(userId);
+    const since = parisDayStart();
+    try {
+        if (HAS_DB) {
+            const r = (await pool.query(`SELECT count(*) FILTER (WHERE correct)::int AS c,
+                count(*) FILTER (WHERE correct AND ms < 2000)::int AS f2, count(*) FILTER (WHERE correct AND ms < 1000)::int AS f1
+                FROM round_stats WHERE user_id=$1`, [userId])).rows[0] || {};
+            s.correctTotal = r.c || 0; s.fast2 = r.f2 || 0; s.fast1 = r.f1 || 0;
+            s.maxAnimeCorrect = (await pool.query(`SELECT count(*)::int AS n FROM round_stats WHERE user_id=$1 AND correct AND anime IS NOT NULL
+                GROUP BY anime ORDER BY n DESC LIMIT 1`, [userId])).rows[0]?.n || 0;
+            s.gamesToday = (await pool.query(`SELECT count(*)::int AS n FROM game_results WHERE user_id=$1 AND created_at >= $2`, [userId, since])).rows[0]?.n || 0;
+            s.friends = (await pool.query(`SELECT count(*)::int AS n FROM friends WHERE user_id=$1 AND status='accepted'`, [userId])).rows[0]?.n || 0;
+        } else {
+            const mine = PROG_MEM.rounds.filter(r => r.user_id === userId);
+            s.correctTotal = mine.filter(r => r.correct).length;
+            s.fast2 = mine.filter(r => r.correct && r.ms != null && r.ms < 2000).length;
+            s.fast1 = mine.filter(r => r.correct && r.ms != null && r.ms < 1000).length;
+            const by = {}; mine.filter(r => r.correct && r.anime).forEach(r => { by[r.anime] = (by[r.anime] || 0) + 1; });
+            s.maxAnimeCorrect = Math.max(0, ...Object.values(by));
+            s.gamesToday = PROG_MEM.results.filter(r => r.user_id === userId && r.created_at >= since.getTime()).length;
+        }
+    } catch (_) {}
+    const h = parisHour();
+    s.night = h >= 2 && h < 5;
+    return s;
+};
+
+async function progHasBadge(uid, id) { return (await progBadges(uid)).includes(id); }
+async function progGiveBadge(uid, id) {
+    if (HAS_DB) { try { await pool.query('INSERT INTO user_badges (user_id, badge) VALUES ($1,$2) ON CONFLICT DO NOTHING', [uid, id]); } catch (_) {} }
+    else { const set = PROG_MEM.badges.get(uid) || new Set(); set.add(id); PROG_MEM.badges.set(uid, set); }
+}
+// Succès attribué sur un évènement précis (dessin trouvé par tous, 90 % en coloriage…)
+async function progAward(p, id) {
+    if (!p || !p.userId || await progHasBadge(p.userId, id)) return;
+    const b = BADGES.find(x => x[0] === id);
+    if (!b) return;
+    await progGiveBadge(p.userId, id);
+    io.to(p.id).emit('xp_gain', { xp: 0, badges: [{ id, name: b[1], desc: b[2], hidden: !!b[4] }] });
+}
+
+/* ---------- Suivi des réponses manche par manche (stats par anime, quêtes, succès) ---------- */
+let LAST_EV = { sid: null, at: 0 };
+async function progTrackRound(p, mode, anime, correct, ms) {
+    if (!p || !p.userId) return;
+    ms = ms == null || !Number.isFinite(ms) ? null : Math.max(0, Math.round(ms));
+    try {
+        if (HAS_DB) await pool.query('INSERT INTO round_stats (user_id, mode, anime, correct, ms) VALUES ($1,$2,$3,$4,$5)', [p.userId, mode, anime || null, !!correct, ms]);
+        else PROG_MEM.rounds.push({ user_id: p.userId, mode, anime: anime || null, correct: !!correct, ms, created_at: Date.now() });
+    } catch (_) {}
+}
+MODE_LABELS.draw = 'Dessine le perso';
+MODE_LABELS['arcade:couleur'] = 'Colorie le perso';
+const ARC_ANIME_LABELS = new Set(ARC_ANIMES.map(a => a[0]));
+function arcRoundAnime(g) {
+    const cur = g.current || {};
+    if (cur.u && ARC_UNIVERSE_ANIME[cur.u]) return ARC_UNIVERSE_ANIME[cur.u];
+    if (cur.answer && ARC_ANIME_LABELS.has(cur.answer)) return cur.answer;
+    return null;
+}
+function arcStampPending(answers, startedAt) {
+    if (!answers) return;
+    const a = answers[LAST_EV.sid];
+    if (a && !a.at && LAST_EV.at >= startedAt) a.at = LAST_EV.at;
+}
+function arcTrackRound(room, g) {
+    const cfg = ARC_GAMES[g.game];
+    if (!cfg || !['choice', 'text', 'multi'].includes(cfg.answer)) return;
+    arcStampPending(g.answers, g.startedAt);
+    const anime = arcRoundAnime(g);
+    const mode = 'arcade:' + g.game;
+    g.roundLog = g.roundLog || {};
+    room.players.forEach(p => {
+        if (p.disconnected) return;
+        let correct, ms = null;
+        if (cfg.answer === 'multi') correct = (g.found[p.id]?.size || 0) > 0;
+        else { const a = g.answers[p.id]; correct = !!(a && a.correct); if (a && a.at) ms = a.at - g.startedAt; }
+        const log = g.roundLog[p.id] = g.roundLog[p.id] || { rounds: 0, wrong: 0 };
+        log.rounds++; if (!correct) log.wrong++;
+        progTrackRound(p, mode, anime, correct, ms);
+    });
+}
+
+/* ---------- Quêtes du jour ---------- */
+const QUEST_ANIMES = ['naruto', 'onepiece', 'bleach', 'dragonball', 'demonslayer', 'jjk', 'hxh', 'snk', 'fairy', 'jojo', 'chainsaw', 'haikyuu'];
+const QUEST_TEMPLATES = [
+    { id: 'play3', label: 'Joue 3 parties', xp: 60, kind: 'games', n: 3 },
+    { id: 'play5', label: 'Joue 5 parties', xp: 90, kind: 'games', n: 5 },
+    { id: 'win1', label: 'Gagne 1 partie', xp: 60, kind: 'wins', n: 1 },
+    { id: 'win2', label: 'Gagne 2 parties', xp: 100, kind: 'wins', n: 2 },
+    { id: 'bt2', label: 'Joue 2 blind tests', xp: 70, kind: 'mode', mode: 'blindtest', n: 2 },
+    { id: 'arc3', label: 'Joue 3 mini-jeux', xp: 70, kind: 'prefix', prefix: 'arcade:', n: 3 },
+    { id: 'correct15', label: 'Donne 15 bonnes réponses', xp: 80, kind: 'correct', n: 15 },
+    { id: 'correct30', label: 'Donne 30 bonnes réponses', xp: 120, kind: 'correct', n: 30 },
+    { id: 'fast5', label: '5 bonnes réponses en moins de 3 secondes', xp: 90, kind: 'fast', n: 5 },
+    { id: 'anime5', label: 'Trouve 5 bonnes réponses sur {anime}', xp: 90, kind: 'anime', n: 5 },
+    { id: 'draw1', label: 'Joue une partie de Dessine le perso', xp: 70, kind: 'mode', mode: 'draw', n: 1 },
+    { id: 'color1', label: 'Joue une partie de Colorie le perso', xp: 70, kind: 'mode', mode: 'arcade:couleur', n: 1 },
+    { id: 'dle1', label: 'Gagne un AnimeDLE', xp: 80, kind: 'modewin', mode: 'dle', n: 1 }
+];
+function dailyQuests(day = dailyKey()) {
+    const rng = dailyRng('quest|' + day);
+    const out = [], kinds = new Set();
+    for (const t of dailyShuffle(QUEST_TEMPLATES, rng)) {
+        if (kinds.has(t.kind) || out.length >= 3) continue;
+        kinds.add(t.kind);
+        const q = { ...t };
+        if (q.kind === 'anime') {
+            const u = QUEST_ANIMES[Math.floor(rng() * QUEST_ANIMES.length)];
+            q.anime = ARC_UNIVERSE_ANIME[u] || 'Naruto';
+            q.label = q.label.replace('{anime}', q.anime);
+            q.id = 'anime5:' + u;
+        }
+        out.push(q);
+    }
+    return out;
+}
+async function questProgress(uid, day = dailyKey()) {
+    const since = parisDayStart(day);
+    let games = [], rounds = [], claimed = new Set();
+    if (HAS_DB) {
+        try {
+            games = (await pool.query('SELECT mode, won FROM game_results WHERE user_id=$1 AND created_at >= $2', [uid, since])).rows;
+            rounds = (await pool.query('SELECT anime, correct, ms FROM round_stats WHERE user_id=$1 AND created_at >= $2', [uid, since])).rows;
+            claimed = new Set((await pool.query('SELECT quest FROM quest_claims WHERE day=$1 AND user_id=$2', [day, uid])).rows.map(r => r.quest));
+        } catch (_) {}
+    } else {
+        games = PROG_MEM.results.filter(r => r.user_id === uid && r.created_at >= since.getTime());
+        rounds = PROG_MEM.rounds.filter(r => r.user_id === uid && r.created_at >= since.getTime());
+        claimed = new Set([...PROG_MEM.quests].filter(k => k.startsWith(day + '|' + uid + '|')).map(k => k.split('|')[2]));
+    }
+    return dailyQuests(day).map(q => {
+        let v = 0;
+        if (q.kind === 'games') v = games.length;
+        else if (q.kind === 'wins') v = games.filter(g => g.won).length;
+        else if (q.kind === 'mode') v = games.filter(g => g.mode === q.mode).length;
+        else if (q.kind === 'modewin') v = games.filter(g => g.mode === q.mode && g.won).length;
+        else if (q.kind === 'prefix') v = games.filter(g => String(g.mode).startsWith(q.prefix)).length;
+        else if (q.kind === 'correct') v = rounds.filter(r => r.correct).length;
+        else if (q.kind === 'fast') v = rounds.filter(r => r.correct && r.ms != null && r.ms < 3000).length;
+        else if (q.kind === 'anime') { const a = normTxt(q.anime); v = rounds.filter(r => r.correct && r.anime && (normTxt(r.anime).includes(a) || a.includes(normTxt(r.anime)))).length; }
+        return { id: q.id, label: q.label, xp: q.xp, n: q.n, progress: Math.min(v, q.n), done: v >= q.n, claimed: claimed.has(q.id) };
+    });
+}
+async function questClaimAll(uid) {
+    const day = dailyKey();
+    const list = await questProgress(uid, day);
+    const got = [];
+    for (const q of list) {
+        if (!q.done || q.claimed) continue;
+        try {
+            if (HAS_DB) {
+                const r = await pool.query('INSERT INTO quest_claims (day, user_id, quest) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING RETURNING quest', [day, uid, q.id]);
+                if (!r.rows.length) continue;
+                await pool.query('UPDATE users SET xp = xp + $1 WHERE id=$2', [q.xp, uid]);
+            } else {
+                const k = day + '|' + uid + '|' + q.id;
+                if (PROG_MEM.quests.has(k)) continue;
+                PROG_MEM.quests.add(k);
+                PROG_MEM.xp.set(uid, (PROG_MEM.xp.get(uid) || 0) + q.xp);
+            }
+            got.push({ label: q.label, xp: q.xp });
+        } catch (_) {}
+    }
+    return got;
+}
+
+/* ---------- Enregistrement des parties : rang, équipes, succès d'évènement ---------- */
+progRecord = async function (room, mode, universe, entries) {
+    const valid = entries.filter(e => e.player);
+    const teams = room && room.teams >= 2 ? room.teams : 0;
+    let teamSum = null, bestTeam = 0;
+    if (teams) {
+        teamSum = {};
+        valid.forEach(e => { const t = e.player.team; if (t == null) return; teamSum[t] = (teamSum[t] || 0) + Math.max(0, e.points || 0); });
+        bestTeam = Math.max(0, ...Object.values(teamSum));
+    }
+    const ranked = valid.map(e => Math.max(0, Math.round(e.points || 0)));
+    for (const e of valid) {
+        const p = e.player;
+        if (!p.userId) continue;
+        const points = Math.max(0, Math.round(e.points || 0));
+        let won = !!e.won, rank = 1 + ranked.filter(x => x > points).length;
+        if (teams && teamSum && Object.keys(teamSum).length >= 2) {
+            const mine = teamSum[p.team] || 0;
+            won = bestTeam > 0 && mine === bestTeam;
+            rank = 1 + Object.values(teamSum).filter(x => x > mine).length;
+        }
+        const xpGain = 15 + (won ? 25 : 0) + Math.min(40, Math.round(points / 40));
+        try {
+            if (HAS_DB) {
+                await pool.query('INSERT INTO game_results (user_id, pseudo, mode, universe, points, won, rank, players) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+                    [p.userId, p.name, mode, universe || null, points, won, rank, valid.length]);
+                await pool.query('UPDATE users SET xp = xp + $1 WHERE id = $2', [xpGain, p.userId]);
+            } else {
+                PROG_MEM.results.push({ user_id: p.userId, pseudo: p.name, mode, universe, points, won, rank, players: valid.length, created_at: Date.now() });
+                PROG_MEM.xp.set(p.userId, (PROG_MEM.xp.get(p.userId) || 0) + xpGain);
+            }
+            const flags = [...(e.flags || [])];
+            if (won && valid.length >= 6) flags.push('underdog');
+            if (points === 0 && valid.length >= 2 && (e.rounds || 0) >= 5) flags.push('zero');
+            for (const f of flags) if (!(await progHasBadge(p.userId, f))) { await progGiveBadge(p.userId, f); (e._newFlags = e._newFlags || []).push(f); }
+            await progCheckBadges(p, xpGain, e._newFlags || []);
+        } catch (err) { console.warn('[Progression]', err.message); }
+    }
+};
+progCheckBadges = async function (p, xpGain, flagged = []) {
+    const stats = await progStats(p.userId);
+    const have = new Set(await progBadges(p.userId));
+    const earned = flagged.map(id => { const b = BADGES.find(x => x[0] === id); return b ? { id, name: b[1], desc: b[2], hidden: !!b[4] } : null; }).filter(Boolean);
+    for (const [id, name, desc, cond, hidden] of BADGES) {
+        if (have.has(id) || !cond(stats)) continue;
+        earned.push({ id, name, desc, hidden: !!hidden });
+        await progGiveBadge(p.userId, id);
+    }
+    const quests = await questClaimAll(p.userId);
+    const qxp = quests.reduce((a, q) => a + q.xp, 0);
+    io.to(p.id).emit('xp_gain', { xp: xpGain + qxp, badges: earned, quests });
+    notifyProfileUpdate(p.id, p.userId);
+    refreshUserCos(p.userId);
+};
+
+// Mini-jeux : manche sans faute + nombre de manches (pour les succès)
+const _arcFinish7 = arcFinish;
+arcFinish = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.phase !== 'finished' && !g.message && g.roundLog) {
+        g.recordExtra = {};
+        room.players.forEach(p => {
+            const log = g.roundLog[p.id];
+            if (!log) return;
+            g.recordExtra[p.id] = { rounds: log.rounds, perfect: log.rounds >= 10 && log.wrong === 0 };
+        });
+    }
+    return _arcFinish7(room, roomCode);
+};
+// progRecord reçoit les infos de manche via l'entrée (on complète au vol)
+const _progRecord7 = progRecord;
+progRecord = function (room, mode, universe, entries) {
+    const g = room && arcGames[room.code];
+    if (g && g.recordExtra && String(mode).startsWith('arcade:')) {
+        entries.forEach(e => {
+            const x = e.player && g.recordExtra[e.player.id];
+            if (!x) return;
+            e.rounds = x.rounds;
+            if (x.perfect && e.won) e.flags = [...(e.flags || []), 'perfect'];
+        });
+    }
+    if (room && room.blindtest && mode === 'blindtest') {
+        const bt = room.blindtest;
+        entries.forEach(e => {
+            const log = e.player && bt.roundLog && bt.roundLog[e.player.id];
+            if (!log) return;
+            e.rounds = log.rounds;
+            if (log.rounds >= 10 && log.wrong === 0 && e.won) e.flags = [...(e.flags || []), 'perfect'];
+        });
+    }
+    return _progRecord7(room, mode, universe, entries);
+};
+
+// Suivi des manches du blind test
+const _btReveal7 = btReveal;
+btReveal = function (room, roomCode) {
+    const bt = room && room.blindtest;
+    if (bt && bt.phase === 'playing' && rooms[roomCode] === room) {
+        arcStampPending(bt.answers, bt.startedAt);
+        bt.roundLog = bt.roundLog || {};
+        room.players.forEach(p => {
+            if (p.disconnected) return;
+            const a = bt.answers[p.id];
+            const correct = !!(a && a.correct);
+            const log = bt.roundLog[p.id] = bt.roundLog[p.id] || { rounds: 0, wrong: 0 };
+            log.rounds++; if (!correct) log.wrong++;
+            progTrackRound(p, 'blindtest', bt.current?.anime, correct, a && a.at ? a.at - bt.startedAt : null);
+        });
+    }
+    return _btReveal7(room, roomCode);
+};
+
+/* ---------- Équipes (blind test et mini-jeux) ---------- */
+const TEAM_INFO = [['Rouge', '#ff4d6d', '🔴'], ['Bleue', '#4da3ff', '🔵'], ['Verte', '#2ee88a', '🟢'], ['Jaune', '#ffd84d', '🟡']];
+function teamBalance(room) {
+    const n = room.teams;
+    if (!(n >= 2)) { room.players.forEach(p => { delete p.team; }); return; }
+    const count = Array(n).fill(0);
+    room.players.forEach(p => { if (p.team != null && p.team < n) count[p.team]++; else delete p.team; });
+    room.players.forEach(p => {
+        if (p.team != null) return;
+        const t = count.indexOf(Math.min(...count));
+        p.team = t; count[t]++;
+    });
+}
+function teamSummary(room, scores) {
+    if (!(room.teams >= 2)) return null;
+    const out = [];
+    for (let i = 0; i < room.teams; i++) {
+        const members = room.players.filter(p => p.team === i);
+        out.push({ idx: i, name: 'Équipe ' + TEAM_INFO[i][0], color: TEAM_INFO[i][1], icon: TEAM_INFO[i][2],
+            score: members.reduce((a, p) => a + (scores[p.id] || 0), 0), members: members.map(p => p.name) });
+    }
+    return out.sort((a, b) => b.score - a.score);
+}
+function withTeamsAndCos(room, out, scores, finished) {
+    if (!out) return out;
+    const byId = Object.fromEntries(room.players.map(p => [p.id, p]));
+    (out.players || []).forEach(x => { const p = byId[x.id]; if (p) { x.cos = p.cos || null; if (p.team != null && room.teams >= 2) x.team = p.team; } });
+    const teams = teamSummary(room, scores || {});
+    if (teams) {
+        out.teams = teams;
+        if (finished && teams[0].members.length) {
+            const top = teams.filter(t => t.score === teams[0].score);
+            out.teamWinner = top.length > 1 ? null : teams[0].name;
+            out.teamWinnerMembers = top.length > 1 ? [] : teams[0].members;
+        }
+    }
+    return out;
+}
+const _arcPublic7 = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublic7(room, g);
+    return withTeamsAndCos(room, out, g.scores, g.phase === 'finished');
+};
+const _btPublicState7 = btPublicState;
+btPublicState = function (room) {
+    const out = _btPublicState7(room);
+    const bt = room.blindtest;
+    return bt ? withTeamsAndCos(room, out, bt.scores, bt.phase === 'finished') : out;
+};
+
+/* ---------- Colorie le perso ---------- */
+ARC_GAMES.couleur = { label: 'Colorie le perso', icon: '🎨', universe: true, rounds: 5, roundMs: 75000, answer: 'color' };
+const _arcBuildRound7 = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game !== 'couleur') return _arcBuildRound7(g);
+    for (let tries = 0; tries < 3; tries++) {
+        const u = g.universe && g.universe !== 'all' ? g.universe : arcPickUniverse(g);
+        const [c] = await arcFindCharacters(g, u, 1, 6);
+        if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display };
+    }
+    return null;
+};
+const _arcNamesFor7 = arcNamesFor;
+arcNamesFor = function (g) { return g.game === 'couleur' ? [] : _arcNamesFor7(g); };
+const _arcReveal7 = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.phase === 'playing') {
+        if (g.game === 'couleur') {
+            const list = room.players.filter(p => g.answers[p.id]).sort((a, b) => g.answers[b.id].pct - g.answers[a.id].pct);
+            const bonus = [100, 50, 25];
+            g.gainedRound = {};
+            list.forEach((p, i) => {
+                const a = g.answers[p.id];
+                const pts = Math.round(a.pct * 3) + (list.length > 1 && a.pct > 0 ? (bonus[i] || 0) : 0);
+                g.scores[p.id] = (g.scores[p.id] || 0) + pts;
+                g.gainedRound[p.id] = pts;
+                a.correct = a.pct >= 50;
+                if (a.pct >= 90) progAward(p, 'artist');
+            });
+        } else {
+            try { arcTrackRound(room, g); } catch (_) {}
+        }
+    }
+    return _arcReveal7(room, roomCode);
+};
+const _arcPublic7b = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublic7b(room, g);
+    if (g.game === 'couleur' && g.current && g.phase !== 'loading') {
+        const t = (g.current.targets || [])[0];
+        out.stage.color = { name: t ? t.display : '', anime: ARC_UNIVERSE_ANIME[g.current.u] || '' };
+        if (g.phase === 'reveal' || g.phase === 'finished') {
+            out.stage.gallery = room.players.filter(p => g.answers[p.id]).map(p => ({ id: p.id, name: p.name, pct: g.answers[p.id].pct, thumb: g.answers[p.id].thumb || null }))
+                .sort((a, b) => b.pct - a.pct).slice(0, 16);
+            out.players.forEach(x => { const a = g.answers[x.id]; x.pct = a ? a.pct : null; });
+        }
+    }
+    return out;
+};
+
+/* ---------- Dessine le perso (façon Skribbl) ---------- */
+const DRAW_CHOOSE_MS = 15000, DRAW_MS = 80000, DRAW_REVEAL_MS = 6500;
+const drawTimers = {};
+const pkeyOf = p => p.userId ? 'u' + p.userId : 'n' + p.name;
+function drawClear(roomCode) {
+    const t = drawTimers[roomCode];
+    if (t) { clearTimeout(t.timer); clearInterval(t.ticker); }
+    delete drawTimers[roomCode];
+}
+function drawStop(roomCode) { drawClear(roomCode); const r = rooms[roomCode]; if (r) delete r.draw; }
+function drawPool(room) {
+    const sub = String(room.subMode || 'all');
+    const us = ARC_UNIVERSE_ANIME[sub] ? [sub] : arcUniverses();
+    const out = [];
+    us.forEach(u => arcFamous(u).slice(0, u === 'pokemon' ? 60 : 30).forEach(c => out.push({ ...c, u })));
+    return out;
+}
+function drawMask(word, hints) {
+    return [...word].map((ch, i) => /[a-z0-9À-ÿ]/i.test(ch) && !hints.includes(i) ? '_' : ch).join('');
+}
+function drawCurrent(room) {
+    const d = room.draw;
+    if (!d) return null;
+    return room.players.find(p => pkeyOf(p) === d.drawerKey) || null;
+}
+function drawPublic(room) {
+    const d = room.draw;
+    if (!d) return null;
+    const drawer = drawCurrent(room);
+    const revealed = d.phase === 'reveal' || d.phase === 'finished';
+    const word = d.word ? d.word.display : '';
+    return {
+        phase: d.phase, turn: d.turn + 1, totalTurns: d.totalTurns, tour: Math.floor(d.turn / Math.max(1, d.order.length)) + 1, tours: d.tours,
+        drawerId: drawer ? drawer.id : null, drawerName: drawer ? drawer.name : (d.drawerName || ''),
+        endsAt: d.endsAt, serverNow: Date.now(), roundMs: d.phase === 'choosing' ? DRAW_CHOOSE_MS : d.phase === 'drawing' ? DRAW_MS : DRAW_REVEAL_MS,
+        mask: d.word && !revealed ? drawMask(word, d.hints) : null,
+        anime: d.word && (revealed || d.animeShown) ? ARC_UNIVERSE_ANIME[d.word.u] : null,
+        reveal: revealed && d.word ? { word, anime: ARC_UNIVERSE_ANIME[d.word.u], img: d.img || null } : null,
+        players: room.players.map(p => {
+            const k = pkeyOf(p);
+            return { id: p.id, name: p.name, cos: p.cos || null, score: d.scores[k] || 0, guessed: d.guessed[k] != null, gained: d.gained[k] || 0,
+                drawing: k === d.drawerKey, offline: !!p.disconnected };
+        }),
+        hostId: room.host,
+        winnerNames: d.winnerNames || null
+    };
+}
+function drawEmit(room, roomCode) { io.to(roomCode).emit('draw_state', drawPublic(room)); }
+function drawPrivate(room, roomCode) {
+    const d = room.draw, drawer = drawCurrent(room);
+    if (!d || !drawer) return;
+    if (d.phase === 'choosing') io.to(drawer.id).emit('draw_options', { options: d.options.map(c => ({ name: c.display, anime: ARC_UNIVERSE_ANIME[c.u] })) });
+    if (d.phase === 'drawing' && d.word) io.to(drawer.id).emit('draw_word', { word: d.word.display, anime: ARC_UNIVERSE_ANIME[d.word.u] });
+}
+function startDraw(room, roomCode) {
+    drawStop(roomCode);
+    if (room.players.length < 2) { io.to(room.host).emit('game_error', { message: 'Il faut au moins 2 joueurs pour Dessine le perso.' }); return; }
+    const order = arcShuffle(room.players.map(pkeyOf));
+    const tours = [1, 2, 3, 4, 5].includes(room.drawTours) ? room.drawTours : 2;
+    room.draw = { order, turn: -1, tours, totalTurns: order.length * tours, phase: 'choosing', scores: {}, guessed: {}, gained: {},
+        strokes: [], hints: [], used: new Set(), word: null, options: [], endsAt: 0 };
+    room.status = 'draw_playing';
+    drawNextTurn(room, roomCode);
+}
+function drawNextTurn(room, roomCode) {
+    const d = room.draw;
+    if (!d || rooms[roomCode] !== room) return;
+    drawClear(roomCode);
+    d.turn++;
+    // saute les dessinateurs partis
+    while (d.turn < d.totalTurns && !room.players.some(p => pkeyOf(p) === d.order[d.turn % d.order.length])) d.turn++;
+    if (d.turn >= d.totalTurns || room.players.length < 2) return drawFinish(room, roomCode);
+    d.drawerKey = d.order[d.turn % d.order.length];
+    d.drawerName = (drawCurrent(room) || {}).name;
+    d.phase = 'choosing';
+    d.word = null; d.img = null; d.hints = []; d.animeShown = false; d.guessed = {}; d.gained = {}; d.strokes = [];
+    const pool = drawPool(room).filter(c => !d.used.has(c.u + '|' + c.display));
+    d.options = arcShuffle(pool.length >= 3 ? pool : drawPool(room)).slice(0, 3);
+    d.endsAt = Date.now() + DRAW_CHOOSE_MS;
+    io.to(roomCode).emit('draw_redraw', { strokes: [] });
+    drawEmit(room, roomCode);
+    drawPrivate(room, roomCode);
+    const turn = d.turn;
+    drawTimers[roomCode] = { timer: setTimeout(() => { if (room.draw === d && d.turn === turn && d.phase === 'choosing') drawChoose(room, roomCode, 0); }, DRAW_CHOOSE_MS + 200) };
+}
+function drawChoose(room, roomCode, idx) {
+    const d = room.draw;
+    if (!d || d.phase !== 'choosing') return;
+    const c = d.options[idx] || d.options[0];
+    if (!c) return drawNextTurn(room, roomCode);
+    drawClear(roomCode);
+    d.word = c; d.used.add(c.u + '|' + c.display);
+    d.phase = 'drawing';
+    d.startedAt = Date.now();
+    d.endsAt = d.startedAt + DRAW_MS;
+    arcCharImage(c.u, c.raw).then(url => { if (room.draw === d && d.word === c && url) d.img = arcToken(url); }).catch(() => {});
+    drawEmit(room, roomCode);
+    drawPrivate(room, roomCode);
+    const turn = d.turn;
+    const letters = [...c.display].map((ch, i) => /[a-z0-9À-ÿ]/i.test(ch) ? i : -1).filter(i => i >= 0);
+    const t = drawTimers[roomCode] = {};
+    t.timer = setTimeout(() => { if (room.draw === d && d.turn === turn && d.phase === 'drawing') drawReveal(room, roomCode); }, DRAW_MS + 200);
+    t.ticker = setInterval(() => {
+        if (room.draw !== d || d.turn !== turn || d.phase !== 'drawing') return;
+        const f = (Date.now() - d.startedAt) / DRAW_MS;
+        let changed = false;
+        if (f > 0.3 && !d.animeShown) { d.animeShown = true; changed = true; }
+        const want = f > 0.75 ? 2 : f > 0.5 ? 1 : 0;
+        while (d.hints.length < Math.min(want, Math.max(0, letters.length - 2))) {
+            const free = letters.filter(i => !d.hints.includes(i));
+            d.hints.push(free[Math.floor(Math.random() * free.length)]);
+            changed = true;
+        }
+        if (changed) drawEmit(room, roomCode);
+    }, 1000);
+}
+function drawReveal(room, roomCode) {
+    const d = room.draw;
+    if (!d || d.phase !== 'drawing') return;
+    drawClear(roomCode);
+    d.phase = 'reveal';
+    d.endsAt = Date.now() + DRAW_REVEAL_MS;
+    const guessers = room.players.filter(p => pkeyOf(p) !== d.drawerKey);
+    const drawer = drawCurrent(room);
+    if (drawer && guessers.length >= 2 && guessers.every(p => d.guessed[pkeyOf(p)] != null)) progAward(drawer, 'mangaka');
+    drawEmit(room, roomCode);
+    const turn = d.turn;
+    drawTimers[roomCode] = { timer: setTimeout(() => { if (room.draw === d && d.turn === turn) drawNextTurn(room, roomCode); }, DRAW_REVEAL_MS) };
+}
+function drawFinish(room, roomCode) {
+    const d = room.draw;
+    if (!d) return;
+    drawClear(roomCode);
+    d.phase = 'finished';
+    const best = Math.max(0, ...room.players.map(p => d.scores[pkeyOf(p)] || 0));
+    d.winnerNames = room.players.filter(p => best > 0 && (d.scores[pkeyOf(p)] || 0) === best).map(p => p.name);
+    room.status = 'draw_over';
+    drawEmit(room, roomCode);
+    if (!d.recorded) {
+        d.recorded = true;
+        progRecord(room, 'draw', String(room.subMode || 'all'), room.players.map(p => ({ player: p, points: d.scores[pkeyOf(p)] || 0,
+            won: room.players.length > 1 && best > 0 && (d.scores[pkeyOf(p)] || 0) === best })));
+    }
+}
+function drawLev(a, b) {
+    const m = a.length, n = b.length;
+    if (Math.abs(m - n) > 3) return 9;
+    const dp = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+    for (let j = 1; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return dp[m][n];
+}
+function drawCleanStroke(s) {
+    if (!s || typeof s !== 'object') return null;
+    const pts = (Array.isArray(s.p) ? s.p : []).slice(0, 80).map(q => [Math.max(0, Math.min(1000, Math.round(+q[0] || 0))), Math.max(0, Math.min(1000, Math.round(+q[1] || 0)))]);
+    if (!pts.length) return null;
+    const c = /^#[0-9a-f]{6}$/i.test(s.c) ? s.c : '#000000';
+    return { id: String(s.id || '').slice(0, 24), c, w: Math.max(1, Math.min(60, +s.w || 4)), er: !!s.er, p: pts, f: !!s.f };
+}
+
+// Dessine le perso : départ d'un joueur en pleine partie
+const _retirer7 = retirerJoueurDuSalon;
+retirerJoueurDuSalon = function (room, roomCode, socketId) {
+    if (!room || room.mode !== 'draw' || !room.draw || (room.status !== 'draw_playing' && room.status !== 'draw_over')) return _retirer7(room, roomCode, socketId);
+    if (!room.players.some(p => p.id === socketId)) return;
+    const leaving = room.players.find(p => p.id === socketId);
+    room.players = room.players.filter(p => p.id !== socketId);
+    if (!room.players.length) { drawStop(roomCode); delete rooms[roomCode]; delete roomKicked[roomCode]; return; }
+    if (room.host === socketId) room.host = room.players[0].id;
+    const d = room.draw;
+    if (room.status === 'draw_playing') {
+        if (room.players.length < 2) return drawFinish(room, roomCode);
+        if (leaving && pkeyOf(leaving) === d.drawerKey && d.phase !== 'reveal') return d.phase === 'drawing' ? drawReveal(room, roomCode) : drawNextTurn(room, roomCode);
+        const guessers = room.players.filter(p => pkeyOf(p) !== d.drawerKey && !p.disconnected);
+        if (d.phase === 'drawing' && guessers.length && guessers.every(p => d.guessed[pkeyOf(p)] != null)) return drawReveal(room, roomCode);
+    }
+    drawEmit(room, roomCode);
+};
+
+/* ---------- Évènements socket V7 ---------- */
+io.on('connection', socket => {
+    const uid = socket.user && socket.user.id;
+    if (uid) { if (!userSockets.has(uid)) userSockets.set(uid, new Set()); userSockets.get(uid).add(socket.id); }
+    socket.on('disconnect', () => { if (uid && userSockets.has(uid)) { userSockets.get(uid).delete(socket.id); if (!userSockets.get(uid).size) userSockets.delete(uid); } });
+
+    // horodatage des réponses (succès « réponse rapide », quêtes)
+    socket.use(([ev, data], next) => {
+        if (ev === 'arc_choice' || ev === 'arc_guess' || ev === 'bt_answer') LAST_EV = { sid: socket.id, at: Date.now() };
+        if (ev === 'reaction' && data && EXTRA_EMOJI_LVL[data.emoji] && ((socket.user && socket.user.cos && socket.user.cos.lvl) || 1) < EXTRA_EMOJI_LVL[data.emoji]) return;
+        next();
+    });
+    const stamp = roomCode => {
+        const g = arcGames[roomCode];
+        if (g && g.answers && g.answers[socket.id] && !g.answers[socket.id].at) g.answers[socket.id].at = LAST_EV.sid === socket.id ? LAST_EV.at : Date.now();
+    };
+    socket.on('arc_choice', ({ roomCode } = {}) => stamp(roomCode));
+    socket.on('arc_guess', ({ roomCode } = {}) => stamp(roomCode));
+    socket.on('bt_answer', ({ roomCode } = {}) => {
+        const bt = rooms[roomCode]?.blindtest;
+        if (bt && bt.answers[socket.id] && !bt.answers[socket.id].at) bt.answers[socket.id].at = LAST_EV.sid === socket.id ? LAST_EV.at : Date.now();
+    });
+
+    // cosmétiques + équipe à l'arrivée dans un salon
+    socket.on('join_room', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        const p = room && room.players.find(x => x.id === socket.id);
+        if (!p) return;
+        let changed = false;
+        if (socket.user && socket.user.cos && JSON.stringify(p.cos) !== JSON.stringify(socket.user.cos)) { p.cos = socket.user.cos; changed = true; }
+        if (room.teams >= 2 && p.team == null) { teamBalance(room); changed = true; }
+        if (changed && room.status === 'waiting') io.to(roomCode).emit('update_room', room);
+    });
+
+    // Colorie le perso : le joueur envoie sa ressemblance + une miniature de son coloriage
+    socket.on('arc_color', ({ roomCode, pct, thumb } = {}) => {
+        const room = rooms[roomCode];
+        const g = arcGames[roomCode];
+        if (!room || !g || g.game !== 'couleur' || g.phase !== 'playing' || g.answers[socket.id]) return;
+        if (!room.players.some(p => p.id === socket.id)) return;
+        const v = Math.max(0, Math.min(100, Math.round(+pct || 0)));
+        const th = typeof thumb === 'string' && /^data:image\/(jpeg|webp|png);base64,/.test(thumb) && thumb.length < 90000 ? thumb : null;
+        g.answers[socket.id] = { pct: v, thumb: th, correct: false };
+        arcCheckAllDone(room, roomCode);
+    });
+
+    // Équipes
+    socket.on('set_teams', ({ roomCode, teams } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || room.status !== 'waiting') return;
+        const n = [0, 2, 3, 4].includes(+teams) ? +teams : 0;
+        room.teams = n;
+        room.players.forEach(p => { delete p.team; });
+        teamBalance(room);
+        io.to(roomCode).emit('update_room', room);
+    });
+    socket.on('join_team', ({ roomCode, team } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.status !== 'waiting' || !(room.teams >= 2)) return;
+        const p = room.players.find(x => x.id === socket.id);
+        const t = +team;
+        if (!p || !(t >= 0 && t < room.teams)) return;
+        p.team = t;
+        io.to(roomCode).emit('update_room', room);
+    });
+
+    // Hôte : liste des joueurs, transfert de l'hôte
+    socket.on('room_players', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !room.players.some(p => p.id === socket.id)) return;
+        socket.emit('room_players', { roomCode, host: room.host, players: room.players.map(p => ({ id: p.id, name: p.name, offline: !!p.disconnected, cos: p.cos || null })) });
+    });
+    socket.on('transfer_host', ({ roomCode, targetId } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || targetId === socket.id) return;
+        const t = room.players.find(p => p.id === targetId);
+        if (!t) return;
+        room.host = t.id;
+        io.to(roomCode).emit('room_toast', { message: `👑 ${t.name} est maintenant l'hôte du salon.` });
+        io.to(roomCode).emit('host_changed', { hostId: t.id });
+        if (room.status === 'waiting') io.to(roomCode).emit('update_room', room);
+        else if (room.mode === 'arcade' && arcGames[roomCode]) arcEmit(room, roomCode);
+        else if (room.mode === 'blindtest' && room.blindtest) emitBlindState(room, roomCode);
+        else if (room.mode === 'draw' && room.draw) drawEmit(room, roomCode);
+    });
+
+    // Amis : invitation directe dans son salon
+    socket.on('friend_invite', async ({ friendId, roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!uid || !room || !room.players.some(p => p.id === socket.id)) return;
+        const fid = +friendId;
+        if (!(await areFriends(uid, fid))) return;
+        socketsOfUser(fid).forEach(sid => io.to(sid).emit('friend_invite', { from: socket.user.pseudo, roomCode, mode: roomLabel(room) }));
+        socket.emit('room_toast', { message: '📨 Invitation envoyée !' });
+    });
+
+    // Dessine le perso
+    socket.on('set_draw_tours', ({ roomCode, tours } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || room.status !== 'waiting') return;
+        room.drawTours = [1, 2, 3, 4, 5].includes(+tours) ? +tours : 2;
+        io.to(roomCode).emit('update_room', room);
+    });
+    socket.on('start_game', roomCode => {
+        const room = rooms[roomCode];
+        if (!room || room.mode !== 'draw' || room.host !== socket.id) return;
+        startDraw(room, roomCode);
+    });
+    socket.on('draw_choose', ({ roomCode, idx } = {}) => {
+        const room = rooms[roomCode];
+        const d = room && room.draw;
+        const drawer = room && drawCurrent(room);
+        if (!d || !drawer || drawer.id !== socket.id || d.phase !== 'choosing') return;
+        drawChoose(room, roomCode, Math.max(0, Math.min(2, +idx || 0)));
+    });
+    const isDrawer = roomCode => {
+        const room = rooms[roomCode];
+        const d = room && room.draw;
+        const drawer = room && drawCurrent(room);
+        return d && drawer && drawer.id === socket.id && d.phase === 'drawing' ? room : null;
+    };
+    socket.on('draw_stroke', ({ roomCode, s } = {}) => {
+        const room = isDrawer(roomCode);
+        const st = room && drawCleanStroke(s);
+        if (!st) return;
+        const d = room.draw;
+        if (d.strokes.length < 12000) d.strokes.push(st);
+        socket.to(roomCode).emit('draw_stroke', st);
+    });
+    socket.on('draw_clear', ({ roomCode } = {}) => {
+        const room = isDrawer(roomCode);
+        if (!room) return;
+        room.draw.strokes = [];
+        io.to(roomCode).emit('draw_redraw', { strokes: [] });
+    });
+    socket.on('draw_undo', ({ roomCode } = {}) => {
+        const room = isDrawer(roomCode);
+        if (!room) return;
+        const d = room.draw;
+        const last = d.strokes.length ? d.strokes[d.strokes.length - 1].id : null;
+        if (last == null) return;
+        d.strokes = d.strokes.filter(s => s.id !== last);
+        io.to(roomCode).emit('draw_redraw', { strokes: d.strokes });
+    });
+    socket.on('draw_guess', ({ roomCode, text } = {}) => {
+        const room = rooms[roomCode];
+        const d = room && room.draw;
+        if (!d) return;
+        const p = room.players.find(x => x.id === socket.id);
+        if (!p) return;
+        const guess = String(text || '').trim().slice(0, 60);
+        if (!guess) return;
+        const now = Date.now();
+        if (now - (p.lastDrawMsg || 0) < 400) return;
+        p.lastDrawMsg = now;
+        const k = pkeyOf(p);
+        if (d.phase !== 'drawing' || k === d.drawerKey || d.guessed[k] != null) {
+            // simple message de chat (le dessinateur et ceux qui ont trouvé ne peuvent pas donner la réponse)
+            const w = d.word ? normTxt(d.word.display) : '';
+            if (d.phase === 'drawing' && w && (k === d.drawerKey || d.guessed[k] != null) && normTxt(guess).includes(w.split(' ')[0])) return socket.emit('draw_chat', { system: true, text: '🤫 Pas de spoil !' });
+            return io.to(roomCode).emit('draw_chat', { name: p.name, text: guess, found: d.guessed[k] != null });
+        }
+        const target = d.word;
+        if (arcNameMatches(target.u, target, guess)) {
+            const left = Math.max(0, d.endsAt - now);
+            const first = Object.keys(d.guessed).length === 0;
+            const pts = Math.round(60 + 240 * left / DRAW_MS) + (first ? 40 : 0);
+            d.guessed[k] = pts;
+            d.gained[k] = pts;
+            d.scores[k] = (d.scores[k] || 0) + pts;
+            d.scores[d.drawerKey] = (d.scores[d.drawerKey] || 0) + 50;
+            d.gained[d.drawerKey] = (d.gained[d.drawerKey] || 0) + 50;
+            progTrackRound(p, 'draw', ARC_UNIVERSE_ANIME[target.u], true, now - d.startedAt);
+            socket.emit('draw_chat', { system: true, ok: true, text: `✅ Bravo, c'était ${target.display} ! +${pts}` });
+            socket.to(roomCode).emit('draw_chat', { system: true, ok: true, text: `✅ ${p.name} a trouvé !` });
+            const guessers = room.players.filter(x => pkeyOf(x) !== d.drawerKey && !x.disconnected);
+            if (guessers.every(x => d.guessed[pkeyOf(x)] != null)) return drawReveal(room, roomCode);
+            // quand quelqu'un trouve, le temps restant descend (comme Skribbl) : 25 s max
+            if (d.endsAt - now > 25000 && first) {
+                d.endsAt = now + 25000;
+                const turn = d.turn;
+                clearTimeout(drawTimers[roomCode]?.timer);
+                if (drawTimers[roomCode]) drawTimers[roomCode].timer = setTimeout(() => { if (room.draw === d && d.turn === turn && d.phase === 'drawing') drawReveal(room, roomCode); }, 25200);
+            }
+            return drawEmit(room, roomCode);
+        }
+        const a = normTxt(guess), w = normTxt(target.display);
+        const close = a.length >= 3 && (drawLev(a, w) <= 2 || w.split(' ').some(part => part.length >= 4 && drawLev(a, part) === 1));
+        if (close) return socket.emit('draw_chat', { system: true, text: `🔥 « ${guess} » : tu y es presque !` });
+        io.to(roomCode).emit('draw_chat', { name: p.name, text: guess });
+    });
+    socket.on('rejoin_room', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.mode !== 'draw' || !room.draw || !room.players.some(p => p.id === socket.id)) return;
+        socket.emit('draw_state', drawPublic(room));
+        socket.emit('draw_redraw', { strokes: room.draw.strokes });
+        const drawer = drawCurrent(room);
+        if (drawer && drawer.id === socket.id) drawPrivate(room, roomCode);
+    });
+    socket.on('draw_sync', ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !room.draw || !room.players.some(p => p.id === socket.id)) return;
+        socket.emit('draw_state', drawPublic(room));
+        socket.emit('draw_redraw', { strokes: room.draw.strokes });
+        const drawer = drawCurrent(room);
+        if (drawer && drawer.id === socket.id) drawPrivate(room, roomCode);
+    });
+});
+
+function roomLabel(room) {
+    if (room.mode === 'arcade') { const g = String(room.subMode || '').split(':')[0]; return ARC_GAMES[g]?.label || 'Mini-jeux'; }
+    return ({ blindtest: 'Blind Test', undercover: 'Undercover', note: 'Devine la note', dle: 'AnimeDLE', quote: 'Citations', rollandgaros: 'Rolland Garros',
+        enchere: 'Enchère', enchereaveugle: "Enchère à l'aveugle", connexion: 'Jeu de connexion', draw: 'Dessine le perso' })[room.mode] || room.mode;
+}
+
+/* ---------- API : amis ---------- */
+async function areFriends(a, b) {
+    if (!HAS_DB || !a || !b) return false;
+    try { return (await pool.query(`SELECT 1 FROM friends WHERE user_id=$1 AND friend_id=$2 AND status='accepted'`, [a, b])).rows.length > 0; } catch (_) { return false; }
+}
+function friendView(row) {
+    const cos = cosOf(row);
+    const where = roomOfUser(row.id);
+    return { id: row.id, pseudo: row.pseudo, level: cos.lvl, cos, online: userOnline(row.id),
+        room: where ? { code: where.code, mode: roomLabel(where.room), waiting: where.room.status === 'waiting', players: where.room.players.length } : null };
+}
+app.get('/api/friends', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid) return res.status(401).json({ ok: false });
+    if (!HAS_DB) return res.json({ ok: true, friends: [], incoming: [], outgoing: [] });
+    try {
+        const acc = (await pool.query(`SELECT u.* FROM friends f JOIN users u ON u.id=f.friend_id WHERE f.user_id=$1 AND f.status='accepted'`, [uid])).rows;
+        const inc = (await pool.query(`SELECT u.* FROM friends f JOIN users u ON u.id=f.user_id WHERE f.friend_id=$1 AND f.status='pending'`, [uid])).rows;
+        const out = (await pool.query(`SELECT u.* FROM friends f JOIN users u ON u.id=f.friend_id WHERE f.user_id=$1 AND f.status='pending'`, [uid])).rows;
+        const friends = acc.map(friendView).sort((a, b) => (b.online - a.online) || a.pseudo.localeCompare(b.pseudo));
+        res.json({ ok: true, friends, incoming: inc.map(r => ({ id: r.id, pseudo: r.pseudo })), outgoing: out.map(r => ({ id: r.id, pseudo: r.pseudo })) });
+    } catch (e) { res.status(500).json({ ok: false }); }
+});
+app.post('/api/friends/request', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !HAS_DB) return res.status(401).json({ ok: false, error: 'Connecte-toi à un compte pour ajouter des amis.' });
+    const pseudo = String((req.body || {}).pseudo || '').trim();
+    try {
+        const t = (await pool.query('SELECT id, pseudo FROM users WHERE lower(pseudo)=lower($1)', [pseudo])).rows[0];
+        if (!t) return res.json({ ok: false, error: 'Aucun joueur avec ce pseudo.' });
+        if (t.id === uid) return res.json({ ok: false, error: "Tu ne peux pas t'ajouter toi-même 😅" });
+        const n = (await pool.query(`SELECT count(*)::int AS n FROM friends WHERE user_id=$1`, [uid])).rows[0].n;
+        if (n >= 150) return res.json({ ok: false, error: "Liste d'amis pleine." });
+        const me = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]?.pseudo || 'Un joueur';
+        const back = (await pool.query('SELECT status FROM friends WHERE user_id=$1 AND friend_id=$2', [t.id, uid])).rows[0];
+        if (back) {
+            // il m'avait déjà demandé : on accepte directement
+            await pool.query(`UPDATE friends SET status='accepted' WHERE user_id=$1 AND friend_id=$2`, [t.id, uid]);
+            await pool.query(`INSERT INTO friends (user_id, friend_id, status) VALUES ($1,$2,'accepted') ON CONFLICT (user_id, friend_id) DO UPDATE SET status='accepted'`, [uid, t.id]);
+            socketsOfUser(t.id).forEach(sid => io.to(sid).emit('friends_changed', { message: `🤝 Tu es maintenant ami avec ${me} !` }));
+            return res.json({ ok: true, message: `🤝 Vous êtes maintenant amis avec ${t.pseudo} !` });
+        }
+        await pool.query(`INSERT INTO friends (user_id, friend_id, status) VALUES ($1,$2,'pending') ON CONFLICT DO NOTHING`, [uid, t.id]);
+        socketsOfUser(t.id).forEach(sid => io.to(sid).emit('friends_changed', { message: `👋 ${me} veut t'ajouter en ami !` }));
+        res.json({ ok: true, message: `Demande envoyée à ${t.pseudo} ✉️` });
+    } catch (e) { res.status(500).json({ ok: false, error: 'Erreur serveur.' }); }
+});
+app.post('/api/friends/respond', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !HAS_DB) return res.status(401).json({ ok: false });
+    const fid = +(req.body || {}).id, accept = !!(req.body || {}).accept;
+    try {
+        if (accept) {
+            const r = await pool.query(`UPDATE friends SET status='accepted' WHERE user_id=$1 AND friend_id=$2 AND status='pending' RETURNING user_id`, [fid, uid]);
+            if (!r.rows.length) return res.json({ ok: false });
+            await pool.query(`INSERT INTO friends (user_id, friend_id, status) VALUES ($1,$2,'accepted') ON CONFLICT (user_id, friend_id) DO UPDATE SET status='accepted'`, [uid, fid]);
+            const me = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]?.pseudo || 'Un joueur';
+            socketsOfUser(fid).forEach(sid => io.to(sid).emit('friends_changed', { message: `🤝 ${me} a accepté ta demande d'ami !` }));
+        } else await pool.query('DELETE FROM friends WHERE user_id=$1 AND friend_id=$2', [fid, uid]);
+        res.json({ ok: true });
+    } catch (e) { res.status(500).json({ ok: false }); }
+});
+app.post('/api/friends/remove', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !HAS_DB) return res.status(401).json({ ok: false });
+    const fid = +(req.body || {}).id;
+    try { await pool.query('DELETE FROM friends WHERE (user_id=$1 AND friend_id=$2) OR (user_id=$2 AND friend_id=$1)', [uid, fid]); res.json({ ok: true }); }
+    catch (e) { res.status(500).json({ ok: false }); }
+});
+
+/* ---------- API : profil étendu (historique, stats par anime, quêtes, cosmétiques) ---------- */
+app.get('/api/profile/extra', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid) return res.status(401).json({ ok: false });
+    let history = [], animes = [], xp = PROG_MEM.xp.get(uid) || 0, row = null;
+    try {
+        if (HAS_DB) {
+            row = (await pool.query('SELECT * FROM users WHERE id=$1', [uid])).rows[0];
+            xp = row?.xp || 0;
+            history = (await pool.query(`SELECT mode, universe, points, won, rank, players, created_at FROM game_results WHERE user_id=$1 ORDER BY created_at DESC LIMIT 30`, [uid])).rows;
+            animes = (await pool.query(`SELECT anime, count(*)::int AS n, count(*) FILTER (WHERE correct)::int AS ok, round(avg(ms) FILTER (WHERE correct))::int AS ms
+                FROM round_stats WHERE user_id=$1 AND anime IS NOT NULL GROUP BY anime ORDER BY n DESC LIMIT 40`, [uid])).rows;
+        } else {
+            history = PROG_MEM.results.filter(r => r.user_id === uid).slice(-30).reverse().map(r => ({ ...r, created_at: new Date(r.created_at) }));
+            const by = {};
+            PROG_MEM.rounds.filter(r => r.user_id === uid && r.anime).forEach(r => { const o = by[r.anime] = by[r.anime] || { anime: r.anime, n: 0, ok: 0 }; o.n++; if (r.correct) o.ok++; });
+            animes = Object.values(by).sort((a, b) => b.n - a.n);
+        }
+    } catch (_) {}
+    animes.forEach(a => { a.pct = a.n ? Math.round(100 * a.ok / a.n) : 0; });
+    const rated = animes.filter(a => a.n >= 5);
+    const best = rated.slice().sort((a, b) => b.pct - a.pct || b.n - a.n)[0] || null;
+    const worst = rated.length >= 2 ? rated.slice().sort((a, b) => a.pct - b.pct || b.n - a.n)[0] : null;
+    const lvl = levelFromXp(xp).level;
+    res.json({
+        ok: true,
+        history: history.map(h => ({ mode: h.mode, label: MODE_LABELS[h.mode] || (h.mode === 'draw' ? 'Dessine le perso' : h.mode === 'arcade:couleur' ? 'Colorie le perso' : h.mode),
+            universe: h.universe && ARC_UNIVERSE_ANIME[h.universe] ? ARC_UNIVERSE_ANIME[h.universe] : null, points: h.points, won: h.won, rank: h.rank, players: h.players, at: h.created_at })),
+        animes, best, worst,
+        quests: await questProgress(uid),
+        cosmetics: {
+            level: lvl,
+            current: row ? cosOf(row) : { color: 'default', frame: 'none', avatar: null },
+            colors: COSMETICS.colors.map(([id, name, css, need]) => ({ id, name, css, need, unlocked: lvl >= need })),
+            frames: COSMETICS.frames.map(([id, name, need]) => ({ id, name, need, unlocked: lvl >= need })),
+            emojis: COSMETICS.emojis.map(([e, need]) => ({ emoji: e, need, unlocked: lvl >= need }))
+        }
+    });
+});
+app.post('/api/cosmetics', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !HAS_DB) return res.status(401).json({ ok: false });
+    try {
+        const row = (await pool.query('SELECT * FROM users WHERE id=$1', [uid])).rows[0];
+        if (!row) return res.status(401).json({ ok: false });
+        const lvl = levelFromXp(row.xp || 0).level;
+        const cur = row.cosmetics || {};
+        const { color, frame } = req.body || {};
+        if (color) { const c = COSMETICS.colors.find(x => x[0] === color); if (!c || c[3] > lvl) return res.json({ ok: false, error: `Débloqué au niveau ${c ? c[3] : '?'}` }); cur.color = color; }
+        if (frame) { const f = COSMETICS.frames.find(x => x[0] === frame); if (!f || f[2] > lvl) return res.json({ ok: false, error: `Débloqué au niveau ${f ? f[2] : '?'}` }); cur.frame = frame; }
+        await pool.query('UPDATE users SET cosmetics=$1 WHERE id=$2', [cur, uid]);
+        await refreshUserCos(uid);
+        res.json({ ok: true, current: cosOf({ ...row, cosmetics: cur }) });
+    } catch (e) { res.status(500).json({ ok: false }); }
+});
+app.get('/api/quests', async (req, res) => {
+    const uid = authUserId(req);
+    res.json({ ok: true, day: dailyKey(), quests: uid ? await questProgress(uid) : dailyQuests().map(q => ({ id: q.id, label: q.label, xp: q.xp, n: q.n, progress: 0, done: false })) });
+});
+
+/* ---------- API : avatar ---------- */
+function avatarFind(u, name) { return ARC_UNIVERSE_ANIME[u] ? arcFamous(u).find(c => c.display === name) || null : null; }
+app.get('/api/avatar/search', (req, res) => {
+    const q = normTxt(req.query.q || '');
+    const out = [];
+    for (const u of arcUniverses()) {
+        for (const c of arcFamous(u).slice(0, u === 'pokemon' ? 151 : 80)) {
+            if (q ? normTxt(c.display).includes(q) : false) out.push({ u, name: c.display, anime: ARC_UNIVERSE_ANIME[u] });
+            if (out.length >= 24) break;
+        }
+        if (out.length >= 24) break;
+    }
+    if (!q) arcShuffle(['naruto', 'onepiece', 'jjk', 'demonslayer', 'dragonball', 'bleach', 'hxh', 'snk', 'chainsaw', 'jojo', 'opm', 'fairy'])
+        .forEach(u => arcFamous(u).slice(0, 2).forEach(c => out.push({ u, name: c.display, anime: ARC_UNIVERSE_ANIME[u] })));
+    res.json({ ok: true, results: out.slice(0, 24) });
+});
+app.get('/api/avatar/img', async (req, res) => {
+    const c = avatarFind(String(req.query.u || ''), String(req.query.n || ''));
+    if (!c) return res.status(404).end();
+    const url = await arcCharImage(String(req.query.u), c.raw);
+    if (!url) return res.status(404).end();
+    res.redirect('/api/img?u=' + encodeURIComponent(url));
+});
+app.post('/api/avatar', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !HAS_DB) return res.status(401).json({ ok: false, error: 'Connecte-toi à un compte.' });
+    const { u, name } = req.body || {};
+    if (!u) { try { await pool.query('UPDATE users SET avatar=NULL WHERE id=$1', [uid]); await refreshUserCos(uid); return res.json({ ok: true }); } catch (_) { return res.json({ ok: false }); } }
+    const c = avatarFind(String(u), String(name || ''));
+    if (!c) return res.json({ ok: false, error: 'Perso introuvable.' });
+    const url = await arcCharImage(String(u), c.raw);
+    if (!url) return res.json({ ok: false, error: "Pas d'image pour ce perso, essaie un autre." });
+    try {
+        await pool.query('UPDATE users SET avatar=$1 WHERE id=$2', [{ u, name: c.display, url }, uid]);
+        await refreshUserCos(uid);
+        res.json({ ok: true, avatar: '/api/img?u=' + encodeURIComponent(url) });
+    } catch (e) { res.status(500).json({ ok: false }); }
+});
+
+/* ---------- API : propositions des joueurs ---------- */
+const suggestLast = new Map();
+app.post('/api/suggest', async (req, res) => {
+    const b = req.body || {};
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0];
+    const now = Date.now();
+    const hist = (suggestLast.get(ip) || []).filter(t => now - t < 3600000);
+    if (hist.length >= 10) return res.json({ ok: false, error: 'Trop de propositions, réessaie dans une heure.' });
+    const clean = (v, n) => String(v || '').trim().slice(0, n);
+    const kind = ['opening', 'perso', 'citation', 'scene', 'anime', 'bug', 'autre'].includes(b.kind) ? b.kind : 'autre';
+    const item = { kind, anime: clean(b.anime, 80), name: clean(b.name, 120), link: clean(b.link, 300), note: clean(b.note, 500) };
+    if (!item.anime && !item.name && !item.note) return res.json({ ok: false, error: 'Remplis au moins un champ.' });
+    const uid = authUserId(req);
+    let pseudo = clean(b.pseudo, 20) || 'Invité';
+    hist.push(now); suggestLast.set(ip, hist);
+    try {
+        if (HAS_DB) {
+            if (uid) pseudo = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]?.pseudo || pseudo;
+            await pool.query('INSERT INTO suggestions (kind, anime, name, link, note, pseudo, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7)', [item.kind, item.anime, item.name, item.link, item.note, pseudo, uid || null]);
+        } else SUGG_MEM.push({ id: SUGG_MEM.length + 1, ...item, pseudo, created_at: new Date() });
+        res.json({ ok: true });
+    } catch (e) { res.status(500).json({ ok: false, error: 'Erreur serveur.' }); }
+});
+async function isAdmin(req) {
+    if (process.env.ADMIN_KEY && req.query.key === process.env.ADMIN_KEY) return true;
+    const uid = authUserId(req);
+    const list = String(process.env.ADMIN_PSEUDOS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (!uid || !list.length || !HAS_DB) return false;
+    try { const p = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]?.pseudo; return !!p && list.includes(p.toLowerCase()); } catch (_) { return false; }
+}
+app.get('/api/suggestions', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ ok: false });
+    let rows = SUGG_MEM.slice().reverse();
+    if (HAS_DB) { try { rows = (await pool.query('SELECT * FROM suggestions ORDER BY created_at DESC LIMIT 300')).rows; } catch (_) {} }
+    res.json({ ok: true, rows });
+});
+app.post('/api/suggestions/delete', async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ ok: false });
+    const id = +(req.body || {}).id;
+    if (HAS_DB) { try { await pool.query('DELETE FROM suggestions WHERE id=$1', [id]); } catch (_) {} }
+    else { const i = SUGG_MEM.findIndex(s => s.id === id); if (i >= 0) SUGG_MEM.splice(i, 1); }
+    res.json({ ok: true });
+});
