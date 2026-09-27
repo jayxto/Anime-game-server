@@ -9251,6 +9251,7 @@ function quotePickNext(room) {
 }
 
 function startQuoteGame(room, roomCode) {
+    quoteEnsureMix(room.subMode);
     const universeKey = QUOTE_UNIVERSES[room.subMode] ? room.subMode : 'naruto';
     const universe = QUOTE_UNIVERSES[universeKey];
 
@@ -11271,7 +11272,7 @@ async function arcBuildRound(g) {
         if (g.universe && g.universe !== 'all') {
             targets.push(...await arcFindCharacters(g, g.universe, 4, 14));
         } else {
-            const us = arcShuffle(arcUniverses());
+            const us = g.uniList ? arcShuffle([...g.uniList, ...g.uniList, ...g.uniList, ...g.uniList]) : arcShuffle(arcUniverses());
             for (const u of us) {
                 if (targets.length >= 4) break;
                 const [c] = await arcFindCharacters(g, u, 1, 4);
@@ -11439,7 +11440,7 @@ function arcEmit(room, roomCode) {
 function arcNamesFor(g) {
     const cfg = ARC_GAMES[g.game];
     if (cfg.answer === 'choice') return [];
-    const us = g.universe && g.universe !== 'all' ? [g.universe] : arcUniverses();
+    const us = g.universe && g.universe !== 'all' ? [g.universe] : (g.uniList || arcUniverses());
     const names = new Set();
     us.forEach(u => arcFamous(u).forEach(c => names.add(c.display)));
     return [...names].sort((a, b) => a.localeCompare(b, 'fr'));
@@ -12978,7 +12979,7 @@ arcBuildRound = async function (g) {
         const n = Math.max(1, g.playerCount || 2);
         const size = Math.min(40, n * 5 + 6);
         const pool = [];
-        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(arcUniverses());
+        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(g.uniList || arcUniverses());
         if (us.length === 1) pool.push(...await arcFindCharactersFast(g, us[0], size, Math.min(arcFamous(us[0]).length, size + 20)));
         else for (const u of us) { if (pool.length >= size) break; pool.push(...await arcFindCharactersFast(g, u, 2, 5)); }
         if (pool.length < Math.min(size, n * 3)) return null;
@@ -13118,7 +13119,7 @@ io.on('connection', socket => {
 });
 
 /* =====================================================================
-   TOURNOI : plusieurs épreuves à la suite, le dernier est éliminé à chaque fois
+   TOURNOI : plusieurs épreuves à la suite, les derniers sont éliminés (plus il y a de joueurs, plus il y en a)
    ===================================================================== */
 const TOUR_POOL = ['emoji', 'quatre', 'scene', 'link', 'imposteur', 'popularite', 'pixel', 'silhouette', 'audio', 'mapguess'];
 const _startArcadeT = startArcade;
@@ -13152,14 +13153,23 @@ arcFinish = function (room, roomCode) {
     // Fin d'une épreuve : classement, élimination du dernier, puis épreuve suivante
     arcClearTimers(g);
     const alive = room.players.filter(p => !g.tour.eliminated.includes(p.id));
-    let out = null;
-    if (alive.length > 2) {
-        const min = Math.min(...alive.map(p => g.scores[p.id] || 0));
-        const last = alive.filter(p => (g.scores[p.id] || 0) === min);
-        if (last.length === 1) { out = last[0]; g.tour.eliminated.push(out.id); }
+    // Plusieurs éliminés selon le nombre de joueurs : on vise 2 finalistes pour la dernière épreuve
+    const left = g.tour.games.length - 1 - g.tour.idx;           // éliminations restantes (celle-ci comprise)
+    const want = alive.length > 2 ? Math.min(alive.length - 2, Math.ceil((alive.length - 2) / Math.max(1, left))) : 0;
+    const outs = [];
+    if (want > 0) {
+        const sc = p => g.scores[p.id] || 0;
+        const sorted = alive.slice().sort((a, b) => sc(a) - sc(b));
+        const cut = sc(sorted[want - 1]);
+        // les ex æquo à la limite restent en jeu (on n'élimine pas au hasard)
+        sorted.filter(p => sc(p) < cut).forEach(p => outs.push(p));
+        const tied = sorted.filter(p => sc(p) === cut);
+        if (outs.length + tied.length <= want) tied.forEach(p => outs.push(p));
+        outs.forEach(p => g.tour.eliminated.push(p.id));
     }
     g.phase = 'intermission';
-    g.tour.lastOut = out ? out.name : null;
+    g.tour.lastOut = outs.length ? outs.map(p => p.name).join(', ') : null;
+    g.tour.lastOutList = outs.map(p => p.name);
     g.tour.nextLabel = ARC_GAMES[g.tour.games[g.tour.idx + 1]]?.label;
     g.revealEndsAt = Date.now() + 8000;
     arcEmit(room, roomCode);
@@ -13182,7 +13192,8 @@ arcPublic = function (room, g) {
         out.tour = {
             idx: g.tour.idx, total: g.tour.games.length, games: g.tour.games.map(k => ARC_GAMES[k]?.label || k),
             eliminated: room.players.filter(p => g.tour.eliminated.includes(p.id)).map(p => p.id),
-            lastOut: g.tour.lastOut || null, nextLabel: g.tour.nextLabel || null
+            lastOut: g.tour.lastOut || null, lastOutList: g.tour.lastOutList || [], nextLabel: g.tour.nextLabel || null,
+            alive: room.players.filter(p => !g.tour.eliminated.includes(p.id)).length
         };
         out.players.forEach(p => { p.eliminated = g.tour.eliminated.includes(p.id); });
         out.gameLabel = `Tournoi • ${ARC_GAMES[g.game]?.label || ''}`;
@@ -13357,7 +13368,7 @@ arcBuildRound = async function (g) {
     if (g.game === 'draft') {
         const n = Math.max(1, g.playerCount || 2);
         const size = Math.min(40, n * 5 + 6);
-        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(arcUniverses());
+        const us = g.universe && g.universe !== 'all' ? [g.universe] : arcShuffle(g.uniList || arcUniverses());
         let pool = [];
         if (us.length === 1) pool = await arcFindCharacters(g, us[0], size, size + 10);
         else {
@@ -14048,7 +14059,8 @@ function drawClear(roomCode) {
 function drawStop(roomCode) { drawClear(roomCode); const r = rooms[roomCode]; if (r) delete r.draw; }
 function drawPool(room) {
     const sub = String(room.subMode || 'all');
-    const us = ARC_UNIVERSE_ANIME[sub] ? [sub] : arcUniverses();
+    const multi = sub.split('+').filter(k => ARC_UNIVERSE_ANIME[k]);
+    const us = ARC_UNIVERSE_ANIME[sub] ? [sub] : multi.length ? multi : arcUniverses();
     const out = [];
     us.forEach(u => arcFamous(u).slice(0, u === 'pokemon' ? 60 : 30).forEach(c => out.push({ ...c, u })));
     return out;
@@ -14926,7 +14938,7 @@ async function siteSave(key) {
 }
 io.on('connection', socket => { socket.emit('site_settings', SITE); });
 app.get('/api/site', (req, res) => res.json({ ok: true, ...SITE }));
-app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.fromEntries(Object.entries(QUOTE_UNIVERSES).map(([k, v]) => [k, v.quotes.length])) }));
+app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.fromEntries(Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).map(([k, v]) => [k, v.quotes.length])) }));
 
 const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
 app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
@@ -15133,7 +15145,7 @@ function customQuoteAdd(row) {
     u.quotes.push({ text: row.text, speaker: row.speaker, recipient: row.recipient || '', aliases: row.aliases || [], customId: row.id });
 }
 function customQuoteRemove(id) {
-    Object.values(QUOTE_UNIVERSES).forEach(u => { const i = u.quotes.findIndex(q => q.customId === id); if (i >= 0) u.quotes.splice(i, 1); });
+    Object.values(QUOTE_UNIVERSES).forEach(u => { if (u.mix) return; const i = u.quotes.findIndex(q => q.customId === id); if (i >= 0) u.quotes.splice(i, 1); });
 }
 
 /* ---------- Questions les plus ratées ---------- */
@@ -15250,9 +15262,9 @@ app.post('/api/admin/chars/delete', adminOnly(async (req, res) => {
 /* ---------- API : citations ---------- */
 app.get('/api/admin/quotes', adminOnly(async (req, res) => {
     const rows = [];
-    Object.entries(QUOTE_UNIVERSES).forEach(([k, u]) => u.quotes.filter(q => q.customId).forEach(q => rows.push({ id: q.customId, universe: k, anime: u.name, text: q.text, speaker: q.speaker, recipient: q.recipient, aliases: q.aliases })));
+    Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).forEach(([k, u]) => u.quotes.filter(q => q.customId).forEach(q => rows.push({ id: q.customId, universe: k, anime: u.name, text: q.text, speaker: q.speaker, recipient: q.recipient, aliases: q.aliases })));
     rows.sort((a, b) => b.id - a.id);
-    res.json({ ok: true, rows, universes: Object.entries(QUOTE_UNIVERSES).map(([k, u]) => ({ k, name: u.name, n: u.quotes.length, speakers: quoteSpeakers(k) })).sort((a, b) => a.name.localeCompare(b.name, 'fr')) });
+    res.json({ ok: true, rows, universes: Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).map(([k, u]) => ({ k, name: u.name, n: u.quotes.length, speakers: quoteSpeakers(k) })).sort((a, b) => a.name.localeCompare(b.name, 'fr')) });
 }));
 app.post('/api/admin/quotes', adminOnly(async (req, res) => {
     const b = req.body || {};
@@ -15312,7 +15324,7 @@ app.get('/api/admin/catalog', adminOnly(async (req, res) => {
         return res.json({ ok: true, universes, items: items.slice(0, 400), total: items.length });
     }
     if (type === 'quotes') {
-        const universes = Object.entries(QUOTE_UNIVERSES).map(([k, x]) => ({ k, name: x.name, n: x.quotes.length })).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+        const universes = Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).map(([k, x]) => ({ k, name: x.name, n: x.quotes.length })).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
         let items = [];
         const us = u && QUOTE_UNIVERSES[u] ? [u] : (q ? universes.map(x => x.k) : []);
         us.forEach(k => QUOTE_UNIVERSES[k].quotes.forEach(x => { if (!q || normTxt(x.text + ' ' + x.speaker).includes(q)) items.push({ text: x.text, speaker: x.speaker, recipient: x.recipient || '', anime: QUOTE_UNIVERSES[k].name, custom: !!x.customId }); }));
@@ -15538,3 +15550,128 @@ app.post('/api/admin/bots', adminOnly(async (req, res) => {
     }
     res.json({ ok: true, names: out });
 }));
+
+/* =====================================================================
+   DESSINE LE PERSO : MODE STREAM — le streamer dessine, le chat Twitch
+   devine avec « !nom du perso ». Le 1er viewer qui trouve gagne 1 point.
+   ===================================================================== */
+const DRAW_STREAM_TURNS = 5; // dessins par « tour » choisi dans le salon
+const _startDrawStream = startDraw;
+startDraw = function (room, roomCode) {
+    if (!room.drawStream) return _startDrawStream(room, roomCode);
+    drawStop(roomCode);
+    const host = room.players.find(p => p.id === room.host) || room.players[0];
+    if (!host) return;
+    const tours = [1, 2, 3, 4, 5].includes(room.drawTours) ? room.drawTours : 2;
+    room.draw = { order: [pkeyOf(host)], turn: -1, tours, totalTurns: tours * DRAW_STREAM_TURNS, phase: 'choosing', scores: {}, guessed: {}, gained: {},
+        strokes: [], hints: [], used: new Set(), word: null, options: [], endsAt: 0, stream: true, viewers: {} };
+    room.status = 'draw_playing';
+    drawNextTurn(room, roomCode);
+};
+const _drawNextTurnStream = drawNextTurn;
+drawNextTurn = function (room, roomCode) {
+    const d = room.draw;
+    if (!d || !d.stream) return _drawNextTurnStream(room, roomCode);
+    if (rooms[roomCode] !== room) return;
+    drawClear(roomCode);
+    d.turn++;
+    const host = room.players.find(p => pkeyOf(p) === d.order[0]) || room.players.find(p => p.id === room.host);
+    if (d.turn >= d.totalTurns || !host) return drawFinish(room, roomCode);
+    d.order[0] = pkeyOf(host);
+    d.drawerKey = d.order[0];
+    d.drawerName = host.name;
+    d.phase = 'choosing';
+    d.word = null; d.img = null; d.hints = []; d.animeShown = false; d.guessed = {}; d.gained = {}; d.strokes = []; d.streamFinder = null;
+    const pool = drawPool(room).filter(c => !d.used.has(c.u + '|' + c.display));
+    d.options = arcShuffle(pool.length >= 3 ? pool : drawPool(room)).slice(0, 3);
+    d.endsAt = Date.now() + 1500;
+    io.to(roomCode).emit('draw_redraw', { strokes: [] });
+    drawEmit(room, roomCode);
+    // en stream, le perso est tiré au hasard (pour que le chat ne voie pas les choix à l'écran)
+    const turn = d.turn;
+    drawTimers[roomCode] = { timer: setTimeout(() => { if (room.draw === d && d.turn === turn && d.phase === 'choosing') drawChoose(room, roomCode, Math.floor(Math.random() * Math.max(1, d.options.length))); }, 1500) };
+};
+const _drawPublicStream = drawPublic;
+drawPublic = function (room) {
+    const out = _drawPublicStream(room);
+    const d = room.draw;
+    if (out && d && d.stream) {
+        out.stream = true;
+        out.streamFinder = d.streamFinder || null;
+        out.tour = d.turn + 1; out.tours = d.totalTurns; // « Dessin 3/10 »
+    }
+    return out;
+};
+io.on('connection', socket => {
+    socket.on('set_draw_stream', ({ roomCode, on } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || room.status !== 'waiting' || room.mode !== 'draw') return;
+        room.drawStream = !!on;
+        io.to(roomCode).emit('update_room', room);
+    });
+    // proposition d'un viewer, relayée par le navigateur du streamer (connecté au chat Twitch)
+    const guessRate = {};
+    socket.on('draw_stream_guess', ({ roomCode, user, name, text } = {}) => {
+        const room = rooms[roomCode];
+        const d = room && room.draw;
+        if (!d || !d.stream || d.phase !== 'drawing' || !d.word || room.host !== socket.id) return;
+        const now = Date.now(), sec = Math.floor(now / 1000);
+        guessRate[sec] = (guessRate[sec] || 0) + 1;
+        Object.keys(guessRate).forEach(k => { if (+k < sec - 2) delete guessRate[k]; });
+        if (guessRate[sec] > 40) return;
+        const guess = String(text || '').trim().slice(0, 60);
+        const login = String(user || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 25);
+        const shown = String(name || login).trim().slice(0, 25) || login;
+        if (!guess || !login) return;
+        if (!arcNameMatches(d.word.u, d.word, guess)) return;
+        d.streamFinder = shown;
+        d.viewers[login] = (d.viewers[login] || 0) + 1;
+        io.to(roomCode).emit('draw_chat', { system: true, ok: true, text: `🎉 ${shown} (chat Twitch) a trouvé : ${d.word.display} ! +1 point` });
+        io.to(roomCode).emit('draw_stream_found', { user: login, name: shown, word: d.word.display });
+        drawReveal(room, roomCode);
+    });
+});
+
+
+/* =====================================================================
+   PLUSIEURS ANIMES AU CHOIX (« naruto+onepiece+bleach »)
+   Marche pour les mini-jeux à univers, Dessine le perso et les Citations.
+   ===================================================================== */
+let ARC_PENDING_UNI = null;
+const uniListOf = sub => [...new Set(String(sub || '').split('+'))].filter(k => ARC_UNIVERSE_ANIME[k]);
+function quoteEnsureMix(key) {
+    key = String(key || '');
+    if (!key.includes('+')) return;
+    const keys = [...new Set(key.split('+'))].filter(k => QUOTE_UNIVERSES[k] && !k.includes('+'));
+    if (keys.length < 2) return;
+    QUOTE_UNIVERSES[key] = { name: keys.map(k => QUOTE_UNIVERSES[k].name).join(' + '), quotes: keys.flatMap(k => QUOTE_UNIVERSES[k].quotes), mix: true };
+}
+const _startArcadeMulti = startArcade;
+startArcade = function (room, roomCode) {
+    const [, uni] = String(room.subMode || '').split(':');
+    const list = uniListOf(uni);
+    ARC_PENDING_UNI = list.length >= 2 ? list : null; // la 1re manche se prépare pendant l'appel
+    try { _startArcadeMulti(room, roomCode); } finally { ARC_PENDING_UNI = null; }
+    const g = arcGames[roomCode];
+    if (g && list.length >= 2 && ARC_GAMES[g.game] && ARC_GAMES[g.game].universe) {
+        g.uniList = list; g.universe = 'all'; g.usedU = [];
+        io.to(roomCode).emit('arc_names', { names: arcNamesFor(g) });
+        arcEmit(room, roomCode);
+    }
+};
+const _arcPickUniverseMulti = arcPickUniverse;
+arcPickUniverse = function (g) {
+    if (!g.uniList && ARC_PENDING_UNI && ARC_GAMES[g.game] && ARC_GAMES[g.game].universe) { g.uniList = ARC_PENDING_UNI; g.universe = 'all'; }
+    if (!g.uniList || (g.universe && g.universe !== 'all')) return _arcPickUniverseMulti(g);
+    let list = g.uniList.filter(u => !g.usedU.includes(u));
+    if (!list.length) { g.usedU = []; list = g.uniList.slice(); }
+    const u = arcPick(list);
+    g.usedU.push(u);
+    return u;
+};
+const _arcPublicMulti = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicMulti(room, g);
+    if (g.uniList) out.universeLabel = g.uniList.map(k => ARC_UNIVERSE_ANIME[k]).join(' + ');
+    return out;
+};

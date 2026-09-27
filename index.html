@@ -709,6 +709,21 @@
         .adm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
         .adm-cards div{background:#101018;border-radius:10px;padding:10px 6px;text-align:center;font-size:.72rem;color:var(--text-muted);}
         .adm-cards b{display:block;font-size:1.4rem;color:var(--accent-cyan);}
+        .draw-peek{background:#2a2a40;color:#fff;border:2px dashed var(--accent-cyan);border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;font-size:1rem;}
+        .draw-peek.on{background:var(--accent-yellow);color:#111;border-style:solid;}
+        .draw-finder{font-weight:800;font-size:1.1rem;color:#bf94ff;margin-bottom:6px;}
+        .draw-sboard{background:#18122b;border:2px solid #9146FF;border-radius:12px;padding:8px;margin:8px 0;}
+        .dsb-h{font-size:.85rem;margin-bottom:6px;color:#d9c3ff;}
+        .dsb-row{display:flex;justify-content:space-between;font-size:.85rem;padding:3px 4px;border-radius:6px;}
+        .dsb-row.new{background:rgba(145,70,255,.35);}
+        .uni-multi-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px;}
+        .uni-multi-bar button{background:#1a1a2e;color:var(--accent-cyan);border:2px solid var(--accent-cyan);border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;}
+        .uni-multi-bar button.on{background:var(--accent-cyan);color:#111;}
+        .quote-universe-btn.uni-sel{border-color:#00ff88;background:#0f2a1c;box-shadow:0 0 0 2px #00ff88 inset;}
+        .quote-universe-btn.uni-sel::before{content:'✔ ';color:#00ff88;}
+        .quote-universe-btn.uni-dim{opacity:.35;pointer-events:none;}
+        .uni-multi-go{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:900;background:#00ff88;color:#111;border:none;border-radius:99px;padding:14px 28px;font-weight:800;font-size:1.05rem;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.5);}
+        .uni-multi-go:disabled{background:#555;color:#ddd;cursor:default;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -1022,7 +1037,7 @@
 
                 <div class="quote-mode-card" style="border-color:#00ff88;">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tournoi <span class="quote-new">NOUVEAU</span></h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">5 épreuves de mini-jeux à la suite, points cumulés • le dernier est éliminé après chaque épreuve • jusqu'à 50 joueurs, parfait en live</p>
+                    <p style="margin:0 0 12px;font-size:.85rem;">5 épreuves de mini-jeux à la suite, points cumulés • les derniers sont éliminés après chaque épreuve (plus vous êtes nombreux, plus il y a d'éliminés) jusqu'à la finale à 2 • jusqu'à 50 joueurs, parfait en live</p>
                     <button class="btn-action" style="margin-top:0;background:#00ff88;color:#111;" onclick="createRoom('arcade','tournoi')">Créer un tournoi</button>
                 </div>
 
@@ -1092,6 +1107,7 @@
                 </div>
                 <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:7px 10px;cursor:pointer;">🔙 Retour</button>
             </div>
+            <div id="uni-multi-bar" class="uni-multi-bar" style="display:none;"><button id="uni-multi-toggle" onclick="uniMultiToggle()">☑️ Choisir plusieurs animes</button><span id="uni-multi-info" class="tl-hint"></span></div>
             <div class="quote-universe-grid" id="universe-select-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">38 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('onepiece')">One Piece<br><span style="font-size:.65rem;color:var(--text-muted);">42 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('bleach')">Bleach<br><span style="font-size:.65rem;color:var(--text-muted);">39 citations</span></button>
@@ -1148,6 +1164,8 @@
                 <span>✏️ Tours de dessin :</span>
                 <select id="room-draw-select" onchange="setDrawTours(this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
                 <b id="room-draw-text"></b>
+                <label id="room-draw-stream" style="display:none;align-items:center;gap:6px;flex-basis:100%;justify-content:center;font-size:.85rem;margin-top:4px;"><input type="checkbox" id="room-draw-stream-cb" onchange="setDrawStream(this.checked)"> 🎥 Mode stream : tu dessines, ton chat Twitch devine avec <b>!nom</b></label>
+                <div id="room-draw-stream-hint" class="tl-hint" style="display:none;flex-basis:100%;"></div>
             </div>
             <button class="invite-btn" id="invite-friend-btn" style="display:none;" onclick="openFriendInvite()">📨 Inviter un ami</button>
             <div id="room-visibility-box" class="room-visibility">
@@ -1486,6 +1504,7 @@
                 </div>
                 <div class="draw-side">
                     <div id="draw-scores" class="quote-scoreboard" style="display:block;"></div>
+                    <div id="draw-stream-board" class="draw-sboard" style="display:none;"></div>
                     <div id="draw-chat" class="draw-chat"></div>
                     <div class="draw-input"><input id="draw-input" maxlength="60" autocomplete="off" placeholder="Ta réponse…" onkeydown="if(event.key==='Enter')drawSendGuess()"><button onclick="drawSendGuess()">➤</button></div>
                 </div>
@@ -2314,6 +2333,11 @@
             const pick = key => mode === 'quote' ? createQuoteRoom(key)
                 : mode.startsWith('arc_') ? createRoom('arcade', mode.slice(4) + ':' + key)
                 : createRoom(mode, key);
+            // plusieurs animes au choix (sauf Rolland Garros, Enchères et AnimeDLE)
+            const multiOk = !['rollandgaros', 'enchere', 'enchereaveugle', 'dle'].includes(mode);
+            uniMulti.on = false; uniMulti.sel = new Set(); uniMulti.pick = pick;
+            const bar = document.getElementById('uni-multi-bar'); if (bar) bar.style.display = multiOk ? 'flex' : 'none';
+            uniMultiUi();
             if (cfg.all) {
                 const all = document.createElement('button');
                 all.className = 'quote-universe-btn';
@@ -2333,7 +2357,8 @@
                     t.textContent = mode === 'quote' && QUOTE_COUNTS[key] ? QUOTE_COUNTS[key] + ' citations' : cfg.tag;
                     b.appendChild(t);
                 }
-                b.onclick = () => pick(key);
+                b.dataset.k = key;
+                b.onclick = () => { if (uniMulti.on) { uniMulti.sel.has(key) ? uniMulti.sel.delete(key) : uniMulti.sel.add(key); uniMultiUi(); } else pick(key); };
                 grid.appendChild(b);
             });
             const p = document.getElementById('quote-universe-selection');
@@ -2341,6 +2366,27 @@
             window.scrollTo(0, 0);
         }
 
+        const uniMulti = { on: false, sel: new Set(), pick: null };
+        function uniMultiToggle() { uniMulti.on = !uniMulti.on; if (!uniMulti.on) uniMulti.sel.clear(); uniMultiUi(); }
+        function uniMultiUi() {
+            const t = document.getElementById('uni-multi-toggle'), info = document.getElementById('uni-multi-info');
+            if (t) { t.textContent = uniMulti.on ? '✖ Annuler' : '☑️ Choisir plusieurs animes'; t.classList.toggle('on', uniMulti.on); }
+            document.querySelectorAll('#universe-select-grid .quote-universe-btn').forEach(b => {
+                const k = b.dataset.k;
+                b.classList.toggle('uni-sel', !!k && uniMulti.sel.has(k));
+                b.classList.toggle('uni-dim', uniMulti.on && !k);
+            });
+            let go = document.getElementById('uni-multi-go');
+            if (uniMulti.on) {
+                if (!go) { go = document.createElement('button'); go.id = 'uni-multi-go'; go.className = 'uni-multi-go'; go.onclick = () => { if (uniMulti.sel.size >= 2 && uniMulti.pick) uniMulti.pick([...uniMulti.sel].join('+')); else if (uniMulti.sel.size === 1 && uniMulti.pick) uniMulti.pick([...uniMulti.sel][0]); }; document.body.appendChild(go); }
+                const n = uniMulti.sel.size;
+                go.disabled = n < 1;
+                go.textContent = n ? `▶ Jouer avec ${n} anime${n > 1 ? 's' : ''}` : 'Coche les animes que tu veux';
+                go.style.display = 'block';
+                if (info) info.textContent = n ? [...uniMulti.sel].map(k => (UNIVERSE_CHOICES.find(x => x[0] === k) || [k, k])[1]).join(' • ') : 'Coche les animes que tu veux jouer, puis lance.';
+            } else { if (go) go.style.display = 'none'; if (info) info.textContent = ''; }
+        }
+        (function () { const orig = window.hideAllPanels; window.hideAllPanels = function () { const r = orig.apply(this, arguments); const go = document.getElementById('uni-multi-go'); if (go) go.style.display = 'none'; return r; }; })();
         function openQuoteUniverseSelection() {
             openUniverseSelection('quote');
         }
@@ -5047,7 +5093,7 @@
                 result.style.color = 'var(--text-muted)'; result.textContent = '';
             } else if (q.phase === 'intermission') {
                 result.style.color = 'var(--accent-yellow)';
-                result.textContent = (q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : '');
+                result.textContent = ((q.tour?.lastOutList || []).length > 1 ? `☠️ ${q.tour.lastOutList.slice(0, -1).join(', ')} et ${q.tour.lastOutList.slice(-1)[0]} sont éliminés ! ` : q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.alive ? `${q.tour.alive} encore en course. ` : '') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : '');
             } else if (q.phase === 'playing' && me.eliminated) {
                 result.style.color = 'var(--text-muted)'; result.textContent = '☠️ Tu es éliminé du tournoi… tu regardes la suite 👀';
             } else if (q.phase === 'playing' && q.answerType === 'chrono') {
@@ -5975,6 +6021,7 @@
                 if (!m) return;
                 const dn = (line.match(/(?:^@|;)display-name=([^;\s]*)/) || [])[1];
                 streamVote(m[1], m[2].trim(), dn ? dn.replace(/\\s/g, ' ') : m[1]);
+                try { streamDrawGuess(m[1], m[2].trim(), dn ? dn.replace(/\\s/g, ' ') : m[1]); } catch (e) {}
             });
             ws.onclose = () => { if (stream.ws === ws) streamStatus('Déconnecté du chat.'); };
             ws.onerror = () => streamStatus('❌ Impossible de joindre le chat Twitch.');
@@ -6205,6 +6252,19 @@
                 dbox.querySelector('span').textContent = room.mode === 'guess' ? '🕵️ Tours (chacun fait deviner) :' : '✏️ Tours de dessin :';
                 sel.value = String(room.drawTours || defT); sel.style.display = iAmHost ? '' : 'none';
                 txt.textContent = iAmHost ? '' : (room.drawTours || defT) + ' tour(s)';
+                const st = document.getElementById('room-draw-stream'), cb = document.getElementById('room-draw-stream-cb'), hint = document.getElementById('room-draw-stream-hint');
+                const isDraw = room.mode === 'draw';
+                if (st) st.style.display = isDraw && iAmHost ? 'flex' : 'none';
+                if (cb) { cb.checked = !!room.drawStream; cb.disabled = !stream.ws && !room.drawStream; }
+                if (isDraw && room.drawStream) {
+                    dbox.querySelector('span').textContent = '🎥 Dessins (×5) :';
+                    if (!iAmHost) txt.textContent = (room.drawTours || defT) * 5 + ' dessins';
+                }
+                if (hint) {
+                    hint.style.display = isDraw ? '' : 'none';
+                    hint.textContent = !isDraw ? '' : room.drawStream ? `Mode stream activé : ${(room.drawTours || defT) * 5} dessins, le 1er viewer qui écrit !nom du perso gagne 1 point. Tu peux jouer seul avec ton chat.`
+                        : iAmHost && !stream.ws ? "Pour le mode stream, connecte d'abord ton chat dans Options → Mode streamer." : '';
+                }
             }
             const inv = document.getElementById('invite-friend-btn');
             if (inv) inv.style.display = isAccount() ? '' : 'none';
@@ -6212,6 +6272,7 @@
         function setTeams(v) { socket.emit('set_teams', { roomCode: currentRoomCode, teams: +v }); }
         function joinTeam(i) { socket.emit('join_team', { roomCode: currentRoomCode, team: i }); }
         function setDrawTours(v) { socket.emit('set_draw_tours', { roomCode: currentRoomCode, tours: +v }); }
+        function setDrawStream(on) { socket.emit('set_draw_stream', { roomCode: currentRoomCode, on: !!on }); }
         function transferHost(id, btn) {
             if (!btn.classList.contains('armed')) {
                 document.querySelectorAll('.host-btn.armed').forEach(b => { b.classList.remove('armed'); b.textContent = '👑'; });
@@ -6631,13 +6692,16 @@
             lastHostId = q.hostId;
             q.players.forEach(p => { if (p.cos) cosById[p.id] = p.cos; });
             const me = drawIsMe();
-            document.getElementById('draw-status').innerHTML = q.phase === 'finished' ? '🏁 Partie terminée' : `Tour ${q.tour}/${q.tours} • ${v7esc(q.drawerName)} ${q.phase === 'choosing' ? 'choisit' : 'dessine'}`;
+            document.getElementById('draw-status').innerHTML = q.phase === 'finished' ? '🏁 Partie terminée' : q.stream ? `🎥 Dessin ${q.tour}/${q.tours} • ${v7esc(q.drawerName)} dessine pour le chat` : `Tour ${q.tour}/${q.tours} • ${v7esc(q.drawerName)} ${q.phase === 'choosing' ? 'choisit' : 'dessine'}`;
+            drawStreamBoard(q);
             const w = document.getElementById('draw-word');
-            if (q.phase === 'drawing' && me && drw.word) { w.className = 'draw-word me'; w.textContent = '✏️ ' + drw.word.word; }
+            if (q.phase === 'drawing' && me && drw.word && q.stream) { w.className = 'draw-word me'; if (!w.__peek) { w.__peek = true; w.innerHTML = `<button class="draw-peek" onpointerdown="drawPeek(true)" onpointerup="drawPeek(false)" onpointerleave="drawPeek(false)" onpointercancel="drawPeek(false)">👁️ Maintiens pour voir le perso (caché pour le chat)</button>`; } }
+            else if (q.phase === 'drawing' && me && drw.word) { w.className = 'draw-word me'; w.textContent = '✏️ ' + drw.word.word; }
             else if (q.phase === 'drawing' && q.mask) { w.className = 'draw-word'; w.textContent = q.mask; }
             else if (q.reveal) { w.className = 'draw-word me'; w.textContent = q.reveal.word; }
             else { w.className = 'draw-word'; w.textContent = q.phase === 'choosing' ? '…' : ''; }
-            document.getElementById('draw-anime').textContent = q.phase === 'drawing' && me && drw.word ? drw.word.anime : (q.anime ? '📺 ' + q.anime : (q.phase === 'drawing' ? `${(q.mask || '').replace(/[^_]/g, '').length} lettres` : ''));
+            if (!(q.phase === 'drawing' && me && q.stream && drw.word)) w.__peek = false;
+            document.getElementById('draw-anime').textContent = q.phase === 'drawing' && me && drw.word && q.stream ? `💬 Chat : écrivez !nom du perso • indice : ${q.mask || ''}${q.anime ? ' • 📺 ' + q.anime : ''}` : q.phase === 'drawing' && me && drw.word ? drw.word.anime : (q.anime ? '📺 ' + q.anime : (q.phase === 'drawing' ? `${(q.mask || '').replace(/[^_]/g, '').length} lettres` : ''));
             // scores
             const sb = document.getElementById('draw-scores');
             sb.innerHTML = [...q.players].sort((a, b) => b.score - a.score).map(p => `<div class="quote-score"><span class="pl-name">${avatarHtml(p.name, p.cos)}${cosNameHtml(p.name, p.cos)}${p.drawing ? ' ✏️' : ''}${p.guessed ? ' ✅' : ''}${p.offline ? ' 📡' : ''}${p.gained && (q.phase === 'reveal') ? ` <small style="color:#00ff88">+${p.gained}</small>` : ''}</span><strong style="color:var(--accent-yellow)">${p.score} pts</strong></div>`).join('');
@@ -6646,11 +6710,12 @@
             ov.className = 'draw-overlay';
             if (q.phase === 'choosing') {
                 ov.classList.add('on');
-                if (me && drw.options) ov.innerHTML = '<div style="font-weight:800;font-size:1.1rem;">🎯 Choisis le perso à dessiner</div>' + drw.options.map((o, i) => `<button class="opt" onclick="socket.emit('draw_choose',{roomCode:currentRoomCode,idx:${i}})">${v7esc(o.name)}<small>${v7esc(o.anime)}</small></button>`).join('');
+                if (q.stream) ov.innerHTML = '<div style="font-size:3rem;">🎲</div><div>Tirage du prochain perso…</div>';
+                else if (me && drw.options) ov.innerHTML = '<div style="font-weight:800;font-size:1.1rem;">🎯 Choisis le perso à dessiner</div>' + drw.options.map((o, i) => `<button class="opt" onclick="socket.emit('draw_choose',{roomCode:currentRoomCode,idx:${i}})">${v7esc(o.name)}<small>${v7esc(o.anime)}</small></button>`).join('');
                 else ov.innerHTML = `<div style="font-size:3rem;">🤔</div><div><b>${v7esc(q.drawerName)}</b> choisit un perso…</div>`;
             } else if (q.phase === 'reveal' && q.reveal) {
                 ov.classList.add('on');
-                ov.innerHTML = `<div>C'était</div><div style="font-family:'Bangers',cursive;font-size:2rem;color:var(--accent-yellow)">${v7esc(q.reveal.word)}</div><div style="color:var(--accent-cyan)">${v7esc(q.reveal.anime)}</div>${q.reveal.img ? `<img src="${v7esc(q.reveal.img)}" alt="">` : ''}`;
+                ov.innerHTML = `${q.stream ? `<div class="draw-finder">${q.streamFinder ? `🎉 <b>${v7esc(q.streamFinder)}</b> a trouvé ! +1 point` : "😶 Personne dans le chat n'a trouvé"}</div>` : ''}<div>C'était</div><div style="font-family:'Bangers',cursive;font-size:2rem;color:var(--accent-yellow)">${v7esc(q.reveal.word)}</div><div style="color:var(--accent-cyan)">${v7esc(q.reveal.anime)}</div>${q.reveal.img ? `<img src="${v7esc(q.reveal.img)}" alt="">` : ''}`;
             } else if (q.phase === 'finished') {
                 ov.classList.add('on');
                 const top = [...q.players].sort((a, b) => b.score - a.score).slice(0, 3);
@@ -6697,6 +6762,51 @@
         socket.on('draw_closed', () => { returningToWaitingRoom = true; drw.state = null; const p = document.getElementById('draw-room'); if (p) p.style.display = 'none'; });
         socket.on('connect', () => { if (currentRoomCode && drw.state) setTimeout(() => socket.emit('draw_sync', { roomCode: currentRoomCode }), 600); });
         function drawReplay() { socket.emit('start_game', currentRoomCode); }
+        // --- mode stream : le chat Twitch devine ---
+        function drawPeek(on) {
+            const w = document.getElementById('draw-word'), b = w && w.querySelector('.draw-peek');
+            if (!b || !drw.word) return;
+            b.textContent = on ? '✏️ ' + drw.word.word + ' (' + drw.word.anime + ')' : '👁️ Maintiens pour voir le perso (caché pour le chat)';
+            b.classList.toggle('on', !!on);
+        }
+        function drawBoardKey() { return 'stream_draw_' + (stream.channel || ''); }
+        function drawBoardLoad() { try { return JSON.parse(localStorage.getItem(drawBoardKey()) || '{}') || {}; } catch (e) { return {}; } }
+        function drawBoardSave(b) { try { localStorage.setItem(drawBoardKey(), JSON.stringify(b)); } catch (e) {} }
+        const drawStreamLast = {};
+        function streamDrawGuess(user, msg, display) {
+            const q = drw.state;
+            if (!q || !q.stream || q.phase !== 'drawing' || !drawIsMe() || !currentRoomCode) return;
+            const m = String(msg || '').match(/^!\s*(.{2,60})$/);
+            if (!m) return;
+            const now = Date.now();
+            if (now - (drawStreamLast[user] || 0) < 1200) return;
+            drawStreamLast[user] = now;
+            socket.emit('draw_stream_guess', { roomCode: currentRoomCode, user, name: display || user, text: m[1].trim() });
+        }
+        function drawStreamBoard(q) {
+            const box = document.getElementById('draw-stream-board');
+            if (!box) return;
+            if (!q || !q.stream) { box.style.display = 'none'; return; }
+            box.style.display = 'block';
+            const mine = stream.ws ? drawBoardLoad() : null;
+            const top = mine ? Object.entries(mine).sort((a, b) => b[1].pts - a[1].pts).slice(0, 10) : [];
+            box.innerHTML = `<div class="dsb-h">💬 Chat Twitch : écrivez <b>!nom du perso</b></div>`
+                + (mine ? (top.length ? top.map(([u, e], i) => `<div class="dsb-row${e.last ? ' new' : ''}"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(e.name)}</span><b>${e.pts} pt${e.pts > 1 ? 's' : ''}</b></div>`).join('') : "<div class='tl-hint'>Personne n'a encore trouvé.</div>")
+                    + `<div class="sv-tools" style="margin-top:6px;"><button onclick="drawBoardReset()">🔄 Remettre à 0</button></div>` : "<div class='tl-hint'>Le classement du chat est sur l'écran du streamer.</div>");
+        }
+        function drawBoardReset() { drawBoardSave({}); drawStreamBoard(drw.state); toast('🔄 Classement du chat remis à zéro', '#9146FF'); }
+        socket.on('draw_stream_found', d => {
+            if (!d || !d.user) return;
+            if (stream.ws) {
+                const b = drawBoardLoad();
+                Object.values(b).forEach(e => { delete e.last; });
+                const e = b[d.user] || (b[d.user] = { name: d.name, pts: 0 });
+                e.name = d.name; e.pts++; e.last = 1;
+                drawBoardSave(b);
+            }
+            drawStreamBoard(drw.state);
+            confetti(1200);
+        });
 
         /* =====================================================================
            COLORIE LE PERSO
