@@ -6799,11 +6799,52 @@
                 return { lab: C[k], share: area[k] / fgArea, where: my < 0.34 ? 'haut' : my > 0.66 ? 'bas' : 'milieu' };
             });
             col.labels = labels; col.D = D; col.W = D.W; col.H = D.H;
-            // une seule zone à deviner : choisie pareil pour tout le monde (même image + même manche)
-            const big = col.zones.map((z, i) => i).filter(i => col.zones[i].share >= 0.12);
-            const pool = big.length ? big : col.zones.map((z, i) => i);
-            col.sel = col.target = 0; // la zone principale (la plus grande) : « la couleur du perso »
+            col.sel = col.target = 0;
+            colPickPart();
             return true;
+        }
+        // Choisit la partie à colorier : les CHEVEUX (manches impaires) ou les VÊTEMENTS (manches paires).
+        // Même image + même manche => même choix chez tous les joueurs.
+        const colIsSkin = l => l[0] > 45 && l[0] < 93 && l[1] > 3 && l[1] < 32 && l[2] > 7 && l[2] < 42 && l[2] > l[1] * 0.55;
+        function colPickPart() {
+            const { W, H } = col, labels = col.labels, lab = col.D.lab, N = W * H;
+            let fg = 0; for (let i = 0; i < N; i++) if (labels[i] >= 0) fg++;
+            if (!fg) return;
+            // morceaux d'un seul tenant (même couleur, pixels voisins)
+            const comp = new Int32Array(N).fill(-1), comps = [], stack = [];
+            for (let i = 0; i < N; i++) {
+                if (labels[i] < 0 || comp[i] >= 0) continue;
+                const z = labels[i], id = comps.length;
+                const c = { id, z, n: 0, ys: 0, ymin: H, L: 0, A: 0, B: 0, px: [] };
+                comp[i] = id; stack.push(i);
+                while (stack.length) {
+                    const k = stack.pop(), x = k % W, y = (k / W) | 0;
+                    c.n++; c.ys += y; if (y < c.ymin) c.ymin = y; c.L += lab[k * 3]; c.A += lab[k * 3 + 1]; c.B += lab[k * 3 + 2]; c.px.push(k);
+                    if (x > 0 && comp[k - 1] < 0 && labels[k - 1] === z) { comp[k - 1] = id; stack.push(k - 1); }
+                    if (x < W - 1 && comp[k + 1] < 0 && labels[k + 1] === z) { comp[k + 1] = id; stack.push(k + 1); }
+                    if (y > 0 && comp[k - W] < 0 && labels[k - W] === z) { comp[k - W] = id; stack.push(k - W); }
+                    if (y < H - 1 && comp[k + W] < 0 && labels[k + W] === z) { comp[k + W] = id; stack.push(k + W); }
+                }
+                c.cy = c.ys / c.n / H; c.top = c.ymin / H; c.lab = [c.L / c.n, c.A / c.n, c.B / c.n]; c.share = c.n / fg;
+                comps.push(c);
+            }
+            const usable = comps.filter(c => !colIsSkin(c.lab) && !colIsSkin(col.zones[c.z].lab));
+            const hair = usable.filter(c => c.cy < 0.45 && c.top < 0.3 && c.share >= 0.03).sort((a, b) => b.n - a.n);
+            const clothes = usable.filter(c => c.cy > 0.5 && c.share >= 0.04).sort((a, b) => b.n - a.n);
+            const wantHair = (col.round || 1) % 2 === 1;
+            let part = wantHair ? 'hair' : 'clothes', pick = (wantHair ? hair : clothes)[0];
+            if (!pick) { part = wantHair ? 'clothes' : 'hair'; pick = (wantHair ? clothes : hair)[0]; }
+            if (!pick) { col.part = 'main'; return; }
+            // on regroupe les autres morceaux de la même couleur dans la même région (ex : mèches, manches)
+            const group = comps.filter(c => c.z === pick.z && c.n >= fg * 0.004 && (part === 'hair' ? c.cy < 0.5 : c.cy > 0.4));
+            const t = col.zones.length;
+            let L = 0, A = 0, B = 0, n = 0;
+            group.forEach(c => { c.px.forEach(k => { labels[k] = t; }); L += c.L; A += c.A; B += c.B; n += c.n; });
+            col.zones.push({ lab: [L / n, A / n, B / n], share: n / fg, where: part });
+            col.sel = col.target = t;
+            col.part = part;
+            const q = document.querySelector('.cr-part');
+            if (q) q.textContent = part === 'hair' ? 'des cheveux de' : 'des vêtements de';
         }
         // Rendu : le perso garde ses couleurs, sa zone principale prend la couleur choisie
         function colPaint(canvas, opts) {
@@ -6959,7 +7000,7 @@
             clearInterval(col.tick);
             const me = q.players.find(p => p.id === socket.id) || {};
             if (q.phase === 'playing') {
-                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.myPct = null; col.D = null; col.hue = 215; col.s = 0.7; col.v = 0.8; }
+                if (newRound) { col.part = null; col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.myPct = null; col.D = null; col.hue = 215; col.s = 0.7; col.v = 0.8; }
                 col.round = q.round;
                 col.out = !!(q.duel && !(me.lives > 0));
                 const info = q.stage.color || {};
@@ -6971,7 +7012,7 @@
                                 <div class="cr-presets">${COL_PRESETS.map(c => `<button data-c="${c}" style="background:${c}" onclick="colPreset('${c}')"></button>`).join('')}</div></div>
                         </div>
                         <div class="cr-right">
-                            <div class="cr-q">Quelle est la couleur de :<b>${v7esc(info.name || '?')}</b><small>${v7esc(info.anime || '')}</small></div>
+                            <div class="cr-q">Quelle est la couleur <span class="cr-part">de</span> :<b>${v7esc(info.name || '?')}</b><small>${v7esc(info.anime || '')}</small></div>
                             <div class="col-canvas-wrap"><canvas class="col-canvas" title="Touche pour voir la zone"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation…</div></div></div>
                             ${col.out ? '<div class="cr-out">💀 Tu es éliminé : regarde les autres jouer !</div>' : '<button class="btn-action col-submit" onclick="colSubmit(false)">Soumettre</button>'}
                         </div>
@@ -7000,7 +7041,7 @@
             const inRound = q.players.filter(p => !q.duel || p.lives > 0 || p.lost || byId[p.id]);
             const cards = inRound.map(p => ({ p, g: byId[p.id] })).sort((a, b) => ((b.g || {}).pct || 0) - ((a.g || {}).pct || 0));
             stage.innerHTML = `<div class="cr-box">${colHeartsBar(q)}
-                <div class="cr-real"><img src="${v7esc(q.stage.img || '')}" alt=""><div><small>La vraie couleur de</small><b>${v7esc((q.stage.color || {}).name || q.answer || '')}</b>
+                <div class="cr-real"><img src="${v7esc(q.stage.img || '')}" alt=""><div><small>La vraie couleur ${col.part === 'hair' ? 'des cheveux de' : col.part === 'clothes' ? 'des vêtements de' : 'de'}</small><b>${v7esc((q.stage.color || {}).name || q.answer || '')}</b>
                 ${me.pct != null ? `<div class="cr-mine">${colPct(me.pct)}</div><div>${colVerdict(me.pct)}</div>` : ''}</div></div>
                 <div class="cr-cards">${cards.map(({ p, g }) => `<div class="${p.id === socket.id ? 'me' : ''}${p.lost ? ' lost' : ''}">
                     ${g && g.hex ? `<canvas class="cr-paint" data-hex="${v7esc(g.hex)}"></canvas>` : g && g.thumb ? `<img src="${g.thumb}" alt="">` : '<div class="cr-none">😶<br>Pas de réponse</div>'}
