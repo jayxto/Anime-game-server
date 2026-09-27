@@ -3,7 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime Game - Multijoueur</title>
+    <title>Anime Game – Quiz et jeux anime multijoueur gratuits</title>
+    <meta name="description" content="Joue gratuitement à des jeux anime entre potes ou avec ton chat Twitch : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE, Colorie le perso et plus de 20 mini-jeux sur Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…">
+    <meta name="theme-color" content="#0b0b10">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Anime Game">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:title" content="Anime Game – Quiz et jeux anime multijoueur gratuits">
+    <meta property="og:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime à jouer entre potes ou avec ton chat Twitch. Gratuit, sans téléchargement.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Anime Game – Quiz et jeux anime multijoueur gratuits">
+    <meta name="twitter:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime entre potes. Gratuit.">
+    <!--SEO-->
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Anime Game","inLanguage":"fr","description":"Quiz et jeux anime multijoueur gratuits dans le navigateur : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE, Colorie le perso et plus de 20 mini-jeux.","genre":["Quiz","Party game","Anime"],"playMode":["MultiPlayer","SinglePlayer"],"gamePlatform":"Navigateur web","applicationCategory":"Game","operatingSystem":"Tous","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -807,6 +823,11 @@
         .rc-who{text-align:center;font-size:1.2rem;font-weight:800;margin:6px 0 10px;}
         .rc-row{display:flex;justify-content:space-between;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:7px 10px;margin-bottom:5px;font-size:.85rem;}
         .rc-row span{color:#aab;} .rc-row b{text-align:right;}
+        .seo-about{max-width:640px;margin:10px auto 60px;padding:0 20px;color:var(--text-muted);font-size:.85rem;line-height:1.5;}
+        .seo-about h1{font-size:1.15rem;color:var(--text-color);margin:0 0 8px;}
+        .seo-about h2{font-size:1rem;color:var(--accent-cyan);margin:14px 0 6px;}
+        .seo-about ul{padding-left:18px;margin:0;}
+        .seo-about b{color:var(--text-color);}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -992,6 +1013,23 @@
             </div>
         </div>
     </div>
+
+    <section id="seo-about" class="seo-about">
+        <h1>Anime Game : quiz et jeux anime en multijoueur, gratuits</h1>
+        <p>Crée un salon, envoie le code à tes potes et jouez ensemble directement dans le navigateur, sans rien télécharger. Parfait pour les soirées entre amis, en vocal sur Discord ou en live avec ton chat Twitch.</p>
+        <h2>Les modes de jeu</h2>
+        <ul>
+            <li><b>Blind test d'openings</b> : reconnais l'anime à partir de son opening ou ending.</li>
+            <li><b>Undercover anime</b> : trouve l'imposteur qui n'a pas le même perso que les autres.</li>
+            <li><b>Dessine le perso</b> : dessine un perso d'anime, les autres doivent le deviner (mode stream pour ton chat Twitch).</li>
+            <li><b>Devine le perso</b> : pose des questions oui / non pour trouver le perso mystère.</li>
+            <li><b>Colorie le perso</b> : retrouve de mémoire la vraie couleur des cheveux ou des vêtements.</li>
+            <li><b>Citations</b> : à qui appartient cette réplique culte ?</li>
+            <li><b>AnimeDLE</b> : le Wordle des persos d'anime, avec un défi du jour.</li>
+            <li><b>Mini-jeux</b> : Pixel, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
+        </ul>
+        <p>Plus de 30 animes : Naruto, One Piece, Bleach, Hunter x Hunter, L'Attaque des Titans, Demon Slayer, Jujutsu Kaisen, Dragon Ball, Chainsaw Man, JoJo, Pokémon, Solo Leveling… Gagne des pièces, collectionne les cartes de tes persos préférés et débloque des titres.</p>
+    </section>
 
     <div id="app-root" style="display:none;">
     <div id="connection-banner" style="display:none; background:#ff2a5f; color:#fff; text-align:center; padding:10px; font-weight:700; font-size:0.85rem;">
@@ -1966,11 +2004,13 @@
         function showAuthScreen() {
             document.getElementById('auth-screen').style.display = 'block';
             document.getElementById('app-root').style.display = 'none';
+            const seo = document.getElementById('seo-about'); if (seo) seo.style.display = '';
         }
 
         function showApp() {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-root').style.display = 'block';
+            const seo = document.getElementById('seo-about'); if (seo) seo.style.display = 'none';
             updateProfileDisplay();
         }
 
