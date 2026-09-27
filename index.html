@@ -1058,6 +1058,25 @@
         .cn-prest{margin-left:3px;font-size:.85em;filter:drop-shadow(0 0 4px rgba(255,215,0,.8));}
         .hub-card.theme{background:linear-gradient(135deg,color-mix(in srgb,var(--ta) 20%,transparent),color-mix(in srgb,var(--tb) 12%,#161622));border-color:var(--ta);}
         @media (max-width:760px){.lg-wrap{grid-template-columns:1fr;}.uq-choices{grid-template-columns:1fr;}.dk-slots{grid-template-columns:repeat(3,1fr);}.uqe-ch{grid-template-columns:1fr;}}
+        .lg-intro{display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0 20px;}
+        .lg-wheel-wrap{position:relative;width:290px;height:290px;}
+        .lg-pointer{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:1.8rem;color:var(--accent-yellow);z-index:2;text-shadow:0 2px 6px #000;}
+        .lg-wheel{position:absolute;inset:0;border-radius:50%;border:6px solid #111;box-shadow:0 0 30px rgba(183,123,255,.4),inset 0 0 20px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;transition:transform 5s cubic-bezier(.12,.7,.08,1);}
+        .lg-wheel.spin{transform:rotate(var(--stop));}
+        .lg-wheel span{position:absolute;font-size:1.5rem;}
+        .lg-reveal{opacity:0;transform:scale(.7);transition:all .6s;text-align:center;max-width:460px;background:#101018;border:2px solid #b77bff;border-radius:16px;padding:14px;}
+        .lg-reveal.on{opacity:1;transform:none;} .lg-reveal h3{margin:4px 0;color:var(--accent-yellow);} .lg-reveal p{font-size:.9rem;} .lg-ri.big{font-size:3.4rem;}
+        .lg-solo{margin:0 0 10px;} .lg-solo button.danger{background:#b91c1c!important;border-color:#b91c1c!important;}
+        .lg-p button{margin-top:2px;} .lg-p button.on{outline:2px solid var(--accent-yellow);}
+        .lg-p button.k-peek,.lg-p button.k-aura{background:#1d4ed8;} .lg-p button.k-protect,.lg-p button.k-guard{background:#15803d;} .lg-p button.k-jail{background:#6d28d9;} .lg-p button.k-link{background:#db2777;} .lg-p button.k-revive,.lg-p button.k-summon{background:#7e22ce;} .lg-p button.k-kira{background:#111;border:1px solid #dc2626;} .lg-p button.k-shoot{background:#475569;}
+        .lg-chan{font-size:.75rem;font-weight:800;color:var(--accent-yellow);}
+        .lgm{padding:2px 0;} .lgm i{font-style:normal;margin-right:3px;} .lgm.ch-demons b{color:#f87171;} .lgm.ch-jail b{color:#c4b5fd;} .lgm.ch-dead b{color:#94a3b8;} .lgm.ch-public b{color:var(--accent-cyan);}
+        .lg-rules{margin-top:14px;text-align:left;background:#101018;border:2px solid #b91c1c;border-radius:14px;padding:12px;} .lg-rules h3{margin:0 0 6px;color:var(--accent-yellow);}
+        .lg-comp{font-size:1.3rem;margin:6px 0;} .lg-comp b{font-size:.85rem;margin-right:6px;}
+        .lg-rules summary{cursor:pointer;font-weight:800;margin-top:6px;}
+        .lg-rlist{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:420px;overflow:auto;}
+        .lg-rlist>div{display:flex;gap:8px;opacity:.55;background:#15151f;border-radius:10px;padding:6px 8px;} .lg-rlist>div.in{opacity:1;border:1px solid #3a3a55;}
+        .lg-rlist span{font-size:1.5rem;} .lg-rlist small{color:var(--text-muted);} .lg-rlist p{margin:2px 0 0;font-size:.78rem;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -1433,7 +1452,7 @@
 
                 <div class="quote-mode-card" style="border-color:#b91c1c;">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🐺 Loup-garou anime</h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">Démons de Muzan 👹, Sharingan 👁️, Médecin ninja 💚, Death Note 📓 et villageois de Konoha 🍃 • nuit / jour, débats et votes • 4 joueurs min., parfait en vocal</p>
+                    <p style="margin:0 0 12px;font-size:.85rem;">17 rôles anime : démons de Muzan 👹, Kira 📓, Sharingan 👁️, Gojo 🌀, Livaï ⚔️, Nagato 🟣, Buggy 🤡, Cupidon 💘… • auras, chats secrets, roue des rôles • 4 à 16 joueurs, parfait en vocal</p>
                     <button class="btn-action" style="margin-top:0;background:#b91c1c;" onclick="createRoom('loupgarou','all')">Créer une partie</button>
                 </div>
 
@@ -9386,72 +9405,122 @@
             if (ring) { ring.style.strokeDasharray = '289'; ring.style.strokeDashoffset = String(289 * (1 - left / q.turnMs)); ring.classList.toggle('hurry', left < 5000); }
         }, 200);
 
-        /* ---------- Loup-garou anime ---------- */
-        socket.on('lg_state', q => { if (!q || !currentRoomCode) return; h2.lg = q; h2._lgRecv = Date.now(); lgRender(); });
+        /* ---------- Loup-garou anime (16 joueurs, 17 rôles) ---------- */
+        const lgc = { msgs: [], wheelDone: {}, roles: null };
+        const LG_AURA = { claire: '☀️ claire', obscure: '🌑 obscure', inconnue: '❔ inconnue' };
+        const LG_CH = { public: ['💬', 'Village'], demons: ['👹', 'Chat des démons'], jail: ['🌀', 'Domaine de Gojo'], dead: ['👻', 'Monde des morts'] };
+        socket.on('lg_state', q => { if (!q || !currentRoomCode) return; const prev = h2.lg; h2.lg = q; h2._lgRecv = Date.now(); if (!prev || prev.phase !== q.phase) lgc.pick = null; lgRender(); });
         socket.on('lg_private', p => { h2.lgp = p; if (h2.lg) lgRender(); });
-        socket.on('chat_message', d => {
-            if (!h2.lg || !d) return;
-            h2.chatLg.push(d); if (h2.chatLg.length > 60) h2.chatLg.shift();
+        socket.on('lg_notice', d => d && d.text && toast(h2esc(d.text), '#b77bff'));
+        socket.on('lg_msg', m => {
+            if (!m) return;
+            lgc.msgs.push(m); if (lgc.msgs.length > 120) lgc.msgs.shift();
             const box = document.getElementById('lg-chat-list'); if (box) { box.innerHTML = lgChatHtml(); box.scrollTop = box.scrollHeight; }
         });
-        function lgChatHtml() { return h2.chatLg.map(m => `<div><b style="color:${m.authorId === socket.id ? 'var(--accent-cyan)' : 'var(--accent-pink)'}">${h2esc(m.author)}</b> ${h2esc(m.message)}</div>`).join(''); }
+        function lgChatHtml() { return lgc.msgs.slice(-60).map(m => `<div class="lgm ch-${m.ch}"><i>${LG_CH[m.ch][0]}</i><b>${h2esc(m.from)}</b> ${h2esc(m.text)}</div>`).join(''); }
+        function lgWheel(q, me) {
+            const roles = q.composition, n = roles.length, seg = 360 / n;
+            const idx = Math.max(0, roles.indexOf(me.orig.id));
+            const stop = 360 * 6 + (360 - (idx * seg + seg / 2));
+            const cols = ['#b91c1c', '#1d4ed8', '#15803d', '#a16207', '#7e22ce', '#0e7490', '#be185d', '#4d7c0f'];
+            const grad = roles.map((r, i) => `${cols[i % cols.length]} ${i * seg}deg ${(i + 1) * seg}deg`).join(',');
+            const icons = roles.map((r, i) => `<span style="transform:rotate(${i * seg + seg / 2}deg) translateY(-118px) rotate(-${i * seg + seg / 2}deg)">${q.roleInfo[r].icon}</span>`).join('');
+            return `<div class="lg-wheel-wrap"><div class="lg-pointer">▼</div><div class="lg-wheel" style="background:conic-gradient(${grad});--stop:${stop}deg">${icons}</div></div>
+                <div class="lg-reveal" id="lg-reveal"><div class="lg-ri big">${me.orig.icon}</div><h3>${h2esc(me.orig.name)}</h3><p>${h2esc(me.orig.desc)}</p><small>Aura : ${LG_AURA[me.orig.aura] || ''}</small></div>`;
+        }
         function lgRender() {
             const q = h2.lg, me = h2.lgp;
             if (!q) return;
             const el = h2Show('lg-room');
             const keepChat = document.getElementById('lg-chat-in') ? document.getElementById('lg-chat-in').value : '';
-            const alive = me && me.alive;
-            const role = me && me.role;
-            const night = q.phase === 'night', day = q.phase === 'day', fin = q.phase === 'finished';
-            const votingOpen = day && Date.now() - h2._lgRecv + q.serverNow >= q.voteOpensAt;
-            let action = null; // [verbe, cible autorisée ?]
-            if (alive && night && role) {
-                if (role.id === 'demon') action = ['👹 Dévorer', p => p.alive && !(me.mates || []).some(m => m.key === p.key) && p.key !== me.key, me.myNight];
-                else if (role.id === 'seer') action = me.myNight ? null : ['👁️ Sonder', p => p.alive && p.key !== me.key, null];
-                else if (role.id === 'doctor') action = ['💚 Protéger', p => p.alive && p.key !== me.lastProtect, me.myNight];
-                else if (role.id === 'note' && !me.noteUsed) action = ['📓 Écrire son nom', p => p.alive && p.key !== me.key, me.myNight];
+            const now = q.serverNow + (Date.now() - h2._lgRecv);
+            const fin = q.phase === 'finished';
+            const phaseTxt = { intro: '🎡 Distribution des rôles', night: `🌙 Nuit ${q.day}`, talk: `☀️ Jour ${q.day} : débat`, vote: `⚖️ Jour ${q.day} : vote`, finished: '🏁 Fin de partie' }[q.phase];
+            const comp = q.composition.map(r => q.roleInfo[r].icon).join('');
+            if (q.phase === 'intro' && me) {
+                const k = q.day + ':' + currentRoomCode;
+                if (!el.querySelector('.lg-wheel') || lgc.wheelKey !== k) {
+                    lgc.wheelKey = k;
+                    el.innerHTML = h2Head('🐺 LOUP-GAROU ANIME', `${phaseTxt} • ${q.composition.length} joueurs`, q) + `<div class="lg-intro">${lgWheel(q, me)}</div>`;
+                    requestAnimationFrame(() => { const w = el.querySelector('.lg-wheel'); if (w) w.classList.add('spin'); });
+                    setTimeout(() => { const r = document.getElementById('lg-reveal'); if (r) r.classList.add('on'); }, 5200);
+                }
+                return;
             }
-            if (alive && day && votingOpen) action = ['⚖️ Voter', p => p.alive && p.key !== me.key, me.myVote];
-            const phaseTxt = fin ? (q.winner === 'village' ? '🎉 Victoire du village !' : '👹 Victoire des démons !') : night ? `🌙 Nuit ${q.day}` : `☀️ Jour ${q.day}`;
-            const roleCard = role ? `<div class="lg-role t-${role.team}"><span class="lg-ri">${role.icon}</span><div><b>${h2esc(role.name)}</b><small>${h2esc(role.desc)}</small>
-                ${me.mates && me.mates.length ? `<small class="lg-mates">Tes alliés démons : ${me.mates.map(m => `${h2esc(m.name)}${m.alive ? '' : ' ☠️'}`).join(', ')}</small>` : ''}
-                ${me.seen && me.seen.length ? `<small class="lg-mates">Sharingan : ${me.seen.map(s => `${h2esc(s.name)} = ${s.role.icon} ${h2esc(s.role.name)}`).join(' • ')}</small>` : ''}
-                ${me.demonVotes && me.demonVotes.length ? `<small class="lg-mates">Choix des démons : ${me.demonVotes.map(v => `${h2esc(v.by)} → ${h2esc(v.target)}`).join(' • ')}</small>` : ''}
-                ${!alive && !fin ? '<small class="lg-dead">☠️ Tu es mort : tu regardes la partie en silence.</small>' : ''}</div></div>` : '';
+            const alive = me && me.alive;
+            const acts = (me && me.actions) || [];
+            const onCard = acts.filter(a => a.targets);
+            const solo = acts.filter(a => a.solo);
+            const role = me && me.role;
+            let info = '';
+            if (me) {
+                const L = [];
+                (me.info || []).forEach(t => L.push(h2esc(t)));
+                if (me.mates && me.mates.length) L.push('👹 Tes alliés : ' + me.mates.map(m => `${h2esc(m.name)} (${m.role.icon})${m.alive ? '' : ' ☠️'}`).join(', '));
+                if (me.demonVotes && me.demonVotes.length) L.push('🗳️ Choix des démons : ' + me.demonVotes.map(v => `${h2esc(v.by)} → ${h2esc(v.target)}`).join(' • '));
+                if (me.demonSeen && me.demonSeen.length) L.push('👺 Vu par Kokushibo : ' + me.demonSeen.map(s => `${h2esc(s.name)} = ${s.role.icon} ${h2esc(s.role.name)}`).join(' • '));
+                if (me.seen && me.seen.length) L.push('👁️ Sharingan : ' + me.seen.map(s => `${h2esc(s.name)} = ${s.role.icon} ${h2esc(s.role.name)}`).join(' • '));
+                if (me.auras && me.auras.length) L.push('🐸 Auras : ' + me.auras.map(s => `${h2esc(s.name)} = ${LG_AURA[s.aura]}`).join(' • '));
+                if (!alive && !fin) L.push('👻 Tu es mort : tu peux parler avec les autres morts.');
+                info = L.map(t => `<small class="lg-mates">${t}</small>`).join('');
+            }
+            const roleCard = role ? `<div class="lg-role t-${role.team}"><span class="lg-ri">${role.icon}</span><div><b>${h2esc(role.name)}</b><small>${h2esc(role.desc)}</small>${info}</div></div>` : '';
             let hint = '';
             if (!fin && alive) {
-                if (night) hint = !role || role.id === 'villager' ? '😴 Tu dors… attends le lever du jour.' : role.id === 'seer' && me.myNight ? '👁️ Vision reçue. Attends le jour.' : role.id === 'note' && me.noteUsed ? '📓 Ton Death Note est déjà utilisé.' : action ? `Choisis un joueur : ${action[0]}` : '';
-                else hint = votingOpen ? (me.myVote ? `Tu as voté${me.myVote === 'skip' ? ' blanc' : ''}. Tu peux changer d’avis.` : 'Débattez puis votez pour éliminer un suspect.') : '🌅 Le village se réveille… lisez les nouvelles.';
+                if (q.phase === 'night') hint = !acts.length ? (me.info || []).some(t => t.includes('enfermé')) ? '🌀 Tu es enfermé : discute avec ton geôlier.' : '😴 Tu dors… attends le lever du jour.' : me.done ? '✔ Tu as joué. Tu peux encore changer d’avis.' : 'Choisis ta cible sur les cartes des joueurs.';
+                else if (q.phase === 'talk') hint = '💬 Débattez ! Le vote commence dans quelques secondes.';
+                else hint = '⚖️ Votez pour éliminer un suspect.';
             }
             const grid = q.players.map(p => {
-                const can = action && action[1](p);
-                const picked = action && action[2] === p.key;
-                return `<div class="lg-p${p.alive ? '' : ' dead'}${p.id === socket.id ? ' me' : ''}${picked ? ' picked' : ''}">${avatarHtml(p.name, p.cos)}<b>${h2esc(p.name)}</b>
+                const btns = onCard.filter(a => a.targets.includes(p.key)).map(a => {
+                    const picked = a.picked === p.key || (lgc.pick && lgc.pick.kind === a.kind && lgc.pick.key === p.key);
+                    return `<button class="k-${a.kind}${picked ? ' on' : ''}" onclick="lgAct('${a.kind}','${h2esc(p.key)}')">${picked ? '✔ ' : ''}${a.label}</button>`;
+                }).join('');
+                return `<div class="lg-p${p.alive ? '' : ' dead'}${p.id === socket.id ? ' me' : ''}">${avatarHtml(p.name, p.cos)}<b>${h2esc(p.name)}${p.hokage ? ' 🏯' : ''}${p.lover ? ' 💘' : ''}</b>
                     ${p.role ? `<small>${p.role.icon} ${h2esc(p.role.name)}</small>` : p.alive ? '' : '<small>☠️</small>'}
-                    ${day && p.votes ? `<em class="lg-votes">${p.votes} 🗳️</em>` : ''}${day && p.voted && p.alive ? '<em class="lg-voted">✔</em>' : ''}
-                    ${can ? `<button onclick="lgAct('${h2esc(p.key)}')">${picked ? '✔ ' : ''}${action[0]}</button>` : ''}</div>`;
+                    ${q.phase === 'vote' && p.votes ? `<em class="lg-votes">${p.votes} 🗳️</em>` : ''}${q.phase === 'vote' && p.voted && p.alive ? '<em class="lg-voted">✔</em>' : ''}${btns}</div>`;
             }).join('');
-            const skipBtn = alive && ((day && votingOpen) || (night && role && role.id === 'note' && !me.noteUsed)) ? `<button class="lg-skip" onclick="lgAct('skip')">${day ? '🤐 Vote blanc' : '📓 Ne pas l’utiliser cette nuit'}</button>` : '';
-            const canChat = alive && day || fin;
-            const comp = Object.entries(q.rolesInGame || {}).map(([r, n]) => `${q.roleInfo[r].icon}×${n}`).join(' ');
+            const soloHtml = solo.length ? `<div class="hb-btns lg-solo">${solo.map(a => `<button class="${a.kind === 'execute' ? 'danger' : ''}" onclick="lgAct('${a.kind}')">${a.label}</button>`).join('')}</div>` : '';
+            const ch = me && me.channel;
+            const chatIn = ch ? `<div class="lg-chan">${LG_CH[ch][0]} ${LG_CH[ch][1]}</div><div class="ch-in"><input id="lg-chat-in" class="v7-input" maxlength="200" placeholder="Écrire…" onkeydown="if(event.key==='Enter')lgChat()"><button onclick="lgChat()">➤</button></div>` : `<div class="tl-hint">🌙 Silence, c’est la nuit…</div>`;
+            const endHtml = fin ? `<div class="ch-end"><div class="ch-end-t">${q.log[q.log.length - 1] ? h2esc(q.log[q.log.length - 1]) : ''}</div>${q.winnerNames && q.winnerNames.length ? `<p>🏆 Gagnants : ${q.winnerNames.map(h2esc).join(', ')}</p>` : ''}${h2EndBtns(q)}</div>` : '';
             el.innerHTML = h2Head('🐺 LOUP-GAROU ANIME', `${phaseTxt} • <span id="lg-timer"></span> • ${comp}`, q)
-                + `<div class="lg-wrap ${night ? 'night' : fin ? 'fin' : 'day'}"><div class="lg-main">${roleCard}${hint ? `<div class="lg-hint">${hint}</div>` : ''}<div class="lg-grid">${grid}</div>${skipBtn}${fin ? h2EndBtns(q) : ''}</div>
-                <div class="lg-side"><div class="lg-log">${q.log.slice(-12).map(h2esc).join('<br>')}</div>
-                <div class="lg-chat"><div id="lg-chat-list">${lgChatHtml()}</div>${canChat ? `<div class="ch-in"><input id="lg-chat-in" class="v7-input" maxlength="200" placeholder="Débattre…" onkeydown="if(event.key==='Enter')lgChat()"><button onclick="lgChat()">➤</button></div>` : `<div class="tl-hint">${night ? '🌙 Silence, c’est la nuit…' : '☠️ Les morts ne parlent pas.'}</div>`}</div></div></div>`;
+                + `<div class="lg-wrap ${q.phase === 'night' ? 'night' : fin ? 'fin' : 'day'}"><div class="lg-main">${endHtml}${roleCard}${hint ? `<div class="lg-hint">${hint}</div>` : ''}${soloHtml}<div class="lg-grid">${grid}</div></div>
+                <div class="lg-side"><div class="lg-log">${q.log.slice(-14).map(h2esc).join('<br>')}</div><div class="lg-chat"><div id="lg-chat-list">${lgChatHtml()}</div>${chatIn}</div></div></div>`;
             const ci = document.getElementById('lg-chat-in'); if (ci && keepChat) { ci.value = keepChat; ci.focus(); }
             const cl = document.getElementById('lg-chat-list'); if (cl) cl.scrollTop = cl.scrollHeight;
+            const lgl = el.querySelector('.lg-log'); if (lgl) lgl.scrollTop = lgl.scrollHeight;
         }
-        function lgAct(k) { socket.emit('lg_act', { roomCode: currentRoomCode, target: k }); }
-        function lgChat() { const i = document.getElementById('lg-chat-in'); if (!i || !i.value.trim()) return; socket.emit('chat_message', { roomCode: currentRoomCode, message: i.value.trim() }); i.value = ''; }
+        function lgAct(kind, key) {
+            if (kind === 'execute' && !confirm('Exécuter ton prisonnier à l’aube ?')) return;
+            if (kind === 'shoot' && !confirm('Utiliser ton unique attaque sur ce joueur ?')) return;
+            lgc.pick = key ? { kind, key } : null;
+            socket.emit('lg_act', { roomCode: currentRoomCode, kind, target: key || null });
+        }
+        function lgChat() { const i = document.getElementById('lg-chat-in'); if (!i || !i.value.trim()) return; socket.emit('lg_chat', { roomCode: currentRoomCode, text: i.value.trim() }); i.value = ''; }
         setInterval(() => {
             const q = h2.lg; if (!q || q.phase === 'finished') return;
             const t = document.getElementById('lg-timer'); if (!t) return;
             const now = q.serverNow + (Date.now() - h2._lgRecv);
-            const left = Math.max(0, Math.ceil((q.endsAt - now) / 1000));
-            t.textContent = `⏱️ ${left} s`;
-            if (q.phase === 'day' && q.voteOpensAt && now >= q.voteOpensAt && !h2._voteOpened) { h2._voteOpened = q.day; lgRender(); }
-            if (q.phase !== 'day') h2._voteOpened = 0;
+            t.textContent = `⏱️ ${Math.max(0, Math.ceil((q.endsAt - now) / 1000))} s`;
         }, 500);
+        // règles et rôles expliqués dans le salon d'attente
+        socket.on('update_room', async room => {
+            if (!room || room.status !== 'waiting' || room.code !== currentRoomCode) return;
+            let box = document.getElementById('lg-rules-box');
+            if (room.mode !== 'loupgarou') { if (box) box.style.display = 'none'; return; }
+            if (!lgc.roles) { const d = await v7get('/api/lg/roles'); if (d && d.ok) lgc.roles = d; else return; }
+            const R = lgc.roles;
+            if (!box) { box = document.createElement('div'); box.id = 'lg-rules-box'; box.className = 'lg-rules'; const list = document.getElementById('waiting-players-list'); (list ? list.parentNode : document.getElementById('waiting-room')).appendChild(box); }
+            box.style.display = '';
+            const n = room.players.length, comp = R.order.slice(0, Math.min(R.max, n));
+            const team = { demons: '👹 Démons', village: '🍃 Village', kira: '📓 Solitaire', buggy: '🤡 Solitaire' };
+            box.innerHTML = `<h3>🐺 Loup-garou anime : règles</h3>
+                <p class="tl-hint">4 à ${R.max} joueurs • 🌙 nuit ${R.timings.night} s → ☀️ débat ${R.timings.talk} s → ⚖️ vote ${R.timings.vote} s. Au début, une roue tire ton rôle. Les démons ont un chat secret la nuit. Un rôle mort est révélé à tous.</p>
+                <p class="tl-hint">🎯 Le village gagne quand il n’y a plus ni démon ni Kira. Les démons gagnent quand ils sont aussi nombreux que les autres. Kira gagne seul. Buggy gagne s’il est voté. Le couple + Cupidon gagnent s’ils sont les derniers.</p>
+                <div class="lg-comp"><b>Avec ${n} joueur${n > 1 ? 's' : ''} :</b> ${n < 4 ? 'il faut au moins 4 joueurs' : comp.map(r => `<span title="${h2esc(R.roles[r].name)}">${R.roles[r].icon}</span>`).join('')}</div>
+                <details><summary>📖 Tous les rôles (${R.order.length + 1})</summary><div class="lg-rlist">${[...R.order, 'villager'].map(r => { const x = R.roles[r]; return `<div class="${comp.includes(r) ? 'in' : ''}"><span>${x.icon}</span><div><b>${h2esc(x.name)}</b> <small>${team[x.team]} • aura ${LG_AURA[x.aura]}</small><p>${h2esc(x.desc)}</p></div></div>`; }).join('')}</div></details>`;
+        });
 
         /* ---------- Quiz des joueurs : partie ---------- */
         socket.on('uq_state', q => { if (!q || !currentRoomCode) return; h2.uq = q; h2._uqRecv = Date.now(); uqRender(); });
@@ -9824,3 +9893,4 @@
 </script>
 </body>
 </html>
+        
