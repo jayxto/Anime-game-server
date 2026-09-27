@@ -705,6 +705,27 @@
         .draw-input button{background:var(--accent-cyan);color:#000;border:0;border-radius:10px;padding:0 14px;font-weight:800;font-size:1.1rem;cursor:pointer;}
         @media (max-width:760px){.draw-main{grid-template-columns:1fr;}.draw-chat{height:150px;}}
 
+        /* ===== Devine le perso ===== */
+        .gs-card{background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:12px;text-align:left;}
+        .gs-secret{display:flex;gap:12px;align-items:center;}
+        .gs-secret img{width:92px;height:92px;object-fit:cover;object-position:top;border-radius:10px;flex:0 0 auto;background:#1b1b2a;}
+        .gs-main{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;margin-top:10px;}
+        .gs-feed{background:#0b0b10;border:1px solid #2a2a40;border-radius:10px;height:340px;overflow-y:auto;padding:8px;text-align:left;font-size:.88rem;}
+        .gs-f{padding:7px 8px;border-radius:8px;margin-bottom:5px;background:#131320;word-break:break-word;}
+        .gs-f.sys{background:none;color:var(--accent-yellow);font-weight:700;}
+        .gs-f.wait{outline:1px dashed #44446a;}
+        .gs-f.g{background:#1a1426;}
+        .gs-f.g.ok{outline:2px solid #00ff88;}
+        .gs-f .gs-a{font-weight:800;margin-left:4px;white-space:nowrap;}
+        .gs-btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+        .gs-btns button,.gs-ok{background:#1d1d2c;color:#fff;border:2px solid;border-radius:8px;padding:6px 9px;font-weight:800;cursor:pointer;font-size:.8rem;}
+        .gs-ok{border-color:#00ff88;margin-left:4px;}
+        #guess-inputs{flex-direction:column;gap:6px;margin-top:8px;}
+        .gs-sugg{display:flex;flex-wrap:wrap;gap:5px;}
+        .gs-sugg button{background:#1d1d2c;color:#fff;border:1px solid #2c2c44;border-radius:8px;padding:5px 8px;font-size:.78rem;cursor:pointer;}
+        .gs-sugg small{color:var(--text-muted);}
+        @media (max-width:760px){.gs-main{grid-template-columns:1fr;}.gs-feed{height:260px;}}
+
         /* ===== Colorie le perso ===== */
         .col-wrap{width:100%;max-width:760px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:start;}
         .col-head{grid-column:1/-1;text-align:center;font-size:1.05rem;}
@@ -885,6 +906,12 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve les vraies couleurs d'un perso de mémoire</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#b77bff;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🕵️ Devine le perso <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Un joueur choisit un perso, les autres posent autant de questions oui / non qu'ils veulent pour le trouver • chacun son tour • 2 joueurs min.</p>
+                    <button class="btn-action" style="margin-top:0;background:#b77bff;color:#111;" onclick="createRoom('guess','all')">Créer une partie</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#ff9a3c;">
@@ -1308,6 +1335,34 @@
                     <button id="bt-replay-btn" class="btn-action" style="background:#00ff88;color:black;margin-top:0;" onclick="nextStepGame()">Rejouer</button>
                     <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
                 </div>
+            </div>
+        </div>
+
+        <div id="guess-room" class="game-panel" style="display:none;max-width:1000px;margin:0 auto;">
+            <div class="draw-top">
+                <button class="btn-action" style="width:auto;margin:0;padding:6px 12px;background:#2a2a40;" onclick="backToMenu()">🔙 Salon</button>
+                <div id="guess-status" style="font-weight:800;"></div>
+                <div id="guess-count" style="font-weight:800;color:var(--accent-cyan);"></div>
+            </div>
+            <div id="guess-top" style="margin-top:10px;"></div>
+            <div class="gs-main">
+                <div>
+                    <div id="guess-feed" class="gs-feed"></div>
+                    <div id="guess-inputs" style="display:none;">
+                        <div class="draw-input"><input id="guess-q" maxlength="140" autocomplete="off" placeholder="Pose une question oui / non (ex : il a des cheveux blancs ?)" onkeydown="if(event.key==='Enter')guessAsk()"><button onclick="guessAsk()">❓</button></div>
+                        <div class="draw-input"><input id="guess-try" maxlength="60" autocomplete="off" placeholder="🎯 Tu penses savoir ? Écris le perso" oninput="guessTrySugg()" onkeydown="if(event.key==='Enter')guessTry()"><button onclick="guessTry()" style="background:#00ff88;">🎯</button></div>
+                        <div id="guess-sugg" class="gs-sugg"></div>
+                    </div>
+                </div>
+                <div class="draw-side">
+                    <div id="guess-scores" class="quote-scoreboard" style="display:block;"></div>
+                    <button id="guess-giveup" class="btn-action" style="margin:0;background:#2a2a40;display:none;" onclick="socket.emit('guess_giveup',{roomCode:currentRoomCode})">🏳️ Abandonner</button>
+                    <button id="guess-skip" class="btn-action" style="margin:0;background:#2a2a40;display:none;" onclick="socket.emit('guess_skip',{roomCode:currentRoomCode})">⏭️ Passer (hôte)</button>
+                </div>
+            </div>
+            <div id="guess-end" style="display:none;gap:10px;margin-top:12px;">
+                <button id="guess-replay" class="btn-action" style="background:#00ff88;color:#111;margin-top:0;" onclick="socket.emit('start_game', currentRoomCode)">Rejouer</button>
+                <button class="btn-action" style="background:var(--text-muted);margin-top:0;" onclick="backToMenu()">Retour au salon</button>
             </div>
         </div>
 
@@ -2235,7 +2290,7 @@
 
             // Un paquet "waiting" retardé ne recouvre pas une partie...
             // SAUF si l'utilisateur vient volontairement d'appuyer sur "Menu".
-            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room','draw-room'];
+            const activeGamePanels = ['gameplay-room','rg-room','enchere-room','enchereaveugle-room','connexion-room','dle-room','quote-room','blindtest-room','arcade-room','draw-room','guess-room'];
             const gameAlreadyVisible = activeGamePanels.some(id => {
                 const el = document.getElementById(id);
                 return el && getComputedStyle(el).display !== 'none';
@@ -5673,7 +5728,7 @@
         setInterval(() => {
             const bar = document.getElementById('fx-react-bar');
             if (!bar) return;
-            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room', 'draw-room']
+            const inRoom = !!currentRoomCode && ['waiting-room', 'arcade-room', 'blindtest-room', 'dle-room', 'rg-room', 'quote-room', 'gameplay-room', 'connexion-room', 'enchere-room', 'enchereaveugle-room', 'draw-room', 'guess-room']
                 .some(id => { const el = document.getElementById(id); return el && el.offsetParent !== null; });
             bar.style.display = inRoom ? 'flex' : 'none';
         }, 700);
@@ -5964,10 +6019,12 @@
             // tours de dessin
             const dbox = document.getElementById('room-draw-box');
             if (dbox) {
-                dbox.style.display = room.mode === 'draw' ? 'flex' : 'none';
+                dbox.style.display = room.mode === 'draw' || room.mode === 'guess' ? 'flex' : 'none';
                 const sel = document.getElementById('room-draw-select'), txt = document.getElementById('room-draw-text');
-                sel.value = String(room.drawTours || 2); sel.style.display = iAmHost ? '' : 'none';
-                txt.textContent = iAmHost ? '' : (room.drawTours || 2) + ' tour(s)';
+                const defT = room.mode === 'guess' ? 1 : 2;
+                dbox.querySelector('span').textContent = room.mode === 'guess' ? '🕵️ Tours (chacun fait deviner) :' : '✏️ Tours de dessin :';
+                sel.value = String(room.drawTours || defT); sel.style.display = iAmHost ? '' : 'none';
+                txt.textContent = iAmHost ? '' : (room.drawTours || defT) + ' tour(s)';
             }
             const inv = document.getElementById('invite-friend-btn');
             if (inv) inv.style.display = isAccount() ? '' : 'none';
@@ -5988,7 +6045,7 @@
         socket.on('host_changed', d => { if (d) lastHostId = d.hostId; hostFabUpdate(); });
 
         /* ---------- Bouton hôte en pleine partie : exclure / donner l'hôte ---------- */
-        const GAME_PANELS = ['gameplay-room', 'rg-room', 'enchere-room', 'enchereaveugle-room', 'connexion-room', 'dle-room', 'quote-room', 'blindtest-room', 'arcade-room', 'draw-room'];
+        const GAME_PANELS = ['gameplay-room', 'rg-room', 'enchere-room', 'enchereaveugle-room', 'connexion-room', 'dle-room', 'quote-room', 'blindtest-room', 'arcade-room', 'draw-room', 'guess-room'];
         function hostFabUpdate() {
             const fab = document.getElementById('host-fab');
             if (!fab) return;
@@ -6747,6 +6804,140 @@
                 if (q && (q.game !== 'couleur' || q.phase === 'finished' || q.phase === 'loading')) { if (q.phase !== 'loading' || q.round === 0) col.key = ''; }
                 return orig.apply(this, arguments);
             };
+        })();
+
+
+        /* =====================================================================
+           DEVINE LE PERSO : questions oui / non illimitées
+           ===================================================================== */
+        const gss = { state: null, secret: null, searchT: null, tryT: null, feedLen: 0 };
+        const GUESS_ANS = { yes: ['✅ Oui', '#00ff88'], no: ['❌ Non', 'var(--accent-pink)'], idk: ['🤷 Je sais pas', 'var(--text-muted)'], close: ['🔥 Presque', '#ff9a3c'] };
+        function guessShow() {
+            const panel = document.getElementById('guess-room');
+            if (!panel || panel.style.display === 'block') return;
+            hideAllPanels();
+            panel.style.display = 'block';
+        }
+        function guessIsChooser() { return gss.state && gss.state.chooserId === socket.id; }
+        function guessRender() {
+            const q = gss.state;
+            if (!q) return;
+            lastHostId = q.hostId;
+            q.players.forEach(p => { if (p.cos) cosById[p.id] = p.cos; });
+            const me = guessIsChooser();
+            document.getElementById('guess-status').textContent = q.phase === 'finished' ? '🏁 Partie terminée' : `Tour ${q.tour}/${q.tours} • ${q.chooserName} ${q.phase === 'choosing' ? 'choisit son perso' : 'fait deviner'}`;
+            document.getElementById('guess-count').textContent = q.phase === 'asking' || q.phase === 'reveal' ? `❓ ${q.questions} question${q.questions > 1 ? 's' : ''}` : '';
+            // carte du haut
+            const top = document.getElementById('guess-top');
+            if (q.phase === 'choosing') {
+                if (me) {
+                    if (!top.__choose) {
+                        top.__choose = true;
+                        top.innerHTML = `<div class="gs-card"><b>🕵️ Choisis ton perso</b><div class="tl-hint">Les autres vont te poser des questions oui / non pour le trouver.</div>
+                            <input class="v7-input" id="guess-search" placeholder="Cherche un perso (ex : Gojo, Luffy…)" autocomplete="off" oninput="guessSearch()">
+                            <div class="av-grid" id="guess-results"></div>
+                            <details style="margin-top:8px;"><summary style="cursor:pointer;color:var(--accent-cyan);font-weight:700;">✍️ Perso pas dans la liste ? Écris-le</summary>
+                            <input class="v7-input" id="guess-custom" maxlength="60" placeholder="Nom du perso" style="margin-top:8px;"><input class="v7-input" id="guess-custom-anime" maxlength="60" placeholder="Anime (facultatif)">
+                            <button class="btn-action" style="margin-top:0;" onclick="guessPickCustom()">Valider ce perso</button>
+                            <div class="tl-hint">Pour un perso libre, c'est toi qui valides la bonne réponse.</div></details></div>`;
+                        guessSearch();
+                    }
+                } else { top.__choose = false; top.innerHTML = `<div class="gs-card" style="text-align:center;"><div style="font-size:2.6rem;">🤔</div><b>${v7esc(q.chooserName)}</b> choisit un perso…</div>`; }
+            } else {
+                top.__choose = false;
+                if (q.phase === 'asking' && me && gss.secret) top.innerHTML = `<div class="gs-card gs-secret">${gss.secret.img ? `<img src="${v7esc(gss.secret.img)}" alt="">` : '<div style="font-size:2.4rem;">🎴</div>'}<div><div class="tl-hint" style="text-align:left;">Ton perso secret</div><b>${v7esc(gss.secret.name)}</b><div style="color:var(--accent-cyan);font-size:.85rem;">${v7esc(gss.secret.anime || '')}</div><div class="tl-hint" style="text-align:left;">Réponds aux questions ci-dessous. Si quelqu'un trouve avec une autre orthographe, appuie sur « ✅ C'est ça ».</div></div></div>`;
+                else if (q.phase === 'asking') top.innerHTML = `<div class="gs-card" style="text-align:center;"><div style="font-size:2rem;">🕵️</div>Trouve le perso de <b>${v7esc(q.chooserName)}</b> ! Questions illimitées.</div>`;
+                else if (q.reveal) top.innerHTML = `<div class="gs-card gs-secret">${q.reveal.img ? `<img src="${v7esc(q.reveal.img)}" alt="">` : '<div style="font-size:2.4rem;">🎴</div>'}<div><div class="tl-hint" style="text-align:left;">C'était</div><b style="font-size:1.3rem;color:var(--accent-yellow)">${v7esc(q.reveal.name)}</b><div style="color:var(--accent-cyan)">${v7esc(q.reveal.anime || '')}</div><div style="margin-top:6px;font-weight:800;">${q.reveal.finder ? `🎯 Trouvé par ${v7esc(q.reveal.finder)} en ${q.questions} question${q.questions > 1 ? 's' : ''} !` : '🏳️ Personne n\'a trouvé !'}</div></div></div>`;
+                else if (q.phase === 'finished') {
+                    const t3 = [...q.players].sort((a, b) => b.score - a.score).slice(0, 3);
+                    top.innerHTML = `<div class="gs-card" style="text-align:center;"><div style="font-size:3rem;">🏆</div><div style="font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow)">${v7esc((q.winnerNames || []).join(' & ') || '—')}</div>${t3.map((p, i) => `<div>${['🥇', '🥈', '🥉'][i]} ${cosNameHtml(p.name, p.cos)} • ${p.score} pts</div>`).join('')}</div>`;
+                    const mine = q.players.find(p => p.id === socket.id);
+                    if (window.__guessFin !== q.totalTurns + '|' + q.turn && mine && (q.winnerNames || []).includes(mine.name)) { window.__guessFin = q.totalTurns + '|' + q.turn; confetti(); }
+                }
+            }
+            // fil des questions
+            const feed = document.getElementById('guess-feed');
+            const canAnswer = me && q.phase === 'asking';
+            feed.innerHTML = (q.feed || []).map(f => {
+                if (f.type === 'sys') return `<div class="gs-f sys">${v7esc(f.text)}</div>`;
+                if (f.type === 'g') return `<div class="gs-f g${f.ok ? ' ok' : ''}">🎯 <b>${v7esc(f.name)}</b> : c'est <b>${v7esc(f.text)}</b> ? <span>${f.ok ? '✅ OUI !' : '❌'}</span>${canAnswer && !f.ok ? ` <button class="gs-ok" onclick="guessValidate(${f.id})">✅ C'est ça</button>` : ''}</div>`;
+                const a = f.answer ? GUESS_ANS[f.answer] : null;
+                return `<div class="gs-f q${f.answer ? '' : ' wait'}"><b>${v7esc(f.name)}</b> : ${v7esc(f.text)} ${a ? `<span class="gs-a" style="color:${a[1]}">${a[0]}</span>` : canAnswer ? `<span class="gs-btns">${Object.entries(GUESS_ANS).map(([k, v]) => `<button onclick="guessAnswer(${f.id},'${k}')" style="border-color:${v[1]}">${v[0]}</button>`).join('')}</span>` : '<span class="gs-a" style="color:var(--text-muted)">⏳</span>'}</div>`;
+            }).join('') || '<div class="tl-hint">Pas encore de question.</div>';
+            if ((q.feed || []).length !== gss.feedLen) { gss.feedLen = (q.feed || []).length; feed.scrollTop = feed.scrollHeight; if (me && q.phase === 'asking' && (q.feed || []).some(f => f.type === 'q' && !f.answer)) try { sfxTouche && sfxOn && sfxTouche(); } catch (_) {} }
+            // saisie
+            const asking = q.phase === 'asking' && !me;
+            document.getElementById('guess-inputs').style.display = asking ? 'flex' : 'none';
+            const myP = q.players.find(p => p.id === socket.id) || {};
+            const gu = document.getElementById('guess-giveup');
+            if (gu) { gu.style.display = asking ? '' : 'none'; gu.textContent = `🏳️ ${myP.gaveUp ? 'Annuler l\'abandon' : 'Abandonner'} (${q.giveup}/${q.giveupNeed})`; }
+            const sk = document.getElementById('guess-skip');
+            if (sk) sk.style.display = q.hostId === socket.id && (q.phase === 'asking' || q.phase === 'choosing') ? '' : 'none';
+            // scores
+            document.getElementById('guess-scores').innerHTML = [...q.players].sort((a, b) => b.score - a.score).map(p => `<div class="quote-score"><span class="pl-name">${avatarHtml(p.name, p.cos)}${cosNameHtml(p.name, p.cos)}${p.choosing ? ' 🕵️' : ''}${p.gaveUp ? ' 🏳️' : ''}${p.offline ? ' 📡' : ''}${p.gained ? ` <small style="color:#00ff88">+${p.gained}</small>` : ''}</span><strong style="color:var(--accent-yellow)">${p.score} pts</strong></div>`).join('');
+            document.getElementById('guess-end').style.display = q.phase === 'finished' ? 'flex' : 'none';
+            const rp = document.getElementById('guess-replay'); if (rp) rp.style.display = q.hostId === socket.id ? '' : 'none';
+        }
+        async function guessSearch() {
+            clearTimeout(gss.searchT);
+            gss.searchT = setTimeout(async () => {
+                const i = document.getElementById('guess-search');
+                const d = await v7get('/api/avatar/search?q=' + encodeURIComponent(i ? i.value.trim() : ''));
+                const grid = document.getElementById('guess-results');
+                if (!grid) return;
+                grid.innerHTML = d && d.results && d.results.length ? d.results.map(r => `<div class="av-item" data-u="${v7esc(r.u)}" data-n="${v7esc(r.name)}" onclick="guessPick(this)"><img src="/api/avatar/img?u=${encodeURIComponent(r.u)}&n=${encodeURIComponent(r.name)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.2">${v7esc(r.name)}<br><small style="color:var(--text-muted)">${v7esc(r.anime)}</small></div>`).join('') : '<p class="tl-hint">Aucun perso trouvé : écris-le en dessous.</p>';
+            }, 250);
+        }
+        function guessPick(el) { socket.emit('guess_pick', { roomCode: currentRoomCode, u: el.dataset.u, name: el.dataset.n }); }
+        function guessPickCustom() {
+            const n = (document.getElementById('guess-custom') || {}).value || '';
+            if (n.trim().length < 2) return toast('Écris le nom du perso', 'var(--accent-pink)');
+            socket.emit('guess_pick', { roomCode: currentRoomCode, custom: n.trim(), name: ((document.getElementById('guess-custom-anime') || {}).value || '').trim() });
+        }
+        function guessAsk() {
+            const i = document.getElementById('guess-q');
+            const t = i && i.value.trim();
+            if (!t) return;
+            socket.emit('guess_ask', { roomCode: currentRoomCode, text: t });
+            i.value = '';
+        }
+        function guessTry() {
+            const i = document.getElementById('guess-try');
+            const t = i && i.value.trim();
+            if (!t) return;
+            socket.emit('guess_try', { roomCode: currentRoomCode, text: t });
+            i.value = '';
+            document.getElementById('guess-sugg').innerHTML = '';
+        }
+        function guessTrySugg() {
+            clearTimeout(gss.tryT);
+            gss.tryT = setTimeout(async () => {
+                const i = document.getElementById('guess-try'), box = document.getElementById('guess-sugg');
+                const v = i ? i.value.trim() : '';
+                if (!box) return;
+                if (v.length < 2) { box.innerHTML = ''; return; }
+                const d = await v7get('/api/avatar/search?q=' + encodeURIComponent(v));
+                box.innerHTML = d && d.results ? d.results.slice(0, 6).map(r => `<button onclick="document.getElementById('guess-try').value=this.dataset.n;guessTry()" data-n="${v7esc(r.name)}">${v7esc(r.name)} <small>${v7esc(r.anime)}</small></button>`).join('') : '';
+            }, 250);
+        }
+        function guessAnswer(id, a) { socket.emit('guess_answer', { roomCode: currentRoomCode, id, answer: a }); }
+        function guessValidate(id) { socket.emit('guess_validate', { roomCode: currentRoomCode, id }); }
+        socket.on('guess_state', q => {
+            if (!q || !currentRoomCode) return;
+            const prev = gss.state;
+            if (!prev || prev.turn !== q.turn) gss.secret = null;
+            if (q.phase === 'reveal' && (!prev || prev.phase !== 'reveal')) { if (q.reveal && q.reveal.finder) fxGood(); }
+            gss.state = q;
+            guessShow();
+            guessRender();
+        });
+        socket.on('guess_secret', d => { gss.secret = d; guessRender(); });
+        socket.on('guess_notice', d => { if (d && d.text) toast(v7esc(d.text), 'var(--accent-yellow)'); });
+        socket.on('guess_closed', () => { returningToWaitingRoom = true; gss.state = null; const p = document.getElementById('guess-room'); if (p) p.style.display = 'none'; });
+        socket.on('connect', () => { if (currentRoomCode && gss.state) setTimeout(() => socket.emit('guess_sync', { roomCode: currentRoomCode }), 600); });
+        (function () {
+            const orig = window.hideAllPanels;
+            window.hideAllPanels = function () { const r = orig.apply(this, arguments); const d = document.getElementById('guess-room'); if (d) d.style.display = 'none'; return r; };
         })();
 
         /* ===== 7 barré dans la police Bangers (sinon on le confond avec le 1) ===== */

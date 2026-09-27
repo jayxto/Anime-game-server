@@ -10415,6 +10415,12 @@ io.on('connection', (socket) => {
             return;
         }
 
+        if (room.mode === 'guess') {
+            if (room.host !== socket.id) return;
+            startGuess(room, roomCode);
+            return;
+        }
+
         if ((room.mode === 'undercover' || room.mode === 'note') && room.status === 'results' && room.lastGameOver === false) {
             // Élimination sans fin de partie : on continue avec les mêmes mots et les joueurs encore en vie
             room.lastGameOver = null;
@@ -10473,6 +10479,7 @@ io.on('connection', (socket) => {
                 delete quoteTimers[roomCode];
             }
             if (room.draw) { drawStop(roomCode); io.to(roomCode).emit('draw_closed'); }
+            if (room.guess) { guessStop(roomCode); io.to(roomCode).emit('guess_closed'); }
             room.status = 'waiting';
             room.votes = {};
             room.players.forEach(p => {
@@ -13651,6 +13658,7 @@ async function progTrackRound(p, mode, anime, correct, ms) {
     } catch (_) {}
 }
 MODE_LABELS.draw = 'Dessine le perso';
+MODE_LABELS.guess = 'Devine le perso';
 MODE_LABELS['arcade:couleur'] = 'Colorie le perso';
 const ARC_ANIME_LABELS = new Set(ARC_ANIMES.map(a => a[0]));
 function arcRoundAnime(g) {
@@ -13697,6 +13705,7 @@ const QUEST_TEMPLATES = [
     { id: 'anime5', label: 'Trouve 5 bonnes réponses sur {anime}', xp: 90, kind: 'anime', n: 5 },
     { id: 'draw1', label: 'Joue une partie de Dessine le perso', xp: 70, kind: 'mode', mode: 'draw', n: 1 },
     { id: 'color1', label: 'Joue une partie de Colorie le perso', xp: 70, kind: 'mode', mode: 'arcade:couleur', n: 1 },
+    { id: 'guess1', label: 'Joue une partie de Devine le perso', xp: 70, kind: 'mode', mode: 'guess', n: 1 },
     { id: 'dle1', label: 'Gagne un AnimeDLE', xp: 80, kind: 'modewin', mode: 'dle', n: 1 }
 ];
 function dailyQuests(day = dailyKey()) {
@@ -14370,7 +14379,7 @@ io.on('connection', socket => {
 function roomLabel(room) {
     if (room.mode === 'arcade') { const g = String(room.subMode || '').split(':')[0]; return ARC_GAMES[g]?.label || 'Mini-jeux'; }
     return ({ blindtest: 'Blind Test', undercover: 'Undercover', note: 'Devine la note', dle: 'AnimeDLE', quote: 'Citations', rollandgaros: 'Rolland Garros',
-        enchere: 'Enchère', enchereaveugle: "Enchère à l'aveugle", connexion: 'Jeu de connexion', draw: 'Dessine le perso' })[room.mode] || room.mode;
+        enchere: 'Enchère', enchereaveugle: "Enchère à l'aveugle", connexion: 'Jeu de connexion', draw: 'Dessine le perso', guess: 'Devine le perso' })[room.mode] || room.mode;
 }
 
 /* ---------- API : amis ---------- */
@@ -14584,4 +14593,235 @@ app.post('/api/suggestions/delete', async (req, res) => {
     if (HAS_DB) { try { await pool.query('DELETE FROM suggestions WHERE id=$1', [id]); } catch (_) {} }
     else { const i = SUGG_MEM.findIndex(s => s.id === id); if (i >= 0) SUGG_MEM.splice(i, 1); }
     res.json({ ok: true });
+});
+
+/* =====================================================================
+   DEVINE LE PERSO : un joueur choisit un perso, les autres posent des questions
+   oui / non (autant qu'ils veulent) et proposent des noms. Chacun son tour.
+   ===================================================================== */
+const GUESS_REVEAL_MS = 7000, GUESS_CHOOSE_MS = 90000;
+const guessTimers = {};
+function guessClear(roomCode) { const t = guessTimers[roomCode]; if (t) clearTimeout(t); delete guessTimers[roomCode]; }
+function guessStop(roomCode) { guessClear(roomCode); const r = rooms[roomCode]; if (r) delete r.guess; }
+function guessChooser(room) { const g = room.guess; return g ? room.players.find(p => pkeyOf(p) === g.chooserKey) || null : null; }
+function guessPublic(room) {
+    const g = room.guess;
+    if (!g) return null;
+    const ch = guessChooser(room);
+    const revealed = g.phase === 'reveal' || g.phase === 'finished';
+    const guessers = room.players.filter(p => pkeyOf(p) !== g.chooserKey && !p.disconnected);
+    return {
+        phase: g.phase, turn: g.turn + 1, totalTurns: g.totalTurns,
+        tour: Math.floor(g.turn / Math.max(1, g.order.length)) + 1, tours: g.tours,
+        chooserId: ch ? ch.id : null, chooserName: ch ? ch.name : (g.chooserName || ''),
+        feed: g.feed.slice(-150), questions: g.feed.filter(f => f.type === 'q' && f.answer).length,
+        giveup: Object.keys(g.giveup).length, giveupNeed: Math.max(1, Math.ceil(guessers.length / 2)),
+        chooseEndsAt: g.phase === 'choosing' ? g.endsAt : null, serverNow: Date.now(),
+        reveal: revealed && g.target ? { name: g.target.name, anime: g.target.anime || null, img: g.img || null, finder: g.finderName || null, gained: g.lastGain || {} } : null,
+        players: room.players.map(p => { const k = pkeyOf(p); return { id: p.id, name: p.name, cos: p.cos || null, score: g.scores[k] || 0, gained: g.phase === 'reveal' ? (g.lastGain[k] || 0) : 0, choosing: k === g.chooserKey, gaveUp: !!g.giveup[k], offline: !!p.disconnected }; }),
+        hostId: room.host, winnerNames: g.winnerNames || null
+    };
+}
+function guessEmit(room, roomCode) { io.to(roomCode).emit('guess_state', guessPublic(room)); }
+function guessPrivate(room) {
+    const g = room.guess, ch = guessChooser(room);
+    if (g && ch && g.target && g.phase === 'asking') io.to(ch.id).emit('guess_secret', { name: g.target.name, anime: g.target.anime || null, img: g.img || null });
+}
+function startGuess(room, roomCode) {
+    guessStop(roomCode);
+    if (room.players.length < 2) { io.to(room.host).emit('game_error', { message: 'Il faut au moins 2 joueurs pour Devine le perso.' }); return; }
+    const order = arcShuffle(room.players.map(pkeyOf));
+    const tours = [1, 2, 3, 4, 5].includes(room.drawTours) ? room.drawTours : 1;
+    room.guess = { order, turn: -1, tours, totalTurns: order.length * tours, phase: 'choosing', scores: {}, feed: [], giveup: {}, target: null, seq: 0 };
+    room.status = 'guess_playing';
+    guessNextTurn(room, roomCode);
+}
+function guessNextTurn(room, roomCode) {
+    const g = room.guess;
+    if (!g || rooms[roomCode] !== room) return;
+    guessClear(roomCode);
+    g.turn++;
+    while (g.turn < g.totalTurns && !room.players.some(p => pkeyOf(p) === g.order[g.turn % g.order.length])) g.turn++;
+    if (g.turn >= g.totalTurns || room.players.length < 2) return guessFinish(room, roomCode);
+    g.chooserKey = g.order[g.turn % g.order.length];
+    g.chooserName = (guessChooser(room) || {}).name;
+    g.phase = 'choosing'; g.target = null; g.img = null; g.feed = []; g.giveup = {}; g.finderName = null; g.lastGain = {};
+    g.endsAt = Date.now() + GUESS_CHOOSE_MS;
+    const turn = g.turn;
+    // perso tiré au hasard si le joueur ne choisit pas à temps
+    guessTimers[roomCode] = setTimeout(() => {
+        if (room.guess !== g || g.turn !== turn || g.phase !== 'choosing') return;
+        const pool = drawPool({ subMode: 'all' });
+        const c = pool[Math.floor(Math.random() * pool.length)];
+        guessSetTarget(room, roomCode, { u: c.u, name: c.display, raw: c.raw, anime: ARC_UNIVERSE_ANIME[c.u] }, true);
+    }, GUESS_CHOOSE_MS + 300);
+    guessEmit(room, roomCode);
+}
+function guessSetTarget(room, roomCode, target, random) {
+    const g = room.guess;
+    if (!g || g.phase !== 'choosing') return;
+    guessClear(roomCode);
+    g.target = target;
+    g.phase = 'asking';
+    g.startedAt = Date.now();
+    g.feed.push({ id: ++g.seq, type: 'sys', text: random ? `⏱️ ${g.chooserName} n'a pas choisi : perso tiré au hasard ! Posez vos questions.` : `🕵️ ${g.chooserName} a choisi son perso. Posez vos questions !` });
+    if (target.u && target.raw) arcCharImage(target.u, target.raw).then(url => { if (room.guess === g && g.target === target && url) { g.img = arcToken(url); guessPrivate(room); } }).catch(() => {});
+    guessEmit(room, roomCode);
+    guessPrivate(room);
+}
+function guessReveal(room, roomCode, finder) {
+    const g = room.guess;
+    if (!g || g.phase !== 'asking') return;
+    guessClear(roomCode);
+    const q = g.feed.filter(f => f.type === 'q' && f.answer).length;
+    g.lastGain = {};
+    const add = (k, pts) => { g.scores[k] = (g.scores[k] || 0) + pts; g.lastGain[k] = (g.lastGain[k] || 0) + pts; };
+    if (finder) {
+        g.finderName = finder.name;
+        add(pkeyOf(finder), Math.max(100, 400 - 12 * q));
+        add(g.chooserKey, Math.min(200, 10 * q));
+        progTrackRound(finder, 'guess', g.target.anime || null, true, Date.now() - g.startedAt);
+    } else add(g.chooserKey, 150 + Math.min(100, 5 * q));
+    g.phase = 'reveal';
+    guessEmit(room, roomCode);
+    const turn = g.turn;
+    guessTimers[roomCode] = setTimeout(() => { if (room.guess === g && g.turn === turn) guessNextTurn(room, roomCode); }, GUESS_REVEAL_MS);
+}
+function guessFinish(room, roomCode) {
+    const g = room.guess;
+    if (!g) return;
+    guessClear(roomCode);
+    g.phase = 'finished';
+    const best = Math.max(0, ...room.players.map(p => g.scores[pkeyOf(p)] || 0));
+    g.winnerNames = room.players.filter(p => best > 0 && (g.scores[pkeyOf(p)] || 0) === best).map(p => p.name);
+    room.status = 'guess_over';
+    guessEmit(room, roomCode);
+    if (!g.recorded) {
+        g.recorded = true;
+        progRecord(room, 'guess', null, room.players.map(p => ({ player: p, points: g.scores[pkeyOf(p)] || 0, won: room.players.length > 1 && best > 0 && (g.scores[pkeyOf(p)] || 0) === best })));
+    }
+}
+function guessMatches(target, text) {
+    if (!target) return false;
+    if (target.u && target.raw) {
+        const c = arcFamous(target.u).find(x => x.display === target.name);
+        if (c && arcNameMatches(target.u, c, text)) return true;
+    }
+    const a = normTxt(text), w = normTxt(target.name);
+    if (!a || a.length < 2) return false;
+    if (a === w || drawLev(a, w) <= (w.length > 6 ? 2 : 1)) return true;
+    // prénom ou nom seul (4 lettres min.)
+    return w.split(' ').some(part => part.length >= 4 && (a === part || drawLev(a, part) <= 1));
+}
+// Départ d'un joueur en pleine partie
+const _retirerG = retirerJoueurDuSalon;
+retirerJoueurDuSalon = function (room, roomCode, socketId) {
+    if (!room || room.mode !== 'guess' || !room.guess || (room.status !== 'guess_playing' && room.status !== 'guess_over')) return _retirerG(room, roomCode, socketId);
+    if (!room.players.some(p => p.id === socketId)) return;
+    const leaving = room.players.find(p => p.id === socketId);
+    room.players = room.players.filter(p => p.id !== socketId);
+    if (!room.players.length) { guessStop(roomCode); delete rooms[roomCode]; delete roomKicked[roomCode]; return; }
+    if (room.host === socketId) room.host = room.players[0].id;
+    const g = room.guess;
+    if (room.status === 'guess_playing') {
+        if (room.players.length < 2) return guessFinish(room, roomCode);
+        if (leaving && pkeyOf(leaving) === g.chooserKey && (g.phase === 'choosing' || g.phase === 'asking')) {
+            if (g.phase === 'asking') { g.feed.push({ id: ++g.seq, type: 'sys', text: `🚪 ${leaving.name} est parti : manche annulée.` }); g.lastGain = {}; g.phase = 'reveal'; guessEmit(room, roomCode); const turn = g.turn; guessClear(roomCode); guessTimers[roomCode] = setTimeout(() => { if (room.guess === g && g.turn === turn) guessNextTurn(room, roomCode); }, 3000); return; }
+            return guessNextTurn(room, roomCode);
+        }
+    }
+    guessEmit(room, roomCode);
+};
+
+io.on('connection', socket => {
+    const ctx = roomCode => {
+        const room = rooms[roomCode];
+        const g = room && room.guess;
+        const p = room && room.players.find(x => x.id === socket.id);
+        return g && p ? { room, g, p, k: pkeyOf(p), isChooser: pkeyOf(p) === g.chooserKey } : null;
+    };
+    socket.on('start_game', roomCode => {
+        const room = rooms[roomCode];
+        if (!room || room.mode !== 'guess' || room.host !== socket.id) return;
+        startGuess(room, roomCode);
+    });
+    socket.on('guess_pick', ({ roomCode, u, name, custom } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || !c.isChooser || c.g.phase !== 'choosing') return;
+        if (custom) {
+            const n = String(custom).trim().slice(0, 60);
+            if (n.length < 2) return;
+            return guessSetTarget(c.room, roomCode, { name: n, anime: String(name || '').trim().slice(0, 60) || null });
+        }
+        const ch = ARC_UNIVERSE_ANIME[u] ? arcFamous(u).find(x => x.display === name) : null;
+        if (!ch) return;
+        guessSetTarget(c.room, roomCode, { u, name: ch.display, raw: ch.raw, anime: ARC_UNIVERSE_ANIME[u] });
+    });
+    socket.on('guess_ask', ({ roomCode, text } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || c.isChooser || c.g.phase !== 'asking') return;
+        const t = String(text || '').trim().slice(0, 140);
+        if (t.length < 2) return;
+        if (c.g.feed.some(f => f.type === 'q' && f.k === c.k && !f.answer)) return socket.emit('guess_notice', { text: '⏳ Attends la réponse à ta question avant d\'en poser une autre.' });
+        c.g.feed.push({ id: ++c.g.seq, type: 'q', k: c.k, pid: socket.id, name: c.p.name, text: t, answer: null });
+        if (c.g.feed.length > 400) c.g.feed.splice(0, c.g.feed.length - 400);
+        guessEmit(c.room, roomCode);
+    });
+    socket.on('guess_answer', ({ roomCode, id, answer } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || !c.isChooser || c.g.phase !== 'asking' || !['yes', 'no', 'idk', 'close'].includes(answer)) return;
+        const q = c.g.feed.find(f => f.id === +id && f.type === 'q');
+        if (!q) return;
+        q.answer = answer;
+        guessEmit(c.room, roomCode);
+    });
+    socket.on('guess_try', ({ roomCode, text } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || c.isChooser || c.g.phase !== 'asking') return;
+        const t = String(text || '').trim().slice(0, 60);
+        if (t.length < 2) return;
+        const now = Date.now();
+        if (now - (c.p.lastGuessTry || 0) < 2500) return socket.emit('guess_notice', { text: '⏳ Attends un peu avant de proposer un autre nom.' });
+        c.p.lastGuessTry = now;
+        const ok = guessMatches(c.g.target, t);
+        c.g.feed.push({ id: ++c.g.seq, type: 'g', k: c.k, pid: socket.id, name: c.p.name, text: t, ok });
+        if (ok) return guessReveal(c.room, roomCode, c.p);
+        progTrackRound(c.p, 'guess', c.g.target.anime || null, false, null);
+        guessEmit(c.room, roomCode);
+    });
+    // le choisisseur valide lui-même une proposition (nom écrit autrement, perso libre…)
+    socket.on('guess_validate', ({ roomCode, id } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || !c.isChooser || c.g.phase !== 'asking') return;
+        const e = c.g.feed.find(f => f.id === +id && f.type === 'g' && !f.ok);
+        if (!e) return;
+        const finder = c.room.players.find(p => pkeyOf(p) === e.k);
+        if (!finder) return;
+        e.ok = true;
+        guessReveal(c.room, roomCode, finder);
+    });
+    socket.on('guess_giveup', ({ roomCode } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || c.g.phase !== 'asking') return;
+        if (c.isChooser) return;
+        if (c.g.giveup[c.k]) delete c.g.giveup[c.k]; else c.g.giveup[c.k] = true;
+        const guessers = c.room.players.filter(p => pkeyOf(p) !== c.g.chooserKey && !p.disconnected);
+        if (Object.keys(c.g.giveup).length >= Math.max(1, Math.ceil(guessers.length / 2))) return guessReveal(c.room, roomCode, null);
+        guessEmit(c.room, roomCode);
+    });
+    socket.on('guess_skip', ({ roomCode } = {}) => {
+        const c = ctx(roomCode);
+        if (!c || c.room.host !== socket.id) return;
+        if (c.g.phase === 'asking') guessReveal(c.room, roomCode, null);
+        else if (c.g.phase === 'choosing') guessNextTurn(c.room, roomCode);
+    });
+    const sync = ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.mode !== 'guess' || !room.guess || !room.players.some(p => p.id === socket.id)) return;
+        socket.emit('guess_state', guessPublic(room));
+        const ch = guessChooser(room);
+        if (ch && ch.id === socket.id) guessPrivate(room);
+    };
+    socket.on('rejoin_room', sync);
+    socket.on('guess_sync', sync);
 });
