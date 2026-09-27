@@ -15984,12 +15984,13 @@ const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.sta
 app.get('/api/shop', async (req, res) => {
     const uid = authUserId(req);
     const e = uid ? await ecoGet(uid) : null;
-    res.json({ ok: true, items: SHOP.filter(i => !i.pass || (e && e.owned.includes(i.id))), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+    res.json({ ok: true, items: SHOP.filter(i => (!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
 });
 app.post('/api/shop/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const it = SHOP_BY_ID[String((req.body || {}).id)];
     if (it && it.pass) return res.json({ ok: false, error: 'Objet exclusif au pass de saison.' });
+    if (it && it.seasonal && it.seasonal !== themeSeason().u) return res.json({ ok: false, error: 'Cet objet n’est plus en vente (saison terminée).' });
     if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
     const e = await ecoGet(uid);
     if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
@@ -16765,7 +16766,7 @@ function bossBroadcast(b) {
 async function bossHit(p, ms) {
     const b = await bossGet();
     if (b.dead) return;
-    const dmg = 10 + (ms != null && ms < 3000 ? 5 : 0);
+    const dmg = (10 + (ms != null && ms < 3000 ? 5 : 0)) * (rushActive() ? 2 : 1); // x2 pendant l'heure de pointe
     const h = b.hits[p.userId] = b.hits[p.userId] || { name: p.name, dmg: 0 };
     h.dmg += dmg; h.name = p.name;
     b.hp = Math.max(0, b.hp - dmg);
@@ -17202,6 +17203,733 @@ io.on('connection', socket => {
         stopSpect();
         if (socket.data.voice) voiceLeave(socket, socket.data.voice);
     });
+});
+
+
+/* =====================================================================
+   HUB 2 : Chaîne de persos, Loup-garou anime, quiz des joueurs, salon
+   personnalisé, deck de cartes, succès secrets, prestige, heure de
+   pointe, saison à thème, blind test facile
+   ===================================================================== */
+const noSock = uid => ({ userId: uid, id: socketsOfUser(uid)[0] || '__hors_ligne__' });
+PUBLIC_MODE_LABELS.chaine = 'Chaîne de persos';
+PUBLIC_MODE_LABELS.loupgarou = 'Loup-garou anime';
+PUBLIC_MODE_LABELS.uquiz = 'Quiz des joueurs';
+MODE_LABELS.chaine = 'Chaîne de persos';
+MODE_LABELS.loupgarou = 'Loup-garou anime';
+MODE_LABELS.uquiz = 'Quiz des joueurs';
+MODE_LABELS.blindtest_facile = 'Blind test facile';
+
+/* ---------- succès secrets ---------- */
+BADGES.push(
+    ['eclair', 'Réflexe divin ⚡', 'Bonne réponse en moins de 0,5 seconde', () => false, true],
+    ['maudit', 'Poissard 🐈‍⬛', 'Perdre 10 parties d’affilée', () => false, true],
+    ['pigeon', 'Tête en l’air 🕊️', 'Rater 8 réponses d’affilée', () => false, true],
+    ['minuit', 'Minuit pile 🕛', 'Donner une bonne réponse à minuit pile', () => false, true],
+    ['fidele', 'Fidèle au poste 📦', 'Ouvrir le coffre du jour 7 jours d’affilée', () => false, true],
+    ['coupfinal', 'Coup de grâce 🗡️', 'Porter le coup final au boss du serveur', () => false, true],
+    ['chaine20', 'Maillon fort ⛓️', 'Une chaîne de 20 persos dans Chaîne de persos', () => false, true],
+    ['demon', 'Démon parfait 👹', 'Gagner une partie de Loup-garou en démon', () => false, true],
+    ['sharingan', 'Œil du Sharingan 👁️', 'Démasquer un démon dès la première nuit', () => false, true],
+    ['createur', 'Créateur 📝', 'Ton quiz a été joué 10 fois', () => false, true],
+    ['prestige1', 'Renaissance ⭐', 'Passer ton premier prestige', () => false, true]
+);
+const MISS_STREAK = new Map();
+const _progTrackRoundH2 = progTrackRound;
+progTrackRound = async function (p, mode, anime, correct, ms) {
+    await _progTrackRoundH2(p, mode, anime, correct, ms);
+    if (!p || !p.userId) return;
+    try {
+        if (correct) {
+            MISS_STREAK.set(p.userId, 0);
+            if (ms != null && ms < 500) progAward(p, 'eclair');
+            const pp = parisParts(); if (pp.h === 0 && pp.min === 0) progAward(p, 'minuit');
+        } else {
+            const n = (MISS_STREAK.get(p.userId) || 0) + 1; MISS_STREAK.set(p.userId, n);
+            if (n >= 8) progAward(p, 'pigeon');
+        }
+    } catch (_) {}
+};
+const _bossHitH2 = bossHit;
+bossHit = async function (p, ms) {
+    const before = (await bossGet()).dead;
+    await _bossHitH2(p, ms);
+    if (!before && (await bossGet()).dead) progAward(p, 'coupfinal');
+};
+
+/* ---------- heure de pointe : une heure surprise par jour, dégâts x2 sur le boss ---------- */
+function rushHour(day = dailyKey(new Date(hubNow()))) { return 12 + hubHash('rush' + day) % 11; } // entre 12 h et 22 h
+function rushActive() { return parisParts().h === rushHour(); }
+let RUSH_ANNOUNCED = null;
+setInterval(() => {
+    const day = dailyKey(new Date(hubNow()));
+    if (rushActive() && RUSH_ANNOUNCED !== day) { RUSH_ANNOUNCED = day; io.emit('rush_start', { until: rushHour() + 1 }); }
+}, 30000);
+
+/* ---------- saison à thème : un anime par mois, cosmétiques exclusifs ---------- */
+const THEME_PALETTES = {
+    naruto: ['#ff8a00', '#3b6cff', '🍥'], onepiece: ['#ff3b3b', '#ffd166', '🏴‍☠️'], bleach: ['#f1f1f1', '#ff6b35', '⚔️'], dragonball: ['#ff9f1c', '#2ec4f1', '🐉'],
+    demonslayer: ['#22c55e', '#ef4444', '🔥'], jjk: ['#8b5cf6', '#60a5fa', '🌀'], hxh: ['#10b981', '#f59e0b', '🎣'], snk: ['#b0794f', '#cbd5e1', '🧱'],
+    deathnote: ['#f5f5f5', '#dc2626', '📓'], chainsaw: ['#f97316', '#dc2626', '🪚'], jojo: ['#d946ef', '#facc15', '⭐'], fma: ['#ef4444', '#f59e0b', '⚗️'],
+    solo: ['#3b82f6', '#a855f7', '🗡️'], opm: ['#fde047', '#f43f5e', '👊'], tokyoghoul: ['#b91c1c', '#e5e7eb', '🎭'], fairy: ['#ec4899', '#f59e0b', '🧚'],
+    sds: ['#16a34a', '#eab308', '🐷'], haikyuu: ['#f97316', '#111827', '🏐'], bluelock: ['#2563eb', '#22d3ee', '⚽'], clover: ['#15803d', '#fbbf24', '🍀']
+};
+function themeSeason(ms = hubNow()) {
+    const keys = Object.keys(THEME_PALETTES).filter(u => ARC_UNIVERSE_ANIME[u]);
+    const u = keys[hubHash('theme' + seasonKey(ms)) % keys.length];
+    return { u, name: ARC_UNIVERSE_ANIME[u], season: seasonKey(ms), palette: THEME_PALETTES[u] };
+}
+Object.keys(THEME_PALETTES).filter(u => ARC_UNIVERSE_ANIME[u]).forEach(u => {
+    const n = ARC_UNIVERSE_ANIME[u], em = THEME_PALETTES[u][2];
+    SHOP.push({ id: 'color:th_' + u, kind: 'color', key: 'th_' + u, name: `${n} ${em}`, price: 600, seasonal: u },
+              { id: 'frame:th_' + u, kind: 'frame', key: 'th_' + u, name: `Cadre ${n} ${em}`, price: 800, seasonal: u });
+});
+SHOP.forEach(i => { SHOP_BY_ID[i.id] = i; });
+
+/* ---------- prestige ---------- */
+const PRESTIGE_LEVEL = 50;
+const PRESTIGE = new Map();
+(async () => { try { for (const { k, v } of await kvList('prestige')) PRESTIGE.set(+k, v.n || 0); } catch (_) {} })();
+const _cosOfPrestige = cosOf;
+cosOf = function (row) {
+    const o = _cosOfPrestige(row);
+    const n = row && row.id ? PRESTIGE.get(row.id) : 0;
+    if (n) o.prestige = n;
+    return o;
+};
+async function userXp(uid) {
+    if (HAS_DB) { try { return (await pool.query('SELECT xp FROM users WHERE id=$1', [uid])).rows[0]?.xp || 0; } catch (_) { return 0; } }
+    return PROG_MEM.xp.get(uid) || 0;
+}
+app.get('/api/prestige', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const xp = await userXp(uid), lvl = levelFromXp(xp);
+    res.json({ ok: true, level: lvl.level, xp, next: lvl.next, cur: lvl.cur, prestige: PRESTIGE.get(uid) || 0, need: PRESTIGE_LEVEL, can: lvl.level >= PRESTIGE_LEVEL, reward: 1000 });
+});
+app.post('/api/prestige', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const xp = await userXp(uid);
+    if (levelFromXp(xp).level < PRESTIGE_LEVEL) return res.json({ ok: false, error: `Atteins d’abord le niveau ${PRESTIGE_LEVEL}.` });
+    if (HAS_DB) { try { await pool.query('UPDATE users SET xp=0 WHERE id=$1', [uid]); } catch (_) {} } else PROG_MEM.xp.set(uid, 0);
+    const n = (PRESTIGE.get(uid) || 0) + 1;
+    PRESTIGE.set(uid, n); await kvSet('prestige', uid, { n, at: hubNow() });
+    await ecoAddCoins(uid, 1000);
+    progAward(noSock(uid), 'prestige1');
+    if (HAS_DB) await refreshUserCos(uid);
+    else socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) s.user.cos = Object.assign({}, s.user.cos, { prestige: n }); });
+    res.json({ ok: true, prestige: n });
+});
+
+/* ---------- deck de 5 cartes : bonus de pièces (x2 si la partie est sur l'anime de la carte) ---------- */
+const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10 };
+async function deckOf(uid) {
+    const keys = (await kvGet('deck', uid, { keys: [] })).keys || [];
+    const mine = await cardsOf(uid);
+    return keys.filter(k => mine.get(k)).map(k => { const [u, display] = k.split('|'); const m = mine.get(k); return { key: k, u, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }) }; });
+}
+function deckPct(deck, universe) {
+    const us = String(universe || '').split(/[+:]/);
+    let pct = 0;
+    deck.forEach(c => { let b = DECK_BONUS[c.rarity] + (c.shiny ? 2 : 0); if (us.includes(c.u)) b *= 2; pct += b; });
+    return Math.min(40, pct);
+}
+app.get('/api/deck', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const deck = await deckOf(uid);
+    res.json({ ok: true, deck, pct: deckPct(deck, ''), rules: DECK_BONUS, max: 5 });
+});
+app.post('/api/deck', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
+    const mine = await cardsOf(uid);
+    if (keys.some(k => !mine.get(k) || k.startsWith('collector|'))) return res.json({ ok: false, error: 'Carte introuvable dans ta collection.' });
+    await kvSet('deck', uid, { keys });
+    const deck = await deckOf(uid);
+    res.json({ ok: true, deck, pct: deckPct(deck, '') });
+});
+
+/* ---------- fins de partie : deck, saison à thème, succès secrets ---------- */
+const _progRecordH2 = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordH2(room, mode, universe, entries);
+    const th = themeSeason();
+    const multi = room && room.players && room.players.length > 1;
+    for (const e of entries || []) {
+        const p = e.player;
+        if (!p || !p.userId) continue;
+        try {
+            const base = (10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80))) * hubMult();
+            const deck = await deckOf(p.userId);
+            let extra = Math.round(base * deckPct(deck, universe) / 100);
+            const onTheme = String(universe || '').split(/[+:]/).includes(th.u);
+            if (onTheme) extra += Math.round(base * 0.25);
+            if (extra > 0) { const total = await ecoAddCoins(p.userId, extra); io.to(p.id).emit('coins_gain', { gain: extra, total, why: onTheme ? `saison ${th.name}` : 'deck' }); }
+            if (multi) {
+                const ls = await kvGet('losestreak', p.userId, { n: 0 });
+                ls.n = e.won ? 0 : ls.n + 1;
+                await kvSet('losestreak', p.userId, ls);
+                if (ls.n >= 10) progAward(p, 'maudit');
+            }
+            const ch = await kvGet('chest', p.userId, { streak: 0 });
+            if ((ch.streak || 0) >= 7) progAward(p, 'fidele');
+        } catch (err) { console.warn('[Hub2] fin de partie', err.message); }
+    }
+    return r;
+};
+
+/* ---------- blind test facile : les openings les plus connus ---------- */
+const BT_FAMOUS = ['blue bird', 'unravel', 'guren no yumiya', 'shinzou wo sasageyo', 'gurenge', 'kaikai kitan', 'specialz', 'kick back', 'silhouette', 'haruka kanata', 'go!!!', 'sign',
+    'departure', 'the world', 'again', 'crossing field', 'idol', 'mixed nuts', 'cry baby', 'peace sign', 'the day', 'fly high', 'bloody stream', 'akuma no ko', 'zankyou sanka',
+    'kizuna no kiseki', 'colors', 'bling-bang-bang-born', 'otonoke', 'we are', 'we go', 'cha-la', 'hikaru nara', 'tank', 'cruel angel', 'asterisk', 'hunting for your dream',
+    'seven deadly sins', 'reawaker', 'inferno', 'datte atashi no hero', 'odd future', 'polaris', 'sora ni utaeba', 'catch the moment', 'kaibutsu', 'lost in paradise', 'rumbling', 'my war'];
+function btFamousTracks() {
+    const ok = BLINDTEST_TRACKS.filter(t => { const s = String(t.title || '').toLowerCase(); return BT_FAMOUS.some(k => s.includes(k)) && !(t.ytId && BT_BAD_IDS.has(t.ytId)); });
+    return arcShuffle(ok);
+}
+const _startBlindTestEasy = startBlindTest;
+startBlindTest = function (room, roomCode) {
+    if (room.subMode !== 'facile') return _startBlindTestEasy(room, roomCode);
+    btClearTimer(roomCode);
+    room.status = 'bt_playing';
+    room.blindtest = {
+        round: 0, totalRounds: arcRoundsFor(room, BLINDTEST_ROUNDS), phase: 'playing', current: null, offset: 0, choices: [], answers: {},
+        scores: Object.fromEntries(room.players.map(p => [p.id, 0])), usedAnimes: [], winnerNames: null, dailyTracks: btFamousTracks(), easy: true
+    };
+    btNextRound(room, roomCode);
+};
+const _pubSubLabelEasy = publicRoomSubLabel;
+publicRoomSubLabel = function (room) {
+    if (room.mode === 'blindtest' && room.subMode === 'facile') return '🟢 Facile';
+    if (room.mode === 'chaine') return room.subMode && room.subMode !== 'all' ? String(room.subMode).split('+').map(u => ARC_UNIVERSE_ANIME[u] || u).join(' + ') : 'Tous les animes';
+    if (room.mode === 'uquiz') { const q = KV.get('uquiz|' + room.subMode); return q ? q.title : 'Quiz'; }
+    if (room.mode === 'loupgarou') return '';
+    return _pubSubLabelEasy(room);
+};
+
+/* =====================================================================
+   SALON PERSONNALISÉ : temps par manche, points, bonus de série (mini-jeux)
+   ===================================================================== */
+const RULE_TIME = { 0.5: 1, 0.75: 1, 1: 1, 1.5: 1, 2: 1 };
+function roomRules(room) { const r = room && room.rules; return r ? { time: RULE_TIME[r.time] ? +r.time : 1, pts: [1, 2, 3].includes(+r.pts) ? +r.pts : 1, streak: !!r.streak } : null; }
+const _arcEmitRules = arcEmit;
+arcEmit = function (room, roomCode) {
+    const g = arcGames[roomCode], ru = roomRules(room);
+    if (g && ru && ru.time !== 1 && g.phase === 'playing' && g._rulesRound !== g.round) {
+        g._rulesRound = g.round;
+        const roundNo = g.round;
+        Promise.resolve().then(() => { // après la fin de arcNextRound : on remplace le minuteur
+            if (g.dead || g.round !== roundNo || g.phase !== 'playing') return;
+            const ms = Math.round(ARC_GAMES[g.game].roundMs * ru.time);
+            clearTimeout(g.timer);
+            g.endsAt = g.startedAt + ms; g.roundMsR = ms;
+            g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, ms + 250);
+            _arcEmitRules(room, roomCode);
+        });
+    }
+    return _arcEmitRules(room, roomCode);
+};
+const _arcPublicRules = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicRules(room, g);
+    if (g && g.roundMsR && g.phase === 'playing') out.roundMs = g.roundMsR;
+    const ru = roomRules(room);
+    if (ru) out.rules = ru;
+    return out;
+};
+const _arcRevealRules = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    const wasPlaying = g && g.phase === 'playing';
+    const r = _arcRevealRules(room, roomCode);
+    const ru = roomRules(room);
+    if (g && wasPlaying && ru && (ru.pts > 1 || ru.streak) && g.phase !== 'playing') {
+        g.streaks = g.streaks || {};
+        room.players.forEach(p => {
+            const gained = g.gainedRound[p.id] || 0;
+            let extra = gained > 0 ? gained * (ru.pts - 1) : 0;
+            g.streaks[p.id] = gained > 0 ? (g.streaks[p.id] || 0) + 1 : 0;
+            if (ru.streak && g.streaks[p.id] >= 2) extra += Math.min(100, 25 * (g.streaks[p.id] - 1));
+            if (extra) { g.scores[p.id] = (g.scores[p.id] || 0) + extra; g.gainedRound[p.id] = gained + extra; }
+        });
+        _arcEmitRules(room, roomCode);
+    }
+    return r;
+};
+
+/* =====================================================================
+   CHAÎNE DE PERSOS : chacun son tour, un perso qui commence par la dernière lettre du précédent
+   ===================================================================== */
+const chLetters = s => normTxt(s).replace(/[^a-z]/g, '');
+const chaineTimers = {};
+function chaineClear(code) { clearTimeout(chaineTimers[code]); delete chaineTimers[code]; }
+function chainePool(room) {
+    const sub = String(room.subMode || 'all');
+    const us = sub === 'all' ? arcUniverses() : sub.split('+').filter(u => ARC_UNIVERSE_ANIME[u]);
+    const out = [];
+    (us.length ? us : arcUniverses()).forEach(u => arcFamous(u).forEach(c => out.push({ u, c, key: chLetters(c.display) })));
+    return out.filter(x => x.key.length >= 2);
+}
+function chaineLetterCount(ch, L) { const used = new Set(ch.used); return ch.pool.filter(x => !used.has(x.key) && x.key[0] === L).length; }
+function chaineNextLetter(ch, display) {
+    const s = chLetters(display).split('').reverse();
+    for (const L of s) if (chaineLetterCount(ch, L) >= 2) return L;
+    const all = 'abcdefghijklmnopqrstuvwxyz'.split('').map(L => [L, chaineLetterCount(ch, L)]).sort((a, b) => b[1] - a[1]);
+    return all[0][0];
+}
+function chaineCur(room) { const ch = room.chaine; return ch ? room.players.find(p => pkeyOf(p) === ch.order[ch.turn]) || null : null; }
+function chainePublic(room) {
+    const ch = room.chaine; if (!ch) return null;
+    const cur = chaineCur(room);
+    return { phase: ch.phase, letter: ch.letter ? ch.letter.toUpperCase() : null, turnId: cur ? cur.id : null, turnName: cur ? cur.name : null, endsAt: ch.endsAt, serverNow: Date.now(), turnMs: ch.turnMs,
+        chain: ch.chain.slice(-40), length: ch.chain.length, possible: ch.letter ? chaineLetterCount(ch, ch.letter) : 0, log: ch.log.slice(-6), solo: ch.solo,
+        players: room.players.map(p => { const k = pkeyOf(p); return { id: p.id, name: p.name, cos: p.cos || null, alive: !!ch.alive[k], score: ch.scores[k] || 0, turn: cur && cur.id === p.id }; }),
+        hostId: room.host, winnerNames: ch.winnerNames || null, universeLabel: publicRoomSubLabel(room) };
+}
+function chaineEmit(room, code) { io.to(code).emit('chaine_state', chainePublic(room)); }
+function startChaine(room, code) {
+    chaineClear(code);
+    const pool = chainePool(room);
+    const ch = { pool, used: [], chain: [], order: arcShuffle(room.players.map(pkeyOf)), turn: 0, alive: {}, scores: {}, log: [], phase: 'playing', solo: room.players.length === 1 };
+    ch.order.forEach(k => { ch.alive[k] = true; });
+    const letters = 'abcdefghijklmnopqrstuvwxyz'.split('').filter(L => chaineLetterCount(ch, L) >= 6);
+    ch.letter = letters[Math.floor(Math.random() * letters.length)] || 'a';
+    room.chaine = ch; room.status = 'chaine_playing';
+    chaineTurn(room, code, true);
+}
+function chaineTurn(room, code, first) {
+    const ch = room.chaine; if (!ch || rooms[code] !== room) return;
+    chaineClear(code);
+    if (!first) {
+        for (let i = 1; i <= ch.order.length; i++) { const t = (ch.turn + i) % ch.order.length; if (ch.alive[ch.order[t]] && room.players.some(p => pkeyOf(p) === ch.order[t])) { ch.turn = t; break; } }
+    }
+    ch.turnMs = Math.max(8000, 20000 - 400 * ch.chain.length);
+    ch.startedAt = Date.now(); ch.endsAt = ch.startedAt + ch.turnMs;
+    const turn = ch.chain.length + ':' + ch.turn + ':' + ch.startedAt;
+    ch.turnKey = turn;
+    chaineTimers[code] = setTimeout(() => { if (room.chaine === ch && ch.turnKey === turn && ch.phase === 'playing') chaineTimeout(room, code); }, ch.turnMs + 300);
+    chaineEmit(room, code);
+}
+function chaineTimeout(room, code) {
+    const ch = room.chaine, cur = chaineCur(room);
+    if (cur) { ch.alive[pkeyOf(cur)] = false; ch.log.push(`⏱️ ${cur.name} a bloqué sur la lettre ${ch.letter.toUpperCase()} : éliminé !`); io.to(code).emit('chaine_out', { name: cur.name }); }
+    const alive = room.players.filter(p => ch.alive[pkeyOf(p)]);
+    if (alive.length <= (ch.solo ? 0 : 1)) return chaineFinish(room, code);
+    chaineTurn(room, code);
+}
+function chaineFinish(room, code) {
+    const ch = room.chaine; if (!ch || ch.phase === 'finished') return;
+    chaineClear(code);
+    ch.phase = 'finished';
+    const alive = room.players.filter(p => ch.alive[pkeyOf(p)]);
+    alive.forEach(p => { ch.scores[pkeyOf(p)] = (ch.scores[pkeyOf(p)] || 0) + 50; });
+    const best = Math.max(0, ...room.players.map(p => ch.scores[pkeyOf(p)] || 0));
+    ch.winnerNames = ch.solo ? null : (alive.length ? alive.map(p => p.name) : room.players.filter(p => (ch.scores[pkeyOf(p)] || 0) === best).map(p => p.name));
+    room.status = 'chaine_over';
+    chaineEmit(room, code);
+    if (ch.chain.length >= 20) room.players.forEach(p => progAward(p, 'chaine20'));
+    progRecord(room, 'chaine', room.subMode, room.players.map(p => ({ player: p, points: (ch.scores[pkeyOf(p)] || 0) * 3, won: !ch.solo && (ch.winnerNames || []).includes(p.name) })));
+}
+function chaineStop(code) { chaineClear(code); const r = rooms[code]; if (r) delete r.chaine; }
+
+/* =====================================================================
+   LOUP-GAROU ANIME : démons de Muzan, Sharingan, médecin ninja, Death Note
+   ===================================================================== */
+const LG_ROLES = {
+    demon: { name: 'Démon de Muzan', icon: '👹', team: 'demons', desc: 'Chaque nuit, choisis avec les autres démons un joueur à dévorer. Le jour, fais-toi passer pour un villageois.' },
+    seer: { name: 'Sharingan', icon: '👁️', team: 'village', desc: 'Chaque nuit, ton Sharingan révèle le vrai rôle d’un joueur.' },
+    doctor: { name: 'Médecin ninja', icon: '💚', team: 'village', desc: 'Chaque nuit, protège un joueur des démons (jamais deux nuits de suite le même).' },
+    note: { name: 'Porteur du Death Note', icon: '📓', team: 'village', desc: 'Une seule fois dans la partie, écris un nom pendant la nuit : cette personne meurt, même protégée.' },
+    villager: { name: 'Villageois de Konoha', icon: '🍃', team: 'village', desc: 'Pas de pouvoir : observe, débats et vote le jour pour démasquer les démons.' }
+};
+const LG_NIGHT_MS = 35000, LG_DAY_MS = 100000, LG_DAWN_MS = 7000;
+const lgTimers = {};
+function lgClear(code) { clearTimeout(lgTimers[code]); delete lgTimers[code]; }
+function lgStop(code) { lgClear(code); const r = rooms[code]; if (r) delete r.lg; }
+const lgByKey = (room, k) => room.players.find(p => pkeyOf(p) === k) || null;
+function lgAliveKeys(lg) { return Object.keys(lg.roles).filter(k => lg.alive[k]); }
+function startLg(room, code) {
+    lgStop(code);
+    const n = room.players.length;
+    if (n < 4) { io.to(room.host).emit('game_error', { message: 'Il faut au moins 4 joueurs pour le Loup-garou.' }); return; }
+    const roles = [];
+    const demons = n >= 11 ? 3 : n >= 7 ? 2 : 1;
+    for (let i = 0; i < demons; i++) roles.push('demon');
+    roles.push('seer');
+    if (n >= 5) roles.push('doctor');
+    if (n >= 6) roles.push('note');
+    while (roles.length < n) roles.push('villager');
+    const keys = arcShuffle(room.players.map(pkeyOf)), rs = arcShuffle(roles);
+    const lg = { roles: {}, alive: {}, names: {}, log: [], day: 1, phase: 'night', night: null, votes: {}, lastProtect: null, noteUsed: false, seerLog: {}, winner: null };
+    keys.forEach((k, i) => { lg.roles[k] = rs[i]; lg.alive[k] = true; lg.names[k] = (lgByKey(room, k) || {}).name; });
+    room.lg = lg; room.status = 'lg_playing';
+    lg.log.push('🌙 La nuit tombe sur le village… Les démons se réveillent.');
+    lgNight(room, code);
+}
+function lgNight(room, code) {
+    const lg = room.lg; if (!lg) return;
+    lgClear(code);
+    lg.phase = 'night'; lg.night = { demon: {}, seer: null, doctor: null, note: undefined };
+    lg.endsAt = Date.now() + LG_NIGHT_MS;
+    const d = lg.day;
+    lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'night' && lg.day === d) lgDawn(room, code); }, LG_NIGHT_MS + 300);
+    lgEmit(room, code);
+}
+function lgNightDone(lg) {
+    const alive = lgAliveKeys(lg);
+    const need = r => alive.filter(k => lg.roles[k] === r);
+    if (need('demon').some(k => !lg.night.demon[k])) return false;
+    if (need('seer').length && !lg.night.seer) return false;
+    if (need('doctor').length && !lg.night.doctor) return false;
+    if (need('note').length && !lg.noteUsed && lg.night.note === undefined) return false;
+    return true;
+}
+function lgDawn(room, code) {
+    const lg = room.lg; if (!lg || lg.phase !== 'night') return;
+    lgClear(code);
+    const votes = Object.values(lg.night.demon).filter(t => lg.alive[t]);
+    const count = {}; votes.forEach(t => { count[t] = (count[t] || 0) + 1; });
+    const max = Math.max(0, ...Object.values(count));
+    const top = Object.keys(count).filter(k => count[k] === max);
+    const target = top.length ? top[Math.floor(Math.random() * top.length)] : null;
+    const dead = [];
+    if (target && target !== lg.night.doctor) dead.push(target);
+    else if (target) lg.log.push('💚 Le médecin ninja a sauvé quelqu’un cette nuit !');
+    if (lg.night.note && lg.alive[lg.night.note]) { lg.noteUsed = true; if (!dead.includes(lg.night.note)) dead.push(lg.night.note); lg.log.push('📓 Un nom a été écrit dans le Death Note…'); }
+    lg.lastProtect = lg.night.doctor || null;
+    dead.forEach(k => { lg.alive[k] = false; lg.log.push(`☠️ ${lg.names[k]} a été retrouvé mort. C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`); });
+    if (!dead.length) lg.log.push('🌅 Personne n’est mort cette nuit.');
+    if (lgCheckWin(room, code)) return;
+    lg.phase = 'day'; lg.votes = {};
+    lg.endsAt = Date.now() + LG_DAWN_MS + LG_DAY_MS;
+    lg.log.push(`☀️ Jour ${lg.day} : débattez et votez pour éliminer un suspect.`);
+    const d = lg.day;
+    lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'day' && lg.day === d) lgDusk(room, code); }, LG_DAWN_MS + LG_DAY_MS + 300);
+    lgEmit(room, code);
+}
+function lgDusk(room, code) {
+    const lg = room.lg; if (!lg || lg.phase !== 'day') return;
+    lgClear(code);
+    const count = {};
+    Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip' && lg.alive[t]) count[t] = (count[t] || 0) + 1; });
+    const max = Math.max(0, ...Object.values(count));
+    const top = Object.keys(count).filter(k => count[k] === max);
+    if (max > 0 && top.length === 1) {
+        const k = top[0]; lg.alive[k] = false;
+        lg.log.push(`⚖️ Le village a éliminé ${lg.names[k]} (${max} vote${max > 1 ? 's' : ''}). C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`);
+    } else lg.log.push('⚖️ Égalité ou pas de vote : personne n’est éliminé.');
+    if (lgCheckWin(room, code)) return;
+    lg.day++;
+    lg.log.push('🌙 La nuit tombe à nouveau…');
+    lgNight(room, code);
+}
+function lgCheckWin(room, code) {
+    const lg = room.lg;
+    const alive = lgAliveKeys(lg);
+    const demons = alive.filter(k => lg.roles[k] === 'demon').length;
+    let winner = null;
+    if (!demons) winner = 'village'; else if (demons >= alive.length - demons) winner = 'demons';
+    if (!winner) return false;
+    lgClear(code);
+    lg.phase = 'finished'; lg.winner = winner;
+    lg.log.push(winner === 'village' ? '🎉 Tous les démons sont vaincus : le village gagne !' : '👹 Les démons ont pris le contrôle du village : les démons gagnent !');
+    room.status = 'lg_over';
+    lgEmit(room, code);
+    const entries = room.players.map(p => { const k = pkeyOf(p), team = LG_ROLES[lg.roles[k] || 'villager'].team; const won = team === winner; return { player: p, points: (won ? 300 : 50) + (lg.alive[k] ? 100 : 0), won }; });
+    entries.forEach(e => { if (e.won && lg.roles[pkeyOf(e.player)] === 'demon') progAward(e.player, 'demon'); });
+    progRecord(room, 'loupgarou', null, entries);
+    return true;
+}
+function lgPublic(room) {
+    const lg = room.lg; if (!lg) return null;
+    const show = lg.phase === 'finished';
+    const tally = {};
+    if (lg.phase === 'day') Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip') tally[t] = (tally[t] || 0) + 1; });
+    return { phase: lg.phase, day: lg.day, endsAt: lg.endsAt, serverNow: Date.now(), winner: lg.winner, log: lg.log.slice(-40), hostId: room.host,
+        voteOpensAt: lg.phase === 'day' ? lg.endsAt - LG_DAY_MS : null,
+        players: room.players.map(p => { const k = pkeyOf(p); const role = lg.roles[k]; return { id: p.id, key: k, name: p.name, cos: p.cos || null, alive: !!lg.alive[k], role: role && (show || !lg.alive[k]) ? { id: role, ...LG_ROLES[role] } : null, voted: lg.phase === 'day' && !!lg.votes[k], votes: tally[k] || 0 }; }),
+        rolesInGame: Object.values(lg.roles).reduce((a, r) => { a[r] = (a[r] || 0) + 1; return a; }, {}), roleInfo: LG_ROLES };
+}
+function lgPrivateFor(room, p) {
+    const lg = room.lg, k = pkeyOf(p), role = lg.roles[k];
+    if (!role) return null;
+    const out = { role: { id: role, ...LG_ROLES[role] }, alive: !!lg.alive[k], key: k };
+    if (role === 'demon') {
+        out.mates = Object.keys(lg.roles).filter(x => lg.roles[x] === 'demon' && x !== k).map(x => ({ key: x, name: lg.names[x], alive: !!lg.alive[x] }));
+        if (lg.phase === 'night') out.demonVotes = Object.entries(lg.night.demon).map(([v, t]) => ({ by: lg.names[v], target: lg.names[t], key: t }));
+    }
+    if (role === 'seer') out.seen = lg.seerLog[k] || [];
+    if (role === 'doctor') out.lastProtect = lg.lastProtect;
+    if (role === 'note') out.noteUsed = lg.noteUsed;
+    if (lg.phase === 'night' && lg.night) {
+        out.myNight = role === 'demon' ? lg.night.demon[k] || null : role === 'seer' ? lg.night.seer : role === 'doctor' ? lg.night.doctor : role === 'note' ? (lg.night.note === undefined ? null : lg.night.note || 'skip') : null;
+    }
+    if (lg.phase === 'day') out.myVote = lg.votes[k] || null;
+    return out;
+}
+function lgEmit(room, code) {
+    io.to(code).emit('lg_state', lgPublic(room));
+    if (room.lg) room.players.forEach(p => io.to(p.id).emit('lg_private', lgPrivateFor(room, p)));
+}
+function lgAct(room, code, p, target) {
+    const lg = room.lg; if (!lg) return;
+    const k = pkeyOf(p), role = lg.roles[k];
+    if (!role || !lg.alive[k]) return;
+    if (lg.phase === 'night') {
+        if (target !== 'skip' && !lg.alive[target]) return;
+        if (role === 'demon') { if (target === 'skip' || lg.roles[target] === 'demon') return; lg.night.demon[k] = target; }
+        else if (role === 'seer') {
+            if (lg.night.seer || target === 'skip' || target === k) return;
+            lg.night.seer = target;
+            const r = lg.roles[target];
+            (lg.seerLog[k] = lg.seerLog[k] || []).push({ name: lg.names[target], role: { id: r, ...LG_ROLES[r] }, day: lg.day });
+            if (lg.day === 1 && r === 'demon') progAward(p, 'sharingan');
+        }
+        else if (role === 'doctor') { if (target === 'skip' || target === lg.lastProtect) return; lg.night.doctor = target; }
+        else if (role === 'note') { if (lg.noteUsed) return; lg.night.note = target === 'skip' ? null : target; }
+        else return;
+        if (lgNightDone(lg)) { lgEmit(room, code); lgClear(code); const d = lg.day; lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'night' && lg.day === d) lgDawn(room, code); }, 1500); return; }
+        return lgEmit(room, code);
+    }
+    if (lg.phase === 'day') {
+        if (Date.now() < lg.endsAt - LG_DAY_MS) return; // l'aube : on lit d'abord les nouvelles
+        if (target !== 'skip' && !lg.alive[target]) return;
+        lg.votes[k] = target;
+        const alive = lgAliveKeys(lg);
+        if (alive.every(x => lg.votes[x])) { lgEmit(room, code); lgClear(code); const d = lg.day; lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'day' && lg.day === d) lgDusk(room, code); }, 2500); return; }
+        lgEmit(room, code);
+    }
+}
+
+/* =====================================================================
+   QUIZ CRÉÉS PAR LES JOUEURS : 10 questions, 4 choix, notes sur 5
+   ===================================================================== */
+const UQ_MS = 20000, UQ_REVEAL_MS = 4500;
+const cleanTxt = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
+function uqView(q, uid) {
+    const rs = Object.values(q.ratings || {});
+    return { id: q.id, title: q.title, anime: q.anime || '', author: q.author, mine: q.authorId === uid, plays: q.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (q.ratings || {})[uid] || null : null, created: q.created, n: q.questions.length };
+}
+app.get('/api/quiz', async (req, res) => {
+    const uid = authUserId(req);
+    const qs = String(req.query.q || '').toLowerCase();
+    const list = (await kvList('uquiz')).map(x => x.v).filter(q => !q.deleted && (!qs || (q.title + ' ' + (q.anime || '') + ' ' + q.author).toLowerCase().includes(qs)));
+    const sort = String(req.query.sort || 'top');
+    const score = q => { const v = uqView(q); return (v.rating || 3) * Math.log2(2 + v.votes) + Math.log2(1 + v.plays) * 0.5; };
+    list.sort((a, b) => sort === 'new' ? b.created - a.created : score(b) - score(a));
+    res.json({ ok: true, list: list.slice(0, 60).map(q => uqView(q, uid)), mine: uid ? list.filter(q => q.authorId === uid).map(q => uqView(q, uid)) : [] });
+});
+app.get('/api/quiz/one', async (req, res) => {
+    const uid = authUserId(req);
+    const q = await kvGet('uquiz', String(req.query.id || ''), null);
+    if (!q || q.deleted) return res.json({ ok: false, error: 'Quiz introuvable.' });
+    res.json({ ok: true, quiz: uqView(q, uid), questions: q.authorId === uid ? q.questions : null });
+});
+app.post('/api/quiz', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {};
+    const title = cleanTxt(b.title, 60), anime = cleanTxt(b.anime, 40);
+    if (title.length < 3) return res.json({ ok: false, error: 'Donne un titre à ton quiz (3 caractères min).' });
+    const qs = Array.isArray(b.questions) ? b.questions : [];
+    if (qs.length !== 10) return res.json({ ok: false, error: 'Il faut exactement 10 questions.' });
+    const questions = [];
+    for (let i = 0; i < 10; i++) {
+        const x = qs[i] || {};
+        const q = cleanTxt(x.q, 160), choices = (Array.isArray(x.choices) ? x.choices : []).slice(0, 4).map(c => cleanTxt(c, 60));
+        const answer = +x.answer;
+        if (q.length < 3) return res.json({ ok: false, error: `Question ${i + 1} : écris la question.` });
+        if (choices.length !== 4 || choices.some(c => !c)) return res.json({ ok: false, error: `Question ${i + 1} : remplis les 4 réponses.` });
+        if (new Set(choices.map(c => c.toLowerCase())).size < 4) return res.json({ ok: false, error: `Question ${i + 1} : les 4 réponses doivent être différentes.` });
+        if (!(answer >= 0 && answer <= 3)) return res.json({ ok: false, error: `Question ${i + 1} : choisis la bonne réponse.` });
+        questions.push({ q, choices, answer });
+    }
+    const mine = (await kvList('uquiz')).filter(x => x.v.authorId === uid && !x.v.deleted);
+    const editing = b.id ? await kvGet('uquiz', String(b.id), null) : null;
+    if (editing && editing.authorId !== uid) return res.json({ ok: false, error: 'Ce n’est pas ton quiz.' });
+    if (!editing && mine.length >= 20) return res.json({ ok: false, error: '20 quiz maximum par joueur.' });
+    const q = editing ? Object.assign(editing, { title, anime, questions, edited: hubNow() })
+        : { id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title, anime, questions, author: await pseudoOf(uid), authorId: uid, ratings: {}, plays: 0, created: hubNow() };
+    await kvSet('uquiz', q.id, q);
+    res.json({ ok: true, id: q.id });
+});
+app.post('/api/quiz/rate', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const q = await kvGet('uquiz', String((req.body || {}).id || ''), null);
+    const stars = Math.round(+(req.body || {}).stars);
+    if (!q || q.deleted) return res.json({ ok: false, error: 'Quiz introuvable.' });
+    if (q.authorId === uid) return res.json({ ok: false, error: 'Tu ne peux pas noter ton propre quiz 😉' });
+    if (!(stars >= 1 && stars <= 5)) return res.json({ ok: false });
+    q.ratings = q.ratings || {}; q.ratings[uid] = stars;
+    await kvSet('uquiz', q.id, q);
+    res.json({ ok: true, quiz: uqView(q, uid) });
+});
+app.post('/api/quiz/delete', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const q = await kvGet('uquiz', String((req.body || {}).id || ''), null);
+    if (!q || q.authorId !== uid) return res.json({ ok: false, error: 'Action impossible.' });
+    q.deleted = true; await kvSet('uquiz', q.id, q);
+    res.json({ ok: true });
+});
+const uqTimers = {};
+function uqClear(code) { clearTimeout(uqTimers[code]); delete uqTimers[code]; }
+function uqStop(code) { uqClear(code); const r = rooms[code]; if (r) delete r.uq; }
+function uqPublic(room) {
+    const u = room.uq; if (!u) return null;
+    const q = u.quiz.questions[u.round - 1];
+    const rev = u.phase === 'reveal' || u.phase === 'finished';
+    return { quizId: u.quiz.id, title: u.quiz.title, author: u.quiz.author, anime: u.quiz.anime, round: u.round, total: u.quiz.questions.length, phase: u.phase, endsAt: u.endsAt, serverNow: Date.now(), roundMs: UQ_MS,
+        q: q && u.phase !== 'finished' ? q.q : null, choices: q && u.phase !== 'finished' ? q.choices : null, answer: rev && q ? q.answer : null,
+        players: room.players.map(p => { const k = pkeyOf(p), a = u.answers[k]; return { id: p.id, name: p.name, cos: p.cos || null, score: u.scores[k] || 0, done: !!a, pick: rev && a ? a.idx : null, correct: rev && a ? a.ok : null, gained: rev && a ? a.gained : 0 }; }),
+        hostId: room.host, winnerNames: u.winnerNames || null };
+}
+function uqEmit(room, code) { io.to(code).emit('uq_state', uqPublic(room)); }
+async function startUq(room, code) {
+    uqStop(code);
+    const quiz = await kvGet('uquiz', String(room.subMode || ''), null);
+    if (!quiz || quiz.deleted) { io.to(code).emit('game_error', { message: 'Ce quiz n’existe plus.' }); return; }
+    room.uq = { quiz, round: 0, scores: {}, answers: {}, phase: 'loading' };
+    room.status = 'uq_playing';
+    uqNext(room, code);
+}
+function uqNext(room, code) {
+    const u = room.uq; if (!u || rooms[code] !== room) return;
+    uqClear(code);
+    if (u.round >= u.quiz.questions.length) return uqFinish(room, code);
+    u.round++; u.phase = 'playing'; u.answers = {}; u.startedAt = Date.now(); u.endsAt = u.startedAt + UQ_MS;
+    const r = u.round;
+    uqTimers[code] = setTimeout(() => { if (room.uq === u && u.round === r && u.phase === 'playing') uqReveal(room, code); }, UQ_MS + 300);
+    uqEmit(room, code);
+}
+function uqReveal(room, code) {
+    const u = room.uq; if (!u || u.phase !== 'playing') return;
+    uqClear(code);
+    u.phase = 'reveal';
+    uqEmit(room, code);
+    const r = u.round;
+    uqTimers[code] = setTimeout(() => { if (room.uq === u && u.round === r) uqNext(room, code); }, UQ_REVEAL_MS);
+}
+async function uqFinish(room, code) {
+    const u = room.uq; if (!u || u.phase === 'finished') return;
+    uqClear(code);
+    u.phase = 'finished';
+    const best = Math.max(0, ...room.players.map(p => u.scores[pkeyOf(p)] || 0));
+    u.winnerNames = room.players.filter(p => best > 0 && (u.scores[pkeyOf(p)] || 0) === best).map(p => p.name);
+    room.status = 'uq_over';
+    uqEmit(room, code);
+    const q = await kvGet('uquiz', u.quiz.id, null);
+    if (q) { q.plays = (q.plays || 0) + 1; await kvSet('uquiz', q.id, q); if (q.plays === 10) progAward(noSock(q.authorId), 'createur'); }
+    progRecord(room, 'uquiz', null, room.players.map(p => ({ player: p, points: u.scores[pkeyOf(p)] || 0, won: room.players.length > 1 && best > 0 && (u.scores[pkeyOf(p)] || 0) === best })));
+}
+
+/* ---------- départs en pleine partie ---------- */
+const _retirerH2 = retirerJoueurDuSalon;
+retirerJoueurDuSalon = function (room, roomCode, socketId) {
+    const mine = room && ((room.mode === 'chaine' && room.chaine) || (room.mode === 'loupgarou' && room.lg) || (room.mode === 'uquiz' && room.uq)) && room.status !== 'waiting';
+    if (!mine) return _retirerH2(room, roomCode, socketId);
+    const leaving = room.players.find(p => p.id === socketId);
+    if (!leaving) return;
+    room.players = room.players.filter(p => p.id !== socketId);
+    if (!room.players.length) { chaineStop(roomCode); lgStop(roomCode); uqStop(roomCode); delete rooms[roomCode]; delete roomKicked[roomCode]; return; }
+    if (room.host === socketId) room.host = room.players[0].id;
+    const k = pkeyOf(leaving);
+    if (room.chaine && room.chaine.phase === 'playing') {
+        const ch = room.chaine; const wasTurn = ch.order[ch.turn] === k;
+        ch.alive[k] = false; ch.log.push(`🚪 ${leaving.name} est parti.`);
+        if (room.players.filter(p => ch.alive[pkeyOf(p)]).length <= (ch.solo ? 0 : 1)) return chaineFinish(room, roomCode);
+        return wasTurn ? chaineTurn(room, roomCode) : chaineEmit(room, roomCode);
+    }
+    if (room.lg && room.lg.phase !== 'finished') {
+        const lg = room.lg;
+        if (lg.alive[k]) { lg.alive[k] = false; lg.log.push(`🚪 ${leaving.name} a quitté le village. C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`); }
+        if (lgCheckWin(room, roomCode)) return;
+        return lgEmit(room, roomCode);
+    }
+    if (room.uq && room.uq.phase === 'playing' && room.players.every(p => room.uq.answers[pkeyOf(p)])) return uqReveal(room, roomCode);
+    if (room.chaine) chaineEmit(room, roomCode); else if (room.lg) lgEmit(room, roomCode); else if (room.uq) uqEmit(room, roomCode);
+};
+
+io.on('connection', socket => {
+    const roomOf = code => { const r = rooms[code]; return r && r.players.some(p => p.id === socket.id) ? r : null; };
+    const me = r => r.players.find(p => p.id === socket.id);
+    socket.on('start_game', async roomCode => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id) return;
+        if (room.mode === 'chaine') startChaine(room, roomCode);
+        else if (room.mode === 'loupgarou') startLg(room, roomCode);
+        else if (room.mode === 'uquiz') await startUq(room, roomCode);
+    });
+    socket.on('set_rules', ({ roomCode, rules } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || room.host !== socket.id || room.status !== 'waiting' || !rules) return;
+        room.rules = { time: RULE_TIME[rules.time] ? +rules.time : 1, pts: [1, 2, 3].includes(+rules.pts) ? +rules.pts : 1, streak: !!rules.streak };
+        if (room.rules.time === 1 && room.rules.pts === 1 && !room.rules.streak) delete room.rules;
+        io.to(roomCode).emit('update_room', room);
+    });
+    socket.on('chaine_answer', ({ roomCode, text } = {}) => {
+        const room = roomOf(roomCode), ch = room && room.chaine;
+        if (!ch || ch.phase !== 'playing') return;
+        const cur = chaineCur(room);
+        if (!cur || cur.id !== socket.id) return;
+        const t = String(text || '').trim().slice(0, 60);
+        if (t.length < 2) return;
+        const n = chLetters(t);
+        let cands = ch.pool.filter(x => x.key === n);
+        if (!cands.length) cands = ch.pool.filter(x => { try { return arcNameMatches(x.u, x.c, t); } catch (_) { return false; } });
+        if (!cands.length) return socket.emit('chaine_feedback', { ok: false, msg: `❓ « ${t} » : perso inconnu` });
+        const good = cands.filter(x => x.key[0] === ch.letter);
+        if (!good.length) return socket.emit('chaine_feedback', { ok: false, msg: `🔤 ${cands[0].c.display} ne commence pas par ${ch.letter.toUpperCase()}` });
+        const fresh = good.filter(x => !ch.used.includes(x.key));
+        if (!fresh.length) return socket.emit('chaine_feedback', { ok: false, msg: `♻️ ${good[0].c.display} a déjà été donné` });
+        const pick = fresh[0];
+        ch.used.push(pick.key);
+        const k = pkeyOf(cur);
+        const fast = Date.now() - ch.startedAt;
+        ch.scores[k] = (ch.scores[k] || 0) + 10 + (fast < 5000 ? 5 : 0);
+        ch.chain.push({ name: pick.c.display, anime: ARC_UNIVERSE_ANIME[pick.u], by: cur.name, img: cardImg({ u: pick.u, display: pick.c.display }) });
+        progTrackRound(cur, 'chaine', ARC_UNIVERSE_ANIME[pick.u], true, fast);
+        cardAward(cur, pick.u, pick.c.display);
+        ch.letter = chaineNextLetter(ch, pick.c.display);
+        socket.emit('chaine_feedback', { ok: true });
+        if (ch.solo) return chaineTurn(room, roomCode, true);
+        chaineTurn(room, roomCode);
+    });
+    socket.on('lg_act', ({ roomCode, target } = {}) => { const room = roomOf(roomCode); if (room && room.lg) lgAct(room, roomCode, me(room), String(target || '')); });
+    socket.on('uq_answer', ({ roomCode, idx } = {}) => {
+        const room = roomOf(roomCode), u = room && room.uq;
+        if (!u || u.phase !== 'playing') return;
+        const p = me(room), k = pkeyOf(p);
+        if (u.answers[k]) return;
+        const i = +idx; if (!(i >= 0 && i <= 3)) return;
+        const q = u.quiz.questions[u.round - 1];
+        const ok = i === q.answer;
+        const left = Math.max(0, u.endsAt - Date.now());
+        const gained = ok ? 100 + Math.round(100 * left / UQ_MS) : 0;
+        u.answers[k] = { idx: i, ok, gained };
+        u.scores[k] = (u.scores[k] || 0) + gained;
+        if (room.players.every(pl => u.answers[pkeyOf(pl)])) uqReveal(room, roomCode); else uqEmit(room, roomCode);
+    });
+    const sync = ({ roomCode } = {}) => {
+        const room = rooms[roomCode];
+        if (!room || !room.players.some(p => p.id === socket.id)) return;
+        setTimeout(() => {
+            if (room.chaine) socket.emit('chaine_state', chainePublic(room));
+            if (room.lg) { socket.emit('lg_state', lgPublic(room)); const p = me(room); if (p) socket.emit('lg_private', lgPrivateFor(room, p)); }
+            if (room.uq) socket.emit('uq_state', uqPublic(room));
+        }, 200);
+    };
+    socket.on('rejoin_room', sync);
+    socket.on('hub2_sync', sync);
+    socket.on('back_to_menu', roomCode => {
+        const room = rooms[roomCode];
+        if (!room || (!room.chaine && !room.lg && !room.uq)) return;
+        chaineStop(roomCode); lgStop(roomCode); uqStop(roomCode);
+        io.to(roomCode).emit('hub2_closed');
+    });
+});
+
+/* ---------- accueil : heure de pointe + saison à thème ---------- */
+app.get('/api/hub/extra', (req, res) => {
+    const th = themeSeason();
+    res.json({ ok: true, rush: rushActive() ? { until: rushHour() + 1 } : null, theme: th, palettes: THEME_PALETTES, prestigeLevel: PRESTIGE_LEVEL });
 });
 
 
