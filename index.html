@@ -800,6 +800,49 @@
         .col-score b{font-family:'Bangers',cursive;font-size:3.4rem;color:#00ff88;line-height:1;}
         .col-score small{font-size:1.2rem;color:var(--text-muted);font-weight:800;}
         .col-score div{font-weight:800;margin-top:4px;}
+        .cr-box{width:100%;max-width:820px;}
+        .cr-hearts{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px;}
+        .cr-hearts span{background:#101018;border:2px solid #2c2c44;border-radius:99px;padding:4px 10px;font-size:.8rem;display:flex;gap:6px;align-items:center;}
+        .cr-hearts span.me{border-color:var(--accent-cyan);}
+        .cr-hearts span.out{opacity:.45;}
+        .cr-hearts span.lost{border-color:var(--accent-pink);animation:crShake .5s 2;}
+        .cr-hearts em,.cr-cards em{color:var(--accent-pink);font-style:normal;font-weight:800;}
+        @keyframes crShake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+        .cr-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;background:#15151f;border:2px solid #2c2c44;border-radius:14px;padding:12px;align-items:start;}
+        .cr-pick{display:flex;gap:12px;background:#0d0d14;border-radius:12px;padding:12px;}
+        .cr-bars{display:flex;gap:6px;}
+        .cr-bar{position:relative;width:30px;height:290px;border-radius:8px;cursor:pointer;touch-action:none;border:2px solid #000;}
+        .cr-bar.hue{background:linear-gradient(180deg,#f00 0%,#ff0 16.6%,#0f0 33.3%,#0ff 50%,#00f 66.6%,#f0f 83.3%,#f00 100%);}
+        .cr-bar i{position:absolute;left:-4px;right:-4px;height:6px;margin-top:-3px;background:#fff;border:2px solid #000;border-radius:3px;pointer-events:none;}
+        .cr-mid{display:flex;flex-direction:column;align-items:center;gap:10px;width:120px;}
+        .cr-timer{font-family:'Bangers',cursive;font-size:2rem;color:#fff;line-height:1;}
+        .cr-timer.hurry{color:var(--accent-pink);}
+        .cr-swatch{width:110px;height:110px;border-radius:10px;border:3px solid #fff;}
+        .cr-swatch.empty{background:repeating-linear-gradient(45deg,#444 0 8px,#666 8px 16px);}
+        .cr-presets{display:grid;grid-template-columns:repeat(3,32px);gap:8px;}
+        .cr-presets button{width:32px;height:32px;border-radius:6px;border:2px solid #2c2c44;cursor:pointer;padding:0;}
+        .cr-presets button.on{border-color:var(--accent-cyan);box-shadow:0 0 0 2px var(--accent-cyan);}
+        .cr-right{display:flex;flex-direction:column;gap:8px;align-items:stretch;}
+        .cr-q{text-align:center;}
+        .cr-q b{display:block;font-size:1.5rem;color:var(--accent-yellow);}
+        .cr-q small{color:var(--accent-cyan);}
+        .cr-right .col-canvas-wrap{background:#fff;min-height:200px;}
+        .cr-right .col-submit{margin-top:0 !important;font-size:1.1rem;}
+        .cr-out{text-align:center;font-weight:800;color:var(--accent-pink);padding:10px;}
+        .cr-real{display:flex;gap:14px;align-items:center;justify-content:center;background:#15151f;border:2px solid #2c2c44;border-radius:14px;padding:12px;margin-bottom:12px;}
+        .cr-real img{max-height:220px;max-width:55%;border-radius:10px;background:#fff;object-fit:contain;}
+        .cr-real small{color:var(--text-muted);display:block;}
+        .cr-real b{display:block;font-size:1.4rem;color:var(--accent-yellow);}
+        .cr-mine{font-family:'Bangers',cursive;font-size:2.6rem;color:#00ff88;line-height:1.1;}
+        .cr-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+        .cr-cards>div{position:relative;background:#fff;border-radius:12px;padding:6px 6px 8px;text-align:center;border:3px solid #2c2c44;color:#111;}
+        .cr-cards>div.me{border-color:var(--accent-cyan);}
+        .cr-cards>div.lost{border-color:var(--accent-pink);}
+        .cr-cards img,.cr-cards canvas{width:100%;aspect-ratio:1;object-fit:contain;display:block;}
+        .cr-none{aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#777;font-weight:800;}
+        .cr-pct{position:absolute;left:0;right:0;top:52%;font-family:'Bangers',cursive;font-size:2.1rem;color:#e02020;-webkit-text-stroke:1.5px #3a0a00;text-shadow:0 3px 0 #3a0a00;}
+        .cr-cards b{display:block;font-size:.85rem;}
+        @media (max-width:640px){.cr-wrap{grid-template-columns:1fr;padding:8px;}.cr-pick{justify-content:center;order:2;padding:8px;}.cr-bar{height:170px;}.cr-right .col-canvas{max-height:210px;width:auto;}.cr-right .col-canvas-wrap{min-height:0;}.cr-q b{font-size:1.2rem;}.cr-presets{grid-template-columns:repeat(3,28px);gap:6px;}.cr-presets button{width:28px;height:28px;}.cr-swatch{width:84px;height:84px;}.cr-real{flex-direction:column;}.cr-real img{max-width:100%;}}
         .col-reveal{width:100%;max-width:820px;}
         .col-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
         .col-pair figure{margin:0;background:#0b0b10;border-radius:12px;padding:8px;text-align:center;border:2px solid #2c2c44;}
@@ -960,7 +1003,7 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('imposteur')"><span class="arc-ico">🕵️</span><b>Imposteur</b><span>3 persos du même anime + 1 intrus : trouve-le</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
-                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve de mémoire la vraie couleur d'une zone du perso, noté sur 10</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('couleur')"><span class="arc-ico">🎨</span><b>Colorie le perso</b><span>Retrouve la vraie couleur du perso : le moins proche perd un cœur</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
                     </div>
                 </div>
@@ -3099,7 +3142,7 @@
                 let statusColor = p.isAlive ? "#00ff88" : "var(--accent-pink)";
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
                 let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
-                let secretTxt = (p.secretData && (data.gameOver || !p.isAlive)) ? ` (${p.secretData})` : '';
+                let secretTxt = (p.secretData && data.gameOver) ? ` (${p.secretData})` : ''; // le mot n'est dévoilé qu'en fin de partie
                 list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
@@ -4451,7 +4494,7 @@
             imposteur:{ title:'🕵️ IMPOSTEUR', sub:"3 persos viennent du même anime… lequel est l'intrus ?", universe:false },
             audio:{ title:'🎧 ÉCOUTE LA SCÈNE', sub:"Pas d'image, juste le son d'une scène culte : de quel anime vient-elle ?", universe:false },
             chrono:{ title:'⏱️ CHRONO-QUIZ', sub:'60 secondes pour enchaîner un max de bonnes réponses (bonus de série)', universe:false },
-            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Le perso est en noir et blanc : retrouve la vraie couleur de la zone entourée avec les curseurs, noté sur 10', universe:true },
+            couleur:{ title:'🎨 COLORIE LE PERSO', sub:'Retrouve la vraie couleur du perso : le moins proche perd un cœur, le dernier en vie gagne', universe:true },
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
@@ -6759,10 +6802,10 @@
             // une seule zone à deviner : choisie pareil pour tout le monde (même image + même manche)
             const big = col.zones.map((z, i) => i).filter(i => col.zones[i].share >= 0.12);
             const pool = big.length ? big : col.zones.map((z, i) => i);
-            col.sel = col.target = pool[((col.round || 1) * 7 + 3) % pool.length];
+            col.sel = col.target = 0; // la zone principale (la plus grande) : « la couleur du perso »
             return true;
         }
-        // Rendu : tout le perso en noir et blanc, la zone à deviner prend la couleur choisie
+        // Rendu : le perso garde ses couleurs, sa zone principale prend la couleur choisie
         function colPaint(canvas, opts) {
             if (!col.D || !canvas) return;
             const o2 = opts || {};
@@ -6777,28 +6820,16 @@
             for (let i = 0; i < W * H; i++) {
                 const z = col.labels[i], L = lab[i * 3];
                 let r, g, b;
-                if (z !== col.target) {
-                    if (o2.color) { r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
-                    else { const v = Math.round(0.299 * q[i * 4] + 0.587 * q[i * 4 + 1] + 0.114 * q[i * 4 + 2]); r = g = b = o2.dim ? v * 0.55 : v; }
-                } else if (c) {
+                if (z !== col.target) { r = q[i * 4]; g = q[i * 4 + 1]; b = q[i * 4 + 2]; }
+                else if (c) {
                     const nl = Math.max(0, Math.min(100, c[0] + (L - zl) * 0.85));
                     [r, g, b] = lab2rgb(nl, c[1], c[2]);
                 } else {
-                    const v = Math.round(Math.max(0, Math.min(255, 175 + (L - zl) * 1.6))); r = g = b = v;
-                    if (((i % W) + Math.floor(i / W)) % 10 < 5) { r -= 18; g -= 18; b -= 18; }
+                    const v = Math.round(Math.max(0, Math.min(255, 200 + (L - zl) * 1.2))); r = g = b = v;
+                    if (((i % W) + Math.floor(i / W)) % 12 < 6) { r -= 22; g -= 22; b -= 22; }
                 }
-                if (pulse && z === col.target) { r = r * (1 - pulse) + 0 * pulse; g = g * (1 - pulse) + 240 * pulse; b = b * (1 - pulse) + 255 * pulse; }
+                if (pulse && z === col.target) { r = r * (1 - pulse); g = g * (1 - pulse) + 240 * pulse; b = b * (1 - pulse) + 255 * pulse; }
                 o[i * 4] = r; o[i * 4 + 1] = g; o[i * 4 + 2] = b; o[i * 4 + 3] = q[i * 4 + 3];
-            }
-            // contour de la zone à deviner
-            if (!o2.noOutline) {
-                for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
-                    const i = y * W + x;
-                    if (col.labels[i] !== col.target) continue;
-                    if (col.labels[i - 1] !== col.target || col.labels[i + 1] !== col.target || col.labels[i - W] !== col.target || col.labels[i + W] !== col.target) {
-                        o[i * 4] = 255; o[i * 4 + 1] = 212; o[i * 4 + 2] = 0;
-                    }
-                }
             }
             cx.putImageData(out, 0, 0);
         }
@@ -6808,7 +6839,7 @@
                 col.raf = 0;
                 const t = col.flash - Date.now();
                 colPaint(document.querySelector('.col-canvas'), { pulse: t > 0 ? 0.55 * Math.abs(Math.sin(t / 160)) : 0 });
-                colSlidersUi();
+                colPickUi();
             });
         }
         function colFlash() {
@@ -6816,27 +6847,50 @@
             const step = () => { colRepaint(); if (Date.now() < col.flash + 60) setTimeout(step, 60); };
             step();
         }
-        // --- curseurs Teinte / Saturation / Luminosité (comme Toon Tone) ---
+        // --- sélecteur : 3 barres verticales (teinte, sombre, clair) + couleurs rapides ---
         function colCur() { return rgb2hex(...hsv2rgb(col.hue, col.s, col.v)); }
-        function colSlidersUi() {
+        function colPickUi() {
             const h = col.hue, s = col.s, v = col.v;
-            const set = (id, bg, val, txt) => {
-                const w = document.getElementById(id); if (!w) return;
-                const tr = w.querySelector('.hsb-track'); if (tr) tr.style.background = bg;
-                const inp = w.querySelector('input'); if (inp && document.activeElement !== inp) inp.value = val;
-                const t = w.querySelector('.hsb-val'); if (t) t.textContent = txt;
+            const bar = (k, bg, y) => {
+                const el = document.querySelector(`.cr-bar[data-k="${k}"]`); if (!el) return;
+                if (bg) el.style.background = bg;
+                const hd = el.querySelector('i'); if (hd) hd.style.top = (y * 100) + '%';
             };
-            const hs = []; for (let i = 0; i <= 12; i++) hs.push(rgb2hex(...hsv2rgb(i * 30, Math.max(.35, s), Math.max(.45, v))));
-            set('hsb-h', `linear-gradient(90deg,${hs.join(',')})`, Math.round(h), Math.round(h) + '°');
-            set('hsb-s', `linear-gradient(90deg,${rgb2hex(...hsv2rgb(h, 0, v))},${rgb2hex(...hsv2rgb(h, 1, v))})`, Math.round(s * 100), Math.round(s * 100) + ' %');
-            set('hsb-v', `linear-gradient(90deg,#000,${rgb2hex(...hsv2rgb(h, s, 1))})`, Math.round(v * 100), Math.round(v * 100) + ' %');
-            const sw = document.querySelector('.hsb-swatch'); if (sw) sw.style.background = colCur();
+            bar('h', null, h / 360);
+            bar('v', `linear-gradient(180deg,${rgb2hex(...hsv2rgb(h, s, 1))},#000)`, 1 - v);
+            bar('s', `linear-gradient(180deg,${rgb2hex(...hsv2rgb(h, 1, v))},${rgb2hex(...hsv2rgb(h, 0, v))})`, 1 - s);
+            const sw = document.querySelector('.cr-swatch');
+            if (sw) { const cur = col.colors[col.target]; sw.style.background = cur || ''; sw.classList.toggle('empty', !cur); }
+            document.querySelectorAll('.cr-presets button').forEach(b => b.classList.toggle('on', b.dataset.c === col.colors[col.target]));
         }
-        function colSlide(k, val) {
-            if (col.sent) return;
-            if (k === 'h') col.hue = +val; else if (k === 's') col.s = val / 100; else col.v = val / 100;
+        function colSetHsv(h, s, v) {
+            if (col.sent || col.out) return;
+            col.hue = h; col.s = s; col.v = v;
             col.colors[col.target] = colCur();
             colRepaint();
+        }
+        function colPreset(hex) {
+            if (col.sent || col.out) return;
+            const [h, s, v] = rgb2hsv(...hex2rgb(hex));
+            col.hue = s ? h : col.hue; col.s = s; col.v = v;
+            col.colors[col.target] = hex;
+            colRepaint();
+        }
+        function colBindBars() {
+            document.querySelectorAll('.cr-bar').forEach(el => {
+                let on = false;
+                const go = e => {
+                    const r = el.getBoundingClientRect();
+                    const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+                    const k = el.dataset.k;
+                    if (k === 'h') colSetHsv(Math.min(359.9, y * 360), col.s, col.v);
+                    else if (k === 'v') colSetHsv(col.hue, col.s, 1 - y);
+                    else colSetHsv(col.hue, 1 - y, col.v);
+                };
+                el.addEventListener('pointerdown', e => { on = true; try { el.setPointerCapture(e.pointerId); } catch (_) {} go(e); e.preventDefault(); });
+                el.addEventListener('pointermove', e => { if (on) { go(e); e.preventDefault(); } });
+                el.addEventListener('pointerup', () => { on = false; }); el.addEventListener('pointercancel', () => { on = false; });
+            });
         }
         // Écart de couleur CIEDE2000
         function deltaE2000(l1, l2) {
@@ -6860,88 +6914,103 @@
             return Math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2 + Rt * (dCp / Sc) * (dHp / Sh));
         }
         function colTargetHex() { const z = col.zones[col.target]; return z ? rgb2hex(...lab2rgb(...z.lab)) : null; }
-        function colScore() { // note sur 100 (affichée /10)
+        function colScore() { // ressemblance en %, 2 décimales
             const z = col.zones[col.target], hex = col.colors[col.target];
             if (!z || !hex) return 0;
             const dE = deltaE2000(rgb2lab(...hex2rgb(hex)), z.lab);
-            return Math.round(100 * Math.exp(-Math.pow(dE / 25, 1.4)));
+            return Math.round(10000 * Math.pow(Math.max(0, 1 - dE / 40), 1.5)) / 100;
         }
-        const colNote = pct => (pct / 10).toFixed(1).replace('.', ',');
+        const colPct = p => (p == null ? '—' : (+p).toFixed(2).replace('.', ',') + '%');
+        const colNote = colPct;
         function colVerdict(pct) {
-            return pct >= 95 ? '🤯 Parfait !' : pct >= 85 ? '🔥 Incroyable' : pct >= 70 ? '👏 Très proche' : pct >= 50 ? '🙂 Pas mal' : pct >= 30 ? '😬 Bof' : '💀 Raté';
+            return pct >= 95 ? '🤯 Parfait !' : pct >= 80 ? '🔥 Incroyable' : pct >= 60 ? '👏 Très proche' : pct >= 40 ? '🙂 Pas mal' : pct >= 20 ? '😬 Bof' : '💀 Raté';
         }
         function colSubmit(auto) {
-            if (col.sent || !col.zones.length) return;
+            if (col.sent || col.out || !col.zones.length) return;
             col.sent = true;
             clearTimeout(col.autoT);
             const touched = !!col.colors[col.target];
-            const raw = document.createElement('canvas'); colPaint(raw, { color: true, noOutline: true });
+            const raw = document.createElement('canvas'); colPaint(raw);
             const big = document.createElement('canvas'); big.width = raw.width; big.height = raw.height;
-            const bx = big.getContext('2d'); bx.fillStyle = '#0b0b10'; bx.fillRect(0, 0, big.width, big.height); bx.drawImage(raw, 0, 0);
+            const bx = big.getContext('2d'); bx.fillStyle = '#ffffff'; bx.fillRect(0, 0, big.width, big.height); bx.drawImage(raw, 0, 0);
             col.myUrl = touched ? big.toDataURL('image/jpeg', 0.85) : null;
-            const th = document.createElement('canvas'); const s = 150 / Math.max(big.width, big.height);
+            const th = document.createElement('canvas'); const s = 220 / Math.max(big.width, big.height);
             th.width = Math.round(big.width * s); th.height = Math.round(big.height * s);
             th.getContext('2d').drawImage(big, 0, 0, th.width, th.height);
             col.myPct = touched ? colScore() : 0;
-            socket.emit('arc_color', { roomCode: currentRoomCode, pct: col.myPct, thumb: touched ? th.toDataURL('image/jpeg', 0.7) : null, hex: col.colors[col.target] || null, target: colTargetHex() });
-            const btn = document.querySelector('.col-submit'); if (btn) { btn.disabled = true; btn.textContent = auto ? '⏱️ Temps écoulé : envoyé !' : '✅ Envoyé ! Attends les autres…'; }
-            document.querySelectorAll('.hsb-row input').forEach(i => { i.disabled = true; });
+            socket.emit('arc_color', { roomCode: currentRoomCode, pct: col.myPct, thumb: touched ? th.toDataURL('image/jpeg', 0.72) : null, hex: col.colors[col.target] || null, target: colTargetHex() });
+            const btn = document.querySelector('.col-submit'); if (btn) { btn.disabled = true; btn.textContent = auto ? '⏱️ Temps écoulé !' : '✅ Envoyé !'; }
         }
-        function colSplit(mine, real, size) {
-            return `<div class="col-split" style="${size ? `height:${size}px;` : ''}"><div style="background:${mine || 'repeating-linear-gradient(45deg,#333 0 6px,#444 6px 12px)'}"><span>${size ? '' : 'Ta couleur'}</span></div><div style="background:${real || '#000'}"><span>${size ? '' : 'Vraie couleur'}</span></div></div>`;
+        function colHearts(p, max) {
+            let h = '';
+            for (let i = 0; i < max; i++) h += i < p.lives ? '❤️' : '🖤';
+            return h;
         }
+        function colHeartsBar(q) {
+            if (!q.duel) return '';
+            return `<div class="cr-hearts">${q.players.map(p => `<span class="${p.lives > 0 ? '' : 'out'}${p.id === socket.id ? ' me' : ''}${p.lost ? ' lost' : ''}"><b>${v7esc(p.name)}</b>${p.lives > 0 ? colHearts(p, q.maxLives || 3) : '💀 éliminé'}${p.lost ? '<em>-❤️</em>' : ''}</span>`).join('')}</div>`;
+        }
+        const COL_PRESETS = ['#ffffff', '#6b6b6b', '#000000', '#7a4a24', '#ffd9a8', '#ff5fb0', '#ff8a00', '#0b2a6e', '#2e8b3a'];
         function arcRenderColor(q, stage) {
             const key = q.round + '|' + (q.phase === 'playing' ? 'p' : 'r');
             if (col.key === key) return;
             const newRound = !col.key.startsWith(q.round + '|');
             col.key = key;
+            clearInterval(col.tick);
+            const me = q.players.find(p => p.id === socket.id) || {};
             if (q.phase === 'playing') {
-                if (newRound) {
-                    col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.myPct = null; col.D = null;
-                    // couleur de départ neutre, différente à chaque manche
-                    col.hue = (q.round * 137) % 360; col.s = 0.5; col.v = 0.7;
-                }
+                if (newRound) { col.zones = []; col.colors = {}; col.sel = 0; col.target = 0; col.sent = false; col.myUrl = null; col.myPct = null; col.D = null; col.hue = 215; col.s = 0.7; col.v = 0.8; }
                 col.round = q.round;
+                col.out = !!(q.duel && !(me.lives > 0));
                 const info = q.stage.color || {};
-                stage.innerHTML = `<div class="col-wrap">
-                    <div class="col-head">🎨 Quelle est la couleur de cette zone de <b>${v7esc(info.name || '?')}</b> ? <span style="color:var(--accent-cyan)">(${v7esc(info.anime || '')})</span><div class="tl-hint">La zone entourée en jaune : retrouve sa vraie couleur de mémoire avec les 3 curseurs.</div></div>
-                    <div class="col-canvas-wrap"><canvas class="col-canvas" title="Touche pour voir la zone"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation…</div></div></div>
-                    <div class="col-side">
-                        <div class="hsb-swatch"></div>
-                        <div class="hsb-row" id="hsb-h"><label>Teinte <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="359" step="1" oninput="colSlide('h',this.value)"></div>
-                        <div class="hsb-row" id="hsb-s"><label>Saturation <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="100" step="1" oninput="colSlide('s',this.value)"></div>
-                        <div class="hsb-row" id="hsb-v"><label>Luminosité <span class="hsb-val"></span></label><div class="hsb-track"></div><input type="range" min="0" max="100" step="1" oninput="colSlide('v',this.value)"></div>
-                        <button class="btn-action col-submit" onclick="colSubmit(false)">✅ Valider ma couleur</button>
+                stage.innerHTML = `<div class="cr-box">${colHeartsBar(q)}
+                    <div class="cr-wrap">
+                        <div class="cr-pick">
+                            <div class="cr-bars"><div class="cr-bar hue" data-k="h"><i></i></div><div class="cr-bar" data-k="v"><i></i></div><div class="cr-bar" data-k="s"><i></i></div></div>
+                            <div class="cr-mid"><div class="cr-timer">--</div><div class="cr-swatch empty"></div>
+                                <div class="cr-presets">${COL_PRESETS.map(c => `<button data-c="${c}" style="background:${c}" onclick="colPreset('${c}')"></button>`).join('')}</div></div>
+                        </div>
+                        <div class="cr-right">
+                            <div class="cr-q">Quelle est la couleur de :<b>${v7esc(info.name || '?')}</b><small>${v7esc(info.anime || '')}</small></div>
+                            <div class="col-canvas-wrap"><canvas class="col-canvas" title="Touche pour voir la zone"></canvas><div class="arc-loading col-load" style="position:absolute;inset:0;"><div class="arc-spin"></div><div>Préparation…</div></div></div>
+                            ${col.out ? '<div class="cr-out">💀 Tu es éliminé : regarde les autres jouer !</div>' : '<button class="btn-action col-submit" onclick="colSubmit(false)">Soumettre</button>'}
+                        </div>
                     </div></div>`;
-                colSlidersUi();
-                const canvas = stage.querySelector('.col-canvas');
-                canvas.addEventListener('click', () => colFlash());
+                colBindBars(); colPickUi();
+                stage.querySelector('.col-canvas').addEventListener('click', () => colFlash());
+                const localEnd = Date.now() + (q.endsAt - q.serverNow);
+                const tick = () => { const t = document.querySelector('.cr-timer'); if (!t) return clearInterval(col.tick); const sec = Math.max(0, Math.ceil((localEnd - Date.now()) / 1000)); t.textContent = sec; t.classList.toggle('hurry', sec <= 5); };
+                tick(); col.tick = setInterval(tick, 250);
                 const myKey = key;
                 arcLoadImage(q.stage.img).then(img => {
                     if (col.key !== myKey) return;
                     const load = stage.querySelector('.col-load');
-                    if (!img || !colBuild(img, Math.min(420, Math.max(260, (stage.clientWidth || 360) - 20)))) { if (load) load.innerHTML = 'Image indisponible 😕'; return; }
+                    if (!img || !colBuild(img, Math.min(360, Math.max(240, (stage.clientWidth || 360) - 40)))) { if (load) load.innerHTML = 'Image indisponible 😕'; return; }
                     if (load) load.remove();
                     col.img = img;
                     colRepaint(); colFlash();
                 });
                 clearTimeout(col.autoT);
-                const localEnd = Date.now() + (q.endsAt - q.serverNow);
-                col.autoT = setTimeout(() => colSubmit(true), Math.max(0, localEnd - Date.now() - 900));
+                if (!col.out) col.autoT = setTimeout(() => colSubmit(true), Math.max(0, localEnd - Date.now() - 900));
                 return;
             }
-            // révélation : ta couleur contre la vraie, note sur 10
-            const me = q.players.find(p => p.id === socket.id) || {};
+            // révélation : la vraie image, puis la version de chaque joueur avec son %
             const gal = q.stage.gallery || [];
-            const mine = gal.find(g => g.id === socket.id) || {};
-            const real = mine.target || (gal.find(g => g.target) || {}).target || colTargetHex();
-            const pct = me.pct != null ? me.pct : null;
-            stage.innerHTML = `<div class="col-reveal">
-                <div class="col-big">${colSplit(mine.hex || col.colors[col.target], real)}
-                    <div class="col-score">${pct != null ? `<b>${colNote(pct)}</b><small>/10</small><div>${colVerdict(pct)}</div>` : '<div>😶 Pas de réponse</div>'}</div></div>
-                <div class="col-pair"><figure><img src="${v7esc(q.stage.img || '')}" alt=""><figcaption>🎴 ${v7esc((q.stage.color || {}).name || q.answer || '')}</figcaption></figure>
-                <figure>${col.myUrl ? `<img src="${col.myUrl}" alt="">` : '<div style="padding:40px 0;">😶 Pas de coloriage</div>'}<figcaption>Ta version</figcaption></figure></div>
-                <div class="col-gallery">${gal.map((g, i) => `<div class="${g.id === socket.id ? 'me' : ''}">${colSplit(g.hex, g.target || real, 34)}<b>${['🥇', '🥈', '🥉'][i] || ''} ${colNote(g.pct)}/10</b>${v7esc(g.name)}</div>`).join('')}</div></div>`;
+            const byId = Object.fromEntries(gal.map(g => [g.id, g]));
+            const inRound = q.players.filter(p => !q.duel || p.lives > 0 || p.lost || byId[p.id]);
+            const cards = inRound.map(p => ({ p, g: byId[p.id] })).sort((a, b) => ((b.g || {}).pct || 0) - ((a.g || {}).pct || 0));
+            stage.innerHTML = `<div class="cr-box">${colHeartsBar(q)}
+                <div class="cr-real"><img src="${v7esc(q.stage.img || '')}" alt=""><div><small>La vraie couleur de</small><b>${v7esc((q.stage.color || {}).name || q.answer || '')}</b>
+                ${me.pct != null ? `<div class="cr-mine">${colPct(me.pct)}</div><div>${colVerdict(me.pct)}</div>` : ''}</div></div>
+                <div class="cr-cards">${cards.map(({ p, g }) => `<div class="${p.id === socket.id ? 'me' : ''}${p.lost ? ' lost' : ''}">
+                    ${g && g.hex ? `<canvas class="cr-paint" data-hex="${v7esc(g.hex)}"></canvas>` : g && g.thumb ? `<img src="${g.thumb}" alt="">` : '<div class="cr-none">😶<br>Pas de réponse</div>'}
+                    <span class="cr-pct">${g ? colPct(g.pct) : '0,00%'}</span>
+                    <b>${v7esc(p.name)}</b>${p.lost ? '<em>-❤️</em>' : ''}</div>`).join('')}</div></div>`;
+            // chaque carte : le perso redessiné avec la couleur choisie par le joueur
+            stage.querySelectorAll('.cr-paint').forEach(cv => {
+                if (!col.D) { cv.outerHTML = `<div class="cr-none" style="background:${cv.dataset.hex}"></div>`; return; }
+                colPaint(cv, { hex: cv.dataset.hex });
+            });
         }
         function colAfterRender(q) {
             const result = document.getElementById('arc-result');
@@ -6949,12 +7018,12 @@
             if (q.phase === 'playing') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 result.style.color = me.done ? 'var(--accent-cyan)' : 'var(--text-color)';
-                result.textContent = me.done ? 'Couleur envoyée ! Attends les autres…' : 'Règle Teinte, Saturation et Luminosité : le plus proche gagne !';
+                result.textContent = q.duel && !(me.lives > 0) ? '💀 Éliminé' : me.done ? 'Couleur envoyée ! Attends les autres…' : (q.duel ? 'Le moins proche de la vraie couleur perd un cœur !' : 'Trouve la vraie couleur : le plus proche gagne !');
             } else if (q.phase === 'reveal') {
                 const me = q.players.find(p => p.id === socket.id) || {};
                 const gal = (q.stage && q.stage.gallery) || [];
                 result.style.color = 'var(--accent-yellow)';
-                result.textContent = gal.length ? `🏆 ${gal[0].name} est le plus proche (${colNote(gal[0].pct)}/10)` + (me.gained ? ` • tu gagnes +${me.gained}` : '') : 'Personne n\'a colorié…';
+                result.textContent = gal.length ? `🏆 ${gal[0].name} est le plus proche (${colPct(gal[0].pct)})` + ((q.players.filter(p => p.lost).length) ? ` • 💔 ${q.players.filter(p => p.lost).map(p => p.name).join(', ')} perd un cœur` : '') + (me.gained ? ` • tu gagnes +${me.gained}` : '') : 'Personne n\'a colorié…';
             }
         }
         (function () {
