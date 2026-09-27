@@ -7136,11 +7136,16 @@
             const canAnswer = me && q.phase === 'asking';
             feed.innerHTML = (q.feed || []).map(f => {
                 if (f.type === 'sys') return `<div class="gs-f sys">${v7esc(f.text)}</div>`;
-                if (f.type === 'g') return `<div class="gs-f g${f.ok ? ' ok' : ''}">🎯 <b>${v7esc(f.name)}</b> : c'est <b>${v7esc(f.text)}</b> ? <span>${f.ok ? '✅ OUI !' : '❌'}</span>${canAnswer && !f.ok ? ` <button class="gs-ok" onclick="guessValidate(${f.id})">✅ C'est ça</button>` : ''}</div>`;
+                if (f.type === 'g') {
+                    const res = f.ok === true ? '<span class="gs-a" style="color:#00ff88">✅ OUI !</span>' : f.ok === false ? '<span class="gs-a" style="color:var(--accent-pink)">❌ Non</span>'
+                        : canAnswer ? `<span class="gs-btns"><button onclick="guessValidate(${f.id})" style="border-color:#00ff88">✅ Oui, c'est ça</button><button onclick="guessDeny(${f.id})" style="border-color:var(--accent-pink)">❌ Non</button></span>`
+                        : '<span class="gs-a" style="color:var(--text-muted)">⏳</span>';
+                    return `<div class="gs-f g${f.ok ? ' ok' : ''}${f.ok == null ? ' wait' : ''}">🎯 <b>${v7esc(f.name)}</b> : c'est <b>${v7esc(f.text)}</b> ? ${res}${canAnswer && f.ok === false ? ` <button class="gs-ok" onclick="guessValidate(${f.id})">↩️ En fait oui</button>` : ''}</div>`;
+                }
                 const a = f.answer ? GUESS_ANS[f.answer] : null;
                 return `<div class="gs-f q${f.answer ? '' : ' wait'}"><b>${v7esc(f.name)}</b> : ${v7esc(f.text)} ${a ? `<span class="gs-a" style="color:${a[1]}">${a[0]}</span>` : canAnswer ? `<span class="gs-btns">${Object.entries(GUESS_ANS).map(([k, v]) => `<button onclick="guessAnswer(${f.id},'${k}')" style="border-color:${v[1]}">${v[0]}</button>`).join('')}</span>` : '<span class="gs-a" style="color:var(--text-muted)">⏳</span>'}</div>`;
             }).join('') || '<div class="tl-hint">Pas encore de question.</div>';
-            if ((q.feed || []).length !== gss.feedLen) { gss.feedLen = (q.feed || []).length; feed.scrollTop = feed.scrollHeight; if (me && q.phase === 'asking' && (q.feed || []).some(f => f.type === 'q' && !f.answer)) try { sfxTouche && sfxOn && sfxTouche(); } catch (_) {} }
+            if ((q.feed || []).length !== gss.feedLen) { gss.feedLen = (q.feed || []).length; feed.scrollTop = feed.scrollHeight; if (me && q.phase === 'asking' && (q.feed || []).some(f => (f.type === 'q' && !f.answer) || (f.type === 'g' && f.ok == null))) try { sfxTouche && sfxOn && sfxTouche(); } catch (_) {} }
             // saisie
             const asking = q.phase === 'asking' && !me;
             document.getElementById('guess-inputs').style.display = asking ? 'flex' : 'none';
@@ -7198,6 +7203,7 @@
         }
         function guessAnswer(id, a) { socket.emit('guess_answer', { roomCode: currentRoomCode, id, answer: a }); }
         function guessValidate(id) { socket.emit('guess_validate', { roomCode: currentRoomCode, id }); }
+        function guessDeny(id) { socket.emit('guess_deny', { roomCode: currentRoomCode, id }); }
         socket.on('guess_state', q => {
             if (!q || !currentRoomCode) return;
             const prev = gss.state;
