@@ -9618,7 +9618,6 @@ const PUBLIC_MODE_LABELS = {
 };
 
 function publicRoomMax(room) {
-    if (room.mode === 'loupgarou') return 16;
     if (room.mode === 'enchere' || room.mode === 'enchereaveugle') return 2;
     if (room.mode === 'undercover' || room.mode === 'note') return 10;
     return 12;
@@ -17533,331 +17532,173 @@ function chaineFinish(room, code) {
 function chaineStop(code) { chaineClear(code); const r = rooms[code]; if (r) delete r.chaine; }
 
 /* =====================================================================
-   LOUP-GAROU ANIME : jusqu'à 16 joueurs, 17 rôles, auras, chats privés
-   (démons la nuit, domaine de Gojo, morts avec Nagato)
+   LOUP-GAROU ANIME : démons de Muzan, Sharingan, médecin ninja, Death Note
    ===================================================================== */
 const LG_ROLES = {
-    demon: { name: 'Démon de Muzan', icon: '👹', team: 'demons', aura: 'obscure', desc: 'Chaque nuit, choisis avec les autres démons un joueur à dévorer. Vous avez un chat secret la nuit.' },
-    voyantdemon: { name: 'Kokushibo, démon aux six yeux', icon: '👺', team: 'demons', aura: 'obscure', desc: 'Démon voyant : chaque nuit, découvre le rôle d’un joueur. Tous les démons voient le résultat. Tu votes aussi pour la victime.' },
-    invocateur: { name: 'Orochimaru (Edo Tensei)', icon: '🐍', team: 'demons', aura: 'inconnue', desc: 'Démon invocateur : une fois dans la partie, ramène à la vie un démon mort pendant la nuit (il revient en simple démon). Ton aura est inconnue.' },
-    gardien: { name: 'Kaido, dragon gardien', icon: '🐉', team: 'demons', aura: 'obscure', desc: 'Démon gardien : une fois dans la partie, pendant le vote, empêche un joueur d’être éliminé.' },
-    kira: { name: 'Kira (Light Yagami)', icon: '📓', team: 'kira', aura: 'inconnue', desc: 'Tueur solitaire : chaque nuit, écris un nom dans le Death Note. Les démons ne peuvent pas te tuer (seul le vote, Livaï, Gojo ou un amour brisé le peuvent). Tu gagnes si tu es le dernier survivant (ou seul face à un dernier villageois).' },
-    sharingan: { name: 'Sasuke (Sharingan)', icon: '👁️', team: 'village', aura: 'claire', desc: 'Voyant : chaque nuit, découvre le vrai rôle d’un joueur.' },
-    ermite: { name: 'Naruto (mode Ermite)', icon: '🐸', team: 'village', aura: 'claire', desc: 'Chaque nuit, ressens l’aura d’un joueur : claire, obscure ou inconnue. Attention, certains démons et solitaires ont une aura inconnue !' },
-    maudit: { name: 'Kaneki (villageois maudit)', icon: '🎭', team: 'village', aura: 'claire', desc: 'Tu es villageois… mais si les démons t’attaquent, tu ne meurs pas : tu deviens un démon et tu rejoins leur camp.' },
-    gojo: { name: 'Gojo (Extension du territoire)', icon: '🌀', team: 'village', aura: 'inconnue', desc: 'Chaque nuit, enferme un joueur dans ton domaine : il ne peut rien faire et personne ne peut l’attaquer. Vous discutez en privé (il ne sait pas qui tu es) et tu peux décider de l’exécuter.' },
-    medecin: { name: 'Tsunade (médecin ninja)', icon: '💚', team: 'village', aura: 'claire', desc: 'Protecteur : chaque nuit, protège un joueur des démons et de Kira (jamais deux nuits de suite le même).' },
-    gaara: { name: 'Gaara (bouclier de sable)', icon: '🏜️', team: 'village', aura: 'claire', desc: 'Protecteur : chaque nuit, protège un joueur des démons et de Kira (jamais deux nuits de suite le même).' },
-    levi: { name: 'Livaï Ackerman', icon: '⚔️', team: 'village', aura: 'inconnue', desc: 'Une fois dans la partie, pendant le jour, élimine le joueur de ton choix devant tout le village.' },
-    nagato: { name: 'Nagato (Rinne Tensei)', icon: '🟣', team: 'village', aura: 'inconnue', desc: 'La nuit, tu discutes avec les morts. Une seule fois dans la partie, ressuscite un joueur mort.' },
-    buggy: { name: 'Buggy le clown', icon: '🤡', team: 'buggy', aura: 'inconnue', desc: 'Solitaire : tu gagnes si le village vote contre toi ! Fais-toi passer pour suspect sans te faire tuer la nuit.' },
-    hokage: { name: 'Le Hokage', icon: '🏯', team: 'village', aura: 'claire', desc: 'Le jour, tu peux révéler ton identité à tout le village : ton vote compte alors double.' },
-    cupidon: { name: 'Anya Forger (Cupidon)', icon: '💘', team: 'village', aura: 'claire', desc: 'La première nuit, lie deux joueurs en couple et découvre leurs rôles. Si les amoureux et toi êtes les derniers en vie, vous gagnez à trois. Si un amoureux meurt, l’autre meurt de chagrin et tu redeviens simple villageoise.' },
-    villager: { name: 'Villageois de Konoha', icon: '🍃', team: 'village', aura: 'claire', desc: 'Pas de pouvoir : observe, débats et vote pour démasquer les démons.' }
+    demon: { name: 'Démon de Muzan', icon: '👹', team: 'demons', desc: 'Chaque nuit, choisis avec les autres démons un joueur à dévorer. Le jour, fais-toi passer pour un villageois.' },
+    seer: { name: 'Sharingan', icon: '👁️', team: 'village', desc: 'Chaque nuit, ton Sharingan révèle le vrai rôle d’un joueur.' },
+    doctor: { name: 'Médecin ninja', icon: '💚', team: 'village', desc: 'Chaque nuit, protège un joueur des démons (jamais deux nuits de suite le même).' },
+    note: { name: 'Porteur du Death Note', icon: '📓', team: 'village', desc: 'Une seule fois dans la partie, écris un nom pendant la nuit : cette personne meurt, même protégée.' },
+    villager: { name: 'Villageois de Konoha', icon: '🍃', team: 'village', desc: 'Pas de pouvoir : observe, débats et vote le jour pour démasquer les démons.' }
 };
-// ordre d'ajout des rôles selon le nombre de joueurs (4 à 16) : les camps restent équilibrés
-const LG_ORDER = ['demon', 'sharingan', 'medecin', 'hokage', 'ermite', 'voyantdemon', 'maudit', 'kira', 'cupidon', 'gojo', 'invocateur', 'levi', 'buggy', 'gardien', 'gaara', 'nagato'];
-const LG_MAX = 16, LG_NIGHT_MS = 30000, LG_TALK_MS = 30000, LG_VOTE_MS = 30000, LG_INTRO_MS = 9000;
-const LG_DEMONS = r => (LG_ROLES[r] || {}).team === 'demons';
+const LG_NIGHT_MS = 35000, LG_DAY_MS = 100000, LG_DAWN_MS = 7000;
 const lgTimers = {};
 function lgClear(code) { clearTimeout(lgTimers[code]); delete lgTimers[code]; }
 function lgStop(code) { lgClear(code); const r = rooms[code]; if (r) delete r.lg; }
 const lgByKey = (room, k) => room.players.find(p => pkeyOf(p) === k) || null;
-const lgAlive = lg => Object.keys(lg.roles).filter(k => lg.alive[k]);
-const lgRoleView = r => ({ id: r, ...LG_ROLES[r] });
-function lgComposition(n) { return LG_ORDER.slice(0, Math.max(0, Math.min(LG_MAX, n))); }
-function lgTimer(room, code, ms, fn) {
-    lgClear(code);
-    const lg = room.lg, tag = lg.phase + ':' + lg.day;
-    lg.endsAt = Date.now() + ms;
-    lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase + ':' + lg.day === tag) fn(); }, ms + 300);
-}
+function lgAliveKeys(lg) { return Object.keys(lg.roles).filter(k => lg.alive[k]); }
 function startLg(room, code) {
     lgStop(code);
     const n = room.players.length;
     if (n < 4) { io.to(room.host).emit('game_error', { message: 'Il faut au moins 4 joueurs pour le Loup-garou.' }); return; }
-    if (n > LG_MAX) { io.to(room.host).emit('game_error', { message: `${LG_MAX} joueurs maximum pour le Loup-garou.` }); return; }
-    const roles = arcShuffle(lgComposition(n));
-    const keys = arcShuffle(room.players.map(pkeyOf));
-    const lg = { roles: {}, orig: {}, alive: {}, names: {}, log: [], day: 1, phase: 'intro', night: null, votes: {}, lastProtect: {}, used: {}, seen: {}, auras: {}, demonSeen: [],
-        lovers: null, cupid: null, cupidActive: false, jail: null, revealed: {}, winner: null, buggyWon: [], composition: roles.slice().sort((a, b) => LG_ORDER.indexOf(a) - LG_ORDER.indexOf(b)) };
-    keys.forEach((k, i) => { lg.roles[k] = roles[i]; lg.orig[k] = roles[i]; lg.alive[k] = true; lg.names[k] = (lgByKey(room, k) || {}).name; lg.used[k] = {}; });
+    const roles = [];
+    const demons = n >= 11 ? 3 : n >= 7 ? 2 : 1;
+    for (let i = 0; i < demons; i++) roles.push('demon');
+    roles.push('seer');
+    if (n >= 5) roles.push('doctor');
+    if (n >= 6) roles.push('note');
+    while (roles.length < n) roles.push('villager');
+    const keys = arcShuffle(room.players.map(pkeyOf)), rs = arcShuffle(roles);
+    const lg = { roles: {}, alive: {}, names: {}, log: [], day: 1, phase: 'night', night: null, votes: {}, lastProtect: null, noteUsed: false, seerLog: {}, winner: null };
+    keys.forEach((k, i) => { lg.roles[k] = rs[i]; lg.alive[k] = true; lg.names[k] = (lgByKey(room, k) || {}).name; });
     room.lg = lg; room.status = 'lg_playing';
-    lg.log.push('🎡 La roue des rôles tourne…');
-    lgTimer(room, code, LG_INTRO_MS, () => lgNight(room, code));
-    lgEmit(room, code);
+    lg.log.push('🌙 La nuit tombe sur le village… Les démons se réveillent.');
+    lgNight(room, code);
 }
 function lgNight(room, code) {
     const lg = room.lg; if (!lg) return;
-    lg.phase = 'night';
-    lg.night = { kill: {}, done: {}, protect: {}, peek: {}, aura: {}, kira: null, summon: null, revive: null, link: null };
-    lg.jail = null;
-    lg.log.push(`🌙 Nuit ${lg.day} : le village s’endort… les démons se réveillent.`);
-    lgTimer(room, code, LG_NIGHT_MS, () => lgDawn(room, code));
+    lgClear(code);
+    lg.phase = 'night'; lg.night = { demon: {}, seer: null, doctor: null, note: undefined };
+    lg.endsAt = Date.now() + LG_NIGHT_MS;
+    const d = lg.day;
+    lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'night' && lg.day === d) lgDawn(room, code); }, LG_NIGHT_MS + 300);
     lgEmit(room, code);
 }
-const lgJailed = (lg, k) => !!(lg.jail && lg.jail.target === k);
-// actions possibles pour un joueur selon la phase et son rôle
-function lgActions(room, k) {
-    const lg = room.lg, r = lg.roles[k], out = [];
-    if (!r || !lg.alive[k]) return out;
-    const alive = lgAlive(lg), others = alive.filter(x => x !== k);
-    const u = lg.used[k] || {};
-    if (lg.phase === 'night') {
-        if (lgJailed(lg, k)) return out;
-        const n = lg.night;
-        if (LG_DEMONS(r)) out.push({ kind: 'kill', label: '👹 Dévorer', targets: others.filter(x => !LG_DEMONS(lg.roles[x])), picked: n.kill[k] || null });
-        if (r === 'voyantdemon' && !n.peek[k]) out.push({ kind: 'peek', label: '👺 Sonder', targets: others.filter(x => !LG_DEMONS(lg.roles[x])) });
-        if (r === 'invocateur' && !u.summon) { const dead = Object.keys(lg.roles).filter(x => !lg.alive[x] && LG_DEMONS(lg.orig[x])); if (dead.length) out.push({ kind: 'summon', label: '🐍 Invoquer', targets: dead, picked: n.summon, dead: true }); }
-        if (r === 'kira') out.push({ kind: 'kira', label: '📓 Écrire son nom', targets: others, picked: n.kira });
-        if (r === 'sharingan' && !n.peek[k]) out.push({ kind: 'peek', label: '👁️ Sonder', targets: others });
-        if (r === 'ermite' && !n.aura[k]) out.push({ kind: 'aura', label: '🐸 Ressentir', targets: others });
-        if (r === 'gojo') { if (!lg.jail) out.push({ kind: 'jail', label: '🌀 Enfermer', targets: others }); else if (!lg.jail.execute) out.push({ kind: 'execute', label: '💀 Exécuter le prisonnier', solo: true }); }
-        if (r === 'medecin' || r === 'gaara') out.push({ kind: 'protect', label: r === 'gaara' ? '🏜️ Protéger' : '💚 Protéger', targets: others.filter(x => x !== lg.lastProtect[k]), picked: n.protect[k] || null });
-        if (r === 'nagato' && !u.revive) { const dead = Object.keys(lg.roles).filter(x => !lg.alive[x]); if (dead.length) out.push({ kind: 'revive', label: '🟣 Ressusciter', targets: dead, picked: n.revive, dead: true }); }
-        if (r === 'cupidon' && lg.day === 1 && !lg.lovers) out.push({ kind: 'link', label: '💘 Lier', targets: alive, picked: (n.link || [])[0] || null, multi: 2 });
-        if (out.length) out.push({ kind: 'skip', label: n.done[k] ? '✔ Prêt' : '😴 J’ai fini', solo: true });
-        return out;
-    }
-    if (lg.phase === 'talk' || lg.phase === 'vote') {
-        if (r === 'levi' && !u.shoot) out.push({ kind: 'shoot', label: '⚔️ Éliminer', targets: others });
-        if (r === 'hokage' && !lg.revealed[k]) out.push({ kind: 'reveal', label: '🏯 Me révéler (vote x2)', solo: true });
-        if (lg.phase === 'vote') {
-            out.push({ kind: 'vote', label: '⚖️ Voter', targets: others, picked: lg.votes[k] && lg.votes[k] !== 'skip' ? lg.votes[k] : null });
-            if (r === 'gardien' && !u.guard) out.push({ kind: 'guard', label: '🐉 Protéger du vote', targets: alive, picked: lg.guard || null });
-            out.push({ kind: 'skip', label: lg.votes[k] === 'skip' ? '✔ Vote blanc' : '🤐 Vote blanc', solo: true });
-        }
-    }
-    return out;
-}
-function lgNightDone(room) {
-    const lg = room.lg;
-    return lgAlive(lg).every(k => { const a = lgActions(room, k); return !a.length || lg.night.done[k]; });
-}
-function lgKill(room, k, why) {
-    const lg = room.lg;
-    if (!lg.alive[k]) return;
-    lg.alive[k] = false;
-    const r = LG_ROLES[lg.roles[k]];
-    lg.log.push(`${why} ${lg.names[k]} était : ${r.icon} ${r.name}.`);
-    if (lg.lovers && lg.lovers.includes(k)) {
-        const other = lg.lovers.find(x => x !== k);
-        if (lg.cupidActive && lg.cupid && lg.alive[lg.cupid]) { lg.roles[lg.cupid] = 'villager'; }
-        lg.cupidActive = false;
-        if (lg.alive[other]) lgKill(room, other, '💔 Fou de chagrin,');
-    }
+function lgNightDone(lg) {
+    const alive = lgAliveKeys(lg);
+    const need = r => alive.filter(k => lg.roles[k] === r);
+    if (need('demon').some(k => !lg.night.demon[k])) return false;
+    if (need('seer').length && !lg.night.seer) return false;
+    if (need('doctor').length && !lg.night.doctor) return false;
+    if (need('note').length && !lg.noteUsed && lg.night.note === undefined) return false;
+    return true;
 }
 function lgDawn(room, code) {
     const lg = room.lg; if (!lg || lg.phase !== 'night') return;
-    const n = lg.night, jailT = lg.jail && lg.jail.target;
-    const active = k => lg.alive[k] && !lgJailed(lg, k);
-    const byRole = r => lgAlive(lg).filter(k => lg.roles[k] === r);
-    // Cupidon
-    if (n.link && n.link.length === 2 && !lg.lovers) {
-        lg.lovers = n.link.slice(); lg.cupid = byRole('cupidon')[0] || null; lg.cupidActive = !!lg.cupid;
-        lg.lovers.forEach(x => { const p = lgByKey(room, x); if (p) io.to(p.id).emit('lg_notice', { text: `💘 Tu es tombé amoureux de ${lg.names[lg.lovers.find(y => y !== x)]} ! Si l’un meurt, l’autre aussi.` }); });
-    }
-    // Gojo exécute son prisonnier
-    const deaths = [];
-    if (lg.jail && lg.jail.execute && lg.alive[jailT]) deaths.push([jailT, '🌀 Exécuté dans le domaine de Gojo,']);
-    // résurrections
-    if (n.summon && !lg.alive[n.summon] && byRole('invocateur').some(active)) { lg.alive[n.summon] = true; lg.roles[n.summon] = 'demon'; lg.log.push(`🐍 ${lg.names[n.summon]} est revenu d’entre les morts…`); byRole('invocateur').forEach(k => { lg.used[k].summon = true; }); }
-    if (n.revive && !lg.alive[n.revive] && byRole('nagato').some(active)) { lg.alive[n.revive] = true; lg.log.push(`🟣 Rinne Tensei ! ${lg.names[n.revive]} revient à la vie.`); byRole('nagato').forEach(k => { lg.used[k].revive = true; }); }
-    // protections (les protecteurs enfermés ne protègent pas)
-    const prot = new Set();
-    Object.entries(n.protect).forEach(([p, t]) => { if (active(p)) { prot.add(t); lg.lastProtect[p] = t; } });
-    if (jailT) prot.add(jailT);
-    // attaque des démons
-    const votes = Object.entries(n.kill).filter(([d, t]) => active(d) && LG_DEMONS(lg.roles[d]) && lg.alive[t]).map(([, t]) => t);
-    const cnt = {}; votes.forEach(t => { cnt[t] = (cnt[t] || 0) + 1; });
-    const max = Math.max(0, ...Object.values(cnt)), top = Object.keys(cnt).filter(t => cnt[t] === max);
+    lgClear(code);
+    const votes = Object.values(lg.night.demon).filter(t => lg.alive[t]);
+    const count = {}; votes.forEach(t => { count[t] = (count[t] || 0) + 1; });
+    const max = Math.max(0, ...Object.values(count));
+    const top = Object.keys(count).filter(k => count[k] === max);
     const target = top.length ? top[Math.floor(Math.random() * top.length)] : null;
-    if (target) {
-        if (prot.has(target)) lg.log.push('🛡️ Quelqu’un a été protégé des démons cette nuit !');
-        else if (lg.roles[target] === 'kira') { /* Kira est immunisé contre les démons : l'attaque échoue sans rien révéler */ }
-        else if (lg.roles[target] === 'maudit') { lg.roles[target] = 'demon'; const p = lgByKey(room, target); if (p) io.to(p.id).emit('lg_notice', { text: '🎭 Les démons t’ont mordu… tu deviens un démon ! Tu rejoins leur camp.' }); }
-        else deaths.push([target, '☠️ Dévoré par les démons,']);
-    }
-    // Kira
-    if (n.kira && byRole('kira').some(active) && lg.alive[n.kira]) {
-        if (prot.has(n.kira)) lg.log.push('🛡️ Le Death Note n’a pas fonctionné cette nuit…');
-        else if (!deaths.some(d => d[0] === n.kira)) deaths.push([n.kira, '📓 Crise cardiaque (Death Note),']);
-    }
-    deaths.forEach(([k, why]) => lgKill(room, k, why));
-    if (!deaths.length) lg.log.push('🌅 Personne n’est mort cette nuit.');
-    lg.jail = null;
+    const dead = [];
+    if (target && target !== lg.night.doctor) dead.push(target);
+    else if (target) lg.log.push('💚 Le médecin ninja a sauvé quelqu’un cette nuit !');
+    if (lg.night.note && lg.alive[lg.night.note]) { lg.noteUsed = true; if (!dead.includes(lg.night.note)) dead.push(lg.night.note); lg.log.push('📓 Un nom a été écrit dans le Death Note…'); }
+    lg.lastProtect = lg.night.doctor || null;
+    dead.forEach(k => { lg.alive[k] = false; lg.log.push(`☠️ ${lg.names[k]} a été retrouvé mort. C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`); });
+    if (!dead.length) lg.log.push('🌅 Personne n’est mort cette nuit.');
     if (lgCheckWin(room, code)) return;
-    lg.phase = 'talk'; lg.votes = {}; lg.guard = null;
-    lg.log.push(`☀️ Jour ${lg.day} : 30 secondes pour débattre.`);
-    lgTimer(room, code, LG_TALK_MS, () => { lg.phase = 'vote'; lg.log.push('⚖️ Place au vote ! 30 secondes.'); lgTimer(room, code, LG_VOTE_MS, () => lgDusk(room, code)); lgEmit(room, code); });
+    lg.phase = 'day'; lg.votes = {};
+    lg.endsAt = Date.now() + LG_DAWN_MS + LG_DAY_MS;
+    lg.log.push(`☀️ Jour ${lg.day} : débattez et votez pour éliminer un suspect.`);
+    const d = lg.day;
+    lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'day' && lg.day === d) lgDusk(room, code); }, LG_DAWN_MS + LG_DAY_MS + 300);
     lgEmit(room, code);
 }
 function lgDusk(room, code) {
-    const lg = room.lg; if (!lg || lg.phase !== 'vote') return;
-    const cnt = {};
-    Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip' && lg.alive[t]) cnt[t] = (cnt[t] || 0) + (lg.revealed[v] ? 2 : 1); });
-    const max = Math.max(0, ...Object.values(cnt)), top = Object.keys(cnt).filter(k => cnt[k] === max);
+    const lg = room.lg; if (!lg || lg.phase !== 'day') return;
+    lgClear(code);
+    const count = {};
+    Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip' && lg.alive[t]) count[t] = (count[t] || 0) + 1; });
+    const max = Math.max(0, ...Object.values(count));
+    const top = Object.keys(count).filter(k => count[k] === max);
     if (max > 0 && top.length === 1) {
-        const k = top[0];
-        if (lg.guard === k) lg.log.push(`🐉 ${lg.names[k]} devait être éliminé… mais un dragon l’a protégé !`);
-        else {
-            if (lg.roles[k] === 'buggy') { lg.buggyWon.push(k); lg.log.push(`🤡 AHAHAH ! Buggy a été voté : il remporte sa victoire solitaire !`); }
-            lgKill(room, k, `⚖️ Éliminé par le vote (${max} voix),`);
-        }
+        const k = top[0]; lg.alive[k] = false;
+        lg.log.push(`⚖️ Le village a éliminé ${lg.names[k]} (${max} vote${max > 1 ? 's' : ''}). C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`);
     } else lg.log.push('⚖️ Égalité ou pas de vote : personne n’est éliminé.');
     if (lgCheckWin(room, code)) return;
     lg.day++;
+    lg.log.push('🌙 La nuit tombe à nouveau…');
     lgNight(room, code);
 }
 function lgCheckWin(room, code) {
     const lg = room.lg;
-    const alive = lgAlive(lg);
-    const demons = alive.filter(k => LG_DEMONS(lg.roles[k]));
-    const kira = alive.find(k => lg.roles[k] === 'kira');
-    let w = null;
-    if (!alive.length) w = 'none';
-    else if (lg.cupidActive && lg.lovers && alive.length >= 2 && alive.every(k => lg.lovers.includes(k) || k === lg.cupid)) w = 'lovers';
-    else if (!demons.length && !kira) w = 'village';
-    else if (kira && !demons.length && alive.length <= 2) w = 'kira';
-    else if (!kira && demons.length >= alive.length - demons.length) w = 'demons';
-    if (!w) return false;
+    const alive = lgAliveKeys(lg);
+    const demons = alive.filter(k => lg.roles[k] === 'demon').length;
+    let winner = null;
+    if (!demons) winner = 'village'; else if (demons >= alive.length - demons) winner = 'demons';
+    if (!winner) return false;
     lgClear(code);
-    lg.phase = 'finished'; lg.winner = w;
-    lg.log.push({ village: '🎉 Plus aucun démon ni Kira : le village gagne !', demons: '👹 Les démons ont pris le village : les démons gagnent !', kira: '📓 Kira est le dernier debout : Kira gagne seul !', lovers: '💘 Les amoureux et Cupidon sont les derniers : ils gagnent à trois !', none: '💀 Plus personne en vie… personne ne gagne.' }[w]);
+    lg.phase = 'finished'; lg.winner = winner;
+    lg.log.push(winner === 'village' ? '🎉 Tous les démons sont vaincus : le village gagne !' : '👹 Les démons ont pris le contrôle du village : les démons gagnent !');
     room.status = 'lg_over';
     lgEmit(room, code);
-    const entries = room.players.map(p => {
-        const k = pkeyOf(p), team = (LG_ROLES[lg.roles[k]] || {}).team || 'village';
-        const won = (w === 'lovers' && (lg.lovers.includes(k) || k === lg.cupid)) || (w !== 'lovers' && w === team) || lg.buggyWon.includes(k);
-        return { player: p, points: (won ? 300 : 50) + (lg.alive[k] ? 100 : 0), won };
-    });
-    entries.forEach(e => { if (e.won && LG_DEMONS(lg.roles[pkeyOf(e.player)])) progAward(e.player, 'demon'); });
+    const entries = room.players.map(p => { const k = pkeyOf(p), team = LG_ROLES[lg.roles[k] || 'villager'].team; const won = team === winner; return { player: p, points: (won ? 300 : 50) + (lg.alive[k] ? 100 : 0), won }; });
+    entries.forEach(e => { if (e.won && lg.roles[pkeyOf(e.player)] === 'demon') progAward(e.player, 'demon'); });
     progRecord(room, 'loupgarou', null, entries);
     return true;
 }
 function lgPublic(room) {
     const lg = room.lg; if (!lg) return null;
-    const fin = lg.phase === 'finished';
+    const show = lg.phase === 'finished';
     const tally = {};
-    if (lg.phase === 'vote') Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip') tally[t] = (tally[t] || 0) + (lg.revealed[v] ? 2 : 1); });
-    const winners = fin ? room.players.filter(p => { const k = pkeyOf(p), team = (LG_ROLES[lg.roles[k]] || {}).team; return (lg.winner === 'lovers' && (lg.lovers.includes(k) || k === lg.cupid)) || (lg.winner !== 'lovers' && lg.winner === team) || lg.buggyWon.includes(k); }).map(p => p.name) : null;
-    return { phase: lg.phase, day: lg.day, endsAt: lg.endsAt, serverNow: Date.now(), winner: lg.winner, winnerNames: winners, log: lg.log.slice(-40), hostId: room.host,
-        players: room.players.map(p => { const k = pkeyOf(p), r = lg.roles[k]; return { id: p.id, key: k, name: p.name, cos: p.cos || null, alive: !!lg.alive[k], role: r && (fin || !lg.alive[k]) ? lgRoleView(r) : null, hokage: !!lg.revealed[k], voted: lg.phase === 'vote' && !!lg.votes[k], votes: tally[k] || 0, lover: fin && lg.lovers ? lg.lovers.includes(k) : false }; }),
-        composition: lg.composition, roleInfo: LG_ROLES };
-}
-function lgChannel(lg, k) {
-    if (!lg.roles[k]) return null;
-    if (lg.phase === 'intro' || lg.phase === 'finished') return 'public';
-    if (lg.phase === 'night') {
-        if (lg.jail && (lg.jail.target === k || lg.jail.by === k) && lg.alive[k]) return 'jail';
-        if (!lg.alive[k] || lg.roles[k] === 'nagato') return 'dead';
-        if (LG_DEMONS(lg.roles[k])) return 'demons';
-        return null;
-    }
-    return lg.alive[k] ? 'public' : 'dead';
+    if (lg.phase === 'day') Object.entries(lg.votes).forEach(([v, t]) => { if (lg.alive[v] && t && t !== 'skip') tally[t] = (tally[t] || 0) + 1; });
+    return { phase: lg.phase, day: lg.day, endsAt: lg.endsAt, serverNow: Date.now(), winner: lg.winner, log: lg.log.slice(-40), hostId: room.host,
+        voteOpensAt: lg.phase === 'day' ? lg.endsAt - LG_DAY_MS : null,
+        players: room.players.map(p => { const k = pkeyOf(p); const role = lg.roles[k]; return { id: p.id, key: k, name: p.name, cos: p.cos || null, alive: !!lg.alive[k], role: role && (show || !lg.alive[k]) ? { id: role, ...LG_ROLES[role] } : null, voted: lg.phase === 'day' && !!lg.votes[k], votes: tally[k] || 0 }; }),
+        rolesInGame: Object.values(lg.roles).reduce((a, r) => { a[r] = (a[r] || 0) + 1; return a; }, {}), roleInfo: LG_ROLES };
 }
 function lgPrivateFor(room, p) {
-    const lg = room.lg, k = pkeyOf(p), r = lg.roles[k];
-    if (!r) return null;
-    const out = { key: k, role: lgRoleView(r), orig: lgRoleView(lg.orig[k]), alive: !!lg.alive[k], actions: lgActions(room, k), channel: lgChannel(lg, k), used: lg.used[k] || {}, info: [] };
-    const nm = x => lg.names[x];
-    if (LG_DEMONS(r)) {
-        out.mates = Object.keys(lg.roles).filter(x => LG_DEMONS(lg.roles[x]) && x !== k).map(x => ({ key: x, name: nm(x), alive: !!lg.alive[x], role: lgRoleView(lg.roles[x]) }));
-        if (lg.phase === 'night') out.demonVotes = Object.entries(lg.night.kill).map(([v, t]) => ({ by: nm(v), target: nm(t) }));
-        out.demonSeen = lg.demonSeen;
+    const lg = room.lg, k = pkeyOf(p), role = lg.roles[k];
+    if (!role) return null;
+    const out = { role: { id: role, ...LG_ROLES[role] }, alive: !!lg.alive[k], key: k };
+    if (role === 'demon') {
+        out.mates = Object.keys(lg.roles).filter(x => lg.roles[x] === 'demon' && x !== k).map(x => ({ key: x, name: lg.names[x], alive: !!lg.alive[x] }));
+        if (lg.phase === 'night') out.demonVotes = Object.entries(lg.night.demon).map(([v, t]) => ({ by: lg.names[v], target: lg.names[t], key: t }));
     }
-    if (lg.seen[k]) out.seen = lg.seen[k];
-    if (lg.auras[k]) out.auras = lg.auras[k];
-    if (r === 'cupidon' || lg.cupid === k) { if (lg.lovers) out.info.push(`💘 Couple : ${lg.lovers.map(x => `${nm(x)} (${LG_ROLES[lg.roles[x]].icon} ${LG_ROLES[lg.roles[x]].name})`).join(' & ')}`); }
-    if (lg.lovers && lg.lovers.includes(k)) { const o = lg.lovers.find(x => x !== k); out.info.push(`💘 Tu es amoureux de ${nm(o)} (${LG_ROLES[lg.roles[o]].icon} ${LG_ROLES[lg.roles[o]].name}). Votre but : survivre ensemble avec Cupidon.`); }
-    if (lg.phase === 'night' && lg.jail) {
-        if (lg.jail.by === k) out.info.push(`🌀 ${nm(lg.jail.target)} est enfermé dans ton domaine.${lg.jail.execute ? ' Il sera exécuté à l’aube.' : ''}`);
-        if (lg.jail.target === k) out.info.push('🌀 Tu es enfermé dans un domaine ! Tu ne peux rien faire cette nuit, mais personne ne peut t’attaquer… sauf ton geôlier.');
+    if (role === 'seer') out.seen = lg.seerLog[k] || [];
+    if (role === 'doctor') out.lastProtect = lg.lastProtect;
+    if (role === 'note') out.noteUsed = lg.noteUsed;
+    if (lg.phase === 'night' && lg.night) {
+        out.myNight = role === 'demon' ? lg.night.demon[k] || null : role === 'seer' ? lg.night.seer : role === 'doctor' ? lg.night.doctor : role === 'note' ? (lg.night.note === undefined ? null : lg.night.note || 'skip') : null;
     }
-    if (r === 'maudit') out.info.push('🎭 Si les démons t’attaquent, tu deviendras l’un des leurs.');
-    if (lg.orig[k] === 'maudit' && r === 'demon') out.info.push('🎭 Tu as été transformé en démon !');
-    if (lg.orig[k] === 'cupidon' && r === 'villager') out.info.push('💔 Ton couple est brisé : tu es redevenue simple villageoise.');
-    if (lg.phase === 'night' && lg.night) out.done = !!lg.night.done[k];
+    if (lg.phase === 'day') out.myVote = lg.votes[k] || null;
     return out;
 }
 function lgEmit(room, code) {
     io.to(code).emit('lg_state', lgPublic(room));
     if (room.lg) room.players.forEach(p => io.to(p.id).emit('lg_private', lgPrivateFor(room, p)));
 }
-function lgAct(room, code, p, kind, target) {
-    const lg = room.lg; if (!lg || !p) return;
-    const k = pkeyOf(p);
-    const acts = lgActions(room, k);
-    const a = acts.find(x => x.kind === kind);
-    if (!a) return;
-    if (a.targets && !a.targets.includes(target)) return;
-    const n = lg.night;
-    switch (kind) {
-        case 'kill': n.kill[k] = target; n.done[k] = true; break;
-        case 'peek': {
-            n.peek[k] = target; n.done[k] = true;
-            const res = { name: lg.names[target], role: lgRoleView(lg.roles[target]), day: lg.day };
-            if (lg.roles[k] === 'voyantdemon') lg.demonSeen.push(res);
-            else { (lg.seen[k] = lg.seen[k] || []).push(res); if (lg.day === 1 && LG_DEMONS(lg.roles[target])) progAward(p, 'sharingan'); }
-            break;
+function lgAct(room, code, p, target) {
+    const lg = room.lg; if (!lg) return;
+    const k = pkeyOf(p), role = lg.roles[k];
+    if (!role || !lg.alive[k]) return;
+    if (lg.phase === 'night') {
+        if (target !== 'skip' && !lg.alive[target]) return;
+        if (role === 'demon') { if (target === 'skip' || lg.roles[target] === 'demon') return; lg.night.demon[k] = target; }
+        else if (role === 'seer') {
+            if (lg.night.seer || target === 'skip' || target === k) return;
+            lg.night.seer = target;
+            const r = lg.roles[target];
+            (lg.seerLog[k] = lg.seerLog[k] || []).push({ name: lg.names[target], role: { id: r, ...LG_ROLES[r] }, day: lg.day });
+            if (lg.day === 1 && r === 'demon') progAward(p, 'sharingan');
         }
-        case 'aura': n.aura[k] = target; n.done[k] = true; (lg.auras[k] = lg.auras[k] || []).push({ name: lg.names[target], aura: LG_ROLES[lg.roles[target]].aura, day: lg.day }); break;
-        case 'kira': n.kira = target; n.done[k] = true; break;
-        case 'summon': n.summon = target; n.done[k] = true; break;
-        case 'jail': lg.jail = { by: k, target, execute: false }; {
-            const t = lgByKey(room, target); if (t) io.to(t.id).emit('lg_notice', { text: '🌀 Tu as été enfermé dans un domaine pour la nuit !' });
-        } break;
-        case 'execute': lg.jail.execute = true; n.done[k] = true; break;
-        case 'protect': n.protect[k] = target; n.done[k] = true; break;
-        case 'revive': n.revive = target; n.done[k] = true; break;
-        case 'link': {
-            n.link = (n.link || []).filter(x => x !== target);
-            n.link.push(target);
-            if (n.link.length > 2) n.link.shift();
-            if (n.link.length === 2) n.done[k] = true;
-            break;
-        }
-        case 'skip': if (lg.phase === 'night') n.done[k] = true; else lg.votes[k] = 'skip'; break;
-        case 'vote': lg.votes[k] = target; break;
-        case 'guard': lg.guard = target; lg.used[k].guard = true; break;
-        case 'shoot': lg.used[k].shoot = true; lgKill(room, target, '⚔️ Livaï a tranché une nuque !'); if (lgCheckWin(room, code)) return; break;
-        case 'reveal': lg.revealed[k] = true; lg.log.push(`🏯 ${lg.names[k]} se révèle : c’est le Hokage ! Son vote compte double.`); break;
+        else if (role === 'doctor') { if (target === 'skip' || target === lg.lastProtect) return; lg.night.doctor = target; }
+        else if (role === 'note') { if (lg.noteUsed) return; lg.night.note = target === 'skip' ? null : target; }
+        else return;
+        if (lgNightDone(lg)) { lgEmit(room, code); lgClear(code); const d = lg.day; lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'night' && lg.day === d) lgDawn(room, code); }, 1500); return; }
+        return lgEmit(room, code);
     }
-    if (lg.phase === 'night' && kind !== 'jail' && lgNightDone(room)) { lgEmit(room, code); lgTimer(room, code, 1500, () => lgDawn(room, code)); return; }
-    if (lg.phase === 'vote' && lgAlive(lg).every(x => lg.votes[x])) { lgEmit(room, code); lgTimer(room, code, 2500, () => lgDusk(room, code)); return; }
-    lgEmit(room, code);
+    if (lg.phase === 'day') {
+        if (Date.now() < lg.endsAt - LG_DAY_MS) return; // l'aube : on lit d'abord les nouvelles
+        if (target !== 'skip' && !lg.alive[target]) return;
+        lg.votes[k] = target;
+        const alive = lgAliveKeys(lg);
+        if (alive.every(x => lg.votes[x])) { lgEmit(room, code); lgClear(code); const d = lg.day; lgTimers[code] = setTimeout(() => { if (room.lg === lg && lg.phase === 'day' && lg.day === d) lgDusk(room, code); }, 2500); return; }
+        lgEmit(room, code);
+    }
 }
-function lgChat(room, code, p, text) {
-    const lg = room.lg; if (!lg || !p) return;
-    const k = pkeyOf(p), ch = lgChannel(lg, k);
-    const t = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
-    if (!ch || !t) return;
-    let to;
-    if (ch === 'public') to = room.players;
-    else if (ch === 'demons') to = room.players.filter(x => { const xk = pkeyOf(x); return lg.alive[xk] && LG_DEMONS(lg.roles[xk]) && !lgJailed(lg, xk); });
-    else if (ch === 'jail') to = room.players.filter(x => [lg.jail.by, lg.jail.target].includes(pkeyOf(x)));
-    else to = room.players.filter(x => { const xk = pkeyOf(x); return !lg.alive[xk] || (lg.roles[xk] === 'nagato' && lg.phase === 'night' && lg.alive[xk]); });
-    const from = ch === 'jail' && lg.jail.by === k ? '🌀 Le Domaine' : p.name;
-    to.forEach(x => io.to(x.id).emit('lg_msg', { ch, from, text: t, me: x.id === p.id }));
-}
-function lgLeave(room, code, leaving) {
-    const lg = room.lg, k = pkeyOf(leaving);
-    if (lg.phase === 'finished') return lgEmit(room, code);
-    if (lg.alive[k]) lgKill(room, k, '🚪 A quitté le village :');
-    if (lgCheckWin(room, code)) return;
-    lgEmit(room, code);
-}
-app.get('/api/lg/roles', (req, res) => res.json({ ok: true, roles: LG_ROLES, order: LG_ORDER, max: LG_MAX, timings: { night: LG_NIGHT_MS / 1000, talk: LG_TALK_MS / 1000, vote: LG_VOTE_MS / 1000 } }));
-io.on('connection', socket => {
-    socket.on('join_room', ({ roomCode } = {}) => {
-        const room = rooms[roomCode];
-        if (room && room.mode === 'loupgarou' && room.status === 'waiting' && room.players.length > LG_MAX) {
-            const extra = room.players[room.players.length - 1];
-            if (extra && extra.id === socket.id) { room.players.pop(); socket.leave(roomCode); socket.emit('game_error', { message: `Salon complet (${LG_MAX} joueurs max).` }); io.to(roomCode).emit('update_room', room); }
-        }
-    });
-    socket.on('lg_chat', ({ roomCode, text } = {}) => { const room = rooms[roomCode]; const p = room && room.players.find(x => x.id === socket.id); if (room && room.lg && p) lgChat(room, roomCode, p, text); });
-});
 
 /* =====================================================================
    QUIZ CRÉÉS PAR LES JOUEURS : 10 questions, 4 choix, notes sur 5
@@ -17996,7 +17837,12 @@ retirerJoueurDuSalon = function (room, roomCode, socketId) {
         if (room.players.filter(p => ch.alive[pkeyOf(p)]).length <= (ch.solo ? 0 : 1)) return chaineFinish(room, roomCode);
         return wasTurn ? chaineTurn(room, roomCode) : chaineEmit(room, roomCode);
     }
-    if (room.lg && room.lg.phase !== 'finished') return lgLeave(room, roomCode, leaving);
+    if (room.lg && room.lg.phase !== 'finished') {
+        const lg = room.lg;
+        if (lg.alive[k]) { lg.alive[k] = false; lg.log.push(`🚪 ${leaving.name} a quitté le village. C’était : ${LG_ROLES[lg.roles[k]].icon} ${LG_ROLES[lg.roles[k]].name}.`); }
+        if (lgCheckWin(room, roomCode)) return;
+        return lgEmit(room, roomCode);
+    }
     if (room.uq && room.uq.phase === 'playing' && room.players.every(p => room.uq.answers[pkeyOf(p)])) return uqReveal(room, roomCode);
     if (room.chaine) chaineEmit(room, roomCode); else if (room.lg) lgEmit(room, roomCode); else if (room.uq) uqEmit(room, roomCode);
 };
@@ -18046,7 +17892,7 @@ io.on('connection', socket => {
         if (ch.solo) return chaineTurn(room, roomCode, true);
         chaineTurn(room, roomCode);
     });
-    socket.on('lg_act', ({ roomCode, kind, target } = {}) => { const room = roomOf(roomCode); if (room && room.lg) lgAct(room, roomCode, me(room), String(kind || ''), target == null ? null : String(target)); });
+    socket.on('lg_act', ({ roomCode, target } = {}) => { const room = roomOf(roomCode); if (room && room.lg) lgAct(room, roomCode, me(room), String(target || '')); });
     socket.on('uq_answer', ({ roomCode, idx } = {}) => {
         const room = roomOf(roomCode), u = room && room.uq;
         if (!u || u.phase !== 'playing') return;
