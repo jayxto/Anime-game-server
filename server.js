@@ -18153,7 +18153,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-30-soutien';
+const SITE_BUILD = '2026-09-30-soutien2';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18529,7 +18529,8 @@ app.post('/api/market/buy', async (req, res) => {
 /* =====================================================================
    SOUTIEN : badge Supporter (Ko-fi + abonnement Stripe) et petites pubs
    Variables Render :
-     STRIPE_SECRET_KEY      clé secrète Stripe (sk_live_... ou sk_test_...)
+     STRIPE_API_KEY         clé restreinte Stripe (rk_...) — ou STRIPE_SECRET_KEY (sk_...)
+     STRIPE_PRICE_ID        (facultatif) prix créé dans Stripe (price_...)
      STRIPE_WEBHOOK_SECRET  secret du webhook Stripe (whsec_...)
      KOFI_TOKEN             « Verification Token » du webhook Ko-fi
    Le reste (lien Ko-fi, AdSense) se règle dans le panneau Admin.
@@ -18576,7 +18577,7 @@ async function moneyCfg() { return Object.assign({ kofiUrl: '', adsClient: '', a
 /* ---------- infos publiques ---------- */
 app.get('/api/money/config', async (req, res) => {
     const uid = authUserId(req), c = await moneyCfg(), s = uid ? await supGet(uid) : null;
-    res.json({ ok: true, kofiUrl: c.kofiUrl || '', kofiAuto: !!process.env.KOFI_TOKEN, stripe: !!process.env.STRIPE_SECRET_KEY, price: SUP_PRICE_CENTS / 100,
+    res.json({ ok: true, kofiUrl: c.kofiUrl || '', kofiAuto: !!process.env.KOFI_TOKEN, stripe: !!STRIPE_KEY(), price: SUP_PRICE_CENTS / 100,
         ads: c.adsOn && c.adsClient ? { client: c.adsClient, slot: c.adsSlot } : null,
         me: uid ? { supporter: supActive(uid), until: s ? s.until : 0, prism: s ? !!s.prism : false, sub: !!(s && s.stripeSub && !s.subCancelled), canManage: !!(s && s.stripeCustomer), pseudo: await pseudoOf(uid) } : null });
 });
@@ -18597,6 +18598,9 @@ app.post('/api/money/prism', async (req, res) => {
 });
 
 /* ---------- Stripe (sans module npm : API REST directe) ---------- */
+// Clé restreinte (rk_...) recommandée ; une clé secrète (sk_...) marche aussi
+const STRIPE_KEY = () => process.env.STRIPE_API_KEY || process.env.STRIPE_SECRET_KEY || '';
+const STRIPE_API_VERSION = '2026-08-26.dahlia';
 function stripeForm(obj, pre = '', out = []) {
     for (const [k, v] of Object.entries(obj)) {
         if (v === undefined || v === null) continue;
@@ -18606,14 +18610,14 @@ function stripeForm(obj, pre = '', out = []) {
     return out;
 }
 async function stripeApi(path, params, method = 'POST') {
-    const r = await fetch('https://api.stripe.com/v1/' + path, { method, headers: { Authorization: 'Bearer ' + process.env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' }, body: method === 'GET' ? undefined : new URLSearchParams(stripeForm(params || {})).toString() });
+    const r = await fetch('https://api.stripe.com/v1/' + path, { method, headers: { Authorization: 'Bearer ' + STRIPE_KEY(), 'Stripe-Version': STRIPE_API_VERSION, 'Content-Type': 'application/x-www-form-urlencoded' }, body: method === 'GET' ? undefined : new URLSearchParams(stripeForm(params || {})).toString() });
     const d = await r.json();
     if (!r.ok) throw new Error((d.error && d.error.message) || 'Stripe');
     return d;
 }
 app.post('/api/money/checkout', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    if (!process.env.STRIPE_SECRET_KEY) return res.json({ ok: false, error: 'Le paiement par carte n’est pas encore activé.' });
+    if (!STRIPE_KEY()) return res.json({ ok: false, error: 'Le paiement par carte n’est pas encore activé.' });
     try {
         const base = siteUrl(req), s = await supGet(uid);
         const params = {
@@ -18621,8 +18625,11 @@ app.post('/api/money/checkout', async (req, res) => {
             success_url: base + '/?supporter=ok', cancel_url: base + '/?supporter=cancel',
             line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: SUP_PRICE_CENTS, recurring: { interval: 'month' }, product_data: { name: 'Anime Game — Supporter 💎' } } } },
             metadata: { uid: String(uid) }, subscription_data: { metadata: { uid: String(uid) } },
-            allow_promotion_codes: 'true'
+            allow_promotion_codes: 'true',
+            integration_identifier: 'animegame-supporter-qkzvmtrb'
         };
+        if (s && s.stripeSub && !s.subCancelled && supActive(uid)) return res.json({ ok: false, error: 'Tu es déjà abonné : gère ton abonnement depuis la fenêtre Soutenir.' });
+        if (process.env.STRIPE_PRICE_ID) params.line_items = { 0: { quantity: 1, price: process.env.STRIPE_PRICE_ID } };
         if (s && s.stripeCustomer) params.customer = s.stripeCustomer;
         const sess = await stripeApi('checkout/sessions', params);
         res.json({ ok: true, url: sess.url });
@@ -18631,7 +18638,7 @@ app.post('/api/money/checkout', async (req, res) => {
 app.post('/api/money/portal', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const s = await supGet(uid);
-    if (!process.env.STRIPE_SECRET_KEY || !s || !s.stripeCustomer) return res.json({ ok: false, error: 'Aucun abonnement trouvé.' });
+    if (!STRIPE_KEY() || !s || !s.stripeCustomer) return res.json({ ok: false, error: 'Aucun abonnement trouvé.' });
     try { const p = await stripeApi('billing_portal/sessions', { customer: s.stripeCustomer, return_url: siteUrl(req) + '/' }); res.json({ ok: true, url: p.url }); }
     catch (e) { res.json({ ok: false, error: 'Stripe : ' + e.message }); }
 });
@@ -18651,24 +18658,42 @@ async function stripeUidOf(obj) {
     const u = await kvGet('stripecust', String(cust), null);
     return u ? (+u || u) : null;
 }
+// Fixe la fin du badge à une date précise (fin de la période payée + 2 jours de marge), sans jamais la raccourcir
+async function supUntil(uid, until, source, set = {}) {
+    const s = (await supGet(uid)) || { since: Date.now(), until: 0, prism: true, history: [] };
+    const was = s.until > Date.now();
+    s.until = Math.max(s.until || 0, until); s.source = source; Object.assign(s, set);
+    s.history = [...(s.history || []), { at: Date.now(), until, source }].slice(-30);
+    await kvSet('supporter', String(uid), s);
+    SUP_MAP.set(uid, { until: s.until, prism: !!s.prism });
+    await supRefreshCos(uid);
+    if (!was) emitUser(uid, 'supporter_on', { until: s.until, source });
+    return s;
+}
 app.post('/api/stripe/webhook', async (req, res) => {
     if (!stripeVerify(req.rawBody, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET)) return res.status(400).send('bad signature');
     const ev = req.body || {}, o = (ev.data && ev.data.object) || {};
     if (await kvGet('stripeev', String(ev.id), null)) return res.json({ received: true });
-    await kvSet('stripeev', String(ev.id), 1);
     try {
         const uid = await stripeUidOf(o);
         if (uid) {
-            if (ev.type === 'checkout.session.completed' && o.mode === 'subscription') {
-                if (o.customer) await kvSet('stripecust', String(o.customer), String(uid));
-                await supGrant(uid, 32, 'stripe', { set: { stripeCustomer: o.customer || null, stripeSub: o.subscription || null, subCancelled: false } });
-            } else if (ev.type === 'invoice.paid' && o.billing_reason && o.billing_reason !== 'subscription_create') {
-                await supGrant(uid, 32, 'stripe', { set: { subCancelled: false } });
+            if (o.customer) await kvSet('stripecust', String(o.customer), String(uid));
+            if ((ev.type === 'checkout.session.completed' || ev.type === 'checkout.session.async_payment_succeeded') && o.mode === 'subscription' && ['paid', 'no_payment_required'].includes(o.payment_status)) {
+                await supUntil(uid, Date.now() + 33 * SUP_DAY, 'stripe', { stripeCustomer: o.customer || null, stripeSub: o.subscription || null, subCancelled: false });
+            } else if (ev.type === 'invoice.paid') {
+                const line = o.lines && o.lines.data && o.lines.data[0];
+                const end = line && line.period && line.period.end ? line.period.end * 1000 : Date.now() + 31 * SUP_DAY;
+                await supUntil(uid, end + 2 * SUP_DAY, 'stripe', { stripeCustomer: o.customer || null, subCancelled: false });
+            } else if (ev.type === 'invoice.payment_failed') {
+                emitUser(uid, 'supporter_payfail', {});
+            } else if (ev.type === 'customer.subscription.updated') {
+                const s = await supGet(uid); if (s) { s.stripeSub = o.id || s.stripeSub; s.subCancelled = !!o.cancel_at_period_end || ['canceled', 'unpaid', 'incomplete_expired'].includes(o.status); await kvSet('supporter', String(uid), s); }
             } else if (ev.type === 'customer.subscription.deleted') {
                 const s = await supGet(uid); if (s) { s.subCancelled = true; await kvSet('supporter', String(uid), s); }
             }
         }
-    } catch (e) { console.error('stripe webhook', e.message); }
+        await kvSet('stripeev', String(ev.id), 1); // marqué traité seulement si tout s'est bien passé
+    } catch (e) { console.error('stripe webhook', e.message); return res.status(500).json({ error: 'retry' }); } // Stripe réessaiera
     res.json({ received: true });
 });
 
@@ -18698,7 +18723,7 @@ app.get('/api/admin/money', adminOnly(async (req, res) => {
     for (const { k, v } of await kvList('supporter')) sups.push({ uid: k, name: await pseudoOf(+k || k), until: v.until, source: v.source, active: v.until > Date.now(), sub: !!(v.stripeSub && !v.subCancelled) });
     sups.sort((a, b) => b.until - a.until);
     const kofi = (await kvList('kofi')).map(x => x.v).sort((a, b) => b.at - a.at).slice(0, 50);
-    res.json({ ok: true, cfg: await moneyCfg(), env: { stripe: !!process.env.STRIPE_SECRET_KEY, stripeHook: !!process.env.STRIPE_WEBHOOK_SECRET, kofi: !!process.env.KOFI_TOKEN }, supporters: sups, kofi, hooks: { stripe: siteUrl(req) + '/api/stripe/webhook', kofi: siteUrl(req) + '/api/kofi/webhook' } });
+    res.json({ ok: true, cfg: await moneyCfg(), env: { stripe: !!STRIPE_KEY(), stripeHook: !!process.env.STRIPE_WEBHOOK_SECRET, kofi: !!process.env.KOFI_TOKEN }, supporters: sups, kofi, hooks: { stripe: siteUrl(req) + '/api/stripe/webhook', kofi: siteUrl(req) + '/api/kofi/webhook' } });
 }));
 app.post('/api/admin/money/config', adminOnly(async (req, res) => {
     const b = req.body || {}, c = await moneyCfg();
