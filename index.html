@@ -4438,11 +4438,11 @@
             if (data.ok) {
                 sfxValide();
             } else if (data.message.indexOf('est éliminé') !== -1) {
-                if (data.message.indexOf('Trop lent') === -1 && !sfxBoard.audio.elimine) sfxBoardPlay('erreur');
-                sfxElimine();   // plus aucune vie
+                // plus aucune vie : son « éliminé » ; sinon, si c'est une mauvaise réponse, juste le FAH
+                if (sfxBoard.audio.elimine || data.message.indexOf('Trop lent') !== -1 || !sfxBoardPlay('erreur')) sfxElimine();
             } else if (data.message.indexOf('perd une vie') !== -1) {
-                if (data.message.indexOf('Trop lent') === -1) sfxBoardPlay('erreur'); // mauvaise réponse : FAH
-                sfxExplosion(); // une vie en moins
+                // mauvaise réponse : juste le FAH ; trop lent (ou pas de FAH) : petite explosion
+                if (data.message.indexOf('Trop lent') !== -1 || !sfxBoardPlay('erreur')) sfxExplosion();
             } else if (data.message.indexOf('Déjà cité') !== -1) {
                 sfxDejaCite();
             } else if (data.message.indexOf('Trop lent') !== -1) {
