@@ -17507,7 +17507,8 @@ function chaineEmit(room, code) { io.to(code).emit('chaine_state', chainePublic(
 function startChaine(room, code) {
     chaineClear(code);
     const pool = chainePool(room);
-    const ch = { pool, used: [], chain: [], order: arcShuffle(room.players.map(pkeyOf)), turn: 0, alive: {}, scores: {}, log: [], phase: 'playing', solo: room.players.length === 1 };
+    const ch = { used: [], chain: [], order: arcShuffle(room.players.map(pkeyOf)), turn: 0, alive: {}, scores: {}, log: [], phase: 'playing', solo: room.players.length === 1 };
+    Object.defineProperty(ch, 'pool', { value: pool, enumerable: false, writable: true }); // jamais envoyé aux joueurs (5000 persos)
     ch.order.forEach(k => { ch.alive[k] = true; });
     const letters = 'abcdefghijklmnopqrstuvwxyz'.split('').filter(L => chaineLetterCount(ch, L) >= 6);
     ch.letter = letters[Math.floor(Math.random() * letters.length)] || 'a';
@@ -18177,7 +18178,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-30-deco';
+const SITE_BUILD = '2026-10-01-perf';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18768,6 +18769,24 @@ app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
     if (b.kofiId) { const k = await kvGet('kofi', String(b.kofiId), null); if (k) { k.status = 'done'; k.uid = uid; await kvSet('kofi', k.id, k); } }
     res.json({ ok: true });
 }));
+
+/* =====================================================================
+   ANTI-LAG : les salons envoyés aux joueurs ne contiennent plus les données internes des modes
+   (chaîne, loup-garou, quiz), qui ont déjà leurs propres messages. Avant : jusqu'à 600 Ko par envoi.
+   ===================================================================== */
+(function () {
+    const HEAVY = new Set(['chaine', 'lg', 'uq']);
+    const EVENTS = new Set(['update_room', 'enchere_state', 'launch_reveal', 'resume_gameplay', 'rg_state', 'start_voting', 'theme_chosen', 'update_gameplay', 'prompt_end_clue_options', 'prompt_end_clue_options_undercover']);
+    const slim = r => { const o = {}; for (const k in r) if (!HEAVY.has(k) && typeof r[k] !== 'function') o[k] = r[k]; return o; };
+    const wrap = proto => {
+        if (!proto || proto === Object.prototype || proto.__slimEmit || typeof proto.emit !== 'function') return;
+        const e = proto.emit;
+        proto.emit = function (ev, ...a) { if (EVENTS.has(ev) && a[0] && typeof a[0] === 'object' && Array.isArray(a[0].players)) a[0] = slim(a[0]); return e.call(this, ev, ...a); };
+        Object.defineProperty(proto, '__slimEmit', { value: true });
+    };
+    try { wrap(Object.getPrototypeOf(io.to('__slim__'))); } catch (_) {}
+    try { wrap(require('socket.io').Socket.prototype); } catch (_) {}
+})();
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
