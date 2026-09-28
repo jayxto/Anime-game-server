@@ -18191,7 +18191,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-02-maint';
+const SITE_BUILD = '2026-10-03-guerre';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -19146,6 +19146,109 @@ io.on('connection', socket => {
         next();
     });
 });
+
+/* =====================================================================
+   GUERRE DES FANDOMS : chaque semaine, deux animes s'affrontent.
+   On choisit son camp, chaque partie rapporte des points au camp,
+   le camp gagnant reçoit une carte Collector exclusive.
+   ===================================================================== */
+const FW_WIN_COINS = 150, FW_LOSE_COINS = 50;
+function fwMatch(wk = weekKey()) {
+    const us = arcUniverses().filter(u => u !== 'pokemon').sort();
+    if (us.length < 2) return null;
+    const h = hubHash('guerre' + wk);
+    const ia = h % us.length;
+    let ib = (h >>> 8) % (us.length - 1); if (ib >= ia) ib++;
+    const side = u => {
+        const list = arcFamous(u);
+        const card = list[hubHash('fwcard' + wk + u) % Math.min(5, list.length)].display;
+        return { u, name: ARC_UNIVERSE_ANIME[u], card, img: cardImg({ u, display: card }) };
+    };
+    return { week: wk, a: side(us[ia]), b: side(us[ib]) };
+}
+function fwEndsAt(wk = weekKey()) { // lundi suivant, minuit heure de Paris
+    const [y, m, d] = wk.split('-').map(Number);
+    const t = Date.UTC(y, m - 1, d + 7);
+    return t - parisParts(t).h * 3600000;
+}
+async function fwState(wk = weekKey()) { return kvGet('fwar', wk, { a: 0, b: 0, by: {} }); }
+function fwCount(st) {
+    const n = { a: 0, b: 0 };
+    Object.values(st.by || {}).forEach(x => { if (n[x.s] !== undefined) n[x.s]++; });
+    return n;
+}
+async function fwPublic(uid) {
+    const wk = weekKey(), m = fwMatch(wk);
+    if (!m) return null;
+    const st = await fwState(wk), n = fwCount(st);
+    const me = uid && st.by[uid] ? { side: st.by[uid].s, pts: st.by[uid].p } : null;
+    const prev = await kvGet('fwrew', weekKey(hubNow() - 7 * 86400000), null);
+    return { week: wk, a: { ...m.a, pts: st.a, members: n.a }, b: { ...m.b, pts: st.b, members: n.b }, mine: me, endsAt: fwEndsAt(wk), winCoins: FW_WIN_COINS, loseCoins: FW_LOSE_COINS, last: prev && prev.result, now: hubNow() };
+}
+app.get('/api/fandom-war', async (req, res) => {
+    res.json({ ok: true, war: await fwPublic(authUserId(req)) });
+});
+app.post('/api/fandom-war/join', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const side = String((req.body || {}).side || '');
+    if (side !== 'a' && side !== 'b') return res.json({ ok: false, error: 'Camp inconnu.' });
+    const wk = weekKey(), st = await fwState(wk);
+    if (st.by[uid]) return res.json({ ok: false, error: 'Tu as déjà choisi ton camp cette semaine.' });
+    st.by[uid] = { s: side, p: 0 };
+    await kvSet('fwar', wk, st);
+    res.json({ ok: true, war: await fwPublic(uid) });
+});
+// chaque partie terminée rapporte des points au camp (x2 si on joue sur l'anime de son camp)
+const _progRecordFw = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordFw(room, mode, universe, entries);
+    try {
+        const wk = weekKey(), m = fwMatch(wk);
+        if (m) {
+            const st = await fwState(wk);
+            const us = String(universe || '').split(/[+:]/);
+            let changed = false;
+            for (const e of entries || []) {
+                const p = e.player, me = p && p.userId && st.by[p.userId];
+                if (!me) continue;
+                let pts = (10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80))) * hubMult();
+                const onSide = us.includes(m[me.s].u);
+                if (onSide) pts *= 2;
+                me.p += pts; st[me.s] += pts; changed = true;
+                io.to(p.id).emit('fw_gain', { pts, side: m[me.s].name, bonus: onSide });
+            }
+            if (changed) { await kvSet('fwar', wk, st); io.emit('fw_score', { week: wk, a: st.a, b: st.b }); }
+        }
+    } catch (err) { console.warn('[Guerre des fandoms]', err.message); }
+    return r;
+};
+// récompenses de la semaine précédente (une seule fois)
+async function fwRewards() {
+    const wk = weekKey(hubNow() - 7 * 86400000);
+    if (await kvGet('fwrew', wk, null)) return;
+    const m = fwMatch(wk);
+    if (!m) return;
+    const st = await fwState(wk);
+    const win = st.a === st.b ? ['a', 'b'] : [st.a > st.b ? 'a' : 'b'];
+    const result = { a: { name: m.a.name, pts: st.a }, b: { name: m.b.name, pts: st.b }, win, card: win.map(s => ({ name: m[s].card, anime: m[s].name, img: m[s].img })) };
+    await kvSet('fwrew', wk, { result, at: hubNow() }); // marqué avant de distribuer : jamais deux fois
+    if (!st.a && !st.b) return;
+    for (const [id, x] of Object.entries(st.by || {})) {
+        const uid = +id;
+        if (!x.p) continue;
+        if (win.includes(x.s)) {
+            const c = m[x.s];
+            await cardGive(uid, { key: `collector|guerre-${wk}|${c.u}|${c.card}` }, false);
+            await ecoAddCoins(uid, FW_WIN_COINS);
+            emitUser(uid, 'fw_win', { name: c.card, anime: c.name, img: c.img, week: 'Guerre des fandoms', coins: FW_WIN_COINS });
+        } else {
+            await ecoAddCoins(uid, FW_LOSE_COINS);
+            emitUser(uid, 'clan_event', { text: `⚔️ Guerre des fandoms : ton camp ${m[x.s].name} a perdu… +${FW_LOSE_COINS} pièces pour ta participation !` });
+        }
+    }
+}
+setInterval(() => fwRewards().catch(e => console.warn('[Guerre des fandoms]', e.message)), 10 * 60 * 1000);
+setTimeout(() => fwRewards().catch(() => {}), 45000);
 
 /* =====================================================================
    SERVEUR SOLIDE : une erreur dans un message ne fait plus rien planter,
