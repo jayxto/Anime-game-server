@@ -18,7 +18,7 @@ const io = new Server(server, {
     connectionStateRecovery: { maxDisconnectionDuration: 2 * 60 * 1000, skipMiddlewares: false }
 });
 
-app.use(express.json());
+app.use(express.json({ verify: (req, res, buf) => { if (req.originalUrl && req.originalUrl.startsWith('/api/stripe/')) req.rawBody = buf; } }));
 // Fichiers du serveur jamais servis au public (code source, config)
 app.use((req, res, next) => {
     if (/^\/(server\.js|package(-lock)?\.json|\.env|\.git|node_modules)(\/|$)/i.test(req.path)) return res.status(404).end();
@@ -18153,7 +18153,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-29-market';
+const SITE_BUILD = '2026-09-30-soutien';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18525,6 +18525,200 @@ app.post('/api/market/buy', async (req, res) => {
     } finally { MARKET_LOCK.delete(id); }
 });
 
+
+/* =====================================================================
+   SOUTIEN : badge Supporter (Ko-fi + abonnement Stripe) et petites pubs
+   Variables Render :
+     STRIPE_SECRET_KEY      clé secrète Stripe (sk_live_... ou sk_test_...)
+     STRIPE_WEBHOOK_SECRET  secret du webhook Stripe (whsec_...)
+     KOFI_TOKEN             « Verification Token » du webhook Ko-fi
+   Le reste (lien Ko-fi, AdSense) se règle dans le panneau Admin.
+   Tous les avantages sont cosmétiques : aucune pièce, aucune carte.
+   ===================================================================== */
+const SUP_PRICE_CENTS = 199, SUP_DAY = 86400000;
+const SUP_MAP = new Map(); // uid -> { until, prism }
+(async () => { try { for (const { k, v } of await kvList('supporter')) SUP_MAP.set(+k || k, { until: v.until || 0, prism: !!v.prism }); } catch (_) {} })();
+const supActive = uid => { const s = uid != null ? SUP_MAP.get(uid) : null; return !!(s && s.until > Date.now()); };
+const _cosOfSup = cosOf;
+cosOf = function (row) {
+    const o = _cosOfSup(row);
+    if (row && row.id && supActive(row.id)) { o.sup = 1; if (SUP_MAP.get(row.id).prism) o.color = 'prisme'; }
+    return o;
+};
+async function supRefreshCos(uid) {
+    if (HAS_DB) { try { await refreshUserCos(uid); return; } catch (_) {} }
+    const on = supActive(uid), prism = on && SUP_MAP.get(uid).prism;
+    const merge = c => { const o = Object.assign({}, c, { sup: on ? 1 : undefined }); if (prism) o.color = 'prisme'; else if (o.color === 'prisme') o.color = 'default'; return o; };
+    socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) s.user.cos = merge(s.user.cos); });
+    for (const [code, r] of Object.entries(rooms)) { const p = r.players.find(x => x.userId === uid); if (p) { p.cos = merge(p.cos); if (r.status === 'waiting') io.to(code).emit('update_room', r); } }
+}
+async function supGet(uid) { return await kvGet('supporter', String(uid), null); }
+async function supGrant(uid, days, source, extra = {}) {
+    const s = (await supGet(uid)) || { since: Date.now(), until: 0, prism: true, history: [] };
+    s.until = Math.max(s.until || 0, Date.now()) + days * SUP_DAY;
+    s.source = source;
+    s.history = [...(s.history || []), { at: Date.now(), days, source, ...extra }].slice(-30);
+    Object.assign(s, extra.set || {}); delete s.history[s.history.length - 1].set;
+    await kvSet('supporter', String(uid), s);
+    SUP_MAP.set(uid, { until: s.until, prism: !!s.prism });
+    await supRefreshCos(uid);
+    emitUser(uid, 'supporter_on', { until: s.until, source });
+    return s;
+}
+async function uidByPseudo(p) {
+    p = String(p || '').trim(); if (!p) return null;
+    if (HAS_DB) { try { const r = (await pool.query('SELECT id FROM users WHERE lower(pseudo)=lower($1)', [p])).rows[0]; if (r) return r.id; } catch (_) {} }
+    for (const s of io.sockets.sockets.values()) if (s.user && s.user.id && String(s.user.pseudo || '').toLowerCase() === p.toLowerCase()) return s.user.id;
+    return null;
+}
+async function moneyCfg() { return Object.assign({ kofiUrl: '', adsClient: '', adsSlot: '', adsOn: false }, await kvGet('cfg', 'money', {})); }
+
+/* ---------- infos publiques ---------- */
+app.get('/api/money/config', async (req, res) => {
+    const uid = authUserId(req), c = await moneyCfg(), s = uid ? await supGet(uid) : null;
+    res.json({ ok: true, kofiUrl: c.kofiUrl || '', kofiAuto: !!process.env.KOFI_TOKEN, stripe: !!process.env.STRIPE_SECRET_KEY, price: SUP_PRICE_CENTS / 100,
+        ads: c.adsOn && c.adsClient ? { client: c.adsClient, slot: c.adsSlot } : null,
+        me: uid ? { supporter: supActive(uid), until: s ? s.until : 0, prism: s ? !!s.prism : false, sub: !!(s && s.stripeSub && !s.subCancelled), canManage: !!(s && s.stripeCustomer), pseudo: await pseudoOf(uid) } : null });
+});
+app.get('/ads.txt', async (req, res) => {
+    const c = await moneyCfg();
+    const pub = String(c.adsClient || '').replace(/^ca-/, '');
+    if (!pub) return res.status(404).type('text/plain').send('');
+    res.type('text/plain').send(`google.com, ${pub}, DIRECT, f08c47fec0942fa0\n`);
+});
+app.post('/api/money/prism', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await supGet(uid);
+    if (!s || !supActive(uid)) return res.json({ ok: false, error: 'Réservé aux Supporters.' });
+    s.prism = !!(req.body || {}).on; await kvSet('supporter', String(uid), s);
+    SUP_MAP.set(uid, { until: s.until, prism: s.prism });
+    await supRefreshCos(uid);
+    res.json({ ok: true, prism: s.prism });
+});
+
+/* ---------- Stripe (sans module npm : API REST directe) ---------- */
+function stripeForm(obj, pre = '', out = []) {
+    for (const [k, v] of Object.entries(obj)) {
+        if (v === undefined || v === null) continue;
+        const key = pre ? `${pre}[${k}]` : k;
+        if (typeof v === 'object') stripeForm(v, key, out); else out.push([key, String(v)]);
+    }
+    return out;
+}
+async function stripeApi(path, params, method = 'POST') {
+    const r = await fetch('https://api.stripe.com/v1/' + path, { method, headers: { Authorization: 'Bearer ' + process.env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' }, body: method === 'GET' ? undefined : new URLSearchParams(stripeForm(params || {})).toString() });
+    const d = await r.json();
+    if (!r.ok) throw new Error((d.error && d.error.message) || 'Stripe');
+    return d;
+}
+app.post('/api/money/checkout', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    if (!process.env.STRIPE_SECRET_KEY) return res.json({ ok: false, error: 'Le paiement par carte n’est pas encore activé.' });
+    try {
+        const base = siteUrl(req), s = await supGet(uid);
+        const params = {
+            mode: 'subscription', client_reference_id: String(uid),
+            success_url: base + '/?supporter=ok', cancel_url: base + '/?supporter=cancel',
+            line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: SUP_PRICE_CENTS, recurring: { interval: 'month' }, product_data: { name: 'Anime Game — Supporter 💎' } } } },
+            metadata: { uid: String(uid) }, subscription_data: { metadata: { uid: String(uid) } },
+            allow_promotion_codes: 'true'
+        };
+        if (s && s.stripeCustomer) params.customer = s.stripeCustomer;
+        const sess = await stripeApi('checkout/sessions', params);
+        res.json({ ok: true, url: sess.url });
+    } catch (e) { res.json({ ok: false, error: 'Stripe : ' + e.message }); }
+});
+app.post('/api/money/portal', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await supGet(uid);
+    if (!process.env.STRIPE_SECRET_KEY || !s || !s.stripeCustomer) return res.json({ ok: false, error: 'Aucun abonnement trouvé.' });
+    try { const p = await stripeApi('billing_portal/sessions', { customer: s.stripeCustomer, return_url: siteUrl(req) + '/' }); res.json({ ok: true, url: p.url }); }
+    catch (e) { res.json({ ok: false, error: 'Stripe : ' + e.message }); }
+});
+function stripeVerify(raw, header, secret) {
+    if (!raw || !header || !secret) return false;
+    const parts = Object.fromEntries(String(header).split(',').map(x => x.split('=')).filter(x => x.length === 2 && x[0] === 't'));
+    const sigs = String(header).split(',').filter(x => x.startsWith('v1=')).map(x => x.slice(3));
+    const t = parts.t; if (!t || Math.abs(Date.now() / 1000 - +t) > 600) return false;
+    const exp = require('crypto').createHmac('sha256', secret).update(t + '.' + raw.toString('utf8')).digest('hex');
+    return sigs.some(s => s.length === exp.length && require('crypto').timingSafeEqual(Buffer.from(s), Buffer.from(exp)));
+}
+async function stripeUidOf(obj) {
+    const m = (obj && (obj.metadata || (obj.subscription_details && obj.subscription_details.metadata) || (obj.parent && obj.parent.subscription_details && obj.parent.subscription_details.metadata))) || {};
+    if (m.uid) return +m.uid || m.uid;
+    if (obj && obj.client_reference_id) return +obj.client_reference_id || obj.client_reference_id;
+    const cust = obj && obj.customer; if (!cust) return null;
+    const u = await kvGet('stripecust', String(cust), null);
+    return u ? (+u || u) : null;
+}
+app.post('/api/stripe/webhook', async (req, res) => {
+    if (!stripeVerify(req.rawBody, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET)) return res.status(400).send('bad signature');
+    const ev = req.body || {}, o = (ev.data && ev.data.object) || {};
+    if (await kvGet('stripeev', String(ev.id), null)) return res.json({ received: true });
+    await kvSet('stripeev', String(ev.id), 1);
+    try {
+        const uid = await stripeUidOf(o);
+        if (uid) {
+            if (ev.type === 'checkout.session.completed' && o.mode === 'subscription') {
+                if (o.customer) await kvSet('stripecust', String(o.customer), String(uid));
+                await supGrant(uid, 32, 'stripe', { set: { stripeCustomer: o.customer || null, stripeSub: o.subscription || null, subCancelled: false } });
+            } else if (ev.type === 'invoice.paid' && o.billing_reason && o.billing_reason !== 'subscription_create') {
+                await supGrant(uid, 32, 'stripe', { set: { subCancelled: false } });
+            } else if (ev.type === 'customer.subscription.deleted') {
+                const s = await supGet(uid); if (s) { s.subCancelled = true; await kvSet('supporter', String(uid), s); }
+            }
+        }
+    } catch (e) { console.error('stripe webhook', e.message); }
+    res.json({ received: true });
+});
+
+/* ---------- Ko-fi : le badge arrive tout seul si le pseudo est dans le message ---------- */
+app.post('/api/kofi/webhook', express.urlencoded({ extended: false, limit: '50kb' }), async (req, res) => {
+    let d = {};
+    try { d = JSON.parse((req.body && req.body.data) || '{}'); } catch (_) { return res.status(400).end(); }
+    if (!process.env.KOFI_TOKEN || d.verification_token !== process.env.KOFI_TOKEN) return res.status(403).end();
+    const tid = String(d.kofi_transaction_id || d.message_id || Date.now());
+    if (await kvGet('kofi', tid, null)) return res.status(200).end();
+    const amount = +d.amount || 0;
+    const days = d.type === 'Subscription' ? 32 : Math.max(30, Math.floor(amount / 2) * 30);
+    // on cherche un pseudo dans le message, puis dans le nom
+    const txt = `${d.message || ''} ${d.from_name || ''}`;
+    const cands = [String(d.message || '').trim(), ...txt.split(/[\s,;:!?()"'«»]+/)].filter(x => x && x.length >= 2 && x.length <= 30);
+    let uid = null;
+    for (const c of cands) { uid = await uidByPseudo(c.replace(/^@/, '')); if (uid) break; }
+    const rec = { id: tid, at: Date.now(), from: String(d.from_name || '').slice(0, 60), message: String(d.message || '').slice(0, 200), amount, currency: d.currency || 'EUR', type: d.type || 'Donation', days, uid: uid || null, status: uid ? 'done' : 'pending' };
+    await kvSet('kofi', tid, rec);
+    if (uid) await supGrant(uid, days, 'kofi', { amount });
+    res.status(200).end();
+});
+
+/* ---------- Admin ---------- */
+app.get('/api/admin/money', adminOnly(async (req, res) => {
+    const sups = [];
+    for (const { k, v } of await kvList('supporter')) sups.push({ uid: k, name: await pseudoOf(+k || k), until: v.until, source: v.source, active: v.until > Date.now(), sub: !!(v.stripeSub && !v.subCancelled) });
+    sups.sort((a, b) => b.until - a.until);
+    const kofi = (await kvList('kofi')).map(x => x.v).sort((a, b) => b.at - a.at).slice(0, 50);
+    res.json({ ok: true, cfg: await moneyCfg(), env: { stripe: !!process.env.STRIPE_SECRET_KEY, stripeHook: !!process.env.STRIPE_WEBHOOK_SECRET, kofi: !!process.env.KOFI_TOKEN }, supporters: sups, kofi, hooks: { stripe: siteUrl(req) + '/api/stripe/webhook', kofi: siteUrl(req) + '/api/kofi/webhook' } });
+}));
+app.post('/api/admin/money/config', adminOnly(async (req, res) => {
+    const b = req.body || {}, c = await moneyCfg();
+    if (b.kofiUrl !== undefined) { const u = String(b.kofiUrl).trim(); if (u && !/^https:\/\/(www\.)?ko-fi\.com\/[\w-]+\/?$/i.test(u)) return res.json({ ok: false, error: 'Lien Ko-fi invalide (ex : https://ko-fi.com/animegame).' }); c.kofiUrl = u; }
+    if (b.adsClient !== undefined) { const a = String(b.adsClient).trim(); if (a && !/^ca-pub-\d{10,20}$/.test(a)) return res.json({ ok: false, error: 'ID AdSense invalide (ex : ca-pub-1234567890123456).' }); c.adsClient = a; }
+    if (b.adsSlot !== undefined) { const s = String(b.adsSlot).trim(); if (s && !/^\d{5,20}$/.test(s)) return res.json({ ok: false, error: 'Numéro d’emplacement AdSense invalide (que des chiffres).' }); c.adsSlot = s; }
+    if (b.adsOn !== undefined) c.adsOn = !!b.adsOn;
+    await kvSet('cfg', 'money', c);
+    res.json({ ok: true, cfg: c });
+}));
+app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
+    const b = req.body || {}, days = Math.round(+b.days);
+    const uid = await uidByPseudo(b.pseudo);
+    if (!uid) return res.json({ ok: false, error: 'Joueur introuvable (compte requis).' });
+    if (days === 0) { const s = await supGet(uid); if (s) { s.until = 0; await kvSet('supporter', String(uid), s); SUP_MAP.set(uid, { until: 0, prism: !!s.prism }); await supRefreshCos(uid); } return res.json({ ok: true }); }
+    if (!(days > 0 && days <= 3650)) return res.json({ ok: false, error: 'Durée entre 1 et 3650 jours.' });
+    await supGrant(uid, days, 'admin');
+    if (b.kofiId) { const k = await kvGet('kofi', String(b.kofiId), null); if (k) { k.status = 'done'; k.uid = uid; await kvSet('kofi', k.id, k); } }
+    res.json({ ok: true });
+}));
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
