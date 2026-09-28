@@ -17461,21 +17461,30 @@ arcReveal = function (room, roomCode) {
    CHAÎNE DE PERSOS : chacun son tour, un perso qui commence par la dernière lettre du précédent
    ===================================================================== */
 const chLetters = s => normTxt(s).replace(/[^a-z]/g, '');
+// le nom complet + chaque mot du nom (prénom, nom) de 3 lettres ou plus : « Naruto », « Uzumaki » ou « Naruto Uzumaki » passent
+const chWords = (display, key) => [...new Set([key || chLetters(display), ...String(display).split(/[\s\-_.']+/).map(chLetters).filter(w => w.length >= 3)])];
+// une seule faute de frappe tolérée (Uchiha / Uchiwa, Kakachi / Kakashi)
+function chDist1(a, b) {
+    if (a === b) return true;
+    let i = 0; while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    return a.slice(i + 1) === b.slice(i + 1) || a.slice(i + 1) === b.slice(i) || a.slice(i) === b.slice(i + 1);
+}
 const chaineTimers = {};
 function chaineClear(code) { clearTimeout(chaineTimers[code]); delete chaineTimers[code]; }
 function chainePool(room) {
     const sub = String(room.subMode || 'all');
     const us = sub === 'all' ? arcUniverses() : sub.split('+').filter(u => ARC_UNIVERSE_ANIME[u]);
     const out = [];
-    (us.length ? us : arcUniverses()).forEach(u => arcFamous(u).forEach(c => out.push({ u, c, key: chLetters(c.display) })));
+    (us.length ? us : arcUniverses()).forEach(u => arcFamous(u).forEach(c => { const key = chLetters(c.display); out.push({ u, c, key, words: chWords(c.display, key) }); }));
     return out.filter(x => x.key.length >= 2);
 }
-function chaineLetterCount(ch, L) { const used = new Set(ch.used); return ch.pool.filter(x => !used.has(x.key) && x.key[0] === L).length; }
-function chaineNextLetter(ch, display) {
-    const s = chLetters(display).split('').reverse();
-    for (const L of s) if (chaineLetterCount(ch, L) >= 2) return L;
+function chaineLetterCount(ch, L) { const used = new Set(ch.used); return ch.pool.filter(x => !used.has(x.key) && x.words.some(w => w[0] === L)).length; }
+// la vraie dernière lettre du nom donné ; on ne recule d'une lettre que s'il n'existe plus AUCUN perso possible
+function chaineNextLetter(ch, said) {
+    const s = chLetters(said).split('').reverse();
+    for (const L of s) if (chaineLetterCount(ch, L) >= 1) return { L, skipped: L !== s[0] ? s[0] : null };
     const all = 'abcdefghijklmnopqrstuvwxyz'.split('').map(L => [L, chaineLetterCount(ch, L)]).sort((a, b) => b[1] - a[1]);
-    return all[0][0];
+    return { L: all[0][0], skipped: s[0] || null };
 }
 function chaineCur(room) { const ch = room.chaine; return ch ? room.players.find(p => pkeyOf(p) === ch.order[ch.turn]) || null : null; }
 function chainePublic(room) {
@@ -18047,11 +18056,14 @@ io.on('connection', socket => {
         const t = String(text || '').trim().slice(0, 60);
         if (t.length < 2) return;
         const n = chLetters(t);
+        if (n.length < 2) return;
         let cands = ch.pool.filter(x => x.key === n);
+        if (!cands.length) cands = ch.pool.filter(x => x.words.includes(n));
         if (!cands.length) cands = ch.pool.filter(x => { try { return arcNameMatches(x.u, x.c, t); } catch (_) { return false; } });
+        if (!cands.length && n.length >= 5) cands = ch.pool.filter(x => x.words.some(w => w[0] === n[0] && Math.abs(w.length - n.length) <= 1 && chDist1(w, n)));
         if (!cands.length) return socket.emit('chaine_feedback', { ok: false, msg: `❓ « ${t} » : perso inconnu` });
-        const good = cands.filter(x => x.key[0] === ch.letter);
-        if (!good.length) return socket.emit('chaine_feedback', { ok: false, msg: `🔤 ${cands[0].c.display} ne commence pas par ${ch.letter.toUpperCase()}` });
+        if (n[0] !== ch.letter) return socket.emit('chaine_feedback', { ok: false, msg: `🔤 « ${t} » ne commence pas par ${ch.letter.toUpperCase()}` });
+        const good = cands;
         const fresh = good.filter(x => !ch.used.includes(x.key));
         if (!fresh.length) return socket.emit('chaine_feedback', { ok: false, msg: `♻️ ${good[0].c.display} a déjà été donné` });
         const pick = fresh[0];
@@ -18059,10 +18071,13 @@ io.on('connection', socket => {
         const k = pkeyOf(cur);
         const fast = Date.now() - ch.startedAt;
         ch.scores[k] = (ch.scores[k] || 0) + 10 + (fast < 5000 ? 5 : 0);
-        ch.chain.push({ name: pick.c.display, anime: ARC_UNIVERSE_ANIME[pick.u], by: cur.name, img: cardImg({ u: pick.u, display: pick.c.display }) });
+        const said = t.replace(/\s+/g, ' ');
+        ch.chain.push({ name: pick.c.display, said, anime: ARC_UNIVERSE_ANIME[pick.u], by: cur.name, img: cardImg({ u: pick.u, display: pick.c.display }) });
         progTrackRound(cur, 'chaine', ARC_UNIVERSE_ANIME[pick.u], true, fast);
         cardAward(cur, pick.u, pick.c.display);
-        ch.letter = chaineNextLetter(ch, pick.c.display);
+        const nx = chaineNextLetter(ch, said);
+        ch.letter = nx.L;
+        if (nx.skipped) ch.log.push(`🔤 Plus aucun perso en ${nx.skipped.toUpperCase()} : on passe à la lettre ${nx.L.toUpperCase()}`);
         socket.emit('chaine_feedback', { ok: true });
         if (ch.solo) return chaineTurn(room, roomCode, true);
         chaineTurn(room, roomCode);
@@ -18141,8 +18156,9 @@ botTick = function (b) {
             const ch = room.chaine, cur = chaineCur(room);
             if (cur && cur.id === me.id) later('ch' + ch.turnKey, 2500, Math.min(9000, ch.turnMs - 1500), () => {
                 const ok = Math.random() < (b.skill || 0.6) + 0.2;
-                const x = ok ? ch.pool.find(c => c.key[0] === ch.letter && !ch.used.includes(c.key)) : null;
-                b.sock.emit('chaine_answer', { roomCode: b.room, text: x ? x.c.display : randomFamousName() });
+                const x = ok ? ch.pool.find(c => !ch.used.includes(c.key) && c.words.some(w => w[0] === ch.letter)) : null;
+                const w = x ? (x.key[0] === ch.letter ? x.c.display : x.words.find(w => w[0] === ch.letter)) : null;
+                b.sock.emit('chaine_answer', { roomCode: b.room, text: w || randomFamousName() });
             });
         }
         if (room.mode === 'uquiz' && room.uq && room.uq.phase === 'playing') {
@@ -18153,7 +18169,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-30-soutien2';
+const SITE_BUILD = '2026-09-30-chaine';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
