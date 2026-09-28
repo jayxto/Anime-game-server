@@ -1259,6 +1259,27 @@
         #summon.sup .sm-back{animation:smHue 3s linear infinite;}
         @keyframes smHue{to{filter:hue-rotate(360deg) drop-shadow(0 0 10px var(--c));}}
         .ch-lastl{color:var(--accent-cyan,#00f0ff);text-decoration:none;border-bottom:2px solid currentColor;}
+
+        /* ---- Décors : jamais coupés + ambiance plus belle ---- */
+        #theme-layer .dk-land{height:clamp(64px,16.67vw,300px);filter:drop-shadow(0 -8px 22px var(--dk-glow,rgba(255,255,255,.08)));}
+        #theme-layer .dk-aura{position:absolute;inset:0;background:radial-gradient(ellipse 60% 45% at var(--dk-ax,80%) var(--dk-ay,12%),var(--dk-glow,rgba(255,200,120,.10)),transparent 70%),radial-gradient(ellipse 80% 40% at 50% 105%,var(--dk-glow2,rgba(120,80,200,.12)),transparent 70%);animation:dkAura 9s ease-in-out infinite alternate;}
+        @keyframes dkAura{from{opacity:.75}to{opacity:1}}
+        #theme-layer .dk-vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 70% at 50% 45%,transparent 55%,rgba(0,0,0,.35) 100%);}
+        #theme-layer .dk-motes i{position:absolute;width:var(--s,4px);height:var(--s,4px);border-radius:50%;background:var(--dk-mote,#ffd98a);box-shadow:0 0 8px 2px var(--dk-mote,#ffd98a);opacity:0;animation:dkMote var(--d,7s) ease-in-out infinite;animation-delay:var(--dl,0s);}
+        @keyframes dkMote{0%{opacity:0;transform:translate(0,0)}25%{opacity:.8}50%{opacity:.35;transform:translate(var(--mx,12px),var(--my,-14px))}75%{opacity:.85}100%{opacity:0;transform:translate(0,0)}}
+        #theme-layer .dk-moon{animation:dkMoon 7s ease-in-out infinite alternate;}
+        @keyframes dkMoon{from{filter:brightness(.95)}to{filter:brightness(1.12)}}
+        @media (max-width:640px){#theme-layer .dk-moon{right:10px!important;top:120px!important;width:70px!important;height:70px!important;} #theme-layer .dk-bats{right:0!important;} #theme-layer .dk-motes i:nth-child(n+14){display:none;}}
+        html.theme-halloween{--dk-glow:rgba(255,140,40,.16);--dk-glow2:rgba(140,60,220,.18);--dk-mote:#ffa24d;}
+        html.theme-noel{--dk-glow:rgba(190,220,255,.14);--dk-glow2:rgba(120,200,255,.12);--dk-mote:#e8f4ff;}
+        html.theme-nouvelan{--dk-glow:rgba(255,215,90,.14);--dk-glow2:rgba(80,120,255,.14);--dk-mote:#ffe27a;--dk-ax:50%;}
+        html.theme-valentin{--dk-glow:rgba(255,90,150,.16);--dk-glow2:rgba(200,40,110,.16);--dk-mote:#ff9cc2;}
+        html.theme-hanami{--dk-glow:rgba(255,170,210,.16);--dk-glow2:rgba(190,120,220,.14);--dk-mote:#ffc4dc;}
+        html.theme-matsuri{--dk-glow:rgba(255,170,60,.16);--dk-glow2:rgba(255,80,40,.14);--dk-mote:#ffd36b;}
+        html.theme-automne{--dk-glow:rgba(255,150,60,.16);--dk-glow2:rgba(200,80,30,.16);--dk-mote:#ffb347;}
+        html.theme-tokyo{--dk-glow:rgba(255,60,210,.14);--dk-glow2:rgba(60,240,255,.16);--dk-mote:#7df7ff;--dk-ax:50%;--dk-ay:100%;}
+        html.theme-ocean{--dk-glow:rgba(255,190,110,.20);--dk-glow2:rgba(70,200,255,.16);--dk-mote:#ffe0a8;--dk-ay:70%;}
+        html.theme-ninja{--dk-glow:rgba(255,230,160,.14);--dk-glow2:rgba(80,110,200,.14);--dk-mote:#d9ff8a;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -8331,7 +8352,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-09-30-chaine';
+        const CLIENT_BUILD = '2026-09-30-deco';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10583,6 +10604,27 @@
             if (d && d.ok) mnLoad();
         }
 
+    </script>
+    <script>
+        /* ---------- Décors : lumières d'ambiance (rien ne tombe) ---------- */
+        (function () {
+            const orig = themeParticles;
+            themeParticles = function () {
+                const r = orig.apply(this, arguments);
+                const layer = document.getElementById('theme-layer');
+                if (layer && layer.innerHTML && !layer.querySelector('.dk-aura')) {
+                    let m = '';
+                    for (let i = 0; i < 26; i++) {
+                        const R = k => ((Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
+                        m += `<i style="left:${(R(1) * 100).toFixed(1)}%;top:${(8 + R(2) * 78).toFixed(1)}%;--s:${(2 + R(3) * 4).toFixed(1)}px;--d:${(5 + R(4) * 7).toFixed(1)}s;--dl:-${(R(5) * 10).toFixed(1)}s;--mx:${Math.round(R(6) * 40 - 20)}px;--my:${Math.round(R(7) * 40 - 20)}px"></i>`;
+                    }
+                    layer.insertAdjacentHTML('afterbegin', '<div class="dk-aura"></div>');
+                    layer.insertAdjacentHTML('beforeend', `<div class="dk-motes">${m}</div><div class="dk-vig"></div>`);
+                }
+                return r;
+            };
+            const l = document.getElementById('theme-layer'); if (l) { l.dataset.t = ''; themeParticles(); }
+        })();
     </script>
     <script>
 
