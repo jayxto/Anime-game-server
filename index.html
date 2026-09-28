@@ -11131,6 +11131,41 @@
         socket.on('fw_win', d => { hubModal('collector-modal', `<h3>⚔️ Ton camp a gagné la Guerre des fandoms !</h3><div class="card-grid booster" style="justify-content:center;"><div class="flip">${collectorCard(d)}</div></div><p class="tl-hint">Carte Collector exclusive de ${hubEsc(d.name)} (${hubEsc(d.anime)}) + ${d.coins} 🪙. Elle est dans ton album.</p>`); confetti(2500); });
     </script>
     <script>
+        /* ---------- FAH dès qu'on se trompe, dans tous les modes ---------- */
+        (function () {
+            const fah = () => { try { if (sfxOn) sfxErreur(); } catch (_) {} };
+            // Arcade (Pixel, Silhouette, Zoom, Qui a dit…) : réponse fausse tapée
+            let arcRound = null, arcFahRound = null;
+            socket.on('arc_state', q => { if (q) arcRound = q.round; });
+            socket.on('bt_state', q => { if (q && q.phase === 'playing') arcFahRound = null; }); // le blind test garde son FAH à la révélation
+            socket.on('arc_feedback', d => { if (d && !d.ok && String(d.message || '').startsWith('❌')) { arcFahRound = arcRound; fah(); } });
+            // pas de deuxième FAH à la révélation si on l'a déjà entendu pendant la manche
+            const origBad = fxBad;
+            fxBad = function () { if (arcFahRound !== null && arcFahRound === arcRound) return; return origBad.apply(this, arguments); };
+            // Chaîne : perso inconnu ou mauvaise lettre
+            socket.on('chaine_feedback', d => { if (d && !d.ok && /^(❓|🔤)/.test(String(d.msg || ''))) fah(); });
+            // DLE : mon perso proposé n'est pas le bon
+            let dleSeen = null;
+            socket.on('dle_state', room => {
+                const d = room && room.dle; if (!d || !d.guesses) return;
+                const key = (d.targetName || d.universeName || '') + '|' + d.guesses.length;
+                if (key === dleSeen) return;
+                const first = dleSeen === null; dleSeen = key;
+                const last = d.guesses[d.guesses.length - 1];
+                if (!first && last && last.playerId === socket.id && !last.correct) fah();
+            });
+            // Citations : ma réponse est fausse
+            let quoteSeen = null;
+            socket.on('quote_state', q => {
+                if (!q || !q.lastResult) return;
+                const key = (q.round || '') + '|' + (q.attempts || 0) + '|' + q.lastResult.answer;
+                if (key === quoteSeen) return;
+                quoteSeen = key;
+                if (!q.lastResult.correct && q.lastResult.playerName === getUsername()) fah();
+            });
+        })();
+    </script>
+    <script>
         /* ---------- Écran « mise à jour en cours » (site fermé par l'admin) ---------- */
         (function () {
             function render() {
