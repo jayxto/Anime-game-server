@@ -1133,6 +1133,95 @@
         .lg-bars-txt small{font-weight:600;color:#c4b5fd;}
         @keyframes lgBarsIn{from{transform:translateY(-100%);}to{transform:none;}}
         .lg-chat{position:relative;z-index:21;}
+        .atk-card{background:#101018;border:2px solid #ff9a3c;border-radius:16px;padding:22px 18px;text-align:center;max-width:560px;margin:0 auto;}
+        .atk-ico{font-size:2.4rem;} .atk-desc{font-size:1.2rem;font-weight:700;margin:8px 0;line-height:1.4;} .atk-anime{color:var(--accent-cyan);font-weight:800;font-size:.9rem;}
+        .atk-ans{margin-top:10px;font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow);}
+        #h3-block{position:fixed;inset:0;z-index:20000;background:rgba(5,5,10,.94);display:flex;align-items:center;justify-content:center;padding:16px;}
+        .h3-block-box{background:#14141f;border:2px solid var(--accent-pink);border-radius:16px;padding:24px;text-align:center;max-width:420px;}
+        #h3-announce{position:fixed;top:0;left:0;right:0;z-index:10003;display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 12px;font-weight:800;font-size:.9rem;background:linear-gradient(90deg,#ffb300,#ff5a2a);color:#111;box-shadow:0 2px 12px rgba(0,0,0,.5);}
+        #h3-announce.k-event{background:linear-gradient(90deg,#00c2ff,#b77bff);color:#fff;} #h3-announce button{background:rgba(0,0,0,.25);border:none;border-radius:6px;color:inherit;cursor:pointer;padding:2px 8px;}
+        .h3-report{margin-top:8px;background:none;border:1px solid #44446a;color:var(--text-muted);border-radius:9px;padding:6px 12px;cursor:pointer;font-size:.8rem;}
+        .h3-evt-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;} .h3-evt-row b{flex:1;min-width:150px;text-align:left;} .h3-evt-row .btn-action{width:auto;margin:0;padding:8px 14px;}
+        .h3-evt-row select,#h3-admin select{background:#101018;color:#fff;border:1px solid #3a3a55;border-radius:8px;padding:6px;}
+        #h3-admin .friend-row.closed{opacity:.5;} #h3-admin button.danger{background:#b91c1c;color:#fff;}
+        .h3-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;} .h3-kpis div{background:#101018;border-radius:10px;padding:10px;text-align:center;} .h3-kpis b{display:block;font-size:1.4rem;color:var(--accent-yellow);} .h3-kpis small{color:var(--text-muted);font-size:.72rem;}
+        .h3-bars{display:flex;align-items:flex-end;gap:3px;height:150px;padding:6px 0 30px;} .h3-bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;position:relative;}
+        .h3-bar i{display:block;width:100%;background:linear-gradient(180deg,var(--accent-cyan),#1d4ed8);border-radius:4px 4px 0 0;min-height:2px;}
+        .h3-bar small{position:absolute;bottom:-18px;font-size:.6rem;color:var(--text-muted);} .h3-bar b{position:absolute;top:-2px;font-size:.6rem;opacity:0;} .h3-bar:hover b{opacity:1;}
+        .h3-hbars>div{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;font-size:.8rem;margin:3px 0;} .h3-hbars i{display:block;height:10px;background:linear-gradient(90deg,var(--accent-pink),var(--accent-yellow));border-radius:99px;}
+        .h3-news-btn{background:#1d1d2e;border:1px solid #3a3a55;color:#fff;border-radius:99px;padding:6px 14px;font-weight:700;cursor:pointer;margin:0 auto 10px;display:inline-flex;align-items:center;gap:4px;}
+        .h3-news{background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px 14px;margin:8px 0;text-align:left;} .h3-news-h{display:flex;justify-content:space-between;} .h3-news-h small{color:var(--text-muted);} .h3-news ul{margin:6px 0 0 18px;font-size:.88rem;}
+        @media (max-width:560px){.h3-kpis{grid-template-columns:1fr 1fr;}.h3-hbars>div{grid-template-columns:100px 1fr 34px;}}
+
+        /* ---- Hôtel des ventes ---- */
+        .mk-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px;}
+        .mk-tabs button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:inherit;padding:7px 12px;border-radius:10px;cursor:pointer;font-weight:700;}
+        .mk-tabs button.on{background:var(--primary,#00f0ff);color:#000;border-color:transparent;}
+        .mk-filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+        .mk-filters input,.mk-filters select{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.18);color:inherit;border-radius:8px;padding:7px 9px;}
+        .mk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+        .mk-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;}
+        .mk-item.shiny{box-shadow:0 0 14px rgba(255,122,224,.45);}
+        .mk-meta{font-size:.78rem;opacity:.8;line-height:1.3;}
+        .mk-price{font-weight:900;color:#ffd700;font-size:1.05rem;}
+        .mk-meta{display:flex;flex-direction:column;gap:4px;align-items:center;width:100%;}
+        .mk-meta small{display:block;}
+        .mk-item button{width:100%;background:var(--primary,#00f0ff);color:#000;border:none;border-radius:8px;padding:7px;font-weight:800;cursor:pointer;}
+        .mk-item button:disabled{opacity:.35;cursor:not-allowed;}
+        .mk-item button.armed{background:#ff2a5f!important;color:#fff!important;animation:mkPulse .6s infinite alternate;}
+        @keyframes mkPulse{to{transform:scale(1.04);}}
+        .mk-sellbox{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+        .mk-pick{max-height:320px;overflow:auto;}
+        .mk-pick .on{outline:2px solid var(--primary,#00f0ff);}
+        /* ---- Scène d'invocation ---- */
+        #summon{position:fixed;inset:0;z-index:10050;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;--c:#d6e4ff;}
+        #summon .sm-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c) 25%,#050510) 0%,#050510 60%,#000 100%);opacity:0;transition:opacity .5s;}
+        #summon.charge .sm-bg{opacity:1;}
+        #summon .sm-circle{position:absolute;width:min(78vw,78vh);height:min(78vw,78vh);left:50%;top:50%;transform:translate(-50%,-50%) scale(.2);opacity:0;transition:transform 1.4s cubic-bezier(.2,.9,.3,1),opacity .6s;filter:drop-shadow(0 0 10px var(--c)) drop-shadow(0 0 30px var(--c));pointer-events:none;}
+        #summon .sm-circle circle,#summon .sm-circle path{fill:none;stroke:var(--c);stroke-width:2;}
+        #summon .sm-runes text{fill:var(--c);font-size:16px;font-family:serif;}
+        #summon.charge .sm-circle{transform:translate(-50%,-50%) scale(1);opacity:1;}
+        #summon.show .sm-circle{opacity:.25;transform:translate(-50%,-50%) scale(1.25);}
+        #summon .sm-rot{transform-origin:150px 150px;animation:smRot 10s linear infinite;}
+        #summon .sm-rot2{transform-origin:150px 150px;animation:smRot 6s linear infinite reverse;}
+        #summon.charge:not(.show) .sm-rot{animation-duration:2.5s;}
+        #summon.charge:not(.show) .sm-rot2{animation-duration:1.5s;}
+        @keyframes smRot{to{transform:rotate(360deg);}}
+        #summon .sm-beam{position:absolute;left:50%;top:0;bottom:0;width:0;transform:translateX(-50%);background:linear-gradient(transparent,var(--c),transparent);opacity:0;transition:width .4s,opacity .4s;filter:blur(6px);pointer-events:none;}
+        #summon.charge .sm-beam{width:14px;opacity:.7;}
+        #summon.burst .sm-beam{width:260px;opacity:.9;}
+        #summon.show .sm-beam{width:0;opacity:0;}
+        #summon .sm-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;}
+        #summon.burst .sm-flash{animation:smFlash .7s ease-out forwards;}
+        @keyframes smFlash{0%{opacity:0}25%{opacity:.95}100%{opacity:0}}
+        #summon .sm-txt{position:relative;z-index:2;color:#fff;font-weight:900;font-size:1.3rem;letter-spacing:1px;text-shadow:0 0 12px var(--c);opacity:0;transition:opacity .4s;margin-bottom:14px;text-align:center;padding:0 16px;}
+        #summon.charge .sm-txt{opacity:1;animation:smPulse 1s infinite alternate;}
+        #summon.show .sm-txt{opacity:0;height:0;margin:0;overflow:hidden;animation:none;}
+        @keyframes smPulse{to{transform:scale(1.06);}}
+        #summon.shake{animation:smShake .45s;}
+        @keyframes smShake{20%{transform:translate(-8px,4px)}40%{transform:translate(7px,-5px)}60%{transform:translate(-5px,3px)}80%{transform:translate(4px,-2px)}}
+        #summon .sm-cards{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:94vw;perspective:1000px;opacity:0;pointer-events:none;}
+        #summon.show .sm-cards{opacity:1;pointer-events:auto;}
+        #summon .sm-card{width:150px;height:235px;}
+        #summon.show .sm-card{animation:smIn .5s both;}
+        @keyframes smIn{from{transform:translateY(40px) scale(.6);opacity:0}}
+        #summon .sm-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s;}
+        #summon .sm-card.flip .sm-inner{transform:rotateY(180deg);}
+        #summon .sm-back,#summon .sm-front{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+        #summon .sm-back{background:linear-gradient(135deg,#1a1033,#0b0b1a);border:2px solid var(--c);box-shadow:0 0 14px var(--c);font-size:2.6rem;}
+        #summon .sm-front{transform:rotateY(180deg);}
+        #summon .sm-front>*{width:100%;height:100%;margin:0;}
+        #summon .sm-card.tease .sm-back{animation:smTease .3s infinite alternate;}
+        @keyframes smTease{from{transform:scale(1);box-shadow:0 0 14px var(--c)}to{transform:scale(1.08);box-shadow:0 0 40px var(--c),0 0 80px var(--c)}}
+        #summon .sm-card.wow .sm-front{box-shadow:0 0 25px var(--c),0 0 60px var(--c);animation:smWow 1.2s ease-out;}
+        @keyframes smWow{0%{filter:brightness(3)}100%{filter:brightness(1)}}
+        #summon .sm-bottom{position:relative;z-index:2;margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transition:opacity .4s;}
+        #summon.show .sm-bottom{opacity:1;}
+        #summon .sm-skip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;padding:9px 18px;border-radius:999px;font-weight:800;cursor:pointer;}
+        #summon.done .sm-skip{background:var(--c);color:#000;border-color:transparent;}
+        #summon .sm-sum{color:#fff;font-weight:700;min-height:1.2em;text-shadow:0 1px 4px #000;}
+        @media (max-width:600px){#summon .sm-card{width:104px;height:170px;}#summon .sm-cards{gap:8px;}}
+        @media (prefers-reduced-motion:reduce){#summon *{animation-duration:.01s!important;transition-duration:.01s!important;}}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -1375,7 +1464,7 @@
             <li><b>Quiz des joueurs</b> : crée ton propre quiz anime et joue ceux de la communauté.</li>
             <li><b>Duel 1v1 classé</b> : affronte un adversaire à ta hauteur et monte de Bronze à Hokage.</li>
             <li><b>Clans, pass de saison et boss du serveur</b> : joue en équipe, débloque des récompenses et abats le boss du jour avec toute la communauté.</li>
-            <li><b>Mini-jeux</b> : Pixel, Zoom extrême, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
+            <li><b>Mini-jeux</b> : Pixel, Devine l'attaque, Zoom extrême, Silhouette, Emoji, 4 images 1 anime, Tournoi, Rolland Garros, Enchères et plus encore.</li>
         </ul>
         <p>Plus de 30 animes : Naruto, One Piece, Bleach, Hunter x Hunter, L'Attaque des Titans, Demon Slayer, Jujutsu Kaisen, Dragon Ball, Chainsaw Man, JoJo, Pokémon, Solo Leveling… Gagne des pièces, collectionne les cartes de tes persos préférés et débloque des titres.</p>
     </section>
@@ -1486,6 +1575,7 @@
                     <div class="arc-menu-grid">
                         <button class="arc-game-btn" onclick="openArcadeGame('pixel')"><span class="arc-ico">🖼️</span><b>Pixel Anime</b><span>Image ultra pixelisée qui se précise → devine le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('silhouette')"><span class="arc-ico">👤</span><b>Silhouette</b><span>Ombre noire d'un perso → trouve son nom</span></button>
+                        <button class="arc-game-btn" onclick="openArcadeGame('attaque')"><span class="arc-ico">💥</span><b>Devine l'attaque</b><span>On lit ce que fait la technique → trouve son nom (Rasengan, Kamehameha…)</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('zoom')"><span class="arc-ico">🔍</span><b>Zoom extrême</b><span>L'image part d'un détail et dézoome petit à petit → trouve le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('emoji')"><span class="arc-ico">😀</span><b>Emoji Anime</b><span>🍥 🦊 🍃 → devine l'anime ou le perso</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('quatre')"><span class="arc-ico">🧩</span><b>4 images = 1 anime</b><span>Les images arrivent une à une → trouve l'anime</span></button>
@@ -2221,7 +2311,7 @@
 
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
-            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button></div>
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -2232,6 +2322,7 @@
             <div id="eco-clan" style="display:none;"></div>
             <div id="eco-stats" style="display:none;"></div>
             <div id="eco-deck" style="display:none;"></div>
+            <div id="eco-market" style="display:none;"></div>
         </div>
     </section>
 
@@ -8202,7 +8293,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-09-28-lg3';
+        const CLIENT_BUILD = '2026-09-29-market';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -9956,6 +10047,353 @@
 
 </script>
 <script>
+        /* =====================================================================
+           HUB 3 : Devine l'attaque, évènements, modération, annonces, stats, nouveautés
+           ===================================================================== */
+        ARC_UI.attaque = { title: '💥 DEVINE L’ATTAQUE', sub: 'On lit ce que fait la technique : trouve son nom parmi 4 propositions', universe: false };
+        // rendu de la question (texte de la technique)
+        (function () {
+            const orig = arcRenderStage;
+            arcRenderStage = function (q) {
+                if (q && q.game === 'attaque' && q.phase !== 'loading' && q.stage && q.stage.attack) {
+                    const stage = document.getElementById('arc-stage');
+                    const key = 'atk|' + q.round + '|' + q.phase;
+                    if (arcStageKey === key) return;
+                    arcStageKey = key;
+                    const a = q.stage.attack;
+                    stage.innerHTML = `<div class="atk-card"><div class="atk-ico">💥</div><div class="atk-desc">« ${v7esc(a.desc)} »</div><div class="atk-anime">${v7esc(a.anime)}</div>${q.phase !== 'playing' && q.answer ? `<div class="atk-ans">${v7esc(q.answer)}</div>` : ''}</div>`;
+                    return;
+                }
+                return orig.apply(this, arguments);
+            };
+        })();
+
+        /* ---------- bannissement / annonces / évènements ---------- */
+        function h3Overlay(html) {
+            let o = document.getElementById('h3-block'); if (!o) { o = document.createElement('div'); o.id = 'h3-block'; document.body.appendChild(o); }
+            o.innerHTML = `<div class="h3-block-box">${html}</div>`;
+        }
+        socket.on('connect_error', e => {
+            if (!e || e.message !== 'banned') return;
+            const d = e.data || {};
+            h3Overlay(`<div style="font-size:3rem;">🚫</div><h2>Tu es banni</h2><p>${d.until ? `Jusqu’au ${new Date(d.until).toLocaleString('fr-FR')}` : 'Définitivement'}${d.reason ? `<br>Raison : ${v7esc(d.reason)}` : ''}</p>`);
+            try { socket.io.opts.reconnection = false; } catch (_) {}
+        });
+        socket.on('banned_now', d => h3Overlay(`<div style="font-size:3rem;">🚫</div><h2>Banni</h2><p>${v7esc(d.message || '')}</p>`));
+        socket.on('announce', d => {
+            if (!d || !d.text) return;
+            let b = document.getElementById('h3-announce');
+            if (!b) { b = document.createElement('div'); b.id = 'h3-announce'; document.body.appendChild(b); }
+            b.className = 'k-' + (d.kind || 'admin');
+            b.innerHTML = `<span>📢 ${v7esc(d.text)}</span><button onclick="this.parentNode.remove()">✕</button>`;
+            clearTimeout(b._t); b._t = setTimeout(() => b.remove(), Math.max(15000, Math.min(3600000, (d.until || 0) - Date.now()) || 60000));
+            if (!d.quiet) toast('📢 ' + v7esc(d.text), '#ffd700');
+        });
+        const h3 = { event: null };
+        socket.on('site_event', e => { h3.event = e; h3RenderEvent(); });
+        socket.on('surprise_open', d => toast(`⚡ <b>Tournoi surprise !</b> Départ dans quelques minutes <button class="toast-btn" onclick="h3JoinSurprise('${d.code}')">Rejoindre</button>`, '#00ff88'));
+        function h3JoinSurprise(code) {
+            if (currentRoomCode && currentRoomCode !== code) socket.emit('leave_room', { roomCode: currentRoomCode });
+            switchTab('mode'); currentRoomCode = code;
+            socket.emit('join_room', { roomCode: code, username: getUsername(), mode: 'arcade', subMode: 'tournoi' });
+        }
+        function h3RenderEvent() {
+            const box = document.getElementById('hub-home'); if (!box) return;
+            box.querySelectorAll('.h3-evt').forEach(x => x.remove());
+            const e = h3.event; if (!e) return;
+            let html = '';
+            if (e.xp2Until) html += `<div class="hub-weekend h3-evt" style="background:linear-gradient(90deg,#00c2ff,#b77bff,#ff4d8d);">🎉 <b>ÉVÈNEMENT XP x2</b> : pièces et XP doublées encore <b data-hub-left="${e.xp2Until}">${hubFmtLeft(e.xp2Until - Date.now())}</b></div>`;
+            if (e.surprise) html += `<div class="hub-card h3-evt weekly"><div class="hb-main"><div class="hb-h">⚡ Tournoi surprise</div><div class="hb-weekly">Départ dans <b data-hub-left="${e.surprise.startAt}">${hubFmtLeft(e.surprise.startAt - Date.now())}</b> • ${e.surprise.players} inscrit${e.surprise.players > 1 ? 's' : ''} • 300 🪙 pour le vainqueur</div><div class="hb-btns"><button class="go" onclick="h3JoinSurprise('${e.surprise.code}')">⚡ Rejoindre</button></div></div></div>`;
+            const t = document.createElement('div'); t.innerHTML = html;
+            [...t.children].reverse().forEach(c => box.prepend(c));
+        }
+        (function () { const orig = hubRenderHome; hubRenderHome = function () { const r = orig.apply(this, arguments); h3RenderEvent(); return r; }; })();
+
+        /* ---------- signaler un joueur ---------- */
+        let h3LastRoom = null;
+        socket.on('update_room', room => { if (room && room.code === currentRoomCode) h3LastRoom = room; h3ReportBtn(); });
+        function h3ReportBtn() {
+            const wr = document.getElementById('waiting-room'); if (!wr) return;
+            let b = document.getElementById('h3-report');
+            if (!b) { b = document.createElement('button'); b.id = 'h3-report'; b.className = 'h3-report'; b.textContent = '🚩 Signaler un joueur'; b.onclick = () => h3Report(); const list = document.getElementById('waiting-players-list'); if (list) list.parentNode.insertBefore(b, list.nextSibling); }
+        }
+        function h3Report(players) {
+            const list = (players || (h3LastRoom && h3LastRoom.players) || []).filter(p => p.id !== socket.id);
+            if (!list.length) return toast('Personne à signaler ici.', 'var(--accent-pink)');
+            hubModal('h3-rep', `<h3>🚩 Signaler un joueur</h3><p class="tl-hint">L’admin verra ton signalement (insultes, triche, pseudo choquant…).</p>
+                <select id="h3-rep-p" class="v7-input">${list.map(p => `<option value="${v7esc(p.id)}">${v7esc(p.name)}</option>`).join('')}</select>
+                <input id="h3-rep-r" class="v7-input" maxlength="200" placeholder="Raison (ex : insultes dans le chat)">
+                <button class="btn-action" onclick="socket.emit('report_player',{roomCode:currentRoomCode,playerId:document.getElementById('h3-rep-p').value,reason:document.getElementById('h3-rep-r').value});document.getElementById('h3-rep').remove()">Envoyer</button>`);
+        }
+        (function () { // bouton dans le Loup-garou aussi
+            const orig = h2Head;
+            h2Head = function (title, sub, q) { const html = orig.apply(this, arguments); return q && q.players ? html.replace('<div class="h2-hbtns">', `<div class="h2-hbtns"><button title="Signaler un joueur" onclick='h3Report(${JSON.stringify(q.players.map(p => ({ id: p.id, name: p.name }))).replace(/'/g, '&#39;')})'>🚩</button>`) : html; };
+        })();
+
+        /* ---------- ADMIN : évènements, modération, annonces, stats ---------- */
+        (function () {
+            const adm = document.getElementById('admin'); if (!adm || document.getElementById('h3-admin')) return;
+            const wrap = document.createElement('div'); wrap.id = 'h3-admin';
+            wrap.innerHTML = `
+            <div class="opt-panel"><h2>⚡ Lancer un évènement</h2><p class="tl-hint" style="text-align:left;">S’applique tout de suite à tout le site, avec une annonce pour tout le monde.</p>
+                <div class="h3-evt-row"><b>🎉 XP et pièces x2</b><select id="h3-xp-h"><option value="1">1 h</option><option value="2" selected>2 h</option><option value="6">6 h</option><option value="24">24 h</option><option value="0">Arrêter</option></select><button class="btn-action" onclick="h3Event('xp2',{hours:+document.getElementById('h3-xp-h').value})">Lancer</button></div>
+                <div class="h3-evt-row"><b>👹 Boss spécial</b><select id="h3-boss-hp"><option value="2000">2 000 PV</option><option value="3000" selected>3 000 PV</option><option value="6000">6 000 PV</option><option value="12000">12 000 PV</option></select><button class="btn-action" onclick="h3Event('boss',{hp:+document.getElementById('h3-boss-hp').value})">Lancer</button></div>
+                <div class="h3-evt-row"><b>⚡ Tournoi surprise</b><select id="h3-sur-m"><option value="2">dans 2 min</option><option value="5" selected>dans 5 min</option><option value="10">dans 10 min</option></select><button class="btn-action" onclick="h3Event('surprise',{minutes:+document.getElementById('h3-sur-m').value})">Lancer</button></div>
+                <div id="h3-evt-state" class="tl-hint" style="text-align:left;"></div></div>
+            <div class="opt-panel"><h2>🛡️ Modération</h2>
+                <div class="ch-in"><input id="h3-mod-q" class="v7-input" placeholder="🔎 Chercher un joueur (pseudo)" onkeydown="if(event.key==='Enter')h3ModSearch()"><button onclick="h3ModSearch()">Chercher</button></div>
+                <input id="h3-mod-reason" class="v7-input" maxlength="120" placeholder="Raison pour muter / bannir (facultatif)">
+                <div id="h3-mod-search"></div><div id="h3-mod"></div></div>
+            <div class="opt-panel"><h2>📢 Annonces programmées</h2>
+                <textarea id="h3-ann-t" class="v7-input" maxlength="300" rows="2" placeholder="Ex : Grosse mise à jour ce soir à 21 h : nouveau mode !"></textarea>
+                <div class="h3-evt-row"><input id="h3-ann-at" type="datetime-local" class="v7-input"><select id="h3-ann-min"><option value="5">affichée 5 min</option><option value="15" selected>15 min</option><option value="60">1 h</option><option value="240">4 h</option></select><button class="btn-action" onclick="h3AnnAdd()">Programmer</button></div>
+                <div id="h3-ann"></div></div>
+            <div class="opt-panel"><h2>📊 Stats du site</h2><div id="h3-stats"><p class="tl-hint">Chargement…</p></div></div>`;
+            adm.appendChild(wrap);
+            const orig = window.switchTab;
+            window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'admin') h3AdminLoad(); return r; };
+        })();
+        function h3AdminLoad() { h3ModLoad(); h3AnnLoad(); h3StatsLoad(); v7get('/api/event').then(e => { if (e && e.ok) h3EvtState(e); }); }
+        function h3EvtState(e) {
+            const el = document.getElementById('h3-evt-state'); if (!el) return;
+            const L = [];
+            if (e.xp2Until) L.push(`🎉 XP x2 actif jusqu’à ${new Date(e.xp2Until).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`);
+            if (e.surprise) L.push(`⚡ Tournoi surprise #${v7esc(e.surprise.code)} à ${new Date(e.surprise.startAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} (${e.surprise.players} inscrits)`);
+            el.innerHTML = L.length ? L.join('<br>') : 'Aucun évènement en cours.';
+        }
+        async function h3Event(type, extra) {
+            const d = await v7post('/api/admin/event', Object.assign({ type }, extra || {}));
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible (server.js à jour ?)'), 'var(--accent-pink)');
+            toast('⚡ Évènement lancé !', '#00ff88'); h3EvtState(d.event);
+        }
+        const H3_DUR = [[1, '1 h'], [24, '24 h'], [168, '7 jours'], [0, 'Définitif']];
+        function h3ModRow(p) {
+            const k = v7esc(p.key), n = v7esc(p.name);
+            return `<div class="friend-row"><span><b>${n}</b> ${p.online ? '<span class="fs on">● en ligne</span>' : ''}${p.guest ? ' <small>(invité)</small>' : ''}${p.muted ? ' 🔇' : ''}${p.banned ? ' 🚫' : ''}</span>
+                <span class="pl-btns"><select id="dur-${k}">${H3_DUR.map(([h, l]) => `<option value="${h}">${l}</option>`).join('')}</select>
+                ${p.muted ? `<button onclick="h3Mod('unmute','${k}','${n}')">🔊 Démuter</button>` : `<button onclick="h3Mod('mute','${k}','${n}')">🔇 Muter</button>`}
+                ${p.banned ? `<button onclick="h3Mod('unban','${k}','${n}')">✅ Débannir</button>` : `<button class="danger" onclick="h3Mod('ban','${k}','${n}')">🚫 Bannir</button>`}</span></div>`;
+        }
+        async function h3ModSearch() {
+            const q = document.getElementById('h3-mod-q').value.trim();
+            const d = await v7get('/api/admin/players?q=' + encodeURIComponent(q));
+            const box = document.getElementById('h3-mod-search'); if (!box || !d) return;
+            box.innerHTML = d.players.length ? d.players.map(h3ModRow).join('') : '<p class="tl-hint">Aucun joueur trouvé.</p>';
+        }
+        async function h3Mod(action, key, name, report) {
+            const sel = document.getElementById('dur-' + key);
+            const ri = document.getElementById('h3-mod-reason'); const reason = action === 'mute' || action === 'ban' ? ((ri && ri.value) || '') : '';
+            const d = await v7post('/api/admin/mod', { action, key, name, hours: sel ? +sel.value : 24, reason, report });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast('✅ Fait', '#00ff88'); h3ModLoad(); if (document.getElementById('h3-mod-q').value) h3ModSearch();
+        }
+        async function h3ModLoad() {
+            const d = await v7get('/api/admin/mod'); const box = document.getElementById('h3-mod'); if (!box || !d || !d.ok) return;
+            const open = d.reports.filter(r => r.status === 'open');
+            box.innerHTML = `<h3 class="adm-h">🚩 Signalements (${open.length} en attente)</h3>${d.reports.length ? d.reports.slice(0, 30).map(r => `<div class="friend-row ${r.status === 'open' ? '' : 'closed'}"><span><b>${v7esc(r.target)}</b> signalé par ${v7esc(r.by)} • ${v7esc(r.mode)} • ${new Date(r.at).toLocaleString('fr-FR')}<br><small>${v7esc(r.reason || 'Pas de raison')}</small></span>
+                <span class="pl-btns">${r.status === 'open' ? `<button onclick="h3Mod('mute','${v7esc(r.targetKey)}','${v7esc(r.target)}')">🔇</button><button class="danger" onclick="h3Mod('ban','${v7esc(r.targetKey)}','${v7esc(r.target)}')">🚫</button><button onclick="v7post('/api/admin/mod',{action:'close',key:'u0',report:'${r.id}'}).then(h3ModLoad)">✔ Traité</button>` : '<small>traité</small>'}</span></div>`).join('') : '<p class="tl-hint">Aucun signalement.</p>'}
+                <h3 class="adm-h">🔇 Muets</h3>${d.muted.length ? d.muted.map(m => h3ModRow({ key: m.key, name: m.name, muted: true })).join('') : '<p class="tl-hint">Personne.</p>'}
+                <h3 class="adm-h">🚫 Bannis</h3>${d.banned.length ? d.banned.map(m => h3ModRow({ key: m.key, name: m.name, banned: true })).join('') : '<p class="tl-hint">Personne.</p>'}`;
+        }
+        async function h3AnnLoad() {
+            const d = await v7get('/api/admin/announce'); const box = document.getElementById('h3-ann'); if (!box || !d || !d.ok) return;
+            const at = document.getElementById('h3-ann-at'); if (at && !at.value) { const t = new Date(Date.now() + 3600000); t.setMinutes(0, 0, 0); at.value = new Date(t - t.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
+            box.innerHTML = d.list.length ? d.list.slice().reverse().map(a => `<div class="friend-row"><span>${a.sent ? '✅' : '⏰'} <b>${new Date(a.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</b> • ${v7esc(a.text)}</span><span class="pl-btns"><button onclick="v7post('/api/admin/announce',{delete:'${a.id}'}).then(h3AnnLoad)">🗑️</button></span></div>`).join('') : '<p class="tl-hint">Aucune annonce programmée.</p>';
+        }
+        async function h3AnnAdd() {
+            const v = document.getElementById('h3-ann-at').value;
+            const d = await v7post('/api/admin/announce', { text: document.getElementById('h3-ann-t').value, at: v ? new Date(v).toISOString() : '', minutes: +document.getElementById('h3-ann-min').value });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            document.getElementById('h3-ann-t').value = ''; toast('📢 Annonce programmée', '#00ff88'); h3AnnLoad();
+        }
+        function h3Bars(rows, label, val, fmt) {
+            const max = Math.max(1, ...rows.map(val));
+            return `<div class="h3-bars">${rows.map(r => `<div class="h3-bar" title="${v7esc(label(r))} : ${val(r)}"><i style="height:${Math.round(100 * val(r) / max)}%"></i><small>${v7esc(fmt ? fmt(r) : label(r))}</small><b>${val(r)}</b></div>`).join('')}</div>`;
+        }
+        async function h3StatsLoad() {
+            const d = await v7get('/api/admin/stats2'); const box = document.getElementById('h3-stats'); if (!box) return;
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Stats indisponibles (server.js à jour ?).</p>'; return; }
+            const hours = Array.from({ length: 24 }, (_, h) => ({ h, n: (d.hours.find(x => x.h === h) || {}).n || 0 }));
+            const peak = hours.slice().sort((a, b) => b.n - a.n)[0];
+            box.innerHTML = `<div class="h3-kpis"><div><b>${d.online}</b><small>connectés maintenant</small></div><div><b>${d.perDay.length ? d.perDay[d.perDay.length - 1].players : 0}</b><small>joueurs aujourd’hui</small></div><div><b>${d.perDay.reduce((a, x) => a + x.games, 0)}</b><small>parties (14 j)</small></div><div><b>${peak && peak.n ? peak.h + ' h' : '—'}</b><small>heure de pointe</small></div></div>
+                <h3 class="adm-h">👥 Joueurs par jour (14 jours)</h3>${d.perDay.length ? h3Bars(d.perDay, r => r.d, r => r.players, r => r.d.slice(8) + '/' + r.d.slice(5, 7)) : '<p class="tl-hint">Pas encore de données.</p>'}
+                <h3 class="adm-h">🎮 Modes les plus joués (30 jours)</h3>${d.modes.length ? `<div class="h3-hbars">${d.modes.map(m => `<div><span>${v7esc(m.label)}</span><i style="width:${Math.round(100 * m.n / d.modes[0].n)}%"></i><b>${m.n}</b></div>`).join('')}</div>` : '<p class="tl-hint">Pas encore de données.</p>'}
+                <h3 class="adm-h">🕐 Heures de pointe (30 jours, heure de Paris)</h3>${h3Bars(hours, r => r.h + ' h', r => r.n, r => r.h % 3 === 0 ? r.h + 'h' : '')}`;
+        }
+
+        /* ---------- Nouveautés ---------- */
+        const CHANGELOG = [
+            { v: '2026-09-30', title: 'Hôtel des ventes et invocations', items: ['🏪 Hôtel des ventes : vends tes cartes contre des pièces et achète celles des autres (onglet Marché de la Collection)', '🔮 Ouvrir un booster lance maintenant une vraie invocation : cercle magique, lumière et suspense avant la carte rare'] },
+            { v: '2026-09-29', title: 'Admin et nouveau mini-jeu', items: ['💥 Nouveau mini-jeu : Devine l’attaque', '⚡ Évènements surprises : XP x2, boss spécial, tournoi surprise', '🚩 Tu peux signaler un joueur', '🆕 Cette page Nouveautés'] },
+            { v: '2026-09-28', title: 'Loup-garou complet et nouveaux décors', items: ['🐺 Loup-garou : 16 joueurs, 17 rôles anime, auras, chats secrets, roue des rôles', '🌀 Gojo enferme un joueur (barreaux à l’écran !)', '🔢 Numéros des joueurs et votes visibles', '🎨 8 nouveaux décors qui changent selon la saison et chaque semaine'] },
+            { v: '2026-09-27', title: 'Gros ajouts', items: ['⛓️ Chaîne de persos, 📝 Quiz des joueurs, 🟢 Blind test facile', '👥 Onglet Amis, 🎴 Deck de cartes, ⭐ Prestige, succès secrets', '⚔️ Duel classé, 🛡️ Clans, 🎟️ Pass de saison, 👹 Boss du serveur', '🔍 Zoom extrême, 🎙️ Salon vocal, 👁️ Mode spectateur, 🇬🇧 Version anglaise'] },
+            { v: '2026-09-26', title: 'Boutique et collection', items: ['🛒 Boutique, 🃏 cartes à collectionner, 🏷️ titres', '🎃 Déco Halloween et Noël'] }
+        ];
+        function seenVersion() { try { return localStorage.getItem('seenChangelog') || ''; } catch (_) { return ''; } }
+        function openChangelog() {
+            try { localStorage.setItem('seenChangelog', CHANGELOG[0].v); } catch (_) {}
+            h3NewsBtn();
+            hubModal('h3-news', `<h3>🆕 Nouveautés</h3>${CHANGELOG.map(c => `<div class="h3-news"><div class="h3-news-h"><b>${v7esc(c.title)}</b><small>${new Date(c.v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</small></div><ul>${c.items.map(i => `<li>${v7esc(i)}</li>`).join('')}</ul></div>`).join('')}`, true);
+        }
+        function h3NewsBtn() {
+            const menu = document.getElementById('menu-selection'); if (!menu) return;
+            let b = document.getElementById('h3-news-btn');
+            if (!b) { b = document.createElement('button'); b.id = 'h3-news-btn'; b.className = 'h3-news-btn'; b.onclick = openChangelog; const h2el = menu.querySelector('h2'); menu.insertBefore(b, h2el ? h2el.nextSibling : menu.firstChild); }
+            const fresh = seenVersion() !== CHANGELOG[0].v;
+            b.innerHTML = `🆕 Nouveautés${fresh ? ' <span class="nav-badge alert">!</span>' : ''}`;
+        }
+        h3NewsBtn();
+
+</script>
+<script>
+        /* =====================================================================
+           HÔTEL DES VENTES + SCÈNE D'INVOCATION
+           ===================================================================== */
+        const mk = { view: 'buy', q: '', rarity: '', shiny: false, sort: 'new', sell: null, cards: [] };
+        (function () {
+            const orig = ecoTab;
+            ecoTab = function (t) {
+                const el = document.getElementById('eco-market');
+                if (t !== 'market') { if (el) el.style.display = 'none'; return orig(t); }
+                eco.tab = t;
+                document.querySelectorAll('.eco-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+                document.querySelectorAll('#collection [id^="eco-"]').forEach(x => { if (x.id !== 'eco-market') x.style.display = 'none'; });
+                el.style.display = '';
+                if (!isAccount()) { el.innerHTML = '<p class="tl-hint">Crée un compte pour utiliser l’hôtel des ventes.</p>'; return; }
+                loadMarket();
+            };
+        })();
+        socket.on('market_sold', d => { toast(`🏪 <b>${v7esc(d.buyer)}</b> a acheté ta carte ${v7esc(d.name)} : +${d.gain} 🪙`, '#ffd700'); if (typeof ecoLoad === 'function') ecoLoad(); });
+        const MK_RAR = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire' };
+        function mkCard(c) { return cardHtml({ name: c.name, rarity: c.rarity, shiny: c.shiny, img: c.img, n: 1 }); }
+        async function loadMarket() {
+            const el = document.getElementById('eco-market'); if (!el) return;
+            const qs = `?q=${encodeURIComponent(mk.q)}&rarity=${mk.rarity}&sort=${mk.sort}${mk.shiny ? '&shiny=1' : ''}`;
+            const d = await v7get('/api/market' + qs);
+            if (!d || !d.ok) { el.innerHTML = '<p class="tl-hint">Hôtel des ventes indisponible (server.js à jour ?).</p>'; return; }
+            mk.data = d;
+            if (typeof eco !== 'undefined') { eco.coins = d.coins; ecoCoinsUi(); }
+            const tabs = `<div class="mk-tabs">${[['buy', '🛒 Acheter'], ['sell', '💰 Vendre'], ['mine', '📦 Mes ventes']].map(([k, l]) => `<button class="${mk.view === k ? 'on' : ''}" onclick="mk.view='${k}';loadMarket()">${l}</button>`).join('')}</div>`;
+            const head = `<div class="shop-head">🏪 Hôtel des ventes <span class="tl-hint">• achète et vends des cartes aux autres joueurs • 🪙 <b>${d.coins}</b> • taxe de ${Math.round(d.tax * 100)} % sur chaque vente</span></div>`;
+            if (mk.view === 'buy') {
+                el.innerHTML = head + tabs + `<div class="mk-filters"><input class="v7-input" placeholder="🔎 Perso, anime, vendeur" value="${v7esc(mk.q)}" onkeydown="if(event.key==='Enter'){mk.q=this.value;loadMarket()}">
+                    <select onchange="mk.rarity=this.value;loadMarket()"><option value="">Toutes raretés</option>${Object.entries(MK_RAR).map(([k, v]) => `<option value="${k}" ${mk.rarity === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
+                    <select onchange="mk.sort=this.value;loadMarket()"><option value="new" ${mk.sort === 'new' ? 'selected' : ''}>Plus récentes</option><option value="cheap" ${mk.sort === 'cheap' ? 'selected' : ''}>Moins chères</option><option value="expensive" ${mk.sort === 'expensive' ? 'selected' : ''}>Plus chères</option></select>
+                    <label><input type="checkbox" ${mk.shiny ? 'checked' : ''} onchange="mk.shiny=this.checked;loadMarket()"> ✨ Brillantes</label></div>
+                    <div class="mk-grid">${d.list.length ? d.list.map(c => `<div class="mk-item${c.mine ? ' mine' : ''}">${mkCard(c)}<div class="mk-meta"><b class="mk-price">🪙 ${c.price}</b><small>${v7esc(c.anime)} • par ${v7esc(c.seller)}</small>
+                        ${c.mine ? '<small class="tl-hint">Ta vente</small>' : `<button ${d.coins < c.price ? 'disabled' : ''} onclick="mkBuy('${c.id}',${c.price},this)">Acheter</button>`}</div></div>`).join('') : '<p class="tl-hint">Aucune carte en vente pour le moment. Sois le premier à vendre !</p>'}</div>`;
+                return;
+            }
+            if (mk.view === 'sell') {
+                if (!mk.cards.length) { const c = await v7get('/api/trade/cards'); mk.cards = (c && c.cards) || []; }
+                const s = mk.sell && mk.cards.find(c => c.key === mk.sell);
+                const hint = s ? d.hints[s.rarity] : null;
+                el.innerHTML = head + tabs + (s ? `<div class="mk-sellbox">${mkCard(s)}<div><h3>${v7esc(s.name)}</h3><p class="tl-hint">${v7esc(s.anime)} • ${MK_RAR[s.rarity]} • tu en as ${s.n}${s.shiny ? ` (dont ${s.shiny} brillante${s.shiny > 1 ? 's' : ''})` : ''}</p>
+                    <p class="tl-hint">Prix conseillé pour une ${MK_RAR[s.rarity].toLowerCase()} : ${hint[0]} à ${hint[1]} 🪙 (plus pour une brillante)</p>
+                    <div class="ch-in"><input id="mk-price" class="v7-input" type="number" min="5" max="100000" value="${hint[0] * 2}" oninput="document.getElementById('mk-net').textContent=Math.max(1,Math.round((+this.value||0)*${1 - d.tax}))"><button class="btn-action" onclick="mkSell()">💰 Mettre en vente</button></div>
+                    <small class="tl-hint">Tu recevras <b id="mk-net">${Math.round(hint[0] * 2 * (1 - d.tax))}</b> 🪙 après la taxe.</small>
+                    ${s.shiny ? `<label style="display:block;margin-top:6px;"><input type="checkbox" id="mk-shiny"> ✨ Vendre l’exemplaire brillant</label>` : ''}
+                    <div class="hb-btns"><button onclick="mk.sell=null;loadMarket()">↩ Choisir une autre carte</button></div></div></div>`
+                    : `<p class="tl-hint">Choisis la carte à vendre (elle quitte ta collection pendant la vente, tu la récupères si tu annules).</p><input class="v7-input" placeholder="🔎 Chercher dans ta collection" oninput="mkFilter(this.value)"><div class="trd-list mk-pick" id="mk-pick"></div>`);
+                if (!s) mkFilter('');
+                return;
+            }
+            const open = d.mine.filter(x => x.status === 'open'), sold = d.mine.filter(x => x.status === 'sold');
+            el.innerHTML = head + tabs + `<h3 class="adm-h">📦 En vente (${open.length}/${d.max})</h3>${open.length ? `<div class="mk-grid">${open.map(c => `<div class="mk-item">${mkCard(c)}<div class="mk-meta"><b class="mk-price">🪙 ${c.price}</b><button onclick="mkCancel('${c.id}')">Retirer</button></div></div>`).join('')}</div>` : '<p class="tl-hint">Rien en vente.</p>'}
+                <h3 class="adm-h">✅ Vendues</h3>${sold.length ? sold.map(c => `<div class="friend-row"><span>${v7esc(c.name)}${c.shiny ? ' ✨' : ''} → <b>${v7esc(c.buyer || '')}</b></span><span>🪙 ${c.price}</span></div>`).join('') : '<p class="tl-hint">Aucune vente pour l’instant.</p>'}
+                <h3 class="adm-h">🛍️ Tes achats</h3>${d.bought.length ? d.bought.map(c => `<div class="friend-row"><span>${v7esc(c.name)}${c.shiny ? ' ✨' : ''} (de ${v7esc(c.seller)})</span><span>🪙 ${c.price}</span></div>`).join('') : '<p class="tl-hint">Aucun achat pour l’instant.</p>'}`;
+        }
+        function mkFilter(q) {
+            const box = document.getElementById('mk-pick'); if (!box) return;
+            const s = String(q || '').toLowerCase();
+            const order = ['legendaire', 'epique', 'rare', 'commune'];
+            box.innerHTML = mk.cards.filter(c => !s || (c.name + ' ' + c.anime).toLowerCase().includes(s)).sort((a, b) => order.indexOf(a.rarity) - order.indexOf(b.rarity)).slice(0, 90)
+                .map(c => `<button class="trd-mini r-${c.rarity}" onclick="mk.sell=${JSON.stringify(c.key).replace(/"/g, '&quot;')};loadMarket()"><img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${v7esc(c.name)}</b><small>${v7esc(c.anime)} • x${c.n}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
+        }
+        async function mkSell() {
+            const price = +document.getElementById('mk-price').value, shiny = !!(document.getElementById('mk-shiny') || {}).checked;
+            const d = await v7post('/api/market/sell', { key: mk.sell, price, shiny });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(`🏪 ${v7esc(d.listing.name)} mis en vente à ${d.listing.price} 🪙`, '#00ff88');
+            mk.sell = null; mk.cards = []; mk.view = 'mine'; loadMarket();
+        }
+        async function mkCancel(id) {
+            const d = await v7post('/api/market/cancel', { id });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast('↩ Carte retirée de la vente et rendue', '#48dbfb'); mk.cards = []; loadMarket();
+        }
+        async function mkBuy(id, price, btn) {
+            if (btn && !btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = `Confirmer ${price} 🪙 ?`; setTimeout(() => { if (btn.isConnected) { btn.classList.remove('armed'); btn.textContent = 'Acheter'; } }, 4000); return; }
+            const d = await v7post('/api/market/buy', { id });
+            if (!d || !d.ok) { toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); return loadMarket(); }
+            if (typeof eco !== 'undefined') { eco.coins = d.coins; ecoCoinsUi(); }
+            showBooster([d.card]);
+            mk.cards = []; loadMarket();
+        }
+
+        /* ---------- scène d'invocation pour les boosters ---------- */
+        (function () {
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3 };
+            const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300'];
+            function circleSvg(col) {
+                const runes = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
+                let t = ''; for (let i = 0; i < 24; i++) { const a = i * 15; t += `<text x="150" y="26" transform="rotate(${a} 150 150)" text-anchor="middle">${runes[i]}</text>`; }
+                return `<svg viewBox="0 0 300 300" class="sm-circle" style="--c:${col}"><g class="sm-rot"><circle cx="150" cy="150" r="140"/><circle cx="150" cy="150" r="118"/><g class="sm-runes">${t}</g></g>
+                    <g class="sm-rot2"><path d="M150 40L245 205H55Z"/><path d="M150 260L55 95H245Z"/><circle cx="150" cy="150" r="60"/><circle cx="150" cy="150" r="30"/></g></svg>`;
+            }
+            showBooster = function (cards) {
+                if (!cards || !cards.length) return;
+                document.getElementById('booster-modal')?.remove(); document.getElementById('summon')?.remove();
+                const best = Math.max(...cards.map(c => RANK[c.rarity] || 0));
+                const anyShiny = cards.some(c => c.shiny);
+                const col = anyShiny && best < 3 ? '#ff7ae0' : COL[best];
+                const o = document.createElement('div'); o.id = 'summon'; o.className = 'summon r' + best + (anyShiny ? ' shiny' : '');
+                o.style.setProperty('--c', col);
+                o.innerHTML = `<div class="sm-bg"></div>${circleSvg(col)}<div class="sm-beam"></div><div class="sm-flash"></div>
+                    <div class="sm-txt">${best >= 3 ? '✨ Une énergie immense se dégage… ✨' : best === 2 ? 'Une aura puissante apparaît…' : 'Invocation…'}</div>
+                    <div class="sm-cards">${cards.map((c, i) => `<div class="sm-card" data-i="${i}" style="animation-delay:${i * 0.08}s"><div class="sm-inner"><div class="sm-back" style="--c:${COL[RANK[c.rarity] || 0]}"><span>🎴</span></div><div class="sm-front">${cardHtml(c, true)}</div></div></div>`).join('')}</div>
+                    <div class="sm-bottom"><button class="sm-skip" onclick="summonRevealAll()">⏭ Tout révéler</button><div class="sm-sum"></div></div>`;
+                document.body.appendChild(o);
+                o._cards = cards;
+                const order = cards.map((c, i) => i).sort((a, b) => (RANK[cards[a].rarity] || 0) + (cards[a].shiny ? .5 : 0) - ((RANK[cards[b].rarity] || 0) + (cards[b].shiny ? .5 : 0)));
+                o._order = order;
+                setTimeout(() => o.classList.add('charge'), 50);
+                setTimeout(() => o.classList.add('burst'), 1700);
+                setTimeout(() => { o.classList.add('show'); summonNext(); }, 2300);
+                o.addEventListener('click', e => { if (e.target.closest('.sm-card') || e.target.closest('button')) return; if (o.classList.contains('done')) o.remove(); });
+            };
+            window.summonNext = function () {
+                const o = document.getElementById('summon'); if (!o || o.classList.contains('done')) return;
+                const i = o._order.shift();
+                if (i == null) return summonDone();
+                const c = o._cards[i], el = o.querySelector(`.sm-card[data-i="${i}"]`);
+                const big = (RANK[c.rarity] || 0) >= 2 || c.shiny;
+                const flip = () => {
+                    el.classList.add('flip');
+                    if (big) { o.classList.add('shake'); setTimeout(() => o.classList.remove('shake'), 500); el.classList.add('wow'); }
+                    o._t = setTimeout(summonNext, big ? 900 : 380);
+                };
+                if (big) { el.classList.add('tease'); o._t = setTimeout(flip, 900); } else flip();
+            };
+            window.summonRevealAll = function () {
+                const o = document.getElementById('summon'); if (!o) return;
+                clearTimeout(o._t);
+                o.classList.add('show');
+                o.querySelectorAll('.sm-card').forEach(e => e.classList.add('flip'));
+                o._order = [];
+                summonDone();
+            };
+            function summonDone() {
+                const o = document.getElementById('summon'); if (!o || o.classList.contains('done')) return;
+                o.classList.add('done');
+                const cards = o._cards, news = cards.filter(c => c.isNew).length, coins = cards.reduce((a, c) => a + (c.coins || 0), 0);
+                o.querySelector('.sm-sum').innerHTML = `${news} nouvelle${news > 1 ? 's' : ''} carte${news > 1 ? 's' : ''}${coins ? ` • doublons : +${coins} 🪙` : ''}`;
+                const b = o.querySelector('.sm-skip'); b.textContent = '✔ Fermer'; b.onclick = () => o.remove();
+            }
+        })();
+
+    </script>
+    <script>
 
         /* =====================================================================
            VERSION ANGLAISE : traduction de l'interface (dictionnaire + règles)
