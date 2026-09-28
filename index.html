@@ -2432,7 +2432,7 @@
         </div>
         <div class="opt-panel">
             <h2>🔊 Soundboard</h2>
-            <p class="tl-hint" style="text-align:left;">Choisis un fichier audio (mp3, 800 Ko max) : il est joué pour tout le monde, tout de suite. Sans fichier, le site joue ses sons de base.</p>
+            <p class="tl-hint" style="text-align:left;">Pour remplacer un son : choisis un fichier audio (mp3, 800 Ko max), il est joué pour tout le monde tout de suite. 🗑️ remet le son de base.</p>
             <div id="adm-sfx"></div>
         </div>
         <div class="opt-panel">
@@ -4324,13 +4324,16 @@
         /* ---- Soundboard : sons uploadés par l'admin (panneau admin > 🔊 Soundboard) ----
            erreur = mauvaise réponse (tous les modes), vie = vie perdue, elimine = 2 vies perdues (Rolland Garos).
            Sans son uploadé, on garde les sons synthétisés. */
+        // Sons par défaut (fichiers du site) : FAH = erreur / vie perdue, fusil à pompe Fortnite = éliminé
+        const SFX_DEFAUT = { erreur: '/music/sfx/fah.mp3', vie: '/music/sfx/fah.mp3', elimine: '/music/sfx/spas12.mp3' };
         const sfxBoard = { at: {}, audio: {} };
+        function sfxBoardSet(k, url) { const a = new Audio(url); a.preload = 'auto'; sfxBoard.audio[k] = a; }
+        Object.entries(SFX_DEFAUT).forEach(([k, url]) => sfxBoardSet(k, url));
         async function sfxBoardLoad() {
             let d = null; try { d = await (await fetch('/api/sfx')).json(); } catch (_) {}
             if (!d || !d.ok) return;
             sfxBoard.at = d.sfx || {};
-            sfxBoard.audio = {};
-            Object.entries(sfxBoard.at).forEach(([k, at]) => { const a = new Audio('/api/sfx/' + k + '?v=' + at); a.preload = 'auto'; sfxBoard.audio[k] = a; });
+            Object.keys(SFX_DEFAUT).forEach(k => sfxBoardSet(k, sfxBoard.at[k] ? '/api/sfx/' + k + '?v=' + sfxBoard.at[k] : SFX_DEFAUT[k]));
         }
         function sfxBoardPlay(k, vol = 0.9) {
             const a = sfxBoard.audio[k];
@@ -4366,12 +4369,12 @@
             o.connect(og); og.connect(c.destination);
             o.start(t0); o.stop(t0 + duree);
         }
-        function sfxExplosion() { // une vie perdue : petite explosion
+        function sfxExplosion() { // une vie perdue : FAH (sinon petite explosion synthétisée)
             if (!sfxOn) return;
             if (sfxBoardPlay('vie', 0.7)) return;
             sfxBoom(0.7, 0.35, 2400);
         }
-        function sfxElimine() { // plus de vie : son uploadé (ex : SPAS-12), sinon grosse explosion + mélodie de défaite
+        function sfxElimine() { // plus de vie : fusil à pompe Fortnite (sinon grosse explosion + mélodie de défaite)
             if (!sfxOn) return;
             if (sfxBoardPlay('elimine')) return;
             sfxBoom(1.4, 0.5, 4000);
@@ -4438,11 +4441,9 @@
             if (data.ok) {
                 sfxValide();
             } else if (data.message.indexOf('est éliminé') !== -1) {
-                // plus aucune vie : son « éliminé » ; sinon, si c'est une mauvaise réponse, juste le FAH
-                if (sfxBoard.audio.elimine || data.message.indexOf('Trop lent') !== -1 || !sfxBoardPlay('erreur')) sfxElimine();
+                sfxElimine();   // plus aucune vie : fusil à pompe Fortnite
             } else if (data.message.indexOf('perd une vie') !== -1) {
-                // mauvaise réponse : juste le FAH ; trop lent (ou pas de FAH) : petite explosion
-                if (data.message.indexOf('Trop lent') !== -1 || !sfxBoardPlay('erreur')) sfxExplosion();
+                sfxExplosion(); // une vie en moins : FAH
             } else if (data.message.indexOf('Déjà cité') !== -1) {
                 sfxDejaCite();
             } else if (data.message.indexOf('Trop lent') !== -1) {
@@ -8585,16 +8586,17 @@
             if (dl) dl.innerHTML = d.animes.map(a => `<option value="${v7esc(a)}">`).join('');
             box.innerHTML = d.rows.length ? d.rows.map(t => `<div class="friend-row"><span style="font-size:.82rem;"><b>${v7esc(t.anime)}</b> • ${v7esc(t.title)} <small style="color:var(--text-muted)">(${t.kind || 'opening'})</small><br><a href="https://youtu.be/${v7esc(t.yt_id)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);font-size:.75rem;">youtu.be/${v7esc(t.yt_id)}</a></span><button onclick="delTrack(${t.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucun opening ajouté depuis ici pour le moment.</p>';
         }
-        const SFX_LABELS = { erreur: '❌ Mauvaise réponse (tous les modes) — ex : FAH', vie: '💥 Vie perdue (Rolland Garos)', elimine: '💀 Éliminé, 2 vies perdues (Rolland Garos) — ex : SPAS-12' };
+        const SFX_LABELS = { erreur: '❌ Mauvaise réponse (tous les modes)', vie: '💥 Vie perdue (Rolland Garos)', elimine: '💀 Éliminé, 2 vies perdues (Rolland Garos)' };
+        const SFX_DEFAUT_NOM = { erreur: 'FAH', vie: 'FAH', elimine: 'fusil à pompe Fortnite' };
         async function loadAdminSfx() {
             const box = document.getElementById('adm-sfx');
             if (!box) return;
             await sfxBoardLoad();
             box.innerHTML = Object.entries(SFX_LABELS).map(([k, label]) => {
                 const has = !!sfxBoard.at[k];
-                return `<div class="friend-row" style="flex-wrap:wrap;gap:6px;"><span style="font-size:.82rem;flex:1 1 100%;text-align:left;"><b>${label}</b><br><small style="color:var(--text-muted)">${has ? '✅ Son personnalisé' : 'Son de base (synthétisé)'}</small></span>
+                return `<div class="friend-row" style="flex-wrap:wrap;gap:6px;"><span style="font-size:.82rem;flex:1 1 100%;text-align:left;"><b>${label}</b><br><small style="color:var(--text-muted)">${has ? '✅ Son personnalisé' : 'Son de base : ' + SFX_DEFAUT_NOM[k]}</small></span>
                     <label class="btn-action" style="margin:0;width:auto;padding:6px 12px;cursor:pointer;">📁 ${has ? 'Changer' : 'Choisir'}<input type="file" accept="audio/*" style="display:none" onchange="uploadSfx('${k}', this)"></label>
-                    ${has ? `<button class="btn-action" style="margin:0;width:auto;padding:6px 12px;" onclick="sfxBoardPlay('${k}')">▶️ Tester</button><button class="btn-action" style="margin:0;width:auto;padding:6px 12px;background:var(--accent-pink);" onclick="delSfx('${k}', this)">🗑️</button>` : ''}</div>`;
+                    <button class="btn-action" style="margin:0;width:auto;padding:6px 12px;" onclick="sfxBoardPlay('${k}')">▶️ Tester</button>${has ? `<button class="btn-action" style="margin:0;width:auto;padding:6px 12px;background:var(--accent-pink);" onclick="delSfx('${k}', this)">🗑️</button>` : ''}</div>`;
             }).join('');
         }
         async function uploadSfx(k, input) {
