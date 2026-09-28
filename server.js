@@ -17475,8 +17475,16 @@ function chainePool(room) {
     const sub = String(room.subMode || 'all');
     const us = sub === 'all' ? arcUniverses() : sub.split('+').filter(u => ARC_UNIVERSE_ANIME[u]);
     const out = [];
-    (us.length ? us : arcUniverses()).forEach(u => arcFamous(u).forEach(c => { const key = chLetters(c.display); out.push({ u, c, key, words: chWords(c.display, key) }); }));
-    return out.filter(x => x.key.length >= 2);
+    // tous les persos du Rolland Garos (des centaines par anime), les plus connus d'abord
+    (us.length ? us : arcUniverses()).forEach(u => {
+        const seen = new Set();
+        const add = (c, famous) => { const key = chLetters(c.display); if (key.length < 2 || seen.has(key)) return; seen.add(key); out.push({ u, c, key, famous, words: chWords(c.display, key) }); };
+        arcFamous(u).forEach(c => add(c, true));
+        let big = [];
+        try { big = rgMasterPoolForUniverse(u, (RG_UNIVERSES[u] || {}).raw || ''); } catch (_) {}
+        big.forEach(raw => { const n = String(raw || '').trim(); if (n) add({ raw: n, display: n }, false); });
+    });
+    return out;
 }
 function chaineLetterCount(ch, L) { const used = new Set(ch.used); return ch.pool.filter(x => !used.has(x.key) && x.words.some(w => w[0] === L)).length; }
 // la vraie dernière lettre du nom donné ; on ne recule d'une lettre que s'il n'existe plus AUCUN perso possible
@@ -18066,7 +18074,7 @@ io.on('connection', socket => {
         const good = cands;
         const fresh = good.filter(x => !ch.used.includes(x.key));
         if (!fresh.length) return socket.emit('chaine_feedback', { ok: false, msg: `♻️ ${good[0].c.display} a déjà été donné` });
-        const pick = fresh[0];
+        const pick = fresh.find(x => x.famous) || fresh[0];
         ch.used.push(pick.key);
         const k = pkeyOf(cur);
         const fast = Date.now() - ch.startedAt;
@@ -18074,7 +18082,7 @@ io.on('connection', socket => {
         const said = t.replace(/\s+/g, ' ');
         ch.chain.push({ name: pick.c.display, said, anime: ARC_UNIVERSE_ANIME[pick.u], by: cur.name, img: cardImg({ u: pick.u, display: pick.c.display }) });
         progTrackRound(cur, 'chaine', ARC_UNIVERSE_ANIME[pick.u], true, fast);
-        cardAward(cur, pick.u, pick.c.display);
+        if (pick.famous) cardAward(cur, pick.u, pick.c.display);
         const nx = chaineNextLetter(ch, said);
         ch.letter = nx.L;
         if (nx.skipped) ch.log.push(`🔤 Plus aucun perso en ${nx.skipped.toUpperCase()} : on passe à la lettre ${nx.L.toUpperCase()}`);
@@ -18156,7 +18164,7 @@ botTick = function (b) {
             const ch = room.chaine, cur = chaineCur(room);
             if (cur && cur.id === me.id) later('ch' + ch.turnKey, 2500, Math.min(9000, ch.turnMs - 1500), () => {
                 const ok = Math.random() < (b.skill || 0.6) + 0.2;
-                const x = ok ? ch.pool.find(c => !ch.used.includes(c.key) && c.words.some(w => w[0] === ch.letter)) : null;
+                const x = ok ? ch.pool.find(c => c.famous && !ch.used.includes(c.key) && c.words.some(w => w[0] === ch.letter)) || ch.pool.find(c => !ch.used.includes(c.key) && c.words.some(w => w[0] === ch.letter)) : null;
                 const w = x ? (x.key[0] === ch.letter ? x.c.display : x.words.find(w => w[0] === ch.letter)) : null;
                 b.sock.emit('chaine_answer', { roomCode: b.room, text: w || randomFamousName() });
             });
@@ -18169,7 +18177,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-30-chaine';
+const SITE_BUILD = '2026-09-30-deco';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
