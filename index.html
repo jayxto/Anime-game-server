@@ -1352,6 +1352,22 @@
         html.live .bt-choice{font-size:1.15rem!important;padding:16px!important;}
         html.live #live-count{top:14px;right:14px;font-size:1rem;}
         @media (max-width:600px){.pm-vs{font-size:1.5rem;}.pm-duel{gap:6px;}}
+
+        /* ---- Catégories de modes ---- */
+        .mode-cats{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;margin:6px 0 10px;scrollbar-width:thin;position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg-color,#0b0b10) 80%,transparent);}
+        .mode-cats button{flex:0 0 auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:inherit;border-radius:999px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:.85rem;white-space:nowrap;}
+        .mode-cats button.on{background:var(--accent-cyan,#00f0ff);color:#000;border-color:transparent;}
+        .mode-cats button.stream{border-color:#9146FF;} .mode-cats button.stream.on{background:#9146FF;color:#fff;}
+        .mode-cats button b{font-weight:900;opacity:.6;margin-left:4px;font-size:.75rem;}
+        .mode-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch;}
+        .mode-grid-2>*{margin:0!important;}
+        .mode-grid-2>.arc-menu,.mode-grid-2>.mc-wide{grid-column:1/-1;}
+        @media (max-width:760px){.mode-grid-2{grid-template-columns:1fr!important;}}
+        .mc-hidden{display:none!important;}
+        .mc-stream-info{grid-column:1/-1;background:linear-gradient(135deg,#2a1152,#15151f);border:2px solid #9146FF;border-radius:12px;padding:14px;text-align:left;}
+        .mc-stream-info h3{margin:0 0 6px;color:#c9a2ff;} .mc-stream-info ol{margin:6px 0 10px 18px;padding:0;font-size:.88rem;line-height:1.5;}
+        .mc-stream-info .btn-action{width:auto;padding:8px 16px;margin:0;}
+        .mc-tag{display:inline-block;font-size:.65rem;font-weight:900;background:#9146FF;color:#fff;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -6775,6 +6791,12 @@
             try { localStorage.setItem('stream_channel', ch); } catch (e) {}
             stream.channel = ch;
             streamBoardLoad();
+            stream.manual = false; stream.retry = 0;
+            streamOpen(ch);
+            document.getElementById('stream-widget').style.display = 'block';
+            streamRender();
+        }
+        function streamOpen(ch) {
             const ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
             stream.ws = ws;
             streamStatus('Connexion au chat…');
@@ -6787,19 +6809,27 @@
             ws.onmessage = ev => String(ev.data).split('\r\n').forEach(line => {
                 if (!line) return;
                 if (line.startsWith('PING')) { ws.send('PONG :tmi.twitch.tv'); return; }
-                if (line.includes(' 366 ') || line.includes('JOIN #' + ch)) streamStatus(`✅ Connecté au chat de ${ch} — les viewers votent avec !1 !2 !3 !4`);
+                if (line.startsWith(':tmi.twitch.tv RECONNECT') || line === 'RECONNECT') { try { ws.close(); } catch (e) {} return; }
+                if (line.includes(' 366 ') || line.includes('JOIN #' + ch)) { stream.retry = 0; streamStatus(`✅ Connecté au chat de ${ch} — les viewers votent avec !1 !2 !3 !4`); }
                 const m = line.match(/:([^!\s]+)![^\s]+ PRIVMSG #[^\s]+ :(.*)$/);
                 if (!m) return;
                 const dn = (line.match(/(?:^@|;)display-name=([^;\s]*)/) || [])[1];
                 streamVote(m[1], m[2].trim(), dn ? dn.replace(/\\s/g, ' ') : m[1]);
                 try { streamDrawGuess(m[1], m[2].trim(), dn ? dn.replace(/\\s/g, ' ') : m[1]); } catch (e) {}
             });
-            ws.onclose = () => { if (stream.ws === ws) streamStatus('Déconnecté du chat.'); };
-            ws.onerror = () => streamStatus('❌ Impossible de joindre le chat Twitch.');
-            document.getElementById('stream-widget').style.display = 'block';
-            streamRender();
+            ws.onclose = () => {
+                if (stream.ws !== ws || stream.manual) return;
+                // coupure (Wi-Fi, maintenance Twitch…) : on se reconnecte tout seul, sans perdre le classement
+                stream.retry = (stream.retry || 0) + 1;
+                const wait = Math.min(15000, 1000 * Math.pow(2, stream.retry - 1));
+                streamStatus(`⚠️ Chat coupé, reconnexion dans ${Math.round(wait / 1000)} s…`);
+                clearTimeout(stream.retryT);
+                stream.retryT = setTimeout(() => { if (stream.ws === ws && !stream.manual) streamOpen(ch); }, wait);
+            };
+            ws.onerror = () => streamStatus('❌ Impossible de joindre le chat Twitch, nouvel essai…');
         }
         function streamDisconnect() {
+            stream.manual = true; clearTimeout(stream.retryT);
             if (stream.ws) { try { stream.ws.close(); } catch (e) {} }
             stream.ws = null;
             streamStatus('Mode streamer désactivé.');
@@ -8424,7 +8454,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-02-hub4';
+        const CLIENT_BUILD = '2026-10-02-cats';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10870,6 +10900,56 @@
             if (on) toast('📺 Écran live : interface épurée pour ton stream', '#9146FF');
         }
 
+    </script>
+    <script>
+        /* ---------- Page Jouer rangée par catégories ---------- */
+        (function () {
+            const grid = [...document.querySelectorAll('#menu-selection div')].find(d => d.style && d.style.gridTemplateColumns === '1fr' && d.querySelector('.arc-menu'));
+            if (!grid || grid.dataset.cats) return;
+            grid.dataset.cats = '1'; grid.classList.add('mode-grid-2');
+            // catégories de chaque carte (une carte peut être dans plusieurs)
+            const RULES = [
+                [/undercover/i, ['bluff']], [/loup-garou/i, ['bluff', 'grand']], [/devine le perso/i, ['bluff']],
+                [/devine la note/i, ['quiz']], [/citation/i, ['quiz']], [/blind test/i, ['musique', 'stream']], [/battle d'openings/i, ['musique', 'stream']],
+                [/mini-jeux/i, ['quiz', 'stream']], [/chaîne de persos/i, ['quiz']], [/quiz des joueurs/i, ['quiz']], [/animedle/i, ['quiz']], [/rolland garos/i, ['quiz']],
+                [/dessine le perso/i, ['fun', 'stream']], [/tier list/i, ['fun']], [/jeu de connexion/i, ['fun']],
+                [/tournoi/i, ['strat', 'grand']], [/enchère/i, ['strat']]
+            ];
+            const CATS = [['all', '⭐ Tout'], ['stream', '🎥 Avec le chat'], ['bluff', '🕵️ Bluff & Undercover'], ['quiz', '🧠 Quiz & mini-jeux'], ['musique', '🎵 Musique'], ['fun', '🎨 Dessin & fun'], ['strat', '💰 Stratégie & tournois']];
+            const STREAM_ARC = ['attaque', 'emoji', 'quatre', 'mapguess', 'scene', 'link', 'imposteur', 'audio', 'plusmoins', 'survie', 'chaos'];
+            const cards = [...grid.children];
+            cards.forEach(c => {
+                const t = (c.querySelector('h3') || {}).textContent || '';
+                const r = RULES.find(([re]) => re.test(t));
+                c.dataset.cat = (r ? r[1] : ['quiz']).join(' ');
+                if (/blind test|battle d'openings|dessine le perso/i.test(t)) { const h = c.querySelector('h3'); if (h && !h.querySelector('.mc-tag')) h.insertAdjacentHTML('beforeend', '<span class="mc-tag">🎥 CHAT</span>'); }
+            });
+            // tuiles mini-jeux jouables avec le chat
+            grid.querySelectorAll('.arc-game-btn').forEach(b => {
+                const m = (b.getAttribute('onclick') || '').match(/openArcadeGame\('(\w+)'\)/);
+                b.dataset.stream = m && STREAM_ARC.includes(m[1]) ? '1' : '0';
+            });
+            // encart d'aide streamer
+            const info = document.createElement('div'); info.className = 'mc-stream-info'; info.dataset.cat = 'stream-only';
+            info.innerHTML = `<h3>🎥 Jouer avec ton chat Twitch</h3><ol><li>Va dans <b>Options → Mode streamer</b> et tape le nom de ta chaîne.</li><li>Lance un des jeux ci-dessous : tes viewers répondent avec <b>!1 !2 !3 !4</b> dans le chat.</li><li>Clique sur <b>📺 Écran live</b> dans le widget pour une interface propre dans OBS.</li></ol><button class="btn-action" onclick="switchTab('options');setTimeout(()=>document.getElementById('stream-channel')?.scrollIntoView({behavior:'smooth',block:'center'}),150)">⚙️ Configurer le mode streamer</button>`;
+            grid.insertBefore(info, grid.firstChild);
+            const bar = document.createElement('div'); bar.className = 'mode-cats'; bar.id = 'mode-cats';
+            grid.parentNode.insertBefore(bar, grid);
+            const count = k => k === 'all' ? cards.length : cards.filter(c => c.dataset.cat.split(' ').includes(k)).length + (k === 'quiz' || k === 'stream' ? 0 : 0);
+            function apply(k) {
+                try { localStorage.setItem('modeCat', k); } catch (_) {}
+                bar.innerHTML = CATS.map(([id, l]) => `<button class="${id === k ? 'on' : ''}${id === 'stream' ? ' stream' : ''}" onclick="modeCat('${id}')">${l}${id !== 'all' ? `<b>${count(id)}</b>` : ''}</button>`).join('');
+                cards.forEach(c => c.classList.toggle('mc-hidden', k !== 'all' && !c.dataset.cat.split(' ').includes(k)));
+                info.classList.toggle('mc-hidden', k !== 'stream');
+                grid.querySelectorAll('.arc-game-btn').forEach(b => b.classList.toggle('mc-hidden', k === 'stream' && b.dataset.stream !== '1'));
+                const mh = grid.querySelector('.arc-menu h3'); if (mh) mh.dataset.orig = mh.dataset.orig || mh.textContent;
+                if (mh) mh.textContent = k === 'stream' ? '🕹️ Mini-jeux jouables avec le chat' : mh.dataset.orig;
+            }
+            window.modeCat = k => { apply(k); bar.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+            let start = 'all'; try { start = localStorage.getItem('modeCat') || 'all'; } catch (_) {}
+            if (!CATS.some(c => c[0] === start)) start = 'all';
+            apply(start);
+        })();
     </script>
     <script>
 
