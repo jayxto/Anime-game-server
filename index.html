@@ -8365,7 +8365,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-01-perf';
+        const CLIENT_BUILD = '2026-10-01-chaine3';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10006,21 +10006,18 @@
            semaine le reste de l'année. Seul l'admin peut forcer un thème.
            ===================================================================== */
         const SITE_THEMES = {
-            halloween: '🎃 Halloween', noel: '🎄 Noël', nouvelan: '🎆 Nouvel An', valentin: '💘 Saint-Valentin', hanami: '🌸 Hanami (printemps)',
-            matsuri: '🏮 Matsuri (été)', automne: '🍁 Automne', tokyo: '🌃 Tokyo néon', ocean: '🌊 Grand Line', ninja: '🌙 Village ninja'
+            halloween: '🎃 Halloween', noel: '🎄 Noël', valentin: '💘 Saint-Valentin', hanami: '🌸 Hanami (printemps)',
+            tokyo: '🌃 Tokyo néon', ninja: '🌙 Village ninja'
         };
-        const THEME_ROTATION = ['tokyo', 'ocean', 'ninja'];
+        const THEME_ROTATION = ['tokyo', 'ninja'];
         siteTheme = function () {
             const t = SITE_STATE.theme;
             if (SITE_THEMES[t]) return t;
-            if (t !== 'auto') return 'none';
+            if (t === 'none') return 'none'; // un ancien thème retiré repasse en automatique
             const d = new Date(), m = d.getMonth() + 1, day = d.getDate();
-            if (m === 1 && day <= 7) return 'nouvelan';
             if (m === 2 && day >= 7 && day <= 15) return 'valentin';
             if ((m === 3 && day >= 20) || m === 4) return 'hanami';
-            if (m === 7 || m === 8) return 'matsuri';
             if (m === 10 || (m === 11 && day <= 2)) return 'halloween';
-            if ((m === 9 && day >= 15) || m === 11) return 'automne';
             if (m === 12) return 'noel';
             // le reste de l'année : un nouveau décor chaque semaine
             const wk = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000 + 3) / 7);

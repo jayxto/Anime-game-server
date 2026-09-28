@@ -14974,7 +14974,7 @@ app.get('/api/admin/stats', adminOnly(async (req, res) => {
 app.post('/api/admin/settings', adminOnly(async (req, res) => {
     const b = req.body || {};
     if (b.maintenance) { SITE.maintenance = { on: !!b.maintenance.on, msg: String(b.maintenance.msg || '').slice(0, 300) }; await siteSave('maintenance'); }
-    if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel', 'nouvelan', 'valentin', 'hanami', 'matsuri', 'automne', 'tokyo', 'ocean', 'ninja'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
+    if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel', 'valentin', 'hanami', 'tokyo', 'ninja'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
     res.json({ ok: true, site: SITE });
 }));
 function ytIdFrom(s) {
@@ -17478,7 +17478,7 @@ function chainePool(room) {
     // tous les persos du Rolland Garos (des centaines par anime), les plus connus d'abord
     (us.length ? us : arcUniverses()).forEach(u => {
         const seen = new Set();
-        const add = (c, famous) => { const key = chLetters(c.display); if (key.length < 2 || seen.has(key)) return; seen.add(key); out.push({ u, c, key, famous, words: chWords(c.display, key) }); };
+        const add = (c, famous) => { const key = chLetters(c.display); if (!key.length || seen.has(key)) return; seen.add(key); out.push({ u, c, key, famous, words: chWords(c.display, key) }); };
         arcFamous(u).forEach(c => add(c, true));
         let big = [];
         try { big = rgMasterPoolForUniverse(u, (RG_UNIVERSES[u] || {}).raw || ''); } catch (_) {}
@@ -17493,6 +17493,15 @@ function chaineNextLetter(ch, said) {
     for (const L of s) if (chaineLetterCount(ch, L) >= 1) return { L, skipped: L !== s[0] ? s[0] : null };
     const all = 'abcdefghijklmnopqrstuvwxyz'.split('').map(L => [L, chaineLetterCount(ch, L)]).sort((a, b) => b[1] - a[1]);
     return { L: all[0][0], skipped: s[0] || null };
+}
+// surnoms, orthographes anglaises et petites fautes, calculé UNE fois par univers (avant : 4 à 5 s de blocage du serveur)
+function chaineFuzzy(ch, t) {
+    const x = normalizeRG(String(t || '')); if (!x) return [];
+    const us = [...new Set(ch.pool.map(p => p.u))];
+    const canon = new Set();
+    for (const u of us) { try { const pool = (RG_POOLS_V2 && RG_POOLS_V2[u]) || []; if (pool.length) { const c = rgCanonicalInput(u, t, pool); if (c) canon.add(u + '|' + c); } } catch (_) {} }
+    const tol = toleranceRG(x.length);
+    return ch.pool.filter(p => { const nm = p.norm || (p.norm = normalizeRG(p.c.display)); return canon.has(p.u + '|' + nm) || (Math.abs(nm.length - x.length) <= tol && distanceRG(x, nm) <= tol); });
 }
 function chaineCur(room) { const ch = room.chaine; return ch ? room.players.find(p => pkeyOf(p) === ch.order[ch.turn]) || null : null; }
 function chainePublic(room) {
@@ -18063,12 +18072,12 @@ io.on('connection', socket => {
         const cur = chaineCur(room);
         if (!cur || cur.id !== socket.id) return;
         const t = String(text || '').trim().slice(0, 60);
-        if (t.length < 2) return;
+        if (!t.length) return;
         const n = chLetters(t);
-        if (n.length < 2) return;
-        let cands = ch.pool.filter(x => x.key === n);
-        if (!cands.length) cands = ch.pool.filter(x => x.words.includes(n));
-        if (!cands.length) cands = ch.pool.filter(x => { try { return arcNameMatches(x.u, x.c, t); } catch (_) { return false; } });
+        if (!n.length) return;
+        // nom complet exact d'abord, puis prénom / nom : si l'un est déjà pris, un autre perso qui colle passe quand même
+        let cands = [...new Set([...ch.pool.filter(x => x.key === n), ...ch.pool.filter(x => x.words.includes(n))])];
+        if (!cands.length || cands.every(x => ch.used.includes(x.key))) cands = [...new Set([...cands, ...chaineFuzzy(ch, t)])];
         if (!cands.length && n.length >= 5) cands = ch.pool.filter(x => x.words.some(w => w[0] === n[0] && Math.abs(w.length - n.length) <= 1 && chDist1(w, n)));
         if (!cands.length) return socket.emit('chaine_feedback', { ok: false, msg: `❓ « ${t} » : perso inconnu` });
         if (n[0] !== ch.letter) return socket.emit('chaine_feedback', { ok: false, msg: `🔤 « ${t} » ne commence pas par ${ch.letter.toUpperCase()}` });
@@ -18178,7 +18187,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-01-perf';
+const SITE_BUILD = '2026-10-01-chaine3';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18787,6 +18796,72 @@ app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
     try { wrap(Object.getPrototypeOf(io.to('__slim__'))); } catch (_) {}
     try { wrap(require('socket.io').Socket.prototype); } catch (_) {}
 })();
+
+/* =====================================================================
+   SERVEUR SOLIDE : une erreur dans un message ne fait plus rien planter,
+   anti-spam, page de santé, mises à jour sans coupure brutale
+   ===================================================================== */
+(function () {
+    // 1. chaque message de joueur est protégé : une erreur est notée, le serveur continue
+    try {
+        const SP = require('socket.io').Socket.prototype;
+        if (!SP.__safeOn) {
+            const on = SP.on;
+            SP.on = function (ev, fn) {
+                if (typeof fn !== 'function' || ev === 'disconnect' && fn.__safe) return on.call(this, ev, fn);
+                const sock = this;
+                const safe = function (...a) {
+                    try {
+                        const r = fn.apply(this, a);
+                        if (r && typeof r.catch === 'function') r.catch(e => console.error(`[socket ${ev}]`, e && e.message));
+                        return r;
+                    } catch (e) {
+                        console.error(`[socket ${ev}] erreur rattrapée :`, e && e.stack || e);
+                        try { if (typeof a[a.length - 1] === 'function') a[a.length - 1]({ ok: false, error: 'Erreur serveur, réessaie.' }); } catch (_) {}
+                    }
+                };
+                safe.__safe = true;
+                return on.call(sock, ev, safe);
+            };
+            Object.defineProperty(SP, '__safeOn', { value: true });
+        }
+    } catch (_) {}
+    // 2. anti-spam : un joueur ne peut pas inonder le serveur (plus de 60 messages par seconde)
+    io.on('connection', socket => {
+        let n = 0, t = Date.now(), strikes = 0;
+        socket.use((pkt, next) => {
+            const now = Date.now();
+            if (now - t > 1000) { t = now; n = 0; }
+            if (++n > 60) {
+                if (n === 61 && ++strikes >= 5) { console.warn('[anti-spam] déconnexion', socket.id); socket.disconnect(true); }
+                return; // message ignoré
+            }
+            next();
+        });
+    });
+    // 3. erreurs des pages / API : réponse propre au lieu d'une page d'erreur
+    app.use((err, req, res, next) => {
+        if (res.headersSent) return next(err);
+        const bad = err && (err.type === 'entity.parse.failed' || err.status === 400 || err.status === 413);
+        if (!bad) console.error('[API]', req.method, req.path, err && err.message);
+        res.status(bad ? (err.status || 400) : 500).json({ ok: false, error: bad ? 'Requête invalide.' : 'Erreur serveur, réessaie.' });
+    });
+    // 4. mise à jour sur Render : on prévient les joueurs avant de redémarrer
+    let stopping = false;
+    process.on('SIGTERM', () => {
+        if (stopping) return; stopping = true;
+        console.log('[arrêt] mise à jour en cours, on prévient les joueurs');
+        try { io.emit('announce', { text: '🔧 Mise à jour du site : reconnexion automatique dans quelques secondes…', kind: 'admin' }); } catch (_) {}
+        setTimeout(() => { try { io.close(); } catch (_) {} process.exit(0); }, 2500);
+    });
+    // 5. surveillance de la mémoire (visible dans les logs Render)
+    setInterval(() => {
+        const m = process.memoryUsage();
+        const mb = Math.round(m.rss / 1048576);
+        if (mb > 420) console.warn(`[mémoire] ${mb} Mo utilisés, ${Object.keys(rooms).length} salons, ${io.engine.clientsCount} joueurs`);
+    }, 5 * 60000).unref();
+})();
+app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0 }));
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
