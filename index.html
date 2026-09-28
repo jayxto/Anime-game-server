@@ -2431,6 +2431,11 @@
             <div id="adm-tracks" style="margin-top:10px;"></div>
         </div>
         <div class="opt-panel">
+            <h2>🔊 Soundboard</h2>
+            <p class="tl-hint" style="text-align:left;">Choisis un fichier audio (mp3, 800 Ko max) : il est joué pour tout le monde, tout de suite. Sans fichier, le site joue ses sons de base.</p>
+            <div id="adm-sfx"></div>
+        </div>
+        <div class="opt-panel">
             <h2>🪙 Pièces de test</h2>
             <p class="tl-hint" style="text-align:left;">Ajoute des pièces sur TON compte pour tester la boutique et les boosters.</p>
             <div style="display:flex;gap:6px;"><button class="btn-action" style="margin-top:0;" onclick="adminCoins(500)">+500</button><button class="btn-action" style="margin-top:0;" onclick="adminCoins(5000)">+5 000</button></div>
@@ -4291,7 +4296,8 @@
             bip(880, 0.3, 0.075, 0.1);
         }
 
-        function sfxErreur() {   // mauvaise réponse : note grave et sourde
+        function sfxErreur() {   // mauvaise réponse : son uploadé (ex : FAH), sinon note grave et sourde
+            if (typeof sfxBoardPlay === 'function' && sfxBoardPlay('erreur')) return;
             bip(220, 0.28, 0.085, 0);
             bip(165, 0.36, 0.07, 0.1);
         }
@@ -4315,18 +4321,25 @@
             bip(784, 0.5, 0.06, 0.08);
         }
 
-        /* ---- Soundboard Rolland Garos : vie perdue / éliminé ----
-           Pour mettre tes propres sons, dépose music/sfx/rg-vie.mp3 et/ou music/sfx/rg-elimine.mp3 sur GitHub :
-           ils remplacent automatiquement les sons synthétisés ci-dessous. */
-        const RG_SFX_FILES = { vie: '/music/sfx/rg-vie.mp3', elimine: '/music/sfx/rg-elimine.mp3' };
-        const rgSfxDispo = {};
-        Object.entries(RG_SFX_FILES).forEach(([k, url]) => {
-            fetch(url, { method: 'HEAD' }).then(r => { rgSfxDispo[k] = r.ok && /audio|mpeg|octet/.test(r.headers.get('content-type') || ''); }).catch(() => {});
-        });
-        function rgSfxFichier(k, vol) {
-            if (!rgSfxDispo[k]) return false;
-            try { const a = new Audio(RG_SFX_FILES[k]); a.volume = vol; a.play().catch(() => {}); return true; } catch (_) { return false; }
+        /* ---- Soundboard : sons uploadés par l'admin (panneau admin > 🔊 Soundboard) ----
+           erreur = mauvaise réponse (tous les modes), vie = vie perdue, elimine = 2 vies perdues (Rolland Garos).
+           Sans son uploadé, on garde les sons synthétisés. */
+        const sfxBoard = { at: {}, audio: {} };
+        async function sfxBoardLoad() {
+            let d = null; try { d = await (await fetch('/api/sfx')).json(); } catch (_) {}
+            if (!d || !d.ok) return;
+            sfxBoard.at = d.sfx || {};
+            sfxBoard.audio = {};
+            Object.entries(sfxBoard.at).forEach(([k, at]) => { const a = new Audio('/api/sfx/' + k + '?v=' + at); a.preload = 'auto'; sfxBoard.audio[k] = a; });
         }
+        function sfxBoardPlay(k, vol = 0.9) {
+            const a = sfxBoard.audio[k];
+            if (!sfxOn || !a) return false;
+            try { a.pause(); a.currentTime = 0; a.volume = vol; a.play().catch(() => {}); return true; } catch (_) { return false; }
+        }
+        sfxBoardLoad();
+        socket.on('connect', () => setTimeout(sfxBoardLoad, 800));
+        socket.on('sfx_update', sfxBoardLoad);
         function sfxBoom(duree, vol, freqDebut, delai = 0) { // bruit filtré + coup grave = explosion
             const c = ctx();
             if (!c) return;
@@ -4355,36 +4368,12 @@
         }
         function sfxExplosion() { // une vie perdue : petite explosion
             if (!sfxOn) return;
-            if (rgSfxFichier('vie', 0.7)) return;
+            if (sfxBoardPlay('vie', 0.7)) return;
             sfxBoom(0.7, 0.35, 2400);
         }
-        // Bruit du SPAS-12 de Fortnite, lu depuis YouTube (lecteur invisible préparé au début de la partie)
-        const RG_SPAS_YT = 'WX2IimUanYk';
-        let rgSpas = null, rgSpasReady = false;
-        function rgSpasPrepare() {
-            if (rgSpas || typeof ytApi !== 'function') return;
-            rgSpas = 'loading';
-            ytApi().then(YT => {
-                const holder = document.createElement('div');
-                holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:120px;opacity:0;pointer-events:none;';
-                const inner = document.createElement('div'); inner.id = 'rg-spas-player'; holder.appendChild(inner);
-                document.body.appendChild(holder);
-                rgSpas = new YT.Player('rg-spas-player', {
-                    videoId: RG_SPAS_YT, width: 200, height: 120,
-                    playerVars: { controls: 0, disablekb: 1, playsinline: 1, rel: 0 },
-                    events: { onReady: () => { rgSpasReady = true; }, onError: () => { rgSpasReady = false; } }
-                });
-            }).catch(() => { rgSpas = null; });
-        }
-        function rgSpasPlay() {
-            if (!rgSpasReady || !rgSpas || !rgSpas.playVideo) return false;
-            try { rgSpas.setVolume(100); rgSpas.seekTo(0, true); rgSpas.playVideo(); return true; } catch (_) { return false; }
-        }
-        socket.on('rg_state', () => { if (sfxOn) rgSpasPrepare(); });
-        function sfxElimine() { // plus de vie : bruit du SPAS-12 (sinon grosse explosion + mélodie de défaite)
+        function sfxElimine() { // plus de vie : son uploadé (ex : SPAS-12), sinon grosse explosion + mélodie de défaite
             if (!sfxOn) return;
-            if (rgSfxFichier('elimine', 0.8)) return;
-            if (rgSpasPlay()) return;
+            if (sfxBoardPlay('elimine')) return;
             sfxBoom(1.4, 0.5, 4000);
             [[587, 0.25], [554, 0.5], [523, 0.75], [494, 1.0]].forEach(([f, t], i) => bip(f, i === 3 ? 0.9 : 0.3, 0.07, t, 'square'));
         }
@@ -4449,8 +4438,10 @@
             if (data.ok) {
                 sfxValide();
             } else if (data.message.indexOf('est éliminé') !== -1) {
+                if (data.message.indexOf('Trop lent') === -1 && !sfxBoard.audio.elimine) sfxBoardPlay('erreur');
                 sfxElimine();   // plus aucune vie
             } else if (data.message.indexOf('perd une vie') !== -1) {
+                if (data.message.indexOf('Trop lent') === -1) sfxBoardPlay('erreur'); // mauvaise réponse : FAH
                 sfxExplosion(); // une vie en moins
             } else if (data.message.indexOf('Déjà cité') !== -1) {
                 sfxDejaCite();
@@ -8561,9 +8552,9 @@
             document.getElementById('adm-maint-back').value = s.maintenance.back || '';
             document.getElementById('adm-theme').value = s.theme || 'auto';
             checkBuild();
-            loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
+            loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-03-guerre';
+        const CLIENT_BUILD = '2026-10-04-sfx';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -8593,6 +8584,31 @@
             const dl = document.getElementById('adm-anime-list');
             if (dl) dl.innerHTML = d.animes.map(a => `<option value="${v7esc(a)}">`).join('');
             box.innerHTML = d.rows.length ? d.rows.map(t => `<div class="friend-row"><span style="font-size:.82rem;"><b>${v7esc(t.anime)}</b> • ${v7esc(t.title)} <small style="color:var(--text-muted)">(${t.kind || 'opening'})</small><br><a href="https://youtu.be/${v7esc(t.yt_id)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);font-size:.75rem;">youtu.be/${v7esc(t.yt_id)}</a></span><button onclick="delTrack(${t.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucun opening ajouté depuis ici pour le moment.</p>';
+        }
+        const SFX_LABELS = { erreur: '❌ Mauvaise réponse (tous les modes) — ex : FAH', vie: '💥 Vie perdue (Rolland Garos)', elimine: '💀 Éliminé, 2 vies perdues (Rolland Garos) — ex : SPAS-12' };
+        async function loadAdminSfx() {
+            const box = document.getElementById('adm-sfx');
+            if (!box) return;
+            await sfxBoardLoad();
+            box.innerHTML = Object.entries(SFX_LABELS).map(([k, label]) => {
+                const has = !!sfxBoard.at[k];
+                return `<div class="friend-row" style="flex-wrap:wrap;gap:6px;"><span style="font-size:.82rem;flex:1 1 100%;text-align:left;"><b>${label}</b><br><small style="color:var(--text-muted)">${has ? '✅ Son personnalisé' : 'Son de base (synthétisé)'}</small></span>
+                    <label class="btn-action" style="margin:0;width:auto;padding:6px 12px;cursor:pointer;">📁 ${has ? 'Changer' : 'Choisir'}<input type="file" accept="audio/*" style="display:none" onchange="uploadSfx('${k}', this)"></label>
+                    ${has ? `<button class="btn-action" style="margin:0;width:auto;padding:6px 12px;" onclick="sfxBoardPlay('${k}')">▶️ Tester</button><button class="btn-action" style="margin:0;width:auto;padding:6px 12px;background:var(--accent-pink);" onclick="delSfx('${k}', this)">🗑️</button>` : ''}</div>`;
+            }).join('');
+        }
+        async function uploadSfx(k, input) {
+            const f = input.files && input.files[0];
+            if (!f) return;
+            if (f.size > 800 * 1024) return toast('❌ Fichier trop lourd (800 Ko max). Prends un son court.', 'var(--accent-pink)');
+            let d = null;
+            try { d = await (await fetch('/api/admin/sfx/' + k, { method: 'POST', headers: { ...authHeaders(), 'Content-Type': f.type || 'audio/mpeg' }, body: f })).json(); } catch (_) {}
+            if (d && d.ok) { toast('🔊 Son ajouté pour tout le monde !', '#00ff88'); await loadAdminSfx(); sfxBoardPlay(k); }
+            else toast('❌ ' + ((d && d.error) || 'Impossible (server.js à jour ?)'), 'var(--accent-pink)');
+        }
+        async function delSfx(k, btn) {
+            if (!btn.classList.contains('armed')) { btn.classList.add('armed'); btn.textContent = 'Sûr ?'; return; }
+            await v7post('/api/admin/sfx/' + k + '/delete', {}); loadAdminSfx();
         }
         async function addTrack() {
             const v = id => document.getElementById(id).value;

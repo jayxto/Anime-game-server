@@ -18190,8 +18190,41 @@ botTick = function (b) {
     } catch (e) { console.warn('[bot h2]', e.message); }
 };
 
+/* ---------- Soundboard : sons uploadés par l'admin (mauvaise réponse, vie perdue, éliminé) ---------- */
+const SFX_SLOTS = ['erreur', 'vie', 'elimine'];
+app.get('/api/sfx', async (req, res) => {
+    const out = {};
+    for (const k of SFX_SLOTS) { const x = await kvGet('sfx', k, null); if (x && x.b64) out[k] = x.at; }
+    res.json({ ok: true, sfx: out });
+});
+app.get('/api/sfx/:slot', async (req, res) => {
+    const k = String(req.params.slot);
+    const x = SFX_SLOTS.includes(k) ? await kvGet('sfx', k, null) : null;
+    if (!x || !x.b64) return res.status(404).end();
+    res.set('Content-Type', x.mime);
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(Buffer.from(x.b64, 'base64'));
+});
+app.post('/api/admin/sfx/:slot', express.raw({ type: () => true, limit: '800kb' }), adminOnly(async (req, res) => {
+    const k = String(req.params.slot);
+    if (!SFX_SLOTS.includes(k)) return res.json({ ok: false, error: 'Emplacement inconnu.' });
+    const mime = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
+    if (!/^audio\/[a-z0-9.+-]+$/.test(mime)) return res.json({ ok: false, error: 'Ce n’est pas un fichier audio (mp3, ogg, wav…).' });
+    if (!Buffer.isBuffer(req.body) || !req.body.length) return res.json({ ok: false, error: 'Fichier vide.' });
+    await kvSet('sfx', k, { mime, b64: req.body.toString('base64'), at: Date.now() });
+    io.emit('sfx_update');
+    res.json({ ok: true });
+}));
+app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
+    const k = String(req.params.slot);
+    if (!SFX_SLOTS.includes(k)) return res.json({ ok: false, error: 'Emplacement inconnu.' });
+    await kvDel('sfx', k);
+    io.emit('sfx_update');
+    res.json({ ok: true });
+}));
+
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-03-guerre';
+const SITE_BUILD = '2026-10-04-sfx';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 

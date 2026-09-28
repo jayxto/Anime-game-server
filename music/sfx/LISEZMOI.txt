@@ -1,9 +1,0 @@
-Sons du mode Rolland Garos (facultatifs)
-
-Dépose ici tes propres fichiers mp3 avec EXACTEMENT ces noms :
-  rg-vie.mp3      -> joué quand un joueur perd une vie
-  rg-elimine.mp3  -> joué quand un joueur perd ses 2 vies (éliminé)
-                   (sans ce fichier : bruit du SPAS-12 de Fortnite lu depuis YouTube)
-
-S'ils ne sont pas là, le site joue des sons synthétisés à la place
-(petite explosion / grosse explosion + mélodie de défaite).
