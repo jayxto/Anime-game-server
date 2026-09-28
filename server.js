@@ -17545,7 +17545,7 @@ const LG_ROLES = {
     sharingan: { name: 'Sasuke (Sharingan)', icon: '👁️', team: 'village', aura: 'claire', desc: 'Voyant : chaque nuit, découvre le vrai rôle d’un joueur.' },
     ermite: { name: 'Naruto (mode Ermite)', icon: '🐸', team: 'village', aura: 'claire', desc: 'Chaque nuit, ressens l’aura d’un joueur : claire, obscure ou inconnue. Attention, certains démons et solitaires ont une aura inconnue !' },
     maudit: { name: 'Kaneki (villageois maudit)', icon: '🎭', team: 'village', aura: 'claire', desc: 'Tu es villageois… mais si les démons t’attaquent, tu ne meurs pas : tu deviens un démon et tu rejoins leur camp.' },
-    gojo: { name: 'Gojo (Extension du territoire)', icon: '🌀', team: 'village', aura: 'inconnue', desc: 'Chaque nuit, enferme un joueur dans ton domaine : il ne peut rien faire et personne ne peut l’attaquer. Vous discutez en privé (il ne sait pas qui tu es) et tu peux décider de l’exécuter.' },
+    gojo: { name: 'Gojo (Extension du territoire)', icon: '🌀', team: 'village', aura: 'inconnue', desc: 'Pendant la journée, choisis qui tu enfermeras la nuit suivante dans ton domaine : il ne peut plus utiliser ses capacités et personne ne peut l’attaquer. La nuit, vous discutez en privé (il ne sait pas qui tu es) et tu peux décider de l’exécuter.' },
     medecin: { name: 'Tsunade (médecin ninja)', icon: '💚', team: 'village', aura: 'claire', desc: 'Protecteur : chaque nuit, protège un joueur des démons et de Kira (jamais deux nuits de suite le même).' },
     gaara: { name: 'Gaara (bouclier de sable)', icon: '🏜️', team: 'village', aura: 'claire', desc: 'Protecteur : chaque nuit, protège un joueur des démons et de Kira (jamais deux nuits de suite le même).' },
     levi: { name: 'Livaï Ackerman', icon: '⚔️', team: 'village', aura: 'inconnue', desc: 'Une fois dans la partie, pendant le jour, élimine le joueur de ton choix devant tout le village.' },
@@ -17595,6 +17595,11 @@ function lgNight(room, code) {
     lg.phase = 'night';
     lg.night = { kill: {}, done: {}, protect: {}, peek: {}, aura: {}, kira: null, summon: null, revive: null, link: null };
     lg.jail = null;
+    const jn = lg.jailNext; lg.jailNext = null;
+    if (jn && lg.alive[jn.by] && lg.alive[jn.target] && lg.roles[jn.by] === 'gojo') {
+        lg.jail = { by: jn.by, target: jn.target, execute: false };
+        const t = lgByKey(room, jn.target); if (t) io.to(t.id).emit('lg_notice', { text: '🌀 Tu es enfermé dans un domaine pour la nuit : tes capacités sont bloquées !' });
+    }
     lg.log.push(`🌙 Nuit ${lg.day} : le village s’endort… les démons se réveillent.`);
     lgTimer(room, code, LG_NIGHT_MS, () => lgDawn(room, code));
     lgEmit(room, code);
@@ -17615,7 +17620,7 @@ function lgActions(room, k) {
         if (r === 'kira') out.push({ kind: 'kira', label: '📓 Écrire son nom', targets: others, picked: n.kira });
         if (r === 'sharingan' && !n.peek[k]) out.push({ kind: 'peek', label: '👁️ Sonder', targets: others });
         if (r === 'ermite' && !n.aura[k]) out.push({ kind: 'aura', label: '🐸 Ressentir', targets: others });
-        if (r === 'gojo' && lg.day > 1) { if (!lg.jail) out.push({ kind: 'jail', label: '🌀 Enfermer', targets: others }); else if (!lg.jail.execute && lg.alive[lg.jail.target]) out.push({ kind: 'execute', label: '💀 Exécuter le prisonnier', solo: true, confirm: true }); }
+        if (r === 'gojo' && lg.jail && lg.jail.by === k && !lg.jail.execute && lg.alive[lg.jail.target]) out.push({ kind: 'execute', label: '💀 Exécuter le prisonnier', solo: true, confirm: true });
         if (r === 'medecin' || r === 'gaara') out.push({ kind: 'protect', label: r === 'gaara' ? '🏜️ Protéger' : '💚 Protéger', targets: others.filter(x => x !== lg.lastProtect[k]), picked: n.protect[k] || null });
         if (r === 'nagato' && !u.revive) { const dead = Object.keys(lg.roles).filter(x => !lg.alive[x]); if (dead.length) out.push({ kind: 'revive', label: '🟣 Ressusciter', targets: dead, picked: n.revive, dead: true }); }
         if (r === 'cupidon' && lg.day === 1 && !lg.lovers) out.push({ kind: 'link', label: '💘 Lier', targets: alive, picked: (n.link || [])[0] || null, multi: 2 });
@@ -17623,6 +17628,7 @@ function lgActions(room, k) {
         return out;
     }
     if (lg.phase === 'talk' || lg.phase === 'vote') {
+        if (r === 'gojo') out.push({ kind: 'jail', label: '🌀 Enfermer cette nuit', targets: others, picked: lg.jailNext && lg.jailNext.by === k ? lg.jailNext.target : null });
         if (r === 'levi' && !u.shoot) out.push({ kind: 'shoot', label: '⚔️ Éliminer', targets: others });
         if (r === 'hokage' && !lg.revealed[k]) out.push({ kind: 'reveal', label: '🏯 Me révéler (vote x2)', solo: true });
         if (lg.phase === 'vote') {
@@ -17773,7 +17779,7 @@ function lgChannel(lg, k) {
 function lgPrivateFor(room, p) {
     const lg = room.lg, k = pkeyOf(p), r = lg.roles[k];
     if (!r) return null;
-    const out = { gameId: lg.gameId, notes: lg.notes[k] || [], key: k, role: lgRoleView(r), orig: lgRoleView(lg.orig[k]), alive: !!lg.alive[k], actions: lgActions(room, k), channel: lgChannel(lg, k), used: lg.used[k] || {}, info: [] };
+    const out = { gameId: lg.gameId, jailed: lg.phase === 'night' && lgJailed(lg, k), notes: lg.notes[k] || [], key: k, role: lgRoleView(r), orig: lgRoleView(lg.orig[k]), alive: !!lg.alive[k], actions: lgActions(room, k), channel: lgChannel(lg, k), used: lg.used[k] || {}, info: [] };
     const nm = x => lg.names[x];
     if (LG_DEMONS(r)) {
         out.mates = Object.keys(lg.roles).filter(x => LG_DEMONS(lg.roles[x]) && x !== k).map(x => ({ key: x, name: nm(x), alive: !!lg.alive[x], role: lgRoleView(lg.roles[x]) }));
@@ -17788,6 +17794,8 @@ function lgPrivateFor(room, p) {
         if (lg.jail.by === k) out.info.push(`🌀 ${nm(lg.jail.target)} est enfermé dans ton domaine.${lg.jail.execute ? ' Il sera exécuté à l’aube.' : ''}`);
         if (lg.jail.target === k) out.info.push('🌀 Tu es enfermé dans un domaine ! Tu ne peux rien faire cette nuit, mais personne ne peut t’attaquer… sauf ton geôlier.');
     }
+    if (r === 'gojo' && lg.jailNext && lg.jailNext.by === k && lg.phase !== 'night') out.info.push(`🌀 Cette nuit, tu enfermeras ${nm(lg.jailNext.target)} dans ton domaine.`);
+    if (r === 'gojo' && lg.phase !== 'night' && lg.phase !== 'finished' && !lg.jailNext) out.info.push('🌀 Choisis pendant la journée qui tu enfermeras cette nuit.');
     if (r === 'maudit') out.info.push('🎭 Si les démons t’attaquent, tu deviendras l’un des leurs.');
     if (lg.orig[k] === 'maudit' && r === 'demon') out.info.push('🎭 Tu as été transformé en démon !');
     if (lg.orig[k] === 'cupidon' && r === 'villager') out.info.push('💔 Ton couple est brisé : tu es redevenue simple villageoise.');
@@ -17818,9 +17826,7 @@ function lgAct(room, code, p, kind, target) {
         case 'aura': n.aura[k] = target; n.done[k] = true; (lg.auras[k] = lg.auras[k] || []).push({ name: lg.names[target], aura: LG_ROLES[lg.roles[target]].aura, day: lg.day }); break;
         case 'kira': n.kira = target; n.done[k] = true; break;
         case 'summon': n.summon = target; n.done[k] = true; break;
-        case 'jail': lg.jail = { by: k, target, execute: false }; {
-            const t = lgByKey(room, target); if (t) io.to(t.id).emit('lg_notice', { text: '🌀 Tu as été enfermé dans un domaine pour la nuit !' });
-        } break;
+        case 'jail': lg.jailNext = { by: k, target }; break;
         case 'execute': lg.jail.execute = true; n.done[k] = true; lgKill(room, lg.jail.target, '🌀 Exécuté dans le domaine de Gojo,'); lgNote(lg, k, `🌀 Tu as exécuté ${lg.names[lg.jail.target]}.`); if (lgCheckWin(room, code)) return; break;
         case 'protect': n.protect[k] = target; n.done[k] = true; break;
         case 'revive': n.revive = target; n.done[k] = true; break;
@@ -17837,7 +17843,7 @@ function lgAct(room, code, p, kind, target) {
         case 'shoot': lg.used[k].shoot = true; lgKill(room, target, '⚔️ Livaï a tranché une nuque !'); if (lgCheckWin(room, code)) return; break;
         case 'reveal': lg.revealed[k] = true; lg.log.push(`🏯 ${lg.names[k]} se révèle : c’est le Hokage ! Son vote compte double.`); break;
     }
-    if (lg.phase === 'night' && kind !== 'jail' && lgNightDone(room)) { lgEmit(room, code); lgTimer(room, code, 1500, () => lgDawn(room, code)); return; }
+    if (lg.phase === 'night' && lgNightDone(room)) { lgEmit(room, code); lgTimer(room, code, 1500, () => lgDawn(room, code)); return; }
     if (lg.phase === 'vote' && lgAlive(lg).every(x => lg.votes[x])) { lgEmit(room, code); lgTimer(room, code, 2500, () => lgDusk(room, code)); return; }
     lgEmit(room, code);
 }
