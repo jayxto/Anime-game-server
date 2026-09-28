@@ -4358,9 +4358,33 @@
             if (rgSfxFichier('vie', 0.7)) return;
             sfxBoom(0.7, 0.35, 2400);
         }
-        function sfxElimine() { // plus de vie : grosse explosion + mélodie de défaite
+        // Bruit du SPAS-12 de Fortnite, lu depuis YouTube (lecteur invisible préparé au début de la partie)
+        const RG_SPAS_YT = 'WX2IimUanYk';
+        let rgSpas = null, rgSpasReady = false;
+        function rgSpasPrepare() {
+            if (rgSpas || typeof ytApi !== 'function') return;
+            rgSpas = 'loading';
+            ytApi().then(YT => {
+                const holder = document.createElement('div');
+                holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:200px;height:120px;opacity:0;pointer-events:none;';
+                const inner = document.createElement('div'); inner.id = 'rg-spas-player'; holder.appendChild(inner);
+                document.body.appendChild(holder);
+                rgSpas = new YT.Player('rg-spas-player', {
+                    videoId: RG_SPAS_YT, width: 200, height: 120,
+                    playerVars: { controls: 0, disablekb: 1, playsinline: 1, rel: 0 },
+                    events: { onReady: () => { rgSpasReady = true; }, onError: () => { rgSpasReady = false; } }
+                });
+            }).catch(() => { rgSpas = null; });
+        }
+        function rgSpasPlay() {
+            if (!rgSpasReady || !rgSpas || !rgSpas.playVideo) return false;
+            try { rgSpas.setVolume(100); rgSpas.seekTo(0, true); rgSpas.playVideo(); return true; } catch (_) { return false; }
+        }
+        socket.on('rg_state', () => { if (sfxOn) rgSpasPrepare(); });
+        function sfxElimine() { // plus de vie : bruit du SPAS-12 (sinon grosse explosion + mélodie de défaite)
             if (!sfxOn) return;
             if (rgSfxFichier('elimine', 0.8)) return;
+            if (rgSpasPlay()) return;
             sfxBoom(1.4, 0.5, 4000);
             [[587, 0.25], [554, 0.5], [523, 0.75], [494, 1.0]].forEach(([f, t], i) => bip(f, i === 3 ? 0.9 : 0.3, 0.07, t, 'square'));
         }
