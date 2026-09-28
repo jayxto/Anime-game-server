@@ -1258,6 +1258,7 @@
         #summon.sup .sm-circle{animation:smHue 3s linear infinite;}
         #summon.sup .sm-back{animation:smHue 3s linear infinite;}
         @keyframes smHue{to{filter:hue-rotate(360deg) drop-shadow(0 0 10px var(--c));}}
+        .ch-lastl{color:var(--accent-cyan,#00f0ff);text-decoration:none;border-bottom:2px solid currentColor;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -8330,7 +8331,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-09-30-soutien2';
+        const CLIENT_BUILD = '2026-09-30-chaine';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -9584,10 +9585,10 @@
                 body = `<div class="ch-end"><div class="ch-end-t">${q.solo ? `⛓️ Chaîne de <b>${q.length}</b> persos !` : q.winnerNames && q.winnerNames.length ? `🏆 ${q.winnerNames.map(h2esc).join(', ')} gagne !` : 'Partie terminée'}</div>${h2EndBtns(q)}</div>`;
             } else {
                 body = `<div class="ch-top"><div class="ch-letter${mine ? ' me' : ''}"><span>${h2esc(q.letter || '?')}</span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" id="ch-ring"/></svg></div>
-                    <div class="ch-turn"><div class="ch-who">${mine ? '👉 <b>À toi !</b>' : `C'est à <b>${h2esc(q.turnName || '')}</b>`}</div><div class="tl-hint">Un perso qui commence par <b>${h2esc(q.letter)}</b> • ${q.possible} possible${q.possible > 1 ? 's' : ''} encore • <span id="ch-timer"></span></div>
+                    <div class="ch-turn"><div class="ch-who">${mine ? '👉 <b>À toi !</b>' : `C'est à <b>${h2esc(q.turnName || '')}</b>`}</div><div class="tl-hint">Un perso (prénom, nom ou les deux) qui commence par <b>${h2esc(q.letter)}</b> • ${q.possible} possible${q.possible > 1 ? 's' : ''} encore • <span id="ch-timer"></span></div>
                     ${meP.alive === false ? '<div class="ch-fb ko">💀 Tu es éliminé : regarde la suite !</div>' : `<div class="ch-in"><input id="ch-input" class="v7-input" autocomplete="off" placeholder="${mine ? `Un perso en ${h2esc(q.letter)}…` : 'Attends ton tour…'}" ${mine ? '' : 'disabled'} onkeydown="if(event.key==='Enter')chSend()"><button class="btn-action" ${mine ? '' : 'disabled'} onclick="chSend()">Valider</button></div><div id="ch-fb" class="ch-fb"></div>`}</div></div>`;
             }
-            const chain = q.chain.slice(-14).map((c, i, a) => `<div class="ch-link${i === a.length - 1 ? ' last' : ''}"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><div><b>${h2esc(c.name)}</b><small>${h2esc(c.anime)} • ${h2esc(c.by)}</small></div></div>`).join('<span class="ch-arrow">→</span>');
+            const chain = q.chain.slice(-14).map((c, i, a) => `<div class="ch-link${i === a.length - 1 ? ' last' : ''}"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><div><b>${c.said ? h2esc(c.said.slice(0, -1)) + '<u class="ch-lastl">' + h2esc(c.said.slice(-1)) + '</u>' : h2esc(c.name)}</b><small>${c.said && chNorm(c.said) !== chNorm(c.name) ? h2esc(c.name) + ' • ' : ''}${h2esc(c.anime)} • ${h2esc(c.by)}</small></div></div>`).join('<span class="ch-arrow">→</span>');
             el.innerHTML = h2Head('⛓️ CHAÎNE DE PERSOS', `${h2esc(q.universeLabel || '')} • chaîne : <b>${q.length}</b>`, q) + body
                 + `<div class="ch-chain">${chain || '<p class="tl-hint">La chaîne commence ! Premier perso en ' + h2esc(q.letter || '') + '.</p>'}</div>`
                 + h2PlayersHtml(q.players, p => (p.alive ? '' : 'out') + (p.turn ? ' turn' : ''))
@@ -9596,6 +9597,7 @@
             if (inp && mine) { inp.value = keepVal; if (window.innerWidth > 700 || newTurn) setTimeout(() => inp.focus(), 30); }
             const cl = el.querySelector('.ch-chain'); if (cl) cl.scrollLeft = cl.scrollWidth;
         }
+        function chNorm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[^a-z]/g, ''); }
         function chSend() { const i = document.getElementById('ch-input'); if (!i || !i.value.trim()) return; socket.emit('chaine_answer', { roomCode: currentRoomCode, text: i.value.trim() }); }
         setInterval(() => {
             const q = h2.ch;
