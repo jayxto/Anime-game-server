@@ -1280,6 +1280,19 @@
         html.theme-tokyo{--dk-glow:rgba(255,60,210,.14);--dk-glow2:rgba(60,240,255,.16);--dk-mote:#7df7ff;--dk-ax:50%;--dk-ay:100%;}
         html.theme-ocean{--dk-glow:rgba(255,190,110,.20);--dk-glow2:rgba(70,200,255,.16);--dk-mote:#ffe0a8;--dk-ay:70%;}
         html.theme-ninja{--dk-glow:rgba(255,230,160,.14);--dk-glow2:rgba(80,110,200,.14);--dk-mote:#d9ff8a;}
+
+        /* ---- ANTI-LAG des décors : pas de filtres coûteux, animations en pause pendant les parties ---- */
+        #theme-layer{contain:strict;transform:translateZ(0);}
+        #theme-layer .dk-land{filter:none!important;}
+        #theme-layer .dk-aura{animation:none!important;}
+        #theme-layer .dk-motes i{box-shadow:none;background:radial-gradient(circle,var(--dk-mote,#ffd98a) 0 35%,transparent 70%);width:calc(var(--s,4px) * 3);height:calc(var(--s,4px) * 3);will-change:transform,opacity;}
+        #theme-layer .dk-motes i:nth-child(n+15){display:none;}
+        #theme-layer .dk-fog{background-position:0 0!important;right:auto;width:calc(100% + 700px);animation-name:dkFogT!important;will-change:transform;}
+        @keyframes dkFogT{from{transform:translateX(-700px)}to{transform:translateX(0)}}
+        html.light #theme-layer *{animation-play-state:paused!important;} html.light #theme-layer .dk-motes{display:none;}
+        html.in-game #theme-layer *,html.lowfx #theme-layer *{animation-play-state:paused!important;}
+        html.in-game #theme-layer .dk-motes,html.lowfx #theme-layer .dk-motes{display:none;}
+        html.lowfx *{backdrop-filter:none!important;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -8352,7 +8365,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-09-30-deco';
+        const CLIENT_BUILD = '2026-10-01-perf';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10624,6 +10637,36 @@
                 return r;
             };
             const l = document.getElementById('theme-layer'); if (l) { l.dataset.t = ''; themeParticles(); }
+        })();
+    </script>
+    <script>
+        /* ---------- ANTI-LAG ---------- */
+        (function () {
+            const root = document.documentElement;
+            let perfMode = false;
+            try { perfMode = localStorage.getItem('perfMode') === '1'; } catch (_) {}
+            root.classList.toggle('lowfx', perfMode);
+            // pendant une partie : les décors se figent (tout le processeur va au jeu)
+            setInterval(() => { root.classList.toggle('in-game', !!currentRoomCode); }, 1000);
+            // si l'appareil est lent (moins de 40 images/s), on passe tout seul en mode performance
+            function probe() {
+                if (perfMode || document.hidden) return;
+                let n = 0; const t0 = performance.now();
+                const f = t => { n++; if (t - t0 < 2500) requestAnimationFrame(f); else { const fps = n / ((t - t0) / 1000); if (fps < 40 && !document.hidden) { root.classList.add('lowfx'); } } };
+                requestAnimationFrame(f);
+            }
+            setTimeout(probe, 4000);
+            window.setPerfMode = function (on) {
+                perfMode = !!on; try { localStorage.setItem('perfMode', on ? '1' : '0'); } catch (_) {}
+                root.classList.toggle('lowfx', perfMode);
+                toast(on ? '⚡ Mode performance activé : décors figés' : '✨ Décors animés réactivés', '#00f0ff');
+            };
+            const opt = document.querySelector('#options > div');
+            if (opt && !document.getElementById('perf-opt')) {
+                const d = document.createElement('div'); d.id = 'perf-opt'; d.style.cssText = 'margin-top:14px;';
+                d.innerHTML = `<label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" ${perfMode ? 'checked' : ''} onchange="setPerfMode(this.checked)"> ⚡ <b>Mode performance</b></label><small class="tl-hint" style="display:block;text-align:left;">Fige les décors animés si le jeu rame sur ton appareil.</small>`;
+                opt.appendChild(d);
+            }
         })();
     </script>
     <script>
