@@ -8330,7 +8330,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-09-30-soutien';
+        const CLIENT_BUILD = '2026-09-30-soutien2';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10452,6 +10452,7 @@
             cosNameHtml = function (name, cos) { return n(name, cos) + (cos && cos.sup ? '<span class="cn-sup" title="Supporter du jeu">💎</span>' : ''); };
             const sb = showBooster;
             showBooster = function (cards) { const r = sb.apply(this, arguments); if (isSup()) document.getElementById('summon')?.classList.add('sup'); return r; };
+            socket.on('supporter_payfail', () => toast('⚠️ Le paiement de ton abonnement Supporter a échoué. Mets à jour ta carte depuis 💎 Soutenir → Gérer mon abonnement.', '#ff2a5f'));
             socket.on('supporter_on', () => { toast('💎 <b>Merci pour ton soutien !</b> Ton badge Supporter est actif.', '#b44dff'); moneyLoad(); });
             const q = new URLSearchParams(location.search).get('supporter');
             if (q) {
@@ -10557,7 +10558,7 @@
         async function mnLoad() {
             const d = await v7get('/api/admin/money'); if (!d || !d.ok) return;
             const y = b => b ? '✅' : '❌';
-            document.getElementById('mn-env').innerHTML = `${y(d.env.stripe)} Clé Stripe (STRIPE_SECRET_KEY) • ${y(d.env.stripeHook)} Webhook Stripe (STRIPE_WEBHOOK_SECRET) • ${y(d.env.kofi)} Ko-fi automatique (KOFI_TOKEN)<br>
+            document.getElementById('mn-env').innerHTML = `${y(d.env.stripe)} Clé Stripe (STRIPE_API_KEY) • ${y(d.env.stripeHook)} Webhook Stripe (STRIPE_WEBHOOK_SECRET) • ${y(d.env.kofi)} Ko-fi automatique (KOFI_TOKEN)<br>
                 Adresse webhook Stripe : <code>${v7esc(d.hooks.stripe)}</code><br>Adresse webhook Ko-fi : <code>${v7esc(d.hooks.kofi)}</code>`;
             document.getElementById('mn-kofi').value = d.cfg.kofiUrl || '';
             document.getElementById('mn-ads-c').value = d.cfg.adsClient || '';
