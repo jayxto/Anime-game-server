@@ -18187,7 +18187,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-01-chaine3';
+const SITE_BUILD = '2026-10-02-hub4';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18796,6 +18796,335 @@ app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
     try { wrap(Object.getPrototypeOf(io.to('__slim__'))); } catch (_) {}
     try { wrap(require('socket.io').Socket.prototype); } catch (_) {}
 })();
+
+/* =====================================================================
+   HUB 4 : Plus ou moins, Survie, Chaos, salle d'attente animée,
+   bannières de profil, page profil publique
+   ===================================================================== */
+
+/* ---------- PLUS OU MOINS : deux persos, lequel est le plus fort / le plus populaire ---------- */
+const PM_BASE_AUDITED = ['naruto', 'onepiece', 'bleach', 'sds', 'clover', 'fairy'];
+const pmBaseName = n => String(n || '').replace(/\s+[—–-]\s+.*$/, '').replace(/\s+prime$/i, '').trim();
+let PM_POWER = null;
+function pmPower() {
+    if (PM_POWER) return PM_POWER;
+    PM_POWER = [];
+    for (const [u, uni] of Object.entries(ENCHERE_UNIVERSES)) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const ov = ENCHERE_POWER_OVERRIDES[u] || {};
+        const seen = new Set();
+        (uni.characters || []).forEach(c => {
+            const audited = PM_BASE_AUDITED.includes(u) || ov[c.name] != null;
+            const base = pmBaseName(c.name);
+            if (!audited || !base || seen.has(base)) return; // une seule forme par perso
+            seen.add(base);
+            PM_POWER.push({ u, name: c.name, base, value: +c.value || 0 });
+        });
+    }
+    return PM_POWER;
+}
+const pmPick = a => a[Math.floor(Math.random() * a.length)];
+const pmCard = (u, display) => ({ name: display, anime: ARC_UNIVERSE_ANIME[u] || '', img: cardImg({ u, display: pmBaseName(display) }) });
+function pmBuild(g) {
+    g.pmUsed = g.pmUsed || [];
+    const crit = Math.random() < 0.55 ? 'fort' : 'populaire';
+    for (let tries = 0; tries < 60; tries++) {
+        if (crit === 'fort') {
+            const pool = pmPower();
+            const us = [...new Set(pool.map(p => p.u))];
+            const u = pmPick(us), list = pool.filter(p => p.u === u);
+            if (list.length < 4) continue;
+            const a = pmPick(list), b = pmPick(list.filter(x => x !== a && Math.abs(x.value - a.value) >= 8));
+            if (!b) continue;
+            const key = [a.name, b.name].sort().join('|'); if (g.pmUsed.includes(key)) continue;
+            g.pmUsed.push(key);
+            const win = a.value > b.value ? a : b;
+            const [x, y] = Math.random() < .5 ? [a, b] : [b, a];
+            return { u, pm: { crit, q: 'Qui est le plus fort ?', a: pmCard(u, x.name), b: pmCard(u, y.name) }, choices: [x.name, y.name], answer: win.name, pmInfo: `${win.name} est plus fort` };
+        } else {
+            const u = pmPick(arcUniverses()), fam = arcFamous(u);
+            if (fam.length < 20) continue;
+            const i = Math.floor(Math.random() * Math.min(fam.length, 60)), j = Math.floor(Math.random() * Math.min(fam.length, 60));
+            if (Math.abs(i - j) < 10) continue;
+            const a = fam[i], b = fam[j];
+            const key = [a.display, b.display].sort().join('|'); if (g.pmUsed.includes(key)) continue;
+            g.pmUsed.push(key);
+            const win = i < j ? a : b;
+            const [x, y] = Math.random() < .5 ? [a, b] : [b, a];
+            return { u, pm: { crit, q: 'Qui est le plus populaire ?', a: pmCard(u, x.display), b: pmCard(u, y.display) }, choices: [x.display, y.display], answer: win.display, pmInfo: `${win.display} est n°${Math.min(i, j) + 1} des persos les plus connus de ${ARC_UNIVERSE_ANIME[u]}` };
+        }
+    }
+    return null;
+}
+ARC_GAMES.plusmoins = { label: 'Plus ou moins', icon: '⚖️', universe: false, rounds: 15, roundMs: 12000, answer: 'choice' };
+ARC_GAMES.survie = { label: 'Survie', icon: '☠️', universe: false, rounds: 200, roundMs: 15000, answer: 'choice' };
+ARC_GAMES.chaos = { label: 'Chaos', icon: '🌀', universe: false, rounds: 12, roundMs: 18000, answer: 'choice' };
+MODE_LABELS['arcade:plusmoins'] = 'Plus ou moins';
+MODE_LABELS['arcade:survie'] = 'Survie';
+MODE_LABELS['arcade:chaos'] = 'Chaos';
+
+// Survie et Chaos piochent leurs questions dans des mini-jeux à choix
+const MIX_SUBS = ['plusmoins', 'attaque', 'emoji'];
+async function mixBuild(g) {
+    for (let t = 0; t < 4; t++) {
+        const sub = pmPick(MIX_SUBS);
+        const tmp = Object.assign({}, g, { game: sub });
+        let r = null;
+        try { r = await arcBuildRound(tmp); } catch (_) { r = null; }
+        for (const k of Object.keys(tmp)) if (k !== 'game' && (g[k] === undefined || /^used/.test(k) || k === 'pmUsed')) g[k] = tmp[k];
+        if (r && r.choices && r.answer) { r.sub = sub; return r; }
+    }
+    return null;
+}
+const _arcBuildRoundH4 = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game === 'plusmoins') return pmBuild(g);
+    if (g.game === 'survie' || g.game === 'chaos') return mixBuild(g);
+    return _arcBuildRoundH4(g);
+};
+
+/* ---------- Chaos : une règle surprise à chaque manche ---------- */
+const CHAOS_RULES = [
+    { id: 'double', label: '💰 Points x2 !', desc: 'Cette manche rapporte le double' },
+    { id: 'rapide', label: '⚡ 6 secondes seulement !', desc: 'Réponds vite' },
+    { id: 'flou', label: '🌫️ Image floue', desc: 'Tout est flou' },
+    { id: 'envers', label: '🙃 Tout à l’envers', desc: 'L’écran est retourné' },
+    { id: 'cache', label: '🙈 Réponses cachées', desc: 'Les choix apparaissent au bout de 3 secondes' },
+    { id: 'triple', label: '💎 Points x3 !', desc: 'Manche bonus' }
+];
+const _arcNextRoundH4 = arcNextRound;
+arcNextRound = async function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.game === 'survie' && g.round > 0) {
+        const alive = room.players.filter(p => !g.out[p.id]);
+        if (alive.length <= (room.players.length > 1 ? 1 : 0)) return arcFinish(room, roomCode);
+    }
+    await _arcNextRoundH4(room, roomCode);
+    if (g && g.game === 'chaos' && g.phase === 'playing' && !g.dead) {
+        const rule = g.round === g.totalRounds ? CHAOS_RULES[5] : pmPick(CHAOS_RULES.slice(0, 5));
+        g.rule = rule;
+        if (rule.id === 'rapide') {
+            clearTimeout(g.timer);
+            g.endsAt = g.startedAt + 6000;
+            const roundNo = g.round;
+            g.timer = setTimeout(() => { if (!g.dead && g.round === roundNo) arcReveal(room, roomCode); }, 6250);
+        }
+        arcEmit(room, roomCode);
+    }
+};
+const _arcRevealH4 = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && g.phase === 'playing') {
+        // Chaos : multiplicateur de points
+        if (g.game === 'chaos' && g.rule && (g.rule.id === 'double' || g.rule.id === 'triple')) {
+            const m = g.rule.id === 'double' ? 1 : 2;
+            room.players.forEach(p => { const x = g.gainedRound[p.id] || 0; if (x) { g.scores[p.id] = (g.scores[p.id] || 0) + x * m; g.gainedRound[p.id] = x * (m + 1); } });
+        }
+        // Plus ou moins : série de bonnes réponses
+        if (g.game === 'plusmoins') {
+            g.streak = g.streak || {};
+            room.players.forEach(p => {
+                const a = g.answers[p.id];
+                if (a && a.correct) { g.streak[p.id] = (g.streak[p.id] || 0) + 1; const bonus = 20 * (g.streak[p.id] - 1); if (bonus) { g.scores[p.id] += bonus; g.gainedRound[p.id] = (g.gainedRound[p.id] || 0) + bonus; } g.best = g.best || {}; g.best[p.id] = Math.max(g.best[p.id] || 0, g.streak[p.id]); }
+                else g.streak[p.id] = 0;
+            });
+        }
+        // Survie : mauvaise réponse ou pas de réponse = éliminé (sauf si tout le monde se trompe)
+        if (g.game === 'survie') {
+            const alive = room.players.filter(p => !g.out[p.id]);
+            const wrong = alive.filter(p => !(g.answers[p.id] && g.answers[p.id].correct));
+            if (wrong.length && wrong.length === alive.length && alive.length > 1) g.message = '😅 Tout le monde s’est trompé : personne n’est éliminé !';
+            else { wrong.forEach(p => { g.out[p.id] = g.round; }); g.message = wrong.length ? `☠️ Éliminé${wrong.length > 1 ? 's' : ''} : ${wrong.map(p => p.name).join(', ')}` : '✅ Tout le monde survit !'; }
+            alive.filter(p => !wrong.includes(p) || (wrong.length === alive.length && alive.length > 1)).forEach(p => { g.scores[p.id] = (g.scores[p.id] || 0) + 10; });
+        }
+    }
+    return _arcRevealH4(room, roomCode);
+};
+const _arcFinishH4 = arcFinish;
+arcFinish = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    const r = _arcFinishH4(room, roomCode);
+    if (g && g.game === 'survie' && !(g.fails >= 3) && g.round > 0) {
+        const alive = room.players.filter(p => !g.out[p.id]);
+        const last = alive.length ? alive : room.players.filter(p => g.out[p.id] === Math.max(...Object.values(g.out)));
+        g.winnerNames = last.map(p => p.name);
+        const solo = room.players[0], sv = solo && g.out[solo.id] ? g.out[solo.id] - 1 : g.round;
+        g.message = room.players.length > 1 ? `🏆 Dernier debout : ${g.winnerNames.join(', ')} (${g.round} manches)` : `☠️ Tu as survécu ${sv} manche${sv > 1 ? 's' : ''} !`;
+        arcEmit(room, roomCode);
+    }
+    if (g && g.game === 'plusmoins' && g.best) {
+        const top = Math.max(0, ...Object.values(g.best));
+        if (top >= 3) { g.message = `🔥 Meilleure série : ${top} bonnes réponses d’affilée`; arcEmit(room, roomCode); }
+    }
+    return r;
+};
+const _arcPlayerDoneH4 = arcPlayerDone;
+arcPlayerDone = function (g, pid) { if (g && g.game === 'survie' && g.out && g.out[pid]) return true; return _arcPlayerDoneH4(g, pid); };
+const _startArcadeH4 = startArcade;
+startArcade = function (room, roomCode) {
+    const { game } = arcParseSub(room.subMode);
+    if (game === 'survie') {
+        // on prépare l'état avant le premier tour
+        const r = _startArcadeH4(room, roomCode);
+        const g = arcGames[roomCode]; if (g) { g.out = {}; g.totalRounds = 200; }
+        return r;
+    }
+    return _startArcadeH4(room, roomCode);
+};
+const _arcPublicH4 = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicH4(room, g);
+    if (!g) return out;
+    const cur = g.current || {};
+    const shown = g.phase === 'playing' || g.phase === 'reveal' || g.phase === 'finished';
+    if (shown && cur.pm) { out.stage.pm = cur.pm; if (g.phase !== 'playing') out.stage.pmInfo = cur.pmInfo; }
+    if (shown && cur.attack && !out.stage.attack) out.stage.attack = cur.attack;
+    if (shown && cur.sub) out.stage.sub = cur.sub;
+    if (g.game === 'chaos' && g.rule && g.phase !== 'finished') out.rule = g.rule;
+    if (g.game === 'survie') {
+        out.totalRounds = null;
+        out.players.forEach(p => { if (g.out && g.out[p.id]) p.eliminated = true; });
+        out.alive = room.players.filter(p => !(g.out && g.out[p.id])).length;
+        if (g.phase !== 'finished') out.message = g.phase === 'reveal' ? g.message : null;
+    }
+    if (g.game === 'plusmoins' && g.streak) out.players.forEach(p => { p.streak = g.streak[p.id] || 0; });
+    return out;
+};
+// un joueur éliminé ne peut plus répondre
+io.on('connection', socket => {
+    socket.use((pkt, next) => {
+        if (pkt[0] === 'arc_choice') {
+            const g = arcGames[(pkt[1] || {}).roomCode];
+            if (g && g.game === 'survie' && g.out && g.out[socket.id]) return;
+        }
+        next();
+    });
+});
+if (typeof TOUR_POOL !== 'undefined' && !TOUR_POOL.includes('plusmoins')) TOUR_POOL.push('plusmoins');
+
+/* ---------- Salle d'attente animée : questions d'échauffement (sans points) ---------- */
+app.get('/api/warmup', (req, res) => {
+    try {
+        const g = {};
+        let q = Math.random() < 0.6 ? pmBuild(g) : null;
+        if (q) return res.json({ ok: true, kind: 'pm', q: q.pm.q, a: q.pm.a, b: q.pm.b, choices: q.choices, answer: q.answer });
+        const a = pmPick(ATTACKS);
+        const others = arcShuffle(ATTACKS.filter(x => x[1] !== a[1])).slice(0, 3).map(x => x[1]);
+        res.json({ ok: true, kind: 'atk', q: `« ${a[2]} »`, anime: a[0], choices: arcShuffle([a[1], ...others]), answer: a[1] });
+    } catch (e) { res.json({ ok: false }); }
+});
+
+/* ---------- Bannières de profil (débloquées avec les succès) ---------- */
+const BANNERS = [
+    { id: 'aube', name: 'Aube', need: 'Offerte', ok: s => true },
+    { id: 'vague', name: 'Vague', need: '1 succès', ok: s => s.n >= 1 },
+    { id: 'sakura', name: 'Pétales', need: '2 succès', ok: s => s.n >= 2 },
+    { id: 'neon', name: 'Néon', need: '4 succès', ok: s => s.n >= 4 },
+    { id: 'braise', name: 'Braise', need: '6 succès', ok: s => s.n >= 6 },
+    { id: 'jade', name: 'Jade', need: '8 succès', ok: s => s.n >= 8 },
+    { id: 'or', name: 'Or royal', need: '12 succès', ok: s => s.n >= 12 },
+    { id: 'galaxie', name: 'Galaxie', need: '16 succès', ok: s => s.n >= 16 },
+    { id: 'eclair', name: 'Foudre', need: 'Succès « Éclair »', ok: s => s.has('eclair') },
+    { id: 'sniper', name: 'Viseur', need: 'Succès « Sniper »', ok: s => s.has('sniper') },
+    { id: 'lune', name: 'Nuit de lune', need: 'Succès « Oiseau de nuit »', ok: s => s.has('nightowl') },
+    { id: 'otaku', name: 'Arc-en-ciel', need: 'Succès « Otaku ultime »', ok: s => s.has('otaku') },
+    { id: 'parfait', name: 'Diamant', need: 'Succès « Sans faute »', ok: s => s.has('perfect') },
+    { id: 'foule', name: 'Couronne', need: 'Succès « Roi de la foule »', ok: s => s.has('underdog') }
+];
+const BANNER_SEL = new Map();
+(async () => { try { for (const { k, v } of await kvList('banner')) if (v) BANNER_SEL.set(+k || k, v); } catch (_) {} })();
+const _cosOfBan = cosOf;
+cosOf = function (row) { const o = _cosOfBan(row); if (row && row.id && BANNER_SEL.has(row.id)) o.banner = BANNER_SEL.get(row.id); return o; };
+async function bannerState(uid) {
+    const b = await progBadges(uid);
+    const s = { n: b.length, has: id => b.includes(id) };
+    return BANNERS.map(x => ({ id: x.id, name: x.name, need: x.need, unlocked: !!x.ok(s) }));
+}
+app.get('/api/banners', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    res.json({ ok: true, list: await bannerState(uid), selected: BANNER_SEL.get(uid) || null });
+});
+app.post('/api/banners/select', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || '');
+    if (!id) { BANNER_SEL.delete(uid); await kvSet('banner', String(uid), null); }
+    else {
+        const b = (await bannerState(uid)).find(x => x.id === id);
+        if (!b) return res.json({ ok: false, error: 'Bannière inconnue.' });
+        if (!b.unlocked) return res.json({ ok: false, error: `Bannière verrouillée : ${b.need}.` });
+        BANNER_SEL.set(uid, id); await kvSet('banner', String(uid), id);
+    }
+    if (HAS_DB) { try { await refreshUserCos(uid); } catch (_) {} }
+    else socketsOfUser(uid).forEach(sid => { const s = io.sockets.sockets.get(sid); if (s && s.user) s.user.cos = Object.assign({}, s.user.cos, { banner: id || undefined }); });
+    res.json({ ok: true, selected: id || null });
+});
+
+/* ---------- Page profil publique : /u/pseudo ---------- */
+function pubEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+async function publicProfile(pseudo) {
+    const uid = await uidByPseudo(pseudo);
+    if (!uid) return null;
+    let xp = PROG_MEM.xp.get(uid) || 0, name = await pseudoOf(uid), cos = {};
+    if (HAS_DB) { try { const r = (await pool.query('SELECT * FROM users WHERE id=$1', [uid])).rows[0]; if (r) { xp = r.xp || 0; name = r.pseudo; cos = cosOf(r); } } catch (_) {} }
+    const lvl = levelFromXp(+xp || 0).level;
+    const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
+    const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
+    const RANK = { legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    let cards = [];
+    try {
+        const m = await cardsOf(uid);
+        cards = [...m.entries()].filter(([k]) => !k.startsWith('collector|')).map(([k, v]) => { const [u, display] = k.split('|'); return { name: display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: keyRarity(k) || 'commune', shiny: (v.shiny || 0) > 0, img: cardImg({ u, display }) }; })
+            .sort((a, b) => (RANK[b.rarity] + (b.shiny ? .5 : 0)) - (RANK[a.rarity] + (a.shiny ? .5 : 0)));
+    } catch (_) {}
+    return { uid, name, lvl, xp, banner: BANNER_SEL.get(uid) || null, sup: typeof supActive === 'function' && supActive(uid), stats: { games: stats.games || 0, wins: stats.wins || 0, points: stats.points || 0 }, badges, cardsTotal: cards.length, cards: cards.slice(0, 12), clan: typeof CLAN_TAG !== 'undefined' ? CLAN_TAG.get(uid) || null : null };
+}
+app.get('/api/public/:pseudo', async (req, res) => {
+    const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
+    if (!p) return res.json({ ok: false, error: 'Joueur introuvable.' });
+    delete p.uid; res.json({ ok: true, profile: p });
+});
+const BANNER_CSS = `
+.ban-aube{background:linear-gradient(120deg,#ff9a8b,#ff6a88 55%,#ff99ac)}
+.ban-vague{background:linear-gradient(135deg,#0f4c75,#3282b8 50%,#bbe1fa)}
+.ban-sakura{background:radial-gradient(circle at 20% 30%,#ffd1dc 0 8%,transparent 9%),radial-gradient(circle at 70% 60%,#ffc0cb 0 6%,transparent 7%),radial-gradient(circle at 45% 80%,#ffe4ec 0 5%,transparent 6%),linear-gradient(135deg,#6a3e6e,#c96b9c)}
+.ban-neon{background:linear-gradient(90deg,#12001f,#3b0a57),repeating-linear-gradient(90deg,transparent 0 18px,rgba(0,240,255,.25) 18px 20px);background-blend-mode:screen;box-shadow:inset 0 0 0 1px #ff3bd4,0 0 10px rgba(255,59,212,.35)}
+.ban-braise{background:linear-gradient(0deg,#3a0a00,#b8350a 60%,#ffb347)}
+.ban-jade{background:linear-gradient(135deg,#0b3d2e,#1f9c73 60%,#b8f2d8)}
+.ban-or{background:linear-gradient(135deg,#6b4a00,#ffd700 45%,#fff3b0 55%,#b8860b)}
+.ban-galaxie{background:radial-gradient(circle at 30% 40%,rgba(255,255,255,.8) 0 1px,transparent 2px),radial-gradient(circle at 75% 25%,rgba(255,255,255,.7) 0 1px,transparent 2px),radial-gradient(circle at 60% 75%,rgba(255,255,255,.6) 0 1px,transparent 2px),linear-gradient(135deg,#0b0033,#3d1a78 50%,#0b6e99)}
+.ban-eclair{background:linear-gradient(115deg,#1a1a40 40%,#ffe600 41%,#ffe600 44%,#1a1a40 45%),linear-gradient(90deg,#1a1a40,#2e2e7a)}
+.ban-sniper{background:radial-gradient(circle at 50% 50%,transparent 0 30%,#ff2a5f 31% 33%,transparent 34% 55%,#ff2a5f 56% 57%,transparent 58%),linear-gradient(135deg,#1b1b1b,#3a3a3a)}
+.ban-lune{background:radial-gradient(circle at 80% 30%,#fff5d1 0 12%,transparent 13%),linear-gradient(180deg,#0b1026,#26305a)}
+.ban-otaku{background:linear-gradient(90deg,#ff5f6d,#ffc371,#7dff8a,#4fc3ff,#b44dff)}
+.ban-parfait{background:linear-gradient(135deg,#a1c4fd,#e0f7ff 45%,#c2e9fb 55%,#7f9cf5)}
+.ban-foule{background:linear-gradient(135deg,#5a0f2e,#c2185b 50%,#ffd700)}`;
+app.get('/u/:pseudo', async (req, res) => {
+    const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
+    const base = siteUrl(req);
+    if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
+    const RAR = { legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const title = `${p.name} – profil Anime Game`;
+    const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
+    res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${pubEsc(title)}</title><meta name="description" content="${pubEsc(desc)}"><meta property="og:title" content="${pubEsc(title)}"><meta property="og:description" content="${pubEsc(desc)}"><meta property="og:image" content="${base}/og.png"><meta property="og:site_name" content="Anime Game"><link rel="icon" href="/icon-192.png">
+<style>*{box-sizing:border-box}body{margin:0;background:#0b0b10;color:#eee;font-family:system-ui,-apple-system,Segoe UI,sans-serif}a{color:#00f0ff}
+.wrap{max-width:860px;margin:0 auto;padding:16px}.hero{border-radius:18px;padding:28px 20px;position:relative;overflow:hidden;min-height:150px;display:flex;align-items:flex-end}
+.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.65))}.hero .in{position:relative;z-index:1}
+.name{font-size:2rem;font-weight:900;text-shadow:0 2px 8px #000}.sub{opacity:.9;margin-top:4px;text-shadow:0 1px 4px #000}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:16px 0}.st{background:#15151f;border:1px solid #2a2a40;border-radius:12px;padding:12px;text-align:center}.st b{display:block;font-size:1.5rem;color:#ffd700}
+h2{font-size:1.1rem;margin:22px 0 10px}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.card{background:#15151f;border:2px solid var(--c);border-radius:12px;overflow:hidden;text-align:center;font-size:.8rem}.card img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#222;display:block}.card div{padding:6px}.card small{color:var(--c);display:block}
+.badges{display:flex;flex-wrap:wrap;gap:8px}.bd{background:#15151f;border:1px solid #2a2a40;border-radius:999px;padding:6px 12px;font-size:.85rem}
+.cta{display:block;text-align:center;margin:26px auto 8px;background:#ff2a5f;color:#fff;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:12px;max-width:340px}
+${BANNER_CSS}.hero:not([class*="ban-"]){background:linear-gradient(135deg,#1b1b3a,#3a1c5c)}</style></head><body><div class="wrap">
+<div class="hero${p.banner ? ' ban-' + pubEsc(p.banner) : ''}"><div class="in"><div class="name">${p.clan ? `<span style="color:${pubEsc(p.clan.color || '#ffd700')}">[${pubEsc(p.clan.tag)}]</span> ` : ''}${pubEsc(p.name)}${p.sup ? ' 💎' : ''}</div><div class="sub">Niveau ${p.lvl} • joueur d’Anime Game</div></div></div>
+<div class="stats"><div class="st"><b>${p.stats.games}</b>parties</div><div class="st"><b>${p.stats.wins}</b>victoires</div><div class="st"><b>${p.badges.length}</b>succès</div><div class="st"><b>${p.cardsTotal}</b>cartes</div></div>
+<h2>🃏 Cartes les plus rares</h2>${p.cards.length ? `<div class="cards">${p.cards.map(c => `<div class="card" style="--c:${COL[c.rarity]}"><img src="${pubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><div><b>${pubEsc(c.name)}</b><small>${c.shiny ? '✨ ' : ''}${RAR[c.rarity]}</small></div></div>`).join('')}</div>` : '<p style="opacity:.7">Pas encore de cartes.</p>'}
+<h2>🏅 Succès</h2>${p.badges.length ? `<div class="badges">${p.badges.map(b => `<span class="bd" title="${pubEsc(b.desc)}">${pubEsc(b.name)}</span>`).join('')}</div>` : '<p style="opacity:.7">Pas encore de succès.</p>'}
+<a class="cta" href="${base}/">🎮 Jouer à Anime Game</a></div></body></html>`);
+});
 
 /* =====================================================================
    SERVEUR SOLIDE : une erreur dans un message ne fait plus rien planter,

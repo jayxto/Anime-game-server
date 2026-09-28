@@ -1295,6 +1295,63 @@
         html.in-game #theme-layer *,html.lowfx #theme-layer *{animation-play-state:paused!important;}
         html.in-game #theme-layer .dk-motes,html.lowfx #theme-layer .dk-motes{display:none;}
         html.lowfx *{backdrop-filter:none!important;}
+
+        /* ---- HUB 4 ---- */
+        .h4-new{position:absolute;top:6px;right:6px;font-style:normal;font-size:.6rem;font-weight:900;background:#ff2a5f;color:#fff;border-radius:6px;padding:2px 5px;}
+        .arc-game-btn{position:relative;}
+        .pm-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
+        .pm-q{font-size:1.35rem;font-weight:900;text-align:center;color:var(--accent-yellow,#ffe600);}
+        .pm-duel{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;}
+        .pm-card{width:min(200px,38vw);background:#15151f;border:2px solid #2c2c44;border-radius:14px;overflow:hidden;text-align:center;transition:transform .3s,border-color .3s,opacity .3s;}
+        .pm-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:#0b0b10;}
+        .pm-card b{display:block;padding:6px 6px 0;font-size:.95rem;} .pm-card small{display:block;padding:0 6px 8px;opacity:.7;font-size:.75rem;}
+        .pm-card.win{border-color:#00ff88;transform:scale(1.05);box-shadow:0 0 22px rgba(0,255,136,.35);} .pm-card.lose{opacity:.45;filter:grayscale(.6);}
+        .pm-vs{font-family:'Bangers',cursive;font-size:2.2rem;color:#ff2a5f;text-shadow:0 0 12px rgba(255,42,95,.6);}
+        .pm-info{font-size:.9rem;color:#9fe8ff;text-align:center;}
+        .pm-streak{font-weight:900;color:#ff9a3c;font-size:1.05rem;animation:pmPop .4s;}
+        @keyframes pmPop{from{transform:scale(1.5)}}
+        .h4-rule{width:100%;text-align:center;font-weight:900;font-size:1.1rem;padding:8px;border-radius:10px;background:linear-gradient(90deg,#6a00ff55,#ff2a5f55);margin-bottom:8px;animation:pmPop .4s;}
+        #arc-stage:has(>.h4-rule){flex-direction:column;flex-wrap:nowrap;align-items:center;}
+        .h4-rule{flex:0 0 auto;box-sizing:border-box;}
+        .h4-rule.surv{background:linear-gradient(90deg,#3a0000aa,#7a0000aa);}
+        #arc-stage.ch-flou img,#arc-stage.ch-flou .arc-emoji,#arc-stage.ch-flou .atk-desc{filter:blur(7px);}
+        #arc-stage.ch-envers>*:not(.h4-rule){transform:rotate(180deg);}
+        #arc-choices.ch-cache{visibility:hidden;}
+        .warmup{margin-top:16px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.18);border-radius:14px;padding:12px;text-align:center;}
+        .wu-head{font-weight:900;margin-bottom:8px;} .wu-head small{font-weight:400;opacity:.6;font-size:.75rem;}
+        .wu-q{font-weight:800;margin-bottom:8px;} .wu-anime{opacity:.7;font-size:.85rem;margin-bottom:8px;}
+        .wu-duel{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:8px;} .wu-duel div{width:90px;font-size:.75rem;} .wu-duel img{width:90px;height:110px;object-fit:cover;border-radius:10px;background:#0b0b10;display:block;margin-bottom:4px;} .wu-duel span{font-weight:900;color:#ff2a5f;}
+        .wu-ch{display:grid;grid-template-columns:1fr 1fr;gap:6px;} .wu-ch button{background:#15151f;border:1px solid #2c2c44;color:#fff;border-radius:10px;padding:8px;cursor:pointer;font-size:.85rem;}
+        .wu-ch button.good{background:#0f5132;border-color:#00ff88;} .wu-ch button.bad{background:#5a1020;border-color:#ff2a5f;}
+        .wu-score{font-size:.8rem;opacity:.7;margin-top:6px;min-height:1em;}
+
+        .ban-aube{background:linear-gradient(120deg,#ff9a8b,#ff6a88 55%,#ff99ac)}
+        .ban-vague{background:linear-gradient(135deg,#0f4c75,#3282b8 50%,#bbe1fa)}
+        .ban-sakura{background:radial-gradient(circle at 20% 30%,#ffd1dc 0 8%,transparent 9%),radial-gradient(circle at 70% 60%,#ffc0cb 0 6%,transparent 7%),radial-gradient(circle at 45% 80%,#ffe4ec 0 5%,transparent 6%),linear-gradient(135deg,#6a3e6e,#c96b9c)}
+        .ban-neon{background:linear-gradient(90deg,#12001f,#3b0a57),repeating-linear-gradient(90deg,transparent 0 18px,rgba(0,240,255,.25) 18px 20px);background-blend-mode:screen;box-shadow:inset 0 0 0 1px #ff3bd4,0 0 10px rgba(255,59,212,.35)}
+        .ban-braise{background:linear-gradient(0deg,#3a0a00,#b8350a 60%,#ffb347)}
+        .ban-jade{background:linear-gradient(135deg,#0b3d2e,#1f9c73 60%,#b8f2d8)}
+        .ban-or{background:linear-gradient(135deg,#6b4a00,#ffd700 45%,#fff3b0 55%,#b8860b)}
+        .ban-galaxie{background:radial-gradient(circle at 30% 40%,rgba(255,255,255,.8) 0 1px,transparent 2px),radial-gradient(circle at 75% 25%,rgba(255,255,255,.7) 0 1px,transparent 2px),radial-gradient(circle at 60% 75%,rgba(255,255,255,.6) 0 1px,transparent 2px),linear-gradient(135deg,#0b0033,#3d1a78 50%,#0b6e99)}
+        .ban-eclair{background:linear-gradient(115deg,#1a1a40 40%,#ffe600 41%,#ffe600 44%,#1a1a40 45%),linear-gradient(90deg,#1a1a40,#2e2e7a)}
+        .ban-sniper{background:radial-gradient(circle at 50% 50%,transparent 0 30%,#ff2a5f 31% 33%,transparent 34% 55%,#ff2a5f 56% 57%,transparent 58%),linear-gradient(135deg,#1b1b1b,#3a3a3a)}
+        .ban-lune{background:radial-gradient(circle at 80% 30%,#fff5d1 0 12%,transparent 13%),linear-gradient(180deg,#0b1026,#26305a)}
+        .ban-otaku{background:linear-gradient(90deg,#ff5f6d,#ffc371,#7dff8a,#4fc3ff,#b44dff)}
+        .ban-parfait{background:linear-gradient(135deg,#a1c4fd,#e0f7ff 45%,#c2e9fb 55%,#7f9cf5)}
+        .ban-foule{background:linear-gradient(135deg,#5a0f2e,#c2185b 50%,#ffd700)}
+        .cn-ban{display:inline-block;padding:1px 8px;border-radius:999px;text-shadow:0 1px 3px rgba(0,0,0,.85);}
+        .ban-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+        .ban-item{height:56px;border-radius:10px;border:2px solid transparent;color:#fff;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 1px 3px #000;font-size:.82rem;}
+        .ban-item small{font-weight:400;font-size:.65rem;opacity:.9;} .ban-item.locked{filter:grayscale(.8) brightness(.6);cursor:not-allowed;} .ban-item.on{border-color:#00f0ff;box-shadow:0 0 12px rgba(0,240,255,.5);} .ban-item.none{background:#15151f;border-color:#2c2c44;}
+        .live-btn{width:100%;margin:6px 0;background:#9146FF;color:#fff;border:none;border-radius:8px;padding:6px;font-weight:800;cursor:pointer;}
+        #live-count{position:fixed;top:10px;right:12px;z-index:9991;background:rgba(145,70,255,.92);color:#fff;border-radius:999px;padding:7px 14px;font-size:.85rem;box-shadow:0 4px 18px rgba(0,0,0,.4);}
+        #live-count small{opacity:.8;margin-left:6px;}
+        html.live header,html.live #fx-react-bar,html.live #bug-fab,html.live #music-player,html.live .ad-slot,html.live #theme-layer,html.live #site-banner,html.live #h3-news-btn{display:none!important;}
+        html.live #arcade-room,html.live #blindtest-room{max-width:1100px!important;margin:10px auto!important;}
+        html.live #arc-stage{transform:scale(1.08);transform-origin:top center;margin-bottom:20px;}
+        html.live .bt-choice{font-size:1.15rem!important;padding:16px!important;}
+        html.live #live-count{top:14px;right:14px;font-size:1rem;}
+        @media (max-width:600px){.pm-vs{font-size:1.5rem;}.pm-duel{gap:6px;}}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -8367,7 +8424,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-01-chaine3';
+        const CLIENT_BUILD = '2026-10-02-hub4';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10295,6 +10352,7 @@
 
         /* ---------- Nouveautés ---------- */
         const CHANGELOG = [
+            { v: '2026-10-03', title: 'Plus ou moins, Survie, Chaos et profils', items: ['⚖️ Plus ou moins : qui est le plus fort, le plus populaire ?', '☠️ Survie : une erreur et tu es éliminé', '🌀 Chaos : une règle surprise à chaque manche', '🔥 Échauffement dans la salle d’attente', '🎨 Bannières de profil à débloquer avec les succès', '🔗 Ta page profil publique à partager (Options)', '📺 Écran live pour les streamers'] },
             { v: '2026-10-01', title: 'Soutenir le jeu', items: ['💎 Badge Supporter : pseudo Prisme animé, invocations arc-en-ciel et plus de pub (bouton 💎 en haut)', '☕ Don libre sur Ko-fi ou abonnement à 1,99 €/mois, que du cosmétique'] },
             { v: '2026-09-30', title: 'Hôtel des ventes et invocations', items: ['🏪 Hôtel des ventes : vends tes cartes contre des pièces et achète celles des autres (onglet Marché de la Collection)', '🔮 Ouvrir un booster lance maintenant une vraie invocation : cercle magique, lumière et suspense avant la carte rare'] },
             { v: '2026-09-29', title: 'Admin et nouveau mini-jeu', items: ['💥 Nouveau mini-jeu : Devine l’attaque', '⚡ Évènements surprises : XP x2, boss spécial, tournoi surprise', '🚩 Tu peux signaler un joueur', '🆕 Cette page Nouveautés'] },
@@ -10667,6 +10725,151 @@
                 opt.appendChild(d);
             }
         })();
+    </script>
+    <script>
+
+        /* =====================================================================
+           HUB 4 : Plus ou moins, Survie, Chaos, échauffement, bannières, profil public, écran live
+           ===================================================================== */
+        ARC_UI.plusmoins = { title: '⚖️ PLUS OU MOINS', sub: 'Deux persos : lequel est le plus fort ou le plus populaire ? Enchaîne les bonnes réponses pour une série', universe: false };
+        ARC_UI.survie = { title: '☠️ SURVIE', sub: 'Une mauvaise réponse et tu es éliminé. Le dernier debout gagne', universe: false };
+        ARC_UI.chaos = { title: '🌀 CHAOS', sub: 'Une règle surprise à chaque manche', universe: false };
+        (function () {
+            const grid = document.querySelector('.arc-menu-grid');
+            if (grid && !grid.querySelector('[data-h4]')) {
+                grid.insertAdjacentHTML('afterbegin', `
+                    <button class="arc-game-btn" data-h4 onclick="openArcadeGame('plusmoins')"><span class="arc-ico">⚖️</span><b>Plus ou moins</b><span>Deux persos : qui est le plus fort, le plus populaire ? Fais la plus longue série</span><em class="h4-new">NOUVEAU</em></button>
+                    <button class="arc-game-btn" data-h4 onclick="openArcadeGame('survie')"><span class="arc-ico">☠️</span><b>Survie</b><span>Mauvaise réponse = éliminé. Le dernier debout gagne</span><em class="h4-new">NOUVEAU</em></button>
+                    <button class="arc-game-btn" data-h4 onclick="openArcadeGame('chaos')"><span class="arc-ico">🌀</span><b>Chaos</b><span>Chaque manche a une règle surprise : x2, 6 secondes, image floue, à l’envers…</span><em class="h4-new">NOUVEAU</em></button>`);
+            }
+            const orig = arcRenderStage;
+            arcRenderStage = function (q) {
+                const st = (q && q.stage) || {};
+                const stage = document.getElementById('arc-stage');
+                // Chaos : effets visuels + bannière de règle
+                if (stage) {
+                    const r = q && q.game === 'chaos' && q.phase === 'playing' ? q.rule : null;
+                    stage.classList.toggle('ch-flou', !!(r && r.id === 'flou'));
+                    stage.classList.toggle('ch-envers', !!(r && r.id === 'envers'));
+                    const ch = document.getElementById('arc-choices');
+                    if (ch) { ch.classList.toggle('ch-cache', !!(r && r.id === 'cache')); if (r && r.id === 'cache') { clearTimeout(window._h4c); window._h4c = setTimeout(() => ch.classList.remove('ch-cache'), Math.max(0, 3000 - (Date.now() + (arcClock || 0) - q.startedAt))); } }
+                }
+                if (q && q.phase !== 'loading' && st.pm) {
+                    const key = 'pm|' + q.round + '|' + q.phase;
+                    if (arcStageKey !== key) {
+                        arcStageKey = key;
+                        const a = st.pm.a, b = st.pm.b, rev = q.phase !== 'playing';
+                        const card = c => `<div class="pm-card${rev ? (c.name === q.answer ? ' win' : ' lose') : ''}"><img src="${v7esc(c.img)}" alt="" onerror="this.style.opacity=.15"><b>${v7esc(c.name)}</b><small>${v7esc(c.anime)}</small></div>`;
+                        stage.innerHTML = `<div class="pm-wrap">${h4RuleHtml(q)}<div class="pm-q">${v7esc(st.pm.q)}</div><div class="pm-duel">${card(a)}<div class="pm-vs">VS</div>${card(b)}</div>${rev && st.pmInfo ? `<div class="pm-info">${v7esc(st.pmInfo)}</div>` : ''}${h4Streak(q)}</div>`;
+                    }
+                    return h4After(q);
+                }
+                if (q && (q.game === 'survie' || q.game === 'chaos') && st.sub) {
+                    const r = orig.call(this, Object.assign({}, q, { game: st.sub }));
+                    if (stage && q.phase !== 'loading' && !stage.querySelector('.h4-rule') && (q.rule || q.game === 'survie')) stage.insertAdjacentHTML('afterbegin', h4RuleHtml(q));
+                    h4After(q);
+                    return r;
+                }
+                return orig.apply(this, arguments);
+            };
+        })();
+        function h4RuleHtml(q) {
+            if (q.game === 'chaos' && q.rule) return `<div class="h4-rule">🌀 ${v7esc(q.rule.label)}</div>`;
+            if (q.game === 'survie') { const me = q.players.find(p => p.id === socket.id) || {}; return `<div class="h4-rule surv">☠️ ${q.alive} survivant${q.alive > 1 ? 's' : ''}${me.eliminated ? ' • tu es éliminé, regarde la suite' : ''}</div>`; }
+            return '';
+        }
+        function h4Streak(q) { const me = q.players.find(p => p.id === socket.id); return me && me.streak >= 2 ? `<div class="pm-streak">🔥 Série : ${me.streak}</div>` : ''; }
+        function h4After(q) {
+            if (q.game === 'survie' && q.message && q.phase === 'reveal') { const r = document.getElementById('arc-result'); if (r) setTimeout(() => { r.textContent = q.message; r.style.color = '#ffb347'; }, 0); }
+        }
+
+        /* ---------- Salle d'attente animée : questions d'échauffement ---------- */
+        (function () {
+            const wr = document.getElementById('waiting-room'); if (!wr || document.getElementById('warmup')) return;
+            const d = document.createElement('div'); d.id = 'warmup'; d.className = 'warmup';
+            d.innerHTML = `<div class="wu-head">🔥 Échauffement <small>en attendant les autres • ne compte pas</small></div><div id="wu-body"><button class="btn-action" onclick="wuNext()">Lancer une question</button></div><div class="wu-score" id="wu-score"></div>`;
+            wr.appendChild(d);
+            let wasOpen = false;
+            setInterval(() => {
+                const open = wr.style.display !== 'none' && wr.offsetParent !== null;
+                if (open && !wasOpen && !wu.q) wuNext();
+                wasOpen = open;
+            }, 1200);
+        })();
+        const wu = { q: null, good: 0, total: 0, t: null };
+        async function wuNext() {
+            clearTimeout(wu.t);
+            const d = await v7get('/api/warmup'); const body = document.getElementById('wu-body'); if (!body) return;
+            if (!d || !d.ok) { body.innerHTML = '<p class="tl-hint">Échauffement indisponible.</p>'; return; }
+            wu.q = d;
+            const imgs = d.kind === 'pm' ? `<div class="wu-duel"><div><img src="${v7esc(d.a.img)}" alt="" onerror="this.style.opacity=.15"><b>${v7esc(d.a.name)}</b></div><span>VS</span><div><img src="${v7esc(d.b.img)}" alt="" onerror="this.style.opacity=.15"><b>${v7esc(d.b.name)}</b></div></div>` : `<div class="wu-anime">${v7esc(d.anime)}</div>`;
+            body.innerHTML = `<div class="wu-q">${v7esc(d.q)}</div>${imgs}<div class="wu-ch">${d.choices.map((c, i) => `<button onclick="wuPick(${i},this)">${v7esc(c)}</button>`).join('')}</div>`;
+        }
+        function wuPick(i, btn) {
+            if (!wu.q || wu.q.done) return;
+            wu.q.done = true; wu.total++;
+            const ok = wu.q.choices[i] === wu.q.answer; if (ok) wu.good++;
+            document.querySelectorAll('#wu-body .wu-ch button').forEach(b => { b.disabled = true; if (b.textContent === wu.q.answer) b.classList.add('good'); });
+            if (!ok) btn.classList.add('bad');
+            const s = document.getElementById('wu-score'); if (s) s.textContent = `${wu.good}/${wu.total} bonnes réponses`;
+            wu.t = setTimeout(wuNext, 1800);
+        }
+
+        /* ---------- Bannières de profil ---------- */
+        (function () {
+            const o = cosNameHtml;
+            cosNameHtml = function (name, cos) { const h = o(name, cos); return cos && cos.banner ? `<span class="cn-ban ban-${v7esc(cos.banner)}">${h}</span>` : h; };
+            const opt = document.querySelector('#options > div');
+            if (opt && !document.getElementById('ban-opt')) {
+                const d = document.createElement('div'); d.id = 'ban-opt'; d.style.cssText = 'margin-top:16px;text-align:left;';
+                d.innerHTML = `<h3 style="margin:0 0 6px;">🎨 Ma bannière</h3><p class="tl-hint" style="text-align:left;margin:0 0 8px;">Un fond derrière ton pseudo dans les salons. Débloque-les avec tes succès.</p><div id="ban-grid" class="ban-grid"><p class="tl-hint">Connecte-toi pour voir tes bannières.</p></div>
+                    <h3 style="margin:16px 0 6px;">🔗 Mon profil public</h3><p class="tl-hint" style="text-align:left;margin:0 0 8px;">Une page à partager avec ta bannière, tes cartes rares et tes succès.</p><div class="ch-in"><button class="btn-action" onclick="pubOpen()">👀 Voir</button><button class="btn-action" onclick="pubCopy()">📋 Copier le lien</button></div>`;
+                opt.appendChild(d);
+            }
+            const sw = window.switchTab;
+            window.switchTab = function (t) { const r = sw.apply(this, arguments); if (t === 'options') banLoad(); return r; };
+        })();
+        async function banLoad() {
+            const g = document.getElementById('ban-grid'); if (!g || !isAccount()) return;
+            const d = await v7get('/api/banners'); if (!d || !d.ok) return;
+            g.innerHTML = `<button class="ban-item none${!d.selected ? ' on' : ''}" onclick="banPick('')"><span>Aucune</span></button>` + d.list.map(b => `<button class="ban-item ban-${v7esc(b.id)}${b.unlocked ? '' : ' locked'}${d.selected === b.id ? ' on' : ''}" onclick="banPick('${v7esc(b.id)}')" title="${v7esc(b.need)}"><span>${b.unlocked ? '' : '🔒 '}${v7esc(b.name)}</span><small>${b.unlocked ? '' : v7esc(b.need)}</small></button>`).join('');
+        }
+        async function banPick(id) {
+            const d = await v7post('/api/banners/select', { id });
+            if (d && d.ok) { toast(id ? '🎨 Bannière équipée !' : 'Bannière retirée', '#00f0ff'); if (currentUser) currentUser.cos = Object.assign({}, currentUser.cos, { banner: id || undefined }); banLoad(); }
+            else toast((d && d.error) || 'Erreur', '#ff2a5f');
+        }
+        function pubUrl() { const p = currentUser && currentUser.pseudo; return p ? location.origin + '/u/' + encodeURIComponent(p) : null; }
+        function pubOpen() { const u = pubUrl(); if (!u || !isAccount()) return toast('Connecte-toi à un compte pour avoir un profil public.', '#ff2a5f'); window.open(u, '_blank', 'noopener'); }
+        async function pubCopy() {
+            const u = pubUrl(); if (!u || !isAccount()) return toast('Connecte-toi à un compte pour avoir un profil public.', '#ff2a5f');
+            try { if (navigator.share && /Mobi|iPhone|Android/i.test(navigator.userAgent)) { await navigator.share({ title: 'Mon profil Anime Game', url: u }); return; } } catch (_) {}
+            try { await navigator.clipboard.writeText(u); toast('🔗 Lien copié : ' + u, '#00ff88'); } catch (_) { toast(u, '#00f0ff'); }
+        }
+
+        /* ---------- Mode Streamer : écran live propre + compteur de viewers ---------- */
+        (function () {
+            const w = document.getElementById('stream-widget'); if (!w || document.getElementById('live-btn')) return;
+            const b = document.createElement('button'); b.id = 'live-btn'; b.className = 'live-btn'; b.textContent = '📺 Écran live';
+            b.onclick = e => { e.stopPropagation(); liveToggle(); };
+            w.insertBefore(b, w.children[1] || null);
+            const c = document.createElement('div'); c.id = 'live-count'; c.style.display = 'none'; document.body.appendChild(c);
+            setInterval(() => {
+                const on = !!(typeof stream !== 'undefined' && stream.ws);
+                if (!on && document.documentElement.classList.contains('live')) liveToggle(false);
+                c.style.display = on ? '' : 'none';
+                if (!on) return;
+                const players = Object.keys(stream.board || {}).length, now = stream.votes ? stream.votes.size : 0;
+                c.innerHTML = `🎥 <b>${Math.max(players, now)}</b> viewer${Math.max(players, now) > 1 ? 's' : ''} jouent${stream.key ? ` • <b>${now}</b> vote${now > 1 ? 's' : ''} sur cette question` : ''} <small>tape !1 !2 !3 !4 dans le chat</small>`;
+            }, 700);
+        })();
+        function liveToggle(force) {
+            const on = force === undefined ? !document.documentElement.classList.contains('live') : !!force;
+            document.documentElement.classList.toggle('live', on);
+            const b = document.getElementById('live-btn'); if (b) b.textContent = on ? '✖ Quitter l’écran live' : '📺 Écran live';
+            if (on) toast('📺 Écran live : interface épurée pour ton stream', '#9146FF');
+        }
+
     </script>
     <script>
 
