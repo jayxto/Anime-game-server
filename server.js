@@ -14973,7 +14973,11 @@ app.get('/api/admin/stats', adminOnly(async (req, res) => {
 }));
 app.post('/api/admin/settings', adminOnly(async (req, res) => {
     const b = req.body || {};
-    if (b.maintenance) { SITE.maintenance = { on: !!b.maintenance.on, msg: String(b.maintenance.msg || '').slice(0, 300) }; await siteSave('maintenance'); }
+    if (b.maintenance) {
+        const lock = !!b.maintenance.lock;
+        SITE.maintenance = { on: !!b.maintenance.on || lock, msg: String(b.maintenance.msg || '').slice(0, 300), lock, back: String(b.maintenance.back || '').slice(0, 60), since: lock ? (SITE.maintenance.lock ? SITE.maintenance.since : Date.now()) : null };
+        await siteSave('maintenance');
+    }
     if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel', 'valentin', 'hanami', 'tokyo', 'ninja'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
     res.json({ ok: true, site: SITE });
 }));
@@ -18187,7 +18191,7 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-02-cats';
+const SITE_BUILD = '2026-10-02-maint';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -19124,6 +19128,23 @@ ${BANNER_CSS}.hero:not([class*="ban-"]){background:linear-gradient(135deg,#1b1b3
 <h2>🃏 Cartes les plus rares</h2>${p.cards.length ? `<div class="cards">${p.cards.map(c => `<div class="card" style="--c:${COL[c.rarity]}"><img src="${pubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><div><b>${pubEsc(c.name)}</b><small>${c.shiny ? '✨ ' : ''}${RAR[c.rarity]}</small></div></div>`).join('')}</div>` : '<p style="opacity:.7">Pas encore de cartes.</p>'}
 <h2>🏅 Succès</h2>${p.badges.length ? `<div class="badges">${p.badges.map(b => `<span class="bd" title="${pubEsc(b.desc)}">${pubEsc(b.name)}</span>`).join('')}</div>` : '<p style="opacity:.7">Pas encore de succès.</p>'}
 <a class="cta" href="${base}/">🎮 Jouer à Anime Game</a></div></body></html>`);
+});
+
+/* ---------- Site fermé pour mise à jour : les joueurs voient un écran d'attente, seul l'admin peut jouer ---------- */
+function sockIsAdmin(socket) {
+    const list = String(process.env.ADMIN_PSEUDOS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+    const p = socket && socket.user && socket.user.pseudo;
+    return !!p && list.includes(String(p).toLowerCase());
+}
+io.on('connection', socket => {
+    socket.use((pkt, next) => {
+        const m = SITE.maintenance || {};
+        if (m.lock && ['create_room', 'join_room', 'start_game', 'quick_play', 'join_public'].includes(pkt[0]) && !sockIsAdmin(socket)) {
+            socket.emit('game_error', { message: '🛠️ Le site est en pleine mise à jour : reviens un peu plus tard !' });
+            return;
+        }
+        next();
+    });
 });
 
 /* =====================================================================

@@ -1368,6 +1368,20 @@
         .mc-stream-info h3{margin:0 0 6px;color:#c9a2ff;} .mc-stream-info ol{margin:6px 0 10px 18px;padding:0;font-size:.88rem;line-height:1.5;}
         .mc-stream-info .btn-action{width:auto;padding:8px 16px;margin:0;}
         .mc-tag{display:inline-block;font-size:.65rem;font-weight:900;background:#9146FF;color:#fff;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle;}
+
+        /* ---- Écran « mise à jour en cours » ---- */
+        #maint-lock{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(ellipse at 50% 30%,#2a1a4a,#0b0b10 70%);color:#fff;text-align:center;}
+        #maint-lock .ml-box{max-width:520px;}
+        #maint-lock .ml-ico{font-size:4.5rem;animation:mlSpin 3s ease-in-out infinite;display:inline-block;}
+        @keyframes mlSpin{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+        #maint-lock h1{font-family:'Bangers',cursive;font-size:2.6rem;letter-spacing:1px;margin:10px 0 6px;color:var(--accent-yellow,#ffe600);}
+        #maint-lock p{opacity:.9;line-height:1.5;margin:6px 0;}
+        #maint-lock .ml-back{display:inline-block;margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:8px 16px;font-weight:800;}
+        #maint-lock .ml-bar{width:220px;height:6px;border-radius:99px;background:rgba(255,255,255,.1);margin:18px auto 0;overflow:hidden;}
+        #maint-lock .ml-bar i{display:block;height:100%;width:40%;background:var(--accent-cyan,#00f0ff);border-radius:99px;animation:mlBar 1.6s ease-in-out infinite;}
+        @keyframes mlBar{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+        #maint-lock small{display:block;margin-top:16px;opacity:.55;}
+        .admin-lock-pill{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:10003;background:#b91c1c;color:#fff;font-weight:800;border-radius:999px;padding:6px 14px;font-size:.8rem;box-shadow:0 4px 14px rgba(0,0,0,.5);cursor:pointer;}
         .adm-h{margin:14px 0 6px;color:var(--accent-yellow);font-size:1rem;}
         .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
         .cat-tabs button{flex:1;background:#101018;border:2px solid #2c2c44;color:#fff;border-radius:10px;padding:7px 4px;font-weight:800;cursor:pointer;font-size:.8rem;}
@@ -2381,8 +2395,10 @@
         </div>
         <div class="opt-panel">
             <h2>🚧 Mode maintenance</h2>
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="checkbox" id="adm-maint"> Afficher le message à tout le monde</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="checkbox" id="adm-maint"> Afficher le message à tout le monde (petite bannière en haut)</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#ffb347;"><input type="checkbox" id="adm-lock"> 🔒 Fermer le site : écran « mise à jour en cours » pour tous les joueurs (toi, tu peux continuer à jouer)</label>
             <input id="adm-maint-msg" class="v7-input" maxlength="300" placeholder="Ex : Mise à jour dans 5 minutes, finissez vos parties !">
+            <input id="adm-maint-back" class="v7-input" maxlength="60" placeholder="Retour prévu (facultatif) : ex « vers 18 h » ou « dans 20 minutes »">
             <button class="btn-action" style="margin-top:0;" onclick="saveMaintenance()">Appliquer</button>
         </div>
         <div class="opt-panel">
@@ -8450,11 +8466,13 @@
             const s = d.site;
             document.getElementById('adm-maint').checked = !!s.maintenance.on;
             document.getElementById('adm-maint-msg').value = s.maintenance.msg || '';
+            document.getElementById('adm-lock').checked = !!s.maintenance.lock;
+            document.getElementById('adm-maint-back').value = s.maintenance.back || '';
             document.getElementById('adm-theme').value = s.theme || 'auto';
             checkBuild();
             loadAdminTracks(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-02-cats';
+        const CLIENT_BUILD = '2026-10-02-maint';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -8465,8 +8483,9 @@
             w.innerHTML = `⚠️ <b>server.js et index.html ne sont pas de la même mise à jour</b> (site : ${CLIENT_BUILD}, serveur : ${d && d.build ? v7esc(d.build) : 'ancien'}). Uploade les deux fichiers sur GitHub, sinon le Loup-garou, les nouveaux modes et certains thèmes ne marchent pas.`;
         }
         async function saveMaintenance() {
-            const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, msg: document.getElementById('adm-maint-msg').value } });
-            toast(d && d.ok ? '✅ Maintenance mise à jour pour tout le monde' : '❌ Impossible', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+            const lock = document.getElementById('adm-lock').checked;
+            const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, lock, msg: document.getElementById('adm-maint-msg').value, back: document.getElementById('adm-maint-back').value } });
+            toast(d && d.ok ? (lock ? '🔒 Site fermé : les joueurs voient l’écran de mise à jour' : '✅ Maintenance mise à jour pour tout le monde') : '❌ Impossible (server.js à jour ?)', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
         }
         async function saveTheme() {
             const want = document.getElementById('adm-theme').value;
@@ -10949,6 +10968,29 @@
             let start = 'all'; try { start = localStorage.getItem('modeCat') || 'all'; } catch (_) {}
             if (!CATS.some(c => c[0] === start)) start = 'all';
             apply(start);
+        })();
+    </script>
+    <script>
+        /* ---------- Écran « mise à jour en cours » (site fermé par l'admin) ---------- */
+        (function () {
+            function render() {
+                const m = (typeof SITE_STATE !== 'undefined' && SITE_STATE.maintenance) || {};
+                const onAuth = (() => { const a = document.getElementById('auth-screen'); return a && a.style.display !== 'none' && a.offsetParent !== null; })();
+                const lockedForMe = !!m.lock && !window.IS_ADMIN;
+                let o = document.getElementById('maint-lock');
+                if (lockedForMe && !(onAuth && window.__adminLogin)) {
+                    if (!o) { o = document.createElement('div'); o.id = 'maint-lock'; document.body.appendChild(o); }
+                    const html = `<div class="ml-box"><div class="ml-ico">🛠️</div><h1>Mise à jour en cours</h1><p>${v7esc(m.msg || 'On améliore le site pour toi : nouveaux modes, corrections et surprises.')}</p><p>Reviens un peu plus tard, la page se rouvrira toute seule dès que c’est fini ✨</p>${m.back ? `<div class="ml-back">⏰ Retour prévu : ${v7esc(m.back)}</div>` : ''}<div class="ml-bar"><i></i></div><small><a href="#" onclick="window.__adminLogin=1;document.getElementById('maint-lock').remove();return false;" style="color:inherit;">Accès admin</a></small></div>`;
+                    if (o.dataset.h !== html) { o.innerHTML = html; o.dataset.h = html; }
+                } else if (o) o.remove();
+                // pastille pour l'admin : rappel que le site est fermé
+                let p = document.getElementById('admin-lock-pill');
+                if (m.lock && window.IS_ADMIN) { if (!p) { p = document.createElement('div'); p.id = 'admin-lock-pill'; p.className = 'admin-lock-pill'; p.textContent = '🔒 Site fermé aux joueurs (clique pour gérer)'; p.onclick = () => switchTab('admin'); document.body.appendChild(p); } }
+                else if (p) p.remove();
+            }
+            socket.on('site_settings', () => setTimeout(render, 0));
+            setInterval(render, 1500);
+            render();
         })();
     </script>
     <script>
