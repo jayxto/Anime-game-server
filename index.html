@@ -2431,7 +2431,7 @@
             <div id="adm-tracks" style="margin-top:10px;"></div>
         </div>
         <div class="opt-panel">
-            <h2>🔊 Soundboard</h2>
+            <h2>🔊 Soundboard Rolland Garos</h2>
             <p class="tl-hint" style="text-align:left;">Pour remplacer un son : choisis un fichier audio (mp3, 800 Ko max), il est joué pour tout le monde tout de suite. 🗑️ remet le son de base.</p>
             <div id="adm-sfx"></div>
         </div>
@@ -4296,8 +4296,7 @@
             bip(880, 0.3, 0.075, 0.1);
         }
 
-        function sfxErreur() {   // mauvaise réponse : son uploadé (ex : FAH), sinon note grave et sourde
-            if (typeof sfxBoardPlay === 'function' && sfxBoardPlay('erreur')) return;
+        function sfxErreur() {   // mauvaise réponse : note grave et sourde
             bip(220, 0.28, 0.085, 0);
             bip(165, 0.36, 0.07, 0.1);
         }
@@ -4321,11 +4320,11 @@
             bip(784, 0.5, 0.06, 0.08);
         }
 
-        /* ---- Soundboard : sons uploadés par l'admin (panneau admin > 🔊 Soundboard) ----
-           erreur = mauvaise réponse (tous les modes), vie = vie perdue, elimine = 2 vies perdues (Rolland Garos).
+        /* ---- Soundboard Rolland Garos (panneau admin > 🔊 Soundboard) ----
+           vie = vie perdue, elimine = 2 vies perdues. Un son uploadé par l'admin remplace celui du site.
            Sans son uploadé, on garde les sons synthétisés. */
-        // Sons par défaut (fichiers du site) : FAH = erreur / vie perdue, fusil à pompe Fortnite = éliminé
-        const SFX_DEFAUT = { erreur: '/music/sfx/fah.mp3', vie: '/music/sfx/fah.mp3', elimine: '/music/sfx/spas12.mp3' };
+        // Sons de Rolland Garos (fichiers du site) : FAH = vie perdue, fusil à pompe Fortnite = éliminé
+        const SFX_DEFAUT = { vie: '/music/sfx/fah.mp3', elimine: '/music/sfx/spas12.mp3' };
         const sfxBoard = { at: {}, audio: {} };
         function sfxBoardSet(k, url) { const a = new Audio(url); a.preload = 'auto'; sfxBoard.audio[k] = a; }
         Object.entries(SFX_DEFAUT).forEach(([k, url]) => sfxBoardSet(k, url));
@@ -8586,8 +8585,8 @@
             if (dl) dl.innerHTML = d.animes.map(a => `<option value="${v7esc(a)}">`).join('');
             box.innerHTML = d.rows.length ? d.rows.map(t => `<div class="friend-row"><span style="font-size:.82rem;"><b>${v7esc(t.anime)}</b> • ${v7esc(t.title)} <small style="color:var(--text-muted)">(${t.kind || 'opening'})</small><br><a href="https://youtu.be/${v7esc(t.yt_id)}" target="_blank" rel="noopener" style="color:var(--accent-cyan);font-size:.75rem;">youtu.be/${v7esc(t.yt_id)}</a></span><button onclick="delTrack(${t.id}, this)">🗑️</button></div>`).join('') : '<p class="tl-hint">Aucun opening ajouté depuis ici pour le moment.</p>';
         }
-        const SFX_LABELS = { erreur: '❌ Mauvaise réponse (tous les modes)', vie: '💥 Vie perdue (Rolland Garos)', elimine: '💀 Éliminé, 2 vies perdues (Rolland Garos)' };
-        const SFX_DEFAUT_NOM = { erreur: 'FAH', vie: 'FAH', elimine: 'fusil à pompe Fortnite' };
+        const SFX_LABELS = { vie: '💥 Vie perdue (Rolland Garos)', elimine: '💀 Éliminé, 2 vies perdues (Rolland Garos)' };
+        const SFX_DEFAUT_NOM = { vie: 'FAH', elimine: 'fusil à pompe Fortnite' };
         async function loadAdminSfx() {
             const box = document.getElementById('adm-sfx');
             if (!box) return;
@@ -11129,41 +11128,6 @@
         socket.on('fw_score', d => { if (fw.war && fw.war.week === d.week) { fw.war.a.pts = d.a; fw.war.b.pts = d.b; fwRender(); } });
         socket.on('fw_gain', d => { toast(`⚔️ +${d.pts} points pour ${hubEsc(d.side)}${d.bonus ? ' (x2 anime de ton camp !)' : ''}`, '#ff5a2a'); if (fw.war && fw.war.mine) { fw.war.mine.pts += d.pts; fwRender(); } });
         socket.on('fw_win', d => { hubModal('collector-modal', `<h3>⚔️ Ton camp a gagné la Guerre des fandoms !</h3><div class="card-grid booster" style="justify-content:center;"><div class="flip">${collectorCard(d)}</div></div><p class="tl-hint">Carte Collector exclusive de ${hubEsc(d.name)} (${hubEsc(d.anime)}) + ${d.coins} 🪙. Elle est dans ton album.</p>`); confetti(2500); });
-    </script>
-    <script>
-        /* ---------- FAH dès qu'on se trompe, dans tous les modes ---------- */
-        (function () {
-            const fah = () => { try { if (sfxOn) sfxErreur(); } catch (_) {} };
-            // Arcade (Pixel, Silhouette, Zoom, Qui a dit…) : réponse fausse tapée
-            let arcRound = null, arcFahRound = null;
-            socket.on('arc_state', q => { if (q) arcRound = q.round; });
-            socket.on('bt_state', q => { if (q && q.phase === 'playing') arcFahRound = null; }); // le blind test garde son FAH à la révélation
-            socket.on('arc_feedback', d => { if (d && !d.ok && String(d.message || '').startsWith('❌')) { arcFahRound = arcRound; fah(); } });
-            // pas de deuxième FAH à la révélation si on l'a déjà entendu pendant la manche
-            const origBad = fxBad;
-            fxBad = function () { if (arcFahRound !== null && arcFahRound === arcRound) return; return origBad.apply(this, arguments); };
-            // Chaîne : perso inconnu ou mauvaise lettre
-            socket.on('chaine_feedback', d => { if (d && !d.ok && /^(❓|🔤)/.test(String(d.msg || ''))) fah(); });
-            // DLE : mon perso proposé n'est pas le bon
-            let dleSeen = null;
-            socket.on('dle_state', room => {
-                const d = room && room.dle; if (!d || !d.guesses) return;
-                const key = (d.targetName || d.universeName || '') + '|' + d.guesses.length;
-                if (key === dleSeen) return;
-                const first = dleSeen === null; dleSeen = key;
-                const last = d.guesses[d.guesses.length - 1];
-                if (!first && last && last.playerId === socket.id && !last.correct) fah();
-            });
-            // Citations : ma réponse est fausse
-            let quoteSeen = null;
-            socket.on('quote_state', q => {
-                if (!q || !q.lastResult) return;
-                const key = (q.round || '') + '|' + (q.attempts || 0) + '|' + q.lastResult.answer;
-                if (key === quoteSeen) return;
-                quoteSeen = key;
-                if (!q.lastResult.correct && q.lastResult.playerName === getUsername()) fah();
-            });
-        })();
     </script>
     <script>
         /* ---------- Écran « mise à jour en cours » (site fermé par l'admin) ---------- */
