@@ -18153,8 +18153,377 @@ botTick = function (b) {
 };
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-28-lg3';
+const SITE_BUILD = '2026-09-29-market';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
+
+
+/* =====================================================================
+   HUB 3 : Devine l'attaque, évènements admin, modération, annonces
+   programmées, stats du site
+   ===================================================================== */
+// [anime, nom de la technique, description (sans jamais dire le nom)]
+const ATTACKS = [
+    ['Naruto', 'Rasengan', 'Une sphère d’énergie qui tourbillonne dans la paume de la main, sans aucun signe incanté.'],
+    ['Naruto', 'Chidori', 'La foudre concentrée dans la main, avec un bruit de milliers d’oiseaux qui piaillent.'],
+    ['Naruto', 'Multiclonage', 'Créer des dizaines de copies physiques de soi-même d’un seul coup.'],
+    ['Naruto', 'Amaterasu', 'Des flammes noires impossibles à éteindre, lancées d’un simple regard.'],
+    ['Naruto', 'Tsukuyomi', 'Une illusion où l’on torture sa cible pendant des jours alors qu’une seconde passe dans la réalité.'],
+    ['Naruto', 'Susano', 'Un immense guerrier spectral qui entoure et protège son utilisateur.'],
+    ['Naruto', 'Chibaku Tensei', 'Une petite sphère noire qui attire la roche jusqu’à former une lune artificielle.'],
+    ['Naruto', 'Shinra Tensei', 'Une onde qui repousse absolument tout autour de soi, jusqu’à raser un village.'],
+    ['Naruto', 'Edo Tensei', 'Ramener des morts à la vie sous forme de pantins immortels.'],
+    ['Naruto', 'Rasen Shuriken', 'Une sphère tourbillonnante entourée de lames de vent qui découpe les cellules.'],
+    ['Naruto', 'Katon Gōkakyū', 'Une énorme boule de feu soufflée par la bouche, technique fétiche d’un clan célèbre.'],
+    ['Naruto', 'Kamui', 'Aspirer un objet (ou une personne) dans une autre dimension grâce à un œil.'],
+    ['One Piece', 'Gomu Gomu no Pistol', 'Un bras qui s’étire en arrière puis revient frapper comme un élastique.'],
+    ['One Piece', 'Gear Second', 'Accélérer son sang pour que le corps fume et devienne ultra rapide.'],
+    ['One Piece', 'Santoryu', 'Se battre avec trois sabres, dont un tenu dans la bouche.'],
+    ['One Piece', 'Diable Jambe', 'Des coups de pied qui s’enflamment à force de tourner sur soi-même.'],
+    ['One Piece', 'Haki des rois', 'Une pression de volonté qui fait s’évanouir les plus faibles d’un seul regard.'],
+    ['One Piece', 'Room', 'Créer une sphère dans laquelle on peut découper et échanger tout ce qui s’y trouve.'],
+    ['One Piece', 'Hiken', 'Un poing de flammes géant projeté par un homme fait de feu.'],
+    ['One Piece', 'Gear Fifth', 'Un corps qui devient aussi élastique qu’un dessin animé, cheveux blancs et rire tonitruant.'],
+    ['Dragon Ball', 'Kamehameha', 'Les mains jointes sur le côté, puis un rayon d’énergie bleue projeté vers l’avant.'],
+    ['Dragon Ball', 'Genkidama', 'Rassembler l’énergie de tous les êtres vivants dans une sphère géante au-dessus de la tête.'],
+    ['Dragon Ball', 'Final Flash', 'Les deux paumes tendues vers l’avant pour un rayon jaune dévastateur, par un prince fier.'],
+    ['Dragon Ball', 'Makankosappo', 'Deux doigts sur le front, puis un rayon en spirale qui perce tout.'],
+    ['Dragon Ball', 'Kienzan', 'Un disque d’énergie tranchant qui coupe même les adversaires les plus solides.'],
+    ['Dragon Ball', 'Taiyoken', 'Une lumière aveuglante émise par le visage pour éblouir tout le monde.'],
+    ['Dragon Ball', 'Fusion', 'Une petite danse synchronisée à deux pour ne faire qu’un seul guerrier.'],
+    ['Dragon Ball', 'Téléportation instantanée', 'Deux doigts sur le front pour apparaître là où l’on sent une énergie.'],
+    ['Bleach', 'Getsuga Tensho', 'Une vague d’énergie en forme de croissant lancée par le tranchant d’un sabre.'],
+    ['Bleach', 'Bankai', 'La libération ultime d’un sabre d’âme, qui décuple la puissance.'],
+    ['Bleach', 'Senbonzakura Kageyoshi', 'Une lame qui se disperse en milliers de pétales tranchants.'],
+    ['Bleach', 'Kyōka Suigetsu', 'Une hypnose totale : quiconque a vu la libération du sabre voit ce que son maître veut.'],
+    ['Bleach', 'Cero', 'Un rayon d’énergie tiré depuis la bouche ou la main par un Hollow.'],
+    ['Demon Slayer', 'Souffle de l’eau', 'Des mouvements de sabre fluides qui ressemblent à des vagues et des tourbillons.'],
+    ['Demon Slayer', 'Hinokami Kagura', 'Une danse sacrée du feu transmise dans la famille d’un vendeur de charbon.'],
+    ['Demon Slayer', 'Premier mouvement du tonnerre', 'Un dégainage si rapide qu’on ne voit qu’un éclair, par un garçon qui dort à moitié.'],
+    ['Demon Slayer', 'Art démoniaque du sang', 'Des flammes roses explosives produites par le sang d’une petite démone.'],
+    ['Demon Slayer', 'Respiration de la bête', 'Deux sabres ébréchés et des attaques sauvages de garçon à tête de sanglier.'],
+    ['Jujutsu Kaisen', 'Extension du territoire', 'Créer un espace clos où toutes tes attaques touchent à coup sûr.'],
+    ['Jujutsu Kaisen', 'Sphère de l’espace infini', 'Un domaine qui inonde le cerveau d’informations infinies jusqu’à paralyser.'],
+    ['Jujutsu Kaisen', 'Pourpre', 'Fusionner l’attraction et la répulsion pour effacer tout sur son passage.'],
+    ['Jujutsu Kaisen', 'Divergent Fist', 'Un coup de poing dont l’énergie frappe une seconde fois avec un léger décalage.'],
+    ['Jujutsu Kaisen', 'Black Flash', 'Un impact d’énergie qui arrive à une microseconde près et fait jaillir des éclairs noirs.'],
+    ['Jujutsu Kaisen', 'Autel du Mal', 'Un temple démoniaque qui découpe en morceaux tout ce qui se trouve dans son rayon.'],
+    ['Hunter x Hunter', 'Pierre-Papier-Ciseaux', 'Une attaque de Nen qui imite un jeu de mains : un poing, une lame ou un projectile.'],
+    ['Hunter x Hunter', 'Bungee Gum', 'Une aura à la fois élastique et collante, comme un chewing-gum.'],
+    ['Hunter x Hunter', 'Godspeed', 'Transformer son aura en électricité pour réagir plus vite que la pensée.'],
+    ['Hunter x Hunter', 'Chaîne du jugement', 'Une chaîne plantée dans le cœur qui tue si l’on brise la règle imposée.'],
+    ['L\'Attaque des Titans', 'Équipement tridimensionnel', 'Des câbles et du gaz pour voler entre les murs et trancher les nuques.'],
+    ['L\'Attaque des Titans', 'Grondement', 'Des milliers de géants qui se mettent en marche pour écraser le monde.'],
+    ['L\'Attaque des Titans', 'Durcissement', 'Recouvrir sa peau d’une matière aussi dure que le cristal.'],
+    ['Fullmetal Alchemist', 'Transmutation humaine', 'Le tabou ultime : tenter de ramener un être cher à la vie par un cercle.'],
+    ['Fullmetal Alchemist', 'Alchimie de flamme', 'Un claquement de doigts grâce à des gants spéciaux et tout s’embrase.'],
+    ['Death Note', 'Death Note', 'Écrire un nom en pensant au visage : la personne meurt 40 secondes plus tard.'],
+    ['Death Note', 'Yeux de shinigami', 'Voir le nom et la durée de vie de chacun, en échange de la moitié de la sienne.'],
+    ['JoJo\'s Bizarre Adventure', 'The World', 'Arrêter le temps quelques secondes, en criant le nom de son Stand.'],
+    ['JoJo\'s Bizarre Adventure', 'Ora Ora Rush', 'Une pluie de coups de poing ultra rapides donnée par un Stand bleu.'],
+    ['JoJo\'s Bizarre Adventure', 'Killer Queen', 'Transformer tout ce que l’on touche en bombe.'],
+    ['JoJo\'s Bizarre Adventure', 'Gold Experience Requiem', 'Ramener l’adversaire à zéro : il ne pourra jamais atteindre la vérité.'],
+    ['One Punch Man', 'Coup de poing normal', 'Un seul coup de poing tout simple… qui suffit à battre n’importe qui.'],
+    ['One Punch Man', 'Coup de poing sérieux', 'Un seul coup lancé avec sérieux qui disperse les nuages de la planète.'],
+    ['Black Clover', 'Anti-magie', 'Des épées noires qui annulent n’importe quelle magie.'],
+    ['Fairy Tail', 'Hurlement du dragon', 'Un souffle de feu craché comme un dragon par un chasseur de dragons.'],
+    ['Solo Leveling', 'Levée des ombres', 'Relever les ennemis vaincus pour en faire des soldats à ses ordres.'],
+    ['Pokémon', 'Tonnerre', 'Une décharge électrique envoyée par une petite souris jaune.'],
+    ['Pokémon', 'Lance-Flammes', 'Un jet de feu intense craché par la bouche.'],
+    ['Seven Deadly Sins', 'Contre-attaque totale', 'Renvoyer n’importe quelle magie à son lanceur, décuplée.'],
+    ['Chainsaw Man', 'Transformation tronçonneuse', 'Tirer sur une corde dans sa poitrine pour faire sortir des tronçonneuses de sa tête et de ses bras.'],
+    ['Sword Art Online', 'Starburst Stream', 'Une combo de 16 coups enchaînés avec deux épées.'],
+    ['Tokyo Ghoul', 'Kagune', 'Un organe prédateur qui sort du dos sous forme de tentacules ou d’ailes.'],
+    ['Blue Lock', 'Métavision', 'Voir tout le terrain comme d’en haut pour anticiper chaque action.'],
+    ['Haikyuu', 'Attaque éclair', 'Un passeur qui envoie le ballon pile où frappe son partenaire, qui saute les yeux fermés.']
+];
+ARC_GAMES.attaque = { label: 'Devine l’attaque', icon: '💥', universe: false, rounds: 10, roundMs: 20000, answer: 'choice' };
+MODE_LABELS['arcade:attaque'] = 'Devine l’attaque';
+const _arcBuildRoundAtk = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game !== 'attaque') return _arcBuildRoundAtk(g);
+    g.usedAtk = g.usedAtk || [];
+    let pool = ATTACKS.map((a, i) => i).filter(i => !g.usedAtk.includes(i));
+    if (!pool.length) { g.usedAtk = []; pool = ATTACKS.map((a, i) => i); }
+    const i = pool[Math.floor(Math.random() * pool.length)];
+    g.usedAtk.push(i);
+    const [anime, name, desc] = ATTACKS[i];
+    const same = arcShuffle(ATTACKS.filter(a => a[0] === anime && a[1] !== name).map(a => a[1]));
+    const other = arcShuffle(ATTACKS.filter(a => a[0] !== anime).map(a => a[1]));
+    const wrong = [...same.slice(0, 2), ...other].filter((x, j, arr) => arr.indexOf(x) === j && x !== name).slice(0, 3);
+    return { attack: { desc, anime }, choices: arcShuffle([name, ...wrong]), answer: name };
+};
+const _arcPublicAtk = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicAtk(room, g);
+    if (g && g.game === 'attaque' && g.current && g.current.attack && out.stage) out.stage.attack = g.current.attack;
+    return out;
+};
+if (typeof TOUR_POOL !== 'undefined' && !TOUR_POOL.includes('attaque')) TOUR_POOL.push('attaque');
+
+/* =====================================================================
+   ÉVÈNEMENTS ADMIN : XP x2, boss spécial, tournoi surprise
+   ===================================================================== */
+const EVENT = { xp2Until: 0, surprise: null };
+(async () => { try { const e = await kvGet('event', 'state', null); if (e) Object.assign(EVENT, e); } catch (_) {} })();
+const _hubMultEvt = hubMult;
+hubMult = function () { return (_hubMultEvt() > 1 || EVENT.xp2Until > Date.now()) ? 2 : 1; };
+function eventPublic() {
+    const s = EVENT.surprise, r = s && rooms[s.code];
+    return { xp2Until: EVENT.xp2Until > Date.now() ? EVENT.xp2Until : 0, surprise: s && r && !s.started ? { code: s.code, startAt: s.startAt, players: r.players.length } : null };
+}
+function eventBroadcast() { io.emit('site_event', eventPublic()); }
+async function startSurprise(minutes) {
+    const code = newRoomCode();
+    serverRoom(code, 'arcade', 'tournoi', { isPublic: true, surprise: true, arcRounds: 3 });
+    EVENT.surprise = { code, startAt: Date.now() + minutes * 60000, started: false };
+    await kvSet('event', 'state', EVENT);
+    io.emit('surprise_open', { code, startAt: EVENT.surprise.startAt });
+    eventBroadcast();
+}
+setInterval(() => {
+    const s = EVENT.surprise; if (!s || s.started) return;
+    const room = rooms[s.code];
+    if (!room) { EVENT.surprise = null; return; }
+    if (Date.now() >= s.startAt) {
+        if (room.players.length >= 2) { s.started = true; io.to(s.code).emit('room_toast', { message: '⚡ Le tournoi surprise commence !' }); startArcade(room, s.code); }
+        else if (Date.now() > s.startAt + 5 * 60000) { room.players.forEach(p => io.to(p.id).emit('room_toast', { message: 'Pas assez de joueurs pour le tournoi surprise.' })); delete rooms[s.code]; EVENT.surprise = null; }
+        eventBroadcast();
+    }
+}, 5000);
+const _progRecordEvt = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordEvt(room, mode, universe, entries);
+    if (room && room.surprise && !room.surpriseDone) {
+        room.surpriseDone = true; room.lockHost = null;
+        for (const e of (entries || []).filter(x => x.won && x.player)) { if (e.player.userId) await ecoAddCoins(e.player.userId, 300); io.to(e.player.id).emit('room_toast', { message: '🏆 Tu gagnes le tournoi surprise : +300 🪙 !' }); }
+        if (EVENT.surprise && EVENT.surprise.code === room.code) EVENT.surprise = null;
+        eventBroadcast();
+    }
+    return r;
+};
+app.post('/api/admin/event', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (b.type === 'xp2') {
+        const h = Math.max(0, Math.min(72, +b.hours || 2));
+        EVENT.xp2Until = h ? Date.now() + h * 3600000 : 0;
+        await kvSet('event', 'state', EVENT);
+        if (h) io.emit('announce', { text: `🎉 Évènement : pièces et XP x2 pendant ${h} h !`, kind: 'event' });
+    } else if (b.type === 'boss') {
+        const day = dailyKey(new Date(hubNow()));
+        const us = Object.keys(BOSS_VILLAINS).filter(u => ARC_UNIVERSE_ANIME[u]);
+        let who = null;
+        for (let t = 0; t < 20 && !who; t++) { const u = us[Math.floor(Math.random() * us.length)]; const c = cardResolve(u, BOSS_VILLAINS[u][Math.floor(Math.random() * BOSS_VILLAINS[u].length)]); if (c) who = { u, display: c.display }; }
+        if (!who) return res.json({ ok: false, error: 'Aucun boss trouvé.' });
+        const hp = Math.max(500, Math.min(20000, +b.hp || 3000));
+        const nb = { day, u: who.u, display: who.display, hp, max: hp, hits: {}, dead: false, special: true };
+        KV.set('boss|' + day, nb); await kvSet('boss', day, nb);
+        io.emit('boss_state', bossPublic(nb));
+        io.emit('announce', { text: `👹 Boss spécial : ${who.display} (${ARC_UNIVERSE_ANIME[who.u]}) débarque avec ${hp} PV ! Toutes vos bonnes réponses lui font mal.`, kind: 'event' });
+    } else if (b.type === 'surprise') {
+        if (EVENT.surprise && rooms[EVENT.surprise.code] && !EVENT.surprise.started) return res.json({ ok: false, error: 'Un tournoi surprise est déjà prévu.' });
+        await startSurprise(Math.max(1, Math.min(30, +b.minutes || 5)));
+    } else return res.json({ ok: false, error: 'Évènement inconnu.' });
+    eventBroadcast();
+    res.json({ ok: true, event: eventPublic() });
+}));
+app.get('/api/event', (req, res) => res.json({ ok: true, ...eventPublic() }));
+
+/* =====================================================================
+   MODÉRATION : signalements, muter, bannir
+   ===================================================================== */
+const MOD = { mute: {}, ban: {} }; // clé : 'u<id>' ou 'n<pseudo>' -> { until, reason, name }
+(async () => { try { const m = await kvGet('mod', 'state', null); if (m) Object.assign(MOD, m); } catch (_) {} })();
+const modKey = u => u && u.id ? 'u' + u.id : 'n' + String((u && u.pseudo) || '').toLowerCase();
+const modActive = (map, k) => { const x = map[k]; return x && (!x.until || x.until > Date.now()) ? x : null; };
+io.use((socket, next) => {
+    const b = socket.user && modActive(MOD.ban, modKey(socket.user));
+    if (b) { const e = new Error('banned'); e.data = { until: b.until || null, reason: b.reason || '' }; return next(e); }
+    next();
+});
+io.on('connection', socket => {
+    socket.use((pkt, next) => {
+        const ev = pkt && pkt[0];
+        if (['chat_message', 'lg_chat', 'reaction', 'spectate_react', 'draw_guess', 'guess_ask'].includes(ev)) {
+            const m = modActive(MOD.mute, modKey(socket.user));
+            if (m) { socket.emit('room_toast', { message: `🔇 Tu es muet${m.until ? ` jusqu’à ${new Date(m.until).toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' })}` : ''}${m.reason ? ' : ' + m.reason : ''}` }); return; }
+        }
+        next();
+    });
+    socket.on('report_player', async ({ roomCode, playerId, reason } = {}) => {
+        const room = rooms[roomCode];
+        const target = room && room.players.find(p => p.id === playerId);
+        if (!target || target.id === socket.id || !socket.user) return;
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+        await kvSet('report', id, { id, at: Date.now(), by: socket.user.pseudo, byKey: modKey(socket.user), target: target.name, targetKey: target.userId ? 'u' + target.userId : 'n' + String(target.name).toLowerCase(), targetId: target.userId || null, reason: String(reason || '').slice(0, 200), room: roomCode, mode: room.mode, status: 'open' });
+        socket.emit('room_toast', { message: '🚩 Signalement envoyé à l’admin. Merci !' });
+    });
+});
+function modKick(key, msg) {
+    for (const s of io.sockets.sockets.values()) if (s.user && modKey(s.user) === key) { s.emit('banned_now', { message: msg }); setTimeout(() => s.disconnect(true), 300); }
+}
+app.get('/api/admin/mod', adminOnly(async (req, res) => {
+    const reports = (await kvList('report')).map(x => x.v).sort((a, b) => b.at - a.at).slice(0, 80);
+    const clean = map => Object.entries(map).filter(([k, v]) => !v.until || v.until > Date.now()).map(([k, v]) => ({ key: k, ...v }));
+    res.json({ ok: true, reports, muted: clean(MOD.mute), banned: clean(MOD.ban) });
+}));
+app.post('/api/admin/mod', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const key = String(b.key || '');
+    if (!/^[un]./.test(key)) return res.json({ ok: false, error: 'Joueur inconnu.' });
+    const until = +b.hours > 0 ? Date.now() + +b.hours * 3600000 : 0;
+    const entry = { until, reason: String(b.reason || '').slice(0, 120), name: String(b.name || key.slice(1)).slice(0, 30), at: Date.now() };
+    if (b.action === 'mute') MOD.mute[key] = entry;
+    else if (b.action === 'unmute') delete MOD.mute[key];
+    else if (b.action === 'ban') { MOD.ban[key] = entry; modKick(key, `🚫 Tu as été banni${until ? ` jusqu’au ${new Date(until).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}` : ''}.${entry.reason ? ' Raison : ' + entry.reason : ''}`); }
+    else if (b.action === 'unban') delete MOD.ban[key];
+    else if (b.action === 'close') { const r = await kvGet('report', String(b.report || ''), null); if (r) { r.status = 'closed'; await kvSet('report', r.id, r); } return res.json({ ok: true }); }
+    else return res.json({ ok: false, error: 'Action inconnue.' });
+    await kvSet('mod', 'state', MOD);
+    res.json({ ok: true });
+}));
+app.get('/api/admin/players', adminOnly(async (req, res) => { // chercher un joueur par pseudo (connectés + comptes)
+    const q = String(req.query.q || '').trim().toLowerCase();
+    const out = new Map();
+    for (const s of io.sockets.sockets.values()) if (s.user && (!q || String(s.user.pseudo).toLowerCase().includes(q))) out.set(modKey(s.user), { key: modKey(s.user), name: s.user.pseudo, online: true, guest: !s.user.id });
+    if (HAS_DB && q) { try { (await pool.query('SELECT id, pseudo FROM users WHERE lower(pseudo) LIKE $1 LIMIT 20', ['%' + q + '%'])).rows.forEach(r => { if (!out.has('u' + r.id)) out.set('u' + r.id, { key: 'u' + r.id, name: r.pseudo, online: userOnline(r.id), guest: false }); }); } catch (_) {} }
+    res.json({ ok: true, players: [...out.values()].slice(0, 30).map(p => ({ ...p, muted: !!modActive(MOD.mute, p.key), banned: !!modActive(MOD.ban, p.key) })) });
+}));
+
+/* =====================================================================
+   ANNONCES PROGRAMMÉES
+   ===================================================================== */
+async function announceList() { return (await kvList('announce')).map(x => x.v).sort((a, b) => a.at - b.at); }
+let ANN_ACTIVE = null;
+setInterval(async () => {
+    try {
+        const now = Date.now();
+        for (const a of await announceList()) {
+            if (!a.sent && a.at <= now) { a.sent = true; await kvSet('announce', a.id, a); ANN_ACTIVE = { text: a.text, until: now + (a.minutes || 10) * 60000 }; io.emit('announce', { text: a.text, kind: 'admin', until: ANN_ACTIVE.until }); }
+        }
+    } catch (_) {}
+}, 15000);
+io.on('connection', socket => { if (ANN_ACTIVE && ANN_ACTIVE.until > Date.now()) socket.emit('announce', { text: ANN_ACTIVE.text, kind: 'admin', until: ANN_ACTIVE.until, quiet: true }); socket.emit('site_event', eventPublic()); });
+app.get('/api/admin/announce', adminOnly(async (req, res) => res.json({ ok: true, list: (await announceList()).slice(-30) })));
+app.post('/api/admin/announce', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (b.delete) { await kvDel('announce', String(b.delete)); return res.json({ ok: true }); }
+    const text = String(b.text || '').trim().slice(0, 300);
+    const at = +new Date(b.at);
+    if (!text) return res.json({ ok: false, error: 'Écris le message.' });
+    if (!at || isNaN(at)) return res.json({ ok: false, error: 'Choisis une date et une heure.' });
+    const a = { id: 'a' + Date.now().toString(36), text, at, minutes: Math.max(1, Math.min(1440, +b.minutes || 15)), sent: false, created: Date.now() };
+    await kvSet('announce', a.id, a);
+    res.json({ ok: true, announce: a });
+}));
+
+/* =====================================================================
+   STATS DU SITE : joueurs par jour, modes, heures de pointe
+   ===================================================================== */
+const ONLINE_LOG = []; // [time, connectés] toutes les 10 minutes (mémoire)
+setInterval(() => { ONLINE_LOG.push([Date.now(), io.sockets.sockets.size]); if (ONLINE_LOG.length > 1008) ONLINE_LOG.shift(); }, 10 * 60000);
+app.get('/api/admin/stats2', adminOnly(async (req, res) => {
+    let perDay = [], modes = [], hours = [], newAccounts = [];
+    if (HAS_DB) {
+        perDay = (await pool.query(`SELECT to_char(created_at AT TIME ZONE 'Europe/Paris', 'YYYY-MM-DD') AS d, count(DISTINCT user_id)::int AS players, count(*)::int AS games FROM game_results WHERE created_at > now() - interval '14 days' GROUP BY d ORDER BY d`)).rows;
+        modes = (await pool.query(`SELECT mode, count(*)::int AS n FROM game_results WHERE created_at > now() - interval '30 days' GROUP BY mode ORDER BY n DESC LIMIT 15`)).rows;
+        hours = (await pool.query(`SELECT extract(hour FROM created_at AT TIME ZONE 'Europe/Paris')::int AS h, count(*)::int AS n FROM game_results WHERE created_at > now() - interval '30 days' GROUP BY h ORDER BY h`)).rows;
+        try { newAccounts = (await pool.query(`SELECT to_char(created_at AT TIME ZONE 'Europe/Paris', 'YYYY-MM-DD') AS d, count(*)::int AS n FROM users WHERE created_at > now() - interval '14 days' GROUP BY d ORDER BY d`)).rows; } catch (_) {}
+    } else {
+        const R = PROG_MEM.results;
+        const byDay = {}; R.forEach(r => { const d = dailyKey(new Date(r.created_at)); const o = byDay[d] = byDay[d] || { d, u: new Set(), games: 0 }; o.u.add(r.user_id); o.games++; });
+        perDay = Object.values(byDay).map(o => ({ d: o.d, players: o.u.size, games: o.games }));
+        const m = {}; R.forEach(r => { m[r.mode] = (m[r.mode] || 0) + 1; }); modes = Object.entries(m).map(([mode, n]) => ({ mode, n })).sort((a, b) => b.n - a.n);
+        const h = {}; R.forEach(r => { const x = parisParts(r.created_at).h; h[x] = (h[x] || 0) + 1; }); hours = Object.entries(h).map(([hh, n]) => ({ h: +hh, n }));
+    }
+    res.json({ ok: true, perDay, modes: modes.map(x => ({ ...x, label: MODE_LABELS[x.mode] || x.mode })), hours, newAccounts, online: io.sockets.sockets.size, onlineLog: ONLINE_LOG.slice(-144) });
+}));
+
+
+/* =====================================================================
+   HÔTEL DES VENTES : les joueurs vendent et achètent des cartes contre des pièces
+   (la carte est retirée de la collection pendant la vente, 5 % de taxe sur la vente)
+   ===================================================================== */
+const MARKET_TAX = 0.05, MARKET_MAX = 20, MARKET_MIN = 5, MARKET_PRICE_MAX = 100000;
+const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500] };
+function marketView(l, uid) {
+    const [u, display] = l.key.split('|');
+    return { id: l.id, name: display, anime: ARC_UNIVERSE_ANIME[u] || '', u, rarity: keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: cardImg({ u, display }) };
+}
+async function marketAll() { return (await kvList('market')).map(x => x.v); }
+app.get('/api/market', async (req, res) => {
+    const uid = authUserId(req);
+    const q = String(req.query.q || '').toLowerCase(), rar = String(req.query.rarity || ''), sort = String(req.query.sort || 'new'), shiny = req.query.shiny === '1';
+    const all = await marketAll();
+    let list = all.filter(l => l.status === 'open').map(l => marketView(l, uid));
+    if (q) list = list.filter(l => (l.name + ' ' + l.anime + ' ' + l.seller).toLowerCase().includes(q));
+    if (rar) list = list.filter(l => l.rarity === rar);
+    if (shiny) list = list.filter(l => l.shiny);
+    list.sort((a, b) => sort === 'cheap' ? a.price - b.price : sort === 'expensive' ? b.price - a.price : b.at - a.at);
+    const mine = uid ? all.filter(l => l.seller === uid).sort((a, b) => b.at - a.at).slice(0, 40).map(l => marketView(l, uid)) : [];
+    const bought = uid ? all.filter(l => l.buyer === uid).sort((a, b) => b.soldAt - a.soldAt).slice(0, 20).map(l => marketView(l, uid)) : [];
+    res.json({ ok: true, list: list.slice(0, 120), total: list.length, mine, bought, tax: MARKET_TAX, hints: MARKET_HINT, max: MARKET_MAX, coins: uid ? ((await ecoGet(uid)) || {}).coins : 0 });
+});
+app.post('/api/market/sell', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || ''), price = Math.round(+(req.body || {}).price);
+    if (!(price >= MARKET_MIN && price <= MARKET_PRICE_MAX)) return res.json({ ok: false, error: `Prix entre ${MARKET_MIN} et ${MARKET_PRICE_MAX} pièces.` });
+    if (!keyRarity(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
+    const active = (await marketAll()).filter(l => l.seller === uid && l.status === 'open').length;
+    if (active >= MARKET_MAX) return res.json({ ok: false, error: `${MARKET_MAX} ventes en cours maximum.` });
+    const deck = (await kvGet('deck', uid, { keys: [] })).keys || [];
+    const mine = await cardsOf(uid), have = mine.get(key);
+    if (!have) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' });
+    if (deck.includes(key) && have.n <= 1) return res.json({ ok: false, error: 'Retire d’abord cette carte de ton deck.' });
+    const wantShiny = !!(req.body || {}).shiny;
+    if (wantShiny && !(have.shiny > 0)) return res.json({ ok: false, error: 'Tu n’as pas cette carte en brillante.' });
+    // on retire un exemplaire (le brillant si demandé)
+    let shiny = false;
+    if (wantShiny) {
+        if (HAS_DB) { await pool.query('UPDATE cards SET shiny = shiny - 1 WHERE user_id=$1 AND ckey=$2 AND shiny > 0', [uid, key]); }
+        else have.shiny--;
+        const t = await cardTake(uid, key, 1); if (!t) return res.json({ ok: false, error: 'Impossible.' });
+        shiny = true;
+    } else {
+        if (have.n - 1 < have.shiny) return res.json({ ok: false, error: 'Il ne te reste que des exemplaires brillants : coche « brillante ».' });
+        const t = await cardTake(uid, key, 1); if (!t) return res.json({ ok: false, error: 'Impossible.' });
+    }
+    const l = { id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), seller: uid, sellerName: await pseudoOf(uid), key, shiny, price, at: hubNow(), status: 'open' };
+    await kvSet('market', l.id, l);
+    res.json({ ok: true, listing: marketView(l, uid) });
+});
+app.post('/api/market/cancel', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const l = await kvGet('market', String((req.body || {}).id || ''), null);
+    if (!l || l.seller !== uid || l.status !== 'open') return res.json({ ok: false, error: 'Vente introuvable.' });
+    l.status = 'cancelled';
+    await kvSet('market', l.id, l);
+    await cardGive(uid, { key: l.key }, l.shiny);
+    res.json({ ok: true });
+});
+const MARKET_LOCK = new Set();
+app.post('/api/market/buy', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || '');
+    if (MARKET_LOCK.has(id)) return res.json({ ok: false, error: 'Quelqu’un est déjà en train de l’acheter.' });
+    MARKET_LOCK.add(id);
+    try {
+        const l = await kvGet('market', id, null);
+        if (!l || l.status !== 'open') return res.json({ ok: false, error: 'Cette carte n’est plus en vente.' });
+        if (l.seller === uid) return res.json({ ok: false, error: 'C’est ta propre vente.' });
+        const e = await ecoGet(uid);
+        if (e.coins < l.price) return res.json({ ok: false, error: `Il te manque ${l.price - e.coins} pièces.` });
+        if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, l.price])).rows[0]; if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' }); }
+        else e.coins -= l.price;
+        l.status = 'sold'; l.buyer = uid; l.buyerName = await pseudoOf(uid); l.soldAt = hubNow();
+        await kvSet('market', l.id, l);
+        const isNew = await cardGive(uid, { key: l.key }, l.shiny);
+        const gain = Math.max(1, Math.round(l.price * (1 - MARKET_TAX)));
+        await ecoAddCoins(l.seller, gain);
+        emitUser(l.seller, 'market_sold', { name: l.key.split('|')[1], price: l.price, gain, buyer: l.buyerName });
+        const card = { ...marketView(l, uid), isNew, coins: 0 };
+        res.json({ ok: true, card, coins: ((await ecoGet(uid)) || {}).coins });
+    } finally { MARKET_LOCK.delete(id); }
+});
 
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
