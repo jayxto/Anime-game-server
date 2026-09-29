@@ -11850,6 +11850,8 @@ function tpLabel(source) {
 }
 
 function arcItemsFor(source) {
+    const qap = /^qap\d{1,3}\|(tp:.+)$/.exec(source); // « Qui a le plus… » : un classement mondial par question
+    if (qap) return tpItemsFor(qap[1]);
     if (source.startsWith('tp:')) return tpItemsFor(source);
     if (source === 'animes') return ARC_ANIMES.map(a => ({ name: a[0] }));
     if (!ARC_UNIVERSE_ANIME[source]) return null;
@@ -14973,7 +14975,7 @@ io.on('connection', socket => {
    ADMIN : tableau de bord, openings ajoutés sans code, signalements de bug,
            mode maintenance, thèmes Halloween / Noël
    ===================================================================== */
-const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false } };
+const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false }, halloween: { on: false, cards: [] } };
 const CUSTOM_TRACKS_MEM = [], BUGS_MEM = [];
 function customTrackAdd(t) {
     const n = 5000 + t.id;
@@ -15788,6 +15790,7 @@ const SHOP = [
     { id: 'booster:3', kind: 'booster', key: '3', name: 'Booster 3 cartes 🃏', price: 150, consumable: true },
     { id: 'booster:10', kind: 'booster', key: '10', name: 'Booster 10 cartes 🎴 (1 rare min.)', price: 450, consumable: true },
     { id: 'booster:epique', kind: 'booster', key: '5', btype: 'epique', name: 'Booster Épique 💜 5 cartes (1 épique min.)', price: 700, consumable: true },
+    { id: 'booster:halloween', kind: 'booster', key: '5', btype: 'halloween', name: 'Booster Halloween 🎃 5 cartes (1 carte Halloween garantie)', price: 900, consumable: true, event: 'halloween' },
     { id: 'booster:mythique', kind: 'booster', key: '5', btype: 'mythique', name: 'Booster Mythique 🌈 5 cartes (1 légendaire min., secrètes x4)', price: 1800, consumable: true }
 ];
 const SHOP_BY_ID = Object.fromEntries(SHOP.map(i => [i.id, i]));
@@ -16068,7 +16071,7 @@ makeDleComparison = function (character, target, player, categories) {
     } catch (_) {}
     return r;
 };
-const RAR_RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9 };
+const RAR_RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5 };
 // type : '' (normal), 'epique' (1 épique ou mieux garantie), 'mythique' (1 légendaire ou mieux garantie + secrètes x4)
 async function openBooster(uid, n, type = '') {
     const us = arcUniverses();
@@ -16142,7 +16145,7 @@ const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.sta
 app.get('/api/shop', async (req, res) => {
     const uid = authUserId(req);
     const e = uid ? await ecoGet(uid) : null;
-    res.json({ ok: true, items: SHOP.filter(i => (!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+    res.json({ ok: true, items: SHOP.filter(i => (!i.event || (SITE.halloween && SITE.halloween.on)) && ((!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id)))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
 });
 app.post('/api/shop/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -16150,6 +16153,7 @@ app.post('/api/shop/buy', async (req, res) => {
     if (it && it.pass) return res.json({ ok: false, error: 'Objet exclusif au pass de saison.' });
     if (it && it.seasonal && it.seasonal !== themeSeason().u) return res.json({ ok: false, error: 'Cet objet n’est plus en vente (saison terminée).' });
     if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
+    if (it.event === 'halloween' && !(SITE.halloween && SITE.halloween.on)) return res.json({ ok: false, error: 'L’événement Halloween est terminé.' });
     const e = await ecoGet(uid);
     if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
     if (e.coins < it.price) return res.json({ ok: false, error: `Il te manque ${it.price - e.coins} pièces.` });
@@ -16711,7 +16715,7 @@ function keyRarity(key) {
 async function cardSpares(uid) {
     const mine = await cardsOf(uid);
     const out = Object.fromEntries(RAR_ORDER.map(r => [r, []]));
-    mine.forEach((v, k) => { if (k.startsWith('collector|') || v.n < 2) return; const r = keyRarity(k); if (r) out[r].push({ k, spare: v.n - 1 }); });
+    mine.forEach((v, k) => { if (k.startsWith('collector|') || v.n < 2) return; const r = keyRarity(k); if (r && out[r]) out[r].push({ k, spare: v.n - 1 }); });
     return out;
 }
 async function cardTake(uid, key, count = 1) { // retire des exemplaires ; renvoie {shiny} ou null
@@ -17642,7 +17646,7 @@ app.post('/api/prestige', async (req, res) => {
 });
 
 /* ---------- deck de 5 cartes : bonus de pièces (x2 si la partie est sur l'anime de la carte) ---------- */
-const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 14, secrete: 20, divine: 25, cosmique: 30, eternelle: 40, omega: 50 };
+const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 14, secrete: 20, divine: 25, cosmique: 30, eternelle: 40, omega: 50, halloween: 18 };
 async function deckOf(uid) {
     const keys = (await kvGet('deck', uid, { keys: [] })).keys || [];
     const mine = await cardsOf(uid);
@@ -18831,7 +18835,7 @@ app.get('/api/admin/stats2', adminOnly(async (req, res) => {
    (la carte est retirée de la collection pendant la vente, 5 % de taxe sur la vente)
    ===================================================================== */
 const MARKET_TAX = 0.05, MARKET_MAX = 20, MARKET_MIN = 5, MARKET_PRICE_MAX = 100000;
-const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999] };
+const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999], halloween: [3000, 10000] };
 function marketView(l, uid) {
     const [u, display] = l.key.split('|');
     return { id: l.id, name: display, anime: ARC_UNIVERSE_ANIME[u] || '', u, rarity: keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: cardImg({ u, display }) };
@@ -19423,7 +19427,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { omega: 9, eternelle: 8, cosmique: 7, divine: 6, secrete: 5, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { omega: 9, eternelle: 8, cosmique: 7, divine: 6, secrete: 5, halloween: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -19456,8 +19460,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { omega: 'Oméga', eternelle: 'Éternelle', cosmique: 'Cosmique', divine: 'Divine', secrete: 'Secrète', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { omega: '#ffffff', eternelle: '#ffd700', cosmique: '#7b5cff', divine: '#fff3b0', secrete: '#00f0ff', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { omega: 'Oméga', eternelle: 'Éternelle', cosmique: 'Cosmique', divine: 'Divine', secrete: 'Secrète', halloween: 'Halloween 🎃', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { omega: '#ffffff', eternelle: '#ffd700', cosmique: '#7b5cff', divine: '#fff3b0', secrete: '#00f0ff', halloween: '#ff7a00', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -19823,3 +19827,76 @@ io.on('connection', socket => {
     socket.on('tiktok_disconnect', () => ttStop(socket.id));
     socket.on('disconnect', () => ttStop(socket.id));
 });
+
+
+/* =====================================================================
+   HALLOWEEN : cartes spéciales créées par les admins (panneau admin →
+   « Cartes Halloween »). Contour Halloween, en boosters pendant l'événement
+   + Booster Halloween en boutique. Clé d'une carte : « anime|perso|halloween ».
+   ===================================================================== */
+const hwOn = () => !!(SITE.halloween && SITE.halloween.on);
+const hwCards = () => (SITE.halloween && Array.isArray(SITE.halloween.cards)) ? SITE.halloween.cards : [];
+const HW_RATE = 1 / 20; // chance par carte de booster pendant l'événement (multipliée par la chance)
+SPECIAL_BY_ID.halloween = { id: 'halloween', label: 'Halloween', coins: 150 };
+// toutes les cartes Halloween (même retirées du tirage : celles des joueurs restent valables)
+const _cardSpecialsHw = cardSpecials;
+cardSpecials = function (tier, u) {
+    if (tier === 'halloween') return hwCards().filter(c => c.u === u).map(c => ({ u, display: c.display, tier: 'halloween', key: cardSpecialKey(u, c.display, 'halloween') }));
+    return _cardSpecialsHw(tier, u);
+};
+// album : les cartes Halloween encore dans le tirage
+const _cardAllSpecialsHw = cardAllSpecials;
+cardAllSpecials = function (u) {
+    return _cardAllSpecialsHw(u).concat(hwCards().filter(c => c.u === u && !c.off).map(c => ({ u, display: c.display, tier: 'halloween', key: cardSpecialKey(u, c.display, 'halloween') })));
+};
+const _openBoosterHw = openBooster;
+openBooster = async function (uid, n, type = '') {
+    const pool = hwCards().filter(c => !c.off && ARC_UNIVERSE_ANIME[c.u]);
+    if (!hwOn() || !pool.length) return _openBoosterHw(uid, n, type === 'halloween' ? 'epique' : type);
+    const luck = await cardLuck(uid);
+    let k = 0;
+    for (let i = 0; i < n; i++) if (Math.random() < Math.min(0.5, HW_RATE * luck)) k++;
+    if (type === 'halloween') k = Math.max(1, k);
+    const out = n - k > 0 ? await _openBoosterHw(uid, n - k, type === 'halloween' ? '' : type) : [];
+    for (let j = 0; j < k; j++) {
+        const c = pool[Math.floor(Math.random() * pool.length)];
+        const card = await cardAwardSecret(uid, c.u, c.display, Math.random() < Math.min(0.9, luck / 10), 'halloween');
+        out.splice(Math.floor(Math.random() * (out.length + 1)), 0, card);
+    }
+    return out;
+};
+const hwView = () => ({ on: hwOn(), cards: hwCards().map(c => ({ u: c.u, display: c.display, off: !!c.off, anime: ARC_UNIVERSE_ANIME[c.u] || c.u, img: cardImg(c) })) });
+app.get('/api/admin/halloween', adminOnly(async (req, res) => {
+    const u = String(req.query.u || '');
+    res.json({ ok: true, ...hwView(), names: ARC_UNIVERSE_ANIME[u] ? cardPool(u).map(c => c.display) : [] });
+}));
+app.post('/api/admin/halloween', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (!SITE.halloween || typeof SITE.halloween !== 'object') SITE.halloween = { on: false, cards: [] };
+    const h = SITE.halloween;
+    if (!Array.isArray(h.cards)) h.cards = [];
+    if (b.action === 'toggle') h.on = !!b.on;
+    else if (b.action === 'add') {
+        // recherche stricte : nom exact, sinon un seul perso dont le nom contient ce qui est tapé
+        const u = String(b.u || ''), q = normalizeRG(String(b.name || ''));
+        const list = ARC_UNIVERSE_ANIME[u] ? cardPool(u) : [];
+        let hit = q ? list.find(x => normalizeRG(x.display) === q) : null;
+        if (!hit && q.length >= 3) { const m = list.filter(x => normalizeRG(x.display).includes(q)); if (m.length === 1) hit = m[0]; }
+        const c = hit ? { u, display: hit.display } : null;
+        if (!c) return res.json({ ok: false, error: 'Perso introuvable dans les cartes de cet anime (choisis-le dans la liste).' });
+        const ex = h.cards.find(x => x.u === c.u && x.display === c.display);
+        if (ex) ex.off = false; else h.cards.push({ u: c.u, display: c.display });
+    } else if (b.action === 'remove') {
+        const ex = h.cards.find(x => x.u === b.u && x.display === b.display);
+        if (ex) ex.off = true; // retirée du tirage, mais celles déjà obtenues restent valables
+    } else if (b.action === 'give') {
+        const uid = authUserId(req);
+        const ex = h.cards.find(x => x.u === b.u && x.display === b.display);
+        if (!uid || !ex) return res.json({ ok: false, error: 'Carte introuvable.' });
+        const card = await cardAwardSecret(uid, ex.u, ex.display, !!b.shiny, 'halloween');
+        await siteSave('halloween');
+        return res.json({ ok: true, ...hwView(), card });
+    }
+    await siteSave('halloween');
+    res.json({ ok: true, ...hwView() });
+}));

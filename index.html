@@ -600,6 +600,7 @@
         .bb-card .bb-name{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.92));font-family:'Bangers',cursive;font-size:clamp(1.1rem,3vw,1.7rem);text-align:center;letter-spacing:.5px;}
         .bb-card.noimg{display:flex;align-items:center;justify-content:center;}
         .bb-card.noimg .bb-name{position:static;background:none;padding:10px;}
+        .qap-q{margin:10px auto 0;max-width:560px;font-weight:900;font-size:clamp(1.1rem,3.4vw,1.45rem);color:#111;background:linear-gradient(90deg,#ffd93d,#ff9f43);padding:10px 14px;border-radius:14px;box-shadow:0 4px 0 #b86b1f;}
         .bb-autocd{margin-top:8px;font-weight:800;color:var(--accent-cyan);font-size:.9rem;}
         .bb-name .bb-sub{display:block;font-family:Poppins,sans-serif;font-size:.68rem;font-weight:600;opacity:.8;margin-top:1px;letter-spacing:0;}
         .bb-card.win{border-color:#00ff88;transform:scale(1.03);}
@@ -799,7 +800,17 @@
         .tcard.r-omega .tc-rar{color:#fff;font-weight:900;letter-spacing:1px;text-shadow:0 0 6px #fff,0 0 14px #b44dff;}
         @keyframes omegaPulse{0%,100%{box-shadow:0 0 22px rgba(255,255,255,.8),0 0 50px rgba(180,77,255,.5)}50%{box-shadow:0 0 34px rgba(255,255,255,1),0 0 80px rgba(0,240,255,.7)}}
         .tcard.empty.r-divine,.tcard.empty.r-cosmique,.tcard.empty.r-eternelle,.tcard.empty.r-omega{animation:none;filter:saturate(.6);}
-        @media (prefers-reduced-motion:reduce){.tcard.r-secrete,.tcard.r-eternelle,.tcard.r-omega{animation:none;}}
+        .tcard.r-halloween{border:3px solid transparent;background:linear-gradient(#1a0f1f,#120a14) padding-box,linear-gradient(135deg,#ff7a00,#8a2be2,#111,#ff7a00,#39ff14,#8a2be2) border-box;background-size:auto,300% 300%;animation:hwGlow 5s linear infinite;box-shadow:0 0 16px rgba(255,122,0,.65),0 0 30px rgba(138,43,226,.45);}
+        .tcard.r-halloween::before{content:'🎃';position:absolute;top:2px;left:4px;font-size:1.05rem;z-index:3;filter:drop-shadow(0 0 4px #ff7a00);}
+        .tcard.r-halloween::after{content:'🦇';position:absolute;top:3px;right:5px;font-size:.85rem;z-index:3;animation:hwBat 2.4s ease-in-out infinite;}
+        .tcard.r-halloween .tc-img{box-shadow:inset 0 -18px 22px rgba(255,122,0,.25);}
+        .tcard.r-halloween .tc-rar{background:linear-gradient(90deg,#ff7a00,#ffb347,#b76bff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        .tcard.r-halloween .tc-name{color:#ffb347;}
+        .tcard.empty.r-halloween{animation:none;filter:saturate(.7);}
+        @keyframes hwGlow{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+        @keyframes hwBat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-3px) rotate(8deg)}}
+        #summon .sm-fx.fx-halloween{filter:drop-shadow(0 0 18px #ff7a00);}
+        @media (prefers-reduced-motion:reduce){.tcard.r-secrete,.tcard.r-eternelle,.tcard.r-omega,.tcard.r-halloween,.tcard.r-halloween::after{animation:none;}}
         .tcard.empty{opacity:.45;border-style:dashed;}
         .tcard.shiny::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.55) 35%,rgba(255,0,200,.25) 45%,rgba(0,255,255,.25) 55%,transparent 70%);background-size:250% 100%;animation:tcShine 2.4s linear infinite;pointer-events:none;mix-blend-mode:screen;}
         @keyframes tcShine{from{background-position:120% 0}to{background-position:-120% 0}}
@@ -1914,6 +1925,12 @@
                     <button class="btn-action" style="margin-top:0;background:var(--accent-cyan);color:#111;" onclick="openUniverseSelection('tupref')">Choisir l'univers</button>
                 </div>
 
+                <div class="quote-mode-card" style="border-color:#ff9f43;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Qui a le plus…</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">« Qui a le plus souffert ? », « Qui est le plus fort ? »… Pas de bonne réponse : c'est TOI qui choisis ! En manches (5 à 20) ou en tournoi jusqu'à la finale • jouable avec ton chat</p>
+                    <button class="btn-action" style="margin-top:0;background:#ff9f43;color:#111;" onclick="openUniverseSelection('qap')">Choisir l'univers</button>
+                </div>
+
                 
 
                 <div style="background: var(--panel-color); padding: 20px; border-radius: 8px; border: 2px solid #2a2a40; text-align: left;">
@@ -2519,6 +2536,15 @@
             <select id="adm-theme" class="v7-input"><option value="auto">📅 Auto (Halloween en octobre, Noël en décembre)</option><option value="none">Normal</option><option value="halloween">🎃 Halloween</option><option value="noel">🎄 Noël</option></select>
             <p class="tl-hint" style="text-align:left;">Change la déco pour tout le monde et ajoute une carte « Pixel / Silhouette spécial » avec des persos du thème.</p>
             <button class="btn-action" style="margin-top:0;" onclick="saveTheme()">Appliquer</button>
+        </div>
+        <div class="opt-panel" id="adm-hw">
+            <h2>🎃 Cartes Halloween</h2>
+            <p class="tl-hint" style="text-align:left;">Crée des cartes Halloween (contour spécial) avec les persos de ton choix. Quand l'événement est activé, elles tombent dans les boosters et un <b>Booster Halloween</b> (1 carte Halloween garantie) apparaît en boutique.</p>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#ff7a00;"><input type="checkbox" id="adm-hw-on" onchange="hwAdmin('toggle')"> 🎃 Événement Halloween activé</label>
+            <select id="adm-hw-u" class="v7-input" onchange="hwAdminNames()"></select>
+            <input id="adm-hw-name" class="v7-input" list="adm-hw-names" maxlength="80" placeholder="Perso (ex : Itachi Uchiwa)"><datalist id="adm-hw-names"></datalist>
+            <button class="btn-action" style="margin-top:4px;background:#ff7a00;color:#111;" onclick="hwAdmin('add')">➕ Ajouter la carte Halloween</button>
+            <div id="adm-hw-list" class="card-grid" style="margin-top:10px;"></div>
         </div>
         <div class="opt-panel">
             <h2>🍀 Chance sur les cartes</h2>
@@ -3231,6 +3257,7 @@
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_couleur:    { title:'🎨 COLORIE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            qap:            { title:'🏆 QUI A LE PLUS…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             tupref:         { title:'🤔 TU PRÉFÈRES…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
@@ -3245,6 +3272,7 @@
             grid.innerHTML = '';
             const pick = key => mode === 'quote' ? createQuoteRoom(key)
                 : mode === 'tupref' ? startBattleSetup('tp:' + key)
+                : mode === 'qap' ? startBattleSetup('tp:' + key, 'qap')
                 : mode.startsWith('arc_') ? createRoom('arcade', mode.slice(4) + ':' + key)
                 : createRoom(mode, key);
             // plusieurs animes au choix (sauf Rolland Garros, Enchères et AnimeDLE)
@@ -6526,16 +6554,31 @@
         function openBattleSelection() {
             startBattleSetup('openings');
         }
-        async function startBattleSetup(source) {
+        const QAP_QUESTIONS = ['Qui a le plus souffert ?', 'Qui est le plus fort ?', 'Qui a le plus de pouvoir ?', 'Qui a le plus d’aura ?', 'Qui a le plus de charisme ?',
+            'Qui est le plus intelligent ?', 'Qui est le plus drôle ?', 'Qui a le meilleur design ?', 'Qui a l’histoire la plus triste ?', 'Qui a le plus de fans ?',
+            'Qui est le plus détesté ?', 'Qui est le plus sous-coté ?', 'Qui est le plus surcoté ?', 'Qui a la meilleure évolution ?', 'Qui est le plus loyal ?',
+            'Qui est le plus flippant ?', 'Qui ferait le meilleur prof ?', 'Qui serait le meilleur coloc ?', 'Qui survivrait le plus longtemps dans un film d’horreur ?',
+            'Qui mange le plus ?', 'Qui est le plus beau ou la plus belle ?', 'Qui a le plus mauvais caractère ?', 'Qui est le plus malchanceux ?', 'Qui ferait le meilleur chef ?',
+            'Qui a le plus de rizz ?', 'Qui gagnerait Koh-Lanta ?', 'Qui est le plus fou ?', 'Qui a les meilleures répliques ?', 'Qui a le plus gros ego ?',
+            'Qui est le plus gentil ?', 'Qui est le plus dangereux ?', 'Qui serait le meilleur pote ?', 'Qui a le meilleur style ?', 'Qui a le plus de haters ?',
+            'Qui est le plus courageux ?', 'Qui est le plus stylé en combat ?', 'Qui ferait le meilleur streamer ?', 'Qui a la plus grosse flemme ?', 'Qui est le plus stratège ?',
+            'Qui pleure le plus ?', 'Qui a le plus de chance ?', 'Qui ferait le pire date ?', 'Qui est le plus mystérieux ?', 'Qui a le meilleur rire ?'];
+        const qapQ = i => QAP_QUESTIONS[i] || QAP_QUESTIONS[0];
+        function qapNextQ() {
+            if (!bb.qBag || !bb.qBag.length) bb.qBag = bbShuffle(QAP_QUESTIONS.map((_, i) => i));
+            return bb.qBag.pop();
+        }
+        async function startBattleSetup(source, kind) {
             hideAllPanels();
             document.getElementById('battle-room').style.display = 'block';
             const body = document.getElementById('bb-body');
             body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
             let data;
             try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
-            bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') };
-            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
-            document.getElementById('bb-subtitle').textContent = bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:'), qap: kind === 'qap' };
+            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI A LE PLUS…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
+            document.getElementById('bb-subtitle').textContent = bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            if (bb.qap) return qapSetup(document.getElementById('bb-body'));
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
             h.innerHTML = '<div class="bb-round">COMBIEN DE PARTICIPANTS ?</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Ils sont tirés au hasard. À chaque duel, clique sur ton préféré (ou flèches ← →).</p>';
@@ -6563,6 +6606,72 @@
             // précharge quelques images
             data.items.slice(0, 16).forEach(it => itemImage(source, it));
         }
+        function qapSetup(body) {
+            body.innerHTML = '';
+            const N = bb.all.length;
+            const h = document.createElement('div'); h.className = 'bb-head';
+            h.innerHTML = '<div class="bb-round">🎲 EN MANCHES</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">À chaque manche, une nouvelle question et deux persos au hasard.</p>';
+            body.appendChild(h);
+            const rs = document.createElement('div'); rs.className = 'bb-sizes';
+            [5, 10, 15, 20].forEach(n => { const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} manches`; b.onclick = () => qapStartRounds(n); rs.appendChild(b); });
+            body.appendChild(rs);
+            const h2 = document.createElement('div'); h2.className = 'bb-head'; h2.style.marginTop = '18px';
+            h2.innerHTML = '<div class="bb-round">🏆 EN TOURNOI</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Une seule question pour tout le tournoi, jusqu’à la finale.</p>';
+            body.appendChild(h2);
+            const sel = document.createElement('select'); sel.className = 'v7-input'; sel.id = 'qap-q'; sel.style.cssText = 'max-width:420px;display:block;margin:0 auto 10px;';
+            sel.innerHTML = '<option value="-1">🎲 Une question au hasard</option>' + QAP_QUESTIONS.map((q, i) => `<option value="${i}">${v7esc(q)}</option>`).join('');
+            body.appendChild(sel);
+            const ts = document.createElement('div'); ts.className = 'bb-sizes';
+            const pickQ = () => { const v = +sel.value; return v >= 0 ? v : Math.floor(Math.random() * QAP_QUESTIONS.length); };
+            [8, 16, 32, 64, 128, 256, 512, 1024].filter(n => n <= N).forEach(n => { const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} persos`; b.onclick = () => { bb.qi = pickQ(); bbStart(n); }; ts.appendChild(b); });
+            if (N >= 8 && ![8, 16, 32, 64, 128, 256, 512, 1024].includes(N)) { const b = document.createElement('button'); b.className = 'btn-action'; b.style.cssText = 'background:#ff9f43;color:#111;'; b.textContent = `🌍 Tous les ${N} persos`; b.onclick = () => { bb.qi = pickQ(); bbStart(N); }; ts.appendChild(b); }
+            body.appendChild(ts);
+            bb.all.slice(0, 12).forEach(it => itemImage(bb.source, it));
+        }
+        // Mode manches : question + 2 persos au hasard à chaque manche
+        function qapPair() {
+            const used = bb.rounds.seen;
+            let pool = bb.all.filter(i => !used.has(i.name));
+            if (pool.length < 2) { used.clear(); pool = bb.all; }
+            const [a, b] = bbShuffle(pool).slice(0, 2).map(i => i.name);
+            used.add(a); used.add(b);
+            return [a, b];
+        }
+        function qapStartRounds(n) {
+            bb.qBag = null;
+            Object.assign(bb, { rounds: { total: n, no: 1, log: [], seen: new Set() }, qi: null, size: n + 1, bye: null, playin: false, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
+            bb.qi = qapNextQ(); bb.current = qapPair();
+            bbRenderDuel();
+        }
+        function qapRoundNext() {
+            const r = bb.rounds;
+            const [w, l] = bb.duels[bb.duels.length - 1];
+            r.log.push({ q: bb.qi, w, l });
+            if (r.no >= r.total) return qapFinishRounds();
+            r.no++; bb.qi = qapNextQ(); bb.current = qapPair(); bb.next = []; bb.idx = 0;
+            bbRenderDuel();
+        }
+        function qapFinishRounds() {
+            bb.done = true;
+            const body = document.getElementById('bb-body');
+            body.innerHTML = '<div class="bb-head"><div class="bb-round">📋 TES CHOIX</div></div>';
+            const list = document.createElement('div'); list.className = 'bb-rank';
+            bb.rounds.log.forEach((e, i) => {
+                const row = bbRankRow(i + 1, e.w, '', null);
+                const mid = row.children[2]; mid.style.flex = '1';
+                const q = document.createElement('div'); q.style.cssText = 'font-size:.78rem;color:var(--accent-cyan);font-weight:700;'; q.textContent = qapQ(e.q);
+                const vs = document.createElement('div'); vs.style.cssText = 'font-size:.75rem;color:var(--text-muted);'; vs.textContent = 'contre ' + e.l;
+                mid.prepend(q); mid.appendChild(vs);
+                row.children[3].remove();
+                list.appendChild(row);
+            });
+            body.appendChild(list);
+            const again = document.createElement('div'); again.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;';
+            const b1 = document.createElement('button'); b1.className = 'btn-action'; b1.style.cssText = 'width:auto;margin:0;'; b1.textContent = '🔁 Rejouer'; b1.onclick = () => qapStartRounds(bb.rounds.total);
+            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer de mode'; b2.onclick = () => startBattleSetup(bb.source, 'qap');
+            again.append(b1, b2); body.appendChild(again);
+            if (typeof confetti === 'function') confetti(1500);
+        }
         function bbShuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
         function bbStart(n) {
             const entrants = bbShuffle(bb.all).slice(0, n).map(i => i.name);
@@ -6571,7 +6680,8 @@
             const extra = entrants.length - P;
             const current = extra ? entrants.slice(0, 2 * extra) : entrants;
             const bye = extra ? entrants.slice(2 * extra) : null;
-            Object.assign(bb, { size: entrants.length, current, bye, playin: !!extra, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
+            Object.assign(bb, { size: entrants.length, current, bye, playin: !!extra, rounds: null, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
+            bb.theme = bb.qap && bb.qi != null ? 'qap' + bb.qi + '|' + bb.source : bb.source;
             bbRenderDuel();
         }
         function bbItem(name) { return bb.all.find(i => i.name === name) || { name }; }
@@ -6616,12 +6726,13 @@
             const a = bb.current[bb.idx], b = bb.current[bb.idx + 1];
             body.innerHTML = '';
             const head = document.createElement('div'); head.className = 'bb-head';
-            const rn = document.createElement('div'); rn.className = 'bb-round'; rn.textContent = bb.playin ? 'TOUR PRÉLIMINAIRE' : (BB_ROUND_NAMES[bb.current.length] || `TOUR DES ${bb.current.length}`);
-            const sub = document.createElement('div'); sub.style.cssText = 'color:var(--text-muted);font-size:.85rem;'; sub.textContent = `Duel ${matchNo} / ${total}`;
+            const rn = document.createElement('div'); rn.className = 'bb-round'; rn.textContent = bb.rounds ? `MANCHE ${bb.rounds.no} / ${bb.rounds.total}` : bb.playin ? 'TOUR PRÉLIMINAIRE' : (BB_ROUND_NAMES[bb.current.length] || `TOUR DES ${bb.current.length}`);
+            const sub = document.createElement('div'); sub.style.cssText = 'color:var(--text-muted);font-size:.85rem;'; sub.textContent = bb.rounds ? 'Pas de bonne réponse : choisis !' : `Duel ${matchNo} / ${total}`;
             const prog = document.createElement('div'); prog.className = 'bb-progress';
             const done = bb.duels.length, all = bb.size - 1;
             prog.innerHTML = `<div style="width:${100 * done / all}%"></div>`;
             head.append(rn, sub, prog);
+            if (bb.qap && bb.qi != null) { const q = document.createElement('div'); q.className = 'qap-q'; q.textContent = qapQ(bb.qi); head.appendChild(q); }
             body.appendChild(head);
             const duel = document.createElement('div'); duel.className = 'bb-duel';
             const ca = bbCard(a, () => bbPick(0, ca, cb));
@@ -6644,13 +6755,14 @@
             const winner = side === 0 ? a : b, loser = side === 0 ? b : a;
             (side === 0 ? ca : cb).classList.add('win');
             (side === 0 ? cb : ca).classList.add('lose');
-            bb.history.push(JSON.stringify({ current: bb.current, next: bb.next, idx: bb.idx, duels: bb.duels, eliminated: bb.eliminated, bye: bb.bye, playin: bb.playin }));
+            bb.history.push(JSON.stringify({ current: bb.current, next: bb.next, idx: bb.idx, duels: bb.duels, eliminated: bb.eliminated, bye: bb.bye, playin: bb.playin, qi: bb.qi, rounds: bb.rounds ? { ...bb.rounds, seen: [...bb.rounds.seen] } : null }));
             bb.duels.push([winner, loser]);
             bb.eliminated[loser] = bb.playin ? bb.size : bb.current.length;
             bb.next.push(winner);
             bb.idx += 2;
             setTimeout(() => {
                 bb.busy = false;
+                if (bb.rounds) return qapRoundNext();
                 if (bb.idx >= bb.current.length) {
                     if (bb.next.length === 1 && !bb.bye) return bbFinish(bb.next[0]);
                     bb.current = bb.bye ? bbShuffle([...bb.next, ...bb.bye]) : bb.next; bb.next = []; bb.idx = 0; bb.bye = null; bb.playin = false;
@@ -6661,6 +6773,7 @@
         function bbUndo() {
             if (!bb || !bb.history.length) return;
             Object.assign(bb, JSON.parse(bb.history.pop()));
+            if (bb.rounds) bb.rounds.seen = new Set(bb.rounds.seen);
             bb.done = false;
             bbRenderDuel();
         }
@@ -6678,7 +6791,7 @@
             const body = document.getElementById('bb-body');
             body.innerHTML = '';
             const box = document.createElement('div'); box.className = 'bb-champion';
-            box.innerHTML = '<div class="bb-round">🏆 TON CHAMPION</div>';
+            box.innerHTML = bb.qap && bb.qi != null ? `<div class="qap-q">${v7esc(qapQ(bb.qi))}</div><div class="bb-round">🏆 TA RÉPONSE</div>` : '<div class="bb-round">🏆 TON CHAMPION</div>';
             box.appendChild(bbCard(champion));
             body.appendChild(box);
             // Classement de ta battle : champion, finaliste, demi-finalistes...
@@ -6704,10 +6817,10 @@
             showMine();
             const again = document.createElement('div'); again.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;';
             const b1 = document.createElement('button'); b1.className = 'btn-action'; b1.style.cssText = 'width:auto;margin:0;'; b1.textContent = '🔁 Rejouer'; b1.onclick = () => bbStart(bb.size);
-            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer le nombre'; b2.onclick = () => startBattleSetup(bb.source);
+            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer le nombre'; b2.onclick = () => startBattleSetup(bb.source, bb.qap ? 'qap' : undefined);
             again.append(b1, b2);
             body.appendChild(again);
-            fetch('/api/battle/result', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: bb.source, champion, duels: bb.duels }) }).catch(() => {});
+            fetch('/api/battle/result', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: bb.theme || bb.source, champion, duels: bb.duels }) }).catch(() => {});
         }
         function bbRankRow(pos, name, right, rate) {
             const row = document.createElement('div'); row.className = 'bb-rank-row';
@@ -6725,7 +6838,7 @@
         async function bbShowRanking(container, withBack) {
             container.innerHTML = '<div class="arc-loading" style="padding:20px;"><div class="arc-spin"></div></div>';
             let d = null;
-            try { d = await (await fetch('/api/battle/ranking?theme=' + encodeURIComponent(bb.source))).json(); } catch (e) {}
+            try { d = await (await fetch('/api/battle/ranking?theme=' + encodeURIComponent(bb.theme || bb.source))).json(); } catch (e) {}
             container.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head'; h.innerHTML = '<div class="bb-round">🌍 CLASSEMENT MONDIAL</div><p style="color:var(--text-muted);font-size:.8rem;">🏆 = nombre de fois champion • % = victoires en duel</p>';
             container.appendChild(h);
@@ -6738,7 +6851,7 @@
             container.appendChild(rank);
             if (withBack) {
                 const back = document.createElement('button'); back.className = 'btn-action'; back.style.cssText = 'max-width:320px;display:block;margin:12px auto 0;background:#2a2a40;';
-                back.textContent = '← Retour'; back.onclick = () => startBattleSetup(bb.source);
+                back.textContent = '← Retour'; back.onclick = () => startBattleSetup(bb.source, bb.qap ? 'qap' : undefined);
                 container.appendChild(back);
             }
         }
@@ -8848,7 +8961,7 @@
             document.getElementById('adm-luck-admins').checked = !!(s.luck && s.luck.admins);
             document.getElementById('adm-luck-players').checked = !!(s.luck && s.luck.players);
             checkBuild();
-            loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
+            loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog(); hwAdminLoad();
         }
         const CLIENT_BUILD = '2026-10-09-clans';
         async function checkBuild() {
@@ -8864,6 +8977,46 @@
             const lock = document.getElementById('adm-lock').checked;
             const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, lock, msg: document.getElementById('adm-maint-msg').value, back: document.getElementById('adm-maint-back').value } });
             toast(d && d.ok ? (lock ? '🔒 Site fermé : les joueurs voient l’écran de mise à jour' : '✅ Maintenance mise à jour pour tout le monde') : '❌ Impossible (server.js à jour ?)', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+        }
+        // --- Cartes Halloween ---
+        let hwAdminCards = [];
+        function hwAdminRender(d) {
+            if (!d || !d.ok) return;
+            document.getElementById('adm-hw-on').checked = !!d.on;
+            hwAdminCards = d.cards || [];
+            const box = document.getElementById('adm-hw-list');
+            box.innerHTML = hwAdminCards.length ? hwAdminCards.map((c, i) => `<div style="text-align:center;${c.off ? 'opacity:.45;' : ''}">${cardHtml({ name: c.display, img: c.img, rarity: 'halloween' })}
+                <small style="display:block;color:var(--text-muted);font-size:.65rem;">${v7esc(c.anime)}${c.off ? ' • retirée du tirage' : ''}</small>
+                <div style="display:flex;gap:4px;justify-content:center;margin-top:3px;">${c.off ? `<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;" title="Remettre dans le tirage" onclick="hwAdmin('readd',${i})">↩️</button>` : `<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;background:#2a2a40;" title="Retirer du tirage" onclick="hwAdmin('remove',${i})">✖</button>`}<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;background:#2a2a40;" title="Me la donner" onclick="hwAdmin('give',${i})">🎁</button></div></div>`).join('') : '<p class="tl-hint">Aucune carte Halloween pour l’instant.</p>';
+        }
+        function hwAdminLoad() {
+            const sel = document.getElementById('adm-hw-u');
+            if (sel && !sel.options.length) sel.innerHTML = UNIVERSE_CHOICES.map(([k, l]) => `<option value="${k}">${v7esc(l)}</option>`).join('');
+            hwAdminNames();
+        }
+        async function hwAdminNames() {
+            const u = document.getElementById('adm-hw-u').value;
+            const d = await v7get('/api/admin/halloween?u=' + encodeURIComponent(u));
+            if (!d || !d.ok) return;
+            document.getElementById('adm-hw-names').innerHTML = (d.names || []).map(n => `<option value="${v7esc(n)}">`).join('');
+            hwAdminRender(d);
+        }
+        async function hwAdmin(action, i) {
+            const c = i != null ? hwAdminCards[i] : null;
+            let body = { action };
+            if (action === 'toggle') body.on = document.getElementById('adm-hw-on').checked;
+            else if (action === 'readd') body = { action: 'add', u: c.u, name: c.display };
+            else if (c) { body.u = c.u; body.display = c.display; }
+            else if (action === 'add') {
+                body.u = document.getElementById('adm-hw-u').value; body.name = document.getElementById('adm-hw-name').value.trim();
+                if (!body.name) return toast('Choisis un perso.', 'var(--accent-pink)');
+            }
+            const d = await v7post('/api/admin/halloween', body);
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible (server.js à jour ?)'), 'var(--accent-pink)');
+            hwAdminRender(d);
+            if (action === 'add') { document.getElementById('adm-hw-name').value = ''; toast('🎃 Carte Halloween ajoutée !', '#ff7a00'); }
+            if (action === 'toggle') toast(body.on ? '🎃 Événement Halloween activé pour tout le monde !' : 'Événement Halloween terminé.', '#ff7a00');
+            if (action === 'give' && d.card && typeof showBooster === 'function') showBooster([d.card]);
         }
         async function saveLuck() {
             const luck = { admins: document.getElementById('adm-luck-admins').checked, players: document.getElementById('adm-luck-players').checked };
@@ -8943,7 +9096,7 @@
            PIÈCES, BOUTIQUE, CARTES, TITRES, EMOTES, EFFETS, DÉFIS, RÉCAP
            ===================================================================== */
         const eco = { coins: 0, items: [], owned: [], sel: {}, cos: {}, tab: 'shop', albumU: null };
-        const RAR_LABEL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique 🔥', secrete: 'Secrète 🌈', divine: 'Divine 👑', cosmique: 'Cosmique 🌌', eternelle: 'Éternelle ♾️', omega: 'Ω OMÉGA' };
+        const RAR_LABEL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique 🔥', secrete: 'Secrète 🌈', divine: 'Divine 👑', cosmique: 'Cosmique 🌌', eternelle: 'Éternelle ♾️', omega: 'Ω OMÉGA', halloween: 'Halloween' };
         function ecoCoinsUi() {
             const b = document.getElementById('coin-badge');
             if (b) { b.style.display = isAccount() ? '' : 'none'; b.querySelector('b').textContent = eco.coins; }
@@ -9035,7 +9188,7 @@
                 <p class="tl-hint">${cards.filter(c => c.isNew).length} nouvelle(s) carte(s)${cards.some(c => c.coins) ? ` • doublons : +${cards.reduce((a, c) => a + (c.coins || 0), 0)} 🪙` : ''}</p></div>`;
             m.addEventListener('click', e => { if (e.target === m) m.remove(); });
             document.body.appendChild(m);
-            const TOP = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
+            const TOP = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween'];
             if (cards.some(c => c.shiny || ['legendaire', 'mythique', ...TOP].includes(c.rarity))) confetti(cards.some(c => TOP.includes(c.rarity)) ? 3500 : 1500);
         }
         let cardQueue = [], cardTimer = null;
@@ -9767,7 +9920,7 @@
         async function fuseGo(r) {
             const d = await v7post('/api/cards/fuse', { rarity: r });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            if (d.card && (d.card.shiny || ['legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'].includes(d.card.rarity))) confetti(1600);
+            if (d.card && (d.card.shiny || ['legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween'].includes(d.card.rarity))) confetti(1600);
             loadFuse(d.card);
         }
 
@@ -10497,7 +10650,7 @@
             const el = document.getElementById('eco-deck'); if (!el) return;
             const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${(dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
             const q = dk.q.toLowerCase();
-            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
             el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, Mythique +14 %, Secrète +20 %, Divine +25 %, Cosmique +30 %, Éternelle +40 %, Oméga +50 %, brillante +2 % • bonus doublé si la partie est sur l’anime de la carte • sans limite</span></div>
                 <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
                 <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans ta collection" value="${h2esc(dk.q)}" oninput="dk.q=this.value;deckList()"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
@@ -10507,7 +10660,7 @@
         function deckList() {
             const box = document.getElementById('dk-list'); if (!box) return;
             const q = dk.q.toLowerCase();
-            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
             box.innerHTML = list.map(c => `<button class="trd-mini r-${c.rarity}${dk.keys.includes(c.key) ? ' on' : ''}" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${h2esc(c.name)}</b><small>${h2esc(c.anime)}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte : joue pour en gagner !</p>';
         }
         function deckToggle(k) {
@@ -10921,7 +11074,7 @@
             };
         })();
         socket.on('market_sold', d => { toast(`🏪 <b>${v7esc(d.buyer)}</b> a acheté ta carte ${v7esc(d.name)} : +${d.gain} 🪙`, '#ffd700'); if (typeof ecoLoad === 'function') ecoLoad(); });
-        const MK_RAR = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique', secrete: 'Secrète', divine: 'Divine', cosmique: 'Cosmique', eternelle: 'Éternelle', omega: 'Oméga' };
+        const MK_RAR = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique', secrete: 'Secrète', divine: 'Divine', cosmique: 'Cosmique', eternelle: 'Éternelle', omega: 'Oméga', halloween: 'Halloween 🎃' };
         function mkCard(c) { return cardHtml({ name: c.name, rarity: c.rarity, shiny: c.shiny, img: c.img, n: 1 }); }
         async function loadMarket() {
             const el = document.getElementById('eco-market'); if (!el) return;
@@ -10963,7 +11116,7 @@
         function mkFilter(q) {
             const box = document.getElementById('mk-pick'); if (!box) return;
             const s = String(q || '').toLowerCase();
-            const order = ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const order = ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
             box.innerHTML = mk.cards.filter(c => !s || (c.name + ' ' + c.anime).toLowerCase().includes(s)).sort((a, b) => order.indexOf(a.rarity) - order.indexOf(b.rarity)).slice(0, 90)
                 .map(c => `<button class="trd-mini r-${c.rarity}" onclick="mk.sell=${JSON.stringify(c.key).replace(/"/g, '&quot;')};loadMarket()"><img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${v7esc(c.name)}</b><small>${v7esc(c.anime)} • x${c.n}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
@@ -10990,17 +11143,18 @@
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9 };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5 };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
                 legendaire: [26, ['#ffb300', '#ffe066', '#fff'], 190, 'out'], mythique: [30, ['#ff9a2a', '#ff3c7a', '#ffe066'], 200, 'up'],
                 secrete: [36, ['#ff2a5f', '#ffe600', '#00ff88', '#00f0ff', '#b44dff'], 220, 'out'], divine: [30, ['#ffffff', '#fff3b0', '#ffd700'], 240, 'down'],
                 cosmique: [44, ['#ffffff', '#7b5cff', '#00c8ff', '#ff5ce1'], 240, 'orbit'], eternelle: [44, ['#ffd700', '#fff3b0', '#b8860b'], 260, 'out'],
-                omega: [70, ['#ff2a5f', '#ffe600', '#00ff88', '#00f0ff', '#b44dff', '#ffffff'], 340, 'out']
+                omega: [70, ['#ff2a5f', '#ffe600', '#00ff88', '#00f0ff', '#b44dff', '#ffffff'], 340, 'out'],
+                halloween: [40, ['#ff7a00', '#ffb347', '#8a2be2', '#39ff14', '#111111'], 230, 'orbit']
             };
             function smParticles(host, rar) {
                 const cfg = PARTS[rar]; if (!cfg) return;
@@ -11024,7 +11178,7 @@
                 if (rank >= 8 && typeof sfxBoom === 'function') sfxBoom(1.2, 0.25, 1500);
             }
             function smReveal(o, el, c) {
-                const rank = RANK[c.rarity] || 0, rar = RNAME[rank] || 'commune';
+                const rank = RANK[c.rarity] || 0, rar = c.rarity === 'halloween' ? 'halloween' : (RNAME[rank] || 'commune');
                 const fx = document.createElement('div'); fx.className = 'sm-fx fx-' + rar; el.appendChild(fx);
                 smParticles(fx, rar);
                 setTimeout(() => fx.remove(), 4200);
@@ -11033,7 +11187,7 @@
                 if (BANNER[rar]) {
                     o.querySelectorAll('.sm-banner').forEach(b => b.remove());
                     const b = document.createElement('div'); b.className = 'sm-banner' + (['secrete', 'omega'].includes(rar) ? ' rainbow' : '');
-                    b.style.setProperty('--bc', COL[rank]); b.textContent = (c.shiny ? '✨ ' : '') + BANNER[rar] + (c.shiny ? ' ✨' : '');
+                    b.style.setProperty('--bc', rar === 'halloween' ? '#ff7a00' : COL[rank]); b.textContent = (c.shiny ? '✨ ' : '') + BANNER[rar] + (c.shiny ? ' ✨' : '');
                     o.appendChild(b); setTimeout(() => b.remove(), 2300);
                 }
                 if (rank >= 3 && typeof confetti === 'function') confetti(rank >= 6 ? 3500 : 1800);
@@ -11461,7 +11615,7 @@
             // catégories de chaque carte (une carte peut être dans plusieurs)
             const RULES = [
                 [/undercover/i, ['bluff']], [/loup-garou/i, ['bluff', 'grand']], [/devine le perso/i, ['bluff']],
-                [/devine la note/i, ['quiz']], [/citation/i, ['quiz']], [/blind test/i, ['musique', 'stream']], [/battle d'openings/i, ['musique', 'stream']], [/tu préfères/i, ['fun', 'stream']],
+                [/devine la note/i, ['quiz']], [/citation/i, ['quiz']], [/blind test/i, ['musique', 'stream']], [/battle d'openings/i, ['musique', 'stream']], [/tu préfères/i, ['fun', 'stream']], [/qui a le plus/i, ['fun', 'stream']],
                 [/mini-jeux/i, ['quiz', 'stream']], [/chaîne de persos/i, ['quiz']], [/quiz des joueurs/i, ['quiz']], [/animedle/i, ['quiz']], [/rolland garos/i, ['quiz']],
                 [/dessine le perso/i, ['fun', 'stream']], [/tier list/i, ['fun']], [/jeu de connexion/i, ['fun']],
                 [/tournoi/i, ['strat', 'grand']], [/enchère/i, ['strat']]
@@ -11473,7 +11627,7 @@
                 const t = (c.querySelector('h3') || {}).textContent || '';
                 const r = RULES.find(([re]) => re.test(t));
                 c.dataset.cat = (r ? r[1] : ['quiz']).join(' ');
-                if (/blind test|battle d'openings|dessine le perso|tu préfères/i.test(t)) { const h = c.querySelector('h3'); if (h && !h.querySelector('.mc-tag')) h.insertAdjacentHTML('beforeend', '<span class="mc-tag">🎥 CHAT</span>'); }
+                if (/blind test|battle d'openings|dessine le perso|tu préfères|qui a le plus/i.test(t)) { const h = c.querySelector('h3'); if (h && !h.querySelector('.mc-tag')) h.insertAdjacentHTML('beforeend', '<span class="mc-tag">🎥 CHAT</span>'); }
             });
             // tuiles mini-jeux jouables avec le chat
             grid.querySelectorAll('.arc-game-btn').forEach(b => {
