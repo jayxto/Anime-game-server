@@ -16333,7 +16333,7 @@ io.on('connection', socket => {
 app.post('/api/admin/coins', adminOnly(async (req, res) => {
     const uid = authUserId(req);
     if (!uid) return res.json({ ok: false, error: 'Connecte-toi à ton compte.' });
-    const n = Math.max(1, Math.min(100000, +(req.body || {}).n || 1000));
+    const n = Math.max(1, Math.min(1000000, +(req.body || {}).n || 1000));
     const total = await ecoAddCoins(uid, n, true);
     socketsOfUser(uid).forEach(sid => io.to(sid).emit('coins_gain', { gain: n, total }));
     res.json({ ok: true, total });
@@ -19811,7 +19811,7 @@ app.get('/api/beta/me', async (req, res) => {
 app.post('/api/beta/coins', async (req, res) => {
     const uid = authUserId(req);
     if (!uid || !(await isPrivUid(uid))) return res.status(403).json({ ok: false, error: 'Réservé aux bêta testeurs.' });
-    const n = Math.max(1, Math.min(100000, +(req.body || {}).n || 1000));
+    const n = Math.max(1, Math.min(1000000, +(req.body || {}).n || 1000));
     const total = await ecoAddCoins(uid, n, true);
     socketsOfUser(uid).forEach(sid => io.to(sid).emit('coins_gain', { gain: n, total }));
     res.json({ ok: true, total });
