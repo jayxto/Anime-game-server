@@ -15724,7 +15724,7 @@ const SHOP = [
     { id: 'booster:mythique', kind: 'booster', key: '5', btype: 'mythique', name: 'Booster Mythique 🌈 5 cartes (1 légendaire min., secrètes x4)', price: 1800, consumable: true }
 ];
 const SHOP_BY_ID = Object.fromEntries(SHOP.map(i => [i.id, i]));
-const RARITIES = [['commune', 'Commune'], ['rare', 'Rare'], ['epique', 'Épique'], ['legendaire', 'Légendaire'], ['mythique', 'Mythique'], ['secrete', 'Secrète']];
+const RARITIES = [['commune', 'Commune'], ['rare', 'Rare'], ['epique', 'Épique'], ['legendaire', 'Légendaire'], ['mythique', 'Mythique'], ['secrete', 'Secrète'], ['divine', 'Divine'], ['cosmique', 'Cosmique'], ['eternelle', 'Éternelle'], ['omega', 'Oméga']];
 
 /* ---------- stockage ---------- */
 const ECO_MEM = new Map();     // uid -> { coins, earned, owned: [], sel: {}, cos: {} }
@@ -15849,10 +15849,33 @@ function cardRarityAt(u, idx) {
     const e = (idx - f) / Math.max(1, list.length - f);
     return e < 0.4 ? 'rare' : e < 0.75 ? 'epique' : e < 0.93 ? 'legendaire' : 'mythique';
 }
-// Cartes Secrètes : version spéciale des 3 persos les plus iconiques de chaque anime
-const SECRET_PER_ANIME = 3;
-const cardSecretKey = (u, display) => u + '|' + display + '|secrete';
-function cardSecrets(u) { return arcFamous(u).slice(0, SECRET_PER_ANIME).map(c => ({ u, display: c.display, key: cardSecretKey(u, c.display) })); }
+// Raretés spéciales : versions à part des persos les plus iconiques, de plus en plus dures à avoir.
+// rate = chance par carte de booster ; top = combien de persos par anime ; animes = animes concernés (sinon tous)
+const SPECIAL_TIERS = [
+    { id: 'secrete', label: 'Secrète', top: 3, rate: 1 / 150, coins: 50 },
+    { id: 'divine', label: 'Divine', top: 2, rate: 1 / 600, coins: 150 },
+    { id: 'cosmique', label: 'Cosmique', top: 1, rate: 1 / 2500, coins: 400 },
+    { id: 'eternelle', label: 'Éternelle', top: 1, rate: 1 / 10000, coins: 1000, animes: ['naruto', 'onepiece', 'dragonball', 'bleach', 'snk', 'jojo', 'hxh', 'demonslayer', 'jjk', 'fma'] },
+    { id: 'omega', label: 'Oméga', top: 1, rate: 1 / 50000, coins: 3000, animes: ['onepiece', 'naruto', 'dragonball'] }
+];
+const SPECIAL_BY_ID = Object.fromEntries(SPECIAL_TIERS.map(t => [t.id, t]));
+const cardSpecialKey = (u, display, tier) => u + '|' + display + '|' + tier;
+// persos iconiques quand l'ordre de la liste ne suffit pas (Pokémon est rangé par numéro du Pokédex)
+const SPECIAL_ICONS = { pokemon: ['Pikachu', 'Dracaufeu', 'Mewtwo'] };
+function cardIcons(u) {
+    const want = SPECIAL_ICONS[u];
+    if (!want) return arcFamous(u);
+    const pool = cardPool(u);
+    return want.map(n => pool.find(c => c.display === n)).filter(Boolean);
+}
+function cardSpecials(tier, u) {
+    const t = SPECIAL_BY_ID[tier];
+    if (!t || (t.animes && !t.animes.includes(u))) return [];
+    return cardIcons(u).slice(0, t.top).map(c => ({ u, display: c.display, tier, key: cardSpecialKey(u, c.display, tier) }));
+}
+const cardSecretKey = (u, display) => cardSpecialKey(u, display, 'secrete');
+function cardSecrets(u) { return cardSpecials('secrete', u); }
+function cardAllSpecials(u) { return SPECIAL_TIERS.flatMap(t => cardSpecials(t.id, u)); }
 function cardResolve(u, name) {
     if (!ARC_UNIVERSE_ANIME[u] || !name) return null;
     const list = cardPool(u);
@@ -15903,11 +15926,15 @@ async function cardAward(p, u, name, opts) {
     if (!(opts && opts.silent)) io.to(p.id).emit('card_gain', out);
     return out;
 }
-async function cardAwardSecret(uid, u, display, shiny) {
-    const key = cardSecretKey(u, display);
-    const isNew = await cardGive(uid, { key }, !!shiny);
-    if (!isNew) await ecoAddCoins(uid, 50);
-    return { name: display, anime: ARC_UNIVERSE_ANIME[u], u, rarity: 'secrete', shiny: !!shiny, isNew, coins: isNew ? 0 : 50, img: cardImg({ u, display }), secret: true };
+async function cardAwardSecret(uid, u, display, shiny, tier = 'secrete') {
+    const t = SPECIAL_BY_ID[tier] || SPECIAL_BY_ID.secrete;
+    const isNew = await cardGive(uid, { key: cardSpecialKey(u, display, t.id) }, !!shiny);
+    if (!isNew) await ecoAddCoins(uid, t.coins);
+    // Cosmique et au-dessus : annoncé à tout le serveur
+    if (['cosmique', 'eternelle', 'omega'].includes(t.id)) {
+        pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: t.id, label: t.label, shiny: !!shiny })).catch(() => {});
+    }
+    return { name: display, anime: ARC_UNIVERSE_ANIME[u], u, rarity: t.id, shiny: !!shiny, isNew, coins: isNew ? 0 : t.coins, img: cardImg({ u, display }), secret: true };
 }
 function playerBySocket(sid) {
     for (const r of Object.values(rooms)) { const p = r.players.find(x => x.id === sid); if (p) return { p, room: r }; }
@@ -15974,19 +16001,24 @@ makeDleComparison = function (character, target, player, categories) {
     } catch (_) {}
     return r;
 };
-const RAR_RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5 };
+const RAR_RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9 };
 // type : '' (normal), 'epique' (1 épique ou mieux garantie), 'mythique' (1 légendaire ou mieux garantie + secrètes x4)
 async function openBooster(uid, n, type = '') {
     const us = arcUniverses();
     const out = [];
-    const secretRate = type === 'mythique' ? 1 / 30 : type === 'epique' ? 1 / 80 : 1 / 150;
+    const mult = type === 'mythique' ? 4 : type === 'epique' ? 2 : 1; // boosters spéciaux : raretés spéciales plus fréquentes
     const minRank = type === 'mythique' ? 3 : type === 'epique' ? 2 : n >= 10 ? 1 : 0;
     for (let i = 0; i < n; i++) {
         const u = us[Math.floor(Math.random() * us.length)];
-        if (Math.random() < secretRate) {
-            const sc = cardSecrets(u);
-            if (sc.length) { const c = sc[Math.floor(Math.random() * sc.length)]; out.push(await cardAwardSecret(uid, u, c.display, Math.random() < 1 / 10)); continue; }
+        let special = null;
+        for (const t of SPECIAL_TIERS.slice().reverse()) { // de la plus rare à la moins rare
+            if (Math.random() >= t.rate * mult) continue;
+            const us2 = t.animes ? t.animes.filter(x => ARC_UNIVERSE_ANIME[x]) : [u];
+            const cu = us2[Math.floor(Math.random() * us2.length)];
+            const sc = cardSpecials(t.id, cu);
+            if (sc.length) { special = sc[Math.floor(Math.random() * sc.length)]; break; }
         }
+        if (special) { out.push(await cardAwardSecret(uid, special.u, special.display, Math.random() < 1 / 10, special.tier)); continue; }
         const list = cardPool(u);
         // les cartes connues tombent plus souvent, les rares moins
         let idx = Math.floor(Math.pow(Math.random(), 1.6) * list.length);
@@ -16032,6 +16064,7 @@ async function titleStats(uid) {
     s.albums = Object.entries(per).filter(([u, n]) => n >= cardPool(u).length).length;
     s.mythics = [...cards.keys()].filter(k => keyRarity(k) === 'mythique').length;
     s.secrets = [...cards.keys()].filter(k => k.endsWith('|secrete')).length;
+    s.special = {}; SPECIAL_TIERS.forEach(t => { s.special[t.id] = [...cards.keys()].filter(k => k.endsWith('|' + t.id)).length; });
     s.earned = ((await ecoGet(uid)) || {}).earned || 0;
     return s;
 }
@@ -16090,7 +16123,7 @@ app.get('/api/cards', async (req, res) => {
     const mine = await cardsOf(uid);
     const u = String(req.query.u || '');
     const universes = arcUniverses().map(k => {
-        const list = cardPool(k).map(c => k + '|' + c.display).concat(cardSecrets(k).map(c => c.key));
+        const list = cardPool(k).map(c => k + '|' + c.display).concat(cardAllSpecials(k).map(c => c.key));
         let owned = 0; list.forEach(key => { if (mine.has(key)) owned++; });
         return { u: k, name: ARC_UNIVERSE_ANIME[k], total: list.length, owned };
     }).sort((a, b) => (b.owned / b.total) - (a.owned / a.total) || a.name.localeCompare(b.name, 'fr'));
@@ -16102,9 +16135,9 @@ app.get('/api/cards', async (req, res) => {
             const rarity = cardRarityAt(u, i);
             return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0 };
         });
-        cardSecrets(u).forEach(c => {
+        cardAllSpecials(u).forEach(c => {
             const m = mine.get(c.key);
-            cards.push(m ? { name: c.display, rarity: 'secrete', n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: 'secrete', n: 0, secret: true });
+            cards.push(m ? { name: c.display, rarity: c.tier, n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: c.tier, n: 0, secret: true });
         });
     }
     const all = [...mine.values()];
@@ -16474,6 +16507,10 @@ TITLES.push(
     { id: 'mythe', name: 'Chasseur de mythes', desc: '5 cartes mythiques', need: s => (s.mythics || 0) >= 5, prog: s => [s.mythics || 0, 5] },
     { id: 'secret', name: 'Gardien du secret', desc: 'Obtenir une carte Secrète', need: s => (s.secrets || 0) >= 1 },
     { id: 'secret10', name: 'Maître des secrets', desc: '10 cartes Secrètes', need: s => (s.secrets || 0) >= 10, prog: s => [s.secrets || 0, 10] },
+    { id: 'divin', name: 'Élu des dieux', desc: 'Obtenir une carte Divine', need: s => ((s.special || {}).divine || 0) >= 1 },
+    { id: 'cosmos', name: 'Voyageur cosmique', desc: 'Obtenir une carte Cosmique', need: s => ((s.special || {}).cosmique || 0) >= 1 },
+    { id: 'eternel', name: 'Éternel', desc: 'Obtenir une carte Éternelle', need: s => ((s.special || {}).eternelle || 0) >= 1 },
+    { id: 'omega', name: 'Ω Oméga', desc: 'Obtenir une carte Oméga (la plus rare du jeu)', need: s => ((s.special || {}).omega || 0) >= 1 },
     { id: 'legende', name: 'Légende de la saison', desc: 'Palier 30 du pass premium', need: s => (s.owned || []).includes('title:legende') },
     { id: 'champion', name: 'Champion du dimanche', desc: 'Gagner le tournoi du dimanche', need: s => (s.owned || []).includes('title:champion') },
     { id: 'hokage', name: 'Hokage', desc: 'Atteindre le rang Hokage en duel classé', need: s => (s.owned || []).includes('title:hokage') },
@@ -16590,18 +16627,18 @@ app.post('/api/chest/open', async (req, res) => {
 /* =====================================================================
    CARTES : fusion de doublons, échanges entre amis, carte collector
    ===================================================================== */
-const RAR_ORDER = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete'];
+const RAR_ORDER = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
 function keyRarity(key) {
     const [u, display, sec] = String(key).split('|');
     if (!ARC_UNIVERSE_ANIME[u]) return null;
-    if (sec === 'secrete') return cardSecrets(u).some(c => c.display === display) ? 'secrete' : null;
+    if (sec) return cardSpecials(sec, u).some(c => c.display === display) || (sec === 'secrete' && arcFamous(u).slice(0, 3).some(c => c.display === display)) ? sec : null;
     const list = cardPool(u);
     const idx = list.findIndex(c => c.display === display);
     return idx < 0 ? null : cardRarityAt(u, idx);
 }
 async function cardSpares(uid) {
     const mine = await cardsOf(uid);
-    const out = { commune: [], rare: [], epique: [], legendaire: [], mythique: [], secrete: [] };
+    const out = Object.fromEntries(RAR_ORDER.map(r => [r, []]));
     mine.forEach((v, k) => { if (k.startsWith('collector|') || v.n < 2) return; const r = keyRarity(k); if (r) out[r].push({ k, spare: v.n - 1 }); });
     return out;
 }
@@ -16623,7 +16660,7 @@ async function cardTake(uid, key, count = 1) { // retire des exemplaires ; renvo
 function randomCardOfRarity(rar) {
     const us = arcShuffle(arcUniverses());
     for (const u of us) {
-        if (rar === 'secrete') { const sc = cardSecrets(u); if (sc.length) return { ...sc[Math.floor(Math.random() * sc.length)], secret: true }; continue; }
+        if (SPECIAL_BY_ID[rar]) { const sc = cardSpecials(rar, u); if (sc.length) return { ...sc[Math.floor(Math.random() * sc.length)], secret: true }; continue; }
         const list = cardPool(u);
         const pool2 = list.filter((c, i) => cardRarityAt(u, i) === rar);
         if (pool2.length) return { u, display: pool2[Math.floor(Math.random() * pool2.length)].display };
@@ -16648,9 +16685,9 @@ app.post('/api/cards/fuse', async (req, res) => {
         if (await cardTake(uid, x.k, n)) { need -= n; used.push({ name: x.k.split('|')[1], n }); }
     }
     if (need > 0) return res.json({ ok: false, error: 'Fusion impossible, réessaie.' });
-    const target = rar === 'secrete' ? 'secrete' : RAR_ORDER[RAR_ORDER.indexOf(rar) + 1];
+    const target = rar === 'omega' ? 'omega' : RAR_ORDER[RAR_ORDER.indexOf(rar) + 1];
     const pick = randomCardOfRarity(target);
-    const card = !pick ? null : pick.secret ? await cardAwardSecret(uid, pick.u, pick.display, rar === 'secrete' || Math.random() < 1 / 10)
+    const card = !pick ? null : pick.secret ? await cardAwardSecret(uid, pick.u, pick.display, rar === 'omega' || Math.random() < 1 / 10, pick.tier)
         : await cardAward({ userId: uid, id: null }, pick.u, pick.display, { silent: true, shinyRate: 1 / 10 });
     res.json({ ok: true, used, card });
 });
@@ -17390,7 +17427,7 @@ app.post('/api/prestige', async (req, res) => {
 });
 
 /* ---------- deck de 5 cartes : bonus de pièces (x2 si la partie est sur l'anime de la carte) ---------- */
-const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 14, secrete: 20 };
+const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 14, secrete: 20, divine: 25, cosmique: 30, eternelle: 40, omega: 50 };
 async function deckOf(uid) {
     const keys = (await kvGet('deck', uid, { keys: [] })).keys || [];
     const mine = await cardsOf(uid);
@@ -18288,7 +18325,7 @@ app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
 }));
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-05-cartes';
+const SITE_BUILD = '2026-10-06-raretes';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -18579,7 +18616,7 @@ app.get('/api/admin/stats2', adminOnly(async (req, res) => {
    (la carte est retirée de la collection pendant la vente, 5 % de taxe sur la vente)
    ===================================================================== */
 const MARKET_TAX = 0.05, MARKET_MAX = 20, MARKET_MIN = 5, MARKET_PRICE_MAX = 100000;
-const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000] };
+const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999] };
 function marketView(l, uid) {
     const [u, display] = l.key.split('|');
     return { id: l.id, name: display, anime: ARC_UNIVERSE_ANIME[u] || '', u, rarity: keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: cardImg({ u, display }) };
@@ -19171,7 +19208,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { secrete: 5, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { omega: 9, eternelle: 8, cosmique: 7, divine: 6, secrete: 5, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -19204,8 +19241,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { secrete: 'Secrète', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { secrete: '#00f0ff', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { omega: 'Oméga', eternelle: 'Éternelle', cosmique: 'Cosmique', divine: 'Divine', secrete: 'Secrète', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { omega: '#ffffff', eternelle: '#ffd700', cosmique: '#7b5cff', divine: '#fff3b0', secrete: '#00f0ff', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
