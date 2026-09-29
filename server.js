@@ -17454,7 +17454,7 @@ function deckPct(deck, universe) {
     const us = String(universe || '').split(/[+:]/);
     let pct = 0;
     deck.forEach(c => { let b = DECK_BONUS[c.rarity] + (c.shiny ? 2 : 0); if (us.includes(c.u)) b *= 2; pct += b; });
-    return Math.min(40, pct);
+    return pct; // plus de plafond
 }
 app.get('/api/deck', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -18342,7 +18342,7 @@ app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
 }));
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-07-chance';
+const SITE_BUILD = '2026-10-08-musique';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -19539,3 +19539,12 @@ cardAward = async function (p, u, name, opts) {
     o.shinyRate = Math.min(0.9, base * luck);
     return _cardAwardLuck(p, u, name, o);
 };
+
+/* ---------- Musique du menu : tous les openings YouTube du blind test ---------- */
+app.get('/api/music/openings', (req, res) => {
+    const seen = new Set();
+    const tracks = BLINDTEST_TRACKS
+        .filter(t => t.ytId && !t.src && !BT_BAD_IDS.has(t.ytId) && !seen.has(t.ytId) && seen.add(t.ytId))
+        .map(t => ({ title: `${t.title} — ${t.anime}`, yt: t.ytId }));
+    res.json({ ok: true, tracks });
+});

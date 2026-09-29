@@ -275,6 +275,10 @@
             backdrop-filter: blur(10px);
         }
         #music-player.music-collapsed .music-player-body { display:none; }
+        #music-yt-box { position:relative; width:100%; aspect-ratio:16/9; max-height:120px; margin-top:8px; border-radius:8px; overflow:hidden; background:#000; }
+        #music-yt-box iframe { width:100%; height:100%; border:0; display:block; }
+        #music-yt-hint { position:absolute; left:0; right:0; bottom:0; padding:4px 6px; font-size:.7rem; font-weight:800; color:#fff; background:linear-gradient(transparent,rgba(0,0,0,.85)); pointer-events:none; text-align:center; }
+        #music-player.music-collapsed #music-yt-box { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; margin:0; }
         .music-player-head {
             display:flex;
             align-items:center;
@@ -4103,6 +4107,11 @@
                 console.warn('[Musique] Diagnostic fichiers indisponible', e);
             }
 
+            // + tous les openings YouTube du blind test
+            try {
+                const d = await (await fetch('/api/music/openings', { cache: 'no-store' })).json();
+                if (d && d.ok) AVAILABLE_MUSIC_TRACKS = AVAILABLE_MUSIC_TRACKS.concat(d.tracks || []);
+            } catch (_) {}
             return AVAILABLE_MUSIC_TRACKS;
         }
         const MUSIC_ENABLED_KEY = 'anime_game_music_enabled_v1';
@@ -4113,7 +4122,8 @@
         backgroundMusic.crossOrigin = 'anonymous';
 
         let musicEnabled = localStorage.getItem(MUSIC_ENABLED_KEY) !== '0';
-        let musicVolume = Number(localStorage.getItem(MUSIC_VOLUME_KEY));
+        const _storedVol = localStorage.getItem(MUSIC_VOLUME_KEY);
+        let musicVolume = _storedVol === null || _storedVol === '' ? 0.18 : Number(_storedVol); // null donnait 0 : musique muette au premier passage
         if (!Number.isFinite(musicVolume)) musicVolume = 0.18;
         musicVolume = Math.max(0, Math.min(1, musicVolume));
 
@@ -4135,6 +4145,72 @@
             return AVAILABLE_MUSIC_TRACKS[musicOrder[musicOrderPos]];
         }
 
+        /* ---- Openings YouTube dans le lecteur du menu ---- */
+        let musicYt = null, musicYtReady = null, musicYtPlaying = false, musicYtBlocked = false, musicYtTimer = null, musicYtWant = null;
+        function musicPaused() { const t = currentMusicTrack(); return t && t.yt ? !musicYtPlaying : backgroundMusic.paused; }
+        function musicYtBox(show, hint) {
+            const b = document.getElementById('music-yt-box'); if (!b) return;
+            b.style.display = show ? '' : 'none';
+            const h = document.getElementById('music-yt-hint'); if (h) { h.textContent = hint || ''; h.style.display = hint ? '' : 'none'; }
+        }
+        async function musicYtEnsure() {
+            if (musicYtReady) return musicYtReady;
+            musicYtReady = (async () => {
+                const YT = await ytApi();
+                await new Promise(res => {
+                    musicYt = new YT.Player('music-yt', {
+                        width: '100%', height: '100%',
+                        playerVars: { autoplay: 1, controls: 0, playsinline: 1, rel: 0, disablekb: 1, fs: 0, iv_load_policy: 3 },
+                        events: {
+                            onReady: () => res(),
+                            onStateChange: e => {
+                                if (e.data === 1) { // lecture
+                                    clearTimeout(musicYtTimer);
+                                    if (window.__btActive) { try { musicYt.pauseVideo(); } catch (_) {} return; }
+                                    musicYtPlaying = true;
+                                    if (musicYtBlocked) { // débloqué par un toucher sur la vidéo : l'opening devient le titre en cours
+                                        musicYtBlocked = false;
+                                        backgroundMusic.pause();
+                                        const i = AVAILABLE_MUSIC_TRACKS.findIndex(t => t.yt === musicYtWant);
+                                        const pos = musicOrder.indexOf(i); if (pos >= 0) musicOrderPos = pos;
+                                        musicYtBox(true, '');
+                                    }
+                                    try { musicYt.setVolume(Math.round(musicVolume * 100)); } catch (_) {}
+                                } else if (e.data === 0) { musicYtPlaying = false; const t = currentMusicTrack(); if (t && t.yt) nextMusicTrack(); }
+                                else if (e.data === 2) musicYtPlaying = false;
+                                updateMusicUI();
+                            },
+                            onError: () => { musicYtPlaying = false; const t = currentMusicTrack(); if (t && t.yt) setTimeout(nextMusicTrack, 300); }
+                        }
+                    });
+                });
+            })().catch(() => { musicYtReady = null; });
+            return musicYtReady;
+        }
+        async function musicYtPlay(id) {
+            backgroundMusic.pause();
+            musicYtBox(true, '');
+            musicYtWant = id;
+            await musicYtEnsure();
+            if (!musicYt) return nextMusicTrack();
+            try { musicYt.setVolume(Math.round(musicVolume * 100)); musicYt.loadVideoById(id); musicYt.playVideo(); } catch (_) {}
+            clearTimeout(musicYtTimer);
+            // Téléphone : la lecture YouTube automatique peut être bloquée → on passe à un mp3, la vidéo reste là pour un toucher
+            musicYtTimer = setTimeout(() => {
+                if (musicYtPlaying || musicYtWant !== id) return;
+                musicYtBlocked = true;
+                try { musicYt.cueVideoById(id); } catch (_) {}
+                musicYtBox(true, '👆 Touche la vidéo pour écouter les openings');
+                nextMusicTrack();
+            }, 6000);
+        }
+        function musicYtPause() { clearTimeout(musicYtTimer); try { if (musicYt && musicYt.pauseVideo) musicYt.pauseVideo(); } catch (_) {} musicYtPlaying = false; }
+        function musicResume() {
+            const t = currentMusicTrack();
+            if (t && t.yt) { if (musicYt) { try { musicYt.playVideo(); } catch (_) {} } else musicYtPlay(t.yt); }
+            else backgroundMusic.play().catch(() => {});
+        }
+
         function updateMusicUI() {
             const track = currentMusicTrack();
             const title = track ? track.title : 'Playlist Anime — prête';
@@ -4147,10 +4223,11 @@
             const vol2 = document.getElementById('music-options-volume');
             const countEl = document.getElementById('music-file-count');
 
-            if (countEl && !countEl.textContent.includes('/87')) countEl.textContent = `Playlist : 87 titres`;
+            const nYt = AVAILABLE_MUSIC_TRACKS.filter(t => t.yt).length;
+            if (countEl) countEl.textContent = `Playlist : ${AVAILABLE_MUSIC_TRACKS.length} titres (${AVAILABLE_MUSIC_TRACKS.length - nYt} mp3 + ${nYt} openings du blind test)`;
             if (now) now.textContent = '🎵 ' + title;
             if (opt) opt.textContent = title;
-            if (play) play.textContent = backgroundMusic.paused ? '▶' : '⏸';
+            if (play) play.textContent = musicPaused() ? '▶' : '⏸';
             if (counter) counter.textContent = track ? `${musicOrderPos + 1}/${musicOrder.length}` : `0/${AVAILABLE_MUSIC_TRACKS.length}`;
             if (toggle) {
                 toggle.textContent = musicEnabled ? '🎵 Activée' : '🔇 Coupée';
@@ -4178,6 +4255,17 @@
             musicOrderPos = pos;
             const track = currentMusicTrack();
             if (!track) return;
+            if (track.yt) {
+                if (musicYtBlocked) { // YouTube bloqué sur cet appareil : on cherche le prochain mp3
+                    const nxt = musicOrder.findIndex((ti, p) => p > pos && !AVAILABLE_MUSIC_TRACKS[ti].yt);
+                    if (nxt >= 0 && nxt !== pos) return playMusicAtOrderPosition(nxt);
+                }
+                musicStarted = true;
+                updateMusicUI();
+                return musicYtPlay(track.yt);
+            }
+            musicYtPause();
+            if (!musicYtBlocked) musicYtBox(false);
 
             backgroundMusic.src = track.src;
             backgroundMusic.volume = musicVolume;
@@ -4218,11 +4306,8 @@
                 startBackgroundMusicIfAllowed();
                 return;
             }
-            if (backgroundMusic.paused) {
-                try { await backgroundMusic.play(); } catch (_) {}
-            } else {
-                backgroundMusic.pause();
-            }
+            if (musicPaused()) musicResume();
+            else { backgroundMusic.pause(); musicYtPause(); }
             updateMusicUI();
         }
 
@@ -4231,9 +4316,10 @@
             localStorage.setItem(MUSIC_ENABLED_KEY, musicEnabled ? '1' : '0');
             if (!musicEnabled) {
                 backgroundMusic.pause();
+                musicYtPause();
             } else {
                 if (!musicStarted) startBackgroundMusicIfAllowed();
-                else backgroundMusic.play().catch(()=>{});
+                else musicResume();
             }
             updateMusicUI();
         }
@@ -4241,6 +4327,7 @@
         function setMusicVolume(value) {
             musicVolume = Math.max(0, Math.min(1, Number(value) || 0));
             backgroundMusic.volume = musicVolume;
+            try { if (musicYt && musicYt.setVolume) musicYt.setVolume(Math.round(musicVolume * 100)); } catch (_) {}
             localStorage.setItem(MUSIC_VOLUME_KEY, String(musicVolume));
             updateMusicUI();
         }
@@ -5067,9 +5154,10 @@
 
         function btPauseBackground() {
             window.__btActive = true;
-            if (!backgroundMusic.paused) {
+            if (!musicPaused()) {
                 btBgWasPlaying = true;
                 backgroundMusic.pause();
+                musicYtPause();
             }
         }
 
@@ -5087,7 +5175,7 @@
             if ((btBgWasPlaying || window.__btBgBlocked) && wasActive && musicEnabled) {
                 btBgWasPlaying = false;
                 window.__btBgBlocked = false;
-                if (musicStarted) backgroundMusic.play().catch(()=>{});
+                if (musicStarted) musicResume();
                 else startBackgroundMusicIfAllowed();
             }
         }
@@ -8639,7 +8727,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-07-chance';
+        const CLIENT_BUILD = '2026-10-08-musique';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -9251,6 +9339,7 @@
             <div id="music-now-playing">🎵 Playlist Anime — prête</div>
             <button id="music-collapse-btn" class="music-mini-btn" onclick="toggleMusicPlayerCollapse()" title="Réduire">▾</button>
         </div>
+        <div id="music-yt-box" style="display:none;"><div id="music-yt"></div><div id="music-yt-hint" style="display:none;"></div></div>
         <div class="music-player-body">
             <span style="font-size:.72rem;">🔈</span>
             <input id="music-volume" type="range" min="0" max="100" value="18" oninput="setMusicVolume(this.value/100)">
@@ -10219,13 +10308,13 @@
             dk.keys = d.deck.map(c => c.key); dk.cards = (all && all.cards) || []; dk.rules = d.rules; dk.pct = d.pct;
             deckRender();
         }
-        function deckPctLocal() { let p = 0; dk.keys.forEach(k => { const c = dk.cards.find(x => x.key === k); if (c) p += (dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0); }); return Math.min(40, p); }
+        function deckPctLocal() { let p = 0; dk.keys.forEach(k => { const c = dk.cards.find(x => x.key === k); if (c) p += (dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0); }); return p; }
         function deckRender() {
             const el = document.getElementById('eco-deck'); if (!el) return;
             const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${(dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
             const q = dk.q.toLowerCase();
             const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
-            el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, brillante +2 % • bonus doublé si la partie est sur l’anime de la carte • max +40 %</span></div>
+            el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, Mythique +14 %, Secrète +20 %, Divine +25 %, Cosmique +30 %, Éternelle +40 %, Oméga +50 %, brillante +2 % • bonus doublé si la partie est sur l’anime de la carte • sans limite</span></div>
                 <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
                 <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans ta collection" value="${h2esc(dk.q)}" oninput="dk.q=this.value;deckList()"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
                 <div class="trd-list dk-list" id="dk-list"></div>`;
