@@ -12438,31 +12438,6 @@
         @keyframes finSlam{to{transform:translate(-50%,-50%) scale(1)}}
         @keyframes finInvert{50%{filter:invert(1) hue-rotate(180deg)}}
         @keyframes finQuote{0%{opacity:0;transform:translate(-50%,20px)}10%{opacity:1;transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
-        /* --- booster à déchirer --- */
-        #pack-open{position:fixed;inset:0;z-index:10060;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,#1d1640,#050510 70%);user-select:none;-webkit-user-select:none;touch-action:none;}
-        #pack-open .pk{position:relative;width:min(58vw,240px);aspect-ratio:3/4.6;cursor:grab;animation:pkIdle 2.4s ease-in-out infinite;}
-        #pack-open.p1 .pk{animation:pkShake1 .5s ease-in-out infinite;}
-        #pack-open.p2 .pk{animation:pkShake2 .25s linear infinite;}
-        #pack-open.p3 .pk{animation:pkShake3 .12s linear infinite;filter:drop-shadow(0 0 30px #ffd700);}
-        #pack-open .pk-body,#pack-open .pk-top{position:absolute;left:0;right:0;border-radius:14px;background:linear-gradient(135deg,#ff2a5f,#b44dff 45%,#00c8ff);box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 0 3px rgba(255,255,255,.25);overflow:hidden;}
-        #pack-open .pk-top{top:0;height:16%;border-radius:14px 14px 4px 4px;z-index:2;background:linear-gradient(135deg,#ff5c85,#c77dff);transition:transform .1s;}
-        #pack-open .pk-top::after{content:'';position:absolute;left:0;right:0;bottom:-6px;height:12px;background:radial-gradient(circle at 6px 0,transparent 6px,rgba(0,0,0,.25) 6px) 0 0/12px 12px repeat-x;}
-        #pack-open .pk-body{top:14%;bottom:0;border-radius:4px 4px 14px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
-        #pack-open .pk-body::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);background-size:250% 100%;animation:finSweep 2.2s ease-in-out infinite;}
-        #pack-open .pk-logo{font-family:'Bangers',cursive;font-size:clamp(1.6rem,8vw,2.4rem);color:#fff;text-shadow:3px 3px 0 #6a1fa0,0 0 20px rgba(255,255,255,.5);letter-spacing:2px;text-align:center;line-height:1;}
-        #pack-open .pk-sub{font-weight:900;color:#fff;font-size:.8rem;opacity:.9;}
-        #pack-open .pk-cut{position:absolute;left:0;top:15%;height:3px;width:0;background:#fff;box-shadow:0 0 12px #fff,0 0 24px var(--pc,#fff);z-index:3;}
-        #pack-open .pk-hint{margin-top:22px;color:#fff;font-weight:800;text-align:center;animation:smPulse 1s infinite alternate;}
-        #pack-open .pk-skip{margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:999px;font-weight:800;cursor:pointer;}
-        #pack-open.torn .pk-top{transform:translate(40px,-160px) rotate(35deg)!important;opacity:0;transition:transform .6s cubic-bezier(.3,1.4,.5,1),opacity .6s;}
-        #pack-open.torn .pk-body{animation:pkDrop .8s ease-in .35s forwards;}
-        #pack-open.torn::after{content:'';position:absolute;left:50%;top:40%;width:20px;height:20px;border-radius:50%;background:var(--pc,#fff);box-shadow:0 0 80px 40px var(--pc,#fff);transform:translate(-50%,-50%);animation:pkBurst .7s ease-out forwards;}
-        @keyframes pkIdle{50%{transform:translateY(-8px) rotate(-1deg)}}
-        @keyframes pkShake1{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
-        @keyframes pkShake2{0%,100%{transform:translate(-2px,0) rotate(-2deg)}50%{transform:translate(2px,-1px) rotate(2deg)}}
-        @keyframes pkShake3{0%,100%{transform:translate(-4px,1px) rotate(-3deg) scale(1.03)}50%{transform:translate(4px,-2px) rotate(3deg) scale(1.03)}}
-        @keyframes pkDrop{to{transform:translateY(120vh) rotate(8deg)}}
-        @keyframes pkBurst{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(6)}}
         /* --- mode inspection --- */
         #card-inspect{position:fixed;inset:0;z-index:10070;background:rgba(5,5,12,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;gap:26px;padding:16px;flex-wrap:wrap;overflow:auto;}
         #card-inspect .ci-stage{perspective:1100px;touch-action:none;cursor:grab;}
@@ -12565,40 +12540,6 @@
                 const q = document.createElement('div'); q.className = 'sm-quote';
                 q.innerHTML = `« ${esc(c.quote)} »<small>— ${esc(c.name)}</small>`;
                 setTimeout(() => { if (o.isConnected) { o.appendChild(q); setTimeout(() => q.remove(), 4600); } }, 900);
-            };
-
-            /* --- ouverture du booster : on le déchire --- */
-            const RK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, duo: 4, secrete: 5, halloween: 5, noel: 5, valentin: 5, ete: 5, eveillee: 5, divine: 6, cosmique: 7, legende: 7, eternelle: 8, omega: 9 };
-            const prevShow = showBooster;
-            showBooster = function (cards) {
-                if (!cards || cards.length < 3) return prevShow.apply(this, arguments);
-                const self = this, args = arguments;
-                document.getElementById('pack-open')?.remove();
-                const best = Math.max(...cards.map(c => (RK[c.rarity] || 0) + (c.finish ? 2 : 0) + (c.god ? 4 : 0)));
-                const lvl = best >= 7 ? 3 : best >= 5 ? 2 : best >= 3 ? 1 : 0;
-                const pc = cards.some(c => c.god) ? '#ffd700' : ['#fff', '#ffb300', '#00f0ff', '#ff4500'][lvl];
-                const o = document.createElement('div'); o.id = 'pack-open'; o.className = 'p' + lvl; o.style.setProperty('--pc', pc);
-                o.innerHTML = `<div class="pk"><div class="pk-top"></div><div class="pk-cut"></div><div class="pk-body"><div class="pk-logo">ANIME<br>GAME</div><div class="pk-sub">🎴 BOOSTER • ${cards.length} CARTES</div></div></div>
-                    <div class="pk-hint">👉 Glisse sur le haut du paquet pour le déchirer<br><small>(ou touche-le)</small></div><button class="pk-skip">⏭ Ouvrir direct</button>`;
-                document.body.appendChild(o);
-                const pk = o.querySelector('.pk'), cut = o.querySelector('.pk-cut'), top = o.querySelector('.pk-top');
-                let done = false, sx = null, prog = 0;
-                const open = () => {
-                    if (done) return; done = true;
-                    o.classList.add('torn');
-                    if (typeof bip === 'function' && typeof sfxOn !== 'undefined' && sfxOn) { for (let k = 0; k < 6; k++) bip(300 + Math.random() * 900, 0.03, 0.04, k * 0.03, 'sawtooth'); }
-                    setTimeout(() => { o.remove(); prevShow.apply(self, args); }, 1000);
-                };
-                pk.addEventListener('pointerdown', e => { sx = e.clientX; pk.setPointerCapture && pk.setPointerCapture(e.pointerId); });
-                pk.addEventListener('pointermove', e => {
-                    if (sx == null || done) return;
-                    prog = Math.min(1, Math.abs(e.clientX - sx) / (pk.offsetWidth * 0.8));
-                    cut.style.width = (prog * 100) + '%'; top.style.transform = `rotate(${(e.clientX - sx > 0 ? 1 : -1) * prog * 8}deg) translateY(${-prog * 6}px)`;
-                    if (prog >= 0.95) open();
-                });
-                pk.addEventListener('pointerup', () => { if (sx != null && (prog > 0.35 || prog < 0.05)) open(); sx = null; });
-                o.querySelector('.pk-skip').onclick = open;
-                setTimeout(() => { if (!done && o.isConnected) o.querySelector('.pk-hint').innerHTML = '👆 Touche le paquet pour l’ouvrir !'; }, 5000);
             };
 
             /* --- mode inspection : la carte en grand, en 3D --- */
