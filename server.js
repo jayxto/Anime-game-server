@@ -16022,7 +16022,7 @@ async function cardAwardSecret(uid, u, display, shiny, tier = 'secrete') {
     if (!isNew) await ecoAddCoins(uid, t.coins);
     // Cosmique et au-dessus : annoncé à tout le serveur
     if (['cosmique', 'eternelle', 'omega'].includes(t.id)) {
-        pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: t.id, label: t.label, shiny: !!shiny })).catch(() => {});
+        // (annonce à tout le serveur retirée) pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: t.id, label: t.label, shiny: !!shiny })).catch(() => {});
     }
     return { name: display, anime: ARC_UNIVERSE_ANIME[u], u, rarity: t.id, shiny: !!shiny, isNew, coins: isNew ? 0 : t.coins, img: cardImg({ u, display }), secret: true };
 }
@@ -20167,9 +20167,9 @@ cardAwardSecret = async function (uid, u, display, shiny, tier) {
     const out = await _cardAwardSecretV2(uid, u, display, shiny, tier);
     if (out && uid) await cardDecorate(uid, out, await cardLuck(uid));
     if (out && ['eveillee', 'legende'].includes(out.rarity) && tier === out.rarity) {
-        pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: out.rarity, label: SPECIAL_BY_ID[out.rarity].label, shiny: !!shiny })).catch(() => {});
+        // (annonce à tout le serveur retirée) pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: out.rarity, label: SPECIAL_BY_ID[out.rarity].label, shiny: !!shiny })).catch(() => {});
     }
-    if (out && out.finish === 'numbered') pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: out.rarity, label: `Numérotée #${out.serial}/${NUMBERED_MAX}`, shiny: !!shiny })).catch(() => {});
+    // (annonce à tout le serveur retirée) if (out && out.finish === 'numbered') pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: out.rarity, label: `Numérotée #${out.serial}/${NUMBERED_MAX}`, shiny: !!shiny })).catch(() => {});
     return out;
 };
 
@@ -20241,7 +20241,7 @@ openBooster = async function (uid, n, type = '') {
                 : await cardAward({ userId: uid, id: null }, pick.u, pick.display, { silent: true, shinyRate: 0.3 });
             if (c) { c.god = true; out.push(c); }
         }
-        if (out.length) { pseudoOf(uid).then(who => io.emit('rare_pull', { who, name: 'GOD PACK', anime: `${out.length} cartes rares d’un coup`, rarity: 'legendaire', label: '✨ God Pack', shiny: true })).catch(() => {}); return out; }
+        if (out.length) return out;
     }
     const out = await _openBoosterV2(uid, n, type);
     const seasons = Object.keys(SEASON_CARDS).filter(id => seasonActive(SEASON_CARDS[id]) && seasonChars(id).length);
