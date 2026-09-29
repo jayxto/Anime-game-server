@@ -601,6 +601,9 @@
         .bb-card.noimg{display:flex;align-items:center;justify-content:center;}
         .bb-card.noimg .bb-name{position:static;background:none;padding:10px;}
         .qap-q{margin:10px auto 0;max-width:560px;font-weight:900;font-size:clamp(1.1rem,3.4vw,1.45rem);color:#111;background:linear-gradient(90deg,#ffd93d,#ff9f43);padding:10px 14px;border-radius:14px;box-shadow:0 4px 0 #b86b1f;}
+        .qap-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0 10px;}
+        .qap-chips button{background:#1d1d2c;border:2px solid #34344a;color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:.82rem;cursor:pointer;}
+        .qap-chips button.on{border-color:#ff9f43;background:rgba(255,159,67,.18);color:#ffd93d;}
         .bb-autocd{margin-top:8px;font-weight:800;color:var(--accent-cyan);font-size:.9rem;}
         .bb-name .bb-sub{display:block;font-family:Poppins,sans-serif;font-size:.68rem;font-weight:600;opacity:.8;margin-top:1px;letter-spacing:0;}
         .bb-card.win{border-color:#00ff88;transform:scale(1.03);}
@@ -6554,18 +6557,31 @@
         function openBattleSelection() {
             startBattleSetup('openings');
         }
-        const QAP_QUESTIONS = ['Qui a le plus souffert ?', 'Qui est le plus fort ?', 'Qui a le plus de pouvoir ?', 'Qui a le plus d’aura ?', 'Qui a le plus de charisme ?',
-            'Qui est le plus intelligent ?', 'Qui est le plus drôle ?', 'Qui a le meilleur design ?', 'Qui a l’histoire la plus triste ?', 'Qui a le plus de fans ?',
-            'Qui est le plus détesté ?', 'Qui est le plus sous-coté ?', 'Qui est le plus surcoté ?', 'Qui a la meilleure évolution ?', 'Qui est le plus loyal ?',
-            'Qui est le plus flippant ?', 'Qui ferait le meilleur prof ?', 'Qui serait le meilleur coloc ?', 'Qui survivrait le plus longtemps dans un film d’horreur ?',
-            'Qui mange le plus ?', 'Qui est le plus beau ou la plus belle ?', 'Qui a le plus mauvais caractère ?', 'Qui est le plus malchanceux ?', 'Qui ferait le meilleur chef ?',
-            'Qui a le plus de rizz ?', 'Qui gagnerait Koh-Lanta ?', 'Qui est le plus fou ?', 'Qui a les meilleures répliques ?', 'Qui a le plus gros ego ?',
-            'Qui est le plus gentil ?', 'Qui est le plus dangereux ?', 'Qui serait le meilleur pote ?', 'Qui a le meilleur style ?', 'Qui a le plus de haters ?',
-            'Qui est le plus courageux ?', 'Qui est le plus stylé en combat ?', 'Qui ferait le meilleur streamer ?', 'Qui a la plus grosse flemme ?', 'Qui est le plus stratège ?',
-            'Qui pleure le plus ?', 'Qui a le plus de chance ?', 'Qui ferait le pire date ?', 'Qui est le plus mystérieux ?', 'Qui a le meilleur rire ?'];
+        // Questions rangées par thème (inspirées des tournois « Who is #1 ? » les plus joués)
+        const QAP_CATS = [['power', '💪 Puissance'], ['aura', '🔥 Aura & style'], ['emo', '💔 Émotions'], ['dark', '😈 Méchants & chaos'], ['fun', '😂 Fun'], ['life', '🤝 Vie quotidienne']];
+        const QAP_BY_CAT = {
+            power: ['Qui est le plus fort ?', 'Qui a le plus de pouvoir ?', 'Qui gagnerait en 1 contre 1 ?', 'Qui a la meilleure transformation ?', 'Qui est le plus dangereux ?',
+                'Qui est le meilleur épéiste ?', 'Qui a le plus de plot armor ?', 'Qui ferait le meilleur boss final ?', 'Qui est le plus stylé en combat ?', 'Qui est le plus stratège ?',
+                'Qui est le plus intelligent ?', 'Qui est le plus courageux ?'],
+            aura: ['Qui a le plus d’aura ?', 'Qui a le plus de charisme ?', 'Qui a l’entrée la plus stylée ?', 'Qui est le plus froid ? 🥶', 'Qui est le plus iconique ?',
+                'Qui a le meilleur design ?', 'Qui a le meilleur style ?', 'Qui a le plus de rizz ?', 'Qui est le plus beau ou la plus belle ?', 'Qui a les meilleures répliques ?',
+                'Qui est le plus mystérieux ?', 'Qui a la plus grosse perte d’aura ?'],
+            emo: ['Qui a le plus souffert ?', 'Qui a l’histoire la plus triste ?', 'Qui a fait le meilleur comeback ?', 'Qui a la meilleure évolution ?', 'Qui est le plus malchanceux ?',
+                'Qui pleure le plus ?', 'Qui est le mieux écrit ?', 'Qui est le plus sous-coté ?', 'Qui est le plus surcoté ?'],
+            dark: ['Qui est le plus maléfique ?', 'Qui est le plus sans pitié ?', 'Qui est le plus détesté ?', 'Qui est le plus flippant ?', 'Qui est le plus fou ?',
+                'Qui a le plus mauvais caractère ?', 'Qui a le plus gros ego ?', 'Qui a le plus de haters ?', 'Qui est le plus agaçant ?'],
+            fun: ['Qui est le plus drôle ?', 'Qui mange le plus ?', 'Qui a la plus grosse flemme ?', 'Qui gagnerait Koh-Lanta ?', 'Qui survivrait le plus longtemps dans un film d’horreur ?',
+                'Qui ferait le meilleur streamer ?', 'Qui mériterait son propre jeu vidéo ?', 'Qui ferait le pire date ?', 'Qui a le meilleur rire ?', 'Qui est le plus inutile ?',
+                'Qui a le look le plus improbable ?', 'Qui a le plus de chance ?'],
+            life: ['Qui serait le meilleur pote ?', 'Qui serait le meilleur coloc ?', 'Qui ferait le meilleur prof ?', 'Qui ferait le meilleur chef ?', 'À qui confierais-tu ta vie ?',
+                'Qui serait le meilleur garde du corps ?', 'Qui est le plus loyal ?', 'Qui est le plus gentil ?', 'Qui a le plus de fans ?', 'Qui ferait le meilleur parent ?']
+        };
+        const QAP_QUESTIONS = [], QAP_CAT_OF = [];
+        QAP_CATS.forEach(([c]) => QAP_BY_CAT[c].forEach(q => { QAP_QUESTIONS.push(q); QAP_CAT_OF.push(c); }));
         const qapQ = i => QAP_QUESTIONS[i] || QAP_QUESTIONS[0];
+        let qapCats = (() => { try { const v = JSON.parse(localStorage.getItem('qap_cats') || 'null'); return Array.isArray(v) && v.length ? v : null; } catch (e) { return null; } })();
         function qapNextQ() {
-            if (!bb.qBag || !bb.qBag.length) bb.qBag = bbShuffle(QAP_QUESTIONS.map((_, i) => i));
+            if (!bb.qBag || !bb.qBag.length) bb.qBag = bbShuffle(QAP_QUESTIONS.map((_, i) => i).filter(i => !qapCats || qapCats.includes(QAP_CAT_OF[i])));
             return bb.qBag.pop();
         }
         async function startBattleSetup(source, kind) {
@@ -6610,8 +6626,27 @@
             body.innerHTML = '';
             const N = bb.all.length;
             const h = document.createElement('div'); h.className = 'bb-head';
-            h.innerHTML = '<div class="bb-round">🎲 EN MANCHES</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">À chaque manche, une nouvelle question et deux persos au hasard.</p>';
+            h.innerHTML = '<div class="bb-round">🎲 EN MANCHES</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">À chaque manche, une nouvelle question et deux persos au hasard. Choisis tes thèmes :</p>';
             body.appendChild(h);
+            // thèmes des questions (plusieurs possibles)
+            const chips = document.createElement('div'); chips.className = 'qap-chips';
+            const drawChips = () => {
+                chips.innerHTML = '';
+                const all = document.createElement('button'); all.textContent = '🌈 Tout mélangé'; all.className = !qapCats ? 'on' : '';
+                all.onclick = () => { qapCats = null; try { localStorage.removeItem('qap_cats'); } catch (e) {} drawChips(); };
+                chips.appendChild(all);
+                QAP_CATS.forEach(([c, label]) => {
+                    const b = document.createElement('button'); b.textContent = label; b.className = qapCats && qapCats.includes(c) ? 'on' : '';
+                    b.onclick = () => {
+                        const set = new Set(qapCats || []); set.has(c) ? set.delete(c) : set.add(c);
+                        qapCats = set.size ? [...set] : null;
+                        try { qapCats ? localStorage.setItem('qap_cats', JSON.stringify(qapCats)) : localStorage.removeItem('qap_cats'); } catch (e) {}
+                        drawChips();
+                    };
+                    chips.appendChild(b);
+                });
+            };
+            drawChips(); body.appendChild(chips);
             const rs = document.createElement('div'); rs.className = 'bb-sizes';
             [5, 10, 15, 20].forEach(n => { const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} manches`; b.onclick = () => qapStartRounds(n); rs.appendChild(b); });
             body.appendChild(rs);
@@ -6619,7 +6654,7 @@
             h2.innerHTML = '<div class="bb-round">🏆 EN TOURNOI</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Une seule question pour tout le tournoi, jusqu’à la finale.</p>';
             body.appendChild(h2);
             const sel = document.createElement('select'); sel.className = 'v7-input'; sel.id = 'qap-q'; sel.style.cssText = 'max-width:420px;display:block;margin:0 auto 10px;';
-            sel.innerHTML = '<option value="-1">🎲 Une question au hasard</option>' + QAP_QUESTIONS.map((q, i) => `<option value="${i}">${v7esc(q)}</option>`).join('');
+            sel.innerHTML = '<option value="-1">🎲 Une question au hasard</option>' + QAP_CATS.map(([c, label]) => `<optgroup label="${v7esc(label)}">${QAP_QUESTIONS.map((q, i) => QAP_CAT_OF[i] === c ? `<option value="${i}">${v7esc(q)}</option>` : '').join('')}</optgroup>`).join('');
             body.appendChild(sel);
             const ts = document.createElement('div'); ts.className = 'bb-sizes';
             const pickQ = () => { const v = +sel.value; return v >= 0 ? v : Math.floor(Math.random() * QAP_QUESTIONS.length); };
@@ -6791,7 +6826,7 @@
             const body = document.getElementById('bb-body');
             body.innerHTML = '';
             const box = document.createElement('div'); box.className = 'bb-champion';
-            box.innerHTML = bb.qap && bb.qi != null ? `<div class="qap-q">${v7esc(qapQ(bb.qi))}</div><div class="bb-round">🏆 TA RÉPONSE</div>` : '<div class="bb-round">🏆 TON CHAMPION</div>';
+            box.innerHTML = bb.qap && bb.qi != null ? `<div class="qap-q">${v7esc(qapQ(bb.qi))}</div><div class="bb-round">👑 TON #1</div>` : '<div class="bb-round">🏆 TON CHAMPION</div>';
             box.appendChild(bbCard(champion));
             body.appendChild(box);
             // Classement de ta battle : champion, finaliste, demi-finalistes...
