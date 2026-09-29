@@ -12658,5 +12658,130 @@
             };
         })();
     </script>
+    <!-- ===================== COLLECTION : toutes mes cartes (tri / filtres) + DECK avec finitions ===================== -->
+    <style>
+        .cf-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0;padding:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;}
+        .cf-bar input[type=text],.cf-bar input:not([type]){flex:1 1 180px;margin:0;min-width:140px;}
+        .cf-bar select{background:#1d1d2c;color:#fff;border:2px solid #34344a;border-radius:10px;padding:7px 8px;font-weight:700;font-size:.8rem;max-width:100%;}
+        .cf-bar label{display:flex;align-items:center;gap:4px;font-size:.8rem;font-weight:800;color:#ddd;cursor:pointer;white-space:nowrap;}
+        .cf-count{font-size:.8rem;color:var(--text-muted);margin:4px 2px;}
+        .cf-stats{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+        .cf-stats span{background:#161622;border:1px solid #2c2c44;border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:800;}
+        .trd-mini{position:relative;}
+        .trd-mini[class*=" f-"]{border-color:var(--fc,#fff);box-shadow:0 0 8px var(--fc,#fff);}
+        .trd-mini .tm-fin{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:900;padding:1px 5px;border-radius:99px;background:rgba(0,0,0,.8);border:1px solid var(--fc,#fff);}
+        .trd-mini .tm-duo{display:flex;width:100%;height:70px;border-radius:6px;overflow:hidden;}
+        .trd-mini .tm-duo img{width:50%;height:70px;object-fit:cover;object-position:top;border-radius:0;}
+        .trd-mini.r-eveillee{border-color:#ff2d55;} .trd-mini.r-legende{border-color:#ff4500;} .trd-mini.r-duo{border-color:#00e5a0;}
+        .trd-mini.f-dark img{filter:invert(1) hue-rotate(180deg);} .trd-mini.f-manga img{filter:grayscale(1) contrast(1.5);} .trd-mini.f-gold img{filter:sepia(.45) saturate(1.5);}
+    </style>
+    <script>
+        (function () {
+            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete'];
+            const FORD = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
+            const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
+            const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
+            const SORTS = {
+                rare: (a, b) => rIdx(a.rarity) - rIdx(b.rarity) || fIdx(a.finish) - fIdx(b.finish) || b.shiny - a.shiny || a.name.localeCompare(b.name, 'fr'),
+                fin: (a, b) => fIdx(a.finish) - fIdx(b.finish) || rIdx(a.rarity) - rIdx(b.rarity) || a.name.localeCompare(b.name, 'fr'),
+                name: (a, b) => a.name.localeCompare(b.name, 'fr'),
+                anime: (a, b) => (a.anime || '').localeCompare(b.anime || '', 'fr') || rIdx(a.rarity) - rIdx(b.rarity),
+                n: (a, b) => b.n - a.n || rIdx(a.rarity) - rIdx(b.rarity)
+            };
+            const newFilter = () => ({ q: '', rar: '', fin: '', anime: '', shiny: false, dup: false, sort: 'rare' });
+            window.cardFilter = function (list, f) {
+                const q = f.q.trim().toLowerCase();
+                return list.filter(c => (!q || (c.name + ' ' + (c.anime || '')).toLowerCase().includes(q))
+                    && (!f.rar || (f.rar === 'special' ? SPECIAL.includes(c.rarity) : c.rarity === f.rar))
+                    && (!f.fin || (f.fin === 'any' ? !!c.finish : f.fin === 'none' ? !c.finish : !!(c.finishes && c.finishes[f.fin])))
+                    && (!f.anime || c.anime === f.anime) && (!f.shiny || c.shiny > 0) && (!f.dup || c.n > 1))
+                    .map(c => f.fin && FORD.includes(f.fin) ? Object.assign({}, c, { finish: f.fin }) : c)
+                    .sort(SORTS[f.sort] || SORTS.rare);
+            };
+            window.cardFilterBar = function (f, list) {
+                const animes = [...new Set(list.map(c => c.anime).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+                const rars = RORD.filter(r => list.some(c => c.rarity === r));
+                const opt = (v, t, cur) => `<option value="${v}"${cur === v ? ' selected' : ''}>${t}</option>`;
+                return `<div class="cf-bar"><input class="v7-input" data-cf="q" placeholder="🔎 Nom ou anime" value="${v7esc(f.q)}">
+                    <select data-cf="rar">${opt('', 'Toutes les raretés', f.rar)}${opt('special', '🌈 Spéciales (Secrète et +)', f.rar)}${rars.map(r => opt(r, RAR_LABEL[r] || r, f.rar)).join('')}</select>
+                    <select data-cf="fin">${opt('', 'Toutes les finitions', f.fin)}${opt('any', '✨ Avec finition', f.fin)}${opt('none', 'Sans finition', f.fin)}${FORD.slice().reverse().map(x => opt(x, FLAB[x], f.fin)).join('')}</select>
+                    <select data-cf="anime">${opt('', 'Tous les animes', f.anime)}${animes.map(a => opt(v7esc(a), v7esc(a), f.anime)).join('')}</select>
+                    <select data-cf="sort">${opt('rare', 'Trier : rareté', f.sort)}${opt('fin', 'Trier : finition', f.sort)}${opt('name', 'Trier : nom A → Z', f.sort)}${opt('anime', 'Trier : anime', f.sort)}${opt('n', 'Trier : exemplaires', f.sort)}</select>
+                    <label><input type="checkbox" data-cf="shiny"${f.shiny ? ' checked' : ''}> ✨ Brillantes</label><label><input type="checkbox" data-cf="dup"${f.dup ? ' checked' : ''}> 📚 Doublons</label></div>`;
+            };
+            window.cardFilterBind = function (root, f, cb) {
+                let tmo = null;
+                root.querySelectorAll('[data-cf]').forEach(el => {
+                    const k = el.dataset.cf;
+                    const upd = () => { f[k] = el.type === 'checkbox' ? el.checked : el.value; cb(); };
+                    if (k === 'q') el.oninput = () => { clearTimeout(tmo); tmo = setTimeout(upd, 180); }; else el.onchange = upd;
+                });
+            };
+
+            /* --- collection : toutes mes cartes --- */
+            const CV = { f: newFilter(), cards: [], lim: 120 };
+            window.cardsAllView = async function () {
+                const box = document.getElementById('eco-album'); if (!box) return;
+                if (typeof eco !== 'undefined') eco.albumU = null;
+                box.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div></div>';
+                const d = await v7get('/api/cards/mine');
+                if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Impossible de charger ta collection.</p>'; return; }
+                CV.cards = d.cards; CV.lim = 120;
+                const tot = d.cards.reduce((a, c) => a + c.n, 0), withFin = d.cards.filter(c => c.finish).length;
+                const byFin = FORD.map(f => [f, d.cards.filter(c => c.finishes && c.finishes[f]).length]).filter(x => x[1]);
+                box.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap;"><button class="host-btn" onclick="loadAlbum(null)">🔙 Albums</button><b>🗂️ Toutes mes cartes</b><button class="host-btn" onclick="cardFinishGuide()">✨ Finitions & raretés</button></div>
+                    <div class="cf-stats"><span>🃏 ${d.cards.length} cartes différentes</span><span>📚 ${tot} exemplaires</span><span>✨ ${d.cards.filter(c => c.shiny).length} brillantes</span><span>🌈 ${withFin} avec finition</span>${byFin.map(([f, n]) => `<span>${FLAB[f]} ${n}</span>`).join('')}</div>
+                    ${cardFilterBar(CV.f, d.cards)}<div class="cf-count" id="cv-count"></div><div class="card-grid" id="cv-grid"></div><div style="text-align:center;"><button class="host-btn" id="cv-more" style="display:none;margin:10px auto;">Afficher plus</button></div>`;
+                cardFilterBind(box, CV.f, () => { CV.lim = 120; cvRender(); });
+                box.querySelector('#cv-more').onclick = () => { CV.lim += 120; cvRender(); };
+                cvRender();
+            };
+            function cvRender() {
+                const list = cardFilter(CV.cards, CV.f), g = document.getElementById('cv-grid'); if (!g) return;
+                g.innerHTML = list.slice(0, CV.lim).map(c => cardHtml(c)).join('') || '<p class="tl-hint">Aucune carte ne correspond.</p>';
+                document.getElementById('cv-count').textContent = `${list.length} carte${list.length > 1 ? 's' : ''} affichée${list.length > 1 ? 's' : ''} • clique sur une carte pour l’inspecter en 3D`;
+                const more = document.getElementById('cv-more'); more.style.display = list.length > CV.lim ? '' : 'none';
+            }
+            // bouton dans l'album
+            const albumPrev = loadAlbum;
+            loadAlbum = async function (u) {
+                await albumPrev.apply(this, arguments);
+                const head = document.querySelector('#eco-album .album-extra-head');
+                if (head && !head.querySelector('.cv-btn')) head.insertAdjacentHTML('afterbegin', '<button class="host-btn cv-btn" style="background:var(--accent-cyan);color:#111;border-color:transparent;" onclick="cardsAllView()">🗂️ Toutes mes cartes (trier / filtrer)</button>');
+            };
+
+            /* --- deck : les finitions se voient, se trient et donnent un bonus --- */
+            dk.f = newFilter();
+            loadDeck = async function () {
+                const [d, all] = await Promise.all([v7get('/api/deck'), v7get('/api/cards/mine')]);
+                if (!d || !d.ok) return;
+                dk.keys = d.deck.map(c => c.key); dk.cards = (all && all.cards) || []; dk.rules = d.rules; dk.pct = d.pct; dk.finDeck = (all && all.finDeck) || {};
+                deckRender();
+            };
+            const bonusOf = c => (dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0) + (c.finish ? (dk.finDeck[c.finish] || 0) : 0);
+            deckPctLocal = function () { let p = 0; dk.keys.forEach(k => { const c = dk.cards.find(x => x.key === k); if (c) p += bonusOf(c); }); return p; };
+            deckRender = function () {
+                const el = document.getElementById('eco-deck'); if (!el) return;
+                const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${bonusOf(c)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
+                el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, Mythique +14 %, Duo +16 %, Secrète +20 %, Éveillée +22 %, Divine +25 %, Cosmique +30 %, Légende vivante +35 %, Éternelle +40 %, Oméga +50 %, brillante +2 % • <b>finitions</b> : Holo / Reverse +1 %, Pailletée +2 %, Gold / Dark +4 %, Full Art / Manga +5 %, Galaxie +6 %, Glitch +7 %, Signée +8 %, Numérotée +10 % • bonus doublé si la partie est sur l’anime de la carte</span></div>
+                    <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
+                    <div style="display:flex;justify-content:flex-end;"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
+                    ${cardFilterBar(dk.f, dk.cards)}<div class="cf-count" id="dk-count"></div><div class="trd-list dk-list" id="dk-list"></div>`;
+                cardFilterBind(el, dk.f, deckList);
+                deckList();
+            };
+            deckList = function () {
+                const box = document.getElementById('dk-list'); if (!box) return;
+                const list = cardFilter(dk.cards, dk.f);
+                const cnt = document.getElementById('dk-count'); if (cnt) cnt.textContent = `${list.length} carte${list.length > 1 ? 's' : ''}${list.length > 150 ? ' (150 premières affichées)' : ''} • clique pour l’ajouter ou la retirer du deck`;
+                box.innerHTML = list.slice(0, 150).map(c => {
+                    const full = dk.cards.find(x => x.key === c.key) || c, fin = full.finish;
+                    const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
+                    return `<button class="trd-mini r-${c.rarity}${fin ? ' f-' + fin : ''}${dk.keys.includes(c.key) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[fin] || '#fff'}" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${img}${fin ? `<span class="tm-fin">${FLAB[fin]}</span>` : ''}<b>${v7esc(c.name)}</b><small>${RAR_LABEL[c.rarity] || c.rarity}${c.shiny ? ' ✨' : ''} • +${bonusOf(full)} %</small></button>`;
+                }).join('') || '<p class="tl-hint">Aucune carte ne correspond.</p>';
+            };
+        })();
+    </script>
 </body>
 </html>

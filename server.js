@@ -20354,3 +20354,37 @@ openBooster = async function (uid, n, type = '') {
     PACK_LUCK.set(uid, 10);
     try { return await _openBoosterPack(uid, n, ''); } finally { PACK_LUCK.delete(uid); }
 };
+
+/* =====================================================================
+   COLLECTION COMPLÈTE (tri / filtres) + FINITIONS DANS LE DECK
+   ===================================================================== */
+DECK_BONUS.duo = 16;
+const FIN_DECK = { holo: 1, reverse: 1, glitter: 2, gold: 4, dark: 4, fullart: 5, manga: 5, galaxy: 6, glitch: 7, signed: 8, numbered: 10 }; // bonus de pièces en plus dans le deck
+app.get('/api/cards/mine', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid), fin = await kvGet('fin', String(uid), {});
+    const duos = Object.fromEntries(DUO_CARDS().map(d => [d.name, d]));
+    const out = [];
+    mine.forEach((v, k) => {
+        if (k.startsWith('collector|')) return;
+        const [u, name, sec] = k.split('|');
+        const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
+        const base = { key: k, name, n: v.n, shiny: v.shiny || 0, finish: best, finishes, serial: best && e.ser && e.ser[best] ? Math.min(...e.ser[best]) : null };
+        if (u === 'duo') { const d = duos[name]; if (d) out.push({ ...base, u: 'duo', anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] }); return; }
+        const r = keyRarity(k); if (!r) return;
+        out.push({ ...base, u, anime: ARC_UNIVERSE_ANIME[u], rarity: r, secret: !!sec, img: cardImg({ u, display: name }) });
+    });
+    res.json({ ok: true, cards: out, finDeck: FIN_DECK });
+});
+const _deckOfFin = deckOf;
+deckOf = async function (uid) {
+    const deck = await _deckOfFin(uid), fin = await kvGet('fin', String(uid), {});
+    deck.forEach(c => { if (c.key.startsWith('duo|')) { const d = DUO_CARDS().find(x => 'duo|' + x.name === c.key); c.rarity = 'duo'; c.u = 'duo'; if (d) { c.imgs = d.imgs; c.img = d.imgs[0]; c.anime = d.sub || ''; } } });
+    deck.forEach(c => { const e = fin[c.key]; c.finish = finBestOf(e); if (c.finish && e.ser && e.ser[c.finish]) c.serial = Math.min(...e.ser[c.finish]); });
+    return deck;
+};
+const _deckPctFin = deckPct;
+deckPct = function (deck, universe) {
+    const us = String(universe || '').split(/[+:]/);
+    return _deckPctFin(deck, universe) + deck.reduce((a, c) => a + (c.finish ? (FIN_DECK[c.finish] || 0) * (us.includes(c.u) ? 2 : 1) : 0), 0);
+};
