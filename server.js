@@ -20388,3 +20388,33 @@ deckPct = function (deck, universe) {
     const us = String(universe || '').split(/[+:]/);
     return _deckPctFin(deck, universe) + deck.reduce((a, c) => a + (c.finish ? (FIN_DECK[c.finish] || 0) * (us.includes(c.u) ? 2 : 1) : 0), 0);
 };
+
+/* =====================================================================
+   VITESSE D'OUVERTURE DES BOOSTERS : pseudo et chance gardés en mémoire
+   quelques secondes (avant, chaque carte refaisait plusieurs requêtes
+   à la base de données, d'où le délai à l'ouverture d'un pack).
+   ===================================================================== */
+const PSEUDO_CACHE = new Map();
+const _pseudoOfCache = pseudoOf;
+pseudoOf = async function (uid) {
+    const c = PSEUDO_CACHE.get(uid);
+    if (c && Date.now() - c.at < 60000) return c.p;
+    const p = await _pseudoOfCache(uid);
+    if (p && p !== 'Joueur') PSEUDO_CACHE.set(uid, { p, at: Date.now() });
+    return p;
+};
+const LUCK_CACHE = new Map();
+const _cardLuckCache = cardLuck;
+cardLuck = async function (uid) {
+    const k = uid + '|' + (PACK_LUCK.get(uid) || 1) + '|' + JSON.stringify(SITE.luck || {}) + '|' + betaList().join(',');
+    const c = LUCK_CACHE.get(k);
+    if (c && Date.now() - c.at < 10000) return c.v;
+    const v = await _cardLuckCache(uid);
+    LUCK_CACHE.set(k, { v, at: Date.now() });
+    if (LUCK_CACHE.size > 2000) LUCK_CACHE.clear();
+    return v;
+};
+// on prépare les listes de cartes au démarrage : le premier booster ouvert ne rame plus
+setTimeout(() => {
+    try { arcUniverses().forEach(u => { cardPool(u); cardAllSpecials(u); }); cardQuote('naruto', 'Naruto Uzumaki'); Object.keys(SEASON_CARDS).forEach(seasonChars); hwBuiltin(); } catch (e) { console.warn('[cartes] préchauffage :', e.message); }
+}, 4000);

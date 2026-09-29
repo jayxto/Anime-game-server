@@ -9507,7 +9507,10 @@
                 }).join('')}</div>`).join('');
         }
         async function shopBuy(id) {
-            const d = await v7post('/api/shop/buy', { id });
+            if (shopBuy.busy) return; // évite d'acheter deux fois en cliquant vite
+            shopBuy.busy = true;
+            document.querySelectorAll('#eco-shop .buy').forEach(b => b.disabled = true);
+            let d; try { d = await v7post('/api/shop/buy', { id }); } finally { shopBuy.busy = false; }
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
             eco.coins = d.coins; eco.owned = d.owned; ecoCoinsUi();
             if (d.cards) showBooster(d.cards);
@@ -11643,8 +11646,8 @@
                 const order = cards.map((c, i) => i).sort((a, b) => w(cards[a]) - w(cards[b]));
                 o._order = order;
                 setTimeout(() => o.classList.add('charge'), 50);
-                setTimeout(() => o.classList.add('burst'), 1700);
-                setTimeout(() => { o.classList.add('show'); summonNext(); }, 2300);
+                setTimeout(() => o.classList.add('burst'), 250);
+                setTimeout(() => { o.classList.add('show'); summonNext(); }, 450);
                 o.addEventListener('click', e => { if (e.target.closest('.sm-card') || e.target.closest('button')) return; if (o.classList.contains('done')) o.remove(); });
             };
             window.summonNext = function () {
@@ -11660,9 +11663,9 @@
                     smReveal(o, el, c);
                     if (big) { o.classList.add('shake'); setTimeout(() => o.classList.remove('shake'), 500); el.classList.add('wow'); }
                     // plus la carte est rare, plus on la laisse briller avant la suivante
-                    o._t = setTimeout(summonNext, [380, 600, 900, 1500, 1800, 2200, 2600, 3000, 3400, 3800][rank] + (c.shiny ? 300 : 0) + (c.finish ? 1200 : 0) + (c.quote ? 1500 : 0));
+                    o._t = setTimeout(summonNext, [200, 280, 400, 650, 800, 950, 1100, 1250, 1400, 1600][rank] + (c.shiny ? 150 : 0) + (c.finish ? 400 : 0) + (c.quote ? 600 : 0));
                 };
-                if (big) { el.classList.add('tease'); if (rank >= 5 || c.finish) el.classList.add('t-high'); if (c.finish) el.style.setProperty('--fc', (window.FIN_COL || {})[c.finish] || '#fff'); o._t = setTimeout(flip, rank >= 9 ? 2600 : rank >= 7 ? 2000 : rank >= 5 ? 1500 : 900); } else flip();
+                if (big) { el.classList.add('tease'); if (rank >= 5 || c.finish) el.classList.add('t-high'); if (c.finish) el.style.setProperty('--fc', (window.FIN_COL || {})[c.finish] || '#fff'); o._t = setTimeout(flip, rank >= 9 ? 1100 : rank >= 7 ? 850 : rank >= 5 ? 600 : 350); } else flip();
             };
             window.summonRevealAll = function () {
                 const o = document.getElementById('summon'); if (!o) return;
