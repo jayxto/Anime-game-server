@@ -592,8 +592,12 @@
         .tl-item .tl-duo img{width:50%;}
         .tl-item .tl-play{position:absolute;top:2px;right:2px;z-index:2;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.75);color:#fff;font-size:.62rem;cursor:pointer;padding:0;}
         .tl-item .tl-play:hover{background:var(--accent-pink);}
-        #tl-player{position:fixed;left:12px;bottom:12px;z-index:9000;width:min(360px,calc(100vw - 24px));background:#0d0d15;border:2px solid var(--accent-cyan);border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);}
-        #tl-player iframe{display:block;width:100%;aspect-ratio:16/9;border:0;}
+        #tl-player{position:fixed;left:12px;bottom:12px;z-index:10040;width:min(420px,calc(100vw - 24px));background:#0d0d15;border:2px solid var(--accent-cyan);border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);}
+        #tl-player .tlp-box{position:relative;width:100%;aspect-ratio:16/9;background:#000;}
+        #tl-player .tlp-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+        #tl-player .tlp-hint{padding:6px 10px 8px;font-size:.78rem;color:var(--text-muted);text-align:center;}
+        #tl-player .tlp-hint a{color:var(--accent-cyan);font-weight:800;}
+        @media (max-width:640px){#tl-player{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;border-width:2px 0 0;}#tl-player .tlp-box{aspect-ratio:auto;height:min(56vw,30vh);}}
         #tl-player .tlp-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:.78rem;font-weight:700;}
         #tl-player .tlp-bar button{background:none;border:1px solid var(--text-muted);color:#fff;border-radius:6px;cursor:pointer;padding:2px 8px;}
         .tl-sec{font-family:'Bangers',cursive;letter-spacing:1px;font-size:1.35rem;color:var(--accent-yellow);margin:18px 0 8px;}
@@ -3021,6 +3025,7 @@
             document.getElementById('quote-room').style.display = 'none';
             document.getElementById('blindtest-room').style.display = 'none';
             ['arcade-room','tierlist-room','battle-room'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+            if (typeof mediaClose === 'function') mediaClose();
             document.getElementById('quote-universe-selection').style.display = 'none';
             document.getElementById('theme-selection-container').style.display = 'none';
             document.getElementById('end-clues-options').style.display = 'none';
@@ -6589,12 +6594,48 @@
         }
 
         /* --- petit lecteur YouTube pour écouter un opening / une OST depuis la tier list --- */
-        function tlPlay(it) {
-            let p = document.getElementById('tl-player');
-            if (!p) { p = document.createElement('div'); p.id = 'tl-player'; document.body.appendChild(p); }
-            p.innerHTML = `<iframe allow="autoplay; encrypted-media" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(it.video)}?autoplay=1&start=${it.start || 0}&rel=0&playsinline=1"></iframe><div class="tlp-bar"><span>🎵 ${v7esc(it.name)}</span><button onclick="tlStopPlayer()">✖</button></div>`;
+        function tlPlay(it) { mediaOpen(it, it.name); }
+        function tlStopPlayer() { mediaClose(); }
+
+        /* --- lecteur YouTube partagé (battles, « Qui a le plus… », tier lists) ---
+           Sur téléphone, le son ne peut démarrer qu'après un toucher DANS le lecteur : on l'affiche en grand
+           en bas de l'écran avec ses commandes, et si la vidéo refuse d'être intégrée, un lien vers YouTube. */
+        let mediaYt = null, mediaKey = 0;
+        function mediaClose() {
+            mediaKey++;
+            try { if (mediaYt && mediaYt.destroy) mediaYt.destroy(); } catch (_) {}
+            mediaYt = null;
+            document.getElementById('tl-player')?.remove();
         }
-        function tlStopPlayer() { document.getElementById('tl-player')?.remove(); }
+        async function mediaOpen(it, title) {
+            mediaClose();
+            const key = ++mediaKey;
+            if (typeof btPauseBackground === 'function') btPauseBackground();
+            const start = Math.max(0, Math.floor(it.start || 0));
+            const p = document.createElement('div'); p.id = 'tl-player';
+            p.innerHTML = `<div class="tlp-bar"><span>${it.scene ? '🎬' : '🎵'} ${v7esc(title || it.name || '')}</span><button onclick="mediaClose()">✖</button></div>
+                <div class="tlp-box"><div id="tlp-yt"></div></div>
+                <div class="tlp-hint">⏳ Chargement…</div>`;
+            document.body.appendChild(p);
+            const hint = p.querySelector('.tlp-hint');
+            const ytUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(it.video)}${start ? '&t=' + start + 's' : ''}`;
+            const fail = () => { if (key !== mediaKey) return; hint.innerHTML = `⚠️ Cette vidéo ne peut pas être lue ici. <a href="${ytUrl}" target="_blank" rel="noopener">▶ Ouvrir sur YouTube</a>`; };
+            let YT;
+            try { YT = await Promise.race([ytApi(), new Promise((_, rej) => setTimeout(() => rej(), 8000))]); } catch (_) { return fail(); }
+            if (key !== mediaKey) return;
+            let playing = false;
+            mediaYt = new YT.Player('tlp-yt', {
+                width: '100%', height: '100%', videoId: it.video,
+                playerVars: { autoplay: 1, playsinline: 1, controls: 1, rel: 0, start, fs: 1, iv_load_policy: 3 },
+                events: {
+                    onReady: e => { try { e.target.unMute(); e.target.setVolume(100); e.target.playVideo(); } catch (_) {} },
+                    onStateChange: e => { if (key === mediaKey && e.data === YT.PlayerState.PLAYING) { playing = true; hint.innerHTML = `🔊 Lecture en cours • <a href="${ytUrl}" target="_blank" rel="noopener">voir sur YouTube</a>`; } },
+                    onError: fail
+                }
+            });
+            // lecture automatique bloquée (téléphone) : on demande de toucher la vidéo
+            setTimeout(() => { if (key === mediaKey && !playing && !/⚠️/.test(hint.textContent)) hint.innerHTML = `👆 Touche la vidéo pour lancer le son • <a href="${ytUrl}" target="_blank" rel="noopener">ou ouvre-la sur YouTube</a>`; }, 1800);
+        }
         async function tlRateUi(t) {
             const box = document.getElementById('tl-rate');
             if (!t || t.mine) { box.style.display = t ? 'block' : 'none'; if (t) box.innerHTML = `Tier list de <b>${v7esc(t.author)}</b> (la tienne) • ${t.rating ? '⭐ ' + t.rating + ' (' + t.votes + ' votes)' : 'pas encore notée'}`; return; }
@@ -6833,9 +6874,9 @@
             bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') || source.startsWith('qt:'), qap: kind === 'qap', qt: kind === 'qt', qtTitle: kind === 'qt' ? data.label : null };
             const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI A LE PLUS…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
             if (bb.qt && h2) h2.textContent = '🏆 QUI A LE PLUS…';
-            const unit = data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
+            const unit = source === 'qt:entree' ? 'entrées' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
             if (bb.qt) bb.unit = unit;
-            document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : unit === 'entrées' ? ' (▶ pour voir la scène)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             if (bb.qap) return qapSetup(document.getElementById('bb-body'));
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
@@ -7007,24 +7048,21 @@
             const it = bbItem(name);
             if (it.video) card.classList.add('bb-op');
             if (it.video && onClick) {
-                const play = document.createElement('button'); play.className = 'bb-play'; play.textContent = '▶ Écouter';
+                const label = bb.source === 'qt:entree' ? '▶ Voir l’entrée' : '▶ Écouter';
+                const play = document.createElement('button'); play.className = 'bb-play'; play.textContent = label;
                 play.onclick = e => {
                     e.stopPropagation();
-                    if (typeof btPauseBackground === 'function') btPauseBackground();
-                    document.querySelectorAll('.bb-card iframe').forEach(f => f.remove());
-                    document.querySelectorAll('.bb-play').forEach(b => b.textContent = '▶ Écouter');
-                    const f = document.createElement('iframe');
-                    f.src = `https://www.youtube-nocookie.com/embed/${it.video}?autoplay=1&start=${it.start != null ? it.start : 35}&rel=0&playsinline=1`;
-                    f.allow = 'autoplay; encrypted-media';
-                    f.className = 'bb-video';
-                    card.appendChild(f);
-                    play.textContent = '🔊 En cours';
+                    document.querySelectorAll('.bb-play').forEach(b => b.textContent = b.dataset.l || label);
+                    mediaOpen({ ...it, start: it.start != null ? it.start : 35, scene: bb.source === 'qt:entree' }, name);
+                    play.textContent = bb.source === 'qt:entree' ? '🎬 En cours' : '🔊 En cours';
                 };
+                play.dataset.l = label;
                 card.appendChild(play);
             }
             return card;
         }
         function bbRenderDuel() {
+            mediaClose();
             const body = document.getElementById('bb-body');
             const total = bb.current.length / 2;
             const matchNo = bb.idx / 2 + 1;
@@ -7092,6 +7130,7 @@
             if (e.key === 'ArrowRight') bbPick(1, cards[0], cards[1]);
         });
         function bbFinish(champion) {
+            mediaClose();
             bb.done = true;
             const body = document.getElementById('bb-body');
             body.innerHTML = '';
