@@ -2497,6 +2497,13 @@
             <button class="btn-action" style="margin-top:0;" onclick="saveTheme()">Appliquer</button>
         </div>
         <div class="opt-panel">
+            <h2>🍀 Chance sur les cartes</h2>
+            <p class="tl-hint" style="text-align:left;">Plus de cartes brillantes, de cartes rares et de raretés spéciales (Secrète → Oméga) dans les boosters et les parties.</p>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#ffd700;"><input type="checkbox" id="adm-luck-admins"> 👑 Chance x10 pour les admins seulement</label>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#00ff88;"><input type="checkbox" id="adm-luck-players"> 🍀 Chance x2 pour tous les joueurs (événement)</label>
+            <button class="btn-action" style="margin-top:0;" onclick="saveLuck()">Appliquer</button>
+        </div>
+        <div class="opt-panel">
             <h2>🎵 Ajouter un opening</h2>
             <p class="tl-hint" style="text-align:left;">Ajouté direct au blind test et au battle d'openings, sans toucher au code.</p>
             <input id="adm-t-anime" class="v7-input" list="adm-anime-list" maxlength="80" placeholder="Anime (ex : Frieren)"><datalist id="adm-anime-list"></datalist>
@@ -8434,7 +8441,7 @@
         /* =====================================================================
            ADMIN, SIGNALEMENTS, MAINTENANCE, THÈMES
            ===================================================================== */
-        let SITE_STATE = { maintenance: { on: false, msg: '' }, theme: 'auto' };
+        let SITE_STATE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false } };
         const lastStates = {};
         ['arc_state', 'bt_state', 'quote_state', 'dle_state', 'draw_state', 'guess_state', 'rg_state'].forEach(ev => socket.on(ev, d => { lastStates[ev] = { at: Date.now(), d }; }));
 
@@ -8627,10 +8634,12 @@
             document.getElementById('adm-lock').checked = !!s.maintenance.lock;
             document.getElementById('adm-maint-back').value = s.maintenance.back || '';
             document.getElementById('adm-theme').value = s.theme || 'auto';
+            document.getElementById('adm-luck-admins').checked = !!(s.luck && s.luck.admins);
+            document.getElementById('adm-luck-players').checked = !!(s.luck && s.luck.players);
             checkBuild();
             loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-06-raretes';
+        const CLIENT_BUILD = '2026-10-07-chance';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -8644,6 +8653,11 @@
             const lock = document.getElementById('adm-lock').checked;
             const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, lock, msg: document.getElementById('adm-maint-msg').value, back: document.getElementById('adm-maint-back').value } });
             toast(d && d.ok ? (lock ? '🔒 Site fermé : les joueurs voient l’écran de mise à jour' : '✅ Maintenance mise à jour pour tout le monde') : '❌ Impossible (server.js à jour ?)', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
+        }
+        async function saveLuck() {
+            const luck = { admins: document.getElementById('adm-luck-admins').checked, players: document.getElementById('adm-luck-players').checked };
+            const d = await v7post('/api/admin/settings', { luck });
+            toast(d && d.ok ? `🍀 Chance : admins ${luck.admins ? 'x10' : 'normale'} • joueurs ${luck.players ? 'x2' : 'normale'}` : '❌ Impossible (server.js à jour ?)', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
         }
         async function saveTheme() {
             const want = document.getElementById('adm-theme').value;
@@ -9282,7 +9296,10 @@
             const acc = isAccount();
             const wa = d.weekAnime, w = d.weekly, b = hub.boss || d.boss;
             const now = Date.now() + (hub.skew || 0);
-            const weekendBar = d.weekend ? `<div class="hub-weekend">🎉 <b>WEEK-END x2</b> : pièces et XP doublées jusqu'à dimanche minuit !</div>` : '';
+            const lk = (typeof SITE_STATE !== 'undefined' && SITE_STATE.luck) || {};
+            const weekendBar = (d.weekend ? `<div class="hub-weekend">🎉 <b>WEEK-END x2</b> : pièces et XP doublées jusqu'à dimanche minuit !</div>` : '')
+                + (lk.admins && window.IS_ADMIN ? `<div class="hub-weekend" style="background:linear-gradient(90deg,#b8860b,#ffd700);color:#000;">👑 <b>CHANCE x10</b> (admin) : brillantes et raretés spéciales x10 !</div>`
+                : lk.players ? `<div class="hub-weekend" style="background:linear-gradient(90deg,#00b862,#00ff88);color:#000;">🍀 <b>CHANCE x2</b> sur les cartes : plus de brillantes et de raretés spéciales !</div>` : '');
             const chest = acc && d.chest ? `<button class="hub-chest${d.chest.ready ? ' ready' : ''}" onclick="hubChest()"><span class="hc-ico">${d.chest.ready ? '🎁' : '📦'}</span><span><b>${d.chest.ready ? 'Coffre du jour prêt !' : 'Coffre du jour ouvert'}</b><small>${d.chest.ready ? `Jour ${d.chest.day}/7 de ta série` : `Série : ${d.chest.streak} jour${d.chest.streak > 1 ? 's' : ''} • reviens demain`}</small></span></button>` : '';
             const pass = acc && d.pass ? `<button class="hub-pass-mini" onclick="switchTab('collection');ecoTab('pass')"><span>🎟️ Pass de saison</span><b>Palier ${d.pass.tier}/30</b><span class="ab"><i style="width:${d.pass.tier >= 30 ? 100 : Math.round(100 * (d.pass.xp % d.pass.perTier) / d.pass.perTier)}%"></i></span></button>` : '';
             const bossHtml = b ? `<div class="hub-card boss${b.dead ? ' dead' : ''}" id="hub-boss">
@@ -9325,6 +9342,7 @@
         socket.on('weekly_result', d => toast(`🏆 <b>${hubEsc(d.winner)}</b> remporte le tournoi du dimanche !`, '#ffd700'));
         socket.on('weekly_win', d => { toast(`🏆 Tu as gagné le tournoi du dimanche ! +${d.coins} 🪙 + titre « Champion du dimanche »`, '#ffd700'); confetti(3000); });
         socket.on('clan_event', d => toast(d.text, '#ffd700'));
+        socket.on('site_settings', () => setTimeout(() => { if (hub.home) hubRenderHome(); }, 0)); // bannière chance x2 / x10
         socket.on('rare_pull', d => { toast(`${{ cosmique: '🌌', eternelle: '♾️', omega: 'Ω' }[d.rarity] || '✨'} <b>${hubEsc(d.who)}</b> vient d'obtenir <b>${hubEsc(d.name)}</b> ${d.shiny ? 'brillante ' : ''}en carte <b>${hubEsc(d.label)}</b> !`, { cosmique: '#7b5cff', eternelle: '#ffd700', omega: '#ffffff' }[d.rarity]); if (d.rarity !== 'cosmique') confetti(3000); });
         socket.on('trade_new', d => toast(`🔁 <b>${hubEsc(d.from)}</b> te propose un échange : ${hubEsc(d.give)} contre ${hubEsc(d.want)} <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Voir</button>`, '#48dbfb'));
         socket.on('trade_done', d => toast(d.text, '#48dbfb'));

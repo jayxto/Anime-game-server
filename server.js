@@ -14922,7 +14922,7 @@ io.on('connection', socket => {
    ADMIN : tableau de bord, openings ajoutés sans code, signalements de bug,
            mode maintenance, thèmes Halloween / Noël
    ===================================================================== */
-const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto' };
+const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false } };
 const CUSTOM_TRACKS_MEM = [], BUGS_MEM = [];
 function customTrackAdd(t) {
     const n = 5000 + t.id;
@@ -14993,6 +14993,7 @@ app.post('/api/admin/settings', adminOnly(async (req, res) => {
         SITE.maintenance = { on: !!b.maintenance.on || lock, msg: String(b.maintenance.msg || '').slice(0, 300), lock, back: String(b.maintenance.back || '').slice(0, 60), since: lock ? (SITE.maintenance.lock ? SITE.maintenance.since : Date.now()) : null };
         await siteSave('maintenance');
     }
+    if (b.luck) { SITE.luck = { admins: !!b.luck.admins, players: !!b.luck.players }; await siteSave('luck'); }
     if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel', 'valentin', 'hanami', 'tokyo', 'ninja'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
     res.json({ ok: true, site: SITE });
 }));
@@ -16021,7 +16022,8 @@ const RAR_RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, s
 async function openBooster(uid, n, type = '') {
     const us = arcUniverses();
     const out = [];
-    const mult = type === 'mythique' ? 4 : type === 'epique' ? 2 : 1; // boosters spéciaux : raretés spéciales plus fréquentes
+    const luck = await cardLuck(uid); // chance x2 (joueurs) / x10 (admins) activée dans le panneau admin
+    const mult = (type === 'mythique' ? 4 : type === 'epique' ? 2 : 1) * luck; // boosters spéciaux : raretés spéciales plus fréquentes
     const minRank = type === 'mythique' ? 3 : type === 'epique' ? 2 : n >= 10 ? 1 : 0;
     for (let i = 0; i < n; i++) {
         const u = us[Math.floor(Math.random() * us.length)];
@@ -16033,10 +16035,10 @@ async function openBooster(uid, n, type = '') {
             const sc = cardSpecials(t.id, cu);
             if (sc.length) { special = sc[Math.floor(Math.random() * sc.length)]; break; }
         }
-        if (special) { out.push(await cardAwardSecret(uid, special.u, special.display, Math.random() < 1 / 10, special.tier)); continue; }
+        if (special) { out.push(await cardAwardSecret(uid, special.u, special.display, Math.random() < Math.min(0.9, luck / 10), special.tier)); continue; }
         const list = cardPool(u);
-        // les cartes connues tombent plus souvent, les rares moins
-        let idx = Math.floor(Math.pow(Math.random(), 1.6) * list.length);
+        // les cartes connues tombent plus souvent, les rares moins (la chance rapproche des cartes rares)
+        let idx = Math.min(list.length - 1, Math.floor(Math.pow(Math.random(), 1.6 / Math.sqrt(luck)) * list.length));
         const last = i === n - 1;
         if (last && minRank && !out.some(c => (RAR_RANK[c.rarity] || 0) >= minRank)) {
             const ok = list.map((c, j) => j).filter(j => RAR_RANK[cardRarityAt(u, j)] >= minRank);
@@ -18340,7 +18342,7 @@ app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
 }));
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-06-raretes';
+const SITE_BUILD = '2026-10-07-chance';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -19518,3 +19520,22 @@ io.on('connection', socket => {
         try { const uid = socket.user && socket.user.id; if (uid && !socket.user.isGuest && await isAdminUid(uid)) await ecoGet(uid); } catch (_) {}
     }, 1500);
 });
+
+/* =====================================================================
+   CHANCE SUR LES CARTES : x10 pour les admins, x2 pour tous les joueurs
+   (interrupteurs dans le panneau admin, section « Chance »)
+   ===================================================================== */
+async function cardLuck(uid) {
+    const l = SITE.luck || {};
+    if (uid && l.admins && await isAdminUid(uid)) return 10;
+    return l.players ? 2 : 1;
+}
+const _cardAwardLuck = cardAward;
+cardAward = async function (p, u, name, opts) {
+    const luck = p && p.userId ? await cardLuck(p.userId) : 1;
+    if (luck === 1) return _cardAwardLuck(p, u, name, opts);
+    const o = Object.assign({}, opts || {});
+    const base = o.shinyRate || (typeof weekAnime === 'function' && u === weekAnime().u ? 1 / 4 : 1 / 12);
+    o.shinyRate = Math.min(0.9, base * luck);
+    return _cardAwardLuck(p, u, name, o);
+};
