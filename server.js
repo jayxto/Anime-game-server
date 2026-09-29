@@ -20118,13 +20118,13 @@ async function finAdd(uid, key, fid) {
     const g = await kvGet('fincount', key, {});
     if (fid === 'numbered' && (g.numbered || 0) >= NUMBERED_MAX) fid = 'signed';
     g[fid] = (g[fid] || 0) + 1;
-    await kvSet('fincount', key, g);
+    kvSet('fincount', key, g); // gardé en mémoire tout de suite, écrit en base sans bloquer l'ouverture
     const m = await kvGet('fin', String(uid), {});
     const e = m[key] = m[key] || {};
     e[fid] = (e[fid] || 0) + 1;
     let serial = null;
     if (fid === 'numbered' || fid === 'signed') { serial = g[fid]; e.ser = e.ser || {}; (e.ser[fid] = e.ser[fid] || []).push(serial); }
-    await kvSet('fin', String(uid), m);
+    kvSet('fin', String(uid), m);
     return { finish: fid, serial, serialMax: fid === 'numbered' ? NUMBERED_MAX : null, finCount: g[fid] };
 }
 const finBestOf = e => e ? FIN_IDS.find(f => e[f] > 0) || null : null;

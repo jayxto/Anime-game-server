@@ -9510,7 +9510,10 @@
             if (shopBuy.busy) return; // évite d'acheter deux fois en cliquant vite
             shopBuy.busy = true;
             document.querySelectorAll('#eco-shop .buy').forEach(b => b.disabled = true);
+            const itB = (eco.items || []).find(i => i.id === id);
+            if (itB && itB.kind === 'booster' && typeof summonPending === 'function') summonPending();
             let d; try { d = await v7post('/api/shop/buy', { id }); } finally { shopBuy.busy = false; }
+            if ((!d || !d.ok || !d.cards) && typeof summonCancel === 'function') summonCancel();
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
             eco.coins = d.coins; eco.owned = d.owned; ecoCoinsUi();
             if (d.cards) showBooster(d.cards);
@@ -11624,8 +11627,20 @@
                 return `<svg viewBox="0 0 300 300" class="sm-circle" style="--c:${col}"><g class="sm-rot"><circle cx="150" cy="150" r="140"/><circle cx="150" cy="150" r="118"/><g class="sm-runes">${t}</g></g>
                     <g class="sm-rot2"><path d="M150 40L245 205H55Z"/><path d="M150 260L55 95H245Z"/><circle cx="150" cy="150" r="60"/><circle cx="150" cy="150" r="30"/></g></svg>`;
             }
+            // affiché dès le clic sur « acheter » : le cercle se charge pendant que le serveur prépare les cartes
+            window.summonPending = function () {
+                document.getElementById('summon')?.remove();
+                const o = document.createElement('div'); o.id = 'summon'; o.className = 'summon r0 pending';
+                o.style.setProperty('--c', COL[0]);
+                o.innerHTML = `<div class="sm-bg"></div>${circleSvg(COL[0])}<div class="sm-beam"></div><div class="sm-flash"></div><div class="sm-txt">Invocation…</div>`;
+                document.body.appendChild(o);
+                setTimeout(() => o.classList.add('charge'), 20);
+                setTimeout(() => { if (o.isConnected && o.classList.contains('pending')) o.remove(); }, 20000); // sécurité si le serveur ne répond pas
+            };
+            window.summonCancel = function () { const o = document.querySelector('#summon.pending'); if (o) o.remove(); };
             showBooster = function (cards) {
                 if (!cards || !cards.length) return;
+                const wasPending = !!document.querySelector('#summon.pending');
                 document.getElementById('booster-modal')?.remove(); document.getElementById('summon')?.remove();
                 const best = Math.max(...cards.map(c => RANK[c.rarity] || 0));
                 const anyShiny = cards.some(c => c.shiny);
@@ -11645,9 +11660,9 @@
                 const w = c => (RANK[c.rarity] || 0) + (c.shiny ? .5 : 0) + (c.finish ? .7 : 0);
                 const order = cards.map((c, i) => i).sort((a, b) => w(cards[a]) - w(cards[b]));
                 o._order = order;
-                setTimeout(() => o.classList.add('charge'), 50);
-                setTimeout(() => o.classList.add('burst'), 250);
-                setTimeout(() => { o.classList.add('show'); summonNext(); }, 450);
+                setTimeout(() => o.classList.add('charge'), wasPending ? 0 : 50);
+                setTimeout(() => o.classList.add('burst'), wasPending ? 20 : 250);
+                setTimeout(() => { o.classList.add('show'); summonNext(); }, wasPending ? 150 : 450);
                 o.addEventListener('click', e => { if (e.target.closest('.sm-card') || e.target.closest('button')) return; if (o.classList.contains('done')) o.remove(); });
             };
             window.summonNext = function () {
