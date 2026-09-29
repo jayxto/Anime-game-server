@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anime Game – Quiz et jeux anime multijoueur gratuits</title>
-    <meta name="description" content="Joue gratuitement à des jeux anime entre potes ou avec ton chat Twitch : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux sur Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…">
+    <meta name="description" content="Joue gratuitement à des jeux anime entre potes ou avec ton chat Twitch ou TikTok : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux sur Naruto, One Piece, Demon Slayer, Jujutsu Kaisen…">
     <meta name="theme-color" content="#0b0b10">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Anime Game">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:title" content="Anime Game – Quiz et jeux anime multijoueur gratuits">
-    <meta property="og:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime à jouer entre potes ou avec ton chat Twitch. Gratuit, sans téléchargement.">
+    <meta property="og:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime à jouer entre potes ou avec ton chat Twitch ou TikTok. Gratuit, sans téléchargement.">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Anime Game – Quiz et jeux anime multijoueur gratuits">
     <meta name="twitter:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime entre potes. Gratuit.">
@@ -1716,7 +1716,7 @@
 
     <section id="seo-about" class="seo-about">
         <h1>Anime Game : quiz et jeux anime en multijoueur, gratuits</h1>
-        <p>Crée un salon, envoie le code à tes potes et jouez ensemble directement dans le navigateur, sans rien télécharger. Parfait pour les soirées entre amis, en vocal sur Discord ou en live avec ton chat Twitch.</p>
+        <p>Crée un salon, envoie le code à tes potes et jouez ensemble directement dans le navigateur, sans rien télécharger. Parfait pour les soirées entre amis, en vocal sur Discord ou en live avec ton chat Twitch ou TikTok.</p>
         <h2>Les modes de jeu</h2>
         <ul>
             <li><b>Blind test d'openings</b> : reconnais l'anime à partir de son opening ou ending.</li>
@@ -2017,7 +2017,7 @@
                 <span>✏️ Tours de dessin :</span>
                 <select id="room-draw-select" onchange="setDrawTours(this.value)"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
                 <b id="room-draw-text"></b>
-                <label id="room-draw-stream" style="display:none;align-items:center;gap:6px;flex-basis:100%;justify-content:center;font-size:.85rem;margin-top:4px;"><input type="checkbox" id="room-draw-stream-cb" onchange="setDrawStream(this.checked)"> 🎥 Mode stream : tu dessines, ton chat Twitch devine avec <b>!nom</b></label>
+                <label id="room-draw-stream" style="display:none;align-items:center;gap:6px;flex-basis:100%;justify-content:center;font-size:.85rem;margin-top:4px;"><input type="checkbox" id="room-draw-stream-cb" onchange="setDrawStream(this.checked)"> 🎥 Mode stream : tu dessines, ton chat Twitch ou TikTok devine le perso</label>
                 <div id="room-draw-stream-hint" class="tl-hint" style="display:none;flex-basis:100%;"></div>
             </div>
             <button class="invite-btn" id="invite-friend-btn" style="display:none;" onclick="openFriendInvite()">📨 Inviter un ami</button>
@@ -2680,7 +2680,11 @@
 
         <div class="opt-panel">
             <h2>🎥 Mode streamer</h2>
-            <p class="tl-hint" style="text-align:left;">Ton chat Twitch vote en direct pendant les blind tests, mini-jeux à choix et battles d'openings : les viewers tapent <b>!1</b>, <b>!2</b>, <b>!3</b> ou <b>!4</b>.</p>
+            <p class="tl-hint" style="text-align:left;">Ton chat Twitch ou TikTok vote en direct pendant les blind tests, mini-jeux à choix et battles d'openings : les viewers tapent <b>1</b>, <b>2</b>, <b>3</b> ou <b>4</b> (ou <b>!1</b>, <b>!2</b>…).</p>
+            <div class="bb-tabs" id="stream-platforms" style="justify-content:flex-start;margin-top:10px;">
+                <button class="lb-tab on" data-p="twitch" onclick="streamSetPlatform('twitch')">🟣 Twitch</button>
+                <button class="lb-tab" data-p="tiktok" onclick="streamSetPlatform('tiktok')">🎵 TikTok Live</button>
+            </div>
             <div class="chat-input-box" style="margin-top:10px;">
                 <input type="text" id="stream-channel" placeholder="Nom de ta chaîne (ex : jordan_jrc)">
                 <button class="btn-action" style="width:auto;margin-top:0;" onclick="streamConnect()">Connecter</button>
@@ -7061,20 +7065,44 @@
         try { applyTheme(localStorage.getItem('theme') || 'dark'); } catch (e) {}
 
         /* ===================== MODE STREAMER : votes du chat Twitch ===================== */
-        const stream = { ws: null, channel: '', key: null, labels: [], votes: new Map(), revealed: null, t0: 0, answered: false, board: {}, lastGain: {}, rounds: 0 };
+        const stream = { platform: 'twitch', ws: null, channel: '', key: null, labels: [], votes: new Map(), revealed: null, t0: 0, answered: false, board: {}, lastGain: {}, rounds: 0 };
         function streamBoardLoad() { try { stream.board = JSON.parse(localStorage.getItem('stream_board_' + stream.channel) || '{}') || {}; } catch (e) { stream.board = {}; } }
         function streamBoardSave() { try { localStorage.setItem('stream_board_' + stream.channel, JSON.stringify(stream.board)); } catch (e) {} }
+        const streamIsTiktok = () => !!(stream.ws ? stream.ws.tiktok : stream.platform === 'tiktok');
+        const streamChatName = () => streamIsTiktok() ? 'TikTok' : 'Twitch';
+        function streamSetPlatform(pf) {
+            stream.platform = pf === 'tiktok' ? 'tiktok' : 'twitch';
+            try { localStorage.setItem('stream_platform', stream.platform); } catch (e) {}
+            document.querySelectorAll('#stream-platforms button').forEach(b => b.classList.toggle('on', b.dataset.p === stream.platform));
+            const i = document.getElementById('stream-channel');
+            if (i) { i.placeholder = stream.platform === 'tiktok' ? 'Ton pseudo TikTok (ex : @jordan_jrc)' : 'Nom de ta chaîne (ex : jordan_jrc)'; try { i.value = localStorage.getItem('stream_channel_' + stream.platform) || ''; } catch (e) {} }
+        }
         function streamConnect() {
             const input = document.getElementById('stream-channel');
-            const ch = String(input.value || '').trim().toLowerCase().replace(/^#/, '').replace(/[^a-z0-9_]/g, '');
+            const tt = stream.platform === 'tiktok';
+            const ch = String(input.value || '').trim().toLowerCase().replace(/^[#@]/, '').replace(tt ? /[^a-z0-9_.]/g : /[^a-z0-9_]/g, '');
             if (!ch) return;
             streamDisconnect();
-            try { localStorage.setItem('stream_channel', ch); } catch (e) {}
+            try { localStorage.setItem('stream_channel_' + stream.platform, ch); if (!tt) localStorage.setItem('stream_channel', ch); } catch (e) {}
+            stream.channel = tt ? 'tiktok_' + ch : ch;
+            if (tt) {
+                streamBoardLoad();
+                stream.manual = false;
+                // pas de chat TikTok lisible depuis le navigateur : le serveur se connecte au live et nous relaie les messages
+                stream.ws = { tiktok: true, user: ch, close() { socket.emit('tiktok_disconnect'); } };
+                socket.emit('tiktok_connect', { username: ch });
+                streamStatus(`Connexion au live de @${ch}…`);
+                document.getElementById('stream-widget').style.display = 'block';
+                document.getElementById('stream-widget').style.borderColor = '#fe2c55';
+                streamRender();
+                return;
+            }
             stream.channel = ch;
             streamBoardLoad();
             stream.manual = false; stream.retry = 0;
             streamOpen(ch);
             document.getElementById('stream-widget').style.display = 'block';
+            document.getElementById('stream-widget').style.borderColor = '';
             streamRender();
         }
         function streamOpen(ch) {
@@ -7118,6 +7146,14 @@
             streamDecorate();
         }
         function streamStatus(t) { const el = document.getElementById('stream-status'); if (el) el.textContent = t; }
+        socket.on('tiktok_chat', m => {
+            if (!m || !stream.ws || !stream.ws.tiktok) return;
+            streamVote(m.user, m.text, m.name);
+            try { streamDrawGuess(m.user, m.text, m.name); } catch (e) {}
+        });
+        socket.on('tiktok_status', s => { if (s && stream.ws && stream.ws.tiktok) streamStatus(s.text); });
+        // le serveur a redémarré ou la connexion a sauté : on relance la lecture du live
+        socket.on('connect', () => { if (stream.ws && stream.ws.tiktok) socket.emit('tiktok_connect', { username: stream.ws.user }); });
         const streamIsBattle = () => String(stream.key || '').startsWith('bb|');
         function streamVote(user, msg, display) {
             if (!stream.key || stream.revealed) return;
@@ -7248,7 +7284,10 @@
         }
         socket.on('arc_state', q => { if (q && q.phase === 'finished' && q.answerType === 'choice') streamFinal('arc|' + (q.totalRounds || '') + '|' + (q.startedAt || '') + '|' + currentRoomCode); });
         socket.on('bt_state', q => { if (q && q.phase === 'finished') streamFinal('bt|' + (q.round || '') + '|' + currentRoomCode + '|' + (q.totalRounds || '')); });
-        try { const ch = localStorage.getItem('stream_channel'); if (ch) setTimeout(() => { const i = document.getElementById('stream-channel'); if (i) i.value = ch; }, 50); } catch (e) {}
+        try {
+            const ch = localStorage.getItem('stream_channel'); if (ch && !localStorage.getItem('stream_channel_twitch')) localStorage.setItem('stream_channel_twitch', ch);
+            setTimeout(() => streamSetPlatform(localStorage.getItem('stream_platform') || 'twitch'), 50);
+        } catch (e) {}
         // Battle d'openings : le chat vote aussi (!1 gauche / !2 droite), % écrit sous chaque opening
         (function () {
             const orig = window.bbRenderDuel;
@@ -7858,12 +7897,12 @@
         function streamDrawGuess(user, msg, display) {
             const q = drw.state;
             if (!q || !q.stream || q.phase !== 'drawing' || !drawIsMe() || !currentRoomCode) return;
-            const m = String(msg || '').match(/^!\s*(.{2,60})$/);
+            const m = String(msg || '').match(stream.ws && stream.ws.tiktok ? /^!?\s*(.{2,60})$/ : /^!\s*(.{2,60})$/);
             if (!m) return;
             const now = Date.now();
             if (now - (drawStreamLast[user] || 0) < 1200) return;
             drawStreamLast[user] = now;
-            socket.emit('draw_stream_guess', { roomCode: currentRoomCode, user, name: display || user, text: m[1].trim() });
+            socket.emit('draw_stream_guess', { roomCode: currentRoomCode, user, name: display || user, text: m[1].trim(), platform: streamIsTiktok() ? 'tiktok' : 'twitch' });
         }
         function drawStreamBoard(q) {
             const box = document.getElementById('draw-stream-board');
@@ -7872,7 +7911,7 @@
             box.style.display = 'block';
             const mine = stream.ws ? drawBoardLoad() : null;
             const top = mine ? Object.entries(mine).sort((a, b) => b[1].pts - a[1].pts).slice(0, 10) : [];
-            box.innerHTML = `<div class="dsb-h">💬 Chat Twitch : écrivez <b>!nom du perso</b></div>`
+            box.innerHTML = `<div class="dsb-h">💬 Chat ${streamChatName()} : écrivez <b>${streamIsTiktok() ? 'le nom du perso' : '!nom du perso'}</b></div>`
                 + (mine ? (top.length ? top.map(([u, e], i) => `<div class="dsb-row${e.last ? ' new' : ''}"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(e.name)}</span><b>${e.pts} pt${e.pts > 1 ? 's' : ''}</b></div>`).join('') : "<div class='tl-hint'>Personne n'a encore trouvé.</div>")
                     + `<div class="sv-tools" style="margin-top:6px;"><button onclick="drawBoardReset()">🔄 Remettre à 0</button></div>` : "<div class='tl-hint'>Le classement du chat est sur l'écran du streamer.</div>");
         }
@@ -11371,7 +11410,7 @@
             });
             // encart d'aide streamer
             const info = document.createElement('div'); info.className = 'mc-stream-info'; info.dataset.cat = 'stream-only';
-            info.innerHTML = `<h3>🎥 Jouer avec ton chat Twitch</h3><ol><li>Va dans <b>Options → Mode streamer</b> et tape le nom de ta chaîne.</li><li>Lance un des jeux ci-dessous : tes viewers répondent avec <b>!1 !2 !3 !4</b> dans le chat.</li><li>Clique sur <b>📺 Écran live</b> dans le widget pour une interface propre dans OBS.</li></ol><button class="btn-action" onclick="switchTab('options');setTimeout(()=>document.getElementById('stream-channel')?.scrollIntoView({behavior:'smooth',block:'center'}),150)">⚙️ Configurer le mode streamer</button>`;
+            info.innerHTML = `<h3>🎥 Jouer avec ton chat Twitch ou TikTok</h3><ol><li>Va dans <b>Options → Mode streamer</b>, choisis Twitch ou TikTok Live et tape ton pseudo.</li><li>Lance un des jeux ci-dessous : tes viewers répondent avec <b>1 2 3 4</b> dans le chat.</li><li>Clique sur <b>📺 Écran live</b> dans le widget pour une interface propre dans OBS.</li></ol><button class="btn-action" onclick="switchTab('options');setTimeout(()=>document.getElementById('stream-channel')?.scrollIntoView({behavior:'smooth',block:'center'}),150)">⚙️ Configurer le mode streamer</button>`;
             grid.insertBefore(info, grid.firstChild);
             const bar = document.createElement('div'); bar.className = 'mode-cats'; bar.id = 'mode-cats';
             grid.parentNode.insertBefore(bar, grid);

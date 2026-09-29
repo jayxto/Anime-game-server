@@ -15580,7 +15580,7 @@ app.post('/api/admin/bots', adminOnly(async (req, res) => {
 }));
 
 /* =====================================================================
-   DESSINE LE PERSO : MODE STREAM — le streamer dessine, le chat Twitch
+   DESSINE LE PERSO : MODE STREAM — le streamer dessine, le chat Twitch/TikTok
    devine avec « !nom du perso ». Le 1er viewer qui trouve gagne 1 point.
    ===================================================================== */
 const DRAW_STREAM_TURNS = 5; // dessins par « tour » choisi dans le salon
@@ -15639,7 +15639,7 @@ io.on('connection', socket => {
     });
     // proposition d'un viewer, relayée par le navigateur du streamer (connecté au chat Twitch)
     const guessRate = {};
-    socket.on('draw_stream_guess', ({ roomCode, user, name, text } = {}) => {
+    socket.on('draw_stream_guess', ({ roomCode, user, name, text, platform } = {}) => {
         const room = rooms[roomCode];
         const d = room && room.draw;
         if (!d || !d.stream || d.phase !== 'drawing' || !d.word || room.host !== socket.id) return;
@@ -15648,13 +15648,13 @@ io.on('connection', socket => {
         Object.keys(guessRate).forEach(k => { if (+k < sec - 2) delete guessRate[k]; });
         if (guessRate[sec] > 40) return;
         const guess = String(text || '').trim().slice(0, 60);
-        const login = String(user || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 25);
+        const login = String(user || '').toLowerCase().replace(/[^a-z0-9_.]/g, '').slice(0, 30);
         const shown = String(name || login).trim().slice(0, 25) || login;
         if (!guess || !login) return;
         if (!arcNameMatches(d.word.u, d.word, guess)) return;
         d.streamFinder = shown;
         d.viewers[login] = (d.viewers[login] || 0) + 1;
-        io.to(roomCode).emit('draw_chat', { system: true, ok: true, text: `🎉 ${shown} (chat Twitch) a trouvé : ${d.word.display} ! +1 point` });
+        io.to(roomCode).emit('draw_chat', { system: true, ok: true, text: `🎉 ${shown} (chat ${platform === 'tiktok' ? 'TikTok' : 'Twitch'}) a trouvé : ${d.word.display} ! +1 point` });
         io.to(roomCode).emit('draw_stream_found', { user: login, name: shown, word: d.word.display });
         drawReveal(room, roomCode);
     });
@@ -19697,4 +19697,81 @@ app.get('/api/music/openings', (req, res) => {
         .filter(t => t.ytId && !t.src && !BT_BAD_IDS.has(t.ytId) && !seen.has(t.ytId) && seen.add(t.ytId))
         .map(t => ({ title: `${t.title} — ${t.anime}`, yt: t.ytId }));
     res.json({ ok: true, tracks });
+});
+
+/* =====================================================================
+   MODE STREAMER TIKTOK : TikTok n'a pas de chat lisible depuis le navigateur
+   (comme l'IRC de Twitch), donc le serveur se connecte au live et relaie
+   chaque message au navigateur du streamer, qui l'utilise comme un message
+   du chat Twitch (votes !1 !2 !3 !4, Dessine le perso…).
+   ===================================================================== */
+let TT_LIB = null;
+const ttLib = async () => (TT_LIB = TT_LIB || await import('tiktok-live-connector'));
+const TT_CONNS = new Map(); // socket.id -> { user, conn, stopped, tries, retryT }
+const TT_MAX = 40;
+function ttStop(sid) {
+    const st = TT_CONNS.get(sid);
+    if (!st) return;
+    st.stopped = true;
+    clearTimeout(st.retryT);
+    try { if (st.conn) st.conn.disconnect().catch(() => {}); } catch (_) {}
+    TT_CONNS.delete(sid);
+}
+io.on('connection', socket => {
+    socket.on('tiktok_connect', ({ username } = {}) => {
+        const user = String(username || '').trim().replace(/^@/, '').toLowerCase().replace(/[^a-z0-9_.]/g, '').slice(0, 24);
+        ttStop(socket.id);
+        if (!user) return socket.emit('tiktok_status', { ok: false, text: '❌ Pseudo TikTok invalide.' });
+        if (TT_CONNS.size >= TT_MAX) return socket.emit('tiktok_status', { ok: false, text: '❌ Trop de lives connectés en ce moment, réessaie dans quelques minutes.' });
+        const st = { user, conn: null, stopped: false, tries: 0, retryT: null };
+        TT_CONNS.set(socket.id, st);
+        const retry = msg => {
+            if (st.stopped) return;
+            st.tries++;
+            const wait = Math.min(60000, 5000 * Math.pow(2, Math.min(st.tries - 1, 4)));
+            socket.emit('tiktok_status', { ok: false, text: `${msg}, nouvel essai dans ${Math.round(wait / 1000)} s…` });
+            clearTimeout(st.retryT);
+            st.retryT = setTimeout(open, wait);
+        };
+        let rate = { sec: 0, n: 0 };
+        async function open() {
+            if (st.stopped) return;
+            let lib;
+            try { lib = await ttLib(); } catch (e) {
+                console.warn('[tiktok] librairie absente :', e.message);
+                socket.emit('tiktok_status', { ok: false, text: '❌ Le mode TikTok n’est pas disponible sur ce serveur pour le moment.' });
+                return ttStop(socket.id);
+            }
+            const { TikTokLiveConnection, WebcastEvent, ControlEvent } = lib;
+            const conn = new TikTokLiveConnection(user, { processInitialData: false, ...(process.env.TIKTOK_SIGN_KEY ? { signApiKey: process.env.TIKTOK_SIGN_KEY } : {}) });
+            st.conn = conn;
+            socket.emit('tiktok_status', { ok: null, text: `Connexion au live de @${user}…` });
+            conn.on(WebcastEvent.CHAT, d => {
+                if (st.stopped || st.conn !== conn) return;
+                const sec = Math.floor(Date.now() / 1000);
+                if (rate.sec !== sec) rate = { sec, n: 0 };
+                if (++rate.n > 60) return; // chat très rapide : on garde 60 messages / seconde
+                const u = d.user || {};
+                const text = String(d.content || '').trim().slice(0, 200);
+                const login = String(u.displayId || u.uniqueId || u.idStr || '').toLowerCase().slice(0, 30);
+                if (!text || !login) return;
+                socket.emit('tiktok_chat', { user: login, name: String(u.nickname || login).slice(0, 30), text });
+            });
+            conn.on(WebcastEvent.STREAM_END, () => { if (!st.stopped && st.conn === conn) retry('📴 Le live est terminé'); });
+            conn.on(ControlEvent.DISCONNECTED, () => { if (!st.stopped && st.conn === conn) retry('⚠️ Live coupé'); });
+            try {
+                await conn.connect();
+                if (st.stopped) { conn.disconnect().catch(() => {}); return; }
+                st.tries = 0;
+                socket.emit('tiktok_status', { ok: true, text: `✅ Connecté au live de @${user} — les viewers votent en écrivant 1, 2, 3 ou 4` });
+            } catch (e) {
+                if (st.stopped || st.conn !== conn) return;
+                const offline = (e && e.constructor && e.constructor.name === 'UserOfflineError') || /offline|not live|isn.t online/i.test(String(e && e.message));
+                retry(offline ? `⏳ @${user} n’est pas en live` : '❌ Impossible de joindre le live TikTok');
+            }
+        }
+        open();
+    });
+    socket.on('tiktok_disconnect', () => ttStop(socket.id));
+    socket.on('disconnect', () => ttStop(socket.id));
 });
