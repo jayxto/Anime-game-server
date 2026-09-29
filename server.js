@@ -370,7 +370,20 @@ async function fetchFandomPageImageBySearch(host, name) {
     return pages.length ? pageImageFromApiPage(pages[0]) : null;
 }
 
+// Image vérifiée de chaque perso (char-images.json) : prioritaire, jamais de perso sans image
+// même si Fandom ne répond pas ou si une ancienne recherche ratée est restée en cache.
+const STATIC_CHAR_IMAGES = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'char-images.json'), 'utf8')); }
+    catch (e) { console.warn('[Images] char-images.json introuvable :', e.message); return {}; }
+})();
+function staticCharImage(universeKey, name) {
+    const m = STATIC_CHAR_IMAGES[universeKey];
+    return m && name ? m[normalizeImageKey(cleanImageCharacterName(name))] || null : null;
+}
+
 async function resolveCharacterImage(universeKey, displayName) {
+    const fixed = staticCharImage(universeKey, displayName);
+    if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
     const host = FANDOM_WIKIS[universeKey];
     if (!host || !displayName) {
         return { imageUrl:null, sourceUrl:null, status:'unsupported' };
@@ -12512,6 +12525,8 @@ async function arcAniImage(u, name) {
 }
 const resolveCharacterImageFandom = resolveCharacterImage;
 resolveCharacterImage = async function (universeKey, displayName) {
+    const fixed = staticCharImage(universeKey, displayName); // image vérifiée : instantané
+    if (fixed) return { imageUrl: fixed, sourceUrl: null, status: 'ok' };
     if (universeKey && universeKey !== 'pokemon' && displayName) {
         try {
             const url = await arcAniImage(universeKey, cleanImageCharacterName(displayName));
@@ -14580,7 +14595,7 @@ app.get('/api/quests', async (req, res) => {
 });
 
 /* ---------- API : avatar ---------- */
-function avatarFind(u, name) { return ARC_UNIVERSE_ANIME[u] ? arcFamous(u).find(c => c.display === name) || null : null; }
+function avatarFind(u, name) { return ARC_UNIVERSE_ANIME[u] ? (typeof cardPool === 'function' ? cardPool(u) : arcFamous(u)).find(c => c.display === name) || null : null; }
 app.get('/api/avatar/search', (req, res) => {
     const q = normTxt(req.query.q || '');
     const out = [];
