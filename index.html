@@ -10228,11 +10228,15 @@
             t.textContent = `⏱️ ${Math.max(0, Math.ceil((q.endsAt - now) / 1000))} s`;
         }, 500);
         // règles et rôles expliqués dans le salon d'attente
+        function lgRulesHide() { const b = document.getElementById('lg-rules-box'); if (b) b.style.display = 'none'; }
+        (function () { const o = goToMenuSelection; goToMenuSelection = function () { lgRulesHide(); lgc.roomMode = null; return o.apply(this, arguments); }; })();
         socket.on('update_room', async room => {
-            if (!room || room.status !== 'waiting' || room.code !== currentRoomCode) return;
+            // les règles du Loup-garou ne s'affichent QUE dans un salon Loup-garou en attente ; sinon on les cache toujours
+            lgc.roomMode = room && room.mode;
+            if (!room || room.mode !== 'loupgarou' || room.status !== 'waiting' || (currentRoomCode && room.code !== currentRoomCode)) return lgRulesHide();
             let box = document.getElementById('lg-rules-box');
-            if (room.mode !== 'loupgarou') { if (box) box.style.display = 'none'; return; }
             if (!lgc.roles) { const d = await v7get('/api/lg/roles'); if (d && d.ok) lgc.roles = d; else return; }
+            if (lgc.roomMode !== 'loupgarou') return lgRulesHide(); // le salon a changé pendant le chargement
             const R = lgc.roles;
             if (!box) { box = document.createElement('div'); box.id = 'lg-rules-box'; box.className = 'lg-rules'; const list = document.getElementById('waiting-players-list'); (list ? list.parentNode : document.getElementById('waiting-room')).appendChild(box); }
             box.style.display = '';
