@@ -776,6 +776,12 @@
         .tcard .tc-name{font-weight:800;font-size:.72rem;margin-top:4px;line-height:1.15;}
         .tcard .tc-rar{font-size:.62rem;color:var(--text-muted);}
         .tcard.r-rare{border-color:#3fa7ff;} .tcard.r-epique{border-color:#b44dff;box-shadow:0 0 8px rgba(180,77,255,.4);} .tcard.r-legendaire{border-color:#ffb300;box-shadow:0 0 12px rgba(255,179,0,.5);}
+        .tcard.r-mythique{border-color:#ff3c7a;box-shadow:0 0 14px rgba(255,60,122,.6),0 0 26px rgba(255,120,40,.35);}
+        .tcard.r-mythique .tc-rar{background:linear-gradient(90deg,#ff3c7a,#ff9a2a);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        .tcard.r-secrete{border:2px solid transparent;background:linear-gradient(#15151f,#15151f) padding-box,linear-gradient(135deg,#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff,#ff2a5f) border-box;background-size:auto,300% 300%;animation:secretGlow 4s linear infinite;box-shadow:0 0 18px rgba(255,255,255,.35);}
+        .tcard.r-secrete .tc-rar{background:linear-gradient(90deg,#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        @keyframes secretGlow{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+        @media (prefers-reduced-motion:reduce){.tcard.r-secrete{animation:none;}}
         .tcard.empty{opacity:.45;border-style:dashed;}
         .tcard.shiny::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.55) 35%,rgba(255,0,200,.25) 45%,rgba(0,255,255,.25) 55%,transparent 70%);background-size:250% 100%;animation:tcShine 2.4s linear infinite;pointer-events:none;mix-blend-mode:screen;}
         @keyframes tcShine{from{background-position:120% 0}to{background-position:-120% 0}}
@@ -941,7 +947,7 @@
         /* fusion */
         .fuse-grid{display:flex;flex-direction:column;gap:8px;}
         .fuse-row{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;font-size:.85rem;}
-        .fuse-row.r-rare{border-color:#2f6fd6;} .fuse-row.r-epique{border-color:#8a3fd1;} .fuse-row.r-legendaire{border-color:#d4a017;}
+        .fuse-row.r-rare{border-color:#2f6fd6;} .fuse-row.r-epique{border-color:#8a3fd1;} .fuse-row.r-legendaire{border-color:#d4a017;} .fuse-row.r-mythique{border-color:#ff3c7a;} .fuse-row.r-secrete{border-color:#00f0ff;}
         .fuse-arrow{font-family:'Bangers',cursive;color:var(--accent-cyan);font-size:1.1rem;}
         .fuse-row button{background:linear-gradient(90deg,#b77bff,#48dbfb);color:#111;border:none;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer;} .fuse-row button:disabled{opacity:.35;cursor:default;}
         .fuse-res{margin:10px 0;}
@@ -8554,7 +8560,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-04-sfx';
+        const CLIENT_BUILD = '2026-10-05-cartes';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -8642,7 +8648,7 @@
            PIÈCES, BOUTIQUE, CARTES, TITRES, EMOTES, EFFETS, DÉFIS, RÉCAP
            ===================================================================== */
         const eco = { coins: 0, items: [], owned: [], sel: {}, cos: {}, tab: 'shop', albumU: null };
-        const RAR_LABEL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire' };
+        const RAR_LABEL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique 🔥', secrete: 'Secrète 🌈' };
         function ecoCoinsUi() {
             const b = document.getElementById('coin-badge');
             if (b) { b.style.display = isAccount() ? '' : 'none'; b.querySelector('b').textContent = eco.coins; }
@@ -8734,7 +8740,7 @@
                 <p class="tl-hint">${cards.filter(c => c.isNew).length} nouvelle(s) carte(s)${cards.some(c => c.coins) ? ` • doublons : +${cards.reduce((a, c) => a + (c.coins || 0), 0)} 🪙` : ''}</p></div>`;
             m.addEventListener('click', e => { if (e.target === m) m.remove(); });
             document.body.appendChild(m);
-            if (cards.some(c => c.shiny || c.rarity === 'legendaire')) confetti(1500);
+            if (cards.some(c => c.shiny || ['legendaire', 'mythique', 'secrete'].includes(c.rarity))) confetti(cards.some(c => c.rarity === 'secrete') ? 3500 : 1500);
         }
         let cardQueue = [], cardTimer = null;
         socket.on('card_gain', c => {
@@ -9451,7 +9457,7 @@
             const box = document.getElementById('eco-fuse');
             const d = await v7get('/api/cards/fuse');
             if (!d || !d.ok) return;
-            const R = [['commune', 'rare', 'Commune', 'Rare'], ['rare', 'epique', 'Rare', 'Épique'], ['epique', 'legendaire', 'Épique', 'Légendaire'], ['legendaire', 'legendaire', 'Légendaire', 'Légendaire brillante ✨']];
+            const R = [['commune', 'rare', 'Commune', 'Rare'], ['rare', 'epique', 'Rare', 'Épique'], ['epique', 'legendaire', 'Épique', 'Légendaire'], ['legendaire', 'mythique', 'Légendaire', 'Mythique 🔥'], ['mythique', 'secrete', 'Mythique', 'Secrète 🌈'], ['secrete', 'secrete', 'Secrète', 'Secrète brillante ✨']];
             box.innerHTML = `<div class="shop-head">⚗️ Fusion de cartes <span class="tl-hint">• 5 doublons de la même rareté = 1 carte de la rareté au-dessus (tu gardes toujours un exemplaire de chaque carte)</span></div>
                 ${result ? `<div class="fuse-res"><div class="card-grid booster" style="justify-content:center;"><div class="flip">${cardHtml(result, true)}</div></div></div>` : ''}
                 <div class="fuse-grid">${R.map(([r, to, a, b]) => `<div class="fuse-row r-${r}"><div class="fuse-from"><b>${d.spares[r]}</b> doublon${d.spares[r] > 1 ? 's' : ''} ${a}</div><div class="fuse-arrow">5 ➜ 1</div><div class="fuse-to">${b}</div><button ${d.spares[r] >= 5 ? '' : 'disabled'} onclick="fuseGo('${r}')">⚗️ Fusionner</button></div>`).join('')}</div>`;
@@ -9459,7 +9465,7 @@
         async function fuseGo(r) {
             const d = await v7post('/api/cards/fuse', { rarity: r });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            if (d.card && (d.card.shiny || d.card.rarity === 'legendaire')) confetti(1600);
+            if (d.card && (d.card.shiny || ['legendaire', 'mythique', 'secrete'].includes(d.card.rarity))) confetti(1600);
             loadFuse(d.card);
         }
 
@@ -10128,7 +10134,7 @@
             const el = document.getElementById('eco-deck'); if (!el) return;
             const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${(dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
             const q = dk.q.toLowerCase();
-            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
             el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, brillante +2 % • bonus doublé si la partie est sur l’anime de la carte • max +40 %</span></div>
                 <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
                 <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans ta collection" value="${h2esc(dk.q)}" oninput="dk.q=this.value;deckList()"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
@@ -10138,7 +10144,7 @@
         function deckList() {
             const box = document.getElementById('dk-list'); if (!box) return;
             const q = dk.q.toLowerCase();
-            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
+            const list = dk.cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).sort((a, b) => ['secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(a.rarity) - ['secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'].indexOf(b.rarity)).slice(0, 80);
             box.innerHTML = list.map(c => `<button class="trd-mini r-${c.rarity}${dk.keys.includes(c.key) ? ' on' : ''}" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})"><img src="${h2esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${h2esc(c.name)}</b><small>${h2esc(c.anime)}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte : joue pour en gagner !</p>';
         }
         function deckToggle(k) {
@@ -10552,7 +10558,7 @@
             };
         })();
         socket.on('market_sold', d => { toast(`🏪 <b>${v7esc(d.buyer)}</b> a acheté ta carte ${v7esc(d.name)} : +${d.gain} 🪙`, '#ffd700'); if (typeof ecoLoad === 'function') ecoLoad(); });
-        const MK_RAR = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire' };
+        const MK_RAR = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique', secrete: 'Secrète' };
         function mkCard(c) { return cardHtml({ name: c.name, rarity: c.rarity, shiny: c.shiny, img: c.img, n: 1 }); }
         async function loadMarket() {
             const el = document.getElementById('eco-market'); if (!el) return;
@@ -10594,7 +10600,7 @@
         function mkFilter(q) {
             const box = document.getElementById('mk-pick'); if (!box) return;
             const s = String(q || '').toLowerCase();
-            const order = ['legendaire', 'epique', 'rare', 'commune'];
+            const order = ['secrete', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
             box.innerHTML = mk.cards.filter(c => !s || (c.name + ' ' + c.anime).toLowerCase().includes(s)).sort((a, b) => order.indexOf(a.rarity) - order.indexOf(b.rarity)).slice(0, 90)
                 .map(c => `<button class="trd-mini r-${c.rarity}" onclick="mk.sell=${JSON.stringify(c.key).replace(/"/g, '&quot;')};loadMarket()"><img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${v7esc(c.name)}</b><small>${v7esc(c.anime)} • x${c.n}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
@@ -10621,7 +10627,7 @@
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3 };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5 };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300'];
             function circleSvg(col) {
                 const runes = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
