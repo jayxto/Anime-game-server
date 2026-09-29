@@ -17029,23 +17029,70 @@ async function clanBoard(wk = weekKey()) {
     return out.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name, 'fr'));
 }
 const CLAN_EMBLEMS = ['🐉', '🦊', '🐺', '🦅', '🔥', '⚡', '🌙', '☀️', '💀', '👑', '🗡️', '🛡️', '🌸', '🍥', '🏴‍☠️', '👁️', '🌀', '❄️', '🎴', '🐍'];
+/* ---- Rôles (comme Clash Royale) : chef > chef adjoint > aîné > membre ; types : ouvert / sur invitation / fermé ---- */
+const CLAN_ROLES = ['member', 'elder', 'coleader', 'leader'];
+const CLAN_ROLE_NAME = { member: 'Membre', elder: 'Aîné', coleader: 'Chef adjoint', leader: 'Chef' };
+const CLAN_TYPES = ['open', 'invite', 'closed'];
+function clanRole(c, uid) { return uid === c.owner ? 'leader' : ((c.roles || {})[uid] || 'member'); }
+function clanRank(c, uid) { return CLAN_ROLES.indexOf(clanRole(c, uid)); }
+function clanType(c) { return CLAN_TYPES.includes(c.type) ? c.type : c.open === false ? 'closed' : 'open'; }
+async function clanOfUser(uid) { const cid = await kvGet('clanof', uid, null); return cid ? await kvGet('clan', cid, null) : null; }
+async function userLevel(uid) { return levelFromXp(await userXp(uid)).level; }
+async function uidByPseudo(pseudo) {
+    const p = String(pseudo || '').trim().toLowerCase(); if (!p) return null;
+    if (HAS_DB) { try { const r = (await pool.query('SELECT id FROM users WHERE lower(pseudo)=$1', [p])).rows[0]; if (r) return r.id; } catch (_) {} }
+    for (const s of io.sockets.sockets.values()) if (s.user && !s.user.isGuest && String(s.user.pseudo || '').toLowerCase() === p) return s.user.id;
+    return null;
+}
+function clanNotify(c, text, minRank = 0, except = null) { c.members.filter(m => m !== except && clanRank(c, m) >= minRank).forEach(m => emitUser(m, 'clan_event', { text })); }
+async function clanAddMember(c, uid) {
+    c.members.push(uid); c.names[uid] = await pseudoOf(uid);
+    c.roles = c.roles || {}; c.roles[uid] = 'member';
+    c.requests = (c.requests || []).filter(r => r.uid !== uid);
+    await kvSet('clan', c.id, c);
+    await kvSet('clanof', uid, c.id);
+    await kvSet('claninv', uid, []);
+    CLAN_TAG.set(uid, { tag: c.tag, color: c.color });
+    await clanRefreshCos(uid);
+    clanNotify(c, `🛡️ ${c.names[uid]} a rejoint ton clan !`, 0, uid);
+}
+async function clanMembersView(c, wk = weekKey()) {
+    const w = await kvGet('clanpts', wk + '|' + c.id, { pts: 0, by: {} });
+    const out = [];
+    for (const m of c.members) out.push({ id: m, name: c.names[m] || await pseudoOf(m), pts: w.by[m] || 0, role: clanRole(c, m) });
+    out.sort((a, b) => CLAN_ROLES.indexOf(b.role) - CLAN_ROLES.indexOf(a.role) || b.pts - a.pts);
+    return { members: out, pts: w.pts };
+}
+const clanPublic = c => ({ id: c.id, name: c.name, tag: c.tag, emblem: c.emblem, color: c.color, bio: c.bio || '', type: clanType(c), minLevel: c.minLevel || 0, count: c.members.length });
 app.get('/api/clans', async (req, res) => {
     const uid = authUserId(req);
     const board = await clanBoard();
-    let mine = null;
+    const clansById = Object.fromEntries((await kvList('clan')).map(x => [x.v.id, x.v]));
+    board.forEach(b => { const c = clansById[b.id]; if (c) Object.assign(b, { type: clanType(c), minLevel: c.minLevel || 0, bio: c.bio || '' }); });
+    let mine = null, invites = [], pending = null, level = 0;
     if (uid) {
-        const cid = await kvGet('clanof', uid, null);
-        const c = cid ? await kvGet('clan', cid, null) : null;
+        level = await userLevel(uid);
+        const c = await clanOfUser(uid);
         if (c) {
-            const w = await kvGet('clanpts', weekKey() + '|' + c.id, { pts: 0, by: {} });
-            const members = [];
-            for (const m of c.members) members.push({ id: m, name: c.names[m] || await pseudoOf(m), pts: w.by[m] || 0, owner: m === c.owner, me: m === uid });
-            members.sort((a, b) => b.pts - a.pts);
-            mine = { ...c, members, pts: w.pts, rank: board.findIndex(x => x.id === c.id) + 1, isOwner: c.owner === uid };
+            const v = await clanMembersView(c);
+            const myRole = clanRole(c, uid);
+            mine = { ...clanPublic(c), members: v.members.map(m => ({ ...m, me: m.id === uid })), pts: v.pts, rank: board.findIndex(x => x.id === c.id) + 1, myRole, isOwner: myRole === 'leader',
+                requests: clanRank(c, uid) >= 1 ? (c.requests || []) : [] };
+        } else {
+            for (const inv of (await kvGet('claninv', uid, [])) || []) { const ic = clansById[inv.cid]; if (ic) invites.push({ ...clanPublic(ic), from: inv.from, at: inv.at }); }
+            const pc = Object.values(clansById).find(x => (x.requests || []).some(r => r.uid === uid));
+            if (pc) pending = { id: pc.id, name: pc.name };
         }
     }
     const lastWeek = weekKey(hubNow() - 7 * 86400000);
-    res.json({ ok: true, mine, board: board.slice(0, 30), emblems: CLAN_EMBLEMS, price: CLAN_PRICE, max: CLAN_MAX, week: weekKey(), rewards: [300, 200, 100], lastWinners: (await kvGet('clanrew', lastWeek, null)) || null });
+    res.json({ ok: true, mine, invites, pending, level, board: board.slice(0, 30), emblems: CLAN_EMBLEMS, price: CLAN_PRICE, max: CLAN_MAX, week: weekKey(), rewards: [300, 200, 100],
+        roles: CLAN_ROLE_NAME, lastWinners: (await kvGet('clanrew', lastWeek, null)) || null });
+});
+app.get('/api/clans/view', async (req, res) => {
+    const c = await kvGet('clan', String(req.query.id || ''), null);
+    if (!c) return res.json({ ok: false, error: 'Clan introuvable.' });
+    const v = await clanMembersView(c);
+    res.json({ ok: true, clan: { ...clanPublic(c), members: v.members, pts: v.pts }, roles: CLAN_ROLE_NAME, max: CLAN_MAX });
 });
 app.post('/api/clans/create', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -17054,6 +17101,9 @@ app.post('/api/clans/create', async (req, res) => {
     const tag = String(b.tag || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
     const emblem = CLAN_EMBLEMS.includes(b.emblem) ? b.emblem : '🐉';
     const color = /^#[0-9a-f]{6}$/i.test(b.color || '') ? b.color : '#ffd700';
+    const type = CLAN_TYPES.includes(b.type) ? b.type : 'open';
+    const bio = String(b.bio || '').trim().slice(0, 200);
+    const minLevel = Math.max(0, Math.min(100, Math.floor(+b.minLevel || 0)));
     if (name.length < 3) return res.json({ ok: false, error: 'Nom trop court (3 caractères min).' });
     if (tag.length < 2) return res.json({ ok: false, error: 'Tag de 2 à 4 lettres/chiffres.' });
     if (await kvGet('clanof', uid, null)) return res.json({ ok: false, error: 'Quitte d’abord ton clan actuel.' });
@@ -17064,65 +17114,158 @@ app.post('/api/clans/create', async (req, res) => {
     if (e.coins < CLAN_PRICE) return res.json({ ok: false, error: `Créer un clan coûte ${CLAN_PRICE} pièces.` });
     if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, CLAN_PRICE])).rows[0]; if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' }); }
     else e.coins -= CLAN_PRICE;
-    const c = { id: 'c' + Date.now().toString(36), name, tag, emblem, color, owner: uid, members: [uid], names: { [uid]: await pseudoOf(uid) }, open: true, created: hubNow() };
+    // on retire d'éventuelles demandes en attente ailleurs
+    for (const { v: oc } of await kvList('clan')) if ((oc.requests || []).some(r => r.uid === uid)) { oc.requests = oc.requests.filter(r => r.uid !== uid); await kvSet('clan', oc.id, oc); }
+    const c = { id: 'c' + Date.now().toString(36), name, tag, emblem, color, owner: uid, members: [uid], names: { [uid]: await pseudoOf(uid) }, roles: {}, requests: [], type, bio, minLevel, open: type === 'open', created: hubNow() };
     await kvSet('clan', c.id, c);
     await kvSet('clanof', uid, c.id);
+    await kvSet('claninv', uid, []);
     CLAN_TAG.set(uid, { tag, color });
     await clanRefreshCos(uid);
     res.json({ ok: true });
 });
+// Rejoindre (ouvert) ou envoyer une demande (sur invitation)
 app.post('/api/clans/join', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const c = await kvGet('clan', String((req.body || {}).id || ''), null);
     if (!c) return res.json({ ok: false, error: 'Clan introuvable.' });
     if (await kvGet('clanof', uid, null)) return res.json({ ok: false, error: 'Quitte d’abord ton clan actuel.' });
     if (c.members.length >= CLAN_MAX) return res.json({ ok: false, error: 'Ce clan est complet.' });
-    if (c.open === false) return res.json({ ok: false, error: 'Ce clan est fermé.' });
-    c.members.push(uid); c.names[uid] = await pseudoOf(uid);
+    const invited = ((await kvGet('claninv', uid, [])) || []).some(i => i.cid === c.id);
+    if (!invited && (c.minLevel || 0) > await userLevel(uid)) return res.json({ ok: false, error: `Il faut être niveau ${c.minLevel} pour rejoindre ce clan.` });
+    const type = clanType(c);
+    if (invited || type === 'open') { await clanAddMember(c, uid); return res.json({ ok: true, joined: true }); }
+    if (type === 'closed') return res.json({ ok: false, error: 'Ce clan est fermé : il faut être invité par un chef ou un aîné.' });
+    c.requests = c.requests || [];
+    for (const { v: oc } of await kvList('clan')) if (oc.id !== c.id && (oc.requests || []).some(r => r.uid === uid)) { oc.requests = oc.requests.filter(r => r.uid !== uid); await kvSet('clan', oc.id, oc); }
+    if (c.requests.some(r => r.uid === uid)) return res.json({ ok: false, error: 'Ta demande est déjà envoyée.' });
+    if (c.requests.length >= 50) return res.json({ ok: false, error: 'Trop de demandes en attente pour ce clan.' });
+    c.requests.push({ uid, name: await pseudoOf(uid), level: await userLevel(uid), msg: String((req.body || {}).msg || '').trim().slice(0, 100), at: hubNow() });
     await kvSet('clan', c.id, c);
-    await kvSet('clanof', uid, c.id);
-    CLAN_TAG.set(uid, { tag: c.tag, color: c.color });
-    await clanRefreshCos(uid);
-    c.members.filter(m => m !== uid).forEach(m => emitUser(m, 'clan_event', { text: `🛡️ ${c.names[uid]} a rejoint ton clan !` }));
+    clanNotify(c, `✉️ ${c.requests[c.requests.length - 1].name} demande à rejoindre ton clan`, 1);
+    res.json({ ok: true, requested: true });
+});
+app.post('/api/clans/cancel-request', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    for (const { v: oc } of await kvList('clan')) if ((oc.requests || []).some(r => r.uid === uid)) { oc.requests = oc.requests.filter(r => r.uid !== uid); await kvSet('clan', oc.id, oc); }
+    res.json({ ok: true });
+});
+// Aîné et plus : accepter / refuser une demande
+app.post('/api/clans/requests/respond', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const c = await clanOfUser(uid);
+    const target = +(req.body || {}).uid, accept = !!(req.body || {}).accept;
+    if (!c || clanRank(c, uid) < 1) return res.json({ ok: false, error: 'Réservé aux aînés, chefs adjoints et au chef.' });
+    const r = (c.requests || []).find(x => x.uid === target);
+    if (!r) return res.json({ ok: false, error: 'Demande introuvable.' });
+    c.requests = c.requests.filter(x => x.uid !== target);
+    if (!accept) { await kvSet('clan', c.id, c); emitUser(target, 'clan_event', { text: `❌ Ta demande pour le clan ${c.name} a été refusée.` }); return res.json({ ok: true }); }
+    if (await kvGet('clanof', target, null)) { await kvSet('clan', c.id, c); return res.json({ ok: false, error: 'Ce joueur est déjà dans un clan.' }); }
+    if (c.members.length >= CLAN_MAX) return res.json({ ok: false, error: 'Le clan est complet.' });
+    await clanAddMember(c, target);
+    emitUser(target, 'clan_event', { text: `🛡️ Ta demande est acceptée : bienvenue dans ${c.name} !` });
+    res.json({ ok: true });
+});
+// Aîné et plus : inviter un joueur par son pseudo
+app.post('/api/clans/invite', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const c = await clanOfUser(uid);
+    if (!c || clanRank(c, uid) < 1) return res.json({ ok: false, error: 'Réservé aux aînés, chefs adjoints et au chef.' });
+    const target = await uidByPseudo((req.body || {}).pseudo);
+    if (!target) return res.json({ ok: false, error: 'Joueur introuvable (vérifie le pseudo).' });
+    if (c.members.includes(target)) return res.json({ ok: false, error: 'Il est déjà dans ton clan.' });
+    if (await kvGet('clanof', target, null)) return res.json({ ok: false, error: 'Ce joueur est déjà dans un clan.' });
+    const inv = ((await kvGet('claninv', target, [])) || []).filter(i => i.cid !== c.id).slice(-9);
+    inv.push({ cid: c.id, from: c.names[uid] || await pseudoOf(uid), at: hubNow() });
+    await kvSet('claninv', target, inv);
+    emitUser(target, 'clan_event', { text: `✉️ ${inv[inv.length - 1].from} t’invite dans le clan ${c.name} [${c.tag}] ! Va dans Collection > Clan.` });
+    res.json({ ok: true, name: await pseudoOf(target) });
+});
+app.post('/api/clans/invites/respond', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const cid = String((req.body || {}).id || ''), accept = !!(req.body || {}).accept;
+    const inv = (await kvGet('claninv', uid, [])) || [];
+    if (!inv.some(i => i.cid === cid)) return res.json({ ok: false, error: 'Invitation introuvable.' });
+    if (!accept) { await kvSet('claninv', uid, inv.filter(i => i.cid !== cid)); return res.json({ ok: true }); }
+    const c = await kvGet('clan', cid, null);
+    if (!c) { await kvSet('claninv', uid, inv.filter(i => i.cid !== cid)); return res.json({ ok: false, error: 'Ce clan n’existe plus.' }); }
+    if (await kvGet('clanof', uid, null)) return res.json({ ok: false, error: 'Quitte d’abord ton clan actuel.' });
+    if (c.members.length >= CLAN_MAX) return res.json({ ok: false, error: 'Ce clan est complet.' });
+    await clanAddMember(c, uid);
+    res.json({ ok: true });
+});
+// Promouvoir / rétrograder
+app.post('/api/clans/role', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const c = await clanOfUser(uid);
+    const target = +(req.body || {}).id, action = (req.body || {}).action;
+    if (!c || !c.members.includes(target) || target === uid) return res.json({ ok: false, error: 'Action impossible.' });
+    const me = clanRank(c, uid), cur = clanRank(c, target);
+    c.roles = c.roles || {};
+    if (action === 'promote') {
+        const next = cur + 1;
+        if (next === 3) { // chef adjoint -> chef : le chef passe son titre
+            if (me !== 3) return res.json({ ok: false, error: 'Seul le chef peut passer son titre.' });
+            c.owner = target; delete c.roles[target]; c.roles[uid] = 'coleader';
+            await kvSet('clan', c.id, c);
+            clanNotify(c, `👑 ${c.names[target]} est le nouveau chef du clan !`);
+            return res.json({ ok: true });
+        }
+        if (me < 2 || next >= me) return res.json({ ok: false, error: me === 2 ? 'Un chef adjoint peut seulement nommer des aînés.' : 'Tu n’as pas le droit de promouvoir.' });
+        c.roles[target] = CLAN_ROLES[next];
+    } else if (action === 'demote') {
+        if (cur <= 0 || me < 2 || cur >= me) return res.json({ ok: false, error: 'Tu n’as pas le droit de rétrograder ce joueur.' });
+        c.roles[target] = CLAN_ROLES[cur - 1];
+    } else return res.json({ ok: false });
+    await kvSet('clan', c.id, c);
+    emitUser(target, 'clan_event', { text: `🛡️ Tu es maintenant ${CLAN_ROLE_NAME[c.roles[target]]} du clan ${c.name}.` });
     res.json({ ok: true });
 });
 async function clanRemove(c, uid) {
     c.members = c.members.filter(m => m !== uid);
     delete c.names[uid];
+    if (c.roles) delete c.roles[uid];
     await kvSet('clanof', uid, null);
     CLAN_TAG.delete(uid);
     await clanRefreshCos(uid);
     if (!c.members.length) { await kvDel('clan', c.id); return; }
-    if (c.owner === uid) c.owner = c.members[0];
+    if (c.owner === uid) { // le chef part : le plus gradé prend sa place
+        const next = c.members.slice().sort((a, b) => clanRank(c, b) - clanRank(c, a))[0];
+        c.owner = next; delete c.roles[next];
+        clanNotify(c, `👑 ${c.names[next]} devient le chef du clan.`);
+    }
     await kvSet('clan', c.id, c);
 }
 app.post('/api/clans/leave', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const cid = await kvGet('clanof', uid, null);
-    const c = cid ? await kvGet('clan', cid, null) : null;
+    const c = await clanOfUser(uid);
     if (!c) { await kvSet('clanof', uid, null); return res.json({ ok: true }); }
     await clanRemove(c, uid);
     res.json({ ok: true });
 });
+// Exclure : aîné -> membres ; chef adjoint -> membres et aînés ; chef -> tout le monde
 app.post('/api/clans/kick', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const cid = await kvGet('clanof', uid, null);
-    const c = cid ? await kvGet('clan', cid, null) : null;
+    const c = await clanOfUser(uid);
     const target = +(req.body || {}).id;
-    if (!c || c.owner !== uid || !c.members.includes(target) || target === uid) return res.json({ ok: false, error: 'Action impossible.' });
+    if (!c || !c.members.includes(target) || target === uid) return res.json({ ok: false, error: 'Action impossible.' });
+    if (clanRank(c, uid) < 1 || clanRank(c, target) >= clanRank(c, uid)) return res.json({ ok: false, error: 'Tu n’as pas le droit d’exclure ce joueur.' });
     await clanRemove(c, target);
     emitUser(target, 'clan_event', { text: `🛡️ Tu as été retiré du clan ${c.name}.` });
     res.json({ ok: true });
 });
+// Chef adjoint et chef : modifier le clan
 app.post('/api/clans/edit', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const cid = await kvGet('clanof', uid, null);
-    const c = cid ? await kvGet('clan', cid, null) : null;
-    if (!c || c.owner !== uid) return res.json({ ok: false, error: 'Seul le chef peut modifier le clan.' });
+    const c = await clanOfUser(uid);
+    if (!c || clanRank(c, uid) < 2) return res.json({ ok: false, error: 'Seuls le chef et les chefs adjoints peuvent modifier le clan.' });
     const b = req.body || {};
     if (CLAN_EMBLEMS.includes(b.emblem)) c.emblem = b.emblem;
     if (/^#[0-9a-f]{6}$/i.test(b.color || '')) c.color = b.color;
-    if (typeof b.open === 'boolean') c.open = b.open;
+    if (CLAN_TYPES.includes(b.type)) { c.type = b.type; c.open = b.type === 'open'; }
+    if (typeof b.open === 'boolean' && !b.type) { c.type = b.open ? 'open' : 'closed'; c.open = b.open; }
+    if (typeof b.bio === 'string') c.bio = b.bio.trim().slice(0, 200);
+    if (b.minLevel !== undefined) c.minLevel = Math.max(0, Math.min(100, Math.floor(+b.minLevel || 0)));
     await kvSet('clan', c.id, c);
     for (const m of c.members) { CLAN_TAG.set(m, { tag: c.tag, color: c.color }); await clanRefreshCos(m); }
     res.json({ ok: true });
@@ -18345,7 +18488,7 @@ app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
 }));
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-10-08-musique';
+const SITE_BUILD = '2026-10-09-clans';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 

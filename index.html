@@ -971,6 +971,16 @@
         .clan-emb.big{width:58px;height:58px;font-size:1.8rem;}
         .clan-create{display:flex;flex-direction:column;gap:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:12px;} .clan-create h3{margin:0;}
         .clan-embs{display:flex;flex-wrap:wrap;gap:4px;} .clan-embs button{background:#1d1d2e;border:2px solid #2c2c44;border-radius:8px;font-size:1.2rem;width:40px;height:40px;cursor:pointer;} .clan-embs button.on{border-color:#ffd700;}
+        .clan-role{display:inline-block;font-size:.66rem;font-weight:900;padding:1px 6px;border-radius:6px;margin-left:4px;vertical-align:middle;background:#2a2a40;color:#ccd;}
+        .clan-role.r-leader{background:#ffd700;color:#000;} .clan-role.r-coleader{background:#b44dff;color:#fff;} .clan-role.r-elder{background:#3fa7ff;color:#000;}
+        .clan-type{display:inline-block;font-size:.7rem;font-weight:800;padding:1px 7px;border-radius:999px;background:#1d1d2e;border:1px solid #44446a;}
+        .clan-type.t-open{border-color:#00ff88;color:#00ff88;} .clan-type.t-invite{border-color:#ffb300;color:#ffb300;} .clan-type.t-closed{border-color:#ff2a5f;color:#ff2a5f;}
+        .clan-bio{margin:10px 0;padding:10px 12px;background:#101018;border-left:3px solid var(--accent-yellow);border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;font-size:.88rem;}
+        .clan-members>div{flex-wrap:wrap;} .clan-acts{display:flex;gap:4px;flex-wrap:wrap;}
+        .clan-acts button.ok{background:#00c86e;color:#000;border-color:#00c86e;} .clan-acts button.danger{background:#5a1a2a;border-color:#ff2a5f;}
+        .clan-invite{display:flex;gap:6px;margin:8px 0;} .clan-invite .v7-input{flex:1;margin:0;} .clan-invite .btn-action{width:auto;margin:0;padding:8px 14px;}
+        .clan-l{display:flex!important;flex-direction:column;align-items:stretch!important;gap:4px;margin:6px 0;text-align:left;font-size:.8rem;font-weight:700;}
+        .clan-pending{background:#101018;border:1px dashed #ffb300;border-radius:10px;padding:8px;margin-bottom:10px;} .clan-pending button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:7px;padding:3px 8px;cursor:pointer;}
         .clan-edit{margin:10px 0;background:#101018;border-radius:10px;padding:8px;} .clan-edit summary{cursor:pointer;font-weight:700;} .clan-edit label{display:inline-flex;gap:6px;align-items:center;margin:6px 10px 0 0;font-size:.85rem;}
         .cn-clan{font-weight:800;font-size:.8em;margin-right:3px;}
         /* stats */
@@ -8727,7 +8737,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog();
         }
-        const CLIENT_BUILD = '2026-10-08-musique';
+        const CLIENT_BUILD = '2026-10-09-clans';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -9650,38 +9660,95 @@
 
         // --- clans ---
         const clanDraft = { emblem: '🐉', color: '#ffd700' };
+        const CLAN_TYPE_LABEL = { open: '🔓 Ouvert', invite: '✉️ Sur invitation', closed: '🔒 Fermé' };
+        const CLAN_TYPE_HINT = { open: 'tout le monde peut entrer', invite: 'il faut envoyer une demande', closed: 'seulement sur invitation' };
+        const CLAN_ROLE_ICON = { leader: '👑', coleader: '⭐', elder: '🛡️', member: '' };
+        const CLAN_RANK = { member: 0, elder: 1, coleader: 2, leader: 3 };
+        let clanData = null;
+        function clanRoleBadge(role, names) { return `<span class="clan-role r-${role}">${CLAN_ROLE_ICON[role] ? CLAN_ROLE_ICON[role] + ' ' : ''}${hubEsc((names || {})[role] || role)}</span>`; }
+        function clanTypeBadge(t) { return `<span class="clan-type t-${t}">${CLAN_TYPE_LABEL[t] || t}</span>`; }
         async function loadClan() {
             const box = document.getElementById('eco-clan');
             const d = await v7get('/api/clans');
             if (!d || !d.ok) return;
+            clanData = d;
             const boardHtml = `<h3 class="adm-h">🏆 Classement de la semaine</h3><div class="tl-hint">Chaque partie jouée par un membre rapporte des points au clan (10 à 60, x2 le week-end). Récompenses le lundi : ${d.rewards.map((r, i) => `${i + 1}${i ? 'e' : 'er'} : ${r} 🪙`).join(' • ')} pour chaque membre.</div>
                 ${d.lastWinners && d.lastWinners.winners && d.lastWinners.winners.length ? `<div class="tl-hint">Semaine dernière : ${d.lastWinners.winners.map((w, i) => `${['🥇', '🥈', '🥉'][i]} ${hubEsc(w.emblem)} ${hubEsc(w.name)}`).join(' • ')}</div>` : ''}
-                <div class="clan-board">${d.board.length ? d.board.map((c, i) => `<div class="${d.mine && d.mine.id === c.id ? 'me' : ''}"><span>${i + 1}.</span><span class="clan-emb" style="--cc:${c.color}">${hubEsc(c.emblem)}</span><b>${hubEsc(c.name)} <small style="color:${c.color}">[${hubEsc(c.tag)}]</small></b><small>${c.members} 👥</small><b>${c.pts} pts</b>${!d.mine ? `<button onclick="clanJoin('${c.id}')">Rejoindre</button>` : ''}</div>`).join('') : '<p class="tl-hint">Aucun clan pour le moment : crée le premier !</p>'}</div>`;
+                <div class="clan-board">${d.board.length ? d.board.map((c, i) => `<div class="${d.mine && d.mine.id === c.id ? 'me' : ''}"><span>${i + 1}.</span><span class="clan-emb" style="--cc:${c.color}">${hubEsc(c.emblem)}</span><b>${hubEsc(c.name)} <small style="color:${c.color}">[${hubEsc(c.tag)}]</small></b><small title="${CLAN_TYPE_HINT[c.type] || ''}">${(CLAN_TYPE_LABEL[c.type] || '').split(' ')[0]}</small><small>${c.members} 👥</small><b>${c.pts} pts</b><button onclick="clanView('${c.id}')">Voir</button></div>`).join('') : '<p class="tl-hint">Aucun clan pour l’instant : crée le premier !</p>'}</div>`;
             if (d.mine) {
-                const c = d.mine;
-                box.innerHTML = `<div class="clan-head" style="--cc:${c.color}"><span class="clan-emb big">${hubEsc(c.emblem)}</span><div><h3>${hubEsc(c.name)} <span style="color:${c.color}">[${hubEsc(c.tag)}]</span></h3><div class="tl-hint">${c.members.length}/${d.max} membres • ${c.rank ? `${c.rank}${c.rank > 1 ? 'e' : 'er'} cette semaine` : ''} • <b>${c.pts} pts</b></div></div></div>
-                    <h3 class="adm-h">👥 Membres (points de la semaine)</h3><div class="clan-members">${c.members.map(m => `<div class="${m.me ? 'me' : ''}"><b>${m.owner ? '👑 ' : ''}${hubEsc(m.name)}</b><span>${m.pts} pts</span>${c.isOwner && !m.me ? `<button onclick="clanKick(${m.id})">Retirer</button>` : ''}</div>`).join('')}</div>
-                    ${c.isOwner ? `<details class="clan-edit"><summary>⚙️ Modifier le clan</summary><div class="clan-embs">${d.emblems.map(e => `<button class="${e === c.emblem ? 'on' : ''}" onclick="clanEdit({emblem:'${e}'})">${e}</button>`).join('')}</div><label>Couleur <input type="color" value="${c.color}" onchange="clanEdit({color:this.value})"></label> <label><input type="checkbox" ${c.open !== false ? 'checked' : ''} onchange="clanEdit({open:this.checked})"> Ouvert à tous</label></details>` : ''}
+                const c = d.mine, my = CLAN_RANK[c.myRole] || 0;
+                const act = m => {
+                    if (m.id === undefined) return '';
+                    const r = CLAN_RANK[m.role] || 0, b = [];
+                    if (my === 3 && r === 2) b.push(`<button onclick="clanRole(${m.id},'promote',true)">👑 Nommer chef</button>`);
+                    else if (my >= 2 && r + 1 < my) b.push(`<button onclick="clanRole(${m.id},'promote')">⬆️ Promouvoir</button>`);
+                    if (my >= 2 && r > 0 && r < my) b.push(`<button onclick="clanRole(${m.id},'demote')">⬇️ Rétrograder</button>`);
+                    if (my >= 1 && r < my) b.push(`<button class="danger" onclick="clanKick(${m.id})">Exclure</button>`);
+                    return b.length ? `<div class="clan-acts">${b.join('')}</div>` : '';
+                };
+                const reqs = my >= 1 ? `<h3 class="adm-h">✉️ Demandes pour rejoindre (${c.requests.length})</h3>${c.requests.length ? `<div class="clan-members">${c.requests.map(r => `<div><b>${hubEsc(r.name)} <small>niv. ${r.level || 1}</small>${r.msg ? `<br><small class="tl-hint">« ${hubEsc(r.msg)} »</small>` : ''}</b><div class="clan-acts"><button class="ok" onclick="clanReq(${r.uid},true)">✔ Accepter</button><button class="danger" onclick="clanReq(${r.uid},false)">✖</button></div></div>`).join('')}</div>` : '<p class="tl-hint">Aucune demande en attente.</p>'}
+                    <div class="clan-invite"><input id="clan-inv-pseudo" class="v7-input" maxlength="20" placeholder="Pseudo du joueur à inviter"><button class="btn-action" onclick="clanInvite()">✉️ Inviter</button></div>` : '';
+                const settings = my >= 2 ? `<details class="clan-edit"><summary>⚙️ Modifier le clan</summary>
+                    <label class="clan-l">Bio du clan<textarea id="clan-e-bio" class="v7-input" maxlength="200" rows="3" placeholder="Présente ton clan, vos règles…">${hubEsc(c.bio)}</textarea></label>
+                    <label class="clan-l">Type<select id="clan-e-type" class="v7-input">${Object.keys(CLAN_TYPE_LABEL).map(t => `<option value="${t}" ${t === c.type ? 'selected' : ''}>${CLAN_TYPE_LABEL[t]} (${CLAN_TYPE_HINT[t]})</option>`).join('')}</select></label>
+                    <label class="clan-l">Niveau minimum pour entrer<input id="clan-e-lvl" class="v7-input" type="number" min="0" max="100" value="${c.minLevel || 0}"></label>
+                    <button class="btn-action" onclick="clanEdit({bio:document.getElementById('clan-e-bio').value,type:document.getElementById('clan-e-type').value,minLevel:document.getElementById('clan-e-lvl').value},'✅ Clan modifié')">💾 Enregistrer</button>
+                    <div class="clan-embs">${d.emblems.map(e => `<button class="${e === c.emblem ? 'on' : ''}" onclick="clanEdit({emblem:'${e}'})">${e}</button>`).join('')}</div><label>Couleur <input type="color" value="${c.color}" onchange="clanEdit({color:this.value})"></label></details>` : '';
+                box.innerHTML = `<div class="clan-head" style="--cc:${c.color}"><span class="clan-emb big">${hubEsc(c.emblem)}</span><div style="min-width:0;flex:1;"><h3>${hubEsc(c.name)} <span style="color:${c.color}">[${hubEsc(c.tag)}]</span></h3>
+                        <div class="tl-hint">${clanTypeBadge(c.type)} ${c.minLevel ? `• niv. ${c.minLevel} min.` : ''} • ${c.members.length}/${d.max} membres • ${c.rank ? `${c.rank}${c.rank > 1 ? 'e' : 'er'} cette semaine • ` : ''}<b>${c.pts} pts</b></div>
+                        <div class="tl-hint">Ton rôle : ${clanRoleBadge(c.myRole, d.roles)}</div></div></div>
+                    ${c.bio ? `<div class="clan-bio">${hubEsc(c.bio)}</div>` : ''}
+                    <h3 class="adm-h">👥 Membres</h3><div class="clan-members">${c.members.map(m => `<div class="${m.me ? 'me' : ''}"><b>${hubEsc(m.name)} ${clanRoleBadge(m.role, d.roles)}</b><span>${m.pts} pts</span>${m.me ? '' : act(m)}</div>`).join('')}</div>
+                    ${reqs}${settings}
+                    <details class="clan-edit"><summary>ℹ️ Qui peut faire quoi ?</summary><div class="tl-hint">🛡️ <b>Aîné</b> : inviter, accepter les demandes, exclure des membres.<br>⭐ <b>Chef adjoint</b> : + promouvoir en aîné, exclure des aînés, modifier le clan.<br>👑 <b>Chef</b> : tout + nommer des chefs adjoints et passer son titre.</div></details>
                     <div class="hb-btns"><button onclick="clanLeave()">🚪 Quitter le clan</button></div>` + boardHtml;
                 return;
             }
-            box.innerHTML = `<div class="clan-create"><h3>🛡️ Créer un clan <small>🪙 ${d.price}</small></h3>
+            const invHtml = d.invites && d.invites.length ? `<h3 class="adm-h">✉️ Invitations reçues</h3><div class="clan-members">${d.invites.map(i => `<div><span class="clan-emb" style="--cc:${i.color}">${hubEsc(i.emblem)}</span><b>${hubEsc(i.name)} <small style="color:${i.color}">[${hubEsc(i.tag)}]</small><br><small class="tl-hint">invité par ${hubEsc(i.from)}</small></b><div class="clan-acts"><button onclick="clanView('${i.id}')">Voir</button><button class="ok" onclick="clanInvResp('${i.id}',true)">✔ Rejoindre</button><button class="danger" onclick="clanInvResp('${i.id}',false)">✖</button></div></div>`).join('')}</div>` : '';
+            const pendHtml = d.pending ? `<div class="tl-hint clan-pending">⏳ Demande envoyée au clan <b>${hubEsc(d.pending.name)}</b> <button onclick="clanAct('/api/clans/cancel-request',{},'Demande annulée')">Annuler</button></div>` : '';
+            box.innerHTML = invHtml + pendHtml + `<div class="clan-create"><h3>🛡️ Créer un clan <small>🪙 ${d.price}</small></h3>
                 <input id="clan-name" class="v7-input" maxlength="20" placeholder="Nom du clan (ex : Akatsuki)"><input id="clan-tag" class="v7-input" maxlength="4" placeholder="Tag (2 à 4 lettres, ex : AKA)" style="text-transform:uppercase">
+                <textarea id="clan-bio" class="v7-input" maxlength="200" rows="2" placeholder="Bio du clan (facultatif)"></textarea>
+                <select id="clan-type" class="v7-input">${Object.keys(CLAN_TYPE_LABEL).map(t => `<option value="${t}">${CLAN_TYPE_LABEL[t]} (${CLAN_TYPE_HINT[t]})</option>`).join('')}</select>
+                <input id="clan-lvl" class="v7-input" type="number" min="0" max="100" placeholder="Niveau minimum (facultatif)">
                 <div class="clan-embs">${d.emblems.map(e => `<button class="${e === clanDraft.emblem ? 'on' : ''}" onclick="clanDraft.emblem='${e}';this.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===this))">${e}</button>`).join('')}</div>
                 <label>Couleur du tag <input type="color" value="${clanDraft.color}" onchange="clanDraft.color=this.value"></label>
                 <button class="btn-action" onclick="clanCreate()">🛡️ Créer mon clan</button></div>` + boardHtml;
         }
+        async function clanView(id) {
+            const d = await v7get('/api/clans/view?id=' + encodeURIComponent(id));
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Clan introuvable'), 'var(--accent-pink)');
+            const c = d.clan, mine = clanData && clanData.mine, lvl = (clanData && clanData.level) || 0;
+            const invited = clanData && (clanData.invites || []).some(i => i.id === c.id);
+            let btn = '';
+            if (!mine) {
+                if (invited) btn = `<button class="btn-action" onclick="clanInvResp('${c.id}',true);this.closest('.v7-modal').remove()">✔ Accepter l’invitation</button>`;
+                else if (c.count >= d.max) btn = '<p class="tl-hint">Clan complet.</p>';
+                else if (c.minLevel && lvl < c.minLevel) btn = `<p class="tl-hint">Il faut être niveau ${c.minLevel} (tu es niveau ${lvl}).</p>`;
+                else if (c.type === 'open') btn = `<button class="btn-action" onclick="clanJoin('${c.id}');this.closest('.v7-modal').remove()">🛡️ Rejoindre</button>`;
+                else if (c.type === 'invite') btn = `<input id="clan-req-msg" class="v7-input" maxlength="100" placeholder="Petit message (facultatif)"><button class="btn-action" onclick="clanJoin('${c.id}',document.getElementById('clan-req-msg').value);this.closest('.v7-modal').remove()">✉️ Envoyer une demande</button>`;
+                else btn = '<p class="tl-hint">🔒 Clan fermé : il faut être invité par un chef ou un aîné.</p>';
+            }
+            hubModal('clan-view', `<div class="clan-head" style="--cc:${c.color}"><span class="clan-emb big">${hubEsc(c.emblem)}</span><div><h3>${hubEsc(c.name)} <span style="color:${c.color}">[${hubEsc(c.tag)}]</span></h3>
+                <div class="tl-hint">${clanTypeBadge(c.type)} ${c.minLevel ? `• niv. ${c.minLevel} min.` : ''} • ${c.count}/${d.max} membres • <b>${c.pts} pts</b> cette semaine</div></div></div>
+                <div class="clan-bio">${c.bio ? hubEsc(c.bio) : '<i>Pas encore de bio.</i>'}</div>
+                <div class="clan-members">${c.members.map(m => `<div><b>${hubEsc(m.name)} ${clanRoleBadge(m.role, d.roles)}</b><span>${m.pts} pts</span></div>`).join('')}</div>${btn}`);
+        }
         async function clanAct(url, body, okMsg) {
             const d = await v7post(url, body);
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            if (okMsg) toast(okMsg, '#ffd700');
+            if (okMsg) toast(typeof okMsg === 'function' ? okMsg(d) : okMsg, '#ffd700');
             ecoLoad(); loadClan();
         }
-        function clanCreate() { clanAct('/api/clans/create', { name: document.getElementById('clan-name').value, tag: document.getElementById('clan-tag').value, emblem: clanDraft.emblem, color: clanDraft.color }, '🛡️ Clan créé !'); }
-        function clanJoin(id) { clanAct('/api/clans/join', { id }, '🛡️ Bienvenue dans le clan !'); }
+        function clanCreate() { clanAct('/api/clans/create', { name: document.getElementById('clan-name').value, tag: document.getElementById('clan-tag').value, emblem: clanDraft.emblem, color: clanDraft.color, bio: document.getElementById('clan-bio').value, type: document.getElementById('clan-type').value, minLevel: document.getElementById('clan-lvl').value }, '🛡️ Clan créé !'); }
+        function clanJoin(id, msg) { clanAct('/api/clans/join', { id, msg: msg || '' }, d => d.requested ? '✉️ Demande envoyée ! Un aîné ou un chef va te répondre.' : '🛡️ Bienvenue dans le clan !'); }
         function clanLeave() { if (confirm('Quitter ton clan ?')) clanAct('/api/clans/leave', {}, 'Tu as quitté le clan.'); }
-        function clanKick(id) { if (confirm('Retirer ce membre ?')) clanAct('/api/clans/kick', { id }); }
-        function clanEdit(o) { clanAct('/api/clans/edit', o); }
+        function clanKick(id) { if (confirm('Exclure ce joueur du clan ?')) clanAct('/api/clans/kick', { id }); }
+        function clanRole(id, action, transfer) { if (transfer && !confirm('Nommer ce joueur chef ? Tu deviendras chef adjoint.')) return; clanAct('/api/clans/role', { id, action }, action === 'promote' ? '⬆️ Promu !' : '⬇️ Rétrogradé'); }
+        function clanReq(uid, accept) { clanAct('/api/clans/requests/respond', { uid, accept }, accept ? '🛡️ Nouveau membre !' : 'Demande refusée'); }
+        function clanInvite() { const i = document.getElementById('clan-inv-pseudo'); clanAct('/api/clans/invite', { pseudo: i.value }, d => `✉️ Invitation envoyée à ${d.name} !`); }
+        function clanInvResp(id, accept) { clanAct('/api/clans/invites/respond', { id, accept }, accept ? '🛡️ Bienvenue dans le clan !' : 'Invitation refusée'); }
+        function clanEdit(o, msg) { clanAct('/api/clans/edit', o, msg); }
         // tag du clan devant le pseudo, partout
         (function () {
             const orig = cosNameHtml;
