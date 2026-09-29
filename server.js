@@ -11857,8 +11857,18 @@ const QT_THEMES = (() => {
 const QT_BY_ID = Object.fromEntries(QT_THEMES.map(t => [t.id, t]));
 app.get('/api/qap/themes', (req, res) => res.json({ ok: true, themes: QT_THEMES.map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: t.items.length })) }));
 
+// Tier lists à thème (tierlist-themes.json : waifu, combats, protagonistes, antagonistes, deutéragonistes, OST) + openings du blind test
+const TLT_THEMES = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'tierlist-themes.json'), 'utf8')).themes || []; }
+    catch (e) { console.warn('[Tier list] tierlist-themes.json introuvable :', e.message); return []; }
+})();
+const TLT_BY_ID = Object.fromEntries(TLT_THEMES.map(t => [t.id, t]));
+const tltItems = id => id === 'opening' ? arcOpeningItems() : TLT_BY_ID[id] ? TLT_BY_ID[id].items : null;
+app.get('/api/tl/themes', (req, res) => res.json({ ok: true, themes: [{ id: 'opening', title: 'Tier list openings', emoji: '🎶', kind: 'openings' }, ...TLT_THEMES].map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: (tltItems(t.id) || []).length })) }));
+
 function arcItemsFor(source) {
     if (source.startsWith('qt:')) return QT_BY_ID[source.slice(3)] ? QT_BY_ID[source.slice(3)].items : null;
+    if (source.startsWith('tl:')) return tltItems(source.slice(3));
     const qap = /^qap\d{1,3}\|(tp:.+)$/.exec(source); // « Qui a le plus… » : un classement mondial par question
     if (qap) return tpItemsFor(qap[1]);
     if (source.startsWith('tp:')) return tpItemsFor(source);
@@ -11886,7 +11896,8 @@ app.get('/api/arcade/items', (req, res) => {
     res.json({
         ok: true,
         source,
-        label: source === 'animes' ? 'Animes' : source.startsWith('tp:') ? tpLabel(source) : source.startsWith('qt:') ? QT_BY_ID[source.slice(3)].title : ARC_UNIVERSE_ANIME[source],
+        label: source === 'animes' ? 'Animes' : source.startsWith('tp:') ? tpLabel(source) : source.startsWith('qt:') ? QT_BY_ID[source.slice(3)].title
+            : source === 'tl:opening' ? 'Tier list openings' : source.startsWith('tl:') ? TLT_BY_ID[source.slice(3)].title : ARC_UNIVERSE_ANIME[source],
         items: items.map(i => ({ name: i.name, img: i.img || null, ...(i.sub ? { sub: i.sub } : {}), ...(i.imgs ? { imgs: i.imgs } : {}), ...(i.video ? { video: i.video, start: i.start || 0 } : {}) }))
     });
 });
@@ -18309,6 +18320,99 @@ app.post('/api/quiz/delete', async (req, res) => {
     q.deleted = true; await kvSet('uquiz', q.id, q);
     res.json({ ok: true });
 });
+/* =====================================================================
+   TIER LISTS CRÉÉES PAR LES JOUEURS : n'importe quels persos / animes,
+   images trouvées via la recherche AniList (/api/tl/search)
+   ===================================================================== */
+const TL_SEARCH_CACHE = new Map();
+const TL_SEARCH_HITS = new Map(); // anti-spam par IP
+app.get('/api/tl/search', async (req, res) => {
+    const q = cleanTxt(req.query.q, 60), type = req.query.type === 'anime' ? 'anime' : 'char';
+    if (q.length < 2) return res.json({ ok: true, items: [] });
+    const key = type + '|' + q.toLowerCase();
+    if (TL_SEARCH_CACHE.has(key)) return res.json({ ok: true, items: TL_SEARCH_CACHE.get(key) });
+    const ip = String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0];
+    const now = Date.now(), hits = (TL_SEARCH_HITS.get(ip) || []).filter(t => now - t < 60000);
+    if (hits.length >= 40) return res.json({ ok: false, error: 'Trop de recherches, attends un peu.' });
+    hits.push(now); TL_SEARCH_HITS.set(ip, hits);
+    const query = type === 'anime'
+        ? 'query($s:String){Page(perPage:16){media(search:$s,type:ANIME,sort:POPULARITY_DESC,isAdult:false){title{romaji english} coverImage{large}}}}'
+        : 'query($s:String){Page(perPage:16){characters(search:$s,sort:FAVOURITES_DESC){name{full} image{large} media(perPage:1,sort:POPULARITY_DESC){nodes{title{romaji english}}}}}}';
+    try {
+        const r = await fetch('https://graphql.anilist.co', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'User-Agent': 'AnimeGame/1.0' }, body: JSON.stringify({ query, variables: { s: q } }), signal: AbortSignal.timeout(10000) });
+        const d = await r.json();
+        const page = (d && d.data && d.data.Page) || {};
+        const items = type === 'anime'
+            ? (page.media || []).map(m => ({ name: m.title.english || m.title.romaji, sub: m.title.english && m.title.romaji !== m.title.english ? m.title.romaji : '', img: m.coverImage && m.coverImage.large }))
+            : (page.characters || []).filter(c => c.image && c.image.large && !/default\.jpg$/.test(c.image.large)).map(c => { const m = c.media && c.media.nodes && c.media.nodes[0]; return { name: c.name.full, sub: m ? (m.title.english || m.title.romaji) : '', img: c.image.large }; });
+        const out = items.filter(i => i.name && i.img);
+        if (!d || !d.data) return res.json({ ok: false, error: 'Recherche indisponible, réessaie dans un instant.' });
+        TL_SEARCH_CACHE.set(key, out);
+        if (TL_SEARCH_CACHE.size > 3000) TL_SEARCH_CACHE.delete(TL_SEARCH_CACHE.keys().next().value);
+        res.json({ ok: true, items: out });
+    } catch (e) { res.json({ ok: false, error: 'Recherche indisponible, réessaie.' }); }
+});
+const TL_IMG_OK = u => { try { const h = new URL(u).hostname; return /^https:/.test(u) && ARC_IMG_HOSTS.test(h); } catch (_) { return false; } };
+function utlView(t, uid) {
+    const rs = Object.values(t.ratings || {});
+    return { id: t.id, title: t.title, author: t.author, mine: t.authorId === uid, plays: t.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (t.ratings || {})[uid] || null : null, created: t.created, n: t.items.length, cover: t.items.slice(0, 4).map(i => i.img).filter(Boolean) };
+}
+app.get('/api/tl/community', async (req, res) => {
+    const uid = authUserId(req);
+    const qs = String(req.query.q || '').toLowerCase();
+    const list = (await kvList('utl')).map(x => x.v).filter(t => t && !t.deleted && (!qs || (t.title + ' ' + t.author).toLowerCase().includes(qs)));
+    const score = t => { const v = utlView(t); return (v.rating || 3) * Math.log2(2 + v.votes) + Math.log2(1 + v.plays) * 0.5; };
+    list.sort((a, b) => req.query.sort === 'new' ? b.created - a.created : score(b) - score(a));
+    res.json({ ok: true, list: list.slice(0, 60).map(t => utlView(t, uid)), mine: uid ? list.filter(t => t.authorId === uid).map(t => utlView(t, uid)) : [] });
+});
+app.get('/api/tl/one', async (req, res) => {
+    const uid = authUserId(req);
+    const t = await kvGet('utl', String(req.query.id || ''), null);
+    if (!t || t.deleted) return res.json({ ok: false, error: 'Tier list introuvable.' });
+    if (req.query.play) { t.plays = (t.plays || 0) + 1; kvSet('utl', t.id, t); }
+    res.json({ ok: true, tl: utlView(t, uid), items: t.items });
+});
+app.post('/api/tl/create', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {};
+    const title = cleanTxt(b.title, 60);
+    if (title.length < 3) return res.json({ ok: false, error: 'Donne un titre à ta tier list (3 caractères min).' });
+    const seen = new Set(), items = [];
+    for (const x of (Array.isArray(b.items) ? b.items : []).slice(0, 300)) {
+        const name = cleanTxt(x && x.name, 50), sub = cleanTxt(x && x.sub, 50), img = String((x && x.img) || '').slice(0, 400);
+        if (!name || seen.has(name.toLowerCase())) continue;
+        seen.add(name.toLowerCase());
+        items.push({ name, ...(sub ? { sub } : {}), ...(TL_IMG_OK(img) ? { img } : {}) });
+    }
+    if (items.length < 4) return res.json({ ok: false, error: 'Mets au moins 4 éléments dans ta tier list.' });
+    const mine = (await kvList('utl')).filter(x => x.v && x.v.authorId === uid && !x.v.deleted);
+    const editing = b.id ? await kvGet('utl', String(b.id), null) : null;
+    if (editing && editing.authorId !== uid) return res.json({ ok: false, error: 'Ce n’est pas ta tier list.' });
+    if (!editing && mine.length >= 30) return res.json({ ok: false, error: '30 tier lists maximum par joueur.' });
+    const t = editing ? Object.assign(editing, { title, items, edited: hubNow() })
+        : { id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title, items, author: await pseudoOf(uid), authorId: uid, ratings: {}, plays: 0, created: hubNow() };
+    await kvSet('utl', t.id, t);
+    res.json({ ok: true, id: t.id });
+});
+app.post('/api/tl/rate', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const t = await kvGet('utl', String((req.body || {}).id || ''), null);
+    const stars = Math.round(+(req.body || {}).stars);
+    if (!t || t.deleted) return res.json({ ok: false, error: 'Tier list introuvable.' });
+    if (t.authorId === uid) return res.json({ ok: false, error: 'Tu ne peux pas noter ta propre tier list 😉' });
+    if (!(stars >= 1 && stars <= 5)) return res.json({ ok: false });
+    t.ratings = t.ratings || {}; t.ratings[uid] = stars;
+    await kvSet('utl', t.id, t);
+    res.json({ ok: true, tl: utlView(t, uid) });
+});
+app.post('/api/tl/delete', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const t = await kvGet('utl', String((req.body || {}).id || ''), null);
+    if (!t || (t.authorId !== uid && !(await isAdmin(req)))) return res.json({ ok: false, error: 'Action impossible.' });
+    t.deleted = true; await kvSet('utl', t.id, t);
+    res.json({ ok: true });
+});
+
 const uqTimers = {};
 function uqClear(code) { clearTimeout(uqTimers[code]); delete uqTimers[code]; }
 function uqStop(code) { uqClear(code); const r = rooms[code]; if (r) delete r.uq; }

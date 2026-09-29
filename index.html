@@ -588,6 +588,33 @@
         .tl-item.dragging{opacity:.35;}
         .tl-hint{text-align:center;color:var(--text-muted);font-size:.78rem;margin-top:6px;}
         @media (max-width:560px){.tl-item{width:62px;height:62px}.tl-label{flex-basis:56px;font-size:1.3rem}.tl-row{min-height:70px}}
+        .tl-item .tl-duo{display:flex;width:100%;height:100%;pointer-events:none;}
+        .tl-item .tl-duo img{width:50%;}
+        .tl-item .tl-play{position:absolute;top:2px;right:2px;z-index:2;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.75);color:#fff;font-size:.62rem;cursor:pointer;padding:0;}
+        .tl-item .tl-play:hover{background:var(--accent-pink);}
+        #tl-player{position:fixed;left:12px;bottom:12px;z-index:9000;width:min(360px,calc(100vw - 24px));background:#0d0d15;border:2px solid var(--accent-cyan);border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);}
+        #tl-player iframe{display:block;width:100%;aspect-ratio:16/9;border:0;}
+        #tl-player .tlp-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:.78rem;font-weight:700;}
+        #tl-player .tlp-bar button{background:none;border:1px solid var(--text-muted);color:#fff;border-radius:6px;cursor:pointer;padding:2px 8px;}
+        .tl-sec{font-family:'Bangers',cursive;letter-spacing:1px;font-size:1.35rem;color:var(--accent-yellow);margin:18px 0 8px;}
+        .tl-cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+        .tl-ccard{background:#161622;border:2px solid #34344a;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .15s;position:relative;}
+        .tl-ccard:hover{transform:translateY(-2px);border-color:var(--accent-cyan);}
+        .tl-ccard .tl-cov{display:grid;grid-template-columns:repeat(4,1fr);height:72px;background:#1d1d2c;}
+        .tl-ccard .tl-cov img{width:100%;height:72px;object-fit:cover;object-position:top;}
+        .tl-ccard .tl-cinfo{padding:8px 10px;}
+        .tl-ccard b{display:block;font-size:.9rem;}
+        .tl-ccard small{color:var(--text-muted);font-size:.72rem;}
+        .tl-ccard .tl-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:6px;cursor:pointer;padding:2px 6px;font-size:.75rem;}
+        .tl-rate{text-align:center;margin:8px 0;font-size:.85rem;color:var(--text-muted);}
+        .tl-rate button{background:none;border:none;font-size:1.3rem;cursor:pointer;color:#555;padding:0 2px;}
+        .tl-rate button.on{color:var(--accent-yellow);}
+        .tl-ed-res{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;min-height:40px;}
+        .tl-ed-res .tl-item{cursor:pointer;}
+        .tl-ed-res .tl-item.added{opacity:.35;}
+        .tl-tabs{display:flex;gap:6px;margin:8px 0;}
+        .tl-tabs button{flex:1;background:#1d1d2c;border:2px solid #34344a;color:#fff;border-radius:10px;padding:7px;font-weight:800;cursor:pointer;}
+        .tl-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
         /* Battle */
         .bb-head{text-align:center;margin:8px 0 4px;}
         .bb-round{font-family:'Bangers',cursive;font-size:1.8rem;color:var(--accent-yellow);letter-spacing:1px;}
@@ -1952,7 +1979,7 @@
 
                 <div class="quote-mode-card" style="border-color:var(--accent-yellow);">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Tier List</h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">Classe tous les animes (107) ou les persos d'un univers de S à F • glisser-déposer (ou toucher sur mobile) • sauvegarde auto • export en image</p>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Openings, waifus, combats, protagonistes, antagonistes, deutéragonistes, OST… des centaines de persos de S à F • ou crée ta propre tier list avec n'importe quels persos et partage-la • export en image</p>
                     <button class="btn-action" style="margin-top:0;" onclick="openTierSelection()">Faire ma tier list</button>
                 </div>
 
@@ -2476,6 +2503,8 @@
                 <div><h2 style="margin:0;">🏆 TIER LIST</h2><div id="tl-subtitle" style="color:var(--accent-cyan);font-size:.82rem;margin-top:4px;"></div></div>
                 <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:6px 10px;font-size:.75rem;cursor:pointer;">🔙 Menu</button>
             </div>
+            <div id="tl-hub" style="display:none;"></div>
+            <div id="tl-rate" class="tl-rate" style="display:none;"></div>
             <div class="tl-toolbar">
                 <button class="btn-action" onclick="tlDownload()">📸 Télécharger en image</button>
                 <button class="btn-action" style="background:var(--accent-cyan);color:#111;" onclick="tlCopyText()">📋 Copier en texte</button>
@@ -6427,16 +6456,167 @@
         const TL_DEFAULT = [['S', '#ff4f6d'], ['A', '#ff9f43'], ['B', '#ffd93d'], ['C', '#6bd66b'], ['D', '#4cc9f0'], ['F', '#b388ff']];
         let tl = null, tlSelected = null, tlDragName = null;
 
-        function openTierSelection() {
-            openSourceSelection('🏆 TIER LIST', 'Que veux-tu classer ? Tous les animes, ou les persos d\'un univers.', startTierList);
+        // l'écran d'accueil des tier lists (thèmes + tier lists des joueurs) ou le plateau de classement
+        function tlMode(hub) {
+            const room = document.getElementById('tierlist-room');
+            room.querySelectorAll(':scope > .tl-toolbar, :scope > #tl-board, :scope > #tl-pool, :scope > .tl-hint').forEach(e => e.style.display = hub ? 'none' : '');
+            document.getElementById('tl-hub').style.display = hub ? 'block' : 'none';
+            if (hub) document.getElementById('tl-rate').style.display = 'none';
+            tlStopPlayer();
+        }
+        let tlCom = { sort: 'top', q: '' };
+        async function openTierSelection() {
+            hideAllPanels();
+            document.getElementById('tierlist-room').style.display = 'block';
+            tlMode(true);
+            document.getElementById('tl-subtitle').textContent = 'Choisis une tier list, ou crée la tienne !';
+            const hub = document.getElementById('tl-hub');
+            hub.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div></div>';
+            const d = await v7get('/api/tl/themes');
+            hub.innerHTML = `<div class="tl-sec">🏆 Tier lists à thème</div><div class="qt-grid" id="tl-themes"></div>
+                <button class="btn-action" style="max-width:420px;display:block;margin:16px auto 0;background:var(--accent-pink);" onclick="tlEditor()">✏️ Créer ma tier list (n'importe quels persos)</button>
+                <div class="tl-sec">👥 Tier lists des joueurs</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><input id="tl-com-q" class="v7-input" style="flex:1;min-width:160px;margin:0;" placeholder="🔎 Chercher une tier list…" value="${v7esc(tlCom.q)}">
+                <div class="tl-tabs" style="margin:0;"><button data-s="top" class="${tlCom.sort === 'top' ? 'on' : ''}">⭐ Top</button><button data-s="new" class="${tlCom.sort === 'new' ? 'on' : ''}">🆕 Récentes</button></div></div>
+                <div id="tl-com"></div>`;
+            const grid = document.getElementById('tl-themes');
+            ((d && d.themes) || []).forEach(t => {
+                const b = document.createElement('button'); b.className = 'qt-btn';
+                b.innerHTML = `<span class="qt-emo">${v7esc(t.emoji || '🏆')}</span><b>${v7esc(t.title)}</b><small>${t.n} ${t.kind === 'ost' || t.kind === 'openings' ? 'musiques' : t.kind === 'fights' ? 'combats' : 'persos'}</small>`;
+                b.onclick = () => startTierList('tl:' + t.id);
+                grid.appendChild(b);
+            });
+            let tmo = null;
+            document.getElementById('tl-com-q').oninput = e => { clearTimeout(tmo); tmo = setTimeout(() => { tlCom.q = e.target.value.trim(); tlLoadCommunity(); }, 300); };
+            hub.querySelectorAll('.tl-tabs button[data-s]').forEach(b => b.onclick = () => { tlCom.sort = b.dataset.s; hub.querySelectorAll('.tl-tabs button[data-s]').forEach(x => x.classList.toggle('on', x === b)); tlLoadCommunity(); });
+            tlLoadCommunity();
+            window.scrollTo(0, 0);
+        }
+        function tlCard(t, mine) {
+            const c = document.createElement('div'); c.className = 'tl-ccard';
+            c.innerHTML = `<div class="tl-cov">${t.cover.map(u => `<img loading="lazy" src="/api/img?u=${encodeURIComponent(u)}" alt="">`).join('')}</div>
+                <div class="tl-cinfo"><b>${v7esc(t.title)}</b><small>par ${v7esc(t.author)} • ${t.n} éléments • ${t.rating ? '⭐ ' + t.rating + ' (' + t.votes + ')' : 'pas encore notée'} • ${t.plays} parties</small></div>`;
+            c.onclick = () => startTierList('utl:' + t.id);
+            if (mine) {
+                const del = document.createElement('button'); del.className = 'tl-del'; del.textContent = '🗑️';
+                del.onclick = async e => { e.stopPropagation(); if (!confirm('Supprimer « ' + t.title + ' » ?')) return; const r = await v7post('/api/tl/delete', { id: t.id }); if (r && r.ok) tlLoadCommunity(); };
+                const ed = document.createElement('button'); ed.className = 'tl-del'; ed.style.right = '40px'; ed.textContent = '✏️';
+                ed.onclick = async e => { e.stopPropagation(); const r = await v7get('/api/tl/one?id=' + encodeURIComponent(t.id)); if (r && r.ok) tlEditor({ id: t.id, title: t.title, items: r.items }); };
+                c.append(ed, del);
+            }
+            return c;
+        }
+        async function tlLoadCommunity() {
+            const box = document.getElementById('tl-com'); if (!box) return;
+            box.innerHTML = '<div class="arc-loading" style="padding:20px;"><div class="arc-spin"></div></div>';
+            const d = await v7get('/api/tl/community?sort=' + tlCom.sort + '&q=' + encodeURIComponent(tlCom.q));
+            box.innerHTML = '';
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Impossible de charger les tier lists.</p>'; return; }
+            if (d.mine && d.mine.length && !tlCom.q) {
+                box.insertAdjacentHTML('beforeend', '<div style="font-weight:800;margin:4px 0 6px;">📁 Mes tier lists</div>');
+                const g = document.createElement('div'); g.className = 'tl-cgrid'; d.mine.forEach(t => g.appendChild(tlCard(t, true))); box.appendChild(g);
+                box.insertAdjacentHTML('beforeend', '<div style="font-weight:800;margin:14px 0 6px;">🌍 Toutes</div>');
+            }
+            if (!d.list.length) { box.insertAdjacentHTML('beforeend', '<p class="tl-hint">Aucune tier list pour l’instant… crée la première !</p>'); return; }
+            const g = document.createElement('div'); g.className = 'tl-cgrid'; d.list.forEach(t => g.appendChild(tlCard(t, false))); box.appendChild(g);
+        }
+
+        /* --- éditeur : n'importe quels persos / animes, images trouvées sur AniList --- */
+        let tlEd = null;
+        function tlEditor(edit) {
+            hideAllPanels();
+            document.getElementById('tierlist-room').style.display = 'block';
+            tlMode(true);
+            tlEd = { id: edit ? edit.id : null, type: 'char', items: edit ? edit.items.slice() : [], res: [] };
+            document.getElementById('tl-subtitle').textContent = edit ? 'Modifier ma tier list' : 'Créer ma tier list';
+            const hub = document.getElementById('tl-hub');
+            hub.innerHTML = `<input id="tl-ed-title" class="v7-input" maxlength="60" placeholder="Titre (ex : Tier list des meilleurs rivaux)" value="${edit ? v7esc(edit.title) : ''}">
+                <div class="tl-tabs"><button data-t="char" class="on">👤 Persos</button><button data-t="anime">📺 Animes</button></div>
+                <div style="display:flex;gap:6px;"><input id="tl-ed-q" class="v7-input" style="flex:1;margin:0;" placeholder="🔎 Cherche un perso de n'importe quel anime (ex : Gojo, Naruto, Frieren…)"><button class="btn-action" style="width:auto;margin:0;padding:0 14px;" onclick="tlEdSearch()">Chercher</button></div>
+                <div class="tl-hint" style="text-align:left;">Clique sur un résultat pour l’ajouter. Tout est cherché sur AniList, donc même les persos qui ne sont pas dans le jeu.</div>
+                <div id="tl-ed-res" class="tl-ed-res"></div>
+                <div style="display:flex;gap:6px;margin-top:6px;"><input id="tl-ed-free" class="v7-input" style="flex:1;margin:0;" maxlength="50" placeholder="…ou ajoute un élément sans image (texte)"><button class="btn-action" style="width:auto;margin:0;padding:0 14px;background:#2a2a40;" onclick="tlEdFree()">➕</button></div>
+                <div class="tl-sec" id="tl-ed-count"></div>
+                <div id="tl-ed-list" class="tl-pool" style="margin-top:0;"></div>
+                <div class="tl-hint">Clique sur un élément de ta liste pour le retirer.</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"><button class="btn-action" style="flex:1;min-width:180px;" onclick="tlEdSave()">💾 ${edit ? 'Enregistrer' : 'Publier ma tier list'}</button><button class="btn-action" style="flex:1;min-width:140px;background:#2a2a40;" onclick="openTierSelection()">Annuler</button></div>`;
+            hub.querySelectorAll('.tl-tabs button').forEach(b => b.onclick = () => { tlEd.type = b.dataset.t; hub.querySelectorAll('.tl-tabs button').forEach(x => x.classList.toggle('on', x === b)); document.getElementById('tl-ed-q').placeholder = tlEd.type === 'anime' ? '🔎 Cherche un anime (ex : Frieren, Bleach…)' : '🔎 Cherche un perso de n\'importe quel anime (ex : Gojo, Naruto, Frieren…)'; tlEdSearch(); });
+            const q = document.getElementById('tl-ed-q'); let tmo = null;
+            q.oninput = () => { clearTimeout(tmo); tmo = setTimeout(tlEdSearch, 450); };
+            q.onkeydown = e => { if (e.key === 'Enter') { clearTimeout(tmo); tlEdSearch(); } };
+            document.getElementById('tl-ed-free').onkeydown = e => { if (e.key === 'Enter') tlEdFree(); };
+            tlEdRender();
+            window.scrollTo(0, 0);
+        }
+        function tlEdTile(it, onClick, added) {
+            const el = document.createElement('div'); el.className = 'tl-item' + (it.img ? '' : ' noimg') + (added ? ' added' : ''); el.title = it.sub ? it.name + ' — ' + it.sub : it.name;
+            if (it.img) { const im = document.createElement('img'); im.loading = 'lazy'; im.src = '/api/img?u=' + encodeURIComponent(it.img); im.onerror = () => { im.remove(); el.classList.add('noimg'); }; el.appendChild(im); }
+            const cap = document.createElement('div'); cap.className = 'tl-name'; cap.textContent = it.name; el.appendChild(cap);
+            el.onclick = onClick; return el;
+        }
+        async function tlEdSearch() {
+            const q = document.getElementById('tl-ed-q').value.trim(), box = document.getElementById('tl-ed-res');
+            if (q.length < 2) { box.innerHTML = ''; return; }
+            box.innerHTML = '<div class="arc-spin" style="margin:8px auto;"></div>';
+            const d = await v7get(`/api/tl/search?type=${tlEd.type}&q=${encodeURIComponent(q)}`);
+            if (!d || !d.ok) { box.innerHTML = `<p class="tl-hint">${v7esc((d && d.error) || 'Recherche impossible.')}</p>`; return; }
+            tlEd.res = d.items; tlEdRenderRes();
+        }
+        function tlEdRenderRes() {
+            const box = document.getElementById('tl-ed-res'); box.innerHTML = '';
+            if (!tlEd.res.length) { box.innerHTML = '<p class="tl-hint">Aucun résultat.</p>'; return; }
+            const has = n => tlEd.items.some(x => x.name.toLowerCase() === n.toLowerCase());
+            tlEd.res.forEach(it => box.appendChild(tlEdTile(it, () => { if (has(it.name)) return; if (tlEd.items.length >= 300) return toast('300 éléments maximum.', 'var(--accent-pink)'); tlEd.items.push(it); tlEdRender(); }, has(it.name))));
+        }
+        function tlEdFree() {
+            const f = document.getElementById('tl-ed-free'), n = f.value.trim();
+            if (!n || tlEd.items.some(x => x.name.toLowerCase() === n.toLowerCase())) return;
+            tlEd.items.push({ name: n }); f.value = ''; tlEdRender();
+        }
+        function tlEdRender() {
+            document.getElementById('tl-ed-count').textContent = `📋 Ma liste (${tlEd.items.length})`;
+            const box = document.getElementById('tl-ed-list'); box.innerHTML = '';
+            if (!tlEd.items.length) box.innerHTML = '<div class="tl-hint" style="width:100%;">Ajoute au moins 4 éléments.</div>';
+            tlEd.items.forEach((it, i) => box.appendChild(tlEdTile(it, () => { tlEd.items.splice(i, 1); tlEdRender(); })));
+            if (tlEd.res.length) tlEdRenderRes();
+        }
+        async function tlEdSave() {
+            const title = document.getElementById('tl-ed-title').value.trim();
+            const d = await v7post('/api/tl/create', { id: tlEd.id, title, items: tlEd.items });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Connecte-toi pour publier une tier list.'), 'var(--accent-pink)');
+            toast('✅ Tier list publiée !', '#00ff88');
+            startTierList('utl:' + d.id);
+        }
+
+        /* --- petit lecteur YouTube pour écouter un opening / une OST depuis la tier list --- */
+        function tlPlay(it) {
+            let p = document.getElementById('tl-player');
+            if (!p) { p = document.createElement('div'); p.id = 'tl-player'; document.body.appendChild(p); }
+            p.innerHTML = `<iframe allow="autoplay; encrypted-media" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(it.video)}?autoplay=1&start=${it.start || 0}&rel=0&playsinline=1"></iframe><div class="tlp-bar"><span>🎵 ${v7esc(it.name)}</span><button onclick="tlStopPlayer()">✖</button></div>`;
+        }
+        function tlStopPlayer() { document.getElementById('tl-player')?.remove(); }
+        async function tlRateUi(t) {
+            const box = document.getElementById('tl-rate');
+            if (!t || t.mine) { box.style.display = t ? 'block' : 'none'; if (t) box.innerHTML = `Tier list de <b>${v7esc(t.author)}</b> (la tienne) • ${t.rating ? '⭐ ' + t.rating + ' (' + t.votes + ' votes)' : 'pas encore notée'}`; return; }
+            box.style.display = 'block';
+            box.innerHTML = `Tier list de <b>${v7esc(t.author)}</b> • Note-la : ${[1, 2, 3, 4, 5].map(s => `<button data-s="${s}" class="${(t.myRating || 0) >= s ? 'on' : ''}">★</button>`).join('')} ${t.rating ? '<small>(' + t.rating + ' • ' + t.votes + ' votes)</small>' : ''}`;
+            box.querySelectorAll('button').forEach(b => b.onclick = async () => { const d = await v7post('/api/tl/rate', { id: t.id, stars: +b.dataset.s }); if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Connecte-toi pour noter.'), 'var(--accent-pink)'); toast('⭐ Merci pour ta note !', '#ffd93d'); tlRateUi(d.tl); });
         }
         async function startTierList(source) {
             hideAllPanels();
             document.getElementById('tierlist-room').style.display = 'block';
+            tlMode(false);
             document.getElementById('tl-board').innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
             document.getElementById('tl-pool').innerHTML = '';
             let data;
-            try { data = await loadItems(source); } catch (e) { document.getElementById('tl-board').innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
+            try {
+                if (source.startsWith('utl:')) {
+                    const d = await v7get('/api/tl/one?play=1&id=' + encodeURIComponent(source.slice(4)));
+                    if (!d || !d.ok) throw new Error('introuvable');
+                    data = { label: d.tl.title, items: d.items };
+                    tlRateUi(d.tl);
+                } else { data = await loadItems(source); document.getElementById('tl-rate').style.display = 'none'; }
+            } catch (e) { document.getElementById('tl-board').innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
             const names = data.items.map(i => i.name);
             let saved = null;
             try { saved = JSON.parse(localStorage.getItem('tierlist:' + source) || 'null'); } catch (e) {}
@@ -6446,7 +6626,8 @@
                 saved.tiers.forEach((t, i) => (t.items || []).forEach(n => { if (tiers[i] && names.includes(n) && !placed.has(n)) { tiers[i].items.push(n); placed.add(n); } }));
             }
             tl = { source, label: data.label, items: Object.fromEntries(data.items.map(i => [i.name, i])), tiers, pool: names.filter(n => !placed.has(n)) };
-            document.getElementById('tl-subtitle').textContent = `${data.label} • ${names.length} ${source === 'animes' ? 'animes' : 'persos'}`;
+            const unit = source === 'animes' ? 'animes' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'éléments' : source.startsWith('utl:') ? 'éléments' : 'persos';
+            document.getElementById('tl-subtitle').textContent = `${data.label} • ${names.length} ${unit}`;
             tlRender();
         }
         function tlSave() {
@@ -6475,7 +6656,16 @@
             el.dataset.name = name;
             const cap = document.createElement('div'); cap.className = 'tl-name'; cap.textContent = name;
             el.appendChild(cap);
-            itemImage(tl.source, it).then(src => {
+            if (it.video) {
+                const pb = document.createElement('button'); pb.className = 'tl-play'; pb.textContent = '▶'; pb.title = 'Écouter';
+                pb.addEventListener('click', e => { e.stopPropagation(); tlPlay(it); });
+                el.appendChild(pb);
+            }
+            if (it.imgs) { // duo / combat : deux images côte à côte
+                const duo = document.createElement('div'); duo.className = 'tl-duo';
+                it.imgs.forEach(u => { const im = document.createElement('img'); im.src = '/api/img?u=' + encodeURIComponent(u); im.alt = ''; im.loading = 'lazy'; duo.appendChild(im); });
+                el.insertBefore(duo, cap); el.classList.remove('noimg');
+            } else itemImage(tl.source, it).then(src => {
                 if (!src) return;
                 const im = document.createElement('img'); im.src = src; im.alt = name; im.loading = 'lazy';
                 im.onload = () => el.classList.remove('noimg');
@@ -6554,7 +6744,9 @@
             let y = 70;
             const imgs = {};
             await Promise.all(tl.tiers.flatMap(t => t.items).map(async n => {
-                const src = await itemImage(tl.source, tl.items[n] || { name: n });
+                const it = tl.items[n] || { name: n };
+                if (it.imgs) { imgs[n] = await Promise.all(it.imgs.map(u => arcLoadImage('/api/img?u=' + encodeURIComponent(u)).catch(() => null))); return; }
+                const src = await itemImage(tl.source, it);
                 if (src) imgs[n] = await arcLoadImage(src);
             }));
             tl.tiers.forEach((t, i) => {
@@ -6567,7 +6759,14 @@
                     const x = labelW + gap + (k % perRow) * (size + gap), yy = y + gap + Math.floor(k / perRow) * (size + gap);
                     const img = imgs[n];
                     ctx.fillStyle = '#1d1d2c'; ctx.fillRect(x, yy, size, size);
-                    if (img) {
+                    if (Array.isArray(img)) img.forEach((im, j) => {
+                        if (!im) return;
+                        const half = size / 2, r = Math.max(half / im.width, size / im.height), w = im.width * r, hh = im.height * r;
+                        ctx.save(); ctx.beginPath(); ctx.rect(x + j * half, yy, half, size); ctx.clip();
+                        ctx.drawImage(im, x + j * half + (half - w) / 2, yy, w, hh);
+                        ctx.restore();
+                    });
+                    else if (img) {
                         const r = Math.max(size / img.width, size / img.height);
                         const w = img.width * r, hh = img.height * r;
                         ctx.save(); ctx.beginPath(); ctx.rect(x, yy, size, size); ctx.clip();
