@@ -600,6 +600,8 @@
         .bb-card .bb-name{position:absolute;left:0;right:0;bottom:0;padding:34px 10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.92));font-family:'Bangers',cursive;font-size:clamp(1.1rem,3vw,1.7rem);text-align:center;letter-spacing:.5px;}
         .bb-card.noimg{display:flex;align-items:center;justify-content:center;}
         .bb-card.noimg .bb-name{position:static;background:none;padding:10px;}
+        .bb-autocd{margin-top:8px;font-weight:800;color:var(--accent-cyan);font-size:.9rem;}
+        .bb-name .bb-sub{display:block;font-family:Poppins,sans-serif;font-size:.68rem;font-weight:600;opacity:.8;margin-top:1px;letter-spacing:0;}
         .bb-card.win{border-color:#00ff88;transform:scale(1.03);}
         .bb-card.lose{opacity:.25;transform:scale(.96);}
         .bb-vs{font-family:'Bangers',cursive;font-size:2.2rem;color:var(--accent-pink);text-shadow:0 0 18px rgba(255,42,95,.6);}
@@ -1904,6 +1906,12 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Battle d'openings</h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Tournoi entre 210 openings / endings : écoute, choisis ton préféré à chaque duel jusqu'au champion (8 à 64) • classement mondial des votes</p>
                     <button class="btn-action" style="margin-top:0;background:var(--accent-pink);" onclick="openBattleSelection()">Lancer une battle</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:var(--accent-cyan);">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🤔 Tu préfères…</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Deux persos, un seul choix ! Tournoi de persos jusqu'à la finale : un anime, plusieurs, ou tous les animes (tous les persos du jeu) • jouable avec ton chat Twitch ou TikTok</p>
+                    <button class="btn-action" style="margin-top:0;background:var(--accent-cyan);color:#111;" onclick="openUniverseSelection('tupref')">Choisir l'univers</button>
                 </div>
 
                 
@@ -3223,6 +3231,7 @@
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_couleur:    { title:'🎨 COLORIE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
+            tupref:         { title:'🤔 TU PRÉFÈRES…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
         };
         let QUOTE_COUNTS = {};
@@ -3235,6 +3244,7 @@
             const grid = document.getElementById('universe-select-grid');
             grid.innerHTML = '';
             const pick = key => mode === 'quote' ? createQuoteRoom(key)
+                : mode === 'tupref' ? startBattleSetup('tp:' + key)
                 : mode.startsWith('arc_') ? createRoom('arcade', mode.slice(4) + ':' + key)
                 : createRoom(mode, key);
             // plusieurs animes au choix (sauf Rolland Garros, Enchères et AnimeDLE)
@@ -6523,18 +6533,28 @@
             body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
             let data;
             try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
-            bb = { source, label: data.label, all: data.items };
-            document.getElementById('bb-subtitle').textContent = `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') };
+            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
+            document.getElementById('bb-subtitle').textContent = bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
             h.innerHTML = '<div class="bb-round">COMBIEN DE PARTICIPANTS ?</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Ils sont tirés au hasard. À chaque duel, clique sur ton préféré (ou flèches ← →).</p>';
             body.appendChild(h);
             const sizes = document.createElement('div'); sizes.className = 'bb-sizes';
-            [8, 16, 32, 64].filter(n => n <= data.items.length).forEach(n => {
-                const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} participants`;
+            const N = data.items.length;
+            const opts = (bb.tp ? [8, 16, 32, 64, 128, 256, 512, 1024] : [8, 16, 32, 64]).filter(n => n <= N);
+            opts.forEach(n => {
+                const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} ${bb.tp ? 'persos' : 'participants'}`;
                 b.onclick = () => bbStart(n);
                 sizes.appendChild(b);
             });
+            // Tu préfères : on peut mettre TOUS les persos (tour préliminaire si le nombre n'est pas une puissance de 2)
+            if (bb.tp && N >= 8 && !opts.includes(N)) {
+                const b = document.createElement('button'); b.className = 'btn-action'; b.style.background = 'var(--accent-cyan)'; b.style.color = '#111';
+                b.textContent = `🌍 Tous les ${N} persos`;
+                b.onclick = () => bbStart(N);
+                sizes.appendChild(b);
+            }
             body.appendChild(sizes);
             const rk = document.createElement('button'); rk.className = 'btn-action'; rk.style.cssText = 'background:#2a2a40;max-width:320px;display:block;margin:0 auto;';
             rk.textContent = '🌍 Voir le classement mondial';
@@ -6546,13 +6566,20 @@
         function bbShuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
         function bbStart(n) {
             const entrants = bbShuffle(bb.all).slice(0, n).map(i => i.name);
-            Object.assign(bb, { size: n, current: entrants, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
+            // nombre qui n'est pas une puissance de 2 : tour préliminaire pour les persos en trop, les autres sont qualifiés d'office
+            const P = Math.pow(2, Math.floor(Math.log2(entrants.length)));
+            const extra = entrants.length - P;
+            const current = extra ? entrants.slice(0, 2 * extra) : entrants;
+            const bye = extra ? entrants.slice(2 * extra) : null;
+            Object.assign(bb, { size: entrants.length, current, bye, playin: !!extra, next: [], idx: 0, duels: [], history: [], eliminated: {}, done: false });
             bbRenderDuel();
         }
         function bbItem(name) { return bb.all.find(i => i.name === name) || { name }; }
         function bbCard(name, onClick) {
             const card = document.createElement('div'); card.className = 'bb-card noimg';
             const cap = document.createElement('div'); cap.className = 'bb-name'; cap.textContent = name;
+            const sub0 = bbItem(name).sub;
+            if (sub0) { const sm = document.createElement('small'); sm.className = 'bb-sub'; sm.textContent = sub0; cap.appendChild(sm); }
             card.appendChild(cap);
             itemImage(bb.source, bbItem(name)).then(src => {
                 if (!src) return;
@@ -6589,7 +6616,7 @@
             const a = bb.current[bb.idx], b = bb.current[bb.idx + 1];
             body.innerHTML = '';
             const head = document.createElement('div'); head.className = 'bb-head';
-            const rn = document.createElement('div'); rn.className = 'bb-round'; rn.textContent = BB_ROUND_NAMES[bb.current.length] || `TOUR DES ${bb.current.length}`;
+            const rn = document.createElement('div'); rn.className = 'bb-round'; rn.textContent = bb.playin ? 'TOUR PRÉLIMINAIRE' : (BB_ROUND_NAMES[bb.current.length] || `TOUR DES ${bb.current.length}`);
             const sub = document.createElement('div'); sub.style.cssText = 'color:var(--text-muted);font-size:.85rem;'; sub.textContent = `Duel ${matchNo} / ${total}`;
             const prog = document.createElement('div'); prog.className = 'bb-progress';
             const done = bb.duels.length, all = bb.size - 1;
@@ -6617,16 +6644,16 @@
             const winner = side === 0 ? a : b, loser = side === 0 ? b : a;
             (side === 0 ? ca : cb).classList.add('win');
             (side === 0 ? cb : ca).classList.add('lose');
-            bb.history.push(JSON.stringify({ current: bb.current, next: bb.next, idx: bb.idx, duels: bb.duels, eliminated: bb.eliminated }));
+            bb.history.push(JSON.stringify({ current: bb.current, next: bb.next, idx: bb.idx, duels: bb.duels, eliminated: bb.eliminated, bye: bb.bye, playin: bb.playin }));
             bb.duels.push([winner, loser]);
-            bb.eliminated[loser] = bb.current.length;
+            bb.eliminated[loser] = bb.playin ? bb.size : bb.current.length;
             bb.next.push(winner);
             bb.idx += 2;
             setTimeout(() => {
                 bb.busy = false;
                 if (bb.idx >= bb.current.length) {
-                    if (bb.next.length === 1) return bbFinish(bb.next[0]);
-                    bb.current = bb.next; bb.next = []; bb.idx = 0;
+                    if (bb.next.length === 1 && !bb.bye) return bbFinish(bb.next[0]);
+                    bb.current = bb.bye ? bbShuffle([...bb.next, ...bb.bye]) : bb.next; bb.next = []; bb.idx = 0; bb.bye = null; bb.playin = false;
                 }
                 bbRenderDuel();
             }, 380);
@@ -6667,7 +6694,8 @@
                 t1.className = 'on'; t2.className = '';
                 list.innerHTML = '';
                 const rank = document.createElement('div'); rank.className = 'bb-rank';
-                const stageName = n => n === champion ? 'Champion' : ({ 2: 'Finaliste', 4: 'Demi-finale', 8: 'Quarts', 16: 'Huitièmes', 32: 'Seizièmes', 64: '1er tour' }[bb.eliminated[n]] || '');
+                const P2 = Math.pow(2, Math.floor(Math.log2(bb.size)));
+            const stageName = n => { if (n === champion) return 'Champion'; const e = bb.eliminated[n]; if (e > P2) return 'Préliminaire'; return { 2: 'Finaliste', 4: 'Demi-finale', 8: 'Quarts', 16: 'Huitièmes', 32: 'Seizièmes' }[e] || (e ? 'Tour des ' + e : ''); };
                 order.forEach((n, i) => rank.appendChild(bbRankRow(i + 1, n, stageName(n), null)));
                 list.appendChild(rank);
             };
@@ -7304,10 +7332,54 @@
                     });
                     if (bb && bb.current) streamPoll('bb|' + bb.current.length + '|' + bb.idx + '|' + bb.duels.length, [bb.current[bb.idx], bb.current[bb.idx + 1]]);
                     streamDecorate();
+                    bbAutoStart();
                 } catch (e) {}
                 return r;
             };
         })();
+        // « Le chat décide » : en live, la majorité du chat (1 = gauche, 2 = droite) choisit toute seule après le compte à rebours
+        const BB_AUTO_SEC = 15;
+        const bbAuto = { on: (() => { try { return localStorage.getItem('bb_chat_auto') === '1'; } catch (e) { return false; } })(), t: null, left: 0 };
+        function bbAutoClear() { clearInterval(bbAuto.t); bbAuto.t = null; }
+        function bbAutoToggle() { bbAuto.on = !bbAuto.on; try { localStorage.setItem('bb_chat_auto', bbAuto.on ? '1' : '0'); } catch (e) {} bbRenderDuel(); }
+        function bbAutoStart() {
+            bbAutoClear();
+            const box = document.getElementById('bb-body');
+            const duel = box && box.querySelector('.bb-duel');
+            if (!stream.ws || !bb || bb.done || !duel) return;
+            const tools = duel.nextElementSibling;
+            if (tools) {
+                const btn = document.createElement('button'); btn.className = 'btn-action';
+                btn.style.cssText = 'width:auto;margin:0;background:' + (bbAuto.on ? '#00c26e;color:#111' : '#2a2a40') + ';';
+                btn.textContent = bbAuto.on ? `🎥 Le chat décide : ON (${BB_AUTO_SEC} s)` : '🎥 Le chat décide : OFF';
+                btn.onclick = bbAutoToggle;
+                tools.appendChild(btn);
+            }
+            if (!bbAuto.on) return;
+            const cd = document.createElement('div'); cd.className = 'bb-autocd';
+            const head = box.querySelector('.bb-head'); if (head) head.appendChild(cd);
+            bbAuto.left = BB_AUTO_SEC;
+            const key = stream.key;
+            const tick = () => {
+                const panel = document.getElementById('battle-room');
+                if (!bb || bb.done || stream.key !== key || !document.body.contains(cd) || !panel || panel.style.display === 'none') return bbAutoClear();
+                const { counts, total } = streamPct();
+                if (bbAuto.left <= 0) {
+                    if (total && counts[0] !== counts[1]) {
+                        bbAutoClear();
+                        const cards = box.querySelectorAll('.bb-duel .bb-card');
+                        bbPick(counts[1] > counts[0] ? 1 : 0, cards[0], cards[1]);
+                        return;
+                    }
+                    bbAuto.left = 5; // égalité ou aucun vote : on prolonge
+                    cd.textContent = total ? '⚖️ Égalité ! 5 secondes de plus…' : '⏳ Personne n’a voté… 5 secondes de plus';
+                    return;
+                }
+                cd.textContent = `⏱️ Le chat décide dans ${bbAuto.left} s • ${total} vote${total > 1 ? 's' : ''} • tapez 1 ou 2`;
+                bbAuto.left--;
+            };
+            tick(); bbAuto.t = setInterval(tick, 1000);
+        }
 
         tryAutoLogin();
 
@@ -11389,7 +11461,7 @@
             // catégories de chaque carte (une carte peut être dans plusieurs)
             const RULES = [
                 [/undercover/i, ['bluff']], [/loup-garou/i, ['bluff', 'grand']], [/devine le perso/i, ['bluff']],
-                [/devine la note/i, ['quiz']], [/citation/i, ['quiz']], [/blind test/i, ['musique', 'stream']], [/battle d'openings/i, ['musique', 'stream']],
+                [/devine la note/i, ['quiz']], [/citation/i, ['quiz']], [/blind test/i, ['musique', 'stream']], [/battle d'openings/i, ['musique', 'stream']], [/tu préfères/i, ['fun', 'stream']],
                 [/mini-jeux/i, ['quiz', 'stream']], [/chaîne de persos/i, ['quiz']], [/quiz des joueurs/i, ['quiz']], [/animedle/i, ['quiz']], [/rolland garos/i, ['quiz']],
                 [/dessine le perso/i, ['fun', 'stream']], [/tier list/i, ['fun']], [/jeu de connexion/i, ['fun']],
                 [/tournoi/i, ['strat', 'grand']], [/enchère/i, ['strat']]
@@ -11401,7 +11473,7 @@
                 const t = (c.querySelector('h3') || {}).textContent || '';
                 const r = RULES.find(([re]) => re.test(t));
                 c.dataset.cat = (r ? r[1] : ['quiz']).join(' ');
-                if (/blind test|battle d'openings|dessine le perso/i.test(t)) { const h = c.querySelector('h3'); if (h && !h.querySelector('.mc-tag')) h.insertAdjacentHTML('beforeend', '<span class="mc-tag">🎥 CHAT</span>'); }
+                if (/blind test|battle d'openings|dessine le perso|tu préfères/i.test(t)) { const h = c.querySelector('h3'); if (h && !h.querySelector('.mc-tag')) h.insertAdjacentHTML('beforeend', '<span class="mc-tag">🎥 CHAT</span>'); }
             });
             // tuiles mini-jeux jouables avec le chat
             grid.querySelectorAll('.arc-game-btn').forEach(b => {

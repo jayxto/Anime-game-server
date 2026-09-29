@@ -11802,7 +11802,55 @@ async function arcAnimeCover(name) {
     return url;
 }
 
+// « Tu préfères » : TOUS les persos du jeu qui ont une image vérifiée, pour un univers,
+// plusieurs (« tp:naruto+bleach ») ou tous (« tp:all »)
+const TP_CACHE = new Map();
+function tpUniverseItems(u) {
+    if (TP_CACHE.has(u)) return TP_CACHE.get(u);
+    const out = [], seen = new Set();
+    const add = (name, img) => {
+        const k = normalizeImageKey(cleanImageCharacterName(name));
+        if (!k || !img || seen.has(k)) return;
+        seen.add(k); out.push({ name, img, u });
+    };
+    if (u === 'pokemon') {
+        arcFamous('pokemon').forEach(c => add(c.display, POKEMON_IMAGE_BY_NAME?.[c.raw] || null));
+    } else {
+        const lists = [ARC_FAMOUS_OVERRIDE[u] || [], (typeof DLE_TARGET_NAMES !== 'undefined' && DLE_TARGET_NAMES[u]) || [],
+            (typeof DLE_MASTER_NAMES !== 'undefined' && DLE_MASTER_NAMES[u]) || [], (typeof RG_POOLS_V2 !== 'undefined' && RG_POOLS_V2[u]) || []];
+        for (const list of lists) for (const raw of list) {
+            const display = arcDisplayName(u, raw);
+            add(display, staticCharImage(u, display) || staticCharImage(u, raw));
+        }
+        // persos à image vérifiée qui ne sont dans aucune liste : on les garde aussi
+        const cap = w => w.replace(/(^|[\s'-])([a-z])/g, (m, p, c) => p + c.toUpperCase());
+        Object.entries(STATIC_CHAR_IMAGES[u] || {}).forEach(([k, img]) => { if (!seen.has(k)) add(cap(k), img); });
+    }
+    TP_CACHE.set(u, out);
+    return out;
+}
+function tpItemsFor(source) {
+    if (TP_CACHE.has(source)) return TP_CACHE.get(source);
+    const key = source.slice(3);
+    const us = key === 'all' ? Object.keys(ARC_UNIVERSE_ANIME) : [...new Set(key.split('+'))];
+    if (!us.length || us.some(u => !ARC_UNIVERSE_ANIME[u])) return null;
+    const multi = us.length > 1;
+    const count = new Map();
+    const items = us.flatMap(u => tpUniverseItems(u));
+    items.forEach(i => count.set(i.name, (count.get(i.name) || 0) + 1));
+    // même nom dans deux animes (King, Angel…) : on précise l'anime pour les distinguer
+    const out = items.map(i => ({ name: count.get(i.name) > 1 ? `${i.name} (${ARC_UNIVERSE_ANIME[i.u]})` : i.name, img: i.img, sub: multi ? ARC_UNIVERSE_ANIME[i.u] : null }));
+    TP_CACHE.set(source, out);
+    return out;
+}
+function tpLabel(source) {
+    const key = source.slice(3);
+    if (key === 'all') return 'Tous les animes';
+    return key.split('+').map(u => ARC_UNIVERSE_ANIME[u]).join(' + ');
+}
+
 function arcItemsFor(source) {
+    if (source.startsWith('tp:')) return tpItemsFor(source);
     if (source === 'animes') return ARC_ANIMES.map(a => ({ name: a[0] }));
     if (!ARC_UNIVERSE_ANIME[source]) return null;
     if (source === 'pokemon') {
@@ -11827,8 +11875,8 @@ app.get('/api/arcade/items', (req, res) => {
     res.json({
         ok: true,
         source,
-        label: source === 'animes' ? 'Animes' : ARC_UNIVERSE_ANIME[source],
-        items: items.map(i => ({ name: i.name, img: i.img || null }))
+        label: source === 'animes' ? 'Animes' : source.startsWith('tp:') ? tpLabel(source) : ARC_UNIVERSE_ANIME[source],
+        items: items.map(i => ({ name: i.name, img: i.img || null, ...(i.sub ? { sub: i.sub } : {}) }))
     });
 });
 
@@ -11857,7 +11905,7 @@ if (process.env.DATABASE_URL) {
         PRIMARY KEY (theme, name))`).catch(e => console.warn('[Battle] table :', e.message));
 }
 
-app.post('/api/battle/result', express.json({ limit: '40kb' }), async (req, res) => {
+app.post('/api/battle/result', express.json({ limit: '1mb' }), async (req, res) => {
     const theme = String(req.body?.theme || '');
     const items = arcItemsFor(theme);
     if (!items) return res.status(400).json({ ok: false });
@@ -11867,7 +11915,7 @@ app.post('/api/battle/result', express.json({ limit: '40kb' }), async (req, res)
     ARC_BATTLE_IP.set(ip, Date.now());
 
     const valid = new Set(items.map(i => i.name));
-    const duels = Array.isArray(req.body?.duels) ? req.body.duels.slice(0, 127) : [];
+    const duels = Array.isArray(req.body?.duels) ? req.body.duels.slice(0, 4095) : [];
     const champion = String(req.body?.champion || '');
     const agg = new Map();
     const bump = (n, k) => { const o = agg.get(n) || { wins: 0, matches: 0, champions: 0 }; o[k]++; agg.set(n, o); };
