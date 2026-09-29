@@ -1,0 +1,3240 @@
+{
+ "themes": [
+  {
+   "id": "souffert",
+   "title": "Qui a le plus souffert ?",
+   "emoji": "😭",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Guts",
+     "sub": "Berserk",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b422-XTaiTuvRohsV.png"
+    },
+    {
+     "name": "Eren Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg"
+    },
+    {
+     "name": "Ken Kaneki",
+     "sub": "Tokyo Ghoul",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b87275-mb13EWZBdbh3.png"
+    },
+    {
+     "name": "Thorfinn",
+     "sub": "Vinland Saga",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b10138-zOPrka0ddZOR.png"
+    },
+    {
+     "name": "Subaru Natsuki",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88573-F8yMTK9GhnTA.png"
+    },
+    {
+     "name": "Shinji Ikari",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89-ZtZhXkh1rITn.png"
+    },
+    {
+     "name": "Nagato",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3180-ITMGBLWNBOgV.png"
+    },
+    {
+     "name": "Obito Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3149-j6cl8A9yup51.png"
+    },
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Sasuke Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png"
+    },
+    {
+     "name": "Naruto Uzumaki",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png"
+    },
+    {
+     "name": "Gaara",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1662-4E5J0LX9jZKZ.png"
+    },
+    {
+     "name": "Tanjiro Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126071-BTNEc1nRIv68.png"
+    },
+    {
+     "name": "Nezuko Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127518-NRlq1CQ1v1ro.png"
+    },
+    {
+     "name": "Yuji Itadori",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127212-FVm2tD0erQ5B.png"
+    },
+    {
+     "name": "Megumi Fushiguro",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126635-L0y3I92JSUkN.png"
+    },
+    {
+     "name": "Denji",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b130102-FO1VHNnEnLlB.png"
+    },
+    {
+     "name": "Gon Freecss",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg"
+    },
+    {
+     "name": "Kurapika",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b28-ivA7UGnfE40a.png"
+    },
+    {
+     "name": "Nico Robin",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b61-ywXUyyocEEqt.png"
+    },
+    {
+     "name": "Portgas D. Ace",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2072-Lc6jEdsueJUK.jpg"
+    },
+    {
+     "name": "Sanji",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b305-6lisPmHtCnLT.png"
+    },
+    {
+     "name": "Nami",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b723-vp5hPptgnNEC.png"
+    },
+    {
+     "name": "Monkey D. Luffy",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40-MNypXsxSRb1R.png"
+    },
+    {
+     "name": "Edward Elric",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg"
+    },
+    {
+     "name": "Alphonse Elric",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b12-tCKu8yK5kFL5.jpg"
+    },
+    {
+     "name": "Scar",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b66-bLbGWXrmDqfV.png"
+    },
+    {
+     "name": "Nina Tucker",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4159-g0Q6tQ9SCq6R.jpg"
+    },
+    {
+     "name": "Rei Ayanami",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/86-cA1zL7fyls8E.jpg"
+    },
+    {
+     "name": "Asuka Langley",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b94-d631a3Z2KPvd.png"
+    },
+    {
+     "name": "Reiner Braun",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46484-P6A2GjNQn49F.png"
+    },
+    {
+     "name": "Mikasa Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40881-F3gr1PkreDvj.png"
+    },
+    {
+     "name": "Kaguya Otsutsuki",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/6/6c/Kaguya_%C5%8Ctsutsuki.png/revision/latest?cb=20180824113908"
+    },
+    {
+     "name": "Uryu Ishida",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/0/05/Ep344UryuProfile3.png/revision/latest?cb=20230125214916&path-prefix=en"
+    },
+    {
+     "name": "Orihime Inoue",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b7-JdR4betokDjR.jpg"
+    },
+    {
+     "name": "Rukia Kuchiki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b6-25WoBeWMZXBc.png"
+    },
+    {
+     "name": "Violet Evergarden",
+     "sub": "Violet Evergarden",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b90169-4wr1Zehnsac8.png"
+    },
+    {
+     "name": "Shoya Ishida",
+     "sub": "A Silent Voice",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b80491-NK6pxb6oH61P.png"
+    },
+    {
+     "name": "Rudeus Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88348-bIe5XnXdRpmX.png"
+    },
+    {
+     "name": "Emma",
+     "sub": "The Promised Neverland",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121725-LQciVJOjnMVh.png"
+    },
+    {
+     "name": "Norman",
+     "sub": "The Promised Neverland",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121700-CRwKIlcBcjbv.jpg"
+    },
+    {
+     "name": "Okabe Rintaro",
+     "sub": "Steins;Gate",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b35252-DY9TW6pusqeh.png"
+    },
+    {
+     "name": "Homura Akemi",
+     "sub": "Madoka Magica",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b38005-T3NR8p2f021x.jpg"
+    },
+    {
+     "name": "Lelouch Lamperouge",
+     "sub": "Code Geass",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b417-gVLmIJu9phcK.png"
+    },
+    {
+     "name": "Kousei Arima",
+     "sub": "Your Lie in April",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b69407-eyIvpsFPeARS.png"
+    },
+    {
+     "name": "Tomoya Okazaki",
+     "sub": "Clannad",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4606-61r9h3WUrkA9.png"
+    },
+    {
+     "name": "Kyojuro Rengoku",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129133-VlTPowwt68rJ.png"
+    },
+    {
+     "name": "Genya Shinazugawa",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137776-E0QuFD7y19OQ.jpg"
+    },
+    {
+     "name": "Sung Jinwoo",
+     "sub": "Solo Leveling",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129928-BCEjVaP0AQSw.png"
+    },
+    {
+     "name": "Rimuru Tempest",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123962-eL9yGV0NLMF7.png"
+    },
+    {
+     "name": "Maki Zenin",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b134167-5TCytk45YByD.png"
+    },
+    {
+     "name": "Toge Inumaki",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b157115-kdhRYQdVhH95.png"
+    },
+    {
+     "name": "Levi Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png"
+    },
+    {
+     "name": "Hinata Hyuga",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1555-Q41GLTV3FvYF.png"
+    },
+    {
+     "name": "Rock Lee",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b306-oUTOO45xInXt.png"
+    },
+    {
+     "name": "Touka Kirishima",
+     "sub": "Tokyo Ghoul",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b87277-oUaqrI1iBzu6.png"
+    }
+   ]
+  },
+  {
+   "id": "smart",
+   "title": "Qui est le plus smart ?",
+   "emoji": "🧠",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Light Yagami",
+     "sub": "Death Note",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b80-26EhwSsSqQ50.png"
+    },
+    {
+     "name": "L",
+     "sub": "Death Note",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b71-1W4panC53vfs.png"
+    },
+    {
+     "name": "Near",
+     "sub": "Death Note",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n464-6KeJpU6g7Hwj.jpg"
+    },
+    {
+     "name": "Lelouch Lamperouge",
+     "sub": "Code Geass",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b417-gVLmIJu9phcK.png"
+    },
+    {
+     "name": "Shikamaru Nara",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2007-QaesJlIZDifj.jpg"
+    },
+    {
+     "name": "Senku Ishigami",
+     "sub": "Dr. Stone",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b124142-XUO1g7wRqkaT.png"
+    },
+    {
+     "name": "Kiyotaka Ayanokoji",
+     "sub": "Classroom of the Elite",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123212-ewZgUQr9vvEM.png"
+    },
+    {
+     "name": "Johan Liebert",
+     "sub": "Monster",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b719-y984mDWyGf5n.jpg"
+    },
+    {
+     "name": "Norman",
+     "sub": "The Promised Neverland",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121700-CRwKIlcBcjbv.jpg"
+    },
+    {
+     "name": "Ray",
+     "sub": "The Promised Neverland",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121724-SJTdODjeO7e6.jpg"
+    },
+    {
+     "name": "Kurapika",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b28-ivA7UGnfE40a.png"
+    },
+    {
+     "name": "Killua Zoldyck",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg"
+    },
+    {
+     "name": "Meruem",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b23277-EYmIxzL64Mji.png"
+    },
+    {
+     "name": "Komugi",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/14313-J4CtnaAZidUe.jpg"
+    },
+    {
+     "name": "Shizuku Murasaki",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/5833.jpg"
+    },
+    {
+     "name": "Sosuke Aizen",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en"
+    },
+    {
+     "name": "Kisuke Urahara",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b210-mw01NrQfRjzT.png"
+    },
+    {
+     "name": "Mayuri Kurotsuchi",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1168-y2jsGtlJVv4z.png"
+    },
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Kakashi Hatake",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png"
+    },
+    {
+     "name": "Minato Namikaze",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2535-Xq9WKNPJQEt3.png"
+    },
+    {
+     "name": "Erwin Smith",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46496-Mu86MENd5wNB.png"
+    },
+    {
+     "name": "Armin Arlert",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46494-g7xYYuBtYPnO.png"
+    },
+    {
+     "name": "Hange Zoë",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b71121-7R7CnQd3lHgt.png"
+    },
+    {
+     "name": "Nico Robin",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b61-ywXUyyocEEqt.png"
+    },
+    {
+     "name": "Trafalgar Law",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b13767-U604OJN9dxCn.jpg"
+    },
+    {
+     "name": "Vegapunk",
+     "sub": "One Piece",
+     "img": "https://static.wikia.nocookie.net/onepiece/images/b/b9/Vegapunk_Anime_Infobox.png/revision/latest?cb=20240428020834"
+    },
+    {
+     "name": "Satoru Gojo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127691-9zqh1xpIubn7.png"
+    },
+    {
+     "name": "Kenjaku",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b289584-KndGudJZm5Ik.jpg"
+    },
+    {
+     "name": "Okabe Rintaro",
+     "sub": "Steins;Gate",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b35252-DY9TW6pusqeh.png"
+    },
+    {
+     "name": "Kurisu Makise",
+     "sub": "Steins;Gate",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b34470-Jw2LXZBL5R8i.png"
+    },
+    {
+     "name": "Kaguya Shinomiya",
+     "sub": "Kaguya-sama",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b120649-NPaWaIpWy60E.png"
+    },
+    {
+     "name": "Miyuki Shirogane",
+     "sub": "Kaguya-sama",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121101-Q8HzKP15At2d.png"
+    },
+    {
+     "name": "Edward Elric",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg"
+    },
+    {
+     "name": "Roy Mustang",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b68-moBLY2WO2am3.png"
+    },
+    {
+     "name": "Bulma",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b678-2YCe13F0tFos.jpg"
+    },
+    {
+     "name": "Dr. Gero",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535"
+    },
+    {
+     "name": "Rimuru Tempest",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123962-eL9yGV0NLMF7.png"
+    },
+    {
+     "name": "Diablo",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b131033-0LguIALHCBEH.jpg"
+    },
+    {
+     "name": "Izuku Midoriya",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89028-8w1I9o1ISHMg.png"
+    },
+    {
+     "name": "Reigen Arataka",
+     "sub": "Mob Psycho 100",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89334-OPj1hCzvrt7X.png"
+    },
+    {
+     "name": "Hachiman Hikigaya",
+     "sub": "Oregairu",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b67065-Dhec6tE2yWA9.png"
+    },
+    {
+     "name": "Yumeko Jabami",
+     "sub": "Kakegurui",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121889-ABsurpy5SjOW.png"
+    },
+    {
+     "name": "Rudeus Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88348-bIe5XnXdRpmX.png"
+    },
+    {
+     "name": "Ainz Ooal Gown",
+     "sub": "Overlord",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89103-ZsnA0r77GHsR.png"
+    },
+    {
+     "name": "Shiroe",
+     "sub": "Log Horizon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b81367-nE2CB4jLVPeu.png"
+    },
+    {
+     "name": "Sora",
+     "sub": "No Game No Life",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b82523-JB9oevKyXWfc.png"
+    },
+    {
+     "name": "Shiro",
+     "sub": "No Game No Life",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b82525-sKk2FGRKN4aK.png"
+    },
+    {
+     "name": "Yoichi Isagi",
+     "sub": "Blue Lock",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b140856-wVzKSyvU7R5B.png"
+    },
+    {
+     "name": "Kei Tsukishima",
+     "sub": "Haikyuu",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b67329-k7mDdqQ6rJ4w.png"
+    },
+    {
+     "name": "Frieren",
+     "sub": "Frieren",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b176754-PCnpqIOkjhFk.png"
+    },
+    {
+     "name": "Makima",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137080-UHcynYNjb5ZU.png"
+    }
+   ]
+  },
+  {
+   "id": "entree",
+   "title": "Qui a la meilleure entrée ?",
+   "emoji": "😎",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Shanks",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b727-wUJx7M1z5xON.png"
+    },
+    {
+     "name": "Monkey D. Luffy",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40-MNypXsxSRb1R.png"
+    },
+    {
+     "name": "Edward Newgate",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2751-NnzW0N2vCTjX.jpg"
+    },
+    {
+     "name": "Monkey D. Garp",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b8064-dPltKaZ8RAsj.jpg"
+    },
+    {
+     "name": "Roronoa Zoro",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b62-S7oAeA9WInjV.png"
+    },
+    {
+     "name": "Sanji",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b305-6lisPmHtCnLT.png"
+    },
+    {
+     "name": "Kaido",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46109-MT7Hm4Bk93In.png"
+    },
+    {
+     "name": "Boa Hancock",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b16342-kVOF6V5Q94go.png"
+    },
+    {
+     "name": "Madara Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b53901-HnRKSoHMG5Vg.png"
+    },
+    {
+     "name": "Minato Namikaze",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2535-Xq9WKNPJQEt3.png"
+    },
+    {
+     "name": "Might Guy",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456"
+    },
+    {
+     "name": "Jiraiya",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2423-RO5MyoXSA9OL.png"
+    },
+    {
+     "name": "Naruto Uzumaki",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png"
+    },
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Hashirama Senju",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n12464-fcgqkCPZoREw.png"
+    },
+    {
+     "name": "Kakashi Hatake",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png"
+    },
+    {
+     "name": "Satoru Gojo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127691-9zqh1xpIubn7.png"
+    },
+    {
+     "name": "Ryomen Sukuna",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b133701-rCQuDpHr3UZL.png"
+    },
+    {
+     "name": "Aoi Todo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137975-6TH7PiLWJaqy.png"
+    },
+    {
+     "name": "Yuta Okkotsu",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129571-GHJk7gviHOOw.jpg"
+    },
+    {
+     "name": "Kyojuro Rengoku",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129133-VlTPowwt68rJ.png"
+    },
+    {
+     "name": "Giyu Tomioka",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b130050-qsLThJs5VIbz.png"
+    },
+    {
+     "name": "Tengen Uzui",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b136071-99Kexnnn2PiV.png"
+    },
+    {
+     "name": "Muzan Kibutsuji",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129132-4nIZakUZ1o8W.jpg"
+    },
+    {
+     "name": "Son Goku",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513"
+    },
+    {
+     "name": "Vegeta",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b913-NIFkKazWM8VO.png"
+    },
+    {
+     "name": "Broly",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/c/cd/Broly_Infobox_image.png/revision/latest?cb=20170525181624"
+    },
+    {
+     "name": "Son Gohan",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059"
+    },
+    {
+     "name": "Ichigo Kurosaki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5-a7bkJgjhhigE.png"
+    },
+    {
+     "name": "Byakuya Kuchiki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b907-kgnDKeMtEN5y.png"
+    },
+    {
+     "name": "Kenpachi Zaraki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b909-slhoFBon7oiH.jpg"
+    },
+    {
+     "name": "Sosuke Aizen",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en"
+    },
+    {
+     "name": "Shunsui Kyoraku",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/0/03/Ep375ShunsuiProfile.png/revision/latest?cb=20221205191725&path-prefix=en"
+    },
+    {
+     "name": "Genryusai Yamamoto",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5726-mO7kc8Abka9J.jpg"
+    },
+    {
+     "name": "Levi Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png"
+    },
+    {
+     "name": "Eren Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg"
+    },
+    {
+     "name": "Dio Brando",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4004-w0OtWuvjhftG.png"
+    },
+    {
+     "name": "Jotaro Kujo",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4003-gWDSEGbeOAll.png"
+    },
+    {
+     "name": "Giorno Giovanna",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838"
+    },
+    {
+     "name": "Saitama",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b73935-ON5d0mAcrItd.jpg"
+    },
+    {
+     "name": "Tatsumaki",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b81929-WPVp2LQoWgkc.png"
+    },
+    {
+     "name": "Sung Jinwoo",
+     "sub": "Solo Leveling",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129928-BCEjVaP0AQSw.png"
+    },
+    {
+     "name": "Meliodas",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b72921-XDHNd1wflN6P.png"
+    },
+    {
+     "name": "Escanor",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b90202-1H7FIX2hDmYd.png"
+    },
+    {
+     "name": "All Might",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89224-K6KEuQAuYKzq.jpg"
+    },
+    {
+     "name": "Hisoka Morow",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b31-FZckOuu7L1un.png"
+    },
+    {
+     "name": "Isaac Netero",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14489-WgGsdlQJka65.jpg"
+    },
+    {
+     "name": "Asta",
+     "sub": "Black Clover",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123285-tKijiuQErDS0.png"
+    }
+   ]
+  },
+  {
+   "id": "waifu",
+   "title": "Qui est la meilleure waifu ?",
+   "emoji": "💖",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Zero Two",
+     "sub": "Darling in the FranXX",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b124381-2gAVq76HPfL2.png"
+    },
+    {
+     "name": "Rem",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88575-Ayu8UPDA8NS6.png"
+    },
+    {
+     "name": "Emilia",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88572-IzTwXEHSobRs.jpg"
+    },
+    {
+     "name": "Makima",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137080-UHcynYNjb5ZU.png"
+    },
+    {
+     "name": "Power",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137079-6yLEUYR3bmpr.png"
+    },
+    {
+     "name": "Mikasa Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40881-F3gr1PkreDvj.png"
+    },
+    {
+     "name": "Hinata Hyuga",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1555-Q41GLTV3FvYF.png"
+    },
+    {
+     "name": "Tsunade",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2767-r61Cj9v8I0wl.png"
+    },
+    {
+     "name": "Sakura Haruno",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145-IorfpI8arxeX.png"
+    },
+    {
+     "name": "Nami",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b723-vp5hPptgnNEC.png"
+    },
+    {
+     "name": "Nico Robin",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b61-ywXUyyocEEqt.png"
+    },
+    {
+     "name": "Boa Hancock",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b16342-kVOF6V5Q94go.png"
+    },
+    {
+     "name": "Yamato",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b176840-8KRqXXLJeLOg.png"
+    },
+    {
+     "name": "Nezuko Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127518-NRlq1CQ1v1ro.png"
+    },
+    {
+     "name": "Shinobu Kocho",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b136070-MC9LLxJsHyHE.png"
+    },
+    {
+     "name": "Mitsuri Kanroji",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b136072-xVwyRUKdpybi.png"
+    },
+    {
+     "name": "Kanao Tsuyuri",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b139038-OcOoDUyLEsRn.png"
+    },
+    {
+     "name": "Asuna Yuuki",
+     "sub": "Sword Art Online",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b36828-j5ib0adAzGMx.png"
+    },
+    {
+     "name": "Erza Scarlet",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5189-GR1xdok9SFsN.jpg"
+    },
+    {
+     "name": "Lucy Heartfilia",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5186-izgXf2S86K9u.png"
+    },
+    {
+     "name": "Yor Forger",
+     "sub": "Spy x Family",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b138102-ZOAu9jI2d5ke.png"
+    },
+    {
+     "name": "Marin Kitagawa",
+     "sub": "My Dress-Up Darling",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b133676-kV2czE3C8Qls.png"
+    },
+    {
+     "name": "Mai Sakurajima",
+     "sub": "Rascal Does Not Dream",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127222-Jh5hhP7vZ7s1.png"
+    },
+    {
+     "name": "Chizuru Mizuhara",
+     "sub": "Rent-a-Girlfriend",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b128106-zSTsuULvz6PX.png"
+    },
+    {
+     "name": "Kurisu Makise",
+     "sub": "Steins;Gate",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b34470-Jw2LXZBL5R8i.png"
+    },
+    {
+     "name": "Rias Gremory",
+     "sub": "High School DxD",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b50389-gIhJkyk8xj1P.png"
+    },
+    {
+     "name": "Megumin",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89361-tq8PQQ4MmF0M.png"
+    },
+    {
+     "name": "Aqua",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89362-ibkc0eoECaW1.png"
+    },
+    {
+     "name": "Violet Evergarden",
+     "sub": "Violet Evergarden",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b90169-4wr1Zehnsac8.png"
+    },
+    {
+     "name": "Taiga Aisaka",
+     "sub": "Toradora",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b12064-7PDN3ylIeAZn.png"
+    },
+    {
+     "name": "Holo",
+     "sub": "Spice and Wolf",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b7373-1BH0gELuZmHD.jpg"
+    },
+    {
+     "name": "Rukia Kuchiki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b6-25WoBeWMZXBc.png"
+    },
+    {
+     "name": "Orihime Inoue",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b7-JdR4betokDjR.jpg"
+    },
+    {
+     "name": "Yoruichi Shihoin",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/6/62/Ep246YoruichiShih%C5%8Din.png/revision/latest?cb=20231105202606&path-prefix=en"
+    },
+    {
+     "name": "Kaguya Shinomiya",
+     "sub": "Kaguya-sama",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b120649-NPaWaIpWy60E.png"
+    },
+    {
+     "name": "Chika Fujiwara",
+     "sub": "Kaguya-sama",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121103-UGLxT8utLPnq.png"
+    },
+    {
+     "name": "Ai Hoshino",
+     "sub": "Oshi no Ko",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b172759-cccVhJ2fQA92.png"
+    },
+    {
+     "name": "Frieren",
+     "sub": "Frieren",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b176754-PCnpqIOkjhFk.png"
+    },
+    {
+     "name": "Fern",
+     "sub": "Frieren",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b183965-uGFohBjlFoTp.png"
+    },
+    {
+     "name": "Nobara Kugisaki",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b133700-f6sOO3TcgLV6.png"
+    },
+    {
+     "name": "Maki Zenin",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b134167-5TCytk45YByD.png"
+    },
+    {
+     "name": "Bulma",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b678-2YCe13F0tFos.jpg"
+    },
+    {
+     "name": "Android 18",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4318-HfIy9rOIOZXM.png"
+    },
+    {
+     "name": "Mirajane Strauss",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5190-Xql1rGKUv1ql.png"
+    },
+    {
+     "name": "Tohru Honda",
+     "sub": "Fruits Basket",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b207-RQ4EUdTD0K62.png"
+    },
+    {
+     "name": "Miku Nakano",
+     "sub": "The Quintessential Quintuplets",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126373-CWeyXb822uDN.png"
+    },
+    {
+     "name": "Nino Nakano",
+     "sub": "The Quintessential Quintuplets",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126372-DtorHRgQaYUJ.png"
+    },
+    {
+     "name": "Raphtalia",
+     "sub": "The Rising of the Shield Hero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88889-CWYytVbCOPsV.png"
+    },
+    {
+     "name": "Albedo",
+     "sub": "Overlord",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89122-Gj7MBs7F5cMJ.png"
+    },
+    {
+     "name": "Esdeath",
+     "sub": "Akame ga Kill",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b65239-2S3t2vSyUew9.png"
+    },
+    {
+     "name": "Akame",
+     "sub": "Akame ga Kill",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b63351-0WmsDENpiscp.png"
+    },
+    {
+     "name": "Hestia",
+     "sub": "DanMachi",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b87654-UmmuLPwSK2Hd.jpg"
+    }
+   ]
+  },
+  {
+   "id": "aura",
+   "title": "Qui a le plus d'aura ?",
+   "emoji": "🔥",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Satoru Gojo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127691-9zqh1xpIubn7.png"
+    },
+    {
+     "name": "Ryomen Sukuna",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b133701-rCQuDpHr3UZL.png"
+    },
+    {
+     "name": "Toji Fushiguro",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b162722-btzdghBizxKS.jpg"
+    },
+    {
+     "name": "Yuta Okkotsu",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129571-GHJk7gviHOOw.jpg"
+    },
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Madara Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b53901-HnRKSoHMG5Vg.png"
+    },
+    {
+     "name": "Minato Namikaze",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2535-Xq9WKNPJQEt3.png"
+    },
+    {
+     "name": "Kakashi Hatake",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png"
+    },
+    {
+     "name": "Pain",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3180-ITMGBLWNBOgV.png"
+    },
+    {
+     "name": "Sosuke Aizen",
+     "sub": "Bleach",
+     "img": "https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en"
+    },
+    {
+     "name": "Byakuya Kuchiki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b907-kgnDKeMtEN5y.png"
+    },
+    {
+     "name": "Ulquiorra Cifer",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1081-xLTqHfLL2I2W.png"
+    },
+    {
+     "name": "Yhwach",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b68537-1bRB5OdseCp0.jpg"
+    },
+    {
+     "name": "Kenpachi Zaraki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b909-slhoFBon7oiH.jpg"
+    },
+    {
+     "name": "Shanks",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b727-wUJx7M1z5xON.png"
+    },
+    {
+     "name": "Edward Newgate",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2751-NnzW0N2vCTjX.jpg"
+    },
+    {
+     "name": "Dracule Mihawk",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n2064-OpnF4nLi6bvL.png"
+    },
+    {
+     "name": "Gol D. Roger",
+     "sub": "One Piece",
+     "img": "https://static.wikia.nocookie.net/onepiece/images/2/24/Gol_D._Roger_Anime_Infobox.png/revision/latest?cb=20230612100153"
+    },
+    {
+     "name": "Kaido",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46109-MT7Hm4Bk93In.png"
+    },
+    {
+     "name": "Roronoa Zoro",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b62-S7oAeA9WInjV.png"
+    },
+    {
+     "name": "Levi Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png"
+    },
+    {
+     "name": "Erwin Smith",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46496-Mu86MENd5wNB.png"
+    },
+    {
+     "name": "Eren Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg"
+    },
+    {
+     "name": "Dio Brando",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4004-w0OtWuvjhftG.png"
+    },
+    {
+     "name": "Jotaro Kujo",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4003-gWDSEGbeOAll.png"
+    },
+    {
+     "name": "Giorno Giovanna",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838"
+    },
+    {
+     "name": "Muzan Kibutsuji",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129132-4nIZakUZ1o8W.jpg"
+    },
+    {
+     "name": "Kokushibo",
+     "sub": "Demon Slayer",
+     "img": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024"
+    },
+    {
+     "name": "Yoriichi Tsugikuni",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b149220-OuBk7B3O6WD6.jpg"
+    },
+    {
+     "name": "Kyojuro Rengoku",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129133-VlTPowwt68rJ.png"
+    },
+    {
+     "name": "Meruem",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b23277-EYmIxzL64Mji.png"
+    },
+    {
+     "name": "Hisoka Morow",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b31-FZckOuu7L1un.png"
+    },
+    {
+     "name": "Chrollo Lucilfer",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b58-USOmsz3nursi.jpg"
+    },
+    {
+     "name": "Isaac Netero",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14489-WgGsdlQJka65.jpg"
+    },
+    {
+     "name": "Son Goku",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513"
+    },
+    {
+     "name": "Vegeta",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b913-NIFkKazWM8VO.png"
+    },
+    {
+     "name": "Sung Jinwoo",
+     "sub": "Solo Leveling",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129928-BCEjVaP0AQSw.png"
+    },
+    {
+     "name": "Lelouch Lamperouge",
+     "sub": "Code Geass",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b417-gVLmIJu9phcK.png"
+    },
+    {
+     "name": "Light Yagami",
+     "sub": "Death Note",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b80-26EhwSsSqQ50.png"
+    },
+    {
+     "name": "Makima",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137080-UHcynYNjb5ZU.png"
+    },
+    {
+     "name": "Garou",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89277-xBGb4B5YISXg.png"
+    },
+    {
+     "name": "Saitama",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b73935-ON5d0mAcrItd.jpg"
+    },
+    {
+     "name": "Griffith",
+     "sub": "Berserk",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b424-Jfrsf8I7zBps.png"
+    },
+    {
+     "name": "Guts",
+     "sub": "Berserk",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b422-XTaiTuvRohsV.png"
+    },
+    {
+     "name": "Askeladd",
+     "sub": "Vinland Saga",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b13020-ZdiYlNmpRUNS.png"
+    },
+    {
+     "name": "Johan Liebert",
+     "sub": "Monster",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b719-y984mDWyGf5n.jpg"
+    },
+    {
+     "name": "Shoto Todoroki",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89220-KNBwaVFAR8FD.png"
+    },
+    {
+     "name": "Diablo",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b131033-0LguIALHCBEH.jpg"
+    },
+    {
+     "name": "Escanor",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b90202-1H7FIX2hDmYd.png"
+    },
+    {
+     "name": "Kiyotaka Ayanokoji",
+     "sub": "Classroom of the Elite",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123212-ewZgUQr9vvEM.png"
+    }
+   ]
+  },
+  {
+   "id": "moinsaura",
+   "title": "Qui a le moins d'aura ?",
+   "emoji": "🤡",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Mr. Satan",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/9377.jpg"
+    },
+    {
+     "name": "Yamcha",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4014-of2ONLvA7T8p.jpg"
+    },
+    {
+     "name": "Krillin",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2159-qtEuMYyOUkwY.jpg"
+    },
+    {
+     "name": "Raditz",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/6155.jpg"
+    },
+    {
+     "name": "Chaozu",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/2151.jpg"
+    },
+    {
+     "name": "Baggy",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n725-g04AaiaK5f9B.png"
+    },
+    {
+     "name": "Usopp",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b724-GFGgI9AJQkfy.jpg"
+    },
+    {
+     "name": "Coby",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b12361-H0SmgKxZ9T61.png"
+    },
+    {
+     "name": "Spandam",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b6551-szpvKXmtWqGX.png"
+    },
+    {
+     "name": "Foxy",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/22412.jpg"
+    },
+    {
+     "name": "Minoru Mineta",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89244-VVwK9loDHeTV.png"
+    },
+    {
+     "name": "Denki Kaminari",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89249-Ygc30RlYoFta.png"
+    },
+    {
+     "name": "Shinji Ikari",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89-ZtZhXkh1rITn.png"
+    },
+    {
+     "name": "Kazuma Sato",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89364-7Th8Tv1XKJtt.png"
+    },
+    {
+     "name": "Aqua",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89362-ibkc0eoECaW1.png"
+    },
+    {
+     "name": "Tonpa",
+     "sub": "Hunter x Hunter",
+     "img": "https://static.wikia.nocookie.net/hunterxhunter/images/9/9f/Tonpa_HE_Portrait.png/revision/latest?cb=20130503200318"
+    },
+    {
+     "name": "Zenitsu Agatsuma",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129131-FZrQ7lSlxmEr.png"
+    },
+    {
+     "name": "Kiba Inuzuka",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n3495-dtw0gHa5SOo6.png"
+    },
+    {
+     "name": "Tenten",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3710-OmDNYKi0Xfjk.png"
+    },
+    {
+     "name": "Konohamaru Sarutobi",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n3889-gCUewPsRY2kD.png"
+    },
+    {
+     "name": "Ebisu",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n10791-YRA5IXwEQRsW.png"
+    },
+    {
+     "name": "Kon",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/1089.jpg"
+    },
+    {
+     "name": "Keigo Asano",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/4227.jpg"
+    },
+    {
+     "name": "Connie Springer",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n46486-izhPjzut6WCZ.png"
+    },
+    {
+     "name": "Floch Forster",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127703-qNIccR0yPZKu.png"
+    },
+    {
+     "name": "Mumen Rider",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b81935-NGDgB9J4MMlF.png"
+    },
+    {
+     "name": "King",
+     "sub": "One Punch Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n88907-M7QLjYvp2LEp.png"
+    },
+    {
+     "name": "Kobeni Higashiyama",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b144594-0dbO1NSYeZ12.png"
+    },
+    {
+     "name": "Hirokazu Arai",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b174263-TTMWfBlU1k3f.png"
+    },
+    {
+     "name": "Kokichi Muta",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b210154-nIn9DX39GFKP.jpg"
+    },
+    {
+     "name": "Nobita",
+     "sub": "Doraemon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/4303.jpg"
+    },
+    {
+     "name": "Brock",
+     "sub": "Pokémon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3854-qMVUF2YmWYoW.png"
+    },
+    {
+     "name": "James",
+     "sub": "Pokémon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3936-5sX4EZIY2BRU.png"
+    },
+    {
+     "name": "Jessie",
+     "sub": "Pokémon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3935-m000RuoIVOGI.png"
+    },
+    {
+     "name": "Hol Horse",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b16557-Kw9mRwSaq6ut.png"
+    }
+   ]
+  },
+  {
+   "id": "pleurnichard",
+   "title": "Qui est le plus pleurnichard ?",
+   "emoji": "😢",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Zenitsu Agatsuma",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129131-FZrQ7lSlxmEr.png"
+    },
+    {
+     "name": "Izuku Midoriya",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89028-8w1I9o1ISHMg.png"
+    },
+    {
+     "name": "Minoru Mineta",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89244-VVwK9loDHeTV.png"
+    },
+    {
+     "name": "Shinji Ikari",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89-ZtZhXkh1rITn.png"
+    },
+    {
+     "name": "Aqua",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89362-ibkc0eoECaW1.png"
+    },
+    {
+     "name": "Usopp",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b724-GFGgI9AJQkfy.jpg"
+    },
+    {
+     "name": "Tony Tony Chopper",
+     "sub": "One Piece",
+     "img": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824"
+    },
+    {
+     "name": "Brook",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5627-av8oD3zhKvDl.png"
+    },
+    {
+     "name": "Franky",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n64-ChX6ZzHHjXqA.png"
+    },
+    {
+     "name": "Nami",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b723-vp5hPptgnNEC.png"
+    },
+    {
+     "name": "Subaru Natsuki",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88573-F8yMTK9GhnTA.png"
+    },
+    {
+     "name": "Orihime Inoue",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b7-JdR4betokDjR.jpg"
+    },
+    {
+     "name": "Sakura Haruno",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145-IorfpI8arxeX.png"
+    },
+    {
+     "name": "Rock Lee",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b306-oUTOO45xInXt.png"
+    },
+    {
+     "name": "Might Guy",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456"
+    },
+    {
+     "name": "Hinata Hyuga",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1555-Q41GLTV3FvYF.png"
+    },
+    {
+     "name": "Naruto Uzumaki",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png"
+    },
+    {
+     "name": "Tanjiro Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126071-BTNEc1nRIv68.png"
+    },
+    {
+     "name": "Kanroji Mitsuri",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b136072-xVwyRUKdpybi.png"
+    },
+    {
+     "name": "Gyomei Himejima",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137778-H4Uzb9cSCvZ6.jpg"
+    },
+    {
+     "name": "Eren Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg"
+    },
+    {
+     "name": "Armin Arlert",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46494-g7xYYuBtYPnO.png"
+    },
+    {
+     "name": "Leorio Paradinight",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b29-RgzoSeKmDYzl.jpg"
+    },
+    {
+     "name": "Denji",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b130102-FO1VHNnEnLlB.png"
+    },
+    {
+     "name": "Kobeni Higashiyama",
+     "sub": "Chainsaw Man",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b144594-0dbO1NSYeZ12.png"
+    },
+    {
+     "name": "Mob",
+     "sub": "Mob Psycho 100",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89616-dXmdOc7L6SDi.png"
+    },
+    {
+     "name": "Hitori Gotoh",
+     "sub": "Bocchi the Rock",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b257562-Ru35NYPfsqhY.png"
+    },
+    {
+     "name": "Emma",
+     "sub": "The Promised Neverland",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b121725-LQciVJOjnMVh.png"
+    },
+    {
+     "name": "Rudeus Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88348-bIe5XnXdRpmX.png"
+    },
+    {
+     "name": "Kazuma Sato",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89364-7Th8Tv1XKJtt.png"
+    },
+    {
+     "name": "Shoyo Hinata",
+     "sub": "Haikyuu",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b64769-WoWlCMLLgJ14.png"
+    },
+    {
+     "name": "Yuji Itadori",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127212-FVm2tD0erQ5B.png"
+    },
+    {
+     "name": "Gon Freecss",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg"
+    },
+    {
+     "name": "Son Gohan",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059"
+    },
+    {
+     "name": "Asta",
+     "sub": "Black Clover",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123285-tKijiuQErDS0.png"
+    },
+    {
+     "name": "Takemichi Hanagaki",
+     "sub": "Tokyo Revengers",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145342-GSUutL83jGgI.png"
+    }
+   ]
+  },
+  {
+   "id": "bonpere",
+   "title": "Qui est le meilleur père ?",
+   "emoji": "👨‍👧",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Minato Namikaze",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2535-Xq9WKNPJQEt3.png"
+    },
+    {
+     "name": "Shikaku Nara",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n18056-fCHMXALzWvOL.png"
+    },
+    {
+     "name": "Inoichi Yamanaka",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/d/d2/Inoichi_Yamanaka.png/revision/latest?cb=20150409122740"
+    },
+    {
+     "name": "Choza Akimichi",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/a/a8/Ch%C5%8Dza_Akimichi.png/revision/latest?cb=20180304093618"
+    },
+    {
+     "name": "Naruto Uzumaki",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png"
+    },
+    {
+     "name": "Edward Newgate",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2751-NnzW0N2vCTjX.jpg"
+    },
+    {
+     "name": "Kozuki Oden",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b149797-UmdR7up3kgoK.png"
+    },
+    {
+     "name": "Zeff",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/10444.jpg"
+    },
+    {
+     "name": "Monkey D. Garp",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b8064-dPltKaZ8RAsj.jpg"
+    },
+    {
+     "name": "Tanjuro Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/c/c3/Tanjuro_anime.png/revision/latest?cb=20210628160831"
+    },
+    {
+     "name": "Maes Hughes",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b69-MRetSG8Qevvu.png"
+    },
+    {
+     "name": "Van Hohenheim",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b9792-YA8kiO4NjmGL.jpg"
+    },
+    {
+     "name": "Loid Forger",
+     "sub": "Spy x Family",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b138101-7NCB0Md8zA6G.png"
+    },
+    {
+     "name": "Thors",
+     "sub": "Vinland Saga",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b13021-XJAVDHwMWek2.png"
+    },
+    {
+     "name": "Son Gohan",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059"
+    },
+    {
+     "name": "Vegeta",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b913-NIFkKazWM8VO.png"
+    },
+    {
+     "name": "Bardock",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b6122-N8XCxV2YPd1r.png"
+    },
+    {
+     "name": "Isshin Kurosaki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2553-tDUlab4F0lFJ.png"
+    },
+    {
+     "name": "Paul Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88347-YtQTlChhN50m.png"
+    },
+    {
+     "name": "Kiritsugu Emiya",
+     "sub": "Fate/Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b10010-fNspzan5MzNk.png"
+    },
+    {
+     "name": "Tomoya Okazaki",
+     "sub": "Clannad",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4606-61r9h3WUrkA9.png"
+    },
+    {
+     "name": "Soichiro Yagami",
+     "sub": "Death Note",
+     "img": "https://static.wikia.nocookie.net/deathnote/images/e/eb/Soichiro_Yagami.PNG/revision/latest?cb=20250630094521"
+    },
+    {
+     "name": "Kakashi Hatake",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png"
+    },
+    {
+     "name": "Jiraiya",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2423-RO5MyoXSA9OL.png"
+    },
+    {
+     "name": "Daikichi Kawachi",
+     "sub": "Usagi Drop",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n12668-CU0ySRvjIo2q.png"
+    },
+    {
+     "name": "Toshinori Yagi",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89224-K6KEuQAuYKzq.jpg"
+    },
+    {
+     "name": "Rudeus Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88348-bIe5XnXdRpmX.png"
+    },
+    {
+     "name": "Fujitaka Kinomoto",
+     "sub": "Card Captor Sakura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3614-1RivUAINlQi0.png"
+    },
+    {
+     "name": "Hiruzen Sarutobi",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n7571-fKldLuBWUtCO.png"
+    },
+    {
+     "name": "Kazuki Kurusu",
+     "sub": "Buddy Daddies",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b289968-j2C0sN9C5mwg.png"
+    }
+   ]
+  },
+  {
+   "id": "pirepere",
+   "title": "Qui est le pire père ?",
+   "emoji": "💀",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Endeavor",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126158-Wix9rh7unTDQ.png"
+    },
+    {
+     "name": "Ging Freecss",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/26-VpZXIwOdcz8p.jpg"
+    },
+    {
+     "name": "Silva Zoldyck",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/60.jpg"
+    },
+    {
+     "name": "Gendo Ikari",
+     "sub": "Evangelion",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1257-qByikcrE8KTG.png"
+    },
+    {
+     "name": "Toji Fushiguro",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b162722-btzdghBizxKS.jpg"
+    },
+    {
+     "name": "Grisha Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b62477-3AHBGul9bXK8.jpg"
+    },
+    {
+     "name": "Fugaku Uchiwa",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/f/f2/Fugaku.png/revision/latest?cb=20180502064054"
+    },
+    {
+     "name": "Rasa",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/2/24/Yondaime_Kazekage.png/revision/latest?cb=20210806012316"
+    },
+    {
+     "name": "Hiashi Hyuga",
+     "sub": "Naruto",
+     "img": "https://static.wikia.nocookie.net/naruto/images/e/ee/Hiashi_Hyuga.png/revision/latest?cb=20150109142633"
+    },
+    {
+     "name": "Orochimaru",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n2455-V9tLMS3TIgJW.png"
+    },
+    {
+     "name": "Vinsmoke Judge",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127895-Io7YzfaJSW7t.png"
+    },
+    {
+     "name": "Monkey D. Dragon",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4884-iBn6FzQ2ESLC.png"
+    },
+    {
+     "name": "Kaido",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b46109-MT7Hm4Bk93In.png"
+    },
+    {
+     "name": "Gol D. Roger",
+     "sub": "One Piece",
+     "img": "https://static.wikia.nocookie.net/onepiece/images/2/24/Gol_D._Roger_Anime_Infobox.png/revision/latest?cb=20230612100153"
+    },
+    {
+     "name": "Son Goku",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513"
+    },
+    {
+     "name": "Paragus",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/a/ab/ParagusDVD.png/revision/latest?cb=20100809114554"
+    },
+    {
+     "name": "Shou Tucker",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3696-FXnbdWQXziOr.jpg"
+    },
+    {
+     "name": "Father",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n15542-7kL0vJ9U8bVR.png"
+    },
+    {
+     "name": "Dio Brando",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4004-w0OtWuvjhftG.png"
+    },
+    {
+     "name": "Jotaro Kujo",
+     "sub": "JoJo's Bizarre Adventure",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b4003-gWDSEGbeOAll.png"
+    },
+    {
+     "name": "Ogi Zenin",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831"
+    },
+    {
+     "name": "Naobito Zenin",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b188432-WePQBJsEuSts.png"
+    },
+    {
+     "name": "Muzan Kibutsuji",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b129132-4nIZakUZ1o8W.jpg"
+    }
+   ]
+  },
+  {
+   "id": "ost",
+   "title": "Qui a le meilleur OST ?",
+   "emoji": "🎵",
+   "kind": "ost",
+   "items": [
+    {
+     "name": "Sadness and Sorrow",
+     "sub": "Naruto",
+     "video": "VGS9nrEwXmw",
+     "img": "https://i.ytimg.com/vi/VGS9nrEwXmw/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "The Raising Fighting Spirit",
+     "sub": "Naruto",
+     "video": "mjjkHg5FOhk",
+     "img": "https://i.ytimg.com/vi/mjjkHg5FOhk/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Strong and Strike",
+     "sub": "Naruto",
+     "video": "UZTkwWSmCAo",
+     "img": "https://i.ytimg.com/vi/UZTkwWSmCAo/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Man of the World",
+     "sub": "Naruto",
+     "video": "U_vI4U1q8eU",
+     "img": "https://i.ytimg.com/vi/U_vI4U1q8eU/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Girei (Pain)",
+     "sub": "Naruto Shippuden",
+     "video": "PCfiqY05BpA",
+     "img": "https://i.ytimg.com/vi/PCfiqY05BpA/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Senya",
+     "sub": "Naruto Shippuden",
+     "video": "_whblS9CpAE",
+     "img": "https://i.ytimg.com/vi/_whblS9CpAE/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Kokuten",
+     "sub": "Naruto Shippuden",
+     "video": "RBlCsbsWO50",
+     "img": "https://i.ytimg.com/vi/RBlCsbsWO50/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Madara Theme",
+     "sub": "Naruto Shippuden",
+     "video": "cJfNz8csSTk",
+     "img": "https://i.ytimg.com/vi/cJfNz8csSTk/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Binks' Sake",
+     "sub": "One Piece",
+     "video": "1z0IfXDPhPE",
+     "img": "https://i.ytimg.com/vi/1z0IfXDPhPE/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Overtaken",
+     "sub": "One Piece",
+     "video": "daFi4MScfl8",
+     "img": "https://i.ytimg.com/vi/daFi4MScfl8/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "The Very Very Very Strongest",
+     "sub": "One Piece",
+     "video": "nUBWp89ATE8",
+     "img": "https://i.ytimg.com/vi/nUBWp89ATE8/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Number One",
+     "sub": "Bleach",
+     "video": "DW6toOrQkkU",
+     "img": "https://i.ytimg.com/vi/DW6toOrQkkU/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Treachery",
+     "sub": "Bleach",
+     "video": "OlOi8Nxwnrg",
+     "img": "https://i.ytimg.com/vi/OlOi8Nxwnrg/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Here to Stay",
+     "sub": "Bleach",
+     "video": "k6LCykRfXL8",
+     "img": "https://i.ytimg.com/vi/k6LCykRfXL8/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Vogel im Käfig",
+     "sub": "L'Attaque des Titans",
+     "video": "QV5ZBuNJMx0",
+     "img": "https://i.ytimg.com/vi/QV5ZBuNJMx0/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "YouSeeBIGGIRL/T:T",
+     "sub": "L'Attaque des Titans",
+     "video": "2o5H8wIR8Go",
+     "img": "https://i.ytimg.com/vi/2o5H8wIR8Go/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Ashes on the Fire",
+     "sub": "L'Attaque des Titans",
+     "video": "wQUH06QRCi4",
+     "img": "https://i.ytimg.com/vi/wQUH06QRCi4/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Call Your Name",
+     "sub": "L'Attaque des Titans",
+     "video": "pFoc5XKkIIw",
+     "img": "https://i.ytimg.com/vi/pFoc5XKkIIw/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Ultimate Battle",
+     "sub": "Dragon Ball Super",
+     "video": "lHVqoiG0CUU",
+     "img": "https://i.ytimg.com/vi/lHVqoiG0CUU/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Ultra Instinct",
+     "sub": "Dragon Ball Super",
+     "video": "Upsm3E2NUI8",
+     "img": "https://i.ytimg.com/vi/Upsm3E2NUI8/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "L's Theme",
+     "sub": "Death Note",
+     "video": "qR6dzwQahOM",
+     "img": "https://i.ytimg.com/vi/qR6dzwQahOM/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Low of Solipsism",
+     "sub": "Death Note",
+     "video": "81D8CCguW4g",
+     "img": "https://i.ytimg.com/vi/81D8CCguW4g/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Brothers",
+     "sub": "Fullmetal Alchemist",
+     "video": "BXQLrkW33f0",
+     "img": "https://i.ytimg.com/vi/BXQLrkW33f0/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Il Vento d'Oro",
+     "sub": "JoJo",
+     "video": "TXjKCzyyyZA",
+     "img": "https://i.ytimg.com/vi/TXjKCzyyyZA/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Awaken (Pillar Men)",
+     "sub": "JoJo",
+     "video": "lRrOLTHu-ew",
+     "img": "https://i.ytimg.com/vi/lRrOLTHu-ew/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Jotaro's Theme",
+     "sub": "JoJo",
+     "video": "NFjE5A4UAJI",
+     "img": "https://i.ytimg.com/vi/NFjE5A4UAJI/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Kamado Tanjiro no Uta",
+     "sub": "Demon Slayer",
+     "video": "4o6wKKUB4z8",
+     "img": "https://i.ytimg.com/vi/4o6wKKUB4z8/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Rengoku Theme",
+     "sub": "Demon Slayer",
+     "video": "TKkuHGWqKTI",
+     "img": "https://i.ytimg.com/vi/TKkuHGWqKTI/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Seigi Shikkou",
+     "sub": "One Punch Man",
+     "video": "rW7OB_HDCGQ",
+     "img": "https://i.ytimg.com/vi/rW7OB_HDCGQ/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Swordland",
+     "sub": "Sword Art Online",
+     "video": "-6NGAQ6UOyg",
+     "img": "https://i.ytimg.com/vi/-6NGAQ6UOyg/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Decisive Battle",
+     "sub": "Evangelion",
+     "video": "8ULvslLSjWk",
+     "img": "https://i.ytimg.com/vi/8ULvslLSjWk/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Libera me from Hell",
+     "sub": "Gurren Lagann",
+     "video": "VT6LFOIofRE",
+     "img": "https://i.ytimg.com/vi/VT6LFOIofRE/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Before My Body Is Dry",
+     "sub": "Kill la Kill",
+     "video": "CRy2Do5ZCA4",
+     "img": "https://i.ytimg.com/vi/CRy2Do5ZCA4/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Hisoka Theme",
+     "sub": "Hunter x Hunter",
+     "video": "900AzBnnhjU",
+     "img": "https://i.ytimg.com/vi/900AzBnnhjU/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Arise",
+     "sub": "Solo Leveling",
+     "video": "XRL7fXFeRGM",
+     "img": "https://i.ytimg.com/vi/XRL7fXFeRGM/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Zoltraak",
+     "sub": "Frieren",
+     "video": "sWFeSl4hhIg",
+     "img": "https://i.ytimg.com/vi/sWFeSl4hhIg/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Continued Story",
+     "sub": "Code Geass",
+     "video": "XHViAiVuDsA",
+     "img": "https://i.ytimg.com/vi/XHViAiVuDsA/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Tank!",
+     "sub": "Cowboy Bebop",
+     "video": "EL-D9LrFJd4",
+     "img": "https://i.ytimg.com/vi/EL-D9LrFJd4/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Glassy Sky",
+     "sub": "Tokyo Ghoul",
+     "video": "vvvvcpwFw5o",
+     "img": "https://i.ytimg.com/vi/vvvvcpwFw5o/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Sparkle",
+     "sub": "Your Name",
+     "video": "tpH8TEkKQI4",
+     "img": "https://i.ytimg.com/vi/tpH8TEkKQI4/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Merry-Go-Round of Life",
+     "sub": "Le Château ambulant",
+     "video": "f7SS57LFPco",
+     "img": "https://i.ytimg.com/vi/f7SS57LFPco/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "One Summer's Day",
+     "sub": "Le Voyage de Chihiro",
+     "video": "TK1Ij_-mank",
+     "img": "https://i.ytimg.com/vi/TK1Ij_-mank/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Gojo Satoru Theme",
+     "sub": "Jujutsu Kaisen",
+     "video": "yox2Yz4Ni2o",
+     "img": "https://i.ytimg.com/vi/yox2Yz4Ni2o/hqdefault.jpg",
+     "start": 0
+    },
+    {
+     "name": "Sukuna Theme",
+     "sub": "Jujutsu Kaisen",
+     "video": "jm5rqq_SP8Q",
+     "img": "https://i.ytimg.com/vi/jm5rqq_SP8Q/hqdefault.jpg",
+     "start": 0
+    }
+   ]
+  },
+  {
+   "id": "loyal",
+   "title": "Qui est le plus loyal ?",
+   "emoji": "🤝",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Roronoa Zoro",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b62-S7oAeA9WInjV.png"
+    },
+    {
+     "name": "Sanji",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b305-6lisPmHtCnLT.png"
+    },
+    {
+     "name": "Jinbe",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b18938-yZANEfjsVhW4.png"
+    },
+    {
+     "name": "Marco",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b9323-tGArly93xBZv.png"
+    },
+    {
+     "name": "Nico Robin",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b61-ywXUyyocEEqt.png"
+    },
+    {
+     "name": "Brook",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5627-av8oD3zhKvDl.png"
+    },
+    {
+     "name": "Rem",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88575-Ayu8UPDA8NS6.png"
+    },
+    {
+     "name": "Riza Hawkeye",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b70-k4bCgDspyOdI.png"
+    },
+    {
+     "name": "Alphonse Elric",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b12-tCKu8yK5kFL5.jpg"
+    },
+    {
+     "name": "Levi Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png"
+    },
+    {
+     "name": "Mikasa Ackerman",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b40881-F3gr1PkreDvj.png"
+    },
+    {
+     "name": "Kakashi Hatake",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png"
+    },
+    {
+     "name": "Shikamaru Nara",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2007-QaesJlIZDifj.jpg"
+    },
+    {
+     "name": "Hinata Hyuga",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b1555-Q41GLTV3FvYF.png"
+    },
+    {
+     "name": "Rock Lee",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b306-oUTOO45xInXt.png"
+    },
+    {
+     "name": "Haku",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2039-9NXBvh6H15LD.png"
+    },
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Killua Zoldyck",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg"
+    },
+    {
+     "name": "Gon Freecss",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg"
+    },
+    {
+     "name": "Leorio Paradinight",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b29-RgzoSeKmDYzl.jpg"
+    },
+    {
+     "name": "Tanjiro Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126071-BTNEc1nRIv68.png"
+    },
+    {
+     "name": "Inosuke Hashibira",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n129130-SJC0Kn1DU39E.jpg"
+    },
+    {
+     "name": "Nezuko Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b127518-NRlq1CQ1v1ro.png"
+    },
+    {
+     "name": "Beru",
+     "sub": "Solo Leveling",
+     "img": "https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143"
+    },
+    {
+     "name": "Igris",
+     "sub": "Solo Leveling",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145722-qSJ71S6vpeeM.png"
+    },
+    {
+     "name": "Diablo",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b131033-0LguIALHCBEH.jpg"
+    },
+    {
+     "name": "Shion",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b128033-fLbTgW4M2yj3.png"
+    },
+    {
+     "name": "Benimaru",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b128038-VgVcqf6NDGJ5.png"
+    },
+    {
+     "name": "Ranga",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b128035-7r8BX1tt8BKg.png"
+    },
+    {
+     "name": "Raphtalia",
+     "sub": "The Rising of the Shield Hero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88889-CWYytVbCOPsV.png"
+    },
+    {
+     "name": "Sebastian Michaelis",
+     "sub": "Black Butler",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b10863-DsfonbP2CATa.png"
+    },
+    {
+     "name": "Albedo",
+     "sub": "Overlord",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b89122-Gj7MBs7F5cMJ.png"
+    },
+    {
+     "name": "Pochita",
+     "sub": "Chainsaw Man",
+     "img": "https://static.wikia.nocookie.net/chainsaw-man/images/5/54/Pochita_anime_design.png/revision/latest?cb=20220919121110"
+    },
+    {
+     "name": "Happy",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5188-1jTaic3aJ7Ds.jpg"
+    },
+    {
+     "name": "Vegeta",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b913-NIFkKazWM8VO.png"
+    },
+    {
+     "name": "Krillin",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2159-qtEuMYyOUkwY.jpg"
+    },
+    {
+     "name": "Draken",
+     "sub": "Tokyo Revengers",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145345-zyirrSsKIDCb.png"
+    },
+    {
+     "name": "Chifuyu Matsuno",
+     "sub": "Tokyo Revengers",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145344-q4BqRljEBYNc.png"
+    },
+    {
+     "name": "Aoi Todo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137975-6TH7PiLWJaqy.png"
+    },
+    {
+     "name": "Kento Nanami",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b133704-8wLTGjc234q2.png"
+    },
+    {
+     "name": "Ban",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b77605-NrjhQwZwgJ3l.png"
+    },
+    {
+     "name": "Yuno",
+     "sub": "Black Clover",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123284-w6kIFYnTclMd.png"
+    }
+   ]
+  },
+  {
+   "id": "duo",
+   "title": "Qui est le meilleur duo ?",
+   "emoji": "👯",
+   "kind": "duos",
+   "items": [
+    {
+     "name": "Naruto & Sasuke",
+     "sub": "Naruto",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png"
+     ]
+    },
+    {
+     "name": "Luffy & Zoro",
+     "sub": "One Piece",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b40-MNypXsxSRb1R.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b62-S7oAeA9WInjV.png"
+     ]
+    },
+    {
+     "name": "Gon & Killua",
+     "sub": "Hunter x Hunter",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg"
+     ]
+    },
+    {
+     "name": "Ed & Al",
+     "sub": "Fullmetal Alchemist",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b12-tCKu8yK5kFL5.jpg"
+     ]
+    },
+    {
+     "name": "Goku & Vegeta",
+     "sub": "Dragon Ball",
+     "imgs": [
+      "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b913-NIFkKazWM8VO.png"
+     ]
+    },
+    {
+     "name": "Tanjiro & Nezuko",
+     "sub": "Demon Slayer",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b126071-BTNEc1nRIv68.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b127518-NRlq1CQ1v1ro.png"
+     ]
+    },
+    {
+     "name": "Denji & Power",
+     "sub": "Chainsaw Man",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b130102-FO1VHNnEnLlB.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b137079-6yLEUYR3bmpr.png"
+     ]
+    },
+    {
+     "name": "Itadori & Todo",
+     "sub": "Jujutsu Kaisen",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b127212-FVm2tD0erQ5B.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b137975-6TH7PiLWJaqy.png"
+     ]
+    },
+    {
+     "name": "Gojo & Geto",
+     "sub": "Jujutsu Kaisen",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b127691-9zqh1xpIubn7.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b133699-FCnXaISgazAi.png"
+     ]
+    },
+    {
+     "name": "Light & L",
+     "sub": "Death Note",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b80-26EhwSsSqQ50.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b71-1W4panC53vfs.png"
+     ]
+    },
+    {
+     "name": "Ichigo & Rukia",
+     "sub": "Bleach",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b5-a7bkJgjhhigE.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b6-25WoBeWMZXBc.png"
+     ]
+    },
+    {
+     "name": "Natsu & Happy",
+     "sub": "Fairy Tail",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b5187-y1OEdRu9sPN2.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b5188-1jTaic3aJ7Ds.jpg"
+     ]
+    },
+    {
+     "name": "Kakashi & Gaï",
+     "sub": "Naruto",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b85-mkVBh2yjxjmx.png",
+      "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456"
+     ]
+    },
+    {
+     "name": "Minato & Kushina",
+     "sub": "Naruto",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b2535-Xq9WKNPJQEt3.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b7302-KQ6ddZtOkvUf.png"
+     ]
+    },
+    {
+     "name": "Jiraiya & Naruto",
+     "sub": "Naruto",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b2423-RO5MyoXSA9OL.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png"
+     ]
+    },
+    {
+     "name": "Sanji & Zoro",
+     "sub": "One Piece",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b305-6lisPmHtCnLT.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b62-S7oAeA9WInjV.png"
+     ]
+    },
+    {
+     "name": "Ace & Luffy",
+     "sub": "One Piece",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b2072-Lc6jEdsueJUK.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b40-MNypXsxSRb1R.png"
+     ]
+    },
+    {
+     "name": "Kirito & Asuna",
+     "sub": "Sword Art Online",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b36765-BnLbXg0Tzzh9.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b36828-j5ib0adAzGMx.png"
+     ]
+    },
+    {
+     "name": "Mob & Reigen",
+     "sub": "Mob Psycho 100",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b89616-dXmdOc7L6SDi.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b89334-OPj1hCzvrt7X.png"
+     ]
+    },
+    {
+     "name": "Saitama & Genos",
+     "sub": "One Punch Man",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b73935-ON5d0mAcrItd.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b73979-tVi9maPID881.jpg"
+     ]
+    },
+    {
+     "name": "Loid & Yor",
+     "sub": "Spy x Family",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b138101-7NCB0Md8zA6G.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b138102-ZOAu9jI2d5ke.png"
+     ]
+    },
+    {
+     "name": "Deku & Bakugo",
+     "sub": "My Hero Academia",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b89028-8w1I9o1ISHMg.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b88892-bdOha3lNcaN6.png"
+     ]
+    },
+    {
+     "name": "Rimuru & Veldora",
+     "sub": "Tensura",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b123962-eL9yGV0NLMF7.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b128034-Gg5MrpTFNSv8.png"
+     ]
+    },
+    {
+     "name": "Rock Lee & Gaï",
+     "sub": "Naruto",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b306-oUTOO45xInXt.png",
+      "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456"
+     ]
+    },
+    {
+     "name": "Inosuke & Zenitsu",
+     "sub": "Demon Slayer",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/n129130-SJC0Kn1DU39E.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b129131-FZrQ7lSlxmEr.png"
+     ]
+    },
+    {
+     "name": "Asta & Yuno",
+     "sub": "Black Clover",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b123285-tKijiuQErDS0.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b123284-w6kIFYnTclMd.png"
+     ]
+    },
+    {
+     "name": "Meliodas & Ban",
+     "sub": "Seven Deadly Sins",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b72921-XDHNd1wflN6P.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b77605-NrjhQwZwgJ3l.png"
+     ]
+    },
+    {
+     "name": "Hinata & Kageyama",
+     "sub": "Haikyuu",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b64769-WoWlCMLLgJ14.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b64771-BuCVs7B8bBdh.png"
+     ]
+    },
+    {
+     "name": "Mikey & Draken",
+     "sub": "Tokyo Revengers",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b145341-CuPldCLZMvvf.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b145345-zyirrSsKIDCb.png"
+     ]
+    },
+    {
+     "name": "Frieren & Fern",
+     "sub": "Frieren",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b176754-PCnpqIOkjhFk.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b183965-uGFohBjlFoTp.png"
+     ]
+    },
+    {
+     "name": "Guts & Griffith",
+     "sub": "Berserk",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b422-XTaiTuvRohsV.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b424-Jfrsf8I7zBps.png"
+     ]
+    },
+    {
+     "name": "Holo & Lawrence",
+     "sub": "Spice and Wolf",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b7373-1BH0gELuZmHD.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b7374-XeKVCsoW129T.png"
+     ]
+    },
+    {
+     "name": "Rem & Ram",
+     "sub": "Re:Zero",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b88575-Ayu8UPDA8NS6.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b88576-NWkotUiJ3mK3.png"
+     ]
+    },
+    {
+     "name": "Livaï & Erwin",
+     "sub": "L'Attaque des Titans",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b45627-CR68RyZmddGG.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b46496-Mu86MENd5wNB.png"
+     ]
+    },
+    {
+     "name": "Eren & Armin",
+     "sub": "L'Attaque des Titans",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b40882-dsj7IP943WFF.jpg",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b46494-g7xYYuBtYPnO.png"
+     ]
+    },
+    {
+     "name": "Jotaro & Joseph",
+     "sub": "JoJo's Bizarre Adventure",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b4003-gWDSEGbeOAll.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b6356-RImEfUfHpC58.png"
+     ]
+    },
+    {
+     "name": "Joseph & Caesar",
+     "sub": "JoJo's Bizarre Adventure",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b6356-RImEfUfHpC58.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b21959-Cm9Rlh0EFAQw.png"
+     ]
+    },
+    {
+     "name": "Spike & Jet",
+     "sub": "Cowboy Bebop",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b1-ChxaldmieFlQ.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b3-JjH9Si9UM1NZ.png"
+     ]
+    },
+    {
+     "name": "Kaguya & Shirogane",
+     "sub": "Kaguya-sama",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b120649-NPaWaIpWy60E.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b121101-Q8HzKP15At2d.png"
+     ]
+    },
+    {
+     "name": "Isagi & Bachira",
+     "sub": "Blue Lock",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b140856-wVzKSyvU7R5B.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b162213-4czykzdxmWG6.png"
+     ]
+    },
+    {
+     "name": "Sung Jinwoo & Igris",
+     "sub": "Solo Leveling",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b129928-BCEjVaP0AQSw.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b145722-qSJ71S6vpeeM.png"
+     ]
+    },
+    {
+     "name": "Thorfinn & Askeladd",
+     "sub": "Vinland Saga",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b10138-zOPrka0ddZOR.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b13020-ZdiYlNmpRUNS.png"
+     ]
+    },
+    {
+     "name": "Senku & Chrome",
+     "sub": "Dr. Stone",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b124142-XUO1g7wRqkaT.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b124145-EEvQmsj8jku4.png"
+     ]
+    },
+    {
+     "name": "Kurapika & Leorio",
+     "sub": "Hunter x Hunter",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b28-ivA7UGnfE40a.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b29-RgzoSeKmDYzl.jpg"
+     ]
+    },
+    {
+     "name": "Law & Kid",
+     "sub": "One Piece",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b13767-U604OJN9dxCn.jpg",
+      "https://static.wikia.nocookie.net/onepiece/images/4/47/Eustass_Kid_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240505021859"
+     ]
+    },
+    {
+     "name": "Anya & Bond",
+     "sub": "Spy x Family",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b138100-4Li0tWRCa5bQ.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b169679-EFPubVtZFYom.jpg"
+     ]
+    },
+    {
+     "name": "Ayanokoji & Karuizawa",
+     "sub": "Classroom of the Elite",
+     "imgs": [
+      "https://s4.anilist.co/file/anilistcdn/character/large/b123212-ewZgUQr9vvEM.png",
+      "https://s4.anilist.co/file/anilistcdn/character/large/b141122-6Zk52eU3VK3O.png"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "animal",
+   "title": "Qui est le meilleur animal de compagnie ?",
+   "emoji": "🐾",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Pochita",
+     "sub": "Chainsaw Man",
+     "img": "https://static.wikia.nocookie.net/chainsaw-man/images/5/54/Pochita_anime_design.png/revision/latest?cb=20220919121110"
+    },
+    {
+     "name": "Happy",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5188-1jTaic3aJ7Ds.jpg"
+    },
+    {
+     "name": "Carla",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b22723-tAU59GCaf2H4.png"
+    },
+    {
+     "name": "Plue",
+     "sub": "Fairy Tail",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/5879.jpg"
+    },
+    {
+     "name": "Akamaru",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n4799-gwSQJlSqWnST.png"
+    },
+    {
+     "name": "Pakkun",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n2766-kJfGu56HevA0.png"
+    },
+    {
+     "name": "Bond Forger",
+     "sub": "Spy x Family",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b169679-EFPubVtZFYom.jpg"
+    },
+    {
+     "name": "Ein",
+     "sub": "Cowboy Bebop",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/4.jpg"
+    },
+    {
+     "name": "Nyanko-sensei",
+     "sub": "Le Pacte des Yōkai",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/13784.jpg"
+    },
+    {
+     "name": "Pikachu",
+     "sub": "Pokémon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3891-edgrZOgCJ9do.jpg"
+    },
+    {
+     "name": "Miaouss",
+     "sub": "Pokémon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3937-qBtTAn2SZqhB.png"
+    },
+    {
+     "name": "Puck",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b90187-xJXlD84KXl3t.jpg"
+    },
+    {
+     "name": "Patrasche",
+     "sub": "Re:Zero",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b181313-eT4mFPCZj1OZ.jpg"
+    },
+    {
+     "name": "Ranga",
+     "sub": "Tensura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b128035-7r8BX1tt8BKg.png"
+    },
+    {
+     "name": "Hawk",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n86683-ZXPoLZnKqNtx.png"
+    },
+    {
+     "name": "Sadaharu",
+     "sub": "Gintama",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n2651-e8BTqVZl8lK2.jpg"
+    },
+    {
+     "name": "Kero",
+     "sub": "Card Captor Sakura",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2897-Ckmv1Y2i9hZZ.jpg"
+    },
+    {
+     "name": "Luna",
+     "sub": "Sailor Moon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/5407.jpg"
+    },
+    {
+     "name": "Artemis",
+     "sub": "Sailor Moon",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5408-eh4f6CArQ8G8.png"
+    },
+    {
+     "name": "Kirara",
+     "sub": "Inuyasha",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b8323-RGrk8ZVTYUuy.png"
+    },
+    {
+     "name": "Chomusuke",
+     "sub": "Konosuba",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b120654-9yWTm8QyQy0O.jpg"
+    },
+    {
+     "name": "Mokona",
+     "sub": "Tsubasa Chronicle",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2074-aq4JY9l74daJ.jpg"
+    },
+    {
+     "name": "Jiji",
+     "sub": "Kiki la petite sorcière",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b3133-pt3Y3TOU3EQr.png"
+    },
+    {
+     "name": "Kon",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/1089.jpg"
+    },
+    {
+     "name": "Chuntaro",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b142420-S8qfnTq1rKeW.jpg"
+    },
+    {
+     "name": "Kasugai Matsuemon",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137810-x5JEOQTuxd86.png"
+    },
+    {
+     "name": "Kyubey",
+     "sub": "Madoka Magica",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b38566-XzE2iqAodRQK.jpg"
+    },
+    {
+     "name": "Oolong",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/2108.jpg"
+    },
+    {
+     "name": "Puar",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b677-PTNZaPeuV1Dx.jpg"
+    },
+    {
+     "name": "Sakamoto",
+     "sub": "Nichijou",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b41069-x6vyw7EIn1ET.png"
+    },
+    {
+     "name": "Chi",
+     "sub": "Chi's Sweet Home",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/10765.jpg"
+    }
+   ]
+  },
+  {
+   "id": "grandfrere",
+   "title": "Qui est le meilleur grand frère ?",
+   "emoji": "🧑‍🤝‍🧑",
+   "kind": "chars",
+   "items": [
+    {
+     "name": "Itachi Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b14-9Kb1E5oel1ke.png"
+    },
+    {
+     "name": "Hashirama Senju",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n12464-fcgqkCPZoREw.png"
+    },
+    {
+     "name": "Madara Uchiwa",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b53901-HnRKSoHMG5Vg.png"
+    },
+    {
+     "name": "Kankuro",
+     "sub": "Naruto",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/n4694-2brvNKpdqARU.png"
+    },
+    {
+     "name": "Portgas D. Ace",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2072-Lc6jEdsueJUK.jpg"
+    },
+    {
+     "name": "Sabo",
+     "sub": "One Piece",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b32893-3weZS61cdwLD.png"
+    },
+    {
+     "name": "Tanjiro Kamado",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126071-BTNEc1nRIv68.png"
+    },
+    {
+     "name": "Sanemi Shinazugawa",
+     "sub": "Demon Slayer",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137774-O1iYrnGLB71l.png"
+    },
+    {
+     "name": "Michikatsu Tsugikuni",
+     "sub": "Demon Slayer",
+     "img": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024"
+    },
+    {
+     "name": "Edward Elric",
+     "sub": "Fullmetal Alchemist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg"
+    },
+    {
+     "name": "Killua Zoldyck",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg"
+    },
+    {
+     "name": "Illumi Zoldyck",
+     "sub": "Hunter x Hunter",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b57-pTFguojSOQZW.png"
+    },
+    {
+     "name": "Choso",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b157116-2jYQf3y8NeTZ.png"
+    },
+    {
+     "name": "Shinichiro Sano",
+     "sub": "Tokyo Revengers",
+     "img": "https://static.wikia.nocookie.net/tokyo-revengers/images/1/1d/Shinichiro_Sano_%28Manga%29.png/revision/latest?cb=20221219161723"
+    },
+    {
+     "name": "Manjiro Sano",
+     "sub": "Tokyo Revengers",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b145341-CuPldCLZMvvf.png"
+    },
+    {
+     "name": "Ichigo Kurosaki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b5-a7bkJgjhhigE.png"
+    },
+    {
+     "name": "Byakuya Kuchiki",
+     "sub": "Bleach",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b907-kgnDKeMtEN5y.png"
+    },
+    {
+     "name": "Lelouch Lamperouge",
+     "sub": "Code Geass",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b417-gVLmIJu9phcK.png"
+    },
+    {
+     "name": "Zeke Jäger",
+     "sub": "L'Attaque des Titans",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b125661-FiqFvAtNlL0v.png"
+    },
+    {
+     "name": "Sae Itoshi",
+     "sub": "Blue Lock",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b169397-wC55onsv5u8t.jpg"
+    },
+    {
+     "name": "Dabi",
+     "sub": "My Hero Academia",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b126378-RFSljq5koy5U.png"
+    },
+    {
+     "name": "Rudeus Greyrat",
+     "sub": "Mushoku Tensei",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b88348-bIe5XnXdRpmX.png"
+    },
+    {
+     "name": "Raditz",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/6155.jpg"
+    },
+    {
+     "name": "Son Gohan",
+     "sub": "Dragon Ball",
+     "img": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059"
+    },
+    {
+     "name": "Trunks",
+     "sub": "Dragon Ball",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b2707-YKWmn4q87oF8.png"
+    },
+    {
+     "name": "Asta",
+     "sub": "Black Clover",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123285-tKijiuQErDS0.png"
+    },
+    {
+     "name": "Nozel Silva",
+     "sub": "Black Clover",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b124442-KpZhHmhjw2EG.png"
+    },
+    {
+     "name": "Ban",
+     "sub": "Seven Deadly Sins",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b77605-NrjhQwZwgJ3l.png"
+    },
+    {
+     "name": "Rin Okumura",
+     "sub": "Blue Exorcist",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b24482-E6087V4uAVqL.jpg"
+    },
+    {
+     "name": "Yato",
+     "sub": "Noragami",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b84677-PFmohzIXD1ud.png"
+    },
+    {
+     "name": "Kyo Sohma",
+     "sub": "Fruits Basket",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b209-NOAbiLvJt1QA.png"
+    },
+    {
+     "name": "Manabu Horikita",
+     "sub": "Classroom of the Elite",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b123219-OEMawnnYXMFY.png"
+    },
+    {
+     "name": "Aoi Todo",
+     "sub": "Jujutsu Kaisen",
+     "img": "https://s4.anilist.co/file/anilistcdn/character/large/b137975-6TH7PiLWJaqy.png"
+    }
+   ]
+  }
+ ]
+}

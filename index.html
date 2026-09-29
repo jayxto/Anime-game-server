@@ -604,6 +604,15 @@
         .qap-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0 10px;}
         .qap-chips button{background:#1d1d2c;border:2px solid #34344a;color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:.82rem;cursor:pointer;}
         .qap-chips button.on{border-color:#ff9f43;background:rgba(255,159,67,.18);color:#ffd93d;}
+        .qt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+        .qt-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:#161622;border:2px solid #34344a;border-radius:14px;padding:14px 8px;color:#fff;cursor:pointer;transition:transform .12s,border-color .15s;}
+        .qt-btn:hover{transform:translateY(-2px);border-color:#ff9f43;}
+        .qt-btn .qt-emo{font-size:2rem;line-height:1;}
+        .qt-btn b{font-size:.92rem;}
+        .qt-btn small{color:var(--text-muted);font-size:.72rem;}
+        .bb-duoimg{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;}
+        .bb-duoimg img{width:100%;height:100%;object-fit:cover;object-position:top;}
+        .bb-card.noimg .bb-duoimg{position:static;height:120px;}
         .bb-autocd{margin-top:8px;font-weight:800;color:var(--accent-cyan);font-size:.9rem;}
         .bb-name .bb-sub{display:block;font-family:Poppins,sans-serif;font-size:.68rem;font-weight:600;opacity:.8;margin-top:1px;letter-spacing:0;}
         .bb-card.win{border-color:#00ff88;transform:scale(1.03);}
@@ -804,7 +813,7 @@
         @keyframes omegaPulse{0%,100%{box-shadow:0 0 22px rgba(255,255,255,.8),0 0 50px rgba(180,77,255,.5)}50%{box-shadow:0 0 34px rgba(255,255,255,1),0 0 80px rgba(0,240,255,.7)}}
         .tcard.empty.r-divine,.tcard.empty.r-cosmique,.tcard.empty.r-eternelle,.tcard.empty.r-omega{animation:none;filter:saturate(.6);}
         .tcard.r-halloween{border:3px solid transparent;background:linear-gradient(#1a0f1f,#120a14) padding-box,linear-gradient(135deg,#ff7a00,#8a2be2,#111,#ff7a00,#39ff14,#8a2be2) border-box;background-size:auto,300% 300%;animation:hwGlow 5s linear infinite;box-shadow:0 0 16px rgba(255,122,0,.65),0 0 30px rgba(138,43,226,.45);}
-        .tcard.r-halloween::before{content:'🎃';position:absolute;top:2px;left:4px;font-size:1.05rem;z-index:3;filter:drop-shadow(0 0 4px #ff7a00);}
+        .tcard.r-halloween::before{content:'🎃';position:absolute;bottom:3px;right:5px;font-size:1.05rem;z-index:3;filter:drop-shadow(0 0 4px #ff7a00);}
         .tcard.r-halloween::after{content:'🦇';position:absolute;top:3px;right:5px;font-size:.85rem;z-index:3;animation:hwBat 2.4s ease-in-out infinite;}
         .tcard.r-halloween .tc-img{box-shadow:inset 0 -18px 22px rgba(255,122,0,.25);}
         .tcard.r-halloween .tc-rar{background:linear-gradient(90deg,#ff7a00,#ffb347,#b76bff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
@@ -813,6 +822,37 @@
         @keyframes hwGlow{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
         @keyframes hwBat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-3px) rotate(8deg)}}
         #summon .sm-fx.fx-halloween{filter:drop-shadow(0 0 18px #ff7a00);}
+        /* invocation Halloween : lune, brume, chauves-souris, citrouille qui gonfle, éclairs */
+        #summon.hw .sm-bg{background:radial-gradient(circle at 50% 55%,#4a1a06 0%,#1e0b2e 45%,#07030c 100%);}
+        #summon.hw .sm-runes text{font-size:18px;}
+        #summon .hw-moon{position:absolute;top:6%;right:8%;width:min(22vw,150px);height:min(22vw,150px);border-radius:50%;background:radial-gradient(circle at 38% 38%,#fff6d8,#ffc46b 60%,#e07a1a);box-shadow:0 0 40px #ff9a2a,0 0 120px rgba(255,122,0,.5);opacity:0;transform:translateY(30px);transition:opacity 1.2s,transform 1.6s;pointer-events:none;}
+        #summon.charge .hw-moon{opacity:.95;transform:none;}
+        #summon .hw-fog{position:absolute;left:-20%;right:-20%;bottom:-6%;height:42%;background:radial-gradient(ellipse at 20% 80%,rgba(160,110,220,.35),transparent 60%),radial-gradient(ellipse at 70% 90%,rgba(255,140,40,.22),transparent 55%),radial-gradient(ellipse at 45% 100%,rgba(200,200,230,.25),transparent 60%);filter:blur(14px);animation:hwFog 7s ease-in-out infinite alternate;pointer-events:none;opacity:0;transition:opacity 1s;}
+        #summon.charge .hw-fog{opacity:1;}
+        #summon .hw-bats{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;}
+        #summon .hw-bats i{position:absolute;left:-10%;font-style:normal;font-size:calc(1.2rem + (var(--k) * .17rem));opacity:0;animation:hwFly 3.2s linear infinite;filter:drop-shadow(0 0 6px #000);}
+        #summon:not(.charge) .hw-bats i{animation-play-state:paused;}
+        #summon .hw-pump{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.2);font-size:min(34vw,34vh);opacity:0;pointer-events:none;filter:drop-shadow(0 0 30px #ff7a00) drop-shadow(0 0 80px #ff4d00);z-index:1;}
+        #summon.charge .hw-pump{animation:hwPump 1.7s cubic-bezier(.3,1.4,.5,1) forwards;}
+        #summon.show .hw-pump{animation:hwPumpOut .5s ease-in forwards;}
+        #summon.hw .sm-flash{background:#ffb347;}
+        #summon.hw .sm-txt{font-family:'Bangers',cursive;font-size:1.7rem;letter-spacing:2px;color:#ffb347;text-shadow:0 0 12px #ff7a00,0 0 26px #8a2be2;}
+        #summon .sm-back.hwb{background:radial-gradient(circle at 50% 40%,#3a1150,#120616);border-color:#ff7a00;box-shadow:0 0 14px #ff7a00,0 0 26px #8a2be2;}
+        #summon .sm-back.hwb span{animation:hwFlicker 1.3s infinite;}
+        #summon .sm-screen.fx-halloween{background:radial-gradient(circle at 50% 50%,rgba(255,122,0,.18),rgba(40,6,60,.75) 60%,rgba(0,0,0,.9));animation:hwScreen 3.6s ease-out forwards;}
+        #summon .fx-halloween::before{width:340px;height:340px;border-radius:50%;background:conic-gradient(#ff7a00,#8a2be2,#39ff14,#ff7a00);-webkit-mask:radial-gradient(circle,transparent 44%,#000 46%,#000 50%,transparent 52%);mask:radial-gradient(circle,transparent 44%,#000 46%,#000 50%,transparent 52%);animation:fxSpin 2.4s linear forwards;}
+        #summon .fx-halloween::after{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,150,40,.9),rgba(138,43,226,.4) 45%,transparent 70%);filter:blur(10px);animation:fxGlow 2.2s ease-out forwards;}
+        #summon .hw-e{position:absolute;left:50%;top:50%;font-weight:400;opacity:0;animation:hwOut var(--d) cubic-bezier(.2,.8,.3,1) var(--dl) forwards;}
+        #summon.hw-storm::before{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(180deg,rgba(220,200,255,.85),rgba(255,160,60,.35));animation:hwLightning 1.5s steps(1) forwards;}
+        @keyframes hwFog{0%{transform:translateX(-4%)}100%{transform:translateX(4%)}}
+        @keyframes hwFly{0%{transform:translate(0,0) scaleX(-1);opacity:0}10%{opacity:1}50%{transform:translate(60vw,-6vh) scaleX(-1)}90%{opacity:1}100%{transform:translate(125vw,4vh) scaleX(-1);opacity:0}}
+        @keyframes hwPump{0%{transform:translate(-50%,-50%) scale(.2) rotate(-20deg);opacity:0}60%{opacity:.9}100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:.85}}
+        @keyframes hwPumpOut{to{transform:translate(-50%,-50%) scale(2.4);opacity:0}}
+        @keyframes hwFlicker{0%,100%{opacity:1;filter:drop-shadow(0 0 8px #ff7a00)}45%{opacity:.55;filter:none}50%{opacity:1}55%{opacity:.7}}
+        @keyframes hwScreen{0%{opacity:0}15%{opacity:1}75%{opacity:.8}100%{opacity:0}}
+        @keyframes hwOut{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}15%{opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1.1) rotate(var(--r));opacity:0}}
+        @keyframes hwLightning{0%{opacity:0}8%{opacity:1}14%{opacity:0}22%{opacity:.8}28%{opacity:0}100%{opacity:0}}
+        @media (prefers-reduced-motion:reduce){#summon .hw-bats,#summon.hw-storm::before{display:none;}}
         @media (prefers-reduced-motion:reduce){.tcard.r-secrete,.tcard.r-eternelle,.tcard.r-omega,.tcard.r-halloween,.tcard.r-halloween::after{animation:none;}}
         .tcard.empty{opacity:.45;border-style:dashed;}
         .tcard.shiny::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.55) 35%,rgba(255,0,200,.25) 45%,rgba(0,255,255,.25) 55%,transparent 70%);background-size:250% 100%;animation:tcShine 2.4s linear infinite;pointer-events:none;mix-blend-mode:screen;}
@@ -1930,8 +1970,8 @@
 
                 <div class="quote-mode-card" style="border-color:#ff9f43;">
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Qui a le plus…</h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">« Qui a le plus souffert ? », « Qui est le plus fort ? »… Pas de bonne réponse : c'est TOI qui choisis ! En manches (5 à 20) ou en tournoi jusqu'à la finale • jouable avec ton chat</p>
-                    <button class="btn-action" style="margin-top:0;background:#ff9f43;color:#111;" onclick="openUniverseSelection('qap')">Choisir l'univers</button>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Qui a le plus souffert ? Meilleure waifu ? Meilleur père ? Meilleur duo ? Meilleur OST ?… Des tournois à thème avec les bons persos, et c'est TOI qui choisis • jouable avec ton chat</p>
+                    <button class="btn-action" style="margin-top:0;background:#ff9f43;color:#111;" onclick="openQapThemes()">Choisir un thème</button>
                 </div>
 
                 
@@ -2542,7 +2582,7 @@
         </div>
         <div class="opt-panel" id="adm-hw">
             <h2>🎃 Cartes Halloween</h2>
-            <p class="tl-hint" style="text-align:left;">Crée des cartes Halloween (contour spécial) avec les persos de ton choix. Quand l'événement est activé, elles tombent dans les boosters et un <b>Booster Halloween</b> (1 carte Halloween garantie) apparaît en boutique.</p>
+            <p class="tl-hint" style="text-align:left;">Une collection Halloween est déjà prête (certains persos seulement), et tu peux en ajouter ou en retirer. Rareté d'une Secrète : ~1 carte sur 150 dans les boosters pendant l'événement, avec une animation d'invocation spéciale. L'événement s'active tout seul du 1er octobre au 2 novembre (la case permet de le forcer ou de le couper). Un <b>Booster Halloween</b> (1 carte Halloween garantie) apparaît aussi en boutique.</p>
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#ff7a00;"><input type="checkbox" id="adm-hw-on" onchange="hwAdmin('toggle')"> 🎃 Événement Halloween activé</label>
             <select id="adm-hw-u" class="v7-input" onchange="hwAdminNames()"></select>
             <input id="adm-hw-name" class="v7-input" list="adm-hw-names" maxlength="80" placeholder="Perso (ex : Itachi Uchiwa)"><datalist id="adm-hw-names"></datalist>
@@ -6591,9 +6631,12 @@
             body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div><div>Chargement…</div></div>';
             let data;
             try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
-            bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:'), qap: kind === 'qap' };
+            bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') || source.startsWith('qt:'), qap: kind === 'qap', qt: kind === 'qt', qtTitle: kind === 'qt' ? data.label : null };
             const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI A LE PLUS…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
-            document.getElementById('bb-subtitle').textContent = bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            if (bb.qt && h2) h2.textContent = '🏆 QUI A LE PLUS…';
+            const unit = data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
+            if (bb.qt) bb.unit = unit;
+            document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             if (bb.qap) return qapSetup(document.getElementById('bb-body'));
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
@@ -6603,14 +6646,14 @@
             const N = data.items.length;
             const opts = (bb.tp ? [8, 16, 32, 64, 128, 256, 512, 1024] : [8, 16, 32, 64]).filter(n => n <= N);
             opts.forEach(n => {
-                const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} ${bb.tp ? 'persos' : 'participants'}`;
+                const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} ${bb.qt ? bb.unit : bb.tp ? 'persos' : 'participants'}`;
                 b.onclick = () => bbStart(n);
                 sizes.appendChild(b);
             });
             // Tu préfères : on peut mettre TOUS les persos (tour préliminaire si le nombre n'est pas une puissance de 2)
             if (bb.tp && N >= 8 && !opts.includes(N)) {
                 const b = document.createElement('button'); b.className = 'btn-action'; b.style.background = 'var(--accent-cyan)'; b.style.color = '#111';
-                b.textContent = `🌍 Tous les ${N} persos`;
+                b.textContent = `🌍 Tous les ${N} ${bb.qt ? bb.unit : 'persos'}`;
                 b.onclick = () => bbStart(N);
                 sizes.appendChild(b);
             }
@@ -6621,6 +6664,29 @@
             body.appendChild(rk);
             // précharge quelques images
             data.items.slice(0, 16).forEach(it => itemImage(source, it));
+        }
+        // Thèmes « Qui a le plus… » avec leurs propres persos (pères, duos, animaux, OST…)
+        async function openQapThemes() {
+            hideAllPanels();
+            document.getElementById('battle-room').style.display = 'block';
+            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = '🏆 QUI A LE PLUS…';
+            document.getElementById('bb-subtitle').textContent = 'Choisis un thème : pas de bonne réponse, c’est toi qui décides !';
+            const body = document.getElementById('bb-body');
+            body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div></div>';
+            let d = null; try { d = await (await fetch('/api/qap/themes')).json(); } catch (e) {}
+            body.innerHTML = '';
+            const grid = document.createElement('div'); grid.className = 'qt-grid';
+            ((d && d.themes) || []).forEach(t => {
+                const b = document.createElement('button'); b.className = 'qt-btn';
+                b.innerHTML = `<span class="qt-emo">${v7esc(t.emoji || '🏆')}</span><b>${v7esc(t.title)}</b><small>${t.n} ${t.kind === 'ost' ? 'musiques' : t.kind === 'duos' ? 'duos' : 'persos'}</small>`;
+                b.onclick = () => startBattleSetup('qt:' + t.id, 'qt');
+                grid.appendChild(b);
+            });
+            body.appendChild(grid);
+            const free = document.createElement('button'); free.className = 'btn-action'; free.style.cssText = 'background:#2a2a40;max-width:420px;display:block;margin:16px auto 0;';
+            free.textContent = '🎲 Mode libre : questions au hasard sur les persos d’un anime'; free.onclick = () => openUniverseSelection('qap');
+            body.appendChild(free);
+            window.scrollTo(0, 0);
         }
         function qapSetup(body) {
             body.innerHTML = '';
@@ -6726,7 +6792,12 @@
             const sub0 = bbItem(name).sub;
             if (sub0) { const sm = document.createElement('small'); sm.className = 'bb-sub'; sm.textContent = sub0; cap.appendChild(sm); }
             card.appendChild(cap);
-            itemImage(bb.source, bbItem(name)).then(src => {
+            const it0 = bbItem(name);
+            if (it0.imgs && it0.imgs.length > 1) {
+                const duo = document.createElement('div'); duo.className = 'bb-duoimg';
+                it0.imgs.slice(0, 2).forEach(u => { const im = document.createElement('img'); im.src = '/api/img?u=' + encodeURIComponent(u); im.alt = ''; im.onload = () => card.classList.remove('noimg'); duo.appendChild(im); });
+                card.insertBefore(duo, cap);
+            } else itemImage(bb.source, it0).then(src => {
                 if (!src) return;
                 const im = document.createElement('img'); im.src = src; im.alt = name;
                 im.onload = () => card.classList.remove('noimg');
@@ -6744,7 +6815,7 @@
                     document.querySelectorAll('.bb-card iframe').forEach(f => f.remove());
                     document.querySelectorAll('.bb-play').forEach(b => b.textContent = '▶ Écouter');
                     const f = document.createElement('iframe');
-                    f.src = `https://www.youtube-nocookie.com/embed/${it.video}?autoplay=1&start=35&rel=0&playsinline=1`;
+                    f.src = `https://www.youtube-nocookie.com/embed/${it.video}?autoplay=1&start=${it.start != null ? it.start : 35}&rel=0&playsinline=1`;
                     f.allow = 'autoplay; encrypted-media';
                     f.className = 'bb-video';
                     card.appendChild(f);
@@ -6767,7 +6838,7 @@
             const done = bb.duels.length, all = bb.size - 1;
             prog.innerHTML = `<div style="width:${100 * done / all}%"></div>`;
             head.append(rn, sub, prog);
-            if (bb.qap && bb.qi != null) { const q = document.createElement('div'); q.className = 'qap-q'; q.textContent = qapQ(bb.qi); head.appendChild(q); }
+            if ((bb.qap && bb.qi != null) || bb.qt) { const q = document.createElement('div'); q.className = 'qap-q'; q.textContent = bb.qt ? bb.qtTitle : qapQ(bb.qi); head.appendChild(q); }
             body.appendChild(head);
             const duel = document.createElement('div'); duel.className = 'bb-duel';
             const ca = bbCard(a, () => bbPick(0, ca, cb));
@@ -6826,7 +6897,7 @@
             const body = document.getElementById('bb-body');
             body.innerHTML = '';
             const box = document.createElement('div'); box.className = 'bb-champion';
-            box.innerHTML = bb.qap && bb.qi != null ? `<div class="qap-q">${v7esc(qapQ(bb.qi))}</div><div class="bb-round">👑 TON #1</div>` : '<div class="bb-round">🏆 TON CHAMPION</div>';
+            box.innerHTML = bb.qt ? `<div class="qap-q">${v7esc(bb.qtTitle)}</div><div class="bb-round">👑 TON #1</div>` : bb.qap && bb.qi != null ? `<div class="qap-q">${v7esc(qapQ(bb.qi))}</div><div class="bb-round">👑 TON #1</div>` : '<div class="bb-round">🏆 TON CHAMPION</div>';
             box.appendChild(bbCard(champion));
             body.appendChild(box);
             // Classement de ta battle : champion, finaliste, demi-finalistes...
@@ -6852,7 +6923,7 @@
             showMine();
             const again = document.createElement('div'); again.style.cssText = 'display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px;';
             const b1 = document.createElement('button'); b1.className = 'btn-action'; b1.style.cssText = 'width:auto;margin:0;'; b1.textContent = '🔁 Rejouer'; b1.onclick = () => bbStart(bb.size);
-            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = 'Changer le nombre'; b2.onclick = () => startBattleSetup(bb.source, bb.qap ? 'qap' : undefined);
+            const b2 = document.createElement('button'); b2.className = 'btn-action'; b2.style.cssText = 'width:auto;margin:0;background:#2a2a40;'; b2.textContent = bb.qt ? 'Changer de thème' : 'Changer le nombre'; b2.onclick = () => bb.qt ? openQapThemes() : startBattleSetup(bb.source, bb.qap ? 'qap' : undefined);
             again.append(b1, b2);
             body.appendChild(again);
             fetch('/api/battle/result', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: bb.theme || bb.source, champion, duels: bb.duels }) }).catch(() => {});
@@ -6886,7 +6957,7 @@
             container.appendChild(rank);
             if (withBack) {
                 const back = document.createElement('button'); back.className = 'btn-action'; back.style.cssText = 'max-width:320px;display:block;margin:12px auto 0;background:#2a2a40;';
-                back.textContent = '← Retour'; back.onclick = () => startBattleSetup(bb.source, bb.qap ? 'qap' : undefined);
+                back.textContent = '← Retour'; back.onclick = () => startBattleSetup(bb.source, bb.qap ? 'qap' : bb.qt ? 'qt' : undefined);
                 container.appendChild(back);
             }
         }
@@ -11212,10 +11283,32 @@
                 if (rank >= 7) bip(notes[n - 1] / 2, 1.2, 0.05, n * 0.07, 'triangle');
                 if (rank >= 8 && typeof sfxBoom === 'function') sfxBoom(1.2, 0.25, 1500);
             }
+            function hwSound() { // rire de sorcière + orage
+                if (typeof bip !== 'function' || typeof sfxOn === 'undefined' || !sfxOn) return;
+                [659, 622, 587, 554, 523, 494, 466, 440].forEach((f, k) => bip(f, 0.14, 0.05, k * 0.09, 'sawtooth'));
+                [880, 988, 880, 988, 880].forEach((f, k) => bip(f, 0.08, 0.04, 0.85 + k * 0.1, 'square'));
+                bip(110, 1.4, 0.06, 0.2, 'triangle');
+                if (typeof sfxBoom === 'function') sfxBoom(1.4, 0.3, 700);
+            }
+            function hwBurst(host) { // chauves-souris, fantômes et citrouilles qui s'échappent de la carte
+                const E = ['🦇', '🦇', '🦇', '👻', '🎃', '🕸️', '🦇', '👻', '🎃', '🦇', '💀', '🦇'];
+                for (let k = 0; k < 18; k++) {
+                    const p = document.createElement('b'); p.className = 'hw-e'; p.textContent = E[k % E.length];
+                    const a = Math.random() * Math.PI * 2, d = 160 + Math.random() * 220;
+                    p.style.cssText = `--x:${(Math.cos(a) * d).toFixed(0)}px;--y:${(Math.sin(a) * d * .8 - 40).toFixed(0)}px;--r:${(Math.random() * 60 - 30).toFixed(0)}deg;--d:${(1.4 + Math.random()).toFixed(2)}s;--dl:${(Math.random() * .35).toFixed(2)}s;font-size:${(1.2 + Math.random() * 1.4).toFixed(1)}rem;`;
+                    host.appendChild(p);
+                }
+            }
             function smReveal(o, el, c) {
                 const rank = RANK[c.rarity] || 0, rar = c.rarity === 'halloween' ? 'halloween' : (RNAME[rank] || 'commune');
                 const fx = document.createElement('div'); fx.className = 'sm-fx fx-' + rar; el.appendChild(fx);
                 smParticles(fx, rar);
+                if (rar === 'halloween') {
+                    hwBurst(fx);
+                    const sc = document.createElement('div'); sc.className = 'sm-screen fx-halloween'; o.insertBefore(sc, o.querySelector('.sm-cards')); setTimeout(() => sc.remove(), 3600);
+                    o.classList.remove('hw-storm'); void o.offsetWidth; o.classList.add('hw-storm'); setTimeout(() => o.classList.remove('hw-storm'), 1600);
+                    hwSound();
+                }
                 setTimeout(() => fx.remove(), 4200);
                 if (rank >= 6) { const sc = document.createElement('div'); sc.className = 'sm-screen fx-' + rar; o.insertBefore(sc, o.querySelector('.sm-cards')); setTimeout(() => sc.remove(), 4000); }
                 if (rank >= 9) { o.classList.add('glitch'); setTimeout(() => o.classList.remove('glitch'), 1900); }
@@ -11225,8 +11318,8 @@
                     b.style.setProperty('--bc', rar === 'halloween' ? '#ff7a00' : COL[rank]); b.textContent = (c.shiny ? '✨ ' : '') + BANNER[rar] + (c.shiny ? ' ✨' : '');
                     o.appendChild(b); setTimeout(() => b.remove(), 2300);
                 }
-                if (rank >= 3 && typeof confetti === 'function') confetti(rank >= 6 ? 3500 : 1800);
-                smSound(rank);
+                if (rank >= 3 && typeof confetti === 'function' && rar !== 'halloween') confetti(rank >= 6 ? 3500 : 1800);
+                if (rar !== 'halloween') smSound(rank);
             }
             function circleSvg(col) {
                 const runes = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
@@ -11239,12 +11332,15 @@
                 document.getElementById('booster-modal')?.remove(); document.getElementById('summon')?.remove();
                 const best = Math.max(...cards.map(c => RANK[c.rarity] || 0));
                 const anyShiny = cards.some(c => c.shiny);
-                const col = anyShiny && best < 3 ? '#ff7ae0' : COL[best] || COL[0];
-                const o = document.createElement('div'); o.id = 'summon'; o.className = 'summon r' + best + (anyShiny ? ' shiny' : '');
+                // une carte Halloween (et rien de plus rare) : toute la scène passe en mode Halloween
+                const hw = cards.some(c => c.rarity === 'halloween') && best <= 5;
+                const col = hw ? '#ff7a00' : anyShiny && best < 3 ? '#ff7ae0' : COL[best] || COL[0];
+                const o = document.createElement('div'); o.id = 'summon'; o.className = 'summon r' + best + (anyShiny ? ' shiny' : '') + (hw ? ' hw' : '');
                 o.style.setProperty('--c', col);
-                o.innerHTML = `<div class="sm-bg"></div>${circleSvg(col)}<div class="sm-beam"></div><div class="sm-flash"></div>
-                    <div class="sm-txt">${best >= 9 ? 'Ω La réalité se déchire… Ω' : best >= 8 ? '♾️ Le temps s’arrête… ♾️' : best >= 7 ? '🌌 Les étoiles s’alignent… 🌌' : best >= 6 ? '👑 Une lumière céleste descend… 👑' : best >= 5 ? '🌈 Un secret se révèle… 🌈' : best >= 4 ? '🔥 Le cercle s’embrase ! 🔥' : best >= 3 ? '✨ Une énergie immense se dégage… ✨' : best === 2 ? 'Une aura puissante apparaît…' : 'Invocation…'}</div>
-                    <div class="sm-cards">${cards.map((c, i) => `<div class="sm-card" data-i="${i}" style="animation-delay:${i * 0.08}s"><div class="sm-inner"><div class="sm-back" style="--c:${COL[RANK[c.rarity] || 0]}"><span>🎴</span></div><div class="sm-front">${cardHtml(c, true)}</div></div></div>`).join('')}</div>
+                const hwDeco = hw ? `<div class="hw-moon"></div><div class="hw-fog"></div><div class="hw-bats">${Array.from({ length: 9 }, (_, k) => `<i style="--k:${k};top:${8 + (k * 37) % 70}%;animation-delay:${(k * 0.23).toFixed(2)}s">🦇</i>`).join('')}</div><div class="hw-pump">🎃</div>` : '';
+                o.innerHTML = `<div class="sm-bg"></div>${hwDeco}${circleSvg(col)}<div class="sm-beam"></div><div class="sm-flash"></div>
+                    <div class="sm-txt">${hw ? '🎃 Les esprits se réveillent… 🎃' : best >= 9 ? 'Ω La réalité se déchire… Ω' : best >= 8 ? '♾️ Le temps s’arrête… ♾️' : best >= 7 ? '🌌 Les étoiles s’alignent… 🌌' : best >= 6 ? '👑 Une lumière céleste descend… 👑' : best >= 5 ? '🌈 Un secret se révèle… 🌈' : best >= 4 ? '🔥 Le cercle s’embrase ! 🔥' : best >= 3 ? '✨ Une énergie immense se dégage… ✨' : best === 2 ? 'Une aura puissante apparaît…' : 'Invocation…'}</div>
+                    <div class="sm-cards">${cards.map((c, i) => `<div class="sm-card" data-i="${i}" style="animation-delay:${i * 0.08}s"><div class="sm-inner"><div class="sm-back${c.rarity === 'halloween' ? ' hwb' : ''}" style="--c:${c.rarity === 'halloween' ? '#ff7a00' : COL[RANK[c.rarity] || 0]}"><span>${c.rarity === 'halloween' ? '🎃' : '🎴'}</span></div><div class="sm-front">${cardHtml(c, true)}</div></div></div>`).join('')}</div>
                     <div class="sm-bottom"><button class="sm-skip" onclick="summonRevealAll()">⏭ Tout révéler</button><div class="sm-sum"></div></div>`;
                 document.body.appendChild(o);
                 o._cards = cards;

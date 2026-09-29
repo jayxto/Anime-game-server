@@ -11849,7 +11849,16 @@ function tpLabel(source) {
     return key.split('+').map(u => ARC_UNIVERSE_ANIME[u]).join(' + ');
 }
 
+// « Qui a le plus… » : thèmes avec leurs propres persos (qap-themes.json : pères, duos, animaux, OST…)
+const QT_THEMES = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'qap-themes.json'), 'utf8')).themes || []; }
+    catch (e) { console.warn('[Qui a le plus] qap-themes.json introuvable :', e.message); return []; }
+})();
+const QT_BY_ID = Object.fromEntries(QT_THEMES.map(t => [t.id, t]));
+app.get('/api/qap/themes', (req, res) => res.json({ ok: true, themes: QT_THEMES.map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: t.items.length })) }));
+
 function arcItemsFor(source) {
+    if (source.startsWith('qt:')) return QT_BY_ID[source.slice(3)] ? QT_BY_ID[source.slice(3)].items : null;
     const qap = /^qap\d{1,3}\|(tp:.+)$/.exec(source); // « Qui a le plus… » : un classement mondial par question
     if (qap) return tpItemsFor(qap[1]);
     if (source.startsWith('tp:')) return tpItemsFor(source);
@@ -11877,8 +11886,8 @@ app.get('/api/arcade/items', (req, res) => {
     res.json({
         ok: true,
         source,
-        label: source === 'animes' ? 'Animes' : source.startsWith('tp:') ? tpLabel(source) : ARC_UNIVERSE_ANIME[source],
-        items: items.map(i => ({ name: i.name, img: i.img || null, ...(i.sub ? { sub: i.sub } : {}) }))
+        label: source === 'animes' ? 'Animes' : source.startsWith('tp:') ? tpLabel(source) : source.startsWith('qt:') ? QT_BY_ID[source.slice(3)].title : ARC_UNIVERSE_ANIME[source],
+        items: items.map(i => ({ name: i.name, img: i.img || null, ...(i.sub ? { sub: i.sub } : {}), ...(i.imgs ? { imgs: i.imgs } : {}), ...(i.video ? { video: i.video, start: i.start || 0 } : {}) }))
     });
 });
 
@@ -15113,7 +15122,7 @@ const THEME_CHARS = {
     halloween: [['deathnote', 'Ryuk'], ['deathnote', 'Rem'], ['tokyoghoul', 'Ken Kaneki'], ['tokyoghoul', 'Rize Kamishiro'], ['tokyoghoul', 'Eto Yoshimura'], ['demonslayer', 'Muzan Kibutsuji'],
         ['demonslayer', 'Akaza'], ['demonslayer', 'Kokushibo'], ['demonslayer', 'Doma'], ['demonslayer', 'Rui'], ['jjk', 'Ryomen Sukuna'], ['jjk', 'Mahito'], ['jjk', 'Jogo'], ['naruto', 'Orochimaru'],
         ['naruto', 'Kisame Hoshigaki'], ['naruto', 'Hidan'], ['naruto', 'Zetsu'], ['onepiece', 'Brook'], ['onepiece', 'Gecko Moria'], ['onepiece', 'Perona'], ['hxh', 'Hisoka Morow'], ['hxh', 'Illumi Zoldyck'],
-        ['hxh', 'Neferpitou'], ['dragonball', 'Majin Buu'], ['dragonball', 'Cell'], ['chainsaw', 'Pochita'], ['chainsaw', 'Power'], ['chainsaw', 'Makima'], ['fma', 'Envy'], ['fma', 'Gluttony'],
+        ['hxh', 'Neferpitou'], ['dragonball', 'Majin Boo'], ['dragonball', 'Cell'], ['chainsaw', 'Pochita'], ['chainsaw', 'Power'], ['chainsaw', 'Makima'], ['fma', 'Envy'], ['fma', 'Gluttony'],
         ['bleach', 'Ulquiorra Cifer'], ['bleach', 'Mayuri Kurotsuchi'], ['bleach', 'Kenpachi Zaraki'], ['snk', 'Zeke Yeager'], ['fairy', 'Zeref Dragneel'], ['jojo', 'Dio Brando'], ['bluelock', 'Ryusei Shidou']],
     noel: [['onepiece', 'Tony Tony Chopper'], ['chainsaw', 'Santa Claus'], ['bleach', 'Toshiro Hitsugaya'], ['bleach', 'Rukia Kuchiki'], ['fairy', 'Gray Fullbuster'], ['onepiece', 'Kuzan'],
         ['naruto', 'Haku'], ['snk', 'Mikasa Ackerman'], ['fairy', 'Juvia Lockser'], ['demonslayer', 'Nezuko Kamado'], ['demonslayer', 'Kyojuro Rengoku'], ['hxh', 'Killua Zoldyck'],
@@ -16145,7 +16154,7 @@ const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.sta
 app.get('/api/shop', async (req, res) => {
     const uid = authUserId(req);
     const e = uid ? await ecoGet(uid) : null;
-    res.json({ ok: true, items: SHOP.filter(i => (!i.event || (SITE.halloween && SITE.halloween.on)) && ((!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id)))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+    res.json({ ok: true, items: SHOP.filter(i => (!i.event || hwOn()) && ((!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id)))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
 });
 app.post('/api/shop/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -16153,7 +16162,7 @@ app.post('/api/shop/buy', async (req, res) => {
     if (it && it.pass) return res.json({ ok: false, error: 'Objet exclusif au pass de saison.' });
     if (it && it.seasonal && it.seasonal !== themeSeason().u) return res.json({ ok: false, error: 'Cet objet n’est plus en vente (saison terminée).' });
     if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
-    if (it.event === 'halloween' && !(SITE.halloween && SITE.halloween.on)) return res.json({ ok: false, error: 'L’événement Halloween est terminé.' });
+    if (it.event === 'halloween' && !hwOn()) return res.json({ ok: false, error: 'L’événement Halloween est terminé.' });
     const e = await ecoGet(uid);
     if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
     if (e.coins < it.price) return res.json({ ok: false, error: `Il te manque ${it.price - e.coins} pièces.` });
@@ -19834,9 +19843,40 @@ io.on('connection', socket => {
    « Cartes Halloween »). Contour Halloween, en boosters pendant l'événement
    + Booster Halloween en boutique. Clé d'une carte : « anime|perso|halloween ».
    ===================================================================== */
-const hwOn = () => !!(SITE.halloween && SITE.halloween.on);
-const hwCards = () => (SITE.halloween && Array.isArray(SITE.halloween.cards)) ? SITE.halloween.cards : [];
-const HW_RATE = 1 / 20; // chance par carte de booster pendant l'événement (multipliée par la chance)
+// Collection Halloween officielle : seulement certains persos (les plus « effrayants »), en plus de ceux ajoutés par les admins
+const HW_BUILTIN = [['deathnote', 'Ryuk'], ['deathnote', 'Light Yagami'], ['tokyoghoul', 'Ken Kaneki'], ['tokyoghoul', 'Rize Kamishiro'], ['tokyoghoul', 'Juuzou Suzuya'],
+    ['demonslayer', 'Muzan Kibutsuji'], ['demonslayer', 'Nezuko Kamado'], ['demonslayer', 'Akaza'], ['demonslayer', 'Doma'], ['jjk', 'Ryomen Sukuna'], ['jjk', 'Mahito'], ['jjk', 'Satoru Gojo'],
+    ['naruto', 'Orochimaru'], ['naruto', 'Itachi Uchiwa'], ['naruto', 'Hidan'], ['onepiece', 'Brook'], ['onepiece', 'Gecko Moria'], ['onepiece', 'Perona'], ['onepiece', 'Trafalgar D. Water Law'],
+    ['hxh', 'Hisoka Morow'], ['hxh', 'Illumi Zoldyck'], ['hxh', 'Neferpitou'], ['dragonball', 'Majin Boo'], ['dragonball', 'Cell'], ['chainsaw', 'Pochita'], ['chainsaw', 'Power'],
+    ['chainsaw', 'Makima'], ['chainsaw', 'Denji'], ['fma', 'Envy'], ['bleach', 'Ulquiorra Cifer'], ['bleach', 'Mayuri Kurotsuchi'], ['bleach', 'Ichigo Kurosaki'], ['snk', 'Eren Jäger'],
+    ['jojo', 'Dio Brando'], ['solo', 'Sung Jinwoo'], ['rezero', 'Rem'], ['pokemon', 'Ectoplasma'], ['pokemon', 'Mimiqui'], ['pokemon', 'Polichombr']];
+let HW_BUILTIN_OK = null;
+function hwBuiltin() { // noms exacts des cartes (les persos introuvables sont ignorés)
+    if (HW_BUILTIN_OK) return HW_BUILTIN_OK;
+    const out = [];
+    for (const [u, name] of HW_BUILTIN) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const list = cardPool(u), q = normalizeRG(name);
+        let hit = list.find(x => normalizeRG(x.display) === q);
+        if (!hit) { const m = list.filter(x => normalizeRG(x.display).includes(q)); if (m.length === 1) hit = m[0]; }
+        if (hit) out.push({ u, display: hit.display, builtin: true });
+    }
+    return (HW_BUILTIN_OK = out);
+}
+// l'événement s'active tout seul du 1er octobre au 2 novembre (sauf si un admin l'a coupé), ou à la main
+function hwOn() {
+    const h = SITE.halloween || {};
+    if (h.mode === 'on') return true;
+    if (h.mode === 'off') return false;
+    if (h.on) return true;
+    const d = new Date(), m = d.getMonth();
+    return m === 9 || (m === 10 && d.getDate() <= 2);
+}
+const hwCards = () => {
+    const own = (SITE.halloween && Array.isArray(SITE.halloween.cards)) ? SITE.halloween.cards : [];
+    return hwBuiltin().filter(b => !own.some(c => c.u === b.u && c.display === b.display)).concat(own);
+};
+const HW_RATE = 1 / 150; // même rareté qu'une Secrète : chance par carte de booster pendant l'événement (multipliée par la chance)
 SPECIAL_BY_ID.halloween = { id: 'halloween', label: 'Halloween', coins: 150 };
 // toutes les cartes Halloween (même retirées du tirage : celles des joueurs restent valables)
 const _cardSpecialsHw = cardSpecials;
@@ -19875,7 +19915,7 @@ app.post('/api/admin/halloween', adminOnly(async (req, res) => {
     if (!SITE.halloween || typeof SITE.halloween !== 'object') SITE.halloween = { on: false, cards: [] };
     const h = SITE.halloween;
     if (!Array.isArray(h.cards)) h.cards = [];
-    if (b.action === 'toggle') h.on = !!b.on;
+    if (b.action === 'toggle') { h.on = !!b.on; h.mode = b.on ? 'on' : 'off'; }
     else if (b.action === 'add') {
         // recherche stricte : nom exact, sinon un seul perso dont le nom contient ce qui est tapé
         const u = String(b.u || ''), q = normalizeRG(String(b.name || ''));
@@ -19887,11 +19927,12 @@ app.post('/api/admin/halloween', adminOnly(async (req, res) => {
         const ex = h.cards.find(x => x.u === c.u && x.display === c.display);
         if (ex) ex.off = false; else h.cards.push({ u: c.u, display: c.display });
     } else if (b.action === 'remove') {
-        const ex = h.cards.find(x => x.u === b.u && x.display === b.display);
+        let ex = h.cards.find(x => x.u === b.u && x.display === b.display);
+        if (!ex && hwBuiltin().some(x => x.u === b.u && x.display === b.display)) h.cards.push(ex = { u: b.u, display: b.display });
         if (ex) ex.off = true; // retirée du tirage, mais celles déjà obtenues restent valables
     } else if (b.action === 'give') {
         const uid = authUserId(req);
-        const ex = h.cards.find(x => x.u === b.u && x.display === b.display);
+        const ex = hwCards().find(x => x.u === b.u && x.display === b.display);
         if (!uid || !ex) return res.json({ ok: false, error: 'Carte introuvable.' });
         const card = await cardAwardSecret(uid, ex.u, ex.display, !!b.shiny, 'halloween');
         await siteSave('halloween');
