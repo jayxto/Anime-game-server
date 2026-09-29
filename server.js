@@ -9320,6 +9320,7 @@ function quoteScheduleNext(roomCode) {
 /* ================= Blind Test Anime (QCM : trouver l'anime) ================= */
 // Chaque musique du dossier /music est associée à son anime.
 // Exclues : pistes hors anime, anime incertain, reprises lo-fi et remix (trop durs à reconnaître).
+const MP3_REPLACED_BY_YT = { 39: 'ovkHHiXPN3M' }; // SAO crossing field : opening TV original (japonais)
 const BLINDTEST_TRACKS = [
     { n:1,  anime:"L'Attaque des Titans", title:"Ai Higuchi - Akuma no Ko" },
     { n:2,  anime:"Demon Slayer", title:"Aimer - Zankyou Sanka" },
@@ -9389,6 +9390,8 @@ const BLINDTEST_TRACKS = [
     const song = t.title.replace(/\s*\((Lo-fi|Remix)\)\s*$/i, '');
     const ost = [38,49,50,69,70,71,72,73,74,75].includes(t.n); // films / OST : pas de version "creditless"
     const yt = ost ? `${t.anime} ${song}` : `${t.anime} ${song} creditless`;
+    // mp3 dans la mauvaise version (ex : crossing field en anglais) : on joue l'opening officiel japonais depuis YouTube
+    if (MP3_REPLACED_BY_YT[t.n]) return { ...t, yt, src: null, ytId: MP3_REPLACED_BY_YT[t.n] };
     return { ...t, yt, src:`/music/track_${String(t.n).padStart(3,'0')}.mp3` };
 });
 
