@@ -16793,15 +16793,48 @@ app.post('/api/cards/fuse', async (req, res) => {
 app.get('/api/trade', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const all = (await kvList('trade')).map(x => x.v).filter(t => (t.from === uid || t.to === uid) && (t.status === 'open' || hubNow() - t.at < 3 * 86400000));
-    const view = t => ({ ...t, giveName: t.give.split('|')[1], giveAnime: ARC_UNIVERSE_ANIME[t.give.split('|')[0]], wantName: t.want.split('|')[1], wantAnime: ARC_UNIVERSE_ANIME[t.want.split('|')[0]],
-        giveImg: cardImg({ u: t.give.split('|')[0], display: t.give.split('|')[1] }), wantImg: cardImg({ u: t.want.split('|')[0], display: t.want.split('|')[1] }) });
+    const side = (key, fin) => { const i = cardInfoOfKey(key) || { name: key.split('|')[1], anime: '', rarity: 'commune', img: '' }; return { name: i.name, anime: i.anime, img: i.img, imgs: i.imgs || null, rarity: i.rarity, finish: fin || null }; };
+    const view = t => { const g = side(t.give, t.giveFin), w = side(t.want, t.wantFin);
+        return { ...t, giveName: g.name, giveAnime: g.anime, giveImg: g.img, giveImgs: g.imgs, giveRarity: g.rarity, giveFin: g.finish, wantName: w.name, wantAnime: w.anime, wantImg: w.img, wantImgs: w.imgs, wantRarity: w.rarity, wantFin: w.finish }; };
     res.json({ ok: true, incoming: all.filter(t => t.to === uid).sort((a, b) => b.at - a.at).map(view), outgoing: all.filter(t => t.from === uid).sort((a, b) => b.at - a.at).map(view), friends: await friendsOf(uid) });
 });
+// fiche d'une carte à partir de sa clé (normale, spéciale, Duo, Collector)
+function cardInfoOfKey(k) {
+    const p = String(k).split('|');
+    if (p[0] === 'collector') { const [, week, u, display] = p; return { name: display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: 'collector', img: cardImg({ u, display }), week }; }
+    if (p[0] === 'duo') { const d = DUO_CARDS().find(x => x.name === p[1]); return d ? { name: d.name, anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] } : null; }
+    const [u, display, sec] = p;
+    if (!ARC_UNIVERSE_ANIME[u]) return null;
+    return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display }) };
+}
+// toutes les cartes échangeables, une ligne par version (normale, Holo, Gold…)
 async function cardListOf(uid) {
-    const mine = await cardsOf(uid);
+    const mine = await cardsOf(uid), fin = await kvGet('fin', String(uid), {});
     const out = [];
-    mine.forEach((v, k) => { if (k.startsWith('collector|')) return; const [u, display] = k.split('|'); const r = keyRarity(k); if (!r) return; out.push({ key: k, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: r, n: v.n, shiny: v.shiny, img: cardImg({ u, display }) }); });
+    mine.forEach((v, k) => {
+        const info = cardInfoOfKey(k); if (!info || !(v.n > 0)) return;
+        const e = fin[k] || {}; let left = v.n;
+        FIN_IDS.forEach(f => {
+            const c = Math.min(e[f] || 0, left); if (c <= 0) return;
+            left -= c;
+            out.push({ ...info, key: k, finish: f, n: c, shiny: v.shiny, serial: e.ser && e.ser[f] && e.ser[f].length ? Math.min(...e.ser[f]) : null });
+        });
+        if (left > 0) out.push({ ...info, key: k, finish: null, n: left, shiny: v.shiny });
+    });
     return out.sort((a, b) => a.anime.localeCompare(b.anime, 'fr') || a.name.localeCompare(b.name, 'fr'));
+}
+const tradeHas = async (uid, key, fin) => (await cardListOf(uid)).some(c => c.key === key && (c.finish || null) === (fin || null) && c.n > 0);
+// déplace une finition (et son numéro de série) d'un joueur à l'autre
+async function finMove(from, to, key, f) {
+    const a = await kvGet('fin', String(from), {}), ea = a[key];
+    if (!ea || !ea[f]) return;
+    ea[f]--; let ser = null;
+    if (ea.ser && ea.ser[f] && ea.ser[f].length) ser = ea.ser[f].shift();
+    await kvSet('fin', String(from), a);
+    const b = await kvGet('fin', String(to), {}), eb = b[key] = b[key] || {};
+    eb[f] = (eb[f] || 0) + 1;
+    if (ser != null) { eb.ser = eb.ser || {}; (eb.ser[f] = eb.ser[f] || []).push(ser); }
+    await kvSet('fin', String(to), b);
 }
 app.get('/api/trade/cards', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -16812,16 +16845,16 @@ app.get('/api/trade/cards', async (req, res) => {
 app.post('/api/trade/propose', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const { friendId, give, want } = req.body || {};
+    const giveFin = FIN_IDS.includes((req.body || {}).giveFin) ? req.body.giveFin : null, wantFin = FIN_IDS.includes((req.body || {}).wantFin) ? req.body.wantFin : null;
     const fid = +friendId;
     if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Tu ne peux échanger qu’avec tes amis.' });
-    const mine = await cardsOf(uid), theirs = await cardsOf(fid);
-    if (!mine.get(String(give))) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' });
-    if (!theirs.get(String(want))) return res.json({ ok: false, error: 'Ton ami n’a pas cette carte.' });
+    if (!(await tradeHas(uid, String(give), giveFin))) return res.json({ ok: false, error: 'Tu n’as pas cette carte (ou plus dans cette version).' });
+    if (!(await tradeHas(fid, String(want), wantFin))) return res.json({ ok: false, error: 'Ton ami n’a pas cette carte (ou plus dans cette version).' });
     const open = (await kvList('trade')).filter(x => x.v.from === uid && x.v.status === 'open').length;
     if (open >= 10) return res.json({ ok: false, error: '10 propositions en attente maximum.' });
-    const t = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), from: uid, fromName: await pseudoOf(uid), to: fid, toName: await pseudoOf(fid), give: String(give), want: String(want), status: 'open', at: hubNow() };
+    const t = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), from: uid, fromName: await pseudoOf(uid), to: fid, toName: await pseudoOf(fid), give: String(give), want: String(want), giveFin, wantFin, status: 'open', at: hubNow() };
     await kvSet('trade', t.id, t);
-    emitUser(fid, 'trade_new', { from: t.fromName, give: t.give.split('|')[1], want: t.want.split('|')[1] });
+    emitUser(fid, 'trade_new', { from: t.fromName, give: (cardInfoOfKey(t.give) || {}).name || t.give.split('|')[1], want: (cardInfoOfKey(t.want) || {}).name || t.want.split('|')[1] });
     res.json({ ok: true });
 });
 app.post('/api/trade/respond', async (req, res) => {
@@ -16836,15 +16869,15 @@ app.post('/api/trade/respond', async (req, res) => {
         return res.json({ ok: true });
     }
     // on vérifie que chacun a encore sa carte, puis on échange un exemplaire
-    const mine = await cardsOf(t.to), theirs = await cardsOf(t.from);
-    if (!mine.get(t.want) || !theirs.get(t.give)) { t.status = 'failed'; await kvSet('trade', t.id, t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' }); }
+    if (!(await tradeHas(t.to, t.want, t.wantFin)) || !(await tradeHas(t.from, t.give, t.giveFin))) { t.status = 'failed'; await kvSet('trade', t.id, t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' }); }
     t.status = 'done';
     await kvSet('trade', t.id, t);
     const a = await cardTake(t.from, t.give), b = await cardTake(t.to, t.want);
-    if (a) await cardGive(t.to, { key: t.give }, a.shiny);
-    if (b) await cardGive(t.from, { key: t.want }, b.shiny);
-    emitUser(t.from, 'trade_done', { text: `🔁 ${t.toName} a accepté : tu reçois ${t.want.split('|')[1]} !` });
-    res.json({ ok: true, got: t.give.split('|')[1] });
+    if (a) { await cardGive(t.to, { key: t.give }, a.shiny); if (t.giveFin) await finMove(t.from, t.to, t.give, t.giveFin); }
+    if (b) { await cardGive(t.from, { key: t.want }, b.shiny); if (t.wantFin) await finMove(t.to, t.from, t.want, t.wantFin); }
+    const gn = (cardInfoOfKey(t.give) || {}).name || t.give.split('|')[1], wn = (cardInfoOfKey(t.want) || {}).name || t.want.split('|')[1];
+    emitUser(t.from, 'trade_done', { text: `🔁 ${t.toName} a accepté : tu reçois ${wn}${t.wantFin ? ' (' + FINISHES.find(f => f.id === t.wantFin).label + ')' : ''} !` });
+    res.json({ ok: true, got: gn + (t.giveFin ? ' (' + FINISHES.find(f => f.id === t.giveFin).label + ')' : '') });
 });
 
 /* =====================================================================

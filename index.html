@@ -1043,6 +1043,10 @@
         .trd-c{display:flex;flex-direction:column;align-items:center;width:110px;text-align:center;font-size:.78rem;} .trd-c img{width:70px;height:88px;object-fit:cover;object-position:top;border-radius:8px;background:#0b0b10;} .trd-c small{color:var(--text-muted);font-size:.68rem;}
         .trd-act{display:flex;gap:6px;justify-content:center;} .trd-act button{background:#2a2a40;color:#fff;border:1px solid #44446a;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;} .trd-act button.go{background:#00ff88;color:#111;border:none;}
         .trd-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0;} .trd-cols>div{display:flex;flex-direction:column;gap:6px;min-width:0;}
+        .trd-rar{color:#ffd93d!important;font-weight:800;}
+        .trd-sel{width:100%;margin:4px 0;background:#1d1d2c;color:#fff;border:2px solid #34344a;border-radius:10px;padding:6px 8px;font-weight:700;}
+        .trd-recap{text-align:center;margin:10px 0;font-size:.9rem;}
+        .trd-card .tcard{width:110px;}
         .trd-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;max-height:320px;overflow:auto;padding:2px;}
         .trd-mini{background:#101018;border:2px solid #2c2c44;border-radius:9px;padding:4px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;font-size:.68rem;text-align:center;font-family:inherit;}
         .trd-mini img{width:100%;height:70px;object-fit:cover;object-position:top;border-radius:6px;} .trd-mini small{color:var(--text-muted);font-size:.6rem;}
@@ -10261,9 +10265,9 @@
             const box = document.getElementById('eco-trade');
             const d = await v7get('/api/trade');
             if (!d || !d.ok) return;
-            const tcard = (name, anime, img) => `<div class="trd-c"><img src="${hubEsc(img)}" alt="" onerror="this.style.opacity=.15"><b>${hubEsc(name)}</b><small>${hubEsc(anime || '')}</small></div>`;
+            const tcard = (name, anime, img, rarity, fin, imgs) => `<div class="trd-c trd-card">${cardHtml({ name, anime, img, imgs, rarity: rarity || 'commune', finish: fin || null })}<small>${hubEsc(anime || '')}</small></div>`;
             const row = (t, inc) => `<div class="trd-row"><div class="trd-who">${inc ? `<b>${hubEsc(t.fromName)}</b> te propose` : `Tu proposes à <b>${hubEsc(t.toName)}</b>`}</div>
-                <div class="trd-swap">${tcard(t.giveName, t.giveAnime, t.giveImg)}<span>⇄</span>${tcard(t.wantName, t.wantAnime, t.wantImg)}</div>
+                <div class="trd-swap">${tcard(t.giveName, t.giveAnime, t.giveImg, t.giveRarity, t.giveFin, t.giveImgs)}<span>⇄</span>${tcard(t.wantName, t.wantAnime, t.wantImg, t.wantRarity, t.wantFin, t.wantImgs)}</div>
                 <div class="trd-act">${t.status === 'open' ? (inc ? `<button class="go" onclick="tradeRespond('${t.id}',true)">✔ Accepter</button><button onclick="tradeRespond('${t.id}',false)">Refuser</button>` : `<button onclick="tradeRespond('${t.id}',false)">Annuler</button>`) : `<span class="tl-hint">${{ done: '✅ Échange fait', refused: '❌ Refusé', cancelled: 'Annulé', failed: 'Carte plus disponible' }[t.status] || t.status}</span>`}</div></div>`;
             box.innerHTML = `<h3 class="adm-h">📨 Propositions reçues</h3>${d.incoming.length ? d.incoming.map(t => row(t, true)).join('') : '<p class="tl-hint">Aucune proposition pour le moment.</p>'}
                 <h3 class="adm-h">🔁 Proposer un échange</h3>
@@ -10282,21 +10286,43 @@
         }
         function tradeRenderPick() {
             const pick = document.getElementById('trd-pick'); if (!pick) return;
-            pick.innerHTML = `<div class="trd-cols"><div><b>Tu donnes</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()"><div class="trd-list" id="trd-l-give"></div></div>
-                <div><b>Tu reçois</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q2)}" oninput="trd.q2=this.value;tradeLists()"><div class="trd-list" id="trd-l-want"></div></div></div>
+            const rars = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const sel = (id, cur, all) => `<select class="trd-sel" onchange="trd['${id}']=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${cur === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${rars.filter(r => all.some(c => c.rarity === r)).map(r => `<option value="${r}"${cur === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select>`;
+            pick.innerHTML = `<div class="trd-cols"><div><b>Tu donnes</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()">${sel('r1', trd.r1, trd.mine)}<div class="trd-list" id="trd-l-give"></div></div>
+                <div><b>Tu reçois</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q2)}" oninput="trd.q2=this.value;tradeLists()">${sel('r2', trd.r2, trd.theirs)}<div class="trd-list" id="trd-l-want"></div></div></div>
+                <div id="trd-recap" class="trd-recap"></div>
                 <button class="btn-action" id="trd-send" disabled onclick="tradePropose()">🔁 Envoyer la proposition</button>`;
             tradeLists();
         }
+        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
+        const trdId = c => c.key + '#' + (c.finish || '');
         function tradeLists() {
-            const list = (arr, sel, side, q) => arr.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, 60).map(c => `<button class="trd-mini r-${c.rarity}${sel === c.key ? ' on' : ''}" onclick="tradeSel('${side}',${JSON.stringify(c.key).replace(/"/g, '&quot;')})"><img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${hubEsc(c.name)}</b><small>${hubEsc(c.anime)}${c.n > 1 ? ' • x' + c.n : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
+            const rk = r => { const i = TRD_ORD.indexOf(r); return i < 0 ? 99 : i; };
+            const list = (arr, sel, side, q, rf) => {
+                const f = arr.filter(c => (!q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())) && (!rf || (rf === 'fin' ? !!c.finish : c.rarity === rf)))
+                    .sort((a, b) => rk(a.rarity) - rk(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || a.name.localeCompare(b.name, 'fr'));
+                return (f.length > 90 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (90 premières affichées)</p>` : '') + f.slice(0, 90).map(c => {
+                    const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
+                    return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === trdId(c) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSel('${side}',${JSON.stringify(trdId(c)).replace(/"/g, '&quot;')})">${img}${c.finish ? `<span class="tm-fin">${TRD_FIN[c.finish]}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${RAR_LABEL[c.rarity] || (c.rarity === 'collector' ? '⭐ Collector' : c.rarity)}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
+                }).join('') || '<p class="tl-hint">Aucune carte.</p>';
+            };
             const g = document.getElementById('trd-l-give'), w = document.getElementById('trd-l-want'), b = document.getElementById('trd-send');
-            if (g) g.innerHTML = list(trd.mine, trd.give, 'give', trd.q1);
-            if (w) w.innerHTML = list(trd.theirs, trd.want, 'want', trd.q2);
+            if (g) g.innerHTML = list(trd.mine, trd.give, 'give', trd.q1, trd.r1);
+            if (w) w.innerHTML = list(trd.theirs, trd.want, 'want', trd.q2, trd.r2);
             if (b) b.disabled = !(trd.give && trd.want);
+            const rc = document.getElementById('trd-recap');
+            if (rc) {
+                const gc = trd.mine.find(c => trdId(c) === trd.give), wc = trd.theirs.find(c => trdId(c) === trd.want);
+                const lab = c => c ? `<b>${hubEsc(c.name)}</b> <span class="trd-rar">${RAR_LABEL[c.rarity] || c.rarity}${c.finish ? ' • ' + TRD_FIN[c.finish] : ''}${c.shiny ? ' ✨' : ''}</span>` : '<i>choisis une carte</i>';
+                rc.innerHTML = `Tu donnes ${lab(gc)} <span style="color:var(--accent-cyan);">⇄</span> tu reçois ${lab(wc)}`;
+            }
         }
-        function tradeSel(side, key) { trd[side] = trd[side] === key ? null : key; tradeLists(); }
+        function tradeSel(side, id) { trd[side] = trd[side] === id ? null : id; tradeLists(); }
         async function tradePropose() {
-            const d = await v7post('/api/trade/propose', { friendId: +trd.friend, give: trd.give, want: trd.want });
+            const sp = id => { const i = String(id).lastIndexOf('#'); return [id.slice(0, i), id.slice(i + 1) || null]; };
+            const [give, giveFin] = sp(trd.give), [want, wantFin] = sp(trd.want);
+            const d = await v7post('/api/trade/propose', { friendId: +trd.friend, give, want, giveFin, wantFin });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
             toast('🔁 Proposition envoyée !', '#48dbfb'); trd.give = trd.want = null; loadTrade();
         }
@@ -11495,7 +11521,7 @@
                 return;
             }
             if (mk.view === 'sell') {
-                if (!mk.cards.length) { const c = await v7get('/api/trade/cards'); mk.cards = (c && c.cards) || []; }
+                if (!mk.cards.length) { const c = await v7get('/api/trade/cards'); mk.cards = Object.values(((c && c.cards) || []).filter(x => x.rarity !== 'duo' && x.rarity !== 'collector').reduce((m, x) => { if (m[x.key]) m[x.key].n += x.n; else m[x.key] = Object.assign({}, x, { finish: null }); return m; }, {})); }
                 const s = mk.sell && mk.cards.find(c => c.key === mk.sell);
                 const hint = s ? d.hints[s.rarity] : null;
                 el.innerHTML = head + tabs + (s ? `<div class="mk-sellbox">${mkCard(s)}<div><h3>${v7esc(s.name)}</h3><p class="tl-hint">${v7esc(s.anime)} • ${MK_RAR[s.rarity]} • tu en as ${s.n}${s.shiny ? ` (dont ${s.shiny} brillante${s.shiny > 1 ? 's' : ''})` : ''}</p>
