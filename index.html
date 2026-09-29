@@ -1836,6 +1836,7 @@
                 <li><button onclick="openSupport()" id="btn-support">💎<span class="sup-lbl"> Soutenir</span></button></li>
                 <li id="coin-badge" class="coin-badge" style="display:none;" onclick="switchTab('collection')">🪙 <b>0</b></li>
                 <li style="display:none;"><button onclick="switchTab('admin')" id="btn-admin">🛠️ Admin</button></li>
+                <li style="display:none;"><button onclick="switchTab('beta');betaLoad()" id="btn-beta">🧪 Bêta</button></li>
             </ul>
         </nav>
     </header>
@@ -2593,7 +2594,26 @@
         </div>
     </section>
 
+    <section id="beta" class="tab-content">
+        <div class="opt-panel">
+            <h2>🧪 Espace bêta testeur</h2>
+            <p class="tl-hint" style="text-align:left;">Merci de tester le site avant tout le monde ! En tant que bêta testeur tu as :</p>
+            <div class="daily-row"><span>🎨 Tous les cadres, couleurs, effets et emotes</span><span>✅ débloqués</span></div>
+            <div class="daily-row"><span>🏷️ Tous les titres et tous les succès</span><span>✅ débloqués</span></div>
+            <div class="daily-row"><span>🍀 Chance x10 sur les cartes (comme les admins)</span><span id="beta-luck">…</span></div>
+            <div class="daily-row"><span>🪙 Pièces gratuites pour tester la boutique et les boosters</span><span>👇</span></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"><button class="btn-action" style="margin-top:0;flex:1;" onclick="betaCoins(500)">+500 🪙</button><button class="btn-action" style="margin-top:0;flex:1;" onclick="betaCoins(5000)">+5 000 🪙</button><button class="btn-action" style="margin-top:0;flex:1;" onclick="betaCoins(50000)">+50 000 🪙</button></div>
+            <p class="tl-hint" style="text-align:left;margin-top:10px;">Tu vois un bug ou un truc bizarre ? Signale-le avec le bouton 🐞 pendant une partie, ou dans Options → « 💡 Proposer un ajout ».</p>
+        </div>
+    </section>
+
     <section id="admin" class="tab-content">
+        <div class="opt-panel">
+            <h2>🧪 Bêta testeurs</h2>
+            <p class="tl-hint" style="text-align:left;">Ils ont tout débloqué comme toi (titres, cadres, couleurs, effets, succès), la chance x10 quand elle est activée pour les admins, et peuvent se donner des pièces. Mais PAS ce panneau admin (maintenance, annonces, joueurs…).</p>
+            <div style="display:flex;gap:6px;"><input id="adm-beta-pseudo" class="v7-input" style="flex:1;margin:0;" maxlength="40" placeholder="Pseudo du joueur"><button class="btn-action" style="width:auto;margin:0;padding:0 14px;" onclick="betaAdmin('add')">➕ Ajouter</button></div>
+            <div id="adm-beta-list" style="margin-top:8px;"></div>
+        </div>
         <div class="opt-panel">
             <h2>🛠️ Tableau de bord</h2>
             <button class="host-btn" onclick="loadAdmin()" style="margin-bottom:8px;">↻ Actualiser</button>
@@ -9277,6 +9297,10 @@
             const d = isAccount() ? await v7get('/api/admin/me') : null;
             btn.parentElement.style.display = d && d.ok ? '' : 'none';
             window.IS_ADMIN = !!(d && d.ok);
+            const bt = isAccount() ? await v7get('/api/beta/me') : null;
+            window.IS_BETA = !!(bt && bt.beta);
+            const bb2 = document.getElementById('btn-beta'); if (bb2) bb2.parentElement.style.display = window.IS_BETA && !window.IS_ADMIN ? '' : 'none';
+            if (window.IS_ADMIN) betaAdminLoad();
             const bb = document.getElementById('admin-bots-box'); if (bb) bb.style.display = window.IS_ADMIN ? 'flex' : 'none';
         }
         socket.on('connect', () => setTimeout(checkAdmin, 700));
@@ -9785,6 +9809,32 @@
             toast('📥 Image du récap téléchargée', '#00ff88');
         }
         // --- bots de test ---
+        // --- bêta testeurs ---
+        async function betaLoad() {
+            const d = await v7get('/api/beta/me');
+            const l = document.getElementById('beta-luck'); if (l) l.textContent = d && d.luck ? '✅ activée' : '⏸️ pas activée en ce moment';
+        }
+        async function betaCoins(n) {
+            const d = await v7post('/api/beta/coins', { n });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(`🪙 +${n.toLocaleString('fr-FR')} pièces !`, '#ffd700');
+        }
+        function betaAdminRender(list) {
+            const box = document.getElementById('adm-beta-list'); if (!box) return;
+            box.innerHTML = list.length ? list.map(p => `<div class="daily-row"><span>🧪 ${v7esc(p)}</span><button class="host-btn" data-p="${v7esc(p)}">✖ Retirer</button></div>`).join('') : '<p class="tl-hint">Aucun bêta testeur pour l’instant.</p>';
+            box.querySelectorAll('button[data-p]').forEach(b => b.onclick = () => betaAdmin('remove', b.dataset.p));
+        }
+        async function betaAdminLoad() { const d = await v7get('/api/admin/beta'); if (d && d.ok) betaAdminRender(d.list); }
+        async function betaAdmin(action, pseudo) {
+            const inp = document.getElementById('adm-beta-pseudo');
+            pseudo = pseudo || inp.value.trim();
+            if (!pseudo) return toast('Écris un pseudo.', 'var(--accent-pink)');
+            const d = await v7post('/api/admin/beta', { action, pseudo });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible (server.js à jour ?)'), 'var(--accent-pink)');
+            if (action === 'add') { inp.value = ''; toast(`🧪 ${pseudo} est maintenant bêta testeur !`, '#00ff88'); } else toast(`${pseudo} n’est plus bêta testeur.`, '#aaa');
+            betaAdminRender(d.list);
+        }
+        socket.on('beta_status', () => { checkAdmin(); if (typeof ecoLoad === 'function') ecoLoad(); });
         async function adminCoins(n) { const d = await v7post('/api/admin/coins', { n }); if (!d || !d.ok) toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); }
         async function adminBots(n) {
             if (!currentRoomCode) return;

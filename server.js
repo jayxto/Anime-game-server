@@ -14995,7 +14995,7 @@ io.on('connection', socket => {
    ADMIN : tableau de bord, openings ajoutés sans code, signalements de bug,
            mode maintenance, thèmes Halloween / Noël
    ===================================================================== */
-const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false }, halloween: { on: false, cards: [] } };
+const SITE = { maintenance: { on: false, msg: '' }, theme: 'auto', luck: { admins: false, players: false }, halloween: { on: false, cards: [] }, beta: [] };
 const CUSTOM_TRACKS_MEM = [], BUGS_MEM = [];
 function customTrackAdd(t) {
     const n = 5000 + t.id;
@@ -19798,6 +19798,36 @@ async function isAdminUid(uid) {
     ADMIN_UID_CACHE.set(uid, { ok, at: Date.now() });
     return ok;
 }
+/* BÊTA TESTEURS : comme les admins pour tout ce qui est « joueur » (tout débloqué, chance x10, pièces gratuites)
+   mais SANS le panneau admin (maintenance, joueurs, annonces…). Liste gérée dans le panneau admin. */
+const betaList = () => (Array.isArray(SITE.beta) ? SITE.beta : []).concat(String(process.env.BETA_PSEUDOS || '').split(',')).map(s => String(s).trim().toLowerCase()).filter(Boolean);
+async function isBetaUid(uid) { return !!uid && betaList().includes(String(await pseudoOf(uid)).toLowerCase()); }
+async function isPrivUid(uid) { return (await isAdminUid(uid)) || (await isBetaUid(uid)); } // admin OU bêta testeur
+app.get('/api/beta/me', async (req, res) => {
+    const uid = authUserId(req);
+    res.json({ ok: true, beta: await isBetaUid(uid), admin: await isAdminUid(uid), luck: !!(SITE.luck && SITE.luck.admins) });
+});
+app.post('/api/beta/coins', async (req, res) => {
+    const uid = authUserId(req);
+    if (!uid || !(await isPrivUid(uid))) return res.status(403).json({ ok: false, error: 'Réservé aux bêta testeurs.' });
+    const n = Math.max(1, Math.min(100000, +(req.body || {}).n || 1000));
+    const total = await ecoAddCoins(uid, n, true);
+    socketsOfUser(uid).forEach(sid => io.to(sid).emit('coins_gain', { gain: n, total }));
+    res.json({ ok: true, total });
+});
+app.get('/api/admin/beta', adminOnly(async (req, res) => res.json({ ok: true, list: Array.isArray(SITE.beta) ? SITE.beta : [] })));
+app.post('/api/admin/beta', adminOnly(async (req, res) => {
+    const b = req.body || {}, pseudo = String(b.pseudo || '').trim().slice(0, 40);
+    if (!Array.isArray(SITE.beta)) SITE.beta = [];
+    if (!pseudo) return res.json({ ok: false, error: 'Donne un pseudo.' });
+    const k = pseudo.toLowerCase();
+    if (b.action === 'remove') SITE.beta = SITE.beta.filter(x => x.toLowerCase() !== k);
+    else if (!SITE.beta.some(x => x.toLowerCase() === k)) SITE.beta.push(pseudo);
+    await siteSave('beta');
+    // on débloque tout de suite s'il est connecté
+    try { for (const s of io.sockets.sockets.values()) if (s.user && !s.user.isGuest && String(s.user.pseudo).toLowerCase() === k) { await ecoGet(s.user.id); s.emit('beta_status', { beta: b.action !== 'remove' }); } } catch (_) {}
+    res.json({ ok: true, list: SITE.beta });
+}));
 const ADMIN_UNLOCK_KINDS = ['color', 'frame', 'effect', 'emote'];
 const adminUnlockIds = () => [
     ...SHOP.filter(i => ADMIN_UNLOCK_KINDS.includes(i.kind) && !i.consumable).map(i => i.id),
@@ -19807,7 +19837,7 @@ const ADMIN_GRANTED = new Set(); // badges déjà donnés depuis le démarrage
 const _ecoGetAdmin = ecoGet;
 ecoGet = async function (uid) {
     const e = await _ecoGetAdmin(uid);
-    if (!e || !(await isAdminUid(uid))) return e;
+    if (!e || !(await isPrivUid(uid))) return e;
     const missing = adminUnlockIds().filter(id => !e.owned.includes(id));
     if (missing.length) {
         e.owned.push(...missing);
@@ -19825,14 +19855,14 @@ ecoGet = async function (uid) {
 const _titleStatsAdmin = titleStats;
 titleStats = async function (uid) {
     const s = await _titleStatsAdmin(uid);
-    if (await isAdminUid(uid)) s.__admin = true;
+    if (await isPrivUid(uid)) s.__admin = true;
     return s;
 };
 TITLES.forEach(t => { const need = t.need; t.need = s => !!(s && s.__admin) || need(s); });
 // à la connexion d'un admin : on débloque tout de suite (les cosmétiques apparaissent sur son pseudo)
 io.on('connection', socket => {
     setTimeout(async () => {
-        try { const uid = socket.user && socket.user.id; if (uid && !socket.user.isGuest && await isAdminUid(uid)) await ecoGet(uid); } catch (_) {}
+        try { const uid = socket.user && socket.user.id; if (uid && !socket.user.isGuest && await isPrivUid(uid)) await ecoGet(uid); } catch (_) {}
     }, 1500);
 });
 
@@ -19842,7 +19872,7 @@ io.on('connection', socket => {
    ===================================================================== */
 async function cardLuck(uid) {
     const l = SITE.luck || {};
-    if (uid && l.admins && await isAdminUid(uid)) return 10;
+    if (uid && l.admins && await isPrivUid(uid)) return 10; // admins + bêta testeurs
     return l.players ? 2 : 1;
 }
 const _cardAwardLuck = cardAward;
