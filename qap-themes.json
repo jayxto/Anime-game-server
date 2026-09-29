@@ -6287,13 +6287,6 @@
 "start": 0
 },
 {
-"name": "Kamado Tanjiro no Uta",
-"sub": "Demon Slayer",
-"video": "4o6wKKUB4z8",
-"img": "https://i.ytimg.com/vi/4o6wKKUB4z8/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Rengoku Theme",
 "sub": "Demon Slayer",
 "video": "TKkuHGWqKTI",
@@ -6364,24 +6357,10 @@
 "start": 0
 },
 {
-"name": "Tank!",
-"sub": "Cowboy Bebop",
-"video": "EL-D9LrFJd4",
-"img": "https://i.ytimg.com/vi/EL-D9LrFJd4/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Glassy Sky",
 "sub": "Tokyo Ghoul",
 "video": "vvvvcpwFw5o",
 "img": "https://i.ytimg.com/vi/vvvvcpwFw5o/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Sparkle",
-"sub": "Your Name",
-"video": "tpH8TEkKQI4",
-"img": "https://i.ytimg.com/vi/tpH8TEkKQI4/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6434,13 +6413,6 @@
 "start": 0
 },
 {
-"name": "Blue Bird (instrumental)",
-"sub": "Naruto Shippuden",
-"video": "Uzdghqpbnm0",
-"img": "https://i.ytimg.com/vi/Uzdghqpbnm0/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Samidare",
 "sub": "Naruto Shippuden",
 "video": "_6N9f1ad9Ow",
@@ -6462,13 +6434,6 @@
 "start": 0
 },
 {
-"name": "We Are!",
-"sub": "One Piece",
-"video": "YoeP9w5UIlg",
-"img": "https://i.ytimg.com/vi/YoeP9w5UIlg/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Drums of Liberation",
 "sub": "One Piece",
 "video": "nhr0igKYIMQ",
@@ -6480,13 +6445,6 @@
 "sub": "One Piece",
 "video": "eWoJ4XwHREw",
 "img": "https://i.ytimg.com/vi/eWoJ4XwHREw/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Memories",
-"sub": "One Piece",
-"video": "2FJlbPqka3M",
-"img": "https://i.ytimg.com/vi/2FJlbPqka3M/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6511,13 +6469,6 @@
 "start": 0
 },
 {
-"name": "Bleach TYBW Main Theme",
-"sub": "Bleach",
-"video": "7nQAGywy3Rw",
-"img": "https://i.ytimg.com/vi/7nQAGywy3Rw/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Attack on Titan (Sawano)",
 "sub": "L'Attaque des Titans",
 "video": "JXvRKs2C1B4",
@@ -6532,13 +6483,6 @@
 "start": 0
 },
 {
-"name": "The Rumbling (instr.)",
-"sub": "L'Attaque des Titans",
-"video": "zlB9F7PoX0E",
-"img": "https://i.ytimg.com/vi/zlB9F7PoX0E/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Apple Seed",
 "sub": "L'Attaque des Titans",
 "video": "1fx1hh3m1Fw",
@@ -6548,8 +6492,8 @@
 {
 "name": "eYe-water",
 "sub": "L'Attaque des Titans",
-"video": "5JKLX-cw9Sw",
-"img": "https://i.ytimg.com/vi/5JKLX-cw9Sw/hqdefault.jpg",
+"video": "bECtZ4TeLQE",
+"img": "https://i.ytimg.com/vi/bECtZ4TeLQE/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6574,41 +6518,6 @@
 "start": 0
 },
 {
-"name": "Zankyou Sanka (instr.)",
-"sub": "Demon Slayer",
-"video": "isFdoIq0DGc",
-"img": "https://i.ytimg.com/vi/isFdoIq0DGc/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Specialz",
-"sub": "Jujutsu Kaisen",
-"video": "5yb2N3pnztU",
-"img": "https://i.ytimg.com/vi/5yb2N3pnztU/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Ao no Sumika",
-"sub": "Jujutsu Kaisen",
-"video": "2c_lHmkOq0E",
-"img": "https://i.ytimg.com/vi/2c_lHmkOq0E/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Kaikai Kitan",
-"sub": "Jujutsu Kaisen",
-"video": "GwaRztMaoY0",
-"img": "https://i.ytimg.com/vi/GwaRztMaoY0/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Mahoraga Theme",
-"sub": "Jujutsu Kaisen",
-"video": "jm5rqq_SP8Q",
-"img": "https://i.ytimg.com/vi/jm5rqq_SP8Q/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Hollow Purple",
 "sub": "Jujutsu Kaisen",
 "video": "EqLS2y0wn0w",
@@ -6616,38 +6525,10 @@
 "start": 0
 },
 {
-"name": "Chainsaw Man Main Theme",
-"sub": "Chainsaw Man",
-"video": "dFlDRhvM4L0",
-"img": "https://i.ytimg.com/vi/dFlDRhvM4L0/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "KICK BACK",
-"sub": "Chainsaw Man",
-"video": "dFlDRhvM4L0",
-"img": "https://i.ytimg.com/vi/dFlDRhvM4L0/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Dragon Ball Z Theme",
-"sub": "Dragon Ball",
-"video": "Xr3KVXaKGjo",
-"img": "https://i.ytimg.com/vi/Xr3KVXaKGjo/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Vegeta's Theme",
 "sub": "Dragon Ball",
 "video": "w50zQ67D6wY",
 "img": "https://i.ytimg.com/vi/w50zQ67D6wY/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Blizzard (Broly)",
-"sub": "Dragon Ball",
-"video": "9UauQDOo5T8",
-"img": "https://i.ytimg.com/vi/9UauQDOo5T8/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6660,8 +6541,8 @@
 {
 "name": "Kyrie",
 "sub": "Death Note",
-"video": "lfOjIkpF5kU",
-"img": "https://i.ytimg.com/vi/lfOjIkpF5kU/hqdefault.jpg",
+"video": "TSX7hYSdDyk",
+"img": "https://i.ytimg.com/vi/TSX7hYSdDyk/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6686,41 +6567,6 @@
 "start": 0
 },
 {
-"name": "Stand Proud",
-"sub": "JoJo",
-"video": "dOQWNEv4_6U",
-"img": "https://i.ytimg.com/vi/dOQWNEv4_6U/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Bloody Stream",
-"sub": "JoJo",
-"video": "eKZ1_skh9ZA",
-"img": "https://i.ytimg.com/vi/eKZ1_skh9ZA/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Hunter x Hunter Main Theme",
-"sub": "Hunter x Hunter",
-"video": "vDOP-mgSQG0",
-"img": "https://i.ytimg.com/vi/vDOP-mgSQG0/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Hyori Ittai",
-"sub": "Hunter x Hunter",
-"video": "ZV9jaHMnaUI",
-"img": "https://i.ytimg.com/vi/ZV9jaHMnaUI/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Unravel",
-"sub": "Tokyo Ghoul",
-"video": "7aMOurgDB-o",
-"img": "https://i.ytimg.com/vi/7aMOurgDB-o/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Licht und Schatten",
 "sub": "Tokyo Ghoul",
 "video": "3S1NmtWDVYk",
@@ -6735,45 +6581,10 @@
 "start": 0
 },
 {
-"name": "The Hero!!",
-"sub": "One Punch Man",
-"video": "atxYe-nOa9w",
-"img": "https://i.ytimg.com/vi/atxYe-nOa9w/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Gurenge",
-"sub": "Demon Slayer",
-"video": "pmanD_s7G3U",
-"img": "https://i.ytimg.com/vi/pmanD_s7G3U/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Crossing Field",
-"sub": "Sword Art Online",
-"video": "KId6eunoiWk",
-"img": "https://i.ytimg.com/vi/KId6eunoiWk/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Luminous Sword",
 "sub": "Sword Art Online",
 "video": "eg3oXhtsi3g",
 "img": "https://i.ytimg.com/vi/eg3oXhtsi3g/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Fly Me to the Moon",
-"sub": "Evangelion",
-"video": "P91pvMdoZ80",
-"img": "https://i.ytimg.com/vi/P91pvMdoZ80/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "A Cruel Angel's Thesis",
-"sub": "Evangelion",
-"video": "-RRWvHTQjPE",
-"img": "https://i.ytimg.com/vi/-RRWvHTQjPE/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6805,34 +6616,6 @@
 "start": 0
 },
 {
-"name": "Frieren Main Theme",
-"sub": "Frieren",
-"video": "sWFeSl4hhIg",
-"img": "https://i.ytimg.com/vi/sWFeSl4hhIg/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Yuusha (Frieren)",
-"sub": "Frieren",
-"video": "bjDixpdHLUA",
-"img": "https://i.ytimg.com/vi/bjDixpdHLUA/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Idol (Oshi no Ko)",
-"sub": "Oshi no Ko",
-"video": "wxNhlCeB9WE",
-"img": "https://i.ytimg.com/vi/wxNhlCeB9WE/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Mixed Nuts",
-"sub": "Spy x Family",
-"video": "Wf8XuAoCjN8",
-"img": "https://i.ytimg.com/vi/Wf8XuAoCjN8/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Guts Theme (Blood and Guts)",
 "sub": "Berserk",
 "video": "aFDsLUO6XMY",
@@ -6847,20 +6630,6 @@
 "start": 0
 },
 {
-"name": "Vinland Saga Main Theme",
-"sub": "Vinland Saga",
-"video": "GEt_poMSw_U",
-"img": "https://i.ytimg.com/vi/GEt_poMSw_U/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Mob Choir",
-"sub": "Mob Psycho 100",
-"video": "F5OJPUXJvHk",
-"img": "https://i.ytimg.com/vi/F5OJPUXJvHk/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Violet Snow",
 "sub": "Violet Evergarden",
 "video": "2FpjfL2qyiQ",
@@ -6868,38 +6637,10 @@
 "start": 0
 },
 {
-"name": "Sadness (Clannad)",
-"sub": "Clannad",
-"video": "rFKKSQ8GgHk",
-"img": "https://i.ytimg.com/vi/rFKKSQ8GgHk/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Suzume",
-"sub": "Suzume",
-"video": "Xs0Lxif1u9E",
-"img": "https://i.ytimg.com/vi/Xs0Lxif1u9E/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Nandemonaiya",
-"sub": "Your Name",
-"video": "-UyWReDZ22Q",
-"img": "https://i.ytimg.com/vi/-UyWReDZ22Q/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Path of the Wind",
 "sub": "Totoro",
 "video": "k9OZ2dtQ2B4",
 "img": "https://i.ytimg.com/vi/k9OZ2dtQ2B4/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Inochi no Namae",
-"sub": "Le Voyage de Chihiro",
-"video": "7jFvmayX8pI",
-"img": "https://i.ytimg.com/vi/7jFvmayX8pI/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6917,59 +6658,10 @@
 "start": 0
 },
 {
-"name": "LEveL",
-"sub": "Solo Leveling",
-"video": "Jsc6bPHe4tM",
-"img": "https://i.ytimg.com/vi/Jsc6bPHe4tM/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Blue Lock Main Theme",
-"sub": "Blue Lock",
-"video": "jcdHkv3hehs",
-"img": "https://i.ytimg.com/vi/jcdHkv3hehs/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Orange",
-"sub": "Haikyuu",
-"video": "smxWVnweNuk",
-"img": "https://i.ytimg.com/vi/smxWVnweNuk/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Tokyo Revengers Main Theme",
-"sub": "Tokyo Revengers",
-"video": "O1bhZgkC4Gw",
-"img": "https://i.ytimg.com/vi/O1bhZgkC4Gw/hqdefault.jpg",
-"start": 0
-},
-{
 "name": "Black Clover Main Theme",
 "sub": "Black Clover",
 "video": "AqeGZ8cNR1g",
 "img": "https://i.ytimg.com/vi/AqeGZ8cNR1g/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Silhouette",
-"sub": "Naruto Shippuden",
-"video": "dlFA0Zq1k2A",
-"img": "https://i.ytimg.com/vi/dlFA0Zq1k2A/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Sign",
-"sub": "Naruto Shippuden",
-"video": "97dkzVU4p-M",
-"img": "https://i.ytimg.com/vi/97dkzVU4p-M/hqdefault.jpg",
-"start": 0
-},
-{
-"name": "Hero's Come Back",
-"sub": "Naruto Shippuden",
-"video": "EBNl8bwdVcA",
-"img": "https://i.ytimg.com/vi/EBNl8bwdVcA/hqdefault.jpg",
 "start": 0
 },
 {
@@ -6980,10 +6672,192 @@
 "start": 0
 },
 {
-"name": "Styx Helix",
-"sub": "Re:Zero",
-"video": "tIhL2KHVdgE",
-"img": "https://i.ytimg.com/vi/tIhL2KHVdgE/hqdefault.jpg",
+"name": "Afternoon of Konoha",
+"sub": "Naruto",
+"video": "qAGvQDoL5s4",
+"img": "https://i.ytimg.com/vi/qAGvQDoL5s4/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Fooling Mode",
+"sub": "Naruto",
+"video": "2qVMJrMiV4U",
+"img": "https://i.ytimg.com/vi/2qVMJrMiV4U/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Nine Tails",
+"sub": "Naruto",
+"video": "oiYr0uaW1NA",
+"img": "https://i.ytimg.com/vi/oiYr0uaW1NA/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Jiraiya's Theme",
+"sub": "Naruto Shippuden",
+"video": "t_9b1dTlXOQ",
+"img": "https://i.ytimg.com/vi/t_9b1dTlXOQ/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Guren",
+"sub": "Naruto Shippuden",
+"video": "AiYeO6_oqhg",
+"img": "https://i.ytimg.com/vi/AiYeO6_oqhg/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Emergence of Talent",
+"sub": "Naruto",
+"video": "KYF1lCXNPPM",
+"img": "https://i.ytimg.com/vi/KYF1lCXNPPM/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "On the Precipice of Defeat",
+"sub": "Bleach",
+"video": "PLyi5xHtkb0",
+"img": "https://i.ytimg.com/vi/PLyi5xHtkb0/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Nothing Can Be Explained",
+"sub": "Bleach",
+"video": "5ixZf5-LLek",
+"img": "https://i.ytimg.com/vi/5ixZf5-LLek/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Clavar la Espada",
+"sub": "Bleach",
+"video": "suwfJMiXauU",
+"img": "https://i.ytimg.com/vi/suwfJMiXauU/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Escalon",
+"sub": "Bleach",
+"video": "fZx7yUztxJ0",
+"img": "https://i.ytimg.com/vi/fZx7yUztxJ0/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "XL-TT",
+"sub": "L'Attaque des Titans",
+"video": "6tMhkQ520Sk",
+"img": "https://i.ytimg.com/vi/6tMhkQ520Sk/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Counterattack Mankind",
+"sub": "L'Attaque des Titans",
+"video": "6v9IwQ09WAw",
+"img": "https://i.ytimg.com/vi/6v9IwQ09WAw/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Solid State Scouter",
+"sub": "Dragon Ball",
+"video": "Lm77VCkf_do",
+"img": "https://i.ytimg.com/vi/Lm77VCkf_do/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Ryuk's Theme",
+"sub": "Death Note",
+"video": "0zYw5IuEUZ0",
+"img": "https://i.ytimg.com/vi/0zYw5IuEUZ0/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Knives",
+"sub": "Fullmetal Alchemist",
+"video": "8KEcpz0IE3M",
+"img": "https://i.ytimg.com/vi/8KEcpz0IE3M/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Thanatos",
+"sub": "Evangelion",
+"video": "YdCDLCtv1-A",
+"img": "https://i.ytimg.com/vi/YdCDLCtv1-A/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Don't Lose Your Way",
+"sub": "Kill la Kill",
+"video": "-AcrT8h8J3Y",
+"img": "https://i.ytimg.com/vi/-AcrT8h8J3Y/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "You Say Run",
+"sub": "My Hero Academia",
+"video": "iYZIUtDAFIw",
+"img": "https://i.ytimg.com/vi/iYZIUtDAFIw/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Jet Set Run",
+"sub": "My Hero Academia",
+"video": "3SDBTVcBUVs",
+"img": "https://i.ytimg.com/vi/3SDBTVcBUVs/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "A Town with an Ocean View",
+"sub": "Kiki la petite sorcière",
+"video": "pR4iCWB-VVQ",
+"img": "https://i.ytimg.com/vi/pR4iCWB-VVQ/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Call of Silence",
+"sub": "L'Attaque des Titans",
+"video": "buZcLljh9eI",
+"img": "https://i.ytimg.com/vi/buZcLljh9eI/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Kozuki Family's Theme",
+"sub": "One Piece",
+"video": "FsPZ-t2CFmU",
+"img": "https://i.ytimg.com/vi/FsPZ-t2CFmU/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Mother Sea",
+"sub": "One Piece",
+"video": "pIEzcyxM_v8",
+"img": "https://i.ytimg.com/vi/pIEzcyxM_v8/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Upper Moon",
+"sub": "Demon Slayer",
+"video": "AFSEqtkzpTA",
+"img": "https://i.ytimg.com/vi/AFSEqtkzpTA/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Sasuke's Theme",
+"sub": "Naruto",
+"video": "SeOJArvdank",
+"img": "https://i.ytimg.com/vi/SeOJArvdank/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Hunter x Hunter Nen",
+"sub": "Hunter x Hunter",
+"video": "RgpJ0WJwiks",
+"img": "https://i.ytimg.com/vi/RgpJ0WJwiks/hqdefault.jpg",
+"start": 0
+},
+{
+"name": "Chainsaw Man Theme",
+"sub": "Chainsaw Man",
+"video": "_U4FQmeYXwc",
+"img": "https://i.ytimg.com/vi/_U4FQmeYXwc/hqdefault.jpg",
 "start": 0
 }
 ]
