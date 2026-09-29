@@ -1253,6 +1253,66 @@
         #summon .sm-sum{color:#fff;font-weight:700;min-height:1.2em;text-shadow:0 1px 4px #000;}
         @media (max-width:600px){#summon .sm-card{width:104px;height:170px;}#summon .sm-cards{gap:8px;}}
         @media (prefers-reduced-motion:reduce){#summon *{animation-duration:.01s!important;transition-duration:.01s!important;}}
+        /* ---- Invocation : une animation par rareté ---- */
+        #summon .sm-card{position:relative;}
+        #summon .sm-fx{position:absolute;inset:-40px;pointer-events:none;z-index:3;}
+        #summon .sm-fx::before,#summon .sm-fx::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;}
+        #summon .sm-p{position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);border-radius:50%;background:var(--pc);box-shadow:0 0 8px var(--pc);animation:smP var(--d) cubic-bezier(.2,.8,.3,1) var(--dl,0s) forwards;opacity:0;}
+        @keyframes smP{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(.2) rotate(var(--r,0deg));opacity:0}}
+        /* commune : petite bouffée */
+        #summon .fx-commune::before{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(214,228,255,.7),transparent 70%);animation:fxPuff .6s ease-out forwards;}
+        @keyframes fxPuff{to{width:220px;height:220px;opacity:0}}
+        /* rare : onde bleue */
+        #summon .fx-rare::before,#summon .fx-rare::after{width:40px;height:40px;border-radius:50%;border:4px solid #3fa7ff;box-shadow:0 0 18px #3fa7ff;animation:fxRing .8s ease-out forwards;}
+        #summon .fx-rare::after{animation-delay:.18s;opacity:0;}
+        @keyframes fxRing{0%{width:40px;height:40px;opacity:1}100%{width:300px;height:300px;opacity:0;border-width:1px}}
+        /* épique : éclairs violets */
+        #summon .fx-epique::before{width:40px;height:40px;border-radius:50%;border:5px solid #b44dff;box-shadow:0 0 30px #b44dff,inset 0 0 20px #b44dff;animation:fxRing .9s ease-out forwards;}
+        #summon .fx-epique::after{width:260px;height:260px;background:repeating-conic-gradient(from 0deg,transparent 0 22deg,rgba(180,77,255,.65) 23deg 25deg,transparent 26deg 45deg);border-radius:50%;animation:fxBolt .7s steps(4) forwards;}
+        @keyframes fxBolt{0%{opacity:1;transform:translate(-50%,-50%) rotate(0) scale(.6)}100%{opacity:0;transform:translate(-50%,-50%) rotate(40deg) scale(1.2)}}
+        /* légendaire : rayons dorés qui tournent */
+        #summon .fx-legendaire::before{width:420px;height:420px;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,200,40,.55) 0 8deg,transparent 8deg 24deg);-webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);animation:fxRays 2.2s ease-out forwards;}
+        #summon .fx-legendaire::after{width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,100,.9),transparent 65%);animation:fxGlow 1.6s ease-out forwards;}
+        @keyframes fxRays{0%{opacity:0;transform:translate(-50%,-50%) rotate(0) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(120deg) scale(1.2)}}
+        @keyframes fxGlow{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+        /* mythique : flammes */
+        #summon .fx-mythique::before{width:220px;height:300px;border-radius:50% 50% 40% 40%;background:radial-gradient(ellipse at 50% 80%,rgba(255,154,42,.85),rgba(255,60,122,.5) 45%,transparent 70%);filter:blur(6px);animation:fxFire .35s ease-in-out 6 alternate,fxFade 2.2s ease-out forwards;}
+        @keyframes fxFire{from{transform:translate(-50%,-50%) scaleY(1) skewX(-3deg)}to{transform:translate(-50%,-56%) scaleY(1.12) skewX(3deg)}}
+        @keyframes fxFade{0%,60%{opacity:1}100%{opacity:0}}
+        /* secrète : prisme arc-en-ciel */
+        #summon .fx-secrete::before{width:320px;height:320px;border-radius:50%;background:conic-gradient(#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff,#ff2a5f);-webkit-mask:radial-gradient(circle,transparent 42%,#000 44%,#000 50%,transparent 52%);mask:radial-gradient(circle,transparent 42%,#000 44%,#000 50%,transparent 52%);animation:fxSpin 2.4s linear forwards;}
+        #summon .fx-secrete::after{width:160px;height:160px;border-radius:50%;background:conic-gradient(rgba(255,42,95,.6),rgba(255,230,0,.6),rgba(0,255,136,.6),rgba(0,240,255,.6),rgba(180,77,255,.6),rgba(255,42,95,.6));filter:blur(18px);animation:fxGlow 2s ease-out forwards;}
+        @keyframes fxSpin{0%{opacity:0;transform:translate(-50%,-50%) rotate(0) scale(.3)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(540deg) scale(1.3)}}
+        /* plein écran pour les très grosses raretés */
+        #summon .sm-screen{position:absolute;inset:0;pointer-events:none;z-index:1;}
+        #summon .sm-screen.fx-divine{background:linear-gradient(90deg,transparent 30%,rgba(255,243,176,.55) 45%,rgba(255,255,255,.9) 50%,rgba(255,243,176,.55) 55%,transparent 70%);animation:fxPillar 2.8s ease-out forwards;}
+        @keyframes fxPillar{0%{opacity:0;transform:scaleX(.1)}20%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.6)}}
+        #summon .fx-divine::before{width:130px;height:34px;top:-2px;border-radius:50%;border:4px solid #fff3b0;box-shadow:0 0 20px #ffd700,inset 0 0 12px #ffd700;animation:fxHalo 3s ease-out forwards;}
+        @keyframes fxHalo{0%{opacity:0;transform:translate(-50%,-60px)}25%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,0)}}
+        #summon .fx-divine::after{width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,243,176,.4) 40%,transparent 70%);animation:fxGlow 2.4s ease-out forwards;}
+        #summon .sm-screen.fx-cosmique{background:radial-gradient(1.5px 1.5px at 12% 20%,#fff,transparent),radial-gradient(1px 1px at 30% 70%,#fff,transparent),radial-gradient(2px 2px at 55% 15%,#cfc3ff,transparent),radial-gradient(1px 1px at 75% 55%,#fff,transparent),radial-gradient(1.5px 1.5px at 88% 85%,#fff,transparent),radial-gradient(1px 1px at 45% 90%,#fff,transparent),radial-gradient(2px 2px at 92% 30%,#9fe8ff,transparent),radial-gradient(circle at 50% 50%,rgba(60,20,140,.85),rgba(5,5,25,.95) 70%);animation:fxSpace 3.2s ease-out forwards;}
+        @keyframes fxSpace{0%{opacity:0;transform:scale(1.4)}20%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+        #summon .fx-cosmique::before{width:460px;height:460px;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(123,92,255,.7),transparent 30%,rgba(0,200,255,.6),transparent 60%,rgba(255,92,225,.6),transparent 90%);filter:blur(10px);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:fxGalaxy 3s ease-out forwards;}
+        @keyframes fxGalaxy{0%{opacity:0;transform:translate(-50%,-50%) rotate(0) scale(.2)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(-360deg) scale(1.1)}}
+        #summon .sm-screen.fx-eternelle{background:radial-gradient(circle at 50% 50%,rgba(255,215,0,.35),rgba(40,28,0,.85) 70%);animation:fxSpace 3.4s ease-out forwards;}
+        #summon .fx-eternelle::before{width:360px;height:360px;border-radius:50%;border:3px solid #ffd700;background:repeating-conic-gradient(#ffd700 0 1.5deg,transparent 1.5deg 30deg);-webkit-mask:radial-gradient(circle,transparent 58%,#000 60%);mask:radial-gradient(circle,transparent 58%,#000 60%);box-shadow:0 0 30px #ffd700;animation:fxClock 3.4s cubic-bezier(.1,.7,.2,1) forwards;}
+        @keyframes fxClock{0%{opacity:0;transform:translate(-50%,-50%) rotate(-720deg) scale(.3)}30%{opacity:1}85%{opacity:1;transform:translate(-50%,-50%) rotate(0) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) rotate(0) scale(1.1)}}
+        #summon .fx-eternelle::after{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,180,.95),transparent 65%);animation:fxGlow 2.6s ease-out forwards;}
+        #summon .sm-screen.fx-omega{background:#fff;animation:fxWhite 3.6s ease-out forwards;}
+        @keyframes fxWhite{0%{opacity:0}8%{opacity:1}30%{opacity:.85}100%{opacity:0}}
+        #summon .sm-screen.fx-omega::after{content:'Ω';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:min(70vw,70vh);font-weight:900;line-height:1;background:conic-gradient(#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff,#ff2a5f);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.35;animation:fxOmega 3.6s ease-out forwards;}
+        @keyframes fxOmega{0%{transform:translate(-50%,-50%) scale(.2) rotate(-30deg);opacity:0}25%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:.5}100%{transform:translate(-50%,-50%) scale(1.3);opacity:0}}
+        #summon .fx-omega::before,#summon .fx-omega::after{width:40px;height:40px;border-radius:50%;border:6px solid transparent;background:conic-gradient(#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff,#ff2a5f) border-box;-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:fxShock 1.4s ease-out 3 forwards;}
+        #summon .fx-omega::after{animation-delay:.45s;opacity:0;}
+        @keyframes fxShock{0%{width:40px;height:40px;opacity:1}100%{width:700px;height:700px;opacity:0}}
+        #summon.glitch{animation:fxGlitch .9s steps(2) 2;}
+        @keyframes fxGlitch{0%{filter:hue-rotate(0) contrast(1)}25%{filter:hue-rotate(90deg) contrast(1.6);transform:translate(4px,-3px)}50%{filter:hue-rotate(200deg) contrast(1.3);transform:translate(-5px,2px)}75%{filter:hue-rotate(300deg) contrast(1.8);transform:translate(3px,4px)}100%{filter:none;transform:none}}
+        /* bannière du nom de la rareté */
+        #summon .sm-banner{position:absolute;left:50%;top:14%;transform:translate(-50%,-50%);z-index:5;font-family:'Bangers',cursive;font-size:clamp(2rem,9vw,4.2rem);letter-spacing:3px;white-space:nowrap;color:var(--bc);text-shadow:0 0 12px var(--bc),0 0 30px var(--bc),0 3px 0 #000;pointer-events:none;animation:fxBanner 2.2s cubic-bezier(.2,1.4,.4,1) forwards;}
+        #summon .sm-banner.rainbow{background:linear-gradient(90deg,#ff2a5f,#ffe600,#00ff88,#00f0ff,#b44dff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 10px rgba(255,255,255,.8));}
+        @keyframes fxBanner{0%{opacity:0;transform:translate(-50%,-50%) scale(3)}18%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+        #summon .sm-card.tease.t-high .sm-back{animation:smTease .12s infinite alternate;}
+        @media (prefers-reduced-motion:reduce){#summon.glitch{animation:none;}}
 
         /* ---- Soutien / Supporter / pubs ---- */
         .cn-prisme{background:linear-gradient(90deg,#ff5f6d,#ffc371,#7dff8a,#4fc3ff,#b44dff,#ff5f6d);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;animation:cnPrism 4s linear infinite;font-weight:800;}
@@ -10640,7 +10700,54 @@
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
             const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9 };
-            const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300'];
+            const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
+            const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω' };
+            // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
+            const PARTS = {
+                rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
+                legendaire: [26, ['#ffb300', '#ffe066', '#fff'], 190, 'out'], mythique: [30, ['#ff9a2a', '#ff3c7a', '#ffe066'], 200, 'up'],
+                secrete: [36, ['#ff2a5f', '#ffe600', '#00ff88', '#00f0ff', '#b44dff'], 220, 'out'], divine: [30, ['#ffffff', '#fff3b0', '#ffd700'], 240, 'down'],
+                cosmique: [44, ['#ffffff', '#7b5cff', '#00c8ff', '#ff5ce1'], 240, 'orbit'], eternelle: [44, ['#ffd700', '#fff3b0', '#b8860b'], 260, 'out'],
+                omega: [70, ['#ff2a5f', '#ffe600', '#00ff88', '#00f0ff', '#b44dff', '#ffffff'], 340, 'out']
+            };
+            function smParticles(host, rar) {
+                const cfg = PARTS[rar]; if (!cfg) return;
+                const [n, cols, dist, dir] = cfg;
+                for (let k = 0; k < n; k++) {
+                    const p = document.createElement('i'); p.className = 'sm-p';
+                    let a = Math.random() * Math.PI * 2, d = dist * (0.45 + Math.random() * 0.55), x = Math.cos(a) * d, y = Math.sin(a) * d;
+                    if (dir === 'up') { x = (Math.random() - .5) * 120; y = -dist * (0.5 + Math.random() * 0.5); }
+                    if (dir === 'down') { x = (Math.random() - .5) * 240; y = dist * (0.3 + Math.random() * 0.4); p.style.borderRadius = '50% 0'; }
+                    if (dir === 'orbit') { a += Math.PI; x = Math.cos(a) * d * 1.2; y = Math.sin(a) * d * .5; }
+                    p.style.cssText += `--x:${x.toFixed(0)}px;--y:${y.toFixed(0)}px;--s:${(3 + Math.random() * (rar === 'omega' ? 9 : 6)).toFixed(1)}px;--pc:${cols[k % cols.length]};--d:${(0.8 + Math.random() * (dir === 'down' ? 2 : 1)).toFixed(2)}s;--dl:${(Math.random() * (dir === 'orbit' ? .8 : .25)).toFixed(2)}s;--r:${(Math.random() * 360).toFixed(0)}deg;`;
+                    host.appendChild(p);
+                }
+            }
+            function smSound(rank) { // petite fanfare, plus longue et plus aiguë selon la rareté
+                if (typeof bip !== 'function' || typeof sfxOn === 'undefined' || !sfxOn) return;
+                const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
+                const n = Math.min(notes.length, 1 + rank);
+                for (let k = 0; k < n; k++) bip(notes[k], k === n - 1 ? 0.6 : 0.16, 0.05, k * 0.07, rank >= 5 ? 'triangle' : 'sine');
+                if (rank >= 7) bip(notes[n - 1] / 2, 1.2, 0.05, n * 0.07, 'triangle');
+                if (rank >= 8 && typeof sfxBoom === 'function') sfxBoom(1.2, 0.25, 1500);
+            }
+            function smReveal(o, el, c) {
+                const rank = RANK[c.rarity] || 0, rar = RNAME[rank] || 'commune';
+                const fx = document.createElement('div'); fx.className = 'sm-fx fx-' + rar; el.appendChild(fx);
+                smParticles(fx, rar);
+                setTimeout(() => fx.remove(), 4200);
+                if (rank >= 6) { const sc = document.createElement('div'); sc.className = 'sm-screen fx-' + rar; o.insertBefore(sc, o.querySelector('.sm-cards')); setTimeout(() => sc.remove(), 4000); }
+                if (rank >= 9) { o.classList.add('glitch'); setTimeout(() => o.classList.remove('glitch'), 1900); }
+                if (BANNER[rar]) {
+                    o.querySelectorAll('.sm-banner').forEach(b => b.remove());
+                    const b = document.createElement('div'); b.className = 'sm-banner' + (['secrete', 'omega'].includes(rar) ? ' rainbow' : '');
+                    b.style.setProperty('--bc', COL[rank]); b.textContent = (c.shiny ? '✨ ' : '') + BANNER[rar] + (c.shiny ? ' ✨' : '');
+                    o.appendChild(b); setTimeout(() => b.remove(), 2300);
+                }
+                if (rank >= 3 && typeof confetti === 'function') confetti(rank >= 6 ? 3500 : 1800);
+                smSound(rank);
+            }
             function circleSvg(col) {
                 const runes = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
                 let t = ''; for (let i = 0; i < 24; i++) { const a = i * 15; t += `<text x="150" y="26" transform="rotate(${a} 150 150)" text-anchor="middle">${runes[i]}</text>`; }
@@ -10652,11 +10759,11 @@
                 document.getElementById('booster-modal')?.remove(); document.getElementById('summon')?.remove();
                 const best = Math.max(...cards.map(c => RANK[c.rarity] || 0));
                 const anyShiny = cards.some(c => c.shiny);
-                const col = anyShiny && best < 3 ? '#ff7ae0' : COL[best];
+                const col = anyShiny && best < 3 ? '#ff7ae0' : COL[best] || COL[0];
                 const o = document.createElement('div'); o.id = 'summon'; o.className = 'summon r' + best + (anyShiny ? ' shiny' : '');
                 o.style.setProperty('--c', col);
                 o.innerHTML = `<div class="sm-bg"></div>${circleSvg(col)}<div class="sm-beam"></div><div class="sm-flash"></div>
-                    <div class="sm-txt">${best >= 3 ? '✨ Une énergie immense se dégage… ✨' : best === 2 ? 'Une aura puissante apparaît…' : 'Invocation…'}</div>
+                    <div class="sm-txt">${best >= 9 ? 'Ω La réalité se déchire… Ω' : best >= 8 ? '♾️ Le temps s’arrête… ♾️' : best >= 7 ? '🌌 Les étoiles s’alignent… 🌌' : best >= 6 ? '👑 Une lumière céleste descend… 👑' : best >= 5 ? '🌈 Un secret se révèle… 🌈' : best >= 4 ? '🔥 Le cercle s’embrase ! 🔥' : best >= 3 ? '✨ Une énergie immense se dégage… ✨' : best === 2 ? 'Une aura puissante apparaît…' : 'Invocation…'}</div>
                     <div class="sm-cards">${cards.map((c, i) => `<div class="sm-card" data-i="${i}" style="animation-delay:${i * 0.08}s"><div class="sm-inner"><div class="sm-back" style="--c:${COL[RANK[c.rarity] || 0]}"><span>🎴</span></div><div class="sm-front">${cardHtml(c, true)}</div></div></div>`).join('')}</div>
                     <div class="sm-bottom"><button class="sm-skip" onclick="summonRevealAll()">⏭ Tout révéler</button><div class="sm-sum"></div></div>`;
                 document.body.appendChild(o);
@@ -10673,19 +10780,27 @@
                 const i = o._order.shift();
                 if (i == null) return summonDone();
                 const c = o._cards[i], el = o.querySelector(`.sm-card[data-i="${i}"]`);
-                const big = (RANK[c.rarity] || 0) >= 2 || c.shiny;
+                const rank = RANK[c.rarity] || 0;
+                const big = rank >= 2 || c.shiny;
                 const flip = () => {
+                    el.classList.remove('tease', 't-high');
                     el.classList.add('flip');
+                    smReveal(o, el, c);
                     if (big) { o.classList.add('shake'); setTimeout(() => o.classList.remove('shake'), 500); el.classList.add('wow'); }
-                    o._t = setTimeout(summonNext, big ? 900 : 380);
+                    // plus la carte est rare, plus on la laisse briller avant la suivante
+                    o._t = setTimeout(summonNext, [380, 600, 900, 1500, 1800, 2200, 2600, 3000, 3400, 3800][rank] + (c.shiny ? 300 : 0));
                 };
-                if (big) { el.classList.add('tease'); o._t = setTimeout(flip, 900); } else flip();
+                if (big) { el.classList.add('tease'); if (rank >= 5) el.classList.add('t-high'); o._t = setTimeout(flip, rank >= 9 ? 2600 : rank >= 7 ? 2000 : rank >= 5 ? 1500 : 900); } else flip();
             };
             window.summonRevealAll = function () {
                 const o = document.getElementById('summon'); if (!o) return;
                 clearTimeout(o._t);
                 o.classList.add('show');
-                o.querySelectorAll('.sm-card').forEach(e => e.classList.add('flip'));
+                // on joue quand même l'animation de la meilleure carte pas encore révélée
+                const hidden = o._order.map(i => ({ i, c: o._cards[i] }));
+                const top = hidden.sort((a, b) => (RANK[b.c.rarity] || 0) - (RANK[a.c.rarity] || 0))[0];
+                o.querySelectorAll('.sm-card').forEach(e => { e.classList.remove('tease', 't-high'); e.classList.add('flip'); });
+                if (top) smReveal(o, o.querySelector(`.sm-card[data-i="${top.i}"]`), top.c);
                 o._order = [];
                 summonDone();
             };
