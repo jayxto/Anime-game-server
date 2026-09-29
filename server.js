@@ -16165,7 +16165,8 @@ const needUid = (req, res) => { const uid = authUserId(req); if (!uid) { res.sta
 app.get('/api/shop', async (req, res) => {
     const uid = authUserId(req);
     const e = uid ? await ecoGet(uid) : null;
-    res.json({ ok: true, items: SHOP.filter(i => (!i.event || hwOn()) && ((!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id)))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
+    const priv = uid ? await isPrivUid(uid) : false; // objets réservés aux admins / bêta testeurs
+    res.json({ ok: true, items: SHOP.filter(i => (!i.priv || priv) && (!i.event || hwOn()) && ((!i.pass && (!i.seasonal || i.seasonal === themeSeason().u)) || (e && e.owned.includes(i.id)))), themeSeason: themeSeason(), coins: e ? e.coins : 0, owned: e ? e.owned : [], sel: e ? e.sel : {}, cos: e ? { color: e.cos.color || null, frame: e.cos.frame || null } : {}, account: !!uid });
 });
 app.post('/api/shop/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -16173,6 +16174,7 @@ app.post('/api/shop/buy', async (req, res) => {
     if (it && it.pass) return res.json({ ok: false, error: 'Objet exclusif au pass de saison.' });
     if (it && it.seasonal && it.seasonal !== themeSeason().u) return res.json({ ok: false, error: 'Cet objet n’est plus en vente (saison terminée).' });
     if (!it) return res.json({ ok: false, error: 'Objet inconnu.' });
+    if (it.priv && !(await isPrivUid(uid))) return res.json({ ok: false, error: 'Réservé aux admins et bêta testeurs.' });
     if (it.event === 'halloween' && !hwOn()) return res.json({ ok: false, error: 'L’événement Halloween est terminé.' });
     const e = await ecoGet(uid);
     if (!it.consumable && e.owned.includes(it.id)) return res.json({ ok: false, error: 'Tu l’as déjà.' });
@@ -20334,4 +20336,21 @@ publicProfile = async function (pseudo) {
         p.cards.forEach(c => { if (c.finish) return; const k = Object.keys(fin).find(k => k.split('|')[1] === c.name); const f = k && finBestOf(fin[k]); if (f) { c.finish = f; c.finishLabel = FINISHES.find(x => x.id === f).label; } });
     } catch (_) {}
     return p;
+};
+
+/* =====================================================================
+   PACK ADMIN : réservé aux admins et bêta testeurs. Chance x10 dans le
+   pack, qui se multiplie avec l'événement « chance x10 » → jusqu'à x100.
+   ===================================================================== */
+const PACK_LUCK = new Map(); // uid -> multiplicateur pendant l'ouverture d'un pack
+const _cardLuckPack = cardLuck;
+cardLuck = async function (uid) { return (await _cardLuckPack(uid)) * (PACK_LUCK.get(uid) || 1); };
+SHOP.push({ id: 'booster:admin', kind: 'booster', key: '10', btype: 'admin', name: 'Pack Admin 👑 10 cartes (chance x10, x100 avec l’événement)', price: 10000, consumable: true, priv: true });
+SHOP_BY_ID['booster:admin'] = SHOP.find(i => i.id === 'booster:admin');
+const _openBoosterPack = openBooster;
+openBooster = async function (uid, n, type = '') {
+    if (type !== 'admin') return _openBoosterPack(uid, n, type);
+    if (!(await isPrivUid(uid))) return _openBoosterPack(uid, n, '');
+    PACK_LUCK.set(uid, 10);
+    try { return await _openBoosterPack(uid, n, ''); } finally { PACK_LUCK.delete(uid); }
 };
