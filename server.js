@@ -19800,7 +19800,8 @@ async function isAdminUid(uid) {
 }
 /* BÊTA TESTEURS : comme les admins pour tout ce qui est « joueur » (tout débloqué, chance x10, pièces gratuites)
    mais SANS le panneau admin (maintenance, joueurs, annonces…). Liste gérée dans le panneau admin. */
-const betaList = () => (Array.isArray(SITE.beta) ? SITE.beta : []).concat(String(process.env.BETA_PSEUDOS || '').split(',')).map(s => String(s).trim().toLowerCase()).filter(Boolean);
+const BETA_DEFAULT = ['Natox']; // bêta testeurs permanents
+const betaList = () => (Array.isArray(SITE.beta) ? SITE.beta : []).concat(BETA_DEFAULT, String(process.env.BETA_PSEUDOS || '').split(',')).map(s => String(s).trim().toLowerCase()).filter(Boolean);
 async function isBetaUid(uid) { return !!uid && betaList().includes(String(await pseudoOf(uid)).toLowerCase()); }
 async function isPrivUid(uid) { return (await isAdminUid(uid)) || (await isBetaUid(uid)); } // admin OU bêta testeur
 app.get('/api/beta/me', async (req, res) => {
