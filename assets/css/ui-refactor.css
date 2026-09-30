@@ -575,7 +575,410 @@
     body.ag-dashboard-on #music-player{max-width:310px}
 }
 
-/* Le shell ne doit jamais affecter les petits écrans. */
+
+/* =====================================================================
+   UI REFACTOR V4 — MOBILE DASHBOARD
+   Même langage visuel que le PC, mais pensé pour le pouce : top bar compacte,
+   bottom-nav fixe, menu complet en tiroir et catalogue en 2 colonnes.
+   ===================================================================== */
+.ag-mobile-menu-toggle,.ag-mobile-bottom,.ag-mobile-backdrop{display:none}
+
 @media (max-width:1180px){
-    .ag-desktop-shell,#ag-home-hero,#ag-quick-actions,#ag-dashboard-right,#ag-games-heading{display:none!important}
+    :root{
+        --ag-mobile-top:62px;
+        --ag-mobile-bottom:72px;
+        --ag-mobile-pad:10px;
+        --ag-mobile-border:rgba(123,165,232,.16);
+        --ag-mobile-panel:rgba(10,17,31,.92);
+    }
+
+    html{scroll-padding-top:calc(var(--ag-mobile-top) + 10px)}
+    body.ag-dashboard-on{
+        background:
+            radial-gradient(circle at 12% 2%,rgba(0,149,255,.15),transparent 27%),
+            radial-gradient(circle at 88% 13%,rgba(148,63,255,.10),transparent 24%),
+            #070b13!important;
+        background-attachment:fixed!important;
+        overflow-x:hidden;
+    }
+    body.ag-mobile-menu-open{overflow:hidden}
+
+    #app-root.ag-dashboard-shell-on > header{display:none!important}
+
+    .ag-desktop-shell{
+        display:block!important;
+        position:fixed;
+        inset:0;
+        z-index:9200;
+        pointer-events:none;
+        font-family:'Poppins',sans-serif;
+    }
+    .ag-desktop-shell *{box-sizing:border-box}
+
+    /* ===== Top bar ===== */
+    .ag-dash-top{
+        pointer-events:auto;
+        position:absolute;
+        top:0;left:0;right:0;
+        height:calc(var(--ag-mobile-top) + env(safe-area-inset-top,0px));
+        padding:env(safe-area-inset-top,0px) 9px 0;
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        align-items:center;
+        gap:8px;
+        background:rgba(6,11,21,.94);
+        border-bottom:1px solid var(--ag-mobile-border);
+        box-shadow:0 8px 28px rgba(0,0,0,.30);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+    }
+    .ag-dash-brand{
+        width:38px;height:38px;padding:0;margin:0;
+        display:grid;place-items:center;border:0;background:none;color:#fff;cursor:pointer;
+    }
+    .ag-dash-brand-mark{
+        width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+        border:1px solid rgba(0,211,255,.48);
+        background:linear-gradient(145deg,rgba(0,183,255,.17),rgba(79,65,255,.10));
+        color:#8beaff;font-family:'Bangers',cursive;font-size:.95rem;
+        box-shadow:inset 0 0 15px rgba(0,240,255,.06),0 0 18px rgba(0,134,255,.08);
+    }
+    .ag-dash-brand-copy,.ag-dash-top-spacer{display:none!important}
+
+    .ag-dash-search{
+        min-width:0;height:38px;padding:0 10px;display:flex;align-items:center;gap:7px;
+        border-radius:11px;background:rgba(14,22,39,.93);border:1px solid rgba(125,165,229,.18);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .ag-dash-search:focus-within{border-color:rgba(0,218,255,.46);box-shadow:0 0 0 3px rgba(0,214,255,.055)}
+    .ag-dash-search span{font-size:.9rem;opacity:.74;flex:0 0 auto}
+    .ag-dash-search input{
+        min-width:0;width:100%;border:0;outline:0;background:transparent;color:#f4f8ff;
+        font:600 .72rem Poppins,sans-serif;
+    }
+    .ag-dash-search input::placeholder{color:#70809c}
+    .ag-dash-search button{border:0;background:transparent;color:#8fa2bf;font-weight:900;padding:0 1px;display:none}
+    .ag-dash-search.has-value button{display:block}
+
+    .ag-dash-account{display:flex;align-items:center;gap:5px;pointer-events:auto}
+    .ag-dash-pill,.ag-dash-icon-btn,.ag-mobile-menu-toggle{
+        height:38px;border:1px solid rgba(125,165,229,.16);background:rgba(14,22,39,.93);
+        color:#eef6ff;border-radius:11px;display:flex;align-items:center;justify-content:center;
+        font:800 .66rem Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-dash-pill{padding:0 8px;gap:4px}
+    .ag-dash-coins{color:#ffd45e;min-width:58px}
+    .ag-dash-icon-btn{display:none!important}
+    .ag-dash-profile{
+        width:38px;min-width:38px;height:38px;padding:0;border:1px solid rgba(125,165,229,.16);
+        border-radius:11px;background:rgba(14,22,39,.93);display:grid;place-items:center;overflow:hidden;
+    }
+    .ag-dash-avatar{width:34px;height:34px;display:grid;place-items:center}
+    .ag-dash-avatar .av{width:32px!important;height:32px!important;font-size:.78rem!important}
+    .ag-dash-profile-copy{display:none!important}
+    .ag-mobile-menu-toggle{display:flex;width:38px;padding:0;font-size:1rem;line-height:1}
+
+    /* ===== Tiroir de navigation ===== */
+    .ag-dash-sidebar{
+        pointer-events:none;
+        position:fixed;
+        left:8px;right:8px;bottom:calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 8px);
+        top:auto;width:auto;max-height:min(74vh,620px);
+        padding:12px 10px 11px;
+        border:1px solid rgba(126,170,238,.20);border-radius:18px;
+        background:linear-gradient(180deg,rgba(13,21,38,.98),rgba(7,13,25,.985));
+        box-shadow:0 -18px 48px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.035);
+        backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+        overflow:auto;
+        transform:translateY(calc(100% + 110px));
+        opacity:0;
+        transition:transform .22s ease,opacity .18s ease;
+        z-index:4;
+        display:flex;flex-direction:column;
+    }
+    body.ag-mobile-menu-open .ag-dash-sidebar{pointer-events:auto;transform:translateY(0);opacity:1}
+    .ag-dash-nav{
+        display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
+    }
+    .ag-dash-nav-btn{
+        min-width:0;height:48px;padding:0 10px;display:flex;align-items:center;gap:8px;
+        border:1px solid rgba(125,165,229,.10);border-radius:11px;background:rgba(255,255,255,.018);
+        color:#b9c8dd;font:700 .70rem Poppins,sans-serif;text-align:left;
+    }
+    .ag-dash-nav-btn .ico{width:22px;text-align:center;font-size:1rem;flex:0 0 auto}
+    .ag-dash-nav-btn.on{
+        color:#dff7ff;border-color:rgba(0,184,255,.32);
+        background:linear-gradient(135deg,rgba(0,143,255,.21),rgba(67,74,210,.12));
+        box-shadow:inset 3px 0 0 #43caff;
+    }
+    .ag-dash-nav-sep{display:none}
+    .ag-dash-event{
+        margin-top:9px;padding:10px 12px;border-radius:11px;border:1px solid rgba(255,211,72,.20);
+        background:linear-gradient(145deg,rgba(75,40,11,.58),rgba(27,18,38,.88));text-align:left;
+    }
+    .ag-dash-event small{display:block;color:#ffd65f;font-size:.52rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    .ag-dash-event b{display:block;color:#fff;font-size:.70rem;margin:4px 0 2px}
+    .ag-dash-event span{display:block;color:#9aaac5;font-size:.57rem;line-height:1.3}
+
+    .ag-mobile-backdrop{
+        display:block;pointer-events:none;position:fixed;inset:0;z-index:3;border:0;padding:0;
+        background:rgba(0,4,12,.58);opacity:0;transition:opacity .18s ease;
+        backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    }
+    body.ag-mobile-menu-open .ag-mobile-backdrop{pointer-events:auto;opacity:1}
+
+    /* ===== Bottom navigation ===== */
+    .ag-mobile-bottom{
+        pointer-events:auto;display:grid;
+        grid-template-columns:repeat(5,1fr);
+        position:fixed;left:7px;right:7px;bottom:calc(6px + env(safe-area-inset-bottom,0px));
+        height:var(--ag-mobile-bottom);padding:6px 5px;
+        border:1px solid rgba(126,170,238,.19);border-radius:18px;
+        background:rgba(8,14,27,.95);box-shadow:0 14px 40px rgba(0,0,0,.48);
+        backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:5;
+    }
+    .ag-mobile-nav-btn{
+        min-width:0;border:0;background:transparent;color:#7588a7;border-radius:12px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+        font-family:Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-mobile-nav-btn span{font-size:1.12rem;line-height:1}
+    .ag-mobile-nav-btn small{font-size:.50rem;font-weight:800;line-height:1.05;white-space:nowrap}
+    .ag-mobile-nav-btn.on{color:#9aeaff;background:linear-gradient(180deg,rgba(0,163,255,.16),rgba(0,118,255,.055))}
+
+    /* ===== Cadre général des pages ===== */
+    #app-root.ag-dashboard-shell-on > .tab-content{
+        width:100%!important;margin-left:0!important;
+        padding:calc(var(--ag-mobile-top) + env(safe-area-inset-top,0px) + 10px) var(--ag-mobile-pad)
+                calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 24px)!important;
+    }
+    #app-root.ag-dashboard-shell-on > #mode{padding-left:0!important;padding-right:0!important}
+    #app-root.ag-dashboard-shell-on #collection,
+    #app-root.ag-dashboard-shell-on #amis,
+    #app-root.ag-dashboard-shell-on #options,
+    #app-root.ag-dashboard-shell-on #admin,
+    #app-root.ag-dashboard-shell-on #beta{max-width:none!important;margin-left:0!important;width:100%!important}
+
+    /* ===== Accueil mobile ===== */
+    #app-root.ag-dashboard-shell-on #mode #menu-selection{
+        width:100%!important;max-width:none!important;margin:0!important;
+        padding:0 var(--ag-mobile-pad) 20px!important;text-align:left!important;
+        display:flex!important;flex-direction:column;gap:11px;align-items:stretch;
+    }
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2 + p,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > #h3-news-btn{display:none!important}
+
+    #ag-home-hero{
+        display:flex!important;order:-50;min-height:158px;position:relative;overflow:hidden;
+        align-items:center;justify-content:space-between;gap:8px;padding:19px 17px!important;
+        border-radius:16px;border:1px solid rgba(65,139,255,.28);
+        background:
+            radial-gradient(circle at 88% 16%,rgba(255,45,147,.24),transparent 24%),
+            radial-gradient(circle at 61% 0%,rgba(117,51,255,.31),transparent 37%),
+            linear-gradient(123deg,#08172d 0%,#113060 54%,#17102e 100%);
+        box-shadow:0 15px 34px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    #ag-home-hero:before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-55px;top:-58px;border:34px solid rgba(0,231,255,.05)}
+    #ag-home-hero:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:52px;bottom:-82px;background:rgba(255,42,95,.11);box-shadow:0 0 42px rgba(255,42,95,.15)}
+    .ag-hero-copy{position:relative;z-index:2;min-width:0;max-width:100%}
+    .ag-hero-kicker{font-size:.48rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#7ee8ff;margin-bottom:6px}
+    .ag-hero-title{font-family:'Bangers',cursive;font-size:2.45rem;line-height:.9;letter-spacing:1.5px;color:#f8fbff;text-shadow:2px 2px 0 #176dff,0 0 20px rgba(46,146,255,.22)}
+    .ag-hero-sub{
+        color:#b7c9e5!important;margin:8px 0 12px!important;font-size:.63rem!important;font-weight:700;line-height:1.38;
+        max-width:290px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .ag-hero-btn{
+        width:auto!important;min-width:0!important;margin:0!important;padding:9px 14px!important;border-radius:999px!important;
+        background:linear-gradient(90deg,#2d78ff,#7c41ff,#db37c8)!important;border:1px solid rgba(255,255,255,.36)!important;
+        box-shadow:0 0 0 3px rgba(97,66,255,.10),0 7px 20px rgba(83,48,255,.22)!important;
+        font-size:.66rem!important;letter-spacing:.03em;
+    }
+    .ag-hero-side{display:none!important}
+
+    #ag-quick-actions{
+        display:grid!important;order:-49;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+    }
+    .ag-quick-btn{
+        min-height:66px;border-radius:12px;border:1px solid rgba(124,163,230,.17);
+        background:linear-gradient(145deg,rgba(17,27,48,.94),rgba(10,16,30,.94));color:#fff;
+        display:flex;align-items:center;gap:8px;padding:10px 10px;cursor:pointer;text-align:left;
+        box-shadow:0 6px 18px rgba(0,0,0,.13);
+    }
+    .ag-quick-btn .qi{font-size:1.13rem;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:rgba(255,255,255,.05);flex:0 0 auto}
+    .ag-quick-btn b{display:block;font-size:.64rem;line-height:1.15}
+    .ag-quick-btn small{display:block;color:#7f91af;font-size:.50rem;margin-top:3px;line-height:1.22}
+    .ag-quick-btn.purple{border-color:rgba(172,81,255,.32)}
+    .ag-quick-btn.blue{border-color:rgba(55,174,255,.30)}
+    .ag-quick-btn.green{border-color:rgba(0,255,136,.25)}
+    .ag-quick-btn.gold{border-color:rgba(255,194,58,.29)}
+
+    /* Rejoindre : une barre compacte, pas une grosse carte. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{
+        order:-48!important;max-width:none!important;margin:0!important;padding:10px!important;
+        display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;
+        border:1px solid rgba(123,165,232,.14)!important;border-radius:12px!important;
+        background:rgba(10,17,31,.88)!important;box-shadow:none!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > h3{display:none!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box{margin:0!important;display:flex!important;gap:7px}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box input{min-width:0;height:38px!important;font-size:.72rem!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box .btn-action{height:38px!important;padding:0 11px!important;font-size:.64rem!important;white-space:nowrap}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms{
+        width:auto!important;margin:0!important;height:38px!important;padding:0 9px!important;font-size:0!important;
+        background:rgba(255,204,69,.10)!important;color:#ffd76d!important;border:1px solid rgba(255,204,69,.22)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms:after{content:"🔎";font-size:.9rem}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .public-rooms-panel{grid-column:1/-1;margin-top:2px!important}
+
+    /* Les widgets sociaux sont un carrousel horizontal sur mobile. */
+    #ag-dashboard-right{
+        display:flex!important;order:-47;flex-direction:row;gap:8px;width:100%;overflow-x:auto;
+        padding:1px 1px 6px;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    }
+    #ag-dashboard-right::-webkit-scrollbar{display:none}
+    .ag-right-card{
+        flex:0 0 min(86vw,360px);scroll-snap-align:start;
+        border:1px solid rgba(124,163,230,.15);border-radius:13px;background:rgba(10,17,31,.89);
+        padding:10px;box-shadow:0 8px 22px rgba(0,0,0,.13);
+    }
+    .ag-right-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+    .ag-right-head b{font-size:.65rem;color:#f0f5ff}
+    .ag-right-head button{border:0;background:none;color:#59d2ff;font:800 .54rem Poppins;padding:2px}
+    .ag-right-muted{color:#788bab;font-size:.56rem;line-height:1.35;margin:4px 0}
+    .ag-friend-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px!important}
+    .ag-friend-row{display:flex;align-items:center;gap:6px;padding:5px;border-radius:8px;background:rgba(255,255,255,.018)}
+    .ag-friend-row:nth-child(n+5){display:none!important}
+    .ag-friend-row .av{width:27px!important;height:27px!important;font-size:.62rem!important;flex:0 0 auto}
+    .ag-friend-copy{min-width:0;flex:1}
+    .ag-friend-copy b{display:block;font-size:.57rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#edf5ff}
+    .ag-friend-copy small{display:block;font-size:.47rem;color:#7589aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .ag-online-dot{width:6px;height:6px;border-radius:50%;background:#20e783;box-shadow:0 0 7px rgba(32,231,131,.5);flex:0 0 auto}
+    .ag-empty-action{width:100%;margin-top:5px;border:1px solid rgba(0,195,255,.20);background:rgba(0,150,255,.07);color:#7fe2ff;border-radius:8px;padding:7px;font:800 .55rem Poppins}
+    #ag-dash-quests .quest-row{padding:5px 0!important;margin:0!important}
+    #ag-dash-quests .qt{font-size:.55rem!important}
+    #ag-dash-quests .qx{font-size:.48rem!important}
+    #ag-dash-quests .qbar{height:5px!important;margin-top:4px!important}
+    .ag-daily-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+    .ag-daily-mini button{border:1px solid rgba(124,163,230,.13);background:rgba(255,255,255,.024);color:#dbe6f7;border-radius:8px;padding:7px 3px;font:800 .50rem Poppins;line-height:1.2}
+
+    /* Recherche catalogue doublon masquée : la recherche du header pilote déjà la vraie recherche. */
+    #app-root.ag-dashboard-shell-on #mode .mode-library-tools{display:none!important}
+
+    #ag-games-heading{
+        display:flex!important;order:-20;align-items:center;justify-content:space-between;gap:8px;margin:3px 1px 0;
+    }
+    #ag-games-heading h3{margin:0!important;color:#f3f7ff!important;font-size:.88rem!important}
+    #ag-games-heading span{font-size:.52rem;color:#6f86aa;text-align:right}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{
+        order:-19;margin:0!important;padding:0 0 3px!important;display:flex!important;gap:6px;overflow-x:auto;scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button{
+        flex:0 0 auto;min-height:34px;border-radius:9px!important;background:rgba(11,19,34,.88)!important;
+        border:1px solid rgba(124,163,230,.14)!important;color:#91a5c6!important;padding:7px 9px!important;font-size:.58rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button.on{color:#dff7ff!important;background:rgba(0,144,255,.17)!important;border-color:rgba(0,189,255,.32)!important}
+
+    /* Deux colonnes : plus de cartes gigantesques empilées. */
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{
+        order:-18;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+        min-width:0;min-height:132px;padding:10px!important;margin:0!important;border-radius:11px!important;
+        border:1px solid rgba(110,146,207,.15)!important;
+        background:linear-gradient(145deg,rgba(17,25,44,.95),rgba(9,16,29,.96))!important;
+        box-shadow:0 6px 18px rgba(0,0,0,.13);overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>h3,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>h3{
+        margin:0 0 5px!important;font-size:.70rem!important;line-height:1.15!important;color:#f1f6ff!important;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>p,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>p{
+        margin:0 0 7px!important;font-size:.54rem!important;line-height:1.35!important;color:#8093b2!important;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .btn-action{
+        min-height:31px!important;margin-top:auto!important;padding:6px 8px!important;border-radius:7px!important;font-size:.56rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .quote-new{font-size:.46rem!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.arc-menu{
+        grid-column:1/-1;padding:11px!important;border-radius:13px!important;
+        background:linear-gradient(145deg,rgba(8,31,54,.85),rgba(22,14,42,.89))!important;
+        border:1px solid rgba(0,180,255,.20)!important;
+    }
+    .arc-menu-refactor-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+    .arc-menu-refactor-head h3{font-size:.76rem!important;margin:0 0 2px!important}
+    .arc-menu-refactor-head p{font-size:.52rem!important;margin:0!important;color:#8093b2!important}
+    .arc-menu-refactor-toggle{padding:6px 8px!important;border-radius:8px!important;font-size:.54rem!important;white-space:nowrap}
+    #app-root.ag-dashboard-shell-on #mode .arc-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-top:7px!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn{
+        min-height:78px!important;padding:8px!important;border-radius:9px!important;background:rgba(7,14,27,.60)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn .arc-ico{font-size:1.02rem!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn b{font-size:.60rem!important;line-height:1.15!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn span:last-child{font-size:.48rem!important;line-height:1.25!important;color:#7387a8!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.mc-stream-info{grid-column:1/-1}
+
+    /* Les cartes daily/quêtes originales sont reflétées dans le carrousel du haut. */
+    #app-root.ag-dashboard-shell-on #mode #quest-card,
+    #app-root.ag-dashboard-shell-on #mode #daily-card{display:none!important}
+    #app-root.ag-dashboard-shell-on #mode #hub-home{order:5;margin-top:1px}
+    #app-root.ag-dashboard-shell-on #mode .rk-card{order:6;margin:0!important;border-radius:12px!important}
+    #app-root.ag-dashboard-shell-on #mode #theme-card{order:7}
+
+    /* Panneaux Collection/Amis/Options : respirent sans manger tout l'écran. */
+    #app-root.ag-dashboard-shell-on #collection > div,
+    #app-root.ag-dashboard-shell-on #amis > div{max-width:none!important;width:100%!important}
+    #app-root.ag-dashboard-shell-on .eco-tabs,
+    #app-root.ag-dashboard-shell-on #collection .eco-tabs{
+        overflow-x:auto!important;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;scrollbar-width:none!important;
+        -webkit-overflow-scrolling:touch;
+    }
+    #app-root.ag-dashboard-shell-on .eco-tabs::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on .eco-tabs button{flex:0 0 auto!important;min-height:38px!important;font-size:.64rem!important}
+
+    /* Le lecteur ne doit pas recouvrir la bottom-nav. */
+    body.ag-dashboard-on #music-player{
+        max-width:calc(100vw - 20px)!important;
+        bottom:calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 14px)!important;
+    }
+}
+
+@media (max-width:390px){
+    :root{--ag-mobile-pad:8px}
+    .ag-dash-coins{display:none!important}
+    .ag-dash-top{grid-template-columns:auto minmax(0,1fr) auto;padding-left:7px;padding-right:7px;gap:6px}
+    .ag-hero-title{font-size:2.18rem}
+    .ag-hero-sub{font-size:.59rem!important}
+    .ag-quick-btn{padding:9px 8px;gap:6px}
+    .ag-quick-btn .qi{width:28px;height:28px;font-size:1.02rem}
+    .ag-quick-btn b{font-size:.60rem}
+    .ag-quick-btn small{font-size:.47rem}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){padding:9px!important;min-height:126px}
+    .ag-mobile-nav-btn small{font-size:.47rem}
+}
+
+@media (max-width:340px){
+    .ag-dash-profile{display:none!important}
+    .ag-hero-title{font-size:2rem}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{grid-template-columns:1fr!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){min-height:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .ag-dash-sidebar,.ag-mobile-backdrop{transition:none!important}
 }
