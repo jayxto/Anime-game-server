@@ -2751,7 +2751,7 @@
 
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
-            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button></div>
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -2763,6 +2763,7 @@
             <div id="eco-stats" style="display:none;"></div>
             <div id="eco-deck" style="display:none;"></div>
             <div id="eco-market" style="display:none;"></div>
+            <div id="eco-museum" style="display:none;"></div>
         </div>
     </section>
 
@@ -2839,6 +2840,12 @@
             <select id="lb-mode" class="lb-select" onchange="setLbMode(this.value)"><option value="">🌍 Classement global</option></select>
             <div id="lb-current" style="font-family:'Bangers';font-size:1.35rem;color:var(--accent-cyan);margin-top:14px;">🌍 Classement global</div>
             <div id="lb-box" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>🏛️ Hall of Fame</h2>
+            <p class="tl-hint" style="text-align:left;">Les champions mensuels restent ici : champion global et meilleurs joueurs par jeu sur les 12 derniers mois.</p>
+            <div id="hof-box"><p class="tl-hint">Chargement…</p></div>
         </div>
 
         <div class="opt-panel">
@@ -7699,7 +7706,7 @@
         // Chargement quand on ouvre l'onglet Options
         (function () {
             const orig = window.switchTab;
-            if (typeof orig === 'function') window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfile(); loadLeaderboard(); } return r; };
+            if (typeof orig === 'function') window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfile(); loadLeaderboard(); loadHallOfFame(); } return r; };
         })();
         socket.on('profile_updated', () => { const o = document.getElementById('options'); if (o && o.classList.contains('active')) loadProfile(); });
 
@@ -9721,7 +9728,7 @@
         }
         // --- cartes ---
         function cardHtml(c, big) {
-            if (!c.name) return `<div class="tcard empty r-${c.rarity}"><div class="tc-img">?</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
+            if (!c.name) return `<div class="tcard empty r-${c.rarity} missing-card"><div class="tc-img">${c.img ? `<img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" style="filter:brightness(0);opacity:.72;" onerror="this.remove();this.parentNode.textContent='?'">` : '?'}</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
             return `<div class="tcard r-${c.rarity}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}"><div class="tc-img"><img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15"></div>
                 <div class="tc-name">${v7esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity]}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}</div>`;
         }
@@ -9734,7 +9741,7 @@
             if (!d || !d.ok) return;
             const head = `<div class="shop-head">🃏 <b>${d.owned}</b> / ${d.total} cartes • ✨ ${d.shinies} brillantes <span class="tl-hint">• trouve des persos en jouant pour gagner leur carte</span></div>`;
             if (!eco.albumU || !d.cards) {
-                box.innerHTML = head + `<div class="album-list">${d.universes.map(x => `<button onclick="loadAlbum('${x.u}')"><b>${v7esc(x.name)}</b><span class="ab"><i style="width:${Math.round(100 * x.owned / x.total)}%"></i></span><small>${x.owned}/${x.total}${x.owned >= x.total ? ' 🏆' : ''}</small></button>`).join('')}</div>`;
+                box.innerHTML = head + `<div class="album-list">${d.universes.map(x => `<button onclick="loadAlbum('${x.u}')"><b>${v7esc(x.name)}</b><span class="ab"><i style="width:${Math.round(100 * x.owned / x.total)}%"></i></span><small>${x.owned}/${x.total} • ${Math.round(100*x.owned/Math.max(1,x.total))}%${x.owned >= x.total ? ' 🏆' : ''}</small></button>`).join('')}</div>`;
                 return;
             }
             const uni = d.universes.find(x => x.u === eco.albumU) || {};
@@ -10380,7 +10387,7 @@
         /* ---------- onglets de la Collection ---------- */
         (function () {
             const orig = ecoTab;
-            const NEW = ['pass', 'trade', 'fuse', 'clan', 'stats'];
+            const NEW = ['pass', 'trade', 'fuse', 'clan', 'stats', 'museum'];
             ecoTab = function (t) {
                 if (!NEW.includes(t)) { NEW.forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = 'none'; }); return orig(t); }
                 eco.tab = t;
@@ -10388,7 +10395,7 @@
                 ['shop', 'album', 'titles', 'challenges', ...NEW].forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = k === t ? '' : 'none'; });
                 const box = document.getElementById('eco-' + t);
                 if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour accéder à cette partie.</p>'; return; }
-                ({ pass: loadPass, trade: loadTrade, fuse: loadFuse, clan: loadClan, stats: loadStats })[t]();
+                ({ pass: loadPass, trade: loadTrade, fuse: loadFuse, clan: loadClan, stats: loadStats, museum: loadMuseum })[t]();
             };
         })();
         function collectorCard(c) {
@@ -12834,7 +12841,7 @@
                     ${d.quote ? `<div class="ci-row ci-quote">« ${esc(d.quote)} »</div>` : ''}
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
                         ${d.canUpgrade ? `<button class="btn-action" style="margin:0;flex:1;" data-act="up">✨ Améliorer la finition (5 doublons)</button>` : ''}
-                        ${d.n ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="vit">${d.showcase ? '🏆 Retirer de la vitrine' : '🏆 Mettre en vitrine'}</button>` : ''}
+                        ${d.n ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="vit">${d.showcase ? '🏛️ Retirer du musée' : '🏛️ Mettre au musée'}</button>` : ''}
                         ${typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="gyro">📱 Gyroscope</button>` : ''}
                     </div>
                     ${!d.canUpgrade && d.n ? `<div class="tl-hint" style="text-align:left;">✨ Avec 6 exemplaires, tu peux fusionner 5 doublons pour passer ta carte en Holo, puis Gold, puis Galaxie.</div>` : ''}`;
@@ -12849,8 +12856,8 @@
                     if (act === 'vit') {
                         const r = await v7post('/api/cards/showcase', { key });
                         if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
-                        const on = r.showcase.includes(key); b.textContent = on ? '🏆 Retirer de la vitrine' : '🏆 Mettre en vitrine';
-                        toast(on ? '🏆 Ajoutée à ta vitrine (visible sur ton profil public)' : 'Retirée de la vitrine', '#ffd700'); return;
+                        const on = r.showcase.includes(key); b.textContent = on ? '🏛️ Retirer du musée' : '🏛️ Mettre au musée';
+                        toast(on ? '🏆 Ajoutée à ton musée (visible sur ton profil public)' : 'Retirée du musée', '#ffd700'); return;
                     }
                     if (act === 'up') {
                         if (!confirm('Fusionner 5 doublons de cette carte pour améliorer sa finition ?')) return;
@@ -12880,7 +12887,7 @@
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
                     <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png', 'https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
-                    <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Mets tes 3 plus belles cartes en <b>vitrine</b> sur ton profil. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
+                    <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
             };
@@ -12900,7 +12907,7 @@
                 if (eco.albumU) return;
                 const list = box.querySelector('.album-list');
                 if (X.showcaseCards && X.showcaseCards.length) {
-                    const s = document.createElement('div'); s.innerHTML = `<h3 class="adm-h">🏆 Ma vitrine</h3><div class="card-grid">${X.showcaseCards.map(c => cardHtml(c)).join('')}</div>`;
+                    const s = document.createElement('div'); s.innerHTML = `<h3 class="adm-h">🏛️ Mon musée</h3><div class="card-grid">${X.showcaseCards.map(c => cardHtml(c)).join('')}</div>`;
                     box.insertBefore(s, list);
                 }
                 const s2 = document.createElement('div');
@@ -13068,5 +13075,78 @@
             };
         })();
     </script>
+
+<style>
+.missing-card .tc-img{background:radial-gradient(circle at 50% 35%,#303044,#11111a 72%);overflow:hidden}.missing-card .tc-img img{width:100%;height:100%;object-fit:cover}
+.museum-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.museum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}.museum-card{background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:7px;text-align:center}.museum-card.on{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.2)}.museum-card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px}.museum-card button{width:100%;margin-top:6px;background:#252538;color:#fff;border:1px solid #45455b;border-radius:7px;padding:7px;cursor:pointer}.museum-card.on button{border-color:#ffd700;color:#ffd700}
+.hof-season{border:1px solid #303044;background:#101018;border-radius:12px;padding:10px;margin:9px 0}.hof-season h3{margin:0 0 8px;color:var(--accent-yellow)}.hof-champ{padding:8px;border-radius:8px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.35);margin-bottom:7px}.hof-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:6px}.hof-mode{background:#151522;border-radius:8px;padding:7px;font-size:.78rem}.hof-mode b{color:var(--accent-cyan)}
+.conn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;width:min(760px,100%)}.conn-card{min-height:72px;border:2px solid #34344a;background:#11111b;color:#fff;border-radius:9px;padding:7px;font-weight:800;cursor:pointer}.conn-card.sel{border-color:var(--accent-yellow);background:rgba(255,230,0,.12)}.conn-card.solved{border-color:#00ff88;background:rgba(0,255,136,.14);color:#baffd8}.conn-solved{width:min(760px,100%);display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}.conn-group{background:#101018;border:1px solid #00ff88;border-radius:8px;padding:6px;font-size:.76rem}
+.code-wrap{width:min(850px,100%)}.code-top{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}.code-team{padding:6px 9px;border-radius:999px;font-weight:900}.code-team.cyan{border:2px solid #00f0ff}.code-team.rose{border:2px solid #ff2a5f}.code-clue{padding:9px;border:1px solid #ffd93d;background:rgba(255,217,61,.08);border-radius:9px;text-align:center;margin-bottom:8px}.code-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.code-card{min-height:64px;border:2px solid #34344a;background:#11111b;color:#fff;border-radius:8px;padding:4px;font-size:.72rem;font-weight:800;cursor:pointer}.code-card.cyan{background:rgba(0,240,255,.18);border-color:#00f0ff}.code-card.rose{background:rgba(255,42,95,.18);border-color:#ff2a5f}.code-card.neutral{background:#363642}.code-card.assassin{background:#050508;border-color:#fff;color:#fff}.code-card.revealed{opacity:.82}.code-clue-form{display:flex;gap:6px;margin:8px 0}.code-clue-form input,.code-clue-form select{background:#101018;color:#fff;border:1px solid #45455b;border-radius:7px;padding:8px}.code-clue-form input{flex:1}
+.order-wrap{width:min(720px,100%)}.order-prompt{font-weight:900;color:var(--accent-yellow);margin-bottom:8px;text-align:center}.order-list{display:flex;flex-direction:column;gap:6px}.order-item{display:grid;grid-template-columns:36px 1fr 70px;align-items:center;gap:6px;background:#11111b;border:2px solid #34344a;border-radius:9px;padding:7px;cursor:grab}.order-item.drag{opacity:.5}.order-move{display:flex;gap:3px}.order-move button{background:#252538;color:#fff;border:1px solid #45455b;border-radius:5px;cursor:pointer}
+.gridc-wrap{width:min(850px,100%);overflow-x:auto}.gridc{display:grid;grid-template-columns:150px repeat(3,minmax(170px,1fr));gap:5px;min-width:700px}.gridc-head,.gridc-rowhead{background:#181828;border:1px solid #3a3a52;border-radius:8px;padding:8px;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center}.gridc-cell{background:#101018;border:1px solid #34344a;border-radius:8px;padding:6px}.gridc-cell.solved{border-color:#00ff88;background:rgba(0,255,136,.12);display:flex;align-items:center;justify-content:center;font-weight:900;color:#baffd8}.gridc-cell input{width:100%;background:#0b0b10;color:#fff;border:1px solid #404058;border-radius:6px;padding:7px}.gridc-cell button{width:100%;margin-top:4px;background:#252538;color:#fff;border:1px solid #45455b;border-radius:6px;padding:5px;cursor:pointer}
+@media(max-width:700px){.conn-grid{grid-template-columns:repeat(2,1fr)}.conn-solved{grid-template-columns:1fr}.code-card{font-size:.56rem;min-height:58px}.order-item{grid-template-columns:30px 1fr 62px}}
+</style>
+<script>
+/* ===== 7 AJOUTS UI ===== */
+ARC_UI.connections={title:'🧩 ANIME CONNECTIONS',sub:'16 persos • retrouve 4 groupes de 4 qui partagent un lien',universe:false};
+ARC_UI.codeanime={title:'🕵️ CODE ANIME',sub:'Deux équipes • un indice + un nombre • évite l’assassin',universe:false};
+ARC_UI.ordre={title:'⏳ REMETS-LES DANS L’ORDRE',sub:'Classe 5 personnages selon une donnée objective • score partiel si tu es proche',universe:false};
+ARC_UI.gridchallenge={title:'🎯 GRID CHALLENGE',sub:'3 univers × 3 catégories • trouve un perso valide dans chaque intersection',universe:false};
+let arcConnPrivate={solved:[]},arcConnSelection=[],arcCodePrivate=null,arcOrderIds=[],arcOrderKey='',arcGridPrivate={solved:{},attempts:0};
+
+(function addSevenGameButtons(){
+    const run=()=>{const grid=document.querySelector('.arc-menu .arc-game-grid');if(!grid||grid.querySelector('[data-seven="connections"]'))return;
+        const defs=[['connections','🧩','Anime Connections','16 persos → forme 4 groupes de 4'],['codeanime','🕵️','Code Anime','2 équipes, indices secrets et assassin'],['ordre','⏳','Remets-les dans l’ordre','Classe 5 persos selon une donnée'],['gridchallenge','🎯','Grid Challenge','3 univers × 3 catégories à remplir']];
+        defs.forEach(([id,ico,name,sub])=>{const b=document.createElement('button');b.className='arc-game-btn';b.dataset.seven=id;b.innerHTML=`<span class="arc-ico">${ico}</span><b>${name}</b><span>${sub}</span>`;b.onclick=()=>openArcadeGame(id);grid.appendChild(b);});};
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else setTimeout(run,0);
+})();
+
+function connSolvedIds(){const out=new Set();(arcConnPrivate.solved||[]).forEach(g=>(g.items||[]).forEach(x=>out.add(x)));return out;}
+function renderConnections(q,stage){
+    const d=q.stage.connections||{},solved=connSolvedIds();stage.innerHTML='';const wrap=document.createElement('div');wrap.style.cssText='width:100%;display:flex;flex-direction:column;align-items:center;';
+    const grid=document.createElement('div');grid.className='conn-grid';(d.items||[]).forEach(it=>{const b=document.createElement('button');b.className='conn-card'+(solved.has(it.id)?' solved':'')+(arcConnSelection.includes(it.id)?' sel':'');b.textContent=it.name;b.disabled=solved.has(it.id)||q.phase!=='playing';b.onclick=()=>{if(arcConnSelection.includes(it.id))arcConnSelection=arcConnSelection.filter(x=>x!==it.id);else if(arcConnSelection.length<4)arcConnSelection.push(it.id);renderConnections(q,stage);};grid.appendChild(b);});wrap.appendChild(grid);
+    if(q.phase==='playing'){const send=document.createElement('button');send.className='btn-action';send.style.cssText='max-width:420px;margin-top:10px;';send.textContent=`Valider le groupe (${arcConnSelection.length}/4)`;send.disabled=arcConnSelection.length!==4;send.onclick=()=>{socket.emit('arc_connections_submit',{roomCode:currentRoomCode,ids:arcConnSelection});arcConnSelection=[];};wrap.appendChild(send);}
+    if((arcConnPrivate.solved||[]).length){const s=document.createElement('div');s.className='conn-solved';s.innerHTML=arcConnPrivate.solved.map(g=>`<div class="conn-group"><b>✅ ${escHtml(g.label)}</b><br>${(g.items||[]).map(id=>(d.items||[]).find(x=>x.id===id)?.name||id).map(escHtml).join(' • ')}</div>`).join('');wrap.appendChild(s);}stage.appendChild(wrap);
+}
+function codeRoleLabel(r){return r==='cyan'?'cyan':r==='rose'?'rose':r==='assassin'?'assassin':'neutral';}
+function renderCodeAnime(q,stage){
+    const d=q.stage.code||{},me=q.players.find(p=>p.id===socket.id)||{},myTeam=me.team,cap=!!arcCodePrivate?.captain;stage.innerHTML='';const w=document.createElement('div');w.className='code-wrap';
+    const n=id=>(q.players.find(p=>p.id===id)||{}).name||'—';w.innerHTML=`<div class="code-top"><span class="code-team cyan">🔵 ${d.remaining?.cyan??0} restants • capitaine ${escHtml(n(d.captains?.cyan))}</span><span><b>${d.turn==='cyan'?'🔵':'🔴'} Tour équipe ${d.turn==='cyan'?'cyan':'rose'}</b></span><span class="code-team rose">🔴 ${d.remaining?.rose??0} restants • capitaine ${escHtml(n(d.captains?.rose))}</span></div>`;
+    if(d.clue)w.insertAdjacentHTML('beforeend',`<div class="code-clue">Indice : <b>${escHtml(d.clue.word)}</b> • <b>${d.clue.number}</b> ${d.guessesLeft?`• ${d.guessesLeft} choix max restants`:''}</div>`);
+    if(q.phase==='playing'&&cap&&myTeam===d.turn&&!d.clue){const f=document.createElement('div');f.className='code-clue-form';f.innerHTML=`<input maxlength="30" placeholder="Ton indice (un mot / courte expression)"><select>${[1,2,3,4,5,6,7,8,9].map(x=>`<option>${x}</option>`).join('')}</select><button class="btn-action" style="width:auto;margin:0;">Donner l’indice</button>`;f.querySelector('button').onclick=()=>socket.emit('arc_code_clue',{roomCode:currentRoomCode,word:f.querySelector('input').value,number:+f.querySelector('select').value});w.appendChild(f);}
+    const grid=document.createElement('div');grid.className='code-grid';(d.items||[]).forEach(it=>{const role=it.revealed?it.role:(arcCodePrivate?.map?arcCodePrivate.map[it.id]:null);const b=document.createElement('button');b.className='code-card'+(role?' '+codeRoleLabel(role):'')+(it.revealed?' revealed':'');b.textContent=it.name;const can=q.phase==='playing'&&!it.revealed&&!cap&&myTeam===d.turn&&!!d.clue; b.disabled=!can;b.onclick=()=>socket.emit('arc_code_guess',{roomCode:currentRoomCode,id:it.id});grid.appendChild(b);});w.appendChild(grid);
+    if(q.phase==='playing'&&!cap&&myTeam===d.turn&&d.clue){const e=document.createElement('button');e.className='host-btn';e.style.marginTop='8px';e.textContent='⏭️ Arrêter de deviner / finir le tour';e.onclick=()=>socket.emit('arc_code_endturn',{roomCode:currentRoomCode});w.appendChild(e);}stage.appendChild(w);
+}
+function renderOrder(q,stage){
+    const d=q.stage.order||{};const k=q.round+'|'+q.phase;if(arcOrderKey!==k&&q.phase==='playing'){arcOrderKey=k;arcOrderIds=(d.items||[]).map(x=>x.id);}if(!arcOrderIds.length)arcOrderIds=(d.items||[]).map(x=>x.id);stage.innerHTML='';const w=document.createElement('div');w.className='order-wrap';w.innerHTML=`<div class="order-prompt">${escHtml(d.prompt||'')}</div>`;const list=document.createElement('div');list.className='order-list';
+    const map=Object.fromEntries((d.items||[]).map(x=>[x.id,x]));arcOrderIds.forEach((id,i)=>{const it=map[id];if(!it)return;const r=document.createElement('div');r.className='order-item';r.draggable=q.phase==='playing';r.dataset.id=id;r.innerHTML=`<b>${i+1}</b><span>${escHtml(it.name)}</span><span class="order-move"><button data-d="-1">▲</button><button data-d="1">▼</button></span>`;r.addEventListener('dragstart',()=>{r.classList.add('drag');window.__ordDrag=id;});r.addEventListener('dragend',()=>r.classList.remove('drag'));r.addEventListener('dragover',e=>e.preventDefault());r.addEventListener('drop',e=>{e.preventDefault();const from=arcOrderIds.indexOf(window.__ordDrag),to=arcOrderIds.indexOf(id);if(from>=0&&to>=0){const [x]=arcOrderIds.splice(from,1);arcOrderIds.splice(to,0,x);renderOrder(q,stage);}});r.querySelectorAll('button').forEach(b=>b.onclick=e=>{e.stopPropagation();const j=i+(+b.dataset.d);if(j<0||j>=arcOrderIds.length)return;[arcOrderIds[i],arcOrderIds[j]]=[arcOrderIds[j],arcOrderIds[i]];renderOrder(q,stage);});list.appendChild(r);});w.appendChild(list);
+    if(q.phase==='playing'){const b=document.createElement('button');b.className='btn-action';b.textContent='✅ Valider cet ordre';b.onclick=()=>socket.emit('arc_order_submit',{roomCode:currentRoomCode,ids:arcOrderIds});w.appendChild(b);}if((q.phase==='reveal'||q.phase==='finished')&&d.correct){const names=d.correct.map(id=>map[id]?.name).filter(Boolean);w.insertAdjacentHTML('beforeend',`<div class="tl-hint" style="text-align:left;margin-top:8px;">✅ Ordre correct : ${names.map(escHtml).join(' → ')}</div>`);}stage.appendChild(w);
+}
+function renderGridChallenge(q,stage){
+    const d=q.stage.grid||{},sol=arcGridPrivate.solved||{};stage.innerHTML='';const w=document.createElement('div');w.className='gridc-wrap';const g=document.createElement('div');g.className='gridc';g.innerHTML='<div class="gridc-head">ANIME × CATÉGORIE</div>'+ (d.cols||[]).map(c=>`<div class="gridc-head">${c.emoji||'🎯'} ${escHtml(c.label)}</div>`).join('');
+    (d.rows||[]).forEach((r,ri)=>{g.insertAdjacentHTML('beforeend',`<div class="gridc-rowhead">${escHtml(r.label)}</div>`);(d.cols||[]).forEach((c,ci)=>{const key=ri+'|'+ci,x=document.createElement('div');x.className='gridc-cell'+(sol[key]?' solved':'');if(sol[key])x.textContent='✅ '+sol[key];else{x.innerHTML='<input maxlength="80" placeholder="Un personnage…"><button>Valider</button>';const input=x.querySelector('input');const go=()=>{if(!input.value.trim())return;socket.emit('arc_grid_submit',{roomCode:currentRoomCode,row:ri,col:ci,text:input.value.trim()});};x.querySelector('button').onclick=go;input.onkeydown=e=>{if(e.key==='Enter')go();};}g.appendChild(x);});});w.appendChild(g);stage.appendChild(w);
+}
+const _arcRenderStageSeven=arcRenderStage;arcRenderStage=function(q){const stage=document.getElementById('arc-stage');if(!stage)return;if(q.game==='connections')return renderConnections(q,stage);if(q.game==='codeanime')return renderCodeAnime(q,stage);if(q.game==='ordre')return renderOrder(q,stage);if(q.game==='gridchallenge')return renderGridChallenge(q,stage);return _arcRenderStageSeven(q);};
+const _renderArcadeSeven=renderArcade;renderArcade=function(q){_renderArcadeSeven(q);if(!q||!['connections','codeanime','ordre','gridchallenge'].includes(q.game))return;const iw=document.getElementById('arc-input-wrap'),ch=document.getElementById('arc-choices');if(iw)iw.style.display='none';if(ch)ch.style.display='none';const r=document.getElementById('arc-result'),round=document.getElementById('arc-round'),ans=document.getElementById('arc-answered'),me=q.players.find(p=>p.id===socket.id)||{};
+    if(round)round.textContent=q.game==='ordre'?`Manche ${q.round}/${q.totalRounds}`:'🎯 Partie en cours';if(ans)ans.textContent=q.game==='connections'?`${me.progress||0}/4 groupes`:q.game==='gridchallenge'?`${me.progress||0}/9 cases`:q.game==='codeanime'?'Deux équipes • capitaine + joueurs':'Classe les 5 cartes';
+    if(q.phase==='playing'&&r&&!arcLastFeedback){r.style.color='var(--text-color)';r.textContent=q.game==='connections'?'Sélectionne exactement 4 personnages qui partagent un lien.':q.game==='codeanime'?(arcCodePrivate?.captain?'Tu es capitaine : donne un indice sans révéler les couleurs.':'Trouve les agents de ton équipe à partir de l’indice du capitaine.'):q.game==='ordre'?'Glisse les cartes ou utilise ▲/▼, puis valide.':'Trouve un personnage différent pour chaque intersection.';}
+};
+socket.on('arc_connections_private',d=>{arcConnPrivate=d||{solved:[]};arcConnSelection=[];if(arcState?.game==='connections'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_code_private',d=>{arcCodePrivate=d||null;if(arcState?.game==='codeanime'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_grid_private',d=>{arcGridPrivate=d||{solved:{}};if(arcState?.game==='gridchallenge'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_state',q=>{if(!q)return;if(q.game!=='connections'){arcConnPrivate={solved:[]};arcConnSelection=[];}if(q.game!=='codeanime')arcCodePrivate=null;if(q.game!=='gridchallenge')arcGridPrivate={solved:{},attempts:0};});
+
+async function loadMuseum(){
+    const box=document.getElementById('eco-museum');if(!box)return;if(!isAccount()){box.innerHTML='<p class="tl-hint">Crée un compte pour ouvrir ton Musée.</p>';return;}box.innerHTML='<div class="arc-loading"><div class="arc-spin"></div></div>';
+    const [m,x]=await Promise.all([v7get('/api/cards/mine'),v7get('/api/cards/extra')]);if(!m?.ok||!x?.ok){box.innerHTML='<p class="tl-hint">Musée indisponible.</p>';return;}const selected=new Set(x.museum||x.showcase||[]);const cards=(m.cards||[]).slice().sort((a,b)=>(selected.has(b.key)-selected.has(a.key))||String(a.anime).localeCompare(String(b.anime),'fr')||String(a.name).localeCompare(String(b.name),'fr'));
+    box.innerHTML=`<div class="museum-head"><div><h3>🏛️ Mon Musée</h3><div class="tl-hint" style="text-align:left;">Expose jusqu’à <b>10 cartes</b> sur ton profil public • ${selected.size}/10 emplacements utilisés.</div></div></div><div class="museum-grid">${cards.map(c=>`<div class="museum-card ${selected.has(c.key)?'on':''}"><img src="${escHtml(c.img||'')}" alt=""><b>${escHtml(c.name)}</b><small style="display:block;color:var(--text-muted);">${escHtml(c.anime||'')} • ${escHtml(RAR_LABEL[c.rarity]||c.rarity||'')}</small><button onclick="museumToggle('${String(c.key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">${selected.has(c.key)?'🏛️ Retirer':'➕ Exposer'}</button></div>`).join('')}</div>`;
+}
+async function museumToggle(key){const d=await v7post('/api/cards/showcase',{key});if(!d?.ok)return toast('❌ '+((d&&d.error)||'Impossible'),'var(--accent-pink)');loadMuseum();}
+
+async function loadHallOfFame(){
+    const box=document.getElementById('hof-box');if(!box)return;let d=null;try{d=await(await fetch('/api/hall-of-fame')).json();}catch(_){}if(!d?.ok||!d.seasons?.length){box.innerHTML='<p class="tl-hint">Le Hall of Fame se remplira quand des résultats mensuels seront enregistrés.</p>';return;}
+    box.innerHTML=d.seasons.map(s=>{const month=new Date(s.season+'-01T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});const c=s.champion;return `<div class="hof-season"><h3>📅 ${escHtml(month.charAt(0).toUpperCase()+month.slice(1))}</h3>${c?`<div class="hof-champ">👑 Champion global : <b>${escHtml(c.pseudo)}</b> • ${c.points} pts • ${c.wins} V</div>`:''}<div class="hof-modes">${(s.modes||[]).map(x=>`<div class="hof-mode"><b>${escHtml(x.label)}</b><br>🏆 ${escHtml(x.winner.pseudo)} • ${x.winner.wins} V • ${x.winner.points} pts</div>`).join('')}</div></div>`;}).join('');
+}
+</script>
 </body>
 </html>

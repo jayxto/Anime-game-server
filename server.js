@@ -16399,11 +16399,11 @@ app.get('/api/cards', async (req, res) => {
         cards = list.map((c, i) => {
             const m = mine.get(u + '|' + c.display);
             const rarity = cardRarityAt(u, i);
-            return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0 };
+            return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0, missing: true, img: cardImg({ u, display: c.display }) };
         });
         cardAllSpecials(u).forEach(c => {
             const m = mine.get(c.key);
-            cards.push(m ? { name: c.display, rarity: c.tier, n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: c.tier, n: 0, secret: true });
+            cards.push(m ? { name: c.display, rarity: c.tier, n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: c.tier, n: 0, secret: true, missing: true, img: cardImg(c) });
         });
     }
     const all = [...mine.values()];
@@ -20660,7 +20660,7 @@ app.get('/api/cards/extra', async (req, res) => {
     const showcaseCards = vit.map(k => { const [u, name, sec] = k.split('|'); if (!mine.has(k)) return null;
         if (u === 'duo') { const d = DUO_CARDS().find(x => x.name === name); return d ? { key: k, name, anime: d.sub, imgs: d.imgs, rarity: 'duo' } : null; }
         return { key: k, u, name, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display: name }), secret: !!sec, finish: (best[k] || {}).f || null, serial: (best[k] || {}).ser || null, shiny: mine.get(k).shiny > 0 }; }).filter(Boolean);
-    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, showcase: vit, showcaseCards, albumFrame,
+    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, showcase: vit, showcaseCards, museum: vit, museumCards: showcaseCards, albumFrame,
         seasons: Object.entries(SEASON_CARDS).filter(([, s]) => seasonActive(s)).map(([id, s]) => ({ id, label: s.label })) });
 });
 // fiche d'une carte (mode inspection) : mes finitions + combien il en existe sur le serveur
@@ -20699,7 +20699,7 @@ app.post('/api/cards/showcase', async (req, res) => {
     const mine = await cardsOf(uid);
     let v = await kvGet('vitrine', String(uid), []);
     if (v.includes(key)) v = v.filter(k => k !== key);
-    else { if (!mine.has(key)) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' }); v = [key, ...v].slice(0, 3); }
+    else { if (!mine.has(key)) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' }); if (v.length >= 10) return res.json({ ok:false, error:'Ton Musée est plein (10/10). Retire une carte avant d’en exposer une autre.' }); v = [key, ...v]; }
     await kvSet('vitrine', String(uid), v);
     res.json({ ok: true, showcase: v });
 });
@@ -20713,7 +20713,7 @@ publicProfile = async function (pseudo) {
         const fin = await kvGet('fin', String(p.uid), {}), vit = await kvGet('vitrine', String(p.uid), []), mine = await cardsOf(p.uid);
         const view = k => { const [u, display, sec] = k.split('|'); const m = mine.get(k); if (!m || !ARC_UNIVERSE_ANIME[u]) return null; const f = finBestOf(fin[k]); return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: sec || keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }), finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
         const top = vit.map(view).filter(Boolean);
-        p.showcase = top;
+        p.showcase = top; p.museum = top;
         p.cards = top.concat(p.cards.filter(c => !top.some(t => t.name === c.name))).slice(0, 12);
         p.cards.forEach(c => { if (c.finish) return; const k = Object.keys(fin).find(k => k.split('|')[1] === c.name); const f = k && finBestOf(fin[k]); if (f) { c.finish = f; c.finishLabel = FINISHES.find(x => x.id === f).label; } });
     } catch (_) {}
@@ -21439,3 +21439,266 @@ publicRoomMax = function(room) {
     if (room?.mode === 'arcade' && String(room.subMode || '').startsWith('cardbattle')) return 2;
     return _publicRoomMaxPCB(room);
 };
+
+
+/* =====================================================================
+   7 AJOUTS : Anime Connections, Code Anime, Remets-les dans l'ordre,
+   Grid Challenge, Album silhouettes, Musée 10 cartes, Hall of Fame
+   ===================================================================== */
+
+ARC_GAMES.connections   = { label:'Anime Connections',       icon:'🧩', universe:false, rounds:1, roundMs:90000,  answer:'connections' };
+ARC_GAMES.codeanime     = { label:'Code Anime',              icon:'🕵️', universe:false, rounds:1, roundMs:600000, answer:'codeanime' };
+ARC_GAMES.ordre         = { label:"Remets-les dans l’ordre", icon:'⏳', universe:false, rounds:5, roundMs:45000,  answer:'order' };
+ARC_GAMES.gridchallenge = { label:'Grid Challenge',          icon:'🎯', universe:false, rounds:1, roundMs:120000, answer:'grid' };
+MODE_LABELS['arcade:connections'] = 'Anime Connections';
+MODE_LABELS['arcade:codeanime'] = 'Code Anime';
+MODE_LABELS['arcade:ordre'] = "Remets-les dans l’ordre";
+MODE_LABELS['arcade:gridchallenge'] = 'Grid Challenge';
+
+const CONNECTION_TRAITS = ['fire','lightning','water','sword','magic','eye','transform','villain','leader','royal','demon','pirate','ninja','hunter','shinigami','ghoul','titan','hair_white','hair_red','hair_blue'];
+function connItemId(c){ return c.u + '|' + normalizeRG(c.name); }
+function connPuzzleAmbiguous(items,groups){
+    const tagMap=Object.fromEntries(bingoCatalog().map(c=>[connItemId(c),new Set((c.tags||[]).filter(t=>CONNECTION_TRAITS.includes(t)))]));
+    const validSets=new Set(groups.map(g=>g.items.slice().sort().join('|'))), ids=items.map(x=>x.id);
+    // 16 choose 4 = 1820 seulement : on refuse toute combinaison alternative partageant un trait.
+    for(let a=0;a<ids.length-3;a++)for(let b=a+1;b<ids.length-2;b++)for(let c=b+1;c<ids.length-1;c++)for(let d=c+1;d<ids.length;d++){
+        const arr=[ids[a],ids[b],ids[c],ids[d]], first=tagMap[arr[0]]||new Set();
+        const common=[...first].filter(t=>arr.slice(1).every(id=>(tagMap[id]||new Set()).has(t)));
+        if(common.length && !validSets.has(arr.slice().sort().join('|'))) return true;
+    }
+    return false;
+}
+function connBuildPuzzle(){
+    const cat = bingoCatalog();
+    const by = {};
+    for (const id of CONNECTION_TRAITS) by[id] = cat.filter(c => (c.tags || []).includes(id));
+    for (let attempt=0; attempt<250; attempt++) {
+        const used = new Set(), groups=[];
+        for (const id of arcShuffle(CONNECTION_TRAITS.slice())) {
+            let pool = arcShuffle((by[id] || []).filter(c => !used.has(connItemId(c))));
+            // si possible, quatre univers différents rendent les groupes moins triviaux
+            const picked=[], seenU=new Set();
+            for (const c of pool) if (!seenU.has(c.u)) { picked.push(c); seenU.add(c.u); if (picked.length===4) break; }
+            if (picked.length<4) for (const c of pool) if (!picked.includes(c)) { picked.push(c); if (picked.length===4) break; }
+            if (picked.length<4) continue;
+            groups.push({ id, label:BINGO_TRAIT_BY_ID[id]?.label || id, items:picked.map(connItemId) });
+            picked.forEach(c => used.add(connItemId(c)));
+            if (groups.length===4) {
+                const items=[];
+                for (const g of groups) for (const key of g.items) {
+                    const c=cat.find(x=>connItemId(x)===key); if(c) items.push({ id:key, name:c.name, anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'', u:c.u });
+                }
+                if (items.length===16) { const shuffled=arcShuffle(items); if(!connPuzzleAmbiguous(shuffled,groups)) return { groups, items:shuffled }; }
+            }
+        }
+    }
+    return null;
+}
+function connPrivate(socketId,g){
+    const solved=[...(g.connections?.solved?.[socketId] || new Set())];
+    return solved.map(id=>{const x=g.connections.puzzle.groups.find(z=>z.id===id);return x?{id:x.id,label:x.label,items:x.items}:null;}).filter(Boolean);
+}
+function connFinish(room,roomCode){ const g=arcGames[roomCode]; if(!g||g.game!=='connections'||g.phase==='finished')return; arcFinish(room,roomCode); }
+
+function codeBuildBoard(){
+    const pool=arcShuffle(bingoCatalog()).filter((c,i,a)=>a.findIndex(x=>normalizeRG(x.name)===normalizeRG(c.name))===i).slice(0,25);
+    if(pool.length<25)return null;
+    const items=pool.map((c,i)=>({id:'c'+i,name:c.name,anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'',u:c.u}));
+    const ids=arcShuffle(items.map(x=>x.id)); const roles={};
+    ids.slice(0,9).forEach(id=>roles[id]='cyan'); ids.slice(9,17).forEach(id=>roles[id]='rose'); ids.slice(17,24).forEach(id=>roles[id]='neutral'); roles[ids[24]]='assassin';
+    return {items,roles};
+}
+function codeRemaining(g,team){ return Object.entries(g.code.roles).filter(([id,r])=>r===team&&!g.code.revealed.has(id)).length; }
+function codeEndTurn(g){ g.code.turn=g.code.turn==='cyan'?'rose':'cyan'; g.code.clue=null; g.code.guessesLeft=0; }
+function codeSendPrivate(room,g){
+    for(const p of room.players){
+        const team=g.code.teams[p.id]; const captain=g.code.captains[team]===p.id;
+        io.to(p.id).emit('arc_code_private',{team,captain,map:captain?g.code.roles:null});
+    }
+}
+function codeFinish(room,roomCode,winner,reason){
+    const g=arcGames[roomCode]; if(!g||g.game!=='codeanime'||g.phase==='finished')return;
+    g.code.winner=winner; g.code.reason=reason||'';
+    room.players.forEach(p=>{ if(g.code.teams[p.id]===winner) g.scores[p.id]=(g.scores[p.id]||0)+500; });
+    arcFinish(room,roomCode);
+}
+
+let ORDER_POOL_CACHE=null;
+function orderPools(){
+    if(ORDER_POOL_CACHE)return ORDER_POOL_CACHE;
+    const out=[];
+    for(const u of arcUniverses()){
+        let d=null; try{d=dleExpandedUniverse(u);}catch(_){continue;}
+        for(const cat of (d?.categories||[])){
+            const vals=[];
+            for(const c of d.characters||[]){ const n=dleNumberValue(c.attrs?.[cat.key]); if(n!==null&&Number.isFinite(n)) vals.push({u,name:c.name,value:n}); }
+            const unique=[]; const seenV=new Set();
+            for(const x of arcShuffle(vals)){ if(seenV.has(x.value))continue; seenV.add(x.value); unique.push(x); }
+            if(unique.length>=5) out.push({u,anime:d.name||ARC_UNIVERSE_ANIME[u]||u,key:cat.key,label:cat.label,items:unique});
+        }
+    }
+    ORDER_POOL_CACHE=out; return out;
+}
+function orderBuildRound(g){
+    let pools=orderPools().filter(p=>!g.used.has('ord|'+p.u+'|'+p.key));
+    if(!pools.length){ for(const k of [...g.used])if(k.startsWith('ord|'))g.used.delete(k); pools=orderPools(); }
+    const p=arcPick(pools); if(!p)return null; g.used.add('ord|'+p.u+'|'+p.key);
+    const chosen=arcShuffle(p.items).slice(0,5).sort((a,b)=>a.value-b.value);
+    const shuffled=arcShuffle(chosen.map((x,i)=>({id:'o'+i+'_'+hubHash(x.u+'|'+x.name+'|'+x.value),name:x.name,value:x.value})));
+    const correct=chosen.map(x=>shuffled.find(y=>y.name===x.name)?.id).filter(Boolean);
+    return {u:p.u,orderPrompt:`${p.anime} • ${p.label} : du plus petit au plus grand`,orderItems:shuffled.map(({id,name})=>({id,name})),orderCorrect:correct,answer:chosen.map(x=>`${x.name} (${x.value})`).join(' → ')};
+}
+function orderScore(submitted,correct){
+    if(!Array.isArray(submitted)||submitted.length!==correct.length||new Set(submitted).size!==correct.length)return 0;
+    let pairs=0,total=0; const pos=Object.fromEntries(submitted.map((id,i)=>[id,i]));
+    for(let i=0;i<correct.length;i++)for(let j=i+1;j<correct.length;j++){total++;if(pos[correct[i]]<pos[correct[j]])pairs++;}
+    return pairs===total?150:Math.round(100*pairs/Math.max(1,total));
+}
+
+const GRID_TRAITS=['fire','lightning','water','sword','magic','eye','transform','villain','leader','royal','demon','pirate','ninja','hunter','shinigami','ghoul','titan'];
+function gridBuildPuzzle(){
+    const cat=bingoCatalog(); const byU={}; for(const c of cat)(byU[c.u]||(byU[c.u]=[])).push(c);
+    const universes=Object.keys(byU).filter(u=>byU[u].length>=12);
+    for(let tries=0;tries<500;tries++){
+        const rows=arcShuffle(universes).slice(0,3); if(rows.length<3)break;
+        const possible=GRID_TRAITS.filter(t=>rows.every(u=>byU[u].filter(c=>(c.tags||[]).includes(t)).length>=1));
+        if(possible.length<3)continue;
+        const cols=arcShuffle(possible).slice(0,3); const candidates={}; let ok=true;
+        rows.forEach((u,r)=>cols.forEach((t,c)=>{const k=r+'|'+c;candidates[k]=byU[u].filter(x=>(x.tags||[]).includes(t));if(!candidates[k].length)ok=false;}));
+        if(ok)return {rows,cols,candidates};
+    }
+    return null;
+}
+function gridPrivate(g,sid){ return {solved:g.grid?.solved?.[sid]||{}, attempts:g.grid?.attempts?.[sid]||0}; }
+function gridFinish(room,roomCode){ const g=arcGames[roomCode]; if(!g||g.game!=='gridchallenge'||g.phase==='finished')return; arcFinish(room,roomCode); }
+
+// ordre utilise le cycle de manches Arcade normal
+const _arcBuildRoundSeven = arcBuildRound;
+arcBuildRound = async function(g){
+    if(g?.game==='ordre') return orderBuildRound(g);
+    return _arcBuildRoundSeven(g);
+};
+
+// Démarrage des jeux à état continu
+const _startArcadeSeven = startArcade;
+startArcade = function(room,roomCode){
+    const game=String(room.subMode||'').split(':')[0];
+    if(game==='connections'){
+        const puzzle=connBuildPuzzle(); if(!puzzle){io.to(roomCode).emit('game_error','Impossible de créer une grille Connections.');return;}
+        arcStop(roomCode); const solved={},attempts={}; room.players.forEach(p=>{solved[p.id]=new Set();attempts[p.id]=0;});
+        const now=Date.now(),g={game:'connections',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+90000,connections:{puzzle,solved,attempts}};
+        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);room.players.forEach(p=>io.to(p.id).emit('arc_connections_private',{solved:connPrivate(p.id,g)}));g.timer=setTimeout(()=>connFinish(room,roomCode),90100);return;
+    }
+    if(game==='codeanime'){
+        if(room.players.length<4){io.to(roomCode).emit('game_error','Code Anime demande au moins 4 joueurs (2 équipes).');return;}
+        const board=codeBuildBoard();if(!board){io.to(roomCode).emit('game_error','Impossible de créer la grille Code Anime.');return;}
+        arcStop(roomCode);const teams={},lists={cyan:[],rose:[]};room.players.forEach((p,i)=>{const t=i%2===0?'cyan':'rose';teams[p.id]=t;lists[t].push(p.id);});
+        const captains={cyan:lists.cyan[0],rose:lists.rose[0]},now=Date.now();
+        const g={game:'codeanime',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+600000,code:{...board,teams,lists,captains,revealed:new Set(),turn:'cyan',clue:null,guessesLeft:0,winner:null,reason:''}};
+        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);codeSendPrivate(room,g);g.timer=setTimeout(()=>{const a=codeRemaining(g,'cyan'),b=codeRemaining(g,'rose');codeFinish(room,roomCode,a<=b?'cyan':'rose','Temps écoulé');},600100);return;
+    }
+    if(game==='gridchallenge'){
+        const puzzle=gridBuildPuzzle();if(!puzzle){io.to(roomCode).emit('game_error','Impossible de créer une Grid Challenge avec les données actuelles.');return;}
+        arcStop(roomCode);const solved={},usedNames={},attempts={};room.players.forEach(p=>{solved[p.id]={};usedNames[p.id]=new Set();attempts[p.id]=0;});const now=Date.now();
+        const g={game:'gridchallenge',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+120000,grid:{...puzzle,solved,usedNames,attempts}};
+        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);room.players.forEach(p=>io.to(p.id).emit('arc_grid_private',gridPrivate(g,p.id)));g.timer=setTimeout(()=>gridFinish(room,roomCode),120100);return;
+    }
+    return _startArcadeSeven(room,roomCode);
+};
+
+const _arcPublicSeven=arcPublic;
+arcPublic=function(room,g){
+    const out=_arcPublicSeven(room,g); if(!g||!out)return out; out.stage=out.stage||{};
+    if(g.game==='connections'&&g.connections){
+        out.stage.connections={items:g.connections.puzzle.items};
+        out.players=out.players.map(p=>({...p,progress:(g.connections.solved[p.id]?.size||0),done:(g.connections.solved[p.id]?.size||0)>=4}));
+    }
+    if(g.game==='codeanime'&&g.code){
+        const c=g.code;out.stage.code={items:c.items.map(x=>({...x,revealed:c.revealed.has(x.id),role:c.revealed.has(x.id)?c.roles[x.id]:null})),turn:c.turn,clue:c.clue,guessesLeft:c.guessesLeft,remaining:{cyan:codeRemaining(g,'cyan'),rose:codeRemaining(g,'rose')},teams:{cyan:c.lists.cyan,rose:c.lists.rose},captains:c.captains,winner:c.winner,reason:c.reason};
+        out.players=out.players.map(p=>({...p,team:c.teams[p.id]}));
+    }
+    if(g.game==='ordre'&&g.current?.orderItems){
+        out.stage.order={prompt:g.current.orderPrompt,items:g.current.orderItems,correct:g.phase==='reveal'||g.phase==='finished'?g.current.orderCorrect:null};
+    }
+    if(g.game==='gridchallenge'&&g.grid){
+        out.stage.grid={rows:g.grid.rows.map(u=>({u,label:ARC_UNIVERSE_ANIME[u]||u})),cols:g.grid.cols.map(id=>({id,label:BINGO_TRAIT_BY_ID[id]?.label||id,emoji:BINGO_TRAIT_BY_ID[id]?.emoji||'🎯'}))};
+        out.players=out.players.map(p=>({...p,progress:Object.keys(g.grid.solved[p.id]||{}).length,done:Object.keys(g.grid.solved[p.id]||{}).length>=9}));
+    }
+    return out;
+};
+
+const _arcSendToSeven=arcSendTo;
+arcSendTo=function(socket,room,roomCode){
+    const ok=_arcSendToSeven(socket,room,roomCode),g=arcGames[roomCode];if(!ok||!g)return ok;
+    if(g.game==='connections')socket.emit('arc_connections_private',{solved:connPrivate(socket.id,g)});
+    if(g.game==='codeanime')codeSendPrivate(room,g);
+    if(g.game==='gridchallenge')socket.emit('arc_grid_private',gridPrivate(g,socket.id));
+    return ok;
+};
+const _arcRemapSeven=arcRemap;
+arcRemap=function(roomCode,oldId,newId){
+    _arcRemapSeven(roomCode,oldId,newId);const g=arcGames[roomCode];if(!g||oldId===newId)return;
+    if(g.connections){for(const k of ['solved','attempts'])if(Object.prototype.hasOwnProperty.call(g.connections[k]||{},oldId)){g.connections[k][newId]=g.connections[k][oldId];delete g.connections[k][oldId];}}
+    if(g.code){if(g.code.teams[oldId]){const t=g.code.teams[oldId];g.code.teams[newId]=t;delete g.code.teams[oldId];g.code.lists[t]=g.code.lists[t].map(x=>x===oldId?newId:x);if(g.code.captains[t]===oldId)g.code.captains[t]=newId;}}
+    if(g.grid){for(const k of ['solved','usedNames','attempts'])if(Object.prototype.hasOwnProperty.call(g.grid[k]||{},oldId)){g.grid[k][newId]=g.grid[k][oldId];delete g.grid[k][oldId];}}
+};
+
+io.on('connection',socket=>{
+    socket.on('arc_connections_submit',({roomCode,ids}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='connections'||g.phase!=='playing'||!g.connections)return;
+        if(!room.players.some(p=>p.id===socket.id))return;ids=Array.isArray(ids)?[...new Set(ids.map(String))]:[];if(ids.length!==4)return;
+        const valid=new Set(g.connections.puzzle.items.map(x=>x.id));if(ids.some(x=>!valid.has(x)))return;
+        const solved=g.connections.solved[socket.id]||(g.connections.solved[socket.id]=new Set());g.connections.attempts[socket.id]=(g.connections.attempts[socket.id]||0)+1;
+        const key=ids.slice().sort().join('|');const match=g.connections.puzzle.groups.find(gr=>!solved.has(gr.id)&&gr.items.slice().sort().join('|')===key);
+        if(match){solved.add(match.id);g.scores[socket.id]=(g.scores[socket.id]||0)+100;socket.emit('arc_feedback',{ok:true,message:`✅ ${match.label} ! +100`});socket.emit('arc_connections_private',{solved:connPrivate(socket.id,g)});}
+        else{g.scores[socket.id]=(g.scores[socket.id]||0)-10;socket.emit('arc_feedback',{ok:false,message:'❌ Ce groupe ne partage pas le même lien : -10'});}
+        arcEmit(room,roomCode);const connected=room.players.filter(p=>!p.disconnected);if(connected.length&&connected.every(p=>(g.connections.solved[p.id]?.size||0)>=4))connFinish(room,roomCode);
+    });
+
+    socket.on('arc_code_clue',({roomCode,word,number}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const c=g.code,team=c.teams[socket.id];
+        if(!team||team!==c.turn||c.captains[team]!==socket.id||c.clue)return;word=String(word||'').trim().replace(/\s+/g,' ').slice(0,30);number=Math.max(1,Math.min(9,Number(number)||1));if(!word)return;
+        c.clue={word,number,by:socket.id};c.guessesLeft=number+1;arcEmit(room,roomCode);
+    });
+    socket.on('arc_code_guess',({roomCode,id}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const c=g.code,team=c.teams[socket.id];
+        if(!team||team!==c.turn||c.captains[team]===socket.id||!c.clue||c.guessesLeft<=0||c.revealed.has(String(id)))return;id=String(id);if(!c.roles[id])return;
+        c.revealed.add(id);const role=c.roles[id];c.guessesLeft--;
+        if(role==='assassin'){codeFinish(room,roomCode,team==='cyan'?'rose':'cyan','☠️ Assassin trouvé');return;}
+        if(role===team){room.players.filter(p=>c.teams[p.id]===team).forEach(p=>g.scores[p.id]=(g.scores[p.id]||0)+50);if(codeRemaining(g,team)===0){codeFinish(room,roomCode,team,'Tous les agents trouvés');return;}if(c.guessesLeft<=0)codeEndTurn(g);}
+        else codeEndTurn(g);
+        arcEmit(room,roomCode);codeSendPrivate(room,g);
+    });
+    socket.on('arc_code_endturn',({roomCode}={})=>{const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const t=g.code.teams[socket.id];if(t!==g.code.turn||g.code.captains[t]===socket.id||!g.code.clue)return;codeEndTurn(g);arcEmit(room,roomCode);});
+
+    socket.on('arc_order_submit',({roomCode,ids}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='ordre'||g.phase!=='playing'||g.answers[socket.id])return;
+        const all=(g.current?.orderItems||[]).map(x=>x.id);ids=Array.isArray(ids)?ids.map(String):[];if(ids.length!==all.length||new Set(ids).size!==all.length||ids.some(id=>!all.includes(id)))return;
+        const score=orderScore(ids,g.current.orderCorrect||[]);g.scores[socket.id]=(g.scores[socket.id]||0)+score;g.gainedRound[socket.id]=score;g.answers[socket.id]={choice:ids.join(','),correct:score===150};socket.emit('arc_feedback',{ok:score===150,message:score===150?`✅ Ordre parfait ! +${score}`:`🧩 Ordre envoyé : +${score} pts`});arcCheckAllDone(room,roomCode);
+    });
+
+    socket.on('arc_grid_submit',({roomCode,row,col,text}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='gridchallenge'||g.phase!=='playing'||!g.grid)return;if(!room.players.some(p=>p.id===socket.id))return;
+        row=Number(row);col=Number(col);if(!Number.isInteger(row)||!Number.isInteger(col)||row<0||row>2||col<0||col>2)return;const key=row+'|'+col,solved=g.grid.solved[socket.id]||(g.grid.solved[socket.id]={});if(solved[key])return;
+        const guess=String(text||'').trim().slice(0,80);if(!guess)return;g.grid.attempts[socket.id]=(g.grid.attempts[socket.id]||0)+1;const cand=g.grid.candidates[key]||[];const found=cand.find(c=>arcNameMatches(c.u,{display:c.name,raw:c.name},guess));
+        const used=g.grid.usedNames[socket.id]||(g.grid.usedNames[socket.id]=new Set());
+        if(found&&used.has(connItemId(found))){socket.emit('arc_feedback',{ok:false,message:'↺ Tu as déjà utilisé ce personnage ailleurs dans la grille.'});return;}
+        if(found){solved[key]=found.name;used.add(connItemId(found));g.scores[socket.id]=(g.scores[socket.id]||0)+100;socket.emit('arc_feedback',{ok:true,message:`✅ ${found.name} ! +100`});}
+        else{g.scores[socket.id]=(g.scores[socket.id]||0)-15;socket.emit('arc_feedback',{ok:false,message:`❌ ${guess} ne correspond pas à cette intersection : -15`});}
+        socket.emit('arc_grid_private',gridPrivate(g,socket.id));arcEmit(room,roomCode);const connected=room.players.filter(p=>!p.disconnected);if(connected.length&&connected.every(p=>Object.keys(g.grid.solved[p.id]||{}).length>=9))gridFinish(room,roomCode);
+    });
+});
+
+// Hall of Fame : champions mensuels conservés sur les 12 derniers mois.
+app.get('/api/hall-of-fame', async (req,res)=>{
+    let raw=[];
+    if(HAS_DB){
+        try{raw=(await pool.query(`SELECT to_char(date_trunc('month', created_at AT TIME ZONE 'Europe/Paris'),'YYYY-MM') AS season, mode, user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games, sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE created_at >= now() - interval '12 months' GROUP BY season, mode, user_id`)).rows;}catch(e){return res.json({ok:false,error:e.message});}
+    }else{
+        const since=Date.now()-366*86400000,agg={};for(const r of PROG_MEM.results.filter(x=>x.created_at>=since)){const d=new Date(r.created_at),season=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`,k=[season,r.mode,r.user_id].join('|'),o=agg[k]||(agg[k]={season,mode:r.mode,user_id:r.user_id,pseudo:r.pseudo,points:0,games:0,wins:0});o.points+=r.points||0;o.games++;o.wins+=r.won?1:0;}raw=Object.values(agg);
+    }
+    const seasons={};for(const r of raw){const s=seasons[r.season]||(seasons[r.season]={season:r.season,global:{},modes:{}}),g=s.global[r.user_id]||(s.global[r.user_id]={pseudo:r.pseudo,points:0,wins:0,games:0});g.points+=+r.points||0;g.wins+=+r.wins||0;g.games+=+r.games||0;(s.modes[r.mode]||(s.modes[r.mode]=[])).push(r);}
+    const best=list=>Object.values(list).sort((a,b)=>b.wins-a.wins||b.points-a.points||a.games-b.games||String(a.pseudo).localeCompare(String(b.pseudo),'fr'))[0]||null;
+    const out=Object.values(seasons).sort((a,b)=>b.season.localeCompare(a.season)).map(s=>({season:s.season,champion:best(s.global),modes:Object.entries(s.modes).map(([mode,list])=>({mode,label:MODE_LABELS[mode]||mode,winner:best(list)})).filter(x=>x.winner).sort((a,b)=>b.winner.wins-a.winner.wins||b.winner.points-a.winner.points).slice(0,10)}));
+    res.json({ok:true,seasons:out});
+});
