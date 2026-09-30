@@ -1,0 +1,224 @@
+/* =====================================================================
+   UI REFACTOR V2 — accueil plus large, cartes unifiées, catalogue compact
+   ===================================================================== */
+
+/* La page Jouer n'est plus enfermée dans une colonne de 600 px sur PC. */
+#mode #menu-selection{
+    width:min(1480px,calc(100vw - 40px));
+    max-width:1480px!important;
+    padding:0 4px 42px;
+}
+
+/* Le bloc de recherche/join reste lisible, même sur grand écran. */
+#mode #menu-selection>.ui-join-card{
+    max-width:980px;
+    margin:0 auto 18px!important;
+}
+
+/* Barre catalogue : recherche + catégories. */
+.mode-library-tools{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:18px 0 8px;
+    position:relative;
+    z-index:7;
+}
+.mode-library-search{
+    flex:1 1 320px;
+    min-width:180px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(16,16,26,.88);
+    border-radius:12px;
+    box-shadow:0 8px 26px rgba(0,0,0,.16);
+}
+.mode-library-search span{opacity:.75}
+.mode-library-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    outline:0;
+    color:var(--text-color);
+    background:transparent;
+    font:600 .9rem Poppins,sans-serif;
+}
+.mode-library-search input::placeholder{color:var(--text-muted)}
+.mode-library-count{
+    flex:0 0 auto;
+    font-size:.78rem;
+    color:var(--text-muted);
+    white-space:nowrap;
+}
+
+/* Les catégories restent accessibles mais prennent moins de place. */
+#mode .mode-cats{
+    position:static;
+    margin:0 0 12px;
+    padding:2px 0 8px;
+    background:none;
+}
+
+/* Grille principale : 3 colonnes desktop, 2 tablette, 1 mobile. */
+#mode .mode-grid-2,
+#mode .game-library-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:12px!important;
+    align-items:stretch;
+}
+
+/* On unifie les différentes générations de cartes du site. */
+#mode .mode-grid-2>.game-mode-card,
+#mode .mode-grid-2>.quote-mode-card,
+#mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+    position:relative;
+    display:flex!important;
+    flex-direction:column;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    min-width:0;
+    min-height:178px;
+    padding:16px!important;
+    margin:0!important;
+    text-align:left!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+    border-radius:14px!important;
+    background:
+        linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        var(--panel-color)!important;
+    box-shadow:0 10px 28px rgba(0,0,0,.18);
+    overflow:hidden;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+#mode .mode-grid-2>.game-mode-card:hover,
+#mode .mode-grid-2>.quote-mode-card:hover,
+#mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info):hover{
+    transform:translateY(-2px);
+    border-color:rgba(0,240,255,.42)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.25);
+}
+#mode .mode-grid-2>*>h3,
+#mode .mode-grid-2>*>div>h3{
+    margin:0 0 7px!important;
+    line-height:1.15;
+    color:var(--accent-yellow)!important;
+    font-size:1.02rem;
+}
+#mode .mode-grid-2>*>p,
+#mode .mode-grid-2>*>div>p{
+    line-height:1.42;
+    color:color-mix(in srgb,var(--text-color) 86%,var(--text-muted));
+}
+#mode .mode-grid-2>* .btn-action{
+    margin-top:auto!important;
+    min-height:38px;
+    border-radius:9px;
+}
+#mode .mode-grid-2>* .quote-new{font-size:.58rem}
+
+/* Mini-jeux = une section du catalogue, pas une énorme carte perdue au milieu. */
+#mode .mode-grid-2>.arc-menu{
+    grid-column:1/-1;
+    margin:0!important;
+    padding:16px!important;
+    border:1px solid rgba(0,240,255,.24)!important;
+    border-radius:16px!important;
+    background:linear-gradient(145deg,rgba(0,240,255,.06),rgba(255,42,95,.035)),var(--panel-color)!important;
+    text-align:left;
+}
+.arc-menu-refactor-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+}
+.arc-menu-refactor-head>div{min-width:0}
+.arc-menu-refactor-head h3{margin:0 0 4px!important}
+.arc-menu-refactor-toggle{
+    flex:0 0 auto;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.06);
+    color:var(--text-color);
+    border-radius:9px;
+    padding:7px 10px;
+    cursor:pointer;
+    font-weight:800;
+}
+#mode .arc-menu-grid{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:8px!important;
+    margin-top:10px!important;
+}
+#mode .arc-game-btn{
+    min-height:112px;
+    padding:11px 10px!important;
+    border-radius:11px!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    background:rgba(255,255,255,.035)!important;
+    text-align:left;
+}
+#mode .arc-game-btn:hover{background:rgba(0,240,255,.085)!important;border-color:rgba(0,240,255,.38)!important}
+#mode .arc-game-btn .arc-ico{font-size:1.35rem}
+#mode .arc-game-btn b{font-size:.82rem;line-height:1.15}
+#mode .arc-game-btn span:last-child{font-size:.68rem;line-height:1.3;color:var(--text-muted)}
+#mode .arc-menu.arc-compact .arc-game-btn:nth-child(n+11){display:none!important}
+#mode .arc-menu.arc-compact.arc-stream-view .arc-game-btn.mc-hidden{display:none!important}
+
+/* Le panneau streamer reste pleine largeur. */
+#mode .mode-grid-2>.mc-stream-info{grid-column:1/-1;margin:0!important}
+
+/* Recherche : les éléments non correspondants disparaissent sans casser les filtres existants. */
+.mode-search-hidden{display:none!important}
+
+/* Daily/quest/ranked : un peu plus larges mais pas étirés sur 1400 px. */
+#mode #ranked-card-body,
+#mode #daily-card,
+#mode #quest-card,
+#mode #theme-card{max-width:1100px;margin-left:auto;margin-right:auto}
+
+/* Admin / Options : titres repliables plus faciles à viser. */
+#admin .opt-collapse-head,
+#options .opt-collapse-head{
+    min-height:42px;
+    border-radius:8px;
+}
+#admin .opt-collapse-toggle,
+#options .opt-collapse-toggle{
+    min-width:38px;
+    min-height:34px;
+}
+
+/* Mobile : pas de largeur forcée, boutons confortables. */
+@media (max-width:1180px){
+    #mode .mode-grid-2,#mode .game-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    #mode .arc-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media (max-width:760px){
+    #mode #menu-selection{width:100%;max-width:none!important;padding:0 10px 34px}
+    .mode-library-tools{align-items:stretch;flex-direction:column}
+    .mode-library-search{flex-basis:auto;width:100%}
+    .mode-library-count{align-self:flex-end}
+    #mode .mode-grid-2,#mode .game-library-grid{grid-template-columns:1fr!important;gap:10px!important}
+    #mode .mode-grid-2>.game-mode-card,
+    #mode .mode-grid-2>.quote-mode-card,
+    #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){min-height:0;padding:14px!important}
+    #mode .arc-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    #mode .arc-game-btn{min-height:102px}
+    .arc-menu-refactor-head{align-items:center}
+}
+@media (max-width:390px){
+    #mode .arc-menu-grid{grid-template-columns:1fr 1fr!important}
+    #mode .arc-game-btn span:last-child{display:none}
+    #mode .arc-game-btn{min-height:78px}
+}
+
+/* Réduction des mouvements si l'utilisateur le demande. */
+@media (prefers-reduced-motion:reduce){
+    #mode .mode-grid-2>*{transition:none!important}
+}
