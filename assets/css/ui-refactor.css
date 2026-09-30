@@ -982,3 +982,15 @@
 @media (prefers-reduced-motion:reduce){
     .ag-dash-sidebar,.ag-mobile-backdrop{transition:none!important}
 }
+
+/* =====================================================================
+   PC GAME PAGE FIX — quand le menu principal est masqué par le jeu,
+   ne pas laisser le dashboard le forcer visible avec display:grid!important.
+   Cela restaure le comportement historique : salon / sélection / jeu = page dédiée.
+   ===================================================================== */
+@media (min-width:1181px){
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display: none"],
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display:none"]{
+        display:none!important;
+    }
+}
