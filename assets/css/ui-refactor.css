@@ -222,3 +222,360 @@
 @media (prefers-reduced-motion:reduce){
     #mode .mode-grid-2>*{transition:none!important}
 }
+
+/* =====================================================================
+   UI REFACTOR V3 — DASHBOARD PC
+   Inspiration dashboard gaming, tout en gardant les composants ANIME GAME.
+   Mobile volontairement inchangé : ces règles ne s'activent qu'en desktop.
+   ===================================================================== */
+
+/* Éléments V3 injectés par JS : invisibles sur mobile/tablette. */
+.ag-desktop-shell,
+#ag-home-hero,
+#ag-quick-actions,
+#ag-dashboard-right,
+#ag-games-heading { display:none; }
+
+@media (min-width:1181px){
+    :root{
+        --ag-shell-top:74px;
+        --ag-shell-left:196px;
+        --ag-shell-right:292px;
+        --ag-shell-gap:16px;
+        --ag-shell-border:rgba(130,170,255,.17);
+        --ag-shell-panel:rgba(12,18,32,.88);
+        --ag-shell-panel-2:rgba(17,24,42,.86);
+    }
+
+    body.ag-dashboard-on{
+        background:
+            radial-gradient(circle at 45% -10%,rgba(0,126,255,.16),transparent 33%),
+            radial-gradient(circle at 80% 15%,rgba(141,49,255,.09),transparent 28%),
+            #070b13;
+        background-attachment:fixed;
+    }
+
+    /* Ancien header remplacé sur les écrans hors partie. */
+    #app-root.ag-dashboard-shell-on > header{display:none!important}
+
+    .ag-desktop-shell{
+        display:block;
+        position:fixed;
+        inset:0;
+        z-index:9200;
+        pointer-events:none;
+        font-family:'Poppins',sans-serif;
+    }
+    .ag-desktop-shell *{box-sizing:border-box}
+
+    .ag-dash-top{
+        pointer-events:auto;
+        position:absolute;
+        inset:0 0 auto 0;
+        height:var(--ag-shell-top);
+        display:grid;
+        grid-template-columns:var(--ag-shell-left) minmax(280px,560px) 1fr auto;
+        align-items:center;
+        gap:18px;
+        padding:0 22px;
+        background:rgba(7,12,23,.94);
+        border-bottom:1px solid var(--ag-shell-border);
+        box-shadow:0 8px 30px rgba(0,0,0,.28);
+        backdrop-filter:blur(18px);
+    }
+    .ag-dash-brand{
+        display:flex;align-items:center;gap:11px;min-width:0;
+        cursor:pointer;
+        border:0;background:none;color:#fff;text-align:left;
+    }
+    .ag-dash-brand-mark{
+        width:38px;height:38px;border-radius:11px;
+        display:grid;place-items:center;
+        border:1px solid rgba(0,240,255,.58);
+        background:linear-gradient(145deg,rgba(0,240,255,.15),rgba(77,105,255,.08));
+        color:var(--accent-cyan);font-family:'Bangers';font-size:1.05rem;
+        box-shadow:inset 0 0 16px rgba(0,240,255,.08),0 0 18px rgba(0,240,255,.06);
+    }
+    .ag-dash-brand-copy{min-width:0}
+    .ag-dash-brand-copy b{
+        display:block;font-family:'Bangers',cursive;font-size:1.48rem;line-height:1;
+        letter-spacing:1.1px;color:#ddebff;text-shadow:2px 2px 0 rgba(30,109,255,.35);
+        white-space:nowrap;
+    }
+    .ag-dash-brand-copy small{display:block;margin-top:3px;color:#7392c4;font-size:.56rem;letter-spacing:.14em}
+
+    .ag-dash-search{
+        height:42px;display:flex;align-items:center;gap:9px;
+        padding:0 12px;border-radius:12px;
+        background:rgba(14,21,38,.9);border:1px solid rgba(124,163,230,.18);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .ag-dash-search:focus-within{border-color:rgba(0,240,255,.48);box-shadow:0 0 0 3px rgba(0,240,255,.06)}
+    .ag-dash-search span{font-size:.98rem;opacity:.72}
+    .ag-dash-search input{
+        flex:1;min-width:0;border:0;outline:0;background:transparent;color:#f5f8ff;
+        font:600 .8rem Poppins,sans-serif;
+    }
+    .ag-dash-search input::placeholder{color:#71809b}
+    .ag-dash-search button{
+        display:none;border:0;background:transparent;color:#8ea0bf;cursor:pointer;font-weight:900;font-size:1rem;
+    }
+    .ag-dash-search.has-value button{display:block}
+
+    .ag-dash-top-spacer{min-width:10px}
+    .ag-dash-account{display:flex;align-items:center;justify-content:flex-end;gap:9px;pointer-events:auto}
+    .ag-dash-pill,.ag-dash-icon-btn{
+        height:40px;border:1px solid rgba(124,163,230,.16);background:rgba(14,21,38,.92);
+        color:#f3f6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:7px;
+        padding:0 12px;font:800 .76rem Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-dash-pill:hover,.ag-dash-icon-btn:hover{border-color:rgba(0,240,255,.42);background:rgba(20,31,54,.96)}
+    .ag-dash-icon-btn{width:40px;padding:0;font-size:1rem}
+    .ag-dash-coins{color:#ffd451;white-space:nowrap}
+    .ag-dash-profile{
+        min-width:146px;max-width:210px;height:48px;padding:4px 9px 4px 5px;
+        border:1px solid rgba(124,163,230,.16);border-radius:14px;background:rgba(14,21,38,.92);
+        display:flex;align-items:center;gap:8px;cursor:pointer;color:#fff;
+    }
+    .ag-dash-profile:hover{border-color:rgba(0,240,255,.42)}
+    .ag-dash-avatar{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto}
+    .ag-dash-avatar .av{width:36px;height:36px;font-size:.95rem}
+    .ag-dash-avatar .av img{width:100%;height:100%;object-fit:cover}
+    .ag-dash-profile-copy{min-width:0;text-align:left}
+    .ag-dash-profile-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.76rem}
+    .ag-dash-profile-copy small{display:block;color:#7890b7;font-size:.61rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+
+    /* Navigation gauche fixe. */
+    .ag-dash-sidebar{
+        pointer-events:auto;position:absolute;left:0;top:var(--ag-shell-top);bottom:0;width:var(--ag-shell-left);
+        padding:18px 10px 14px;background:rgba(8,13,24,.91);border-right:1px solid var(--ag-shell-border);
+        display:flex;flex-direction:column;overflow:auto;backdrop-filter:blur(16px);
+    }
+    .ag-dash-nav{display:flex;flex-direction:column;gap:4px}
+    .ag-dash-nav-btn{
+        width:100%;height:43px;display:flex;align-items:center;gap:11px;padding:0 12px;
+        border:1px solid transparent;background:transparent;color:#b8c6dc;border-radius:10px;
+        font:700 .76rem Poppins,sans-serif;cursor:pointer;text-align:left;transition:.14s ease;
+    }
+    .ag-dash-nav-btn .ico{width:22px;text-align:center;font-size:1rem;opacity:.92}
+    .ag-dash-nav-btn:hover{background:rgba(255,255,255,.045);color:#fff}
+    .ag-dash-nav-btn.on{
+        color:#cfefff;border-color:rgba(0,160,255,.27);
+        background:linear-gradient(90deg,rgba(0,149,255,.23),rgba(37,91,202,.13));
+        box-shadow:inset 3px 0 0 #4cc9ff,0 8px 24px rgba(0,77,180,.08);
+    }
+    .ag-dash-nav-sep{height:1px;background:rgba(124,163,230,.11);margin:9px 7px}
+    .ag-dash-event{
+        margin-top:auto;padding:12px;border-radius:12px;border:1px solid rgba(255,217,84,.22);
+        background:linear-gradient(145deg,rgba(78,36,8,.62),rgba(22,16,31,.92));cursor:pointer;
+    }
+    .ag-dash-event small{display:block;color:#ffd45b;font-size:.57rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .ag-dash-event b{display:block;color:#fff;font-size:.75rem;margin:5px 0 2px;line-height:1.25}
+    .ag-dash-event span{display:block;color:#9baccc;font-size:.61rem;line-height:1.35}
+
+    /* Décalage de toutes les pages quand le shell est actif. */
+    #app-root.ag-dashboard-shell-on > .tab-content{
+        width:calc(100% - var(--ag-shell-left));
+        margin-left:var(--ag-shell-left);
+        padding:calc(var(--ag-shell-top) + 18px) 22px 44px!important;
+    }
+    #app-root.ag-dashboard-shell-on > #mode{padding-left:16px!important;padding-right:16px!important}
+
+    /* Accueil : 1 colonne centrale + colonne droite. */
+    #app-root.ag-dashboard-shell-on #mode #menu-selection{
+        width:100%;max-width:none!important;margin:0!important;padding:0 0 44px!important;
+        display:grid!important;
+        grid-template-columns:minmax(0,1fr) var(--ag-shell-right);
+        column-gap:var(--ag-shell-gap);row-gap:14px;text-align:left!important;
+        align-items:start;
+    }
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > *{grid-column:1;min-width:0}
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2 + p,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > #h3-news-btn{display:none!important}
+
+    #ag-home-hero{
+        display:flex;order:-20;min-height:188px;position:relative;overflow:hidden;
+        align-items:center;justify-content:space-between;gap:24px;padding:25px 30px!important;
+        border-radius:17px;border:1px solid rgba(73,139,255,.28);
+        background:
+            radial-gradient(circle at 77% 38%,rgba(255,42,95,.29),transparent 22%),
+            radial-gradient(circle at 58% 0%,rgba(129,52,255,.36),transparent 34%),
+            linear-gradient(115deg,#09172e 0%,#122b63 48%,#151032 100%);
+        box-shadow:0 18px 42px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.045);
+    }
+    #ag-home-hero:before,#ag-home-hero:after{content:"";position:absolute;border-radius:50%;filter:blur(1px);pointer-events:none}
+    #ag-home-hero:before{width:280px;height:280px;right:-65px;top:-95px;border:52px solid rgba(0,240,255,.055)}
+    #ag-home-hero:after{width:180px;height:180px;right:140px;bottom:-140px;background:rgba(255,42,95,.1);box-shadow:0 0 65px rgba(255,42,95,.17)}
+    .ag-hero-copy{position:relative;z-index:2;max-width:660px}
+    .ag-hero-kicker{font-size:.63rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#73dfff;margin-bottom:8px}
+    .ag-hero-title{font-family:'Bangers',cursive;font-size:clamp(2.7rem,4.4vw,4.5rem);line-height:.88;letter-spacing:2px;color:#f7fbff;text-shadow:3px 3px 0 #176dff,0 0 25px rgba(46,146,255,.25)}
+    .ag-hero-sub{color:#c5d5ef!important;margin:11px 0 17px!important;font-size:.77rem!important;font-weight:700;letter-spacing:.08em}
+    .ag-hero-btn{
+        width:auto!important;min-width:220px!important;margin:0!important;padding:11px 20px!important;border-radius:999px!important;
+        background:linear-gradient(90deg,#317bff,#8e3dff,#e338c9)!important;border:1px solid rgba(255,255,255,.4)!important;
+        box-shadow:0 0 0 4px rgba(97,66,255,.11),0 8px 28px rgba(83,48,255,.28)!important;
+        font-size:.82rem!important;letter-spacing:.04em;
+    }
+    .ag-hero-side{
+        position:relative;z-index:2;align-self:stretch;width:230px;min-width:190px;
+        display:flex;align-items:center;justify-content:center;
+    }
+    .ag-hero-orb{
+        width:160px;height:160px;border-radius:50%;display:grid;place-items:center;
+        background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(0,240,255,.08) 26%,rgba(50,46,255,.16) 48%,rgba(6,9,20,.25) 70%);
+        border:1px solid rgba(117,190,255,.22);box-shadow:0 0 55px rgba(64,100,255,.2),inset 0 0 30px rgba(0,240,255,.08);
+        font-family:'Bangers';font-size:3rem;color:#bdefff;text-shadow:0 0 20px rgba(0,240,255,.5);
+        transform:rotate(-6deg);
+    }
+
+    #ag-quick-actions{
+        display:grid;order:-19;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+    }
+    .ag-quick-btn{
+        min-height:70px;border-radius:12px;border:1px solid rgba(124,163,230,.17);
+        background:linear-gradient(145deg,rgba(17,27,48,.94),rgba(10,16,30,.94));color:#fff;
+        display:flex;align-items:center;gap:10px;padding:12px 13px;cursor:pointer;text-align:left;
+        box-shadow:0 7px 22px rgba(0,0,0,.14);transition:.14s ease;
+    }
+    .ag-quick-btn:hover{transform:translateY(-1px);border-color:rgba(0,240,255,.35);background:linear-gradient(145deg,rgba(23,37,65,.98),rgba(10,19,37,.98))}
+    .ag-quick-btn .qi{font-size:1.35rem;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.055)}
+    .ag-quick-btn b{display:block;font-size:.73rem;line-height:1.2}
+    .ag-quick-btn small{display:block;color:#7e91b1;font-size:.58rem;margin-top:3px;line-height:1.25}
+    .ag-quick-btn.purple{border-color:rgba(172,81,255,.33)}
+    .ag-quick-btn.blue{border-color:rgba(55,174,255,.31)}
+    .ag-quick-btn.green{border-color:rgba(0,255,136,.27)}
+    .ag-quick-btn.gold{border-color:rgba(255,194,58,.31)}
+
+    #ag-games-heading{
+        display:flex;order:-8;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;
+    }
+    #ag-games-heading h3{margin:0!important;color:#f3f7ff!important;font-size:1rem!important}
+    #ag-games-heading span{color:#6f86aa;font-size:.65rem}
+
+    /* Ordre du contenu : l'essentiel avant les gros panneaux communautaires. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{order:-18;max-width:none!important;margin:0!important;padding:14px 16px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-library-tools{order:-7;margin:0!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{order:-6;margin:0!important;padding:0 0 4px!important}
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{order:-5}
+    #app-root.ag-dashboard-shell-on #mode #hub-home{order:10}
+    #app-root.ag-dashboard-shell-on #mode .rk-card{order:11}
+    #app-root.ag-dashboard-shell-on #mode #daily-card{order:12}
+    #app-root.ag-dashboard-shell-on #mode #theme-card{order:13}
+    #app-root.ag-dashboard-shell-on #mode #quest-card{order:14}
+
+    /* Le join devient une barre compacte au lieu d'un gros bloc. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{
+        display:grid!important;grid-template-columns:auto minmax(280px,1fr) auto;align-items:center;gap:12px;
+        border:1px solid rgba(124,163,230,.14)!important;border-radius:12px!important;
+        background:rgba(11,18,32,.82)!important;box-shadow:none!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > h3{margin:0!important;font-size:.8rem!important;white-space:nowrap;color:#cce8ff!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box{margin:0!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms{margin:0!important;width:auto!important;white-space:nowrap;padding:10px 13px!important;background:rgba(255,204,69,.12)!important;color:#ffd76d!important;border:1px solid rgba(255,204,69,.26)!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .public-rooms-panel{grid-column:1/-1}
+
+    /* Catalogue plus proche de la maquette : cartes compactes mais toujours celles du site. */
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+        min-height:154px;padding:14px!important;border-radius:12px!important;
+        border:1px solid rgba(108,144,207,.16)!important;
+        background:linear-gradient(145deg,rgba(17,25,44,.96),rgba(10,16,30,.96))!important;
+        box-shadow:0 8px 24px rgba(0,0,0,.14);
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>h3,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>h3{font-size:.88rem!important;color:#f3f7ff!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>p,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>p{font-size:.68rem!important;color:#8295b5!important;line-height:1.38!important;margin-bottom:10px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .btn-action{min-height:34px!important;padding:8px 10px!important;font-size:.68rem!important;border-radius:8px!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.arc-menu{
+        grid-column:1/-1;padding:15px!important;border-radius:14px!important;
+        background:linear-gradient(145deg,rgba(8,31,54,.86),rgba(22,14,42,.9))!important;
+        border-color:rgba(0,180,255,.22)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .arc-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn{min-height:92px!important;padding:10px!important;border-radius:10px!important;background:rgba(8,14,27,.6)!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn b{font-size:.74rem!important;color:#eef6ff}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn span:last-child{font-size:.59rem!important;color:#7185a7!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn .arc-ico{font-size:1.15rem!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{display:flex!important;gap:7px;overflow:auto;scrollbar-width:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button{
+        flex:0 0 auto;border-radius:9px!important;background:rgba(12,19,34,.86)!important;border:1px solid rgba(124,163,230,.15)!important;
+        color:#91a5c6!important;padding:8px 11px!important;font-size:.66rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button.on{color:#dff7ff!important;background:rgba(0,144,255,.18)!important;border-color:rgba(0,189,255,.35)!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-library-search{background:rgba(11,18,32,.84)!important;border-color:rgba(124,163,230,.14)!important;height:40px}
+
+    /* Colonne droite : vraie donnée des amis + quêtes existantes. */
+    #ag-dashboard-right{
+        display:flex!important;grid-column:2!important;grid-row:1 / span 80;order:-30;
+        position:sticky;top:calc(var(--ag-shell-top) + 18px);align-self:start;
+        flex-direction:column;gap:12px;max-height:calc(100vh - var(--ag-shell-top) - 32px);overflow:auto;padding-right:2px;
+        scrollbar-width:thin;scrollbar-color:#263a5f transparent;
+    }
+    .ag-right-card{
+        border:1px solid rgba(124,163,230,.16);border-radius:13px;background:rgba(10,17,31,.89);
+        padding:12px;box-shadow:0 10px 26px rgba(0,0,0,.15);backdrop-filter:blur(10px);
+    }
+    .ag-right-head{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:9px}
+    .ag-right-head b{font-size:.72rem;color:#f2f6ff}
+    .ag-right-head button{border:0;background:none;color:#4cc9ff;font:800 .6rem Poppins;cursor:pointer;padding:2px}
+    .ag-right-muted{color:#7185a7;font-size:.62rem;line-height:1.4;margin:5px 0}
+    .ag-friend-list{display:flex;flex-direction:column;gap:5px}
+    .ag-friend-row{display:flex;align-items:center;gap:8px;padding:6px;border-radius:9px;background:rgba(255,255,255,.018);cursor:pointer}
+    .ag-friend-row:hover{background:rgba(255,255,255,.045)}
+    .ag-friend-row .av{width:32px;height:32px;font-size:.72rem;flex:0 0 auto}
+    .ag-friend-copy{min-width:0;flex:1}
+    .ag-friend-copy b{display:block;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#eef4ff}
+    .ag-friend-copy small{display:block;font-size:.55rem;color:#7387a9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+    .ag-online-dot{width:7px;height:7px;border-radius:50%;background:#20e783;box-shadow:0 0 8px rgba(32,231,131,.5);flex:0 0 auto}
+    .ag-empty-action{width:100%;margin-top:6px;border:1px solid rgba(0,195,255,.22);background:rgba(0,150,255,.08);color:#7fe2ff;border-radius:8px;padding:7px;font:800 .61rem Poppins;cursor:pointer}
+
+    #ag-dash-quests .quest-row{padding:6px 0!important;margin:0!important;border-bottom:1px solid rgba(124,163,230,.07)}
+    #ag-dash-quests .quest-row:last-child{border-bottom:0}
+    #ag-dash-quests .qt{font-size:.6rem!important}
+    #ag-dash-quests .qx{font-size:.53rem!important;white-space:nowrap}
+    #ag-dash-quests .qbar{height:5px!important;margin-top:4px!important}
+    #ag-dash-quests > .tl-hint{font-size:.56rem!important;margin:5px 0!important;text-align:left!important}
+
+    .ag-daily-mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+    .ag-daily-mini button{
+        border:1px solid rgba(124,163,230,.14);background:rgba(255,255,255,.025);color:#dbe6f7;border-radius:9px;
+        padding:8px 4px;font:800 .55rem Poppins;cursor:pointer;line-height:1.25;
+    }
+    .ag-daily-mini button:hover{border-color:rgba(0,240,255,.35);background:rgba(0,240,255,.05)}
+
+    /* Les doublons des quêtes/daily restent plus bas pour conserver leur logique,
+       mais sont cachés sur l'accueil desktop car ils sont reflétés à droite. */
+    #app-root.ag-dashboard-shell-on #mode #quest-card,
+    #app-root.ag-dashboard-shell-on #mode #daily-card{display:none!important}
+
+    /* Hub/boss : conservé, mais plus discret sous les jeux. */
+    #app-root.ag-dashboard-shell-on #mode #hub-home{margin-top:8px}
+    #app-root.ag-dashboard-shell-on #mode #hub-home .hub-card{border-radius:12px!important}
+
+    /* Pages Collection / Amis / Options : le contenu historique reste intact,
+       simplement placé dans le nouveau cadre desktop. */
+    #app-root.ag-dashboard-shell-on #collection,
+    #app-root.ag-dashboard-shell-on #amis,
+    #app-root.ag-dashboard-shell-on #options,
+    #app-root.ag-dashboard-shell-on #admin,
+    #app-root.ag-dashboard-shell-on #beta{max-width:1500px;margin-left:var(--ag-shell-left)!important}
+    #app-root.ag-dashboard-shell-on #collection > div,
+    #app-root.ag-dashboard-shell-on #amis > div{max-width:1200px!important}
+
+    /* Le lecteur reste accessible sans masquer totalement la colonne droite. */
+    body.ag-dashboard-on #music-player{max-width:310px}
+}
+
+/* Le shell ne doit jamais affecter les petits écrans. */
+@media (max-width:1180px){
+    .ag-desktop-shell,#ag-home-hero,#ag-quick-actions,#ag-dashboard-right,#ag-games-heading{display:none!important}
+}
