@@ -663,7 +663,15 @@
         .bb-tabs button{width:auto;margin:0;padding:8px 14px;font-size:.85rem;background:#11111a;border:1px solid #34344a;color:#fff;}
         .bb-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
         @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}}
-</style>
+
+        /* ===== Party Mix / Combat de cartes / Bingo Anime ===== */
+        .pm-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:14px 0}.pm-pick{display:flex;align-items:center;gap:8px;background:#101019;border:1px solid #34344a;border-radius:10px;padding:10px;cursor:pointer;font-size:.82rem}.pm-pick:has(input:checked){border-color:var(--accent-cyan);box-shadow:0 0 0 1px rgba(0,240,255,.18)}.pm-pick input{accent-color:var(--accent-cyan)}
+        .arc-mix-card{max-width:660px;margin:auto;background:#101019;border:1px solid #34344a;border-radius:14px;padding:18px;text-align:left}.arc-mix-card .big-quote{font-size:1.18rem;line-height:1.6;color:#fff;margin:8px 0}.arc-dle-clues{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-top:12px}.arc-dle-clue{background:#171725;border:1px solid #34344a;border-radius:10px;padding:10px;text-align:center}.arc-dle-clue small{display:block;color:var(--text-muted);font-size:.68rem;text-transform:uppercase}.arc-dle-clue b{display:block;margin-top:4px;color:var(--accent-cyan)}
+        .cb-wrap{width:100%;}.cb-cat{text-align:center;font-family:'Bangers',cursive;font-size:2rem;letter-spacing:1px;color:var(--accent-yellow);margin-bottom:12px}.cb-help{text-align:center;color:var(--text-muted);font-size:.78rem;margin:-6px 0 10px}.cb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px}.cb-card{position:relative;background:#101019;border:2px solid #303044;border-radius:12px;padding:8px;cursor:pointer;transition:.15s;overflow:hidden}.cb-card:hover:not(.used):not(.locked){transform:translateY(-2px);border-color:var(--accent-cyan)}.cb-card.used{opacity:.35;filter:grayscale(.7);cursor:not-allowed}.cb-card.locked{border-color:var(--accent-yellow);box-shadow:0 0 16px rgba(255,230,0,.2)}.cb-card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;background:#09090f}.cb-name{font-weight:800;font-size:.78rem;margin-top:6px}.cb-anime{font-size:.64rem;color:var(--text-muted);min-height:1.8em}.cb-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:6px;font-size:.66rem}.cb-stats span{background:#181826;border-radius:5px;padding:3px}.cb-stat-hot{color:var(--accent-yellow);font-weight:800}.cb-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}.cb-play{text-align:center}.cb-play img{width:min(190px,100%);aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:2px solid #34344a}.cb-play.win img{border-color:#00ff88;box-shadow:0 0 18px rgba(0,255,136,.22)}.cb-value{font-size:2rem;font-family:'Bangers',cursive;color:var(--accent-yellow)}
+        .bingo-wrap{width:100%;display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:14px;align-items:start}.bingo-char{background:#101019;border:1px solid #34344a;border-radius:12px;padding:9px;text-align:center}.bingo-char img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px}.bingo-char b{display:block;margin-top:7px}.bingo-char small{color:var(--text-muted)}.bingo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.bingo-cell{min-height:66px;background:#11111b;border:1px solid #34344a;border-radius:8px;padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:.66rem;cursor:pointer;line-height:1.15}.bingo-cell:hover:not(.marked){border-color:var(--accent-cyan)}.bingo-cell .em{font-size:1.05rem;margin-bottom:3px}.bingo-cell.marked{background:rgba(0,255,136,.14);border-color:#00ff88;color:#baffd8}.bingo-cell.match:not(.marked){border-color:var(--accent-yellow);box-shadow:inset 0 0 0 1px rgba(255,230,0,.35)}.bingo-pass{margin-top:9px;width:100%;background:#252538;border:1px solid #45455b;color:#fff;padding:8px;border-radius:8px;cursor:pointer}.bingo-reveal{margin-top:8px;font-size:.72rem;color:var(--accent-yellow);text-align:center}
+        @media(max-width:700px){.bingo-wrap{grid-template-columns:1fr}.bingo-char{display:grid;grid-template-columns:85px 1fr;align-items:center;text-align:left;gap:10px}.bingo-char img{width:85px}.bingo-cell{min-height:58px;font-size:.56rem;padding:3px}.cb-vs{grid-template-columns:1fr}.cb-vs>div:nth-child(2){transform:rotate(90deg)}}
+
+    </style>
 
     <style>
         /* ===== V7 : pseudos stylés, cadres, avatars ===== */
@@ -1978,6 +1986,24 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">✏️ Dessine le perso <span class="quote-new">NOUVEAU</span></h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Chacun son tour, un joueur dessine un perso et les autres devinent le plus vite possible • indices au fil du temps • 2 joueurs min.</p>
                     <button class="btn-action" style="margin-top:0;background:#ff9a3c;color:#111;" onclick="openUniverseSelection('draw')">Créer une partie</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#00f0ff;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎮 Party Mix <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Choisis 3 à 8 épreuves et enchaîne-les sans élimination • AnimeDLE, Citations, Plus ou moins, Blind Test, Pixel… • un seul score général jusqu’à la fin</p>
+                    <button class="btn-action" style="margin-top:0;background:#00f0ff;color:#111;" onclick="openPartyMixSelection()">Créer mon Party Mix</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ff5e7d;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Combat de cartes <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Duel à 2 avec ton deck de 5 cartes • à chaque manche une stat tombe : Puissance, Intelligence, Vitesse ou Aura • choix secret • la rareté et les finitions sont cosmétiques, aucun pay-to-win</p>
+                    <button class="btn-action" style="margin-top:0;background:#ff5e7d;" onclick="createRoom('arcade','cardbattle')">Lancer un duel de cartes</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ffd93d;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎟️ Bingo Anime <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Grille 5×5 différente pour chacun • un perso apparaît, coche une caractéristique qui lui correspond • cheveux blancs, épéiste, feu, démon, pirate… • première ligne de 5 = victoire</p>
+                    <button class="btn-action" style="margin-top:0;background:#ffd93d;color:#111;" onclick="createRoom('arcade','bingo')">Créer un Bingo</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#00ff88;">
@@ -3598,7 +3624,8 @@
             // Nombre de manches (mini-jeux et blind test)
             const rbox = document.getElementById('room-rounds-box');
             if (rbox) {
-                const withRounds = room.mode === 'arcade' || room.mode === 'blindtest';
+                const fixedArc = room.mode === 'arcade' && /^(?:cardbattle|bingo|partymix)/.test(String(room.subMode || ''));
+                const withRounds = (room.mode === 'arcade' && !fixedArc) || room.mode === 'blindtest';
                 rbox.style.display = withRounds ? 'flex' : 'none';
                 const sel = document.getElementById('room-rounds-select'), txt = document.getElementById('room-rounds-text');
                 const v = room.arcRounds === 0 ? '0' : (room.arcRounds ? String(room.arcRounds) : '');
@@ -5739,7 +5766,14 @@
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
+        ARC_UI.mix_dle = { title:'🎴 ANIMEDLE EXPRESS', sub:'Trois indices, quatre personnages : trouve le bon', universe:false };
+        ARC_UI.mix_quote = { title:'💬 CITATIONS', sub:'Qui a prononcé cette citation ?', universe:false };
+        ARC_UI.mix_blind = { title:'🎧 BLIND TEST', sub:'Écoute quelques secondes et retrouve l’anime', universe:false };
+        ARC_UI.cardbattle = { title:'⚔️ COMBAT DE CARTES', sub:'Ton deck de 5 cartes • choix secret • rareté purement cosmétique', universe:false };
+        ARC_UI.bingo = { title:'🎟️ BINGO ANIME', sub:'Coche une caractéristique valide • première ligne de 5 = victoire', universe:false };
+
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
+        let arcCardDeck = [], arcCardUsed = new Set(), arcBingoBoard = null;
         let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null, arcYt = null;
         // Bouton « Activer le son » pour Écoute la scène (mobile : le son doit partir d'un vrai toucher)
         function arcAudioButton(box, player, key) {
@@ -5769,6 +5803,28 @@
             } else {
                 createRoom('arcade', game);
             }
+        }
+
+        const PARTY_MIX_OPTIONS = [
+            ['mix_dle','🎴','AnimeDLE'],['mix_quote','💬','Citations'],['plusmoins','⚖️','Plus ou moins'],['mix_blind','🎧','Blind Test'],
+            ['pixel','🖼️','Pixel Anime'],['silhouette','👤','Silhouette'],['emoji','😀','Emoji Anime'],['quatre','🧩','4 images = 1 anime'],
+            ['attaque','💥','Devine l’attaque'],['scene','🎬','Scene Guessr'],['mapguess','🗺️','Map Guess'],['link','🔗','Common Link'],
+            ['imposteur','🕵️','Imposteur'],['popularite','👥','Popularité']
+        ];
+        function openPartyMixSelection() {
+            const defaults = new Set(['mix_dle','mix_quote','plusmoins','mix_blind','pixel']);
+            hubModal('party-mix-modal', `<h3 style="color:var(--accent-yellow);">🎮 Créer un Party Mix</h3>
+                <p class="tl-hint" style="text-align:left;">Choisis entre <b>3 et 8 épreuves</b>. Tout le monde joue jusqu’au bout et le score se cumule d’un jeu à l’autre.</p>
+                <div class="pm-picker">${PARTY_MIX_OPTIONS.map(([id,em,n]) => `<label class="pm-pick"><input type="checkbox" data-pm="${id}" ${defaults.has(id)?'checked':''}> <span>${em} ${n}</span></label>`).join('')}</div>
+                <label style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;">Manches par épreuve : <select id="pm-rounds" style="background:#101019;color:#fff;border:1px solid #45455b;padding:7px;border-radius:7px;"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>
+                <button class="btn-action" onclick="startPartyMixSelection()">🎮 Créer le salon</button>`, true);
+        }
+        function startPartyMixSelection() {
+            const m = document.getElementById('party-mix-modal');
+            const games = [...m.querySelectorAll('input[data-pm]:checked')].map(x => x.dataset.pm).slice(0,8);
+            if (games.length < 3) return toast('Choisis au moins 3 épreuves.', 'var(--accent-pink)');
+            const per = Math.max(1, Math.min(3, +(document.getElementById('pm-rounds')?.value || 2)));
+            m.remove(); createRoom('arcade', 'partymix:' + games.join(',') + '~' + per);
         }
 
         function arcNorm(s) {
@@ -5903,13 +5959,61 @@
 
         function arcNow() { return Date.now() + arcClock; }
 
+        function arcRenderCardBattle(q, stage) {
+            const d = q.stage?.cardBattle || {}, cat = d.category || { id:'aura', label:'Aura', emoji:'🔥' };
+            const me = (q.players || []).find(p => p.id === socket.id) || {};
+            stage.innerHTML = '';
+            const wrap = document.createElement('div'); wrap.className = 'cb-wrap';
+            const title = document.createElement('div'); title.className = 'cb-cat'; title.textContent = `${cat.emoji || '⚔️'} ${cat.label || 'Stat'}`;
+            wrap.appendChild(title);
+            if (q.phase === 'reveal' && Array.isArray(d.plays)) {
+                const vs = document.createElement('div'); vs.className = 'cb-vs';
+                d.plays.forEach((pl, i) => {
+                    const box = document.createElement('div'); box.className = 'cb-play' + ((pl.value || 0) === Math.max(...d.plays.map(x => x.value || 0)) ? ' win' : '');
+                    const c = pl.card || {};
+                    box.innerHTML = `${c.img ? `<img src="${v7esc(c.img)}" alt="">` : '<div style="font-size:4rem;">🃏</div>'}<b>${v7esc(c.name || 'Aucune carte')}</b><small style="display:block;color:var(--text-muted);">${v7esc(pl.name || '')}</small><div class="cb-value">${pl.value || 0}</div>`;
+                    vs.appendChild(box);
+                    if (i === 0) { const x=document.createElement('div'); x.style.cssText='font-family:Bangers;font-size:2rem;color:var(--accent-pink);'; x.textContent='VS'; vs.appendChild(x); }
+                });
+                wrap.appendChild(vs);
+            } else {
+                const help = document.createElement('div'); help.className='cb-help'; help.textContent = me.done ? '🔒 Carte verrouillée — attends ton adversaire.' : 'Choisis une carte encore disponible. Les cartes de ton adversaire restent secrètes.'; wrap.appendChild(help);
+                const grid = document.createElement('div'); grid.className='cb-grid';
+                if (!arcCardDeck.length) grid.innerHTML='<div class="arc-loading"><div class="arc-spin"></div><div>Chargement de ton deck…</div></div>';
+                arcCardDeck.forEach(c => {
+                    const used = arcCardUsed.has(c.key), el=document.createElement('button'); el.type='button'; el.className='cb-card'+(used?' used':'')+(me.done && !used?' locked':'');
+                    const stats=c.stats||{};
+                    el.innerHTML=`<img src="${v7esc(c.img||'')}" alt=""><div class="cb-name">${v7esc(c.name)}</div><div class="cb-anime">${v7esc(c.anime||'')}</div><div class="cb-stats"><span class="${cat.id==='power'?'cb-stat-hot':''}">💥 ${stats.power||0}</span><span class="${cat.id==='intelligence'?'cb-stat-hot':''}">🧠 ${stats.intelligence||0}</span><span class="${cat.id==='speed'?'cb-stat-hot':''}">⚡ ${stats.speed||0}</span><span class="${cat.id==='aura'?'cb-stat-hot':''}">🔥 ${stats.aura||0}</span></div>`;
+                    el.disabled = q.phase!=='playing' || me.done || used;
+                    if (!el.disabled) el.onclick=()=>{ socket.emit('arc_card_pick',{roomCode:currentRoomCode,key:c.key}); [...grid.children].forEach(x=>x.disabled=true); };
+                    grid.appendChild(el);
+                });
+                wrap.appendChild(grid);
+            }
+            stage.appendChild(wrap);
+        }
+        function arcRenderBingo(q, stage) {
+            const d=q.stage?.bingo||{}, c=d.character||{}, me=(q.players||[]).find(p=>p.id===socket.id)||{};
+            stage.innerHTML='';
+            const wrap=document.createElement('div'); wrap.className='bingo-wrap';
+            const ch=document.createElement('div'); ch.className='bingo-char'; ch.innerHTML=`${c.img?`<img src="${v7esc(c.img)}" alt="">`:'<div style="font-size:4rem;">👤</div>'}<div><b>${v7esc(c.name||'…')}</b><small>${v7esc(c.anime||'')}</small></div>`; wrap.appendChild(ch);
+            const right=document.createElement('div'), grid=document.createElement('div'); grid.className='bingo-grid';
+            const matches=new Set((d.revealTraits||[]).map(x=>x.id));
+            (arcBingoBoard?.cells||[]).forEach((cell,i)=>{ const b=document.createElement('button'); b.type='button'; b.className='bingo-cell'+(cell.marked?' marked':'')+(matches.has(cell.id)?' match':''); b.innerHTML=`<span class="em">${cell.emoji||'•'}</span><span>${v7esc(cell.label)}</span>`; b.disabled=q.phase!=='playing'||me.done||cell.marked; if(!b.disabled)b.onclick=()=>socket.emit('arc_bingo_mark',{roomCode:currentRoomCode,idx:i}); grid.appendChild(b); });
+            if (!(arcBingoBoard?.cells||[]).length) grid.innerHTML='<div class="arc-loading" style="grid-column:1/-1"><div class="arc-spin"></div><div>Création de ta grille…</div></div>';
+            right.appendChild(grid);
+            if(q.phase==='playing'){const pass=document.createElement('button');pass.className='bingo-pass';pass.textContent=me.done?'Choix envoyé ✓':'⏭️ Aucune case ne correspond : passer';pass.disabled=!!me.done;pass.onclick=()=>socket.emit('arc_bingo_mark',{roomCode:currentRoomCode,idx:-1});right.appendChild(pass);}
+            if(q.phase==='reveal'&&d.revealTraits){const r=document.createElement('div');r.className='bingo-reveal';r.textContent='Correspondances : '+d.revealTraits.map(x=>(x.emoji||'')+' '+x.label).join(' • ');right.appendChild(r);}
+            wrap.appendChild(right); stage.appendChild(wrap);
+        }
+
         function arcRenderStage(q) {
             const stage = document.getElementById('arc-stage');
-            const key = (q.game === 'scene' || q.game === 'audio') && q.stage && q.stage.video
+            const key = (q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind') && q.stage && q.stage.video
                 ? `${q.round}|${q.game}|${q.stage.video}`
                 : `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}|${(q.stage.names || []).filter(Boolean).length}`;
             if (q.game === 'scene' && q.phase === 'reveal' && arcYt) { try { arcYt.unMute(); arcYt.setVolume(60); } catch (_) {} }
-            if (q.game === 'audio' && q.phase !== 'playing') { const v = document.querySelector('.arc-video .arc-audio-veil'); if (v) v.remove(); }
+            if ((q.game === 'audio' || q.game === 'mix_blind') && q.phase !== 'playing') { const v = document.querySelector('.arc-video .arc-audio-veil'); if (v) v.remove(); }
             if (q.phase === 'loading') {
                 if (arcStageKey !== 'loading') stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation de la manche…</div></div>';
                 arcStageKey = 'loading';
@@ -5922,10 +6026,11 @@
                 return;
             }
             if (q.phase === 'intermission') {
-                if (arcStageKey === 'inter' + q.tour?.idx) return;
-                arcStageKey = 'inter' + q.tour?.idx;
+                const seq = q.mix || q.tour || {};
+                if (arcStageKey === 'inter' + (seq.idx || 0)) return;
+                arcStageKey = 'inter' + (seq.idx || 0);
                 arcDestroyVideo();
-                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:4rem;">🏁</div><div class="arc-ask">Fin de l'épreuve ${(q.tour?.idx || 0) + 1}/${q.tour?.total || ''}</div></div>`;
+                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:4rem;">🏁</div><div class="arc-ask">Fin de l'épreuve ${(seq.idx || 0) + 1}/${seq.total || ''}</div>${q.mix&&seq.nextLabel?`<div style="color:var(--accent-cyan);margin-top:8px;">Prochaine : ${v7esc(seq.nextLabel)}</div>`:''}</div>`;
                 return;
             }
             if (key === arcStageKey) return;
@@ -5934,6 +6039,15 @@
             arcDestroyVideo();
             const reveal = q.phase !== 'playing';
             const st = q.stage || {};
+
+            if (q.game === 'cardbattle') { arcRenderCardBattle(q, stage); return; }
+            if (q.game === 'bingo') { arcRenderBingo(q, stage); return; }
+            if (q.game === 'mix_quote') {
+                const x=st.quote||{}; stage.innerHTML=`<div class="arc-mix-card"><div style="color:var(--accent-cyan);font-weight:800;">💬 ${v7esc(x.anime||'Citation')}</div><div class="big-quote">« ${v7esc(x.text||'…')} »</div><div class="tl-hint">Qui a dit ça ?</div></div>`; return;
+            }
+            if (q.game === 'mix_dle') {
+                const x=st.dle||{}; stage.innerHTML=`<div class="arc-mix-card"><div style="color:var(--accent-yellow);font-weight:800;text-align:center;">🎴 ${v7esc(x.anime||'AnimeDLE')}</div><div class="arc-dle-clues">${(x.clues||[]).map(c=>`<div class="arc-dle-clue"><small>${v7esc(c.label)}</small><b>${v7esc(c.value)}</b></div>`).join('')}</div></div>`; return;
+            }
 
             if (q.game === 'link' || q.game === 'imposteur') {
                 stage.innerHTML = '';
@@ -6006,8 +6120,8 @@
                 stage.appendChild(grid);
                 return;
             }
-            if ((q.game === 'scene' || q.game === 'audio') && st.video) {
-                const audioOnly = q.game === 'audio';
+            if ((q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind') && st.video) {
+                const audioOnly = q.game === 'audio' || q.game === 'mix_blind';
                 stage.innerHTML = '';
                 const box = document.createElement('div'); box.className = 'arc-video';
                 const holder = document.createElement('div'); holder.id = 'arc-yt-' + q.round + '-' + st.video;
@@ -6224,10 +6338,13 @@
             arcClock = q.serverNow - Date.now();
             const ui = ARC_UI[q.game] || {};
             document.getElementById('arc-title').textContent = ui.title || q.gameLabel;
-            document.getElementById('arc-subtitle').textContent = q.tour
-                ? `🏆 Tournoi • épreuve ${q.tour.idx + 1}/${q.tour.total} • ${ui.sub || ''}`
-                : (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
-            if (q.tour) document.getElementById('arc-title').textContent = '🏆 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
+            document.getElementById('arc-subtitle').textContent = q.mix
+                ? `🎮 Party Mix • épreuve ${q.mix.idx + 1}/${q.mix.total} • ${ui.sub || ''}`
+                : q.tour
+                    ? `🏆 Tournoi • épreuve ${q.tour.idx + 1}/${q.tour.total} • ${ui.sub || ''}`
+                    : (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
+            if (q.mix) document.getElementById('arc-title').textContent = '🎮 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
+            else if (q.tour) document.getElementById('arc-title').textContent = '🏆 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
             document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds ?? '∞'}`;
             const arcEnd = document.getElementById('arc-end-infinite');
             if (arcEnd) arcEnd.style.display = q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none';
@@ -6307,7 +6424,7 @@
                 result.style.color = 'var(--text-muted)'; result.textContent = '';
             } else if (q.phase === 'intermission') {
                 result.style.color = 'var(--accent-yellow)';
-                result.textContent = ((q.tour?.lastOutList || []).length > 1 ? `☠️ ${q.tour.lastOutList.slice(0, -1).join(', ')} et ${q.tour.lastOutList.slice(-1)[0]} sont éliminés ! ` : q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.alive ? `${q.tour.alive} encore en course. ` : '') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : '');
+                result.textContent = q.mix ? `✅ Épreuve terminée. Tous les joueurs continuent !${q.mix.nextLabel ? ' Prochaine épreuve : ' + q.mix.nextLabel : ''}` : (((q.tour?.lastOutList || []).length > 1 ? `☠️ ${q.tour.lastOutList.slice(0, -1).join(', ')} et ${q.tour.lastOutList.slice(-1)[0]} sont éliminés ! ` : q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.alive ? `${q.tour.alive} encore en course. ` : '') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : ''));
             } else if (q.phase === 'playing' && me.eliminated) {
                 result.style.color = 'var(--text-muted)'; result.textContent = '☠️ Tu es éliminé du tournoi… tu regardes la suite 👀';
             } else if (q.phase === 'playing' && q.answerType === 'chrono') {
@@ -6321,15 +6438,17 @@
                 if (me.done) { result.style.color = 'var(--accent-cyan)'; result.textContent = arcLastFeedback?.ok ? arcLastFeedback.message + ' — attends les autres…' : 'Réponse envoyée, attends les autres…'; }
                 else if (arcLastFeedback) { result.style.color = arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = arcLastFeedback.message; }
                 else if (q.answerType === 'bac') { result.style.color = q.notice ? 'var(--accent-pink)' : 'var(--text-color)'; result.textContent = q.notice || `Lettre ${q.stage.letter} : remplis les 5 cases puis appuie sur STOP !`; }
-                else { result.style.color = 'var(--text-color)'; result.textContent = q.game === 'popularite' ? 'Clique sur le perso le plus populaire !' : q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
+                else { result.style.color = 'var(--text-color)'; result.textContent = q.game === 'cardbattle' ? 'Choisis secrètement une carte de ton deck.' : q.game === 'bingo' ? 'Clique sur UNE case qui correspond au personnage, ou passe.' : q.game === 'popularite' ? 'Clique sur le perso le plus populaire !' : q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
             } else if (q.phase === 'reveal') {
                 const ok = !!me.gained;
                 result.style.color = ok ? '#00ff88' : 'var(--accent-pink)';
-                result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
+                if (q.game === 'cardbattle') result.textContent = ok ? `⚔️ +${me.gained} pts sur cette manche !` : `⚔️ Manche perdue — ${q.answer || ''}`;
+                else if (q.game === 'bingo') result.textContent = me.correct ? `✅ Case validée ! +${me.gained || 0}` : `🎟️ Pas de case validée sur ce perso.`;
+                else result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
                 const bits = [];
                 if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
                 if (q.reveal?.place) bits.push(q.game === 'imposteur' ? q.reveal.place : '📍 ' + q.reveal.place);
-                if (q.reveal?.song) bits.push(q.game === 'scene' || q.game === 'audio' ? q.reveal.song : '🎶 ' + q.reveal.song);
+                if (q.reveal?.song) bits.push(q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind' ? q.reveal.song : '🎶 ' + q.reveal.song);
                 if (q.answerType === 'chrono') result.textContent = `⏱️ Temps écoulé ! Tu marques ${me.gained || 0} pts (${me.progress || 0} bonnes réponses)`;
                 extra.textContent = bits.join(' • ');
             } else {
@@ -6414,6 +6533,8 @@
         });
         socket.on('arc_names', d => { arcNames = Array.isArray(d?.names) ? d.names : []; });
         socket.on('arc_private', d => { arcMyFound = Array.isArray(d?.found) ? d.found : []; arcRenderFound(); });
+        socket.on('arc_card_deck', d => { arcCardDeck = Array.isArray(d?.cards) ? d.cards : []; arcCardUsed = new Set(Array.isArray(d?.used) ? d.used : []); if (arcState?.game === 'cardbattle') { arcStageKey=''; arcRenderStage(arcState); } });
+        socket.on('arc_bingo_board', d => { arcBingoBoard = d || null; if (arcState?.game === 'bingo') { arcStageKey=''; arcRenderStage(arcState); } });
         socket.on('arc_feedback', d => {
             arcLastFeedback = d;
             const result = document.getElementById('arc-result');

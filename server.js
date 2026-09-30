@@ -20800,3 +20800,461 @@ cardLuck = async function (uid) {
 setTimeout(() => {
     try { arcUniverses().forEach(u => { cardPool(u); cardAllSpecials(u); }); cardQuote('naruto', 'Naruto Uzumaki'); Object.keys(SEASON_CARDS).forEach(seasonChars); hwBuiltin(); } catch (e) { console.warn('[cartes] préchauffage :', e.message); }
 }, 4000);
+
+/* =====================================================================
+   PARTY MIX + COMBAT DE CARTES + BINGO ANIME
+   - Party Mix : 3 à 8 épreuves, score cumulé, aucune élimination
+   - Combat de cartes : 1v1, deck équipé de 5 cartes, rareté cosmétique
+   - Bingo Anime : grille privée 5x5, validation serveur, première ligne gagnante
+   ===================================================================== */
+
+ARC_GAMES.partymix  = { label:'Party Mix',          icon:'🎮', universe:false, rounds:1,  roundMs:18000, answer:'choice' };
+ARC_GAMES.mix_dle   = { label:'AnimeDLE Express',   icon:'🎴', universe:false, rounds:2,  roundMs:20000, answer:'choice' };
+ARC_GAMES.mix_quote = { label:'Citations Express',  icon:'💬', universe:false, rounds:2,  roundMs:18000, answer:'choice' };
+ARC_GAMES.mix_blind = { label:'Blind Test Express', icon:'🎧', universe:false, rounds:2,  roundMs:20000, answer:'choice' };
+ARC_GAMES.cardbattle= { label:'Combat de cartes',    icon:'⚔️', universe:false, rounds:5,  roundMs:25000, answer:'cardbattle' };
+ARC_GAMES.bingo     = { label:'Bingo Anime',         icon:'🎟️', universe:false, rounds:40, roundMs:16000, answer:'bingo' };
+
+MODE_LABELS['arcade:partymix'] = 'Party Mix';
+MODE_LABELS['arcade:cardbattle'] = 'Combat de cartes';
+MODE_LABELS['arcade:bingo'] = 'Bingo Anime';
+if (typeof PUBLIC_MODE_LABELS !== 'undefined') PUBLIC_MODE_LABELS.arcade = 'Mini-jeu';
+
+const PARTY_MIX_ALLOWED = new Set(['mix_dle','mix_quote','plusmoins','mix_blind','pixel','silhouette','emoji','quatre','attaque','scene','mapguess','link','imposteur','popularite']);
+const PARTY_MIX_FALLBACK = ['mix_dle','mix_quote','plusmoins','mix_blind','pixel'];
+
+function partyMixParse(raw) {
+    const s = String(raw || '');
+    if (!s.startsWith('partymix:')) return null;
+    const body = s.slice('partymix:'.length);
+    const [gamesRaw, perRaw] = body.split('~');
+    const games = [...new Set(String(gamesRaw || '').split(',').map(x => x.trim()).filter(x => PARTY_MIX_ALLOWED.has(x)))].slice(0, 8);
+    const valid = games.length >= 3 ? games : PARTY_MIX_FALLBACK.slice();
+    const per = Math.max(1, Math.min(3, Number(perRaw) || 2));
+    return { games: valid, per };
+}
+
+/* ---------- Questions Party Mix propres à DLE / Citations / Blind Test ---------- */
+const _arcBuildRoundPCB = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g.game === 'mix_quote') {
+        const entries = [];
+        for (const [u, qd] of Object.entries(QUOTE_UNIVERSES || {})) {
+            for (const q of (qd.quotes || [])) if (q && q.text && q.speaker) entries.push({ u, anime:qd.name || ARC_UNIVERSE_ANIME[u] || u, ...q });
+        }
+        let pool = entries.filter(q => !g.used.has('mixq|' + q.u + '|' + normalizeRG(q.text)));
+        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('mixq|')) g.used.delete(k); pool = entries; }
+        const q = arcPick(pool);
+        if (!q) return null;
+        g.used.add('mixq|' + q.u + '|' + normalizeRG(q.text));
+        const same = [...new Set(entries.filter(x => x.u === q.u).map(x => x.speaker).filter(Boolean))];
+        const all = [...new Set(entries.map(x => x.speaker).filter(Boolean))];
+        const wrong = arcShuffle([...same.filter(x => normalizeRG(x) !== normalizeRG(q.speaker)), ...all.filter(x => normalizeRG(x) !== normalizeRG(q.speaker))])
+            .filter((x, i, a) => a.findIndex(y => normalizeRG(y) === normalizeRG(x)) === i).slice(0, 3);
+        return { u:q.u, quote:{ text:q.text, anime:q.anime }, answer:q.speaker, choices:arcShuffle([q.speaker, ...wrong]) };
+    }
+
+    if (g.game === 'mix_dle') {
+        const candidates = arcShuffle(arcUniverses()).filter(u => DLE_UNIVERSES[u]);
+        for (const u of candidates) {
+            let data = null;
+            try { data = dleExpandedUniverse(u); } catch (_) { data = null; }
+            const chars = (data?.characters || []).filter(c => c?.name && c?.attrs && !g.used.has('mixd|' + u + '|' + normalizeRG(c.name)));
+            if (chars.length < 4) continue;
+            const target = arcPick(chars);
+            g.used.add('mixd|' + u + '|' + normalizeRG(target.name));
+            const cats = arcShuffle((data.categories || []).filter(c => target.attrs[c.key] != null && String(target.attrs[c.key]).trim() && !/^non précisé$/i.test(String(target.attrs[c.key])))).slice(0, 3);
+            if (!cats.length) continue;
+            const wrong = arcShuffle(chars.filter(c => normalizeRG(c.name) !== normalizeRG(target.name))).slice(0, 3).map(c => c.name);
+            return {
+                u,
+                dle:{ anime:data.name || ARC_UNIVERSE_ANIME[u] || u, clues:cats.map(c => ({ label:c.label, value:String(target.attrs[c.key]) })) },
+                answer:target.name,
+                choices:arcShuffle([target.name, ...wrong])
+            };
+        }
+        return null;
+    }
+
+    if (g.game === 'mix_blind') {
+        const usable = (BLINDTEST_YT_TRACKS || []).filter(t => t?.id && t?.anime && !BT_BAD_IDS.has(t.id));
+        let pool = usable.filter(t => !g.used.has('mixb|' + t.id));
+        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('mixb|')) g.used.delete(k); pool = usable; }
+        const track = arcPick(pool);
+        if (!track) return null;
+        g.used.add('mixb|' + track.id);
+        const animeNames = [...new Set(usable.map(t => t.anime).filter(Boolean))];
+        const wrong = arcShuffle(animeNames.filter(a => a !== track.anime)).slice(0, 3);
+        return { video:track.id, frac:0.12 + Math.random() * 0.52, answer:track.anime, song:track.title || null, choices:arcShuffle([track.anime, ...wrong]) };
+    }
+
+    if (g.game === 'cardbattle') {
+        const cat = g.cardBattle?.categories?.[Math.max(0, g.round)] || CARD_BATTLE_CATS[Math.max(0, g.round) % CARD_BATTLE_CATS.length];
+        return { cardCategory:cat, answer:cat?.label || 'Combat' };
+    }
+
+    if (g.game === 'bingo') {
+        if (!g.bingo) return null;
+        const cat = BINGO_TRAITS[(g.bingo.traitOrder || [])[Math.max(0, g.round)] ?? Math.max(0, g.round) % BINGO_TRAITS.length];
+        const desired = cat?.id;
+        let pool = bingoCatalog().filter(c => (!desired || c.tags.includes(desired)) && !g.used.has('bingoc|' + c.u + '|' + normalizeRG(c.name)));
+        if (!pool.length) pool = bingoCatalog().filter(c => !g.used.has('bingoc|' + c.u + '|' + normalizeRG(c.name)));
+        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('bingoc|')) g.used.delete(k); pool = bingoCatalog().filter(c => !desired || c.tags.includes(desired)); }
+        const c = arcPick(pool);
+        if (!c) return null;
+        g.used.add('bingoc|' + c.u + '|' + normalizeRG(c.name));
+        let img = c.img || null;
+        if (!img) { try { img = (await resolveCharacterImage(c.u, c.name))?.imageUrl || null; } catch (_) {} }
+        return { bingoChar:{ name:c.name, anime:ARC_UNIVERSE_ANIME[c.u] || c.anime || '', u:c.u, img:img ? arcToken(img) : null, tags:c.tags }, answer:c.tags.map(id => BINGO_TRAIT_BY_ID[id]?.label).filter(Boolean).join(' • ') };
+    }
+
+    return _arcBuildRoundPCB(g);
+};
+
+/* ---------- Combat de cartes ---------- */
+const CARD_BATTLE_CATS = [
+    { id:'power', label:'Puissance', emoji:'💥' },
+    { id:'intelligence', label:'Intelligence', emoji:'🧠' },
+    { id:'speed', label:'Vitesse', emoji:'⚡' },
+    { id:'aura', label:'Aura', emoji:'🔥' },
+    { id:'power', label:'Puissance', emoji:'💥' }
+];
+
+function cbNormName(n) { return normalizeRG(pmBaseName(String(n || ''))); }
+function cbPower(c) {
+    if (!c) return 50;
+    if (c.u === 'duo') return 82;
+    const ov = ENCHERE_POWER_OVERRIDES?.[c.u] || {};
+    const target = cbNormName(c.name);
+    for (const [n, v] of Object.entries(ov)) if (cbNormName(n) === target) return Math.max(1, Math.min(100, Number(v) || 50));
+    const list = ENCHERE_UNIVERSES?.[c.u]?.characters || [];
+    const found = list.find(x => cbNormName(x.name) === target);
+    if (found && Number.isFinite(+found.value)) return Math.max(1, Math.min(100, +found.value));
+    return 48 + (hubHash((c.u || '') + '|' + target + '|power') % 31); // 48..78 si aucune note auditée
+}
+function cbStableStat(c, stat) {
+    const n = 45 + (hubHash((c.u || '') + '|' + cbNormName(c.name) + '|' + stat) % 46); // 45..90
+    return Math.max(1, Math.min(100, n));
+}
+function cbCard(c) {
+    return {
+        key:c.key, name:c.name, anime:c.anime || ARC_UNIVERSE_ANIME[c.u] || '', u:c.u,
+        rarity:c.rarity || 'commune', shiny:!!c.shiny, finish:c.finish || null, img:c.img || null,
+        stats:{ power:cbPower(c), intelligence:cbStableStat(c,'intelligence'), speed:cbStableStat(c,'speed'), aura:cbStableStat(c,'aura') }
+    };
+}
+function cbSendDeck(socketId, g) {
+    if (!g?.cardBattle?.decks?.[socketId]) return;
+    io.to(socketId).emit('arc_card_deck', { cards:g.cardBattle.decks[socketId], used:[...(g.cardBattle.used[socketId] || new Set())] });
+}
+
+/* ---------- Bingo Anime ---------- */
+const BINGO_TRAITS = [
+    {id:'hair_white',label:'Cheveux blancs',emoji:'⚪'}, {id:'hair_black',label:'Cheveux noirs',emoji:'⚫'}, {id:'hair_blond',label:'Cheveux blonds',emoji:'🟡'}, {id:'hair_red',label:'Cheveux rouges',emoji:'🔴'}, {id:'hair_blue',label:'Cheveux bleus',emoji:'🔵'},
+    {id:'male',label:'Homme',emoji:'♂️'}, {id:'female',label:'Femme',emoji:'♀️'}, {id:'sword',label:'Épéiste / lame',emoji:'⚔️'}, {id:'fire',label:'Utilisateur de feu',emoji:'🔥'}, {id:'lightning',label:'Foudre / électricité',emoji:'⚡'},
+    {id:'water',label:'Eau / glace',emoji:'💧'}, {id:'magic',label:'Magie / pouvoir mystique',emoji:'✨'}, {id:'demon',label:'Démon / fléau',emoji:'😈'}, {id:'dead',label:'Personnage mort',emoji:'🕯️'}, {id:'leader',label:'Chef / capitaine',emoji:'👑'},
+    {id:'royal',label:'Royal / noble',emoji:'🏰'}, {id:'pirate',label:'Pirate',emoji:'🏴‍☠️'}, {id:'ninja',label:'Ninja',emoji:'🥷'}, {id:'hunter',label:'Hunter',emoji:'🎯'}, {id:'shinigami',label:'Shinigami',emoji:'☠️'},
+    {id:'ghoul',label:'Goule',emoji:'🩸'}, {id:'titan',label:'Titan',emoji:'🗿'}, {id:'eye',label:'Pouvoir des yeux',emoji:'👁️'}, {id:'transform',label:'Transformation',emoji:'🔄'}, {id:'villain',label:'Antagoniste / méchant',emoji:'🦹'}
+];
+const BINGO_TRAIT_BY_ID = Object.fromEntries(BINGO_TRAITS.map(x => [x.id, x]));
+const BINGO_DEAD_NAMES = new Set([
+    'Jiraiya','Itachi Uchiha','Neji Hyuga','Minato Namikaze','Kushina Uzumaki','Hiruzen Sarutobi',
+    'Portgas D. Ace','Edward Newgate','Gol D. Roger','Pedro',
+    'Isaac Netero','Meruem','Neferpitou','Shaiapouf','Menthuthuyoupi',
+    'Erwin Smith','Sasha Blouse','Hange Zoe','Bertholdt Hoover','Marco Bott',
+    'Kyojuro Rengoku','Muzan Kibutsuji','Kokushibo','Akaza','Doma',
+    'Light Yagami','L Lawliet','Mello','Soichiro Yagami',
+    'Genryusai Shigekuni Yamamoto','Ulquiorra Cifer','Coyote Starrk',
+    'Maes Hughes','King Bradley','Van Hohenheim','Father',
+    'Toji Fushiguro'
+].map(normalizeRG));
+let BINGO_CATALOG_CACHE = null;
+function bingoText(data, c) {
+    return normalizeImageKey([c.name, ...Object.values(c.attrs || {})].filter(Boolean).join(' '));
+}
+function bingoField(data, c, labelRe) {
+    const vals = [];
+    for (const cat of (data.categories || [])) if (labelRe.test(normalizeImageKey(cat.label || ''))) vals.push(c.attrs?.[cat.key]);
+    return normalizeImageKey(vals.filter(Boolean).join(' '));
+}
+function bingoTags(u, data, c) {
+    const txt = bingoText(data, c), tags = new Set();
+    const has = re => re.test(txt);
+    const hair = bingoField(data, c, /cheveux|hair/);
+    const gender = bingoField(data, c, /sexe|genre|gender/);
+    if (/blanc|argent|silver|white/.test(hair)) tags.add('hair_white');
+    if (/noir|black/.test(hair)) tags.add('hair_black');
+    if (/blond|blonde|jaune|yellow/.test(hair)) tags.add('hair_blond');
+    if (/rouge|roux|red/.test(hair)) tags.add('hair_red');
+    if (/bleu|blue|azur/.test(hair)) tags.add('hair_blue');
+    if (/\bhomme\b|masculin|male|garcon/.test(gender)) tags.add('male');
+    if (/\bfemme\b|feminin|female|fille/.test(gender)) tags.add('female');
+    if (has(/epee|epeiste|sabre|katana|lame|sword|zangetsu|zanpakuto/)) tags.add('sword');
+    if (has(/\bfeu\b|fire|flamme|mera mera|katon|brasier|explosion/)) tags.add('fire');
+    if (has(/foudre|electric|eclair|lightning|raiton/)) tags.add('lightning');
+    if (has(/\beau\b|water|suiton|glace|\bice\b|hyorinmaru/)) tags.add('water');
+    if (has(/magie|magic|mana|grimoire|sort|malediction|\bnen\b|chakra|\bki\b|\bstand\b|fruit du demon|pouvoir/)) tags.add('magic');
+    if (has(/demon|fl[eé]au|diable|devil|\boni\b/)) tags.add('demon');
+    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name))) tags.add('dead');
+    if (has(/chef|capitaine|commandant|hokage|kazekage|empereur|roi|leader|maitre de guilde/)) tags.add('leader');
+    if (has(/royal|royaute|prince|princesse|\broi\b|\breine\b|noble|famille royale/)) tags.add('royal');
+    if (has(/pirate/) || (u === 'onepiece' && !has(/marine|gouvernement|revolutionnaire|cipher pol|cp0|cp9/) && has(/chapeau de paille|heart|roux|barbe blanche|barbe noire|cent betes|big mom|kuja|thriller bark/))) tags.add('pirate');
+    if (has(/ninja|shinobi|nukenin|hokage|kazekage|mizukage|raikage|tsuchikage|konoha|suna|kiri|iwa|kumo/)) tags.add('ninja');
+    if (has(/\bhunter\b|association des hunters/)) tags.add('hunter');
+    if (u === 'bleach' && has(/shinigami|gotei|substitut/)) tags.add('shinigami');
+    if (u === 'tokyoghoul' && has(/goule|ghoul|kagune/)) tags.add('ghoul');
+    if (u === 'snk' && has(/titan|assaillant|colossal|cuirasse|bestial|feminin|machoire|charrette|marteau|originel/)) tags.add('titan');
+    if (has(/sharingan|rinnegan|byakugan|dojutsu|oeil|eyes?|six eyes|geass/)) tags.add('eye');
+    if (has(/transformation|transform|forme|gear|super saiyan|bankai|resurreccion|titan|jinchuriki|hybride/)) tags.add('transform');
+    if (has(/antagoniste|mechant|vilain|villain|criminel|espada|akatsuki|homunculi|lune superieure|fl[eé]au/)) tags.add('villain');
+    // règles d'univers utiles quand les profils ne contiennent pas le mot générique
+    if (u === 'dragonball' && has(/antagoniste/)) tags.add('villain');
+    if (u === 'demonslayer' && has(/demon|lune/)) { tags.add('demon'); tags.add('villain'); }
+    if (u === 'chainsaw' && has(/devil|demon/)) tags.add('demon');
+    return [...tags];
+}
+function bingoCatalog() {
+    if (BINGO_CATALOG_CACHE) return BINGO_CATALOG_CACHE;
+    const out = [], seen = new Set();
+    for (const u of arcUniverses()) {
+        if (!DLE_UNIVERSES[u]) continue;
+        let data = null; try { data = dleExpandedUniverse(u); } catch (_) { data = null; }
+        for (const c of (data?.characters || []).slice(0, 70)) {
+            const k = u + '|' + normalizeRG(c.name); if (seen.has(k)) continue;
+            const tags = bingoTags(u, data, c); if (!tags.length) continue;
+            seen.add(k); out.push({ u, name:c.name, anime:data.name, tags, img:staticCharImage(u, c.name) || null });
+        }
+    }
+    BINGO_CATALOG_CACHE = out;
+    return out;
+}
+function bingoHasLine(marked) {
+    const yes = i => marked.has(i);
+    for (let r=0;r<5;r++) if ([0,1,2,3,4].every(c => yes(r*5+c))) return true;
+    for (let c=0;c<5;c++) if ([0,1,2,3,4].every(r => yes(r*5+c))) return true;
+    if ([0,6,12,18,24].every(yes)) return true;
+    if ([4,8,12,16,20].every(yes)) return true;
+    return false;
+}
+function bingoSendBoard(socketId, g) {
+    const b = g?.bingo?.boards?.[socketId]; if (!b) return;
+    io.to(socketId).emit('arc_bingo_board', { cells:b.cells.map((id, i) => ({ ...BINGO_TRAIT_BY_ID[id], marked:b.marked.has(i) })) });
+}
+
+/* ---------- Démarrage des trois modes ---------- */
+const _startArcadePCB = startArcade;
+startArcade = function (room, roomCode) {
+    const mix = partyMixParse(room.subMode);
+    if (mix) {
+        arcStop(roomCode);
+        const g = {
+            game:mix.games[0], universe:'all', round:0, totalRounds:mix.per, phase:'loading', current:null,
+            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
+            used:new Set(), usedU:[], lastGuess:{}, mix:{ games:mix.games, idx:0, per:mix.per }
+        };
+        arcGames[roomCode]=g; room.status='arc_playing'; arcEmit(room, roomCode);
+        io.to(roomCode).emit('arc_names',{names:arcNamesFor(g)}); arcNextRound(room, roomCode); return;
+    }
+
+    const parsed = arcParseSub(room.subMode);
+    if (parsed.game === 'cardbattle') {
+        if (room.players.length !== 2) { io.to(roomCode).emit('game_error','Le Combat de cartes se joue à exactement 2 joueurs.'); return; }
+        arcStop(roomCode);
+        const g = {
+            game:'cardbattle', universe:'all', round:0, totalRounds:5, phase:'loading', current:null,
+            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
+            used:new Set(), usedU:[], lastGuess:{}, cardBattle:{ decks:{}, used:{}, picks:{}, categories:arcShuffle(CARD_BATTLE_CATS.slice(0,4)).concat(CARD_BATTLE_CATS[4]) }
+        };
+        arcGames[roomCode]=g; room.status='arc_playing';
+        Promise.all(room.players.map(async p => {
+            if (!p.userId) throw new Error(`${p.name} doit être connecté à un compte pour utiliser son deck.`);
+            const deck = (await deckOf(p.userId)).slice(0,5);
+            if (deck.length !== 5) throw new Error(`${p.name} doit équiper exactement 5 cartes dans son Deck.`);
+            g.cardBattle.decks[p.id]=deck.map(cbCard); g.cardBattle.used[p.id]=new Set();
+        })).then(() => {
+            if (arcGames[roomCode] !== g) return;
+            room.players.forEach(p => cbSendDeck(p.id,g)); arcEmit(room,roomCode); arcNextRound(room,roomCode);
+        }).catch(err => {
+            if (arcGames[roomCode] !== g) return;
+            g.message=err.message; arcFinish(room,roomCode);
+        });
+        return;
+    }
+
+    if (parsed.game === 'bingo') {
+        arcStop(roomCode);
+        const traits = BINGO_TRAITS.map((_,i)=>i);
+        const boards = {};
+        room.players.forEach(p => { boards[p.id]={ cells:arcShuffle(BINGO_TRAITS.map(x=>x.id)), marked:new Set() }; });
+        const g = {
+            game:'bingo', universe:'all', round:0, totalRounds:40, phase:'loading', current:null,
+            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
+            used:new Set(), usedU:[], lastGuess:{}, bingo:{ boards, traitOrder:arcShuffle(traits), winnerId:null }
+        };
+        arcGames[roomCode]=g; room.status='arc_playing';
+        room.players.forEach(p => bingoSendBoard(p.id,g)); arcEmit(room,roomCode); arcNextRound(room,roomCode); return;
+    }
+
+    return _startArcadePCB(room, roomCode);
+};
+
+/* ---------- Fin d'une épreuve Party Mix : on garde le score, personne ne sort ---------- */
+const _arcFinishPCB = arcFinish;
+arcFinish = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    // Bingo : la partie ne se termine pas aux points. On continue par blocs jusqu'à la première ligne de 5.
+    if (g?.game === 'bingo' && g.bingo && !g.bingo.winnerId && !g.message) {
+        g.totalRounds = Math.max(g.totalRounds || 40, g.round) + 25;
+        return arcNextRound(room, roomCode);
+    }
+    if (g?.mix && !g.message && g.mix.idx < g.mix.games.length - 1) {
+        arcClearTimers(g);
+        g.phase='intermission';
+        g.mix.nextLabel=ARC_GAMES[g.mix.games[g.mix.idx+1]]?.label || g.mix.games[g.mix.idx+1];
+        g.revealEndsAt=Date.now()+5500; arcEmit(room,roomCode);
+        g.timer=setTimeout(()=>{
+            if (g.dead || arcGames[roomCode]!==g) return;
+            g.mix.idx++; g.game=g.mix.games[g.mix.idx]; g.round=0; g.totalRounds=g.mix.per;
+            g.current=null; g.nextPromise=null; g.answers={}; g.found={}; g.gainedRound={}; g.message=null;
+            io.to(roomCode).emit('arc_names',{names:arcNamesFor(g)}); arcNextRound(room,roomCode);
+        },5500);
+        return;
+    }
+    return _arcFinishPCB(room,roomCode);
+};
+
+/* ---------- Révélation Combat de cartes ---------- */
+const _arcRevealPCB = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g=arcGames[roomCode];
+    if (g?.game==='cardbattle' && g.phase==='playing' && g.cardBattle) {
+        const cat=g.current?.cardCategory || CARD_BATTLE_CATS[0];
+        const plays=[];
+        for (const p of room.players) {
+            const deck=g.cardBattle.decks[p.id] || [], used=g.cardBattle.used[p.id] || new Set();
+            let key=g.cardBattle.picks[p.id];
+            let card=deck.find(c=>c.key===key && !used.has(c.key));
+            if (!card) card=deck.find(c=>!used.has(c.key)) || deck[0];
+            if (card) { g.cardBattle.picks[p.id]=card.key; used.add(card.key); }
+            const value=card?.stats?.[cat.id] || 0;
+            plays.push({ id:p.id, name:p.name, card, value });
+            g.answers[p.id]={choice:card?.name || 'Aucune carte',correct:false};
+            g.gainedRound[p.id]=0;
+        }
+        const best=Math.max(0,...plays.map(x=>x.value));
+        const winners=plays.filter(x=>x.value===best);
+        for (const x of winners) {
+            const gain=winners.length===1?100:50;
+            g.scores[x.id]=(g.scores[x.id]||0)+gain; g.gainedRound[x.id]=gain; g.answers[x.id].correct=true;
+        }
+        g.current.cardResult={category:cat,plays};
+        g.current.answer=winners.length===1?`${winners[0].name} gagne avec ${best}`:`Égalité à ${best}`;
+        g.cardBattle.picks={};
+        room.players.forEach(p=>cbSendDeck(p.id,g));
+    }
+    return _arcRevealPCB(room,roomCode);
+};
+
+/* ---------- État public spécial ---------- */
+const _arcPublicPCB = arcPublic;
+arcPublic = function (room,g) {
+    const out=_arcPublicPCB(room,g); if(!g||!out) return out;
+    out.stage=out.stage||{};
+    if(g.mix){ out.mix={idx:g.mix.idx,total:g.mix.games.length,games:g.mix.games.map(k=>ARC_GAMES[k]?.label||k),nextLabel:g.mix.nextLabel||null}; out.gameLabel=`Party Mix • ${ARC_GAMES[g.game]?.label||g.game}`; }
+    const cur=g.current||{};
+    if(g.game==='mix_quote'&&cur.quote) out.stage.quote=cur.quote;
+    if(g.game==='mix_dle'&&cur.dle) out.stage.dle=cur.dle;
+    if(g.game==='mix_blind'&&cur.video){out.stage.video=cur.video;out.stage.frac=cur.frac;out.stage.audio=true;}
+    if(g.game==='cardbattle'&&g.cardBattle){
+        const cat=cur.cardCategory||CARD_BATTLE_CATS[0];
+        out.stage.cardBattle={category:cat,locked:room.players.filter(p=>g.cardBattle.picks[p.id]).map(p=>p.id)};
+        if(g.phase==='reveal'&&cur.cardResult) out.stage.cardBattle.plays=cur.cardResult.plays.map(x=>({name:x.name,value:x.value,card:x.card?{name:x.card.name,anime:x.card.anime,img:x.card.img}:null}));
+    }
+    if(g.game==='bingo'&&g.bingo&&cur.bingoChar){
+        out.stage.bingo={character:{name:cur.bingoChar.name,anime:cur.bingoChar.anime,img:cur.bingoChar.img}};
+        if(g.phase==='reveal'||g.phase==='finished') out.stage.bingo.revealTraits=(cur.bingoChar.tags||[]).map(id=>BINGO_TRAIT_BY_ID[id]).filter(Boolean);
+    }
+    return out;
+};
+
+/* ---------- Listes privées / reconnexion ---------- */
+const _arcNamesForPCB = arcNamesFor;
+arcNamesFor = function(g){ if(g&&(g.game==='cardbattle'||g.game==='bingo')) return []; return _arcNamesForPCB(g); };
+const _arcSendToPCB=arcSendTo;
+arcSendTo=function(socket,room,roomCode){
+    const ok=_arcSendToPCB(socket,room,roomCode),g=arcGames[roomCode];
+    if(ok&&g?.game==='cardbattle') cbSendDeck(socket.id,g);
+    if(ok&&g?.game==='bingo') bingoSendBoard(socket.id,g);
+    return ok;
+};
+const _arcRemapPCB=arcRemap;
+arcRemap=function(roomCode,oldId,newId){
+    _arcRemapPCB(roomCode,oldId,newId); const g=arcGames[roomCode]; if(!g||oldId===newId)return;
+    if(g.cardBattle){
+        for(const key of ['decks','used','picks']) if(g.cardBattle[key]&&Object.prototype.hasOwnProperty.call(g.cardBattle[key],oldId)){g.cardBattle[key][newId]=g.cardBattle[key][oldId];delete g.cardBattle[key][oldId];}
+    }
+    if(g.bingo?.boards?.[oldId]){g.bingo.boards[newId]=g.bingo.boards[oldId];delete g.bingo.boards[oldId];if(g.bingo.winnerId===oldId)g.bingo.winnerId=newId;}
+};
+
+/* ---------- Actions privées Combat/Bingo ---------- */
+io.on('connection',socket=>{
+    socket.on('arc_card_pick',({roomCode,key}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];
+        if(!room||!g||g.game!=='cardbattle'||g.phase!=='playing'||!g.cardBattle||g.answers[socket.id])return;
+        if(!room.players.some(p=>p.id===socket.id))return;
+        const deck=g.cardBattle.decks[socket.id]||[],used=g.cardBattle.used[socket.id]||new Set();
+        const card=deck.find(c=>c.key===String(key||'')); if(!card||used.has(card.key))return;
+        g.cardBattle.picks[socket.id]=card.key; g.answers[socket.id]={choice:'Carte verrouillée',correct:false}; g.gainedRound[socket.id]=0;
+        arcCheckAllDone(room,roomCode);
+    });
+
+    socket.on('arc_bingo_mark',({roomCode,idx}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];
+        if(!room||!g||g.game!=='bingo'||g.phase!=='playing'||!g.bingo||g.answers[socket.id])return;
+        if(!room.players.some(p=>p.id===socket.id))return;
+        const board=g.bingo.boards[socket.id]; if(!board)return;
+        idx=Number(idx);
+        if(idx===-1){g.answers[socket.id]={choice:'Passer',correct:false};g.gainedRound[socket.id]=0;socket.emit('arc_feedback',{ok:false,message:'⏭️ Tu passes sur ce personnage.'});arcCheckAllDone(room,roomCode);return;}
+        if(!Number.isInteger(idx)||idx<0||idx>=25||board.marked.has(idx))return;
+        const trait=board.cells[idx],tags=g.current?.bingoChar?.tags||[];
+        const correct=tags.includes(trait);
+        g.answers[socket.id]={choice:BINGO_TRAIT_BY_ID[trait]?.label||trait,correct};
+        g.gainedRound[socket.id]=correct?100:0;
+        if(correct){
+            board.marked.add(idx);g.scores[socket.id]=(g.scores[socket.id]||0)+100;bingoSendBoard(socket.id,g);
+            socket.emit('arc_feedback',{ok:true,message:`✅ ${BINGO_TRAIT_BY_ID[trait]?.label||'Case'} !`});
+            if(bingoHasLine(board.marked)&&!g.bingo.winnerId){
+                g.bingo.winnerId=socket.id;g.scores[socket.id]=(g.scores[socket.id]||0)+10000;g.gainedRound[socket.id]+=10000;
+                g.message=null;g.winnerNames=[room.players.find(p=>p.id===socket.id)?.name||'Joueur'];
+                arcClearTimers(g);g.phase='finished';room.status='arc_over';arcEmit(room,roomCode);
+                // Enregistrement progression : on passe par la chaîne habituelle une seule fois.
+                if(!g.recorded){g.recorded=true;progRecord(room,'arcade:bingo','all',room.players.map(p=>({player:p,points:g.scores[p.id]||0,won:p.id===socket.id})));}
+                return;
+            }
+        } else socket.emit('arc_feedback',{ok:false,message:'❌ Cette case ne correspond pas à ce personnage.'});
+        arcCheckAllDone(room,roomCode);
+    });
+
+    // Blind Test du Party Mix : si la vidéo n'est pas intégrable, on remplace la manche.
+    socket.on('arc_media_error',({roomCode,round}={})=>{
+        const room=rooms[roomCode],g=arcGames[roomCode];
+        if(!room||!g||g.game!=='mix_blind'||g.phase!=='playing'||g.round!==round||!g.current?.video)return;
+        if(Date.now()-g.startedAt>15000)return;
+        BT_BAD_IDS.add(g.current.video);arcClearTimers(g);g.round=Math.max(0,g.round-1);g.current=null;g.nextPromise=null;arcNextRound(room,roomCode);
+    });
+});
+
+/* ---------- Progression : Party Mix compte comme un mode unique ---------- */
+const _progRecordPCB=progRecord;
+progRecord=async function(room,mode,universe,entries){
+    if(room?.mode==='arcade'&&partyMixParse(room.subMode)) mode='arcade:partymix';
+    return _progRecordPCB(room,mode,universe,entries);
+};
+
+
+// Un salon public de Combat de cartes ne peut accueillir que les deux duellistes.
+const _publicRoomMaxPCB = publicRoomMax;
+publicRoomMax = function(room) {
+    if (room?.mode === 'arcade' && String(room.subMode || '').startsWith('cardbattle')) return 2;
+    return _publicRoomMaxPCB(room);
+};
