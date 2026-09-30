@@ -680,6 +680,23 @@ async function applyImpostorModeRanking(room, { impostorsWin, noImpostorRoundWin
         await recordMatchResult(p.userId, won, eloDelta);
         notifyProfileUpdate(p.id, p.userId);
     }
+
+    // Le classement général existait déjà via l'ELO, mais ces parties n'étaient pas
+    // enregistrées dans game_results : elles étaient donc absentes du classement par jeu.
+    if (!room._progImpostorRecorded) {
+        room._progImpostorRecorded = true;
+        const modeKey = room.mode === 'note'
+            ? 'note'
+            : (room.subMode === 'hardcore' ? 'undercover:hardcore' : 'undercover:normal');
+        const entries = room.players.map(p => {
+            let won;
+            if (noImpostorRoundWin) won = true;
+            else if (p.isImpostor) won = impostorsWin;
+            else won = !impostorsWin;
+            return { player: p, points: won ? 100 : 20, won };
+        });
+        await progRecord(room, modeKey, null, entries);
+    }
 }
 
 // Rolland Garos : un seul gagnant (dernier en vie), tous les autres perdent
@@ -9976,6 +9993,8 @@ io.on('connection', (socket) => {
         room.status = 'reveal';
         room.noImpostor = false;
         room.votes = {};
+        // Une nouvelle manche Undercover / Devine la note peut compter dans son classement propre.
+        room._progImpostorRecorded = false;
 
         // Système de relance propre : tout le monde repart en vie à chaque nouvelle manche
         room.players.forEach(p => { p.isAlive = true; });
@@ -12772,7 +12791,10 @@ publicUser = function (row) {
 };
 
 const MODE_LABELS = {
+    'undercover:normal': 'Undercover Normal', 'undercover:hardcore': 'Undercover Hardcore', note: 'Devine la note',
     blindtest: 'Blind Test', dle: 'AnimeDLE', rollandgaros: 'Rolland Garros', quote: 'Citations',
+    enchere: 'Enchère', enchereaveugle: 'Enchère à l’aveugle', draw: 'Dessine le perso', guess: 'Devine le dessin',
+    chaine: 'Chaîne anime', loupgarou: 'Loup-Garou', uquiz: 'Quiz communautaire',
     'arcade:pixel': 'Pixel Anime', 'arcade:silhouette': 'Silhouette', 'arcade:emoji': 'Emoji Anime', 'arcade:quatre': '4 images = 1 anime',
     'arcade:mapguess': 'Map Guess', 'arcade:fusion': 'Fusion Anime', 'arcade:scene': 'Scene Guessr', 'arcade:link': 'Common Link',
     'arcade:popularite': 'Popularity Guess', 'arcade:bac': 'Petit bac', 'arcade:imposteur': 'Imposteur', 'arcade:audio': 'Écoute la scène',
@@ -12926,6 +12948,28 @@ emitQuoteState = function (room, roomCode) {
     progRecord(room, 'quote', qg.universeKey, room.players.map(p => ({ player: p, points: (qg.scores[p.id] || 0) * 20, won: p.name === qg.winnerName })));
 };
 
+const _endEnchereProg = endEnchere;
+endEnchere = function (room, roomCode) {
+    _endEnchereProg(room, roomCode);
+    const e = room.enchere;
+    if (!e || e.progRecorded) return;
+    e.progRecorded = true;
+    progRecord(room, 'enchere', e.universeKey, room.players.map(p => ({
+        player: p, points: e.totals?.[p.id] || 0, won: !!e.winnerId && e.winnerId === p.id
+    })));
+};
+
+const _endEnchereAveugleProg = endEnchereAveugle;
+endEnchereAveugle = function (room, roomCode) {
+    _endEnchereAveugleProg(room, roomCode);
+    const e = room.enchereAveugle;
+    if (!e || e.progRecorded) return;
+    e.progRecorded = true;
+    progRecord(room, 'enchereaveugle', e.universeKey, room.players.map(p => ({
+        player: p, points: e.totals?.[p.id] || 0, won: !!e.winnerId && e.winnerId === p.id
+    })));
+};
+
 // ---- API profil & classements ----
 function authUserId(req) {
     const h = req.headers.authorization || '';
@@ -12962,8 +13006,9 @@ app.get('/api/leaderboard', async (req, res) => {
             const params = [];
             let where = period === 'week' ? `created_at > now() - interval '7 days'` : 'true';
             if (mode) { params.push(mode); where += ` AND mode = $${params.length}`; }
+            const order = mode ? 'wins DESC, points DESC, games ASC, pseudo ASC' : 'points DESC, wins DESC, games ASC, pseudo ASC';
             rows = (await pool.query(`SELECT user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games,
-                sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY points DESC LIMIT 25`, params)).rows;
+                sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY ${order} LIMIT 50`, params)).rows;
         } catch (_) {}
     } else {
         const since = period === 'week' ? Date.now() - 7 * 86400000 : 0;
@@ -12972,9 +13017,12 @@ app.get('/api/leaderboard', async (req, res) => {
             const o = agg[r.user_id] = agg[r.user_id] || { user_id: r.user_id, pseudo: r.pseudo, points: 0, games: 0, wins: 0 };
             o.points += r.points; o.games++; o.wins += r.won ? 1 : 0;
         });
-        rows = Object.values(agg).sort((a, b) => b.points - a.points).slice(0, 25);
+        rows = Object.values(agg).sort((a, b) => mode
+            ? (b.wins - a.wins || b.points - a.points || a.games - b.games || String(a.pseudo).localeCompare(String(b.pseudo)))
+            : (b.points - a.points || b.wins - a.wins || a.games - b.games || String(a.pseudo).localeCompare(String(b.pseudo)))).slice(0, 50);
     }
-    res.json({ ok: true, period, mode, rows, modes: MODE_LABELS });
+    rows = rows.map(r => ({ ...r, winrate: r.games ? Math.round((r.wins / r.games) * 100) : 0 }));
+    res.json({ ok: true, period, mode, label: mode ? (MODE_LABELS[mode] || mode) : 'Classement global', metric: mode ? 'wins' : 'points', rows, modes: MODE_LABELS });
 });
 
 /* =====================================================================
@@ -15159,22 +15207,6 @@ app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.f
 
 const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
 app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
-function adminConnectedPlayers() {
-    const out = new Map();
-    for (const socket of io.sockets.sockets.values()) {
-        const u = socket.user;
-        if (!u || !u.pseudo) continue;
-        const guest = !u.id || !!u.isGuest;
-        const key = guest ? `g:${String(u.pseudo).toLowerCase()}` : `u:${u.id}`;
-        const row = out.get(key) || { pseudo: String(u.pseudo), guest, sockets: 0 };
-        row.sockets++; out.set(key, row);
-    }
-    return [...out.values()].sort((a,b) => Number(a.guest)-Number(b.guest) || a.pseudo.localeCompare(b.pseudo,'fr'));
-}
-app.get('/api/admin/online', adminOnly(async (req, res) => {
-    const players = adminConnectedPlayers();
-    res.json({ ok:true, count:players.length, players });
-}));
 app.get('/api/admin/stats', adminOnly(async (req, res) => {
     const socketsN = io.sockets && io.sockets.sockets ? io.sockets.sockets.size : 0;
     const roomsList = Object.values(rooms);
@@ -15193,8 +15225,7 @@ app.get('/api/admin/stats', adminOnly(async (req, res) => {
         modes = Object.entries(agg).map(([mode, n]) => ({ mode, n })).sort((a, b) => b.n - a.n);
         gamesWeek = PROG_MEM.results.length; suggestions = SUGG_MEM.length; bugs = BUGS_MEM.length;
     }
-    const connectedPlayers = adminConnectedPlayers();
-    res.json({ ok: true, online: socketsN, accountsOnline: userSockets.size, connectedPlayers, rooms: roomsList.length,
+    res.json({ ok: true, online: socketsN, accountsOnline: userSockets.size, rooms: roomsList.length,
         inGame: roomsList.filter(r => r.status !== 'waiting').reduce((a, r) => a + r.players.length, 0),
         byMode: Object.entries(byMode).map(([mode, o]) => ({ mode, ...o })).sort((a, b) => b.players - a.players),
         modes: modes.map(m => ({ ...m, label: MODE_LABELS[m.mode] || m.mode })), accounts, gamesToday, gamesWeek, suggestions, bugs,
@@ -16930,11 +16961,86 @@ app.post('/api/cards/fuse', async (req, res) => {
         : await cardAward({ userId: uid, id: null }, pick.u, pick.display, { silent: true, shinyRate: 1 / 10 });
     res.json({ ok: true, used, card });
 });
-// Échanges directs — chacun ne voit que SA collection ; l'autre joueur pose lui-même sa carte.
-// Déroulé : ouverture de table -> chacun pose une carte -> double accord -> double confirmation -> transfert.
-const TRADE_ACTIVE_STATUS = new Set(['negotiating', 'confirm']);
-const TRADE_FINALIZING = new Set();
-const TRADE_TTL = 30 * 60 * 1000;
+// Échanges — système direct à deux joueurs
+// Chaque joueur ne voit que SA collection. Il choisit sa carte, l'autre choisit la sienne,
+// puis il faut un accord des deux joueurs + une confirmation finale des deux côtés.
+const LIVE_TRADES = new Map();       // tradeId -> session
+const LIVE_TRADE_USER = new Map();  // userId -> tradeId
+
+function tradeCardInfo(key, fin) {
+    if (!key) return null;
+    const i = cardInfoOfKey(String(key)) || { name: String(key).split('|')[1] || 'Carte', anime: '', rarity: 'commune', img: '' };
+    return { key: String(key), name: i.name, anime: i.anime, img: i.img, imgs: i.imgs || null, rarity: i.rarity, finish: fin || null };
+}
+function liveTradeSide(t, uid) { return t.a.uid === uid ? t.a : t.b; }
+function liveTradeOther(t, uid) { return t.a.uid === uid ? t.b : t.a; }
+function liveTradeSession(uid) {
+    const id = LIVE_TRADE_USER.get(+uid);
+    const t = id ? LIVE_TRADES.get(id) : null;
+    if (!t || t.status !== 'active') { if (id) LIVE_TRADE_USER.delete(+uid); return null; }
+    return t;
+}
+function liveTradeView(t, uid) {
+    if (!t) return null;
+    const me = liveTradeSide(t, +uid), other = liveTradeOther(t, +uid);
+    return {
+        id: t.id, phase: t.phase, createdAt: t.at, updatedAt: t.updatedAt,
+        me: { uid: me.uid, name: me.name, card: tradeCardInfo(me.key, me.fin), accepted: !!me.accepted, confirmed: !!me.confirmed },
+        other: { uid: other.uid, name: other.name, card: tradeCardInfo(other.key, other.fin), accepted: !!other.accepted, confirmed: !!other.confirmed }
+    };
+}
+async function liveTradePush(t) {
+    if (!t) return;
+    emitUser(t.a.uid, 'trade_live_state', { ok: true, session: liveTradeView(t, t.a.uid) });
+    emitUser(t.b.uid, 'trade_live_state', { ok: true, session: liveTradeView(t, t.b.uid) });
+}
+async function tradeHistoryAdd(t, status, extra = {}) {
+    try {
+        const h = {
+            id: t.id, status, at: t.at, endedAt: hubNow(),
+            aUid: t.a.uid, aName: t.a.name, aKey: t.a.key || null, aFin: t.a.fin || null,
+            bUid: t.b.uid, bName: t.b.name, bKey: t.b.key || null, bFin: t.b.fin || null,
+            ...extra
+        };
+        await kvSet('trade_history', h.id, h);
+    } catch (_) {}
+}
+async function closeLiveTrade(t, status, extra = {}) {
+    if (!t) return;
+    t.status = status;
+    LIVE_TRADES.delete(t.id);
+    LIVE_TRADE_USER.delete(t.a.uid);
+    LIVE_TRADE_USER.delete(t.b.uid);
+    await tradeHistoryAdd(t, status, extra);
+    emitUser(t.a.uid, 'trade_live_closed', { id: t.id, status, by: extra.by || null });
+    emitUser(t.b.uid, 'trade_live_closed', { id: t.id, status, by: extra.by || null });
+}
+async function liveTradeFriends(uid) {
+    const f = await friendsOf(uid);
+    return f.map(x => ({ ...x, online: userOnline(x.id), busy: !!liveTradeSession(x.id) }));
+}
+
+app.get('/api/trade', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    res.json({ ok: true, session: liveTradeView(liveTradeSession(uid), uid), friends: await liveTradeFriends(uid) });
+});
+app.get('/api/trade/history', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const rows = (await kvList('trade_history')).map(x => x.v)
+        .filter(t => t.aUid === uid || t.bUid === uid)
+        .sort((a, b) => (b.endedAt || b.at || 0) - (a.endedAt || a.at || 0)).slice(0, 60);
+    // On conserve aussi les anciens échanges terminés pour ne pas perdre l'historique existant.
+    const legacy = (await kvList('trade')).map(x => x.v)
+        .filter(t => (t.from === uid || t.to === uid) && t.status !== 'open')
+        .map(t => ({ id: 'legacy:' + t.id, status: t.status, at: t.at, endedAt: t.at, aUid: t.from, aName: t.fromName, aKey: t.give, aFin: t.giveFin || null, bUid: t.to, bName: t.toName, bKey: t.want, bFin: t.wantFin || null }));
+    const all = [...rows, ...legacy].sort((a, b) => (b.endedAt || b.at || 0) - (a.endedAt || a.at || 0)).slice(0, 60);
+    res.json({ ok: true, history: all.map(t => {
+        const mineA = t.aUid === uid;
+        const mine = mineA ? { name: t.aName, card: tradeCardInfo(t.aKey, t.aFin) } : { name: t.bName, card: tradeCardInfo(t.bKey, t.bFin) };
+        const other = mineA ? { name: t.bName, card: tradeCardInfo(t.bKey, t.bFin) } : { name: t.aName, card: tradeCardInfo(t.aKey, t.aFin) };
+        return { id: t.id, status: t.status, at: t.endedAt || t.at, mine, other };
+    }) });
+});
 
 // fiche d'une carte à partir de sa clé (normale, spéciale, Duo, Collector)
 function cardInfoOfKey(k) {
@@ -16974,214 +17080,104 @@ async function finMove(from, to, key, f) {
     if (ser != null) { eb.ser = eb.ser || {}; (eb.ser[f] = eb.ser[f] || []).push(ser); }
     await kvSet('fin', String(to), b);
 }
-const tradeOfferInfo = offer => {
-    if (!offer || !offer.key) return null;
-    const i = cardInfoOfKey(offer.key) || { name: String(offer.key).split('|')[1] || 'Carte', anime: '', rarity: 'commune', img: '' };
-    return { name: i.name, anime: i.anime, img: i.img, imgs: i.imgs || null, rarity: i.rarity || 'commune', finish: offer.finish || null };
-};
-const tradePlayers = t => [t.a, t.b];
-const tradeOther = (t, uid) => t.a === uid ? t.b : t.a;
-const tradeOfferFor = (t, uid) => t.offers && t.offers[String(uid)] ? t.offers[String(uid)] : null;
-const tradeBoolFor = (obj, uid) => !!(obj && obj[String(uid)]);
-function tradeResetAgreements(t) {
-    t.status = 'negotiating';
-    t.accepted = { [String(t.a)]: false, [String(t.b)]: false };
-    t.confirmed = { [String(t.a)]: false, [String(t.b)]: false };
-}
-async function tradeExpireStale() {
-    const now = hubNow();
-    for (const x of await kvList('trade_live')) {
-        const t = x.v;
-        if (t && TRADE_ACTIVE_STATUS.has(t.status) && now - (t.updatedAt || t.at || now) > TRADE_TTL) {
-            t.status = 'expired'; t.endedAt = now; t.updatedAt = now;
-            await kvSet('trade_live', t.id, t);
-            tradePlayers(t).forEach(u => emitUser(u, 'trade_live', { id: t.id, type: 'closed' }));
-        }
-    }
-}
-async function tradeActiveOf(uid) {
-    await tradeExpireStale();
-    const all = (await kvList('trade_live')).map(x => x.v).filter(Boolean);
-    return all.find(t => TRADE_ACTIVE_STATUS.has(t.status) && tradePlayers(t).includes(uid)) || null;
-}
-async function tradeView(t, uid) {
-    if (!t) return null;
-    const otherId = tradeOther(t, uid);
-    return {
-        id: t.id,
-        status: t.status,
-        other: { id: otherId, pseudo: otherId === t.a ? t.aName : t.bName },
-        mine: tradeOfferInfo(tradeOfferFor(t, uid)),
-        mineRef: tradeOfferFor(t, uid) ? { key: tradeOfferFor(t, uid).key, finish: tradeOfferFor(t, uid).finish || null } : null,
-        theirs: tradeOfferInfo(tradeOfferFor(t, otherId)),
-        myAccepted: tradeBoolFor(t.accepted, uid),
-        theirAccepted: tradeBoolFor(t.accepted, otherId),
-        myConfirmed: tradeBoolFor(t.confirmed, uid),
-        theirConfirmed: tradeBoolFor(t.confirmed, otherId),
-        at: t.at,
-        updatedAt: t.updatedAt || t.at
-    };
-}
-async function tradePush(t, type = 'update') {
-    for (const uid of tradePlayers(t)) emitUser(uid, 'trade_live', { id: t.id, type, status: t.status });
-}
-
-app.get('/api/trade', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const active = await tradeActiveOf(uid);
-    const friends = (await friendsOf(uid)).map(f => ({ ...f, online: socketsOfUser(+f.id).length > 0 }));
-    res.json({ ok: true, active: await tradeView(active, uid), friends });
-});
-
-// Le client n'a accès qu'à SA collection. L'ancien ?friend= est volontairement ignoré/refusé.
 app.get('/api/trade/cards', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    if (req.query.friend) return res.json({ ok: false, error: 'En échange direct, tu ne peux parcourir que tes propres cartes.' });
+    // Sécurité du nouveau système : impossible de consulter la collection d'un autre joueur.
+    if (req.query.friend) return res.status(403).json({ ok: false, error: 'En échange direct, chacun ne voit que ses propres cartes.' });
     res.json({ ok: true, cards: await cardListOf(uid) });
 });
-
-app.post('/api/trade/start', async (req, res) => {
+app.post('/api/trade/live/open', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const fid = +(req.body || {}).friendId;
-    if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Choisis un ami valide.' });
-    if (!socketsOfUser(fid).length) return res.json({ ok: false, error: 'Cet ami est hors ligne. Un échange direct nécessite les deux joueurs connectés.' });
-    const mine = await tradeActiveOf(uid), theirs = await tradeActiveOf(fid);
-    if (mine && tradeOther(mine, uid) === fid) return res.json({ ok: true, active: await tradeView(mine, uid) });
-    if (mine) return res.json({ ok: false, error: 'Tu as déjà un échange direct en cours.' });
-    if (theirs) return res.json({ ok: false, error: 'Cet ami est déjà dans un autre échange.' });
-    const now = hubNow();
+    const fid = +(req.body || {}).friendId || 0;
+    if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Choisis un ami.' });
+    if (!userOnline(fid)) return res.json({ ok: false, error: 'Cet ami doit être connecté pour un échange en direct.' });
+    if (liveTradeSession(uid)) return res.json({ ok: false, error: 'Tu as déjà un échange en cours.' });
+    if (liveTradeSession(fid)) return res.json({ ok: false, error: 'Cet ami est déjà dans un échange.' });
     const t = {
-        id: 'td_' + now.toString(36) + Math.random().toString(36).slice(2, 7),
-        a: uid, b: fid,
-        aName: await pseudoOf(uid), bName: await pseudoOf(fid),
-        offers: { [String(uid)]: null, [String(fid)]: null },
-        accepted: { [String(uid)]: false, [String(fid)]: false },
-        confirmed: { [String(uid)]: false, [String(fid)]: false },
-        status: 'negotiating', at: now, updatedAt: now
+        id: 'lt' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), status: 'active', phase: 'select', at: hubNow(), updatedAt: hubNow(), locked: false,
+        a: { uid, name: await pseudoOf(uid), key: null, fin: null, accepted: false, confirmed: false },
+        b: { uid: fid, name: await pseudoOf(fid), key: null, fin: null, accepted: false, confirmed: false }
     };
-    await kvSet('trade_live', t.id, t);
-    emitUser(fid, 'trade_live', { id: t.id, type: 'started', from: t.aName, status: t.status });
-    emitUser(uid, 'trade_live', { id: t.id, type: 'started', from: t.bName, status: t.status });
-    res.json({ ok: true, active: await tradeView(t, uid) });
+    LIVE_TRADES.set(t.id, t); LIVE_TRADE_USER.set(uid, t.id); LIVE_TRADE_USER.set(fid, t.id);
+    emitUser(fid, 'trade_live_invite', { id: t.id, from: t.a.name });
+    await liveTradePush(t);
+    res.json({ ok: true, session: liveTradeView(t, uid) });
 });
-
-app.post('/api/trade/offer', async (req, res) => {
+app.post('/api/trade/live/select', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const t = await kvGet('trade_live', String((req.body || {}).id));
-    if (!t || !TRADE_ACTIVE_STATUS.has(t.status) || !tradePlayers(t).includes(uid)) return res.json({ ok: false, error: 'Échange direct introuvable.' });
-    if (t.status === 'confirm') return res.json({ ok: false, error: 'La confirmation finale a commencé. Annule ou confirme l’échange.' });
-    const key = String((req.body || {}).card || '');
-    const finish = FIN_IDS.includes((req.body || {}).finish) ? req.body.finish : null;
-    if (key && !(await tradeHas(uid, key, finish))) return res.json({ ok: false, error: 'Tu ne possèdes plus cette carte dans cette version.' });
-    t.offers = t.offers || {};
-    t.offers[String(uid)] = key ? { key, finish } : null;
-    tradeResetAgreements(t);
-    t.updatedAt = hubNow();
-    await kvSet('trade_live', t.id, t);
-    await tradePush(t, 'offer');
-    res.json({ ok: true, active: await tradeView(t, uid) });
+    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
+    if (t.locked) return res.json({ ok: false, error: 'Échange en cours de validation.' });
+    const key = String((req.body || {}).key || ''), fin = FIN_IDS.includes((req.body || {}).finish) ? req.body.finish : null;
+    if (!key || !(await tradeHas(uid, key, fin))) return res.json({ ok: false, error: 'Tu ne possèdes plus cette carte.' });
+    const me = liveTradeSide(t, uid);
+    me.key = key; me.fin = fin;
+    // Toute modification annule immédiatement les accords déjà donnés des deux côtés.
+    t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false; t.phase = 'select'; t.updatedAt = hubNow();
+    await liveTradePush(t);
+    res.json({ ok: true, session: liveTradeView(t, uid) });
 });
-
-app.post('/api/trade/decision', async (req, res) => {
+app.post('/api/trade/live/decision', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const t = await kvGet('trade_live', String((req.body || {}).id));
-    if (!t || !TRADE_ACTIVE_STATUS.has(t.status) || !tradePlayers(t).includes(uid)) return res.json({ ok: false, error: 'Échange direct introuvable.' });
-    const accept = !!(req.body || {}).accept;
-    if (!accept) {
-        t.status = 'refused'; t.endedAt = hubNow(); t.updatedAt = t.endedAt;
-        await kvSet('trade_live', t.id, t); await tradePush(t, 'closed');
-        const other = tradeOther(t, uid); emitUser(other, 'trade_done', { text: `❌ ${await pseudoOf(uid)} a refusé / quitté l’échange.` });
+    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
+    if (!(req.body || {}).accept) {
+        const by = await pseudoOf(uid); await closeLiveTrade(t, 'refused', { by });
+        emitUser(liveTradeOther(t, uid).uid, 'trade_done', { text: `❌ ${by} a refusé l’échange.` });
         return res.json({ ok: true, closed: true });
     }
-    if (t.status !== 'negotiating') return res.json({ ok: false, error: 'L’échange est déjà en confirmation finale.' });
-    const myOffer = tradeOfferFor(t, uid), otherId = tradeOther(t, uid), otherOffer = tradeOfferFor(t, otherId);
-    if (!myOffer || !otherOffer) return res.json({ ok: false, error: 'Les deux joueurs doivent poser une carte avant d’accepter.' });
-    if (!(await tradeHas(uid, myOffer.key, myOffer.finish))) return res.json({ ok: false, error: 'Ta carte proposée n’est plus disponible.' });
-    t.accepted[String(uid)] = true;
-    if (tradeBoolFor(t.accepted, otherId)) {
-        t.status = 'confirm';
-        t.confirmed = { [String(t.a)]: false, [String(t.b)]: false };
-    }
-    t.updatedAt = hubNow();
-    await kvSet('trade_live', t.id, t); await tradePush(t, t.status === 'confirm' ? 'confirm' : 'accepted');
-    res.json({ ok: true, active: await tradeView(t, uid) });
+    if (!t.a.key || !t.b.key) return res.json({ ok: false, error: 'Les deux joueurs doivent poser une carte.' });
+    const me = liveTradeSide(t, uid); me.accepted = true; me.confirmed = false; t.updatedAt = hubNow();
+    if (t.a.accepted && t.b.accepted) { t.phase = 'confirm'; t.a.confirmed = t.b.confirmed = false; }
+    await liveTradePush(t);
+    res.json({ ok: true, session: liveTradeView(t, uid) });
 });
-
-app.post('/api/trade/unaccept', async (req, res) => {
+app.post('/api/trade/live/confirm', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const t = await kvGet('trade_live', String((req.body || {}).id));
-    if (!t || t.status !== 'negotiating' || !tradePlayers(t).includes(uid)) return res.json({ ok: false, error: 'Impossible de retirer ton accord maintenant.' });
-    t.accepted[String(uid)] = false; t.updatedAt = hubNow();
-    await kvSet('trade_live', t.id, t); await tradePush(t, 'accepted');
-    res.json({ ok: true, active: await tradeView(t, uid) });
-});
-
-app.post('/api/trade/confirm', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const id = String((req.body || {}).id || '');
-    const t = await kvGet('trade_live', id);
-    if (!t || t.status !== 'confirm' || !tradePlayers(t).includes(uid)) return res.json({ ok: false, error: 'Confirmation introuvable.' });
+    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
+    if (t.phase !== 'confirm') return res.json({ ok: false, error: 'Les deux joueurs doivent d’abord accepter.' });
     if (!(req.body || {}).confirm) {
-        t.status = 'refused'; t.endedAt = hubNow(); t.updatedAt = t.endedAt;
-        await kvSet('trade_live', t.id, t); await tradePush(t, 'closed');
-        emitUser(tradeOther(t, uid), 'trade_done', { text: `❌ ${await pseudoOf(uid)} a annulé à la confirmation finale.` });
-        return res.json({ ok: true, closed: true });
+        t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false; t.updatedAt = hubNow();
+        await liveTradePush(t); return res.json({ ok: true, session: liveTradeView(t, uid) });
     }
-    t.confirmed[String(uid)] = true; t.updatedAt = hubNow();
-    await kvSet('trade_live', t.id, t); await tradePush(t, 'confirm');
-    const otherId = tradeOther(t, uid);
-    if (!tradeBoolFor(t.confirmed, otherId)) return res.json({ ok: true, active: await tradeView(t, uid), waiting: true });
-
-    if (TRADE_FINALIZING.has(id)) return res.json({ ok: true, waiting: true });
-    TRADE_FINALIZING.add(id);
+    liveTradeSide(t, uid).confirmed = true; t.updatedAt = hubNow();
+    if (!(t.a.confirmed && t.b.confirmed)) { await liveTradePush(t); return res.json({ ok: true, session: liveTradeView(t, uid) }); }
+    if (t.locked) return res.json({ ok: false, error: 'Validation déjà en cours.' });
+    t.locked = true;
     try {
-        // Relire la session après le lock et revérifier les deux confirmations/cartes.
-        const fresh = await kvGet('trade_live', id);
-        if (!fresh || fresh.status !== 'confirm' || !tradeBoolFor(fresh.confirmed, fresh.a) || !tradeBoolFor(fresh.confirmed, fresh.b)) return res.json({ ok: false, error: 'Confirmation incomplète.' });
-        const oa = tradeOfferFor(fresh, fresh.a), ob = tradeOfferFor(fresh, fresh.b);
-        if (!oa || !ob || !(await tradeHas(fresh.a, oa.key, oa.finish)) || !(await tradeHas(fresh.b, ob.key, ob.finish))) {
-            fresh.status = 'failed'; fresh.endedAt = hubNow(); fresh.updatedAt = fresh.endedAt;
-            await kvSet('trade_live', fresh.id, fresh); await tradePush(fresh, 'closed');
-            return res.json({ ok: false, error: 'Une des cartes n’est plus disponible. Échange annulé.' });
+        if (!(await tradeHas(t.a.uid, t.a.key, t.a.fin)) || !(await tradeHas(t.b.uid, t.b.key, t.b.fin))) {
+            t.locked = false; t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false;
+            await liveTradePush(t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' });
         }
-        const ta = await cardTake(fresh.a, oa.key), tb = await cardTake(fresh.b, ob.key);
-        if (!ta || !tb) {
-            // Restauration best-effort si une carte a été retirée avant l'échec de l'autre côté.
-            if (ta) await cardGive(fresh.a, { key: oa.key }, ta.shiny);
-            if (tb) await cardGive(fresh.b, { key: ob.key }, tb.shiny);
-            fresh.status = 'failed'; fresh.endedAt = hubNow(); fresh.updatedAt = fresh.endedAt;
-            await kvSet('trade_live', fresh.id, fresh); await tradePush(fresh, 'closed');
-            return res.json({ ok: false, error: 'Transfert impossible. Aucune carte n’a été échangée.' });
+        const takeA = await cardTake(t.a.uid, t.a.key);
+        if (!takeA) { t.locked = false; return res.json({ ok: false, error: 'Ta carte n’est plus disponible.' }); }
+        const takeB = await cardTake(t.b.uid, t.b.key);
+        if (!takeB) {
+            await cardGive(t.a.uid, { key: t.a.key }, takeA.shiny);
+            t.locked = false; t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false;
+            await liveTradePush(t); return res.json({ ok: false, error: 'La carte de l’autre joueur n’est plus disponible.' });
         }
-        await cardGive(fresh.b, { key: oa.key }, ta.shiny);
-        await cardGive(fresh.a, { key: ob.key }, tb.shiny);
-        if (oa.finish) await finMove(fresh.a, fresh.b, oa.key, oa.finish);
-        if (ob.finish) await finMove(fresh.b, fresh.a, ob.key, ob.finish);
-        fresh.status = 'done'; fresh.endedAt = hubNow(); fresh.updatedAt = fresh.endedAt;
-        await kvSet('trade_live', fresh.id, fresh); await tradePush(fresh, 'done');
-        const ai = tradeOfferInfo(oa), bi = tradeOfferInfo(ob);
-        emitUser(fresh.a, 'trade_done', { text: `✅ Échange confirmé avec ${fresh.bName} : tu reçois ${bi.name} !`, done: true });
-        emitUser(fresh.b, 'trade_done', { text: `✅ Échange confirmé avec ${fresh.aName} : tu reçois ${ai.name} !`, done: true });
-        res.json({ ok: true, done: true, got: uid === fresh.a ? bi.name : ai.name });
-    } finally { TRADE_FINALIZING.delete(id); }
+        await cardGive(t.b.uid, { key: t.a.key }, takeA.shiny);
+        await cardGive(t.a.uid, { key: t.b.key }, takeB.shiny);
+        if (t.a.fin) await finMove(t.a.uid, t.b.uid, t.a.key, t.a.fin);
+        if (t.b.fin) await finMove(t.b.uid, t.a.uid, t.b.key, t.b.fin);
+        const aGot = tradeCardInfo(t.b.key, t.b.fin), bGot = tradeCardInfo(t.a.key, t.a.fin);
+        await closeLiveTrade(t, 'done');
+        emitUser(t.a.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${aGot.name}${aGot.finish ? ' (' + (FINISHES.find(f => f.id === aGot.finish)?.label || aGot.finish) + ')' : ''} !` });
+        emitUser(t.b.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${bGot.name}${bGot.finish ? ' (' + (FINISHES.find(f => f.id === bGot.finish)?.label || bGot.finish) + ')' : ''} !` });
+        return res.json({ ok: true, done: true, got: aGot.name });
+    } catch (e) {
+        t.locked = false;
+        return res.status(500).json({ ok: false, error: 'Échange interrompu : ' + e.message });
+    }
 });
+// Ancien système d'offres désactivé : évite que de vieux clients puissent encore consulter/choisir la carte d'un autre joueur.
+app.post('/api/trade/propose', async (req, res) => res.status(410).json({ ok: false, error: 'Les propositions ont été remplacées par les échanges en direct.' }));
+app.post('/api/trade/respond', async (req, res) => res.status(410).json({ ok: false, error: 'Les propositions ont été remplacées par les échanges en direct.' }));
 
-app.get('/api/trade/history', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const cutoff = hubNow() - 30 * 86400000;
-    const live = (await kvList('trade_live')).map(x => x.v).filter(t => t && tradePlayers(t).includes(uid) && !TRADE_ACTIVE_STATUS.has(t.status) && (t.endedAt || t.updatedAt || t.at || 0) >= cutoff)
-        .map(t => {
-            const otherId = tradeOther(t, uid);
-            return { id: t.id, status: t.status, other: otherId === t.a ? t.aName : t.bName, mine: tradeOfferInfo(tradeOfferFor(t, uid)), theirs: tradeOfferInfo(tradeOfferFor(t, otherId)), at: t.endedAt || t.updatedAt || t.at };
-        });
-    // On conserve aussi les anciens échanges terminés afin de ne pas perdre l'historique existant.
-    const legacy = (await kvList('trade')).map(x => x.v).filter(t => t && (t.from === uid || t.to === uid) && t.status !== 'open' && (t.at || 0) >= cutoff).map(t => {
-        const mineKey = t.from === uid ? t.give : t.want, mineFin = t.from === uid ? t.giveFin : t.wantFin;
-        const theirKey = t.from === uid ? t.want : t.give, theirFin = t.from === uid ? t.wantFin : t.giveFin;
-        return { id: 'legacy_' + t.id, status: t.status, other: t.from === uid ? t.toName : t.fromName, mine: tradeOfferInfo(mineKey ? { key: mineKey, finish: mineFin } : null), theirs: tradeOfferInfo(theirKey ? { key: theirKey, finish: theirFin } : null), at: t.at, legacy: true };
-    });
-    res.json({ ok: true, history: [...live, ...legacy].sort((a, b) => b.at - a.at).slice(0, 50) });
-});
+// Nettoie les tables abandonnées après 30 minutes d'inactivité.
+setInterval(() => {
+    const now = hubNow();
+    for (const t of LIVE_TRADES.values()) if (now - t.updatedAt > 30 * 60000) closeLiveTrade(t, 'expired').catch(() => {});
+}, 60000);
 
 /* =====================================================================
    ANIME DE LA SEMAINE : brillantes x3 + carte collector après 15 persos trouvés
@@ -19006,7 +19002,7 @@ app.post('/api/admin/sfx/:slot/delete', adminOnly(async (req, res) => {
 }));
 
 /* ---------- version : l'admin voit si server.js et index.html ne sont pas de la même mise à jour ---------- */
-const SITE_BUILD = '2026-09-30-trade-options';
+const SITE_BUILD = '2026-10-09-clans';
 app.get('/api/version', (req, res) => res.json({ ok: true, build: SITE_BUILD }));
 
 
@@ -19240,6 +19236,20 @@ app.get('/api/admin/players', adminOnly(async (req, res) => { // chercher un jou
     for (const s of io.sockets.sockets.values()) if (s.user && (!q || String(s.user.pseudo).toLowerCase().includes(q))) out.set(modKey(s.user), { key: modKey(s.user), name: s.user.pseudo, online: true, guest: !s.user.id });
     if (HAS_DB && q) { try { (await pool.query('SELECT id, pseudo FROM users WHERE lower(pseudo) LIKE $1 LIMIT 20', ['%' + q + '%'])).rows.forEach(r => { if (!out.has('u' + r.id)) out.set('u' + r.id, { key: 'u' + r.id, name: r.pseudo, online: userOnline(r.id), guest: false }); }); } catch (_) {} }
     res.json({ ok: true, players: [...out.values()].slice(0, 30).map(p => ({ ...p, muted: !!modActive(MOD.mute, p.key), banned: !!modActive(MOD.ban, p.key) })) });
+}));
+
+// Liste temps réel des pseudos connectés, visible uniquement dans l'administration.
+app.get('/api/admin/online', adminOnly(async (req, res) => {
+    const out = new Map();
+    for (const sock of io.sockets.sockets.values()) {
+        if (!sock.user || !sock.user.pseudo) continue;
+        const key = modKey(sock.user);
+        const cur = out.get(key) || { key, name: String(sock.user.pseudo).slice(0, 30), guest: !sock.user.id, connections: 0 };
+        cur.connections++;
+        out.set(key, cur);
+    }
+    const players = [...out.values()].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+    res.json({ ok: true, count: players.length, connections: io.sockets.sockets.size, players });
 }));
 
 /* =====================================================================

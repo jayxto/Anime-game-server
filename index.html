@@ -1051,30 +1051,6 @@
         .trd-mini{background:#101018;border:2px solid #2c2c44;border-radius:9px;padding:4px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;font-size:.68rem;text-align:center;font-family:inherit;}
         .trd-mini img{width:100%;height:70px;object-fit:cover;object-position:top;border-radius:6px;} .trd-mini small{color:var(--text-muted);font-size:.6rem;}
         .trd-mini.on{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,.45);}
-        .trd-live-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
-        .trd-live-head .live{color:#00ff88;font-weight:800;}
-        .trd-live-slots{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:12px 0;}
-        .trd-slot{min-height:180px;background:#101018;border:2px dashed #34344a;border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-        .trd-slot.mine{border-color:var(--accent-cyan);}.trd-slot.theirs{border-color:var(--accent-pink);}
-        .trd-slot .trd-c{width:125px}.trd-slot .trd-c img{width:82px;height:105px;}
-        .trd-vs{font-size:1.8rem;color:var(--accent-yellow);font-weight:900;}
-        .trd-accept-state{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0;}
-        .trd-accept-state span{padding:5px 9px;border-radius:999px;background:#202033;color:var(--text-muted);font-size:.72rem;font-weight:800;}
-        .trd-accept-state span.on{background:rgba(0,255,136,.14);color:#7dffb4;border:1px solid #00ff88;}
-        .trd-final{border:2px solid var(--accent-yellow);background:rgba(255,230,0,.06);border-radius:12px;padding:12px;margin:12px 0;text-align:center;}
-        .trd-history{margin-top:10px;border-top:1px solid #2a2a40;padding-top:10px;}
-        .trd-history-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;background:#101018;border:1px solid #2a2a40;border-radius:9px;padding:8px;margin-bottom:6px;font-size:.76rem;}
-        .trd-history-row>span:nth-child(2){color:var(--accent-cyan);font-weight:900;}
-        .opt-collapse-head{display:flex!important;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none;}
-        .opt-collapse-arrow{margin-left:auto;font-family:system-ui,sans-serif;font-size:.85rem;color:var(--accent-cyan);transition:transform .18s ease;}
-        .opt-collapse-body{overflow:visible;}
-        .opt-collapsed>.opt-collapse-body{display:none;}
-        .opt-collapsed>.opt-collapse-head{margin-bottom:0!important;}
-        .opt-collapsed>.opt-collapse-head .opt-collapse-arrow{transform:rotate(-90deg);}
-        .adm-online-list{display:flex;flex-wrap:wrap;gap:7px;}
-        .adm-online-user{display:inline-flex;align-items:center;gap:6px;background:#101018;border:1px solid #2d2d44;border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:800;}
-        .adm-online-user::before{content:'●';color:#00ff88;font-size:.7rem;}
-        .adm-online-user.guest::before{color:#ffd93d;}
         /* fusion */
         .fuse-grid{display:flex;flex-direction:column;gap:8px;}
         .fuse-row{display:grid;grid-template-columns:1fr auto 1fr auto;align-items:center;gap:8px;background:#101018;border:1px solid #2c2c44;border-radius:12px;padding:10px;font-size:.85rem;}
@@ -1136,7 +1112,7 @@
         .a11y-panel h3{margin:0;} .a11y-panel label{display:flex;gap:8px;align-items:center;flex-wrap:wrap;cursor:pointer;}
         html.big-text body{zoom:1.15;}
         html.cb{--accent-pink:#ff9f1c;}
-        @media (max-width:560px){.hub-row{grid-template-columns:1fr;}.trd-cols{grid-template-columns:1fr;}.trd-live-slots{grid-template-columns:1fr;}.trd-vs{transform:rotate(90deg);}.fuse-row{grid-template-columns:1fr 1fr;}.hb-img{flex-basis:64px;height:84px;}}
+        @media (max-width:560px){.hub-row{grid-template-columns:1fr;}.trd-cols{grid-template-columns:1fr;}.fuse-row{grid-template-columns:1fr 1fr;}.hb-img{flex-basis:64px;height:84px;}}
 
         /* ===== HUB 2 ===== */
         .nav-badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:#00ff88;color:#111;font-size:.7rem;font-weight:800;line-height:18px;text-align:center;}
@@ -2648,11 +2624,6 @@
             <div id="adm-stats"><p class="tl-hint">Chargement…</p></div>
         </div>
         <div class="opt-panel">
-            <h2>🟢 Joueurs connectés</h2>
-            <p class="tl-hint" style="text-align:left;">Pseudos actuellement connectés au site. La liste s'actualise automatiquement.</p>
-            <div id="adm-online-list" class="adm-online-list"><span class="tl-hint">Chargement…</span></div>
-        </div>
-        <div class="opt-panel">
             <h2>🚧 Mode maintenance</h2>
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><input type="checkbox" id="adm-maint"> Afficher le message à tout le monde (petite bannière en haut)</label>
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800;color:#ffb347;"><input type="checkbox" id="adm-lock"> 🔒 Fermer le site : écran « mise à jour en cours » pour tous les joueurs (toi, tu peux continuer à jouer)</label>
@@ -2832,13 +2803,16 @@
         </div>
 
         <div class="opt-panel">
-            <h2>🏆 Classement</h2>
+            <h2>🏆 Classements par jeu</h2>
+            <p class="tl-hint" style="text-align:left;margin-bottom:10px;">Choisis un jeu pour voir ses meilleurs joueurs. Dans un jeu précis, le classement privilégie les <b>victoires</b>, puis les points.</p>
             <div class="bb-tabs" style="justify-content:flex-start;">
                 <button class="lb-tab on" data-p="week" onclick="setLbPeriod('week')">Cette semaine</button>
                 <button class="lb-tab" data-p="all" onclick="setLbPeriod('all')">Depuis toujours</button>
             </div>
-            <select id="lb-mode" class="lb-select" onchange="lbMode=this.value;loadLeaderboard()"><option value="">Tous les modes</option></select>
-            <div id="lb-box" style="margin-top:10px;"></div>
+            <label for="lb-mode" style="display:block;margin:10px 0 5px;font-size:.78rem;color:var(--text-muted);font-weight:800;">🎮 JEU</label>
+            <select id="lb-mode" class="lb-select" onchange="setLbMode(this.value)"><option value="">🌍 Classement global</option></select>
+            <div id="lb-current" style="font-family:'Bangers';font-size:1.35rem;color:var(--accent-cyan);margin-top:14px;">🌍 Classement global</div>
+            <div id="lb-box" style="margin-top:8px;"></div>
         </div>
 
         <div class="opt-panel">
@@ -2913,32 +2887,6 @@
         function getUsername() {
             return currentUser ? currentUser.pseudo : "Anonyme";
         }
-
-        function setOptionCollapsed(panel, collapsed) {
-            panel.classList.toggle('opt-collapsed', !!collapsed);
-            const h = panel.querySelector(':scope > .opt-collapse-head');
-            if (h) h.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-        }
-        function initCollapsibleOptions() {
-            ['options','admin'].forEach(scope => {
-                const root=document.getElementById(scope); if(!root) return;
-                [...root.children].filter(panel => panel.tagName === 'DIV' && panel.querySelector(':scope > h2')).forEach((panel,i) => {
-                    if(panel.dataset.collapseReady) return;
-                    const h=panel.querySelector(':scope > h2'); if(!h) return;
-                    panel.dataset.collapseReady='1'; h.classList.add('opt-collapse-head'); h.setAttribute('role','button'); h.setAttribute('tabindex','0');
-                    const title=(h.textContent||('section-'+i)).trim();
-                    const key='animegame:collapse:'+scope+':'+title.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-');
-                    const body=document.createElement('div'); body.className='opt-collapse-body';
-                    while(h.nextSibling) body.appendChild(h.nextSibling);
-                    panel.appendChild(body);
-                    const arrow=document.createElement('span'); arrow.className='opt-collapse-arrow'; arrow.textContent='▼'; arrow.setAttribute('aria-hidden','true'); h.appendChild(arrow);
-                    const toggle=()=>{ const c=!panel.classList.contains('opt-collapsed'); setOptionCollapsed(panel,c); try{localStorage.setItem(key,c?'1':'0');}catch(_){}};
-                    h.addEventListener('click',toggle); h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
-                    let collapsed=false; try{collapsed=localStorage.getItem(key)==='1';}catch(_){} setOptionCollapsed(panel,collapsed);
-                });
-            });
-        }
-        initCollapsibleOptions();
 
         /* ---------------- Authentification ---------------- */
 
@@ -7573,13 +7521,33 @@
             let d = null;
             try { d = await (await fetch(`/api/leaderboard?period=${lbPeriod}&mode=${encodeURIComponent(lbMode)}`)).json(); } catch (e) {}
             const sel = document.getElementById('lb-mode');
-            if (d && sel && sel.options.length <= 1) Object.entries(d.modes || {}).forEach(([k, v]) => { const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o); });
-            if (!d || !d.rows || !d.rows.length) { box.innerHTML = '<p class="tl-hint">Pas encore de parties classées sur cette période.</p>'; return; }
-            box.innerHTML = d.rows.map((r, i) => `<div class="daily-row${currentUser && r.pseudo === currentUser.pseudo ? ' me' : ''}"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(r.pseudo)}</span><span>${r.points} pts • ${r.games} parties</span></div>`).join('');
+            if (d && sel && sel.options.length <= 1) {
+                Object.entries(d.modes || {}).sort((a, b) => a[1].localeCompare(b[1], 'fr')).forEach(([k, v]) => {
+                    const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o);
+                });
+                sel.value = lbMode;
+            }
+            const cur = document.getElementById('lb-current');
+            if (cur && d) cur.textContent = (lbMode ? '🎮 ' : '🌍 ') + (d.label || 'Classement global');
+            if (!d || !d.rows || !d.rows.length) { box.innerHTML = '<p class="tl-hint">Pas encore de parties enregistrées pour ce jeu sur cette période.</p>'; return; }
+            box.innerHTML = d.rows.map((r, idx) => {
+                const pos = ['🥇', '🥈', '🥉'][idx] || (idx + 1) + '.';
+                const mine = currentUser && r.pseudo === currentUser.pseudo ? ' me' : '';
+                const right = lbMode
+                    ? `<b>${r.wins} V</b> • ${r.games} parties • ${r.winrate}% • ${r.points} pts`
+                    : `<b>${r.points} pts</b> • ${r.wins} V • ${r.games} parties`;
+                return `<div class="daily-row${mine}"><span>${pos} ${escHtml(r.pseudo)}</span><span>${right}</span></div>`;
+            }).join('');
+        }
+        function setLbMode(mode) {
+            lbMode = mode || '';
+            const sel = document.getElementById('lb-mode');
+            if (sel && sel.value !== lbMode) sel.value = lbMode;
+            loadLeaderboard();
         }
         function setLbPeriod(p) {
             lbPeriod = p;
-            document.querySelectorAll('.lb-tab').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+            document.querySelectorAll('#options .lb-tab[data-p="week"], #options .lb-tab[data-p="all"]').forEach(b => b.classList.toggle('on', b.dataset.p === p));
             loadLeaderboard();
         }
         // Chargement quand on ouvre l'onglet Options
@@ -9393,7 +9361,6 @@
                 ${d.byMode.length ? d.byMode.map(m => `<div class="daily-row"><span>${v7esc(m.mode)}</span><span>${m.players} joueur(s) • ${m.rooms} salon(s) • ${m.playing} en partie</span></div>`).join('') : '<p class="tl-hint">Aucun salon ouvert.</p>'}
                 <h3 class="adm-h">📊 Modes les plus joués (7 jours)</h3>
                 ${d.modes.length ? d.modes.map(m => `<div class="anime-stat"><span>${v7esc(m.label)}</span><div class="ab"><div style="width:${Math.round(100 * m.n / maxM)}%"></div></div><b>${m.n}</b></div>`).join('') : '<p class="tl-hint">Pas encore de partie enregistrée.</p>'}`;
-            loadAdminOnline(d.connectedPlayers || null);
             const s = d.site;
             document.getElementById('adm-maint').checked = !!s.maintenance.on;
             document.getElementById('adm-maint-msg').value = s.maintenance.msg || '';
@@ -9405,14 +9372,7 @@
             checkBuild();
             loadAdminTracks(); loadAdminSfx(); loadAdminBugs(); loadSuggestionsAdmin(); loadAdminChars(); loadAdminQuotes(); loadMissed(); loadCatalog(); hwAdminLoad();
         }
-        async function loadAdminOnline(prefetched) {
-            const box = document.getElementById('adm-online-list'); if (!box || !window.IS_ADMIN) return;
-            let list = prefetched;
-            if (!Array.isArray(list)) { const d = await v7get('/api/admin/online'); if (!d || !d.ok) return; list = d.players || []; }
-            box.innerHTML = list.length ? list.map(p => `<span class="adm-online-user${p.guest ? ' guest' : ''}" title="${p.guest ? 'Invité' : 'Compte'}${p.sockets > 1 ? ' • '+p.sockets+' connexions' : ''}">${v7esc(p.pseudo)}${p.guest ? ' <small>(invité)</small>' : ''}</span>`).join('') : '<span class="tl-hint">Aucun joueur connecté.</span>';
-        }
-        setInterval(() => { if (window.IS_ADMIN && document.getElementById('admin')?.classList.contains('active')) loadAdminOnline(); }, 10000);
-        const CLIENT_BUILD = '2026-09-30-trade-options';
+        const CLIENT_BUILD = '2026-10-09-clans';
         async function checkBuild() {
             let d = null; try { d = await (await fetch('/api/version')).json(); } catch (_) {}
             const box = document.getElementById('admin');
@@ -10190,12 +10150,10 @@
         socket.on('clan_event', d => toast(d.text, '#ffd700'));
         socket.on('site_settings', () => setTimeout(() => { if (hub.home) hubRenderHome(); }, 0)); // bannière chance x2 / x10
         socket.on('rare_pull', d => { toast(`${{ cosmique: '🌌', eternelle: '♾️', omega: 'Ω' }[d.rarity] || '✨'} <b>${hubEsc(d.who)}</b> vient d'obtenir <b>${hubEsc(d.name)}</b> ${d.shiny ? 'brillante ' : ''}en carte <b>${hubEsc(d.label)}</b> !`, { cosmique: '#7b5cff', eternelle: '#ffd700', omega: '#ffffff' }[d.rarity]); if (d.rarity !== 'cosmique') confetti(3000); });
-        socket.on('trade_live', d => {
-            const tradeOpen = document.getElementById('eco-trade') && document.getElementById('eco-trade').style.display !== 'none';
-            if (d && d.type === 'started' && !tradeOpen) toast(`🔁 <b>${hubEsc(d.from || 'Un ami')}</b> a ouvert un échange direct avec toi. <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Ouvrir</button>`, '#48dbfb');
-            if (tradeOpen && typeof loadTrade === 'function') loadTrade(true);
-        });
-        socket.on('trade_done', d => { toast(d.text, '#48dbfb'); if (d && d.done) confetti(900); const b=document.getElementById('eco-trade'); if (b && b.style.display !== 'none' && typeof loadTrade==='function') loadTrade(true); });
+        socket.on('trade_live_invite', d => { toast(`🔴 <b>${hubEsc(d.from)}</b> a ouvert un échange direct avec toi <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Ouvrir</button>`, '#48dbfb'); if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
+        socket.on('trade_live_state', d => { if (!d || !d.ok) return; trd.session = d.session || null; if (document.getElementById('eco-trade')?.style.display !== 'none') { if (!trd.mine.length) loadTrade(); else tradeRender(); } });
+        socket.on('trade_live_closed', () => { trd.session = null; if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
+        socket.on('trade_done', d => { toast(d.text, '#48dbfb'); if (/terminé/i.test(d.text || '')) confetti(1000); if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
         function hubJoinWeekly(code) {
             if (currentRoomCode && currentRoomCode !== code) socket.emit('leave_room', { roomCode: currentRoomCode });
             switchTab('mode');
@@ -10341,118 +10299,89 @@
         }
 
         // --- échanges directs ---
-        const trd = { friend: null, mine: [], q: '', r: '', active: null, historyOpen: false, history: [] };
+        const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
         const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
-        const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [String(id).slice(0, i), String(id).slice(i + 1) || null]; };
-        const trdRarity = c => RAR_LABEL[c?.rarity] || (c?.rarity === 'collector' ? '⭐ Collector' : c?.rarity || 'Carte');
-        function tradeInfoCard(c, emptyText) {
-            if (!c) return `<div class="tl-hint">${hubEsc(emptyText || 'Aucune carte posée')}</div>`;
-            return `<div class="trd-c trd-card">${cardHtml({ name:c.name, anime:c.anime, img:c.img, imgs:c.imgs, rarity:c.rarity || 'commune', finish:c.finish || null })}<b>${hubEsc(c.name)}</b><small>${hubEsc(c.anime || '')}</small><small class="trd-rar">${hubEsc(trdRarity(c))}${c.finish ? ' • ' + hubEsc(TRD_FIN[c.finish] || c.finish) : ''}</small></div>`;
+        const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
+        function trdCard(c, empty) {
+            if (!c) return `<div class="trd-c trd-card"><div style="width:86px;height:108px;border:2px dashed #3b3b55;border-radius:10px;display:grid;place-items:center;font-size:1.7rem;">${empty || '❔'}</div><small>Aucune carte</small></div>`;
+            return `<div class="trd-c trd-card">${cardHtml({ name:c.name, anime:c.anime, img:c.img, imgs:c.imgs, rarity:c.rarity || 'commune', finish:c.finish || null })}<small>${hubEsc(c.anime || '')}</small></div>`;
         }
-        async function tradeLoadMine(force) {
-            if (trd.mine.length && !force) return;
-            const d = await v7get('/api/trade/cards');
-            trd.mine = d && d.ok ? (d.cards || []) : [];
-        }
-        async function loadTrade(forceCards) {
+        async function loadTrade() {
             const box = document.getElementById('eco-trade'); if (!box) return;
-            const d = await v7get('/api/trade');
+            const [d, cards] = await Promise.all([v7get('/api/trade'), v7get('/api/trade/cards')]);
             if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Impossible de charger les échanges.</p>'; return; }
-            trd.active = d.active || null;
-            if (trd.active) await tradeLoadMine(!!forceCards);
-            if (trd.active) return tradeRenderLive();
-            trd.mine = [];
-            const online = (d.friends || []).filter(f => f.online);
-            const offline = (d.friends || []).filter(f => !f.online);
-            box.innerHTML = `<div class="shop-head">🔁 Échange direct <span class="tl-hint">• chacun choisit uniquement dans sa propre collection</span></div>
-                <p class="tl-hint" style="text-align:left;">Choisis un ami connecté pour ouvrir la table. Il n'y a plus de liste de cartes de l'autre joueur : chacun pose lui-même sa carte.</p>
-                ${online.length ? `<select id="trd-friend" class="v7-input"><option value="">Choisis un ami connecté…</option>${online.map(f => `<option value="${f.id}">${hubEsc(f.pseudo)} • en ligne</option>`).join('')}</select><button class="btn-action" onclick="tradeStart()">🔁 Ouvrir l'échange direct</button>` : '<p class="tl-hint">Aucun ami n’est connecté pour le moment.</p>'}
-                ${offline.length ? `<p class="tl-hint" style="text-align:left;margin-top:10px;">Hors ligne : ${offline.map(f => hubEsc(f.pseudo)).join(', ')}</p>` : ''}
-                <button class="host-btn" style="margin-top:12px;" onclick="tradeToggleHistory()">📜 ${trd.historyOpen ? 'Masquer' : 'Voir'} l'historique des échanges</button>
-                <div id="trd-history" class="trd-history" style="display:${trd.historyOpen ? '' : 'none'};"></div>`;
-            if (trd.historyOpen) tradeLoadHistory();
+            trd.friends = d.friends || []; trd.session = d.session || null; trd.mine = (cards && cards.cards) || [];
+            tradeRender();
+            if (trd.showHistory) tradeLoadHistory();
         }
-        async function tradeStart() {
-            const fid = +(document.getElementById('trd-friend')?.value || 0);
-            if (!fid) return toast('Choisis un ami connecté.', 'var(--accent-pink)');
-            const d = await v7post('/api/trade/start', { friendId: fid });
-            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            trd.active = d.active; trd.mine = []; trd.q = ''; trd.r = ''; await tradeLoadMine(true); tradeRenderLive();
+        function tradeRender() {
+            const box = document.getElementById('eco-trade'); if (!box) return;
+            const hist = `<label style="display:flex;align-items:center;gap:8px;margin:10px 0;cursor:pointer;"><input id="trd-history-toggle" type="checkbox" ${trd.showHistory ? 'checked' : ''} onchange="tradeHistoryToggle(this.checked)"> 🕘 Voir l’historique des échanges</label><div id="trd-history" style="display:${trd.showHistory ? '' : 'none'};"></div>`;
+            if (!trd.session) {
+                const online = trd.friends.filter(f => f.online);
+                box.innerHTML = `<div class="shop-head">🔁 <b>Échange en direct</b> <span class="tl-hint">• chacun choisit uniquement dans sa propre collection</span></div>
+                    <div class="trd-row" style="padding:14px;"><b>Ouvrir une table d’échange</b><p class="tl-hint" style="margin:3px 0 8px;">Choisis un ami connecté. Tu ne verras jamais sa collection : il posera lui-même sa carte.</p>
+                    ${online.length ? `<div class="ch-in"><select id="trd-friend" class="v7-input"><option value="">Choisis un ami connecté…</option>${online.map(f => `<option value="${f.id}" ${f.busy ? 'disabled' : ''}>${hubEsc(f.pseudo)}${f.busy ? ' • déjà en échange' : ''}</option>`).join('')}</select><button class="btn-action" style="width:auto;margin:0;" onclick="tradeOpen()">Ouvrir</button></div>` : '<p class="tl-hint">Aucun ami n’est connecté pour le moment.</p>'}</div>${hist}`;
+                return;
+            }
+            const s = trd.session, me = s.me, other = s.other;
+            const myPicked = me.card ? trdId(me.card) : '';
+            const status = s.phase === 'confirm'
+                ? `<div class="trd-row" style="border-color:#ffd700;text-align:center;"><b>⚠️ Confirmation finale</b><p class="tl-hint" style="margin:4px 0;">Les deux joueurs ont accepté. Vérifie une dernière fois les deux cartes.</p><div class="trd-act"><button class="go" ${me.confirmed ? 'disabled' : ''} onclick="tradeConfirm(true)">${me.confirmed ? '✅ Confirmé — attente…' : '🔒 Confirmer définitivement'}</button><button onclick="tradeConfirm(false)">↩ Revenir</button></div></div>`
+                : `<div class="trd-act"><button class="go" ${!(me.card && other.card) || me.accepted ? 'disabled' : ''} onclick="tradeDecision(true)">${me.accepted ? '✅ Accepté — attente de ' + hubEsc(other.name) : '✔ Accepter l’échange'}</button><button onclick="tradeDecision(false)">✖ Refuser / quitter</button></div>`;
+            box.innerHTML = `<div class="shop-head">🔴 <b>Échange en direct avec ${hubEsc(other.name)}</b></div>
+                <div class="trd-row"><div class="trd-swap"><div><b>Toi</b>${trdCard(me.card, '🃏')}<small>${me.accepted ? '✅ accepté' : 'en attente'}</small></div><span>⇄</span><div><b>${hubEsc(other.name)}</b>${trdCard(other.card, '⌛')}<small>${other.accepted ? '✅ accepté' : 'choisit sa carte'}</small></div></div>${status}</div>
+                <h3 class="adm-h">🃏 Tes cartes</h3><p class="tl-hint">Clique sur une carte pour la poser. Si tu changes de carte, les validations des deux joueurs sont automatiquement annulées.</p>
+                <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans tes cartes" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()"><select class="trd-sel" style="max-width:210px" onchange="trd.r1=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${trd.r1 === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${TRD_ORD.filter(r => trd.mine.some(c => c.rarity === r)).map(r => `<option value="${r}"${trd.r1 === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select></div>
+                <div class="trd-list" id="trd-l-give"></div>${hist}`;
+            tradeLists(myPicked);
         }
-        function tradeRenderLive() {
-            const box = document.getElementById('eco-trade'), t = trd.active; if (!box || !t) return loadTrade();
-            const mineRef = t.mineRef ? t.mineRef.key + '#' + (t.mineRef.finish || '') : '';
-            const rars = TRD_ORD.filter(r => trd.mine.some(c => c.rarity === r));
-            const final = t.status === 'confirm';
-            box.innerHTML = `<div class="trd-live-head"><div><b>🔴 Échange en direct avec ${hubEsc(t.other.pseudo)}</b><div class="tl-hint">${final ? 'Les deux cartes sont verrouillées : confirmation finale.' : 'Si une carte change, les accords sont automatiquement annulés.'}</div></div><span class="live">● EN DIRECT</span></div>
-                <div class="trd-live-slots"><div class="trd-slot mine"><b>Ta carte</b>${tradeInfoCard(t.mine, 'Choisis une carte ci-dessous')}</div><div class="trd-vs">⇄</div><div class="trd-slot theirs"><b>Carte de ${hubEsc(t.other.pseudo)}</b>${tradeInfoCard(t.theirs, `${t.other.pseudo} n'a encore rien posé`)}</div></div>
-                <div class="trd-accept-state"><span class="${t.myAccepted || final ? 'on' : ''}">${t.myAccepted || final ? '✔' : '…'} Ton accord</span><span class="${t.theirAccepted || final ? 'on' : ''}">${t.theirAccepted || final ? '✔' : '…'} Accord de ${hubEsc(t.other.pseudo)}</span></div>
-                ${final ? tradeFinalHtml(t) : `<h3 class="adm-h">🃏 Ta collection</h3><div style="display:grid;grid-template-columns:1fr minmax(130px,220px);gap:7px;"><input class="v7-input" style="margin:0;" placeholder="🔎 Chercher une carte" value="${hubEsc(trd.q)}" oninput="trd.q=this.value;tradeRenderCards()"><select class="trd-sel" style="margin:0;" onchange="trd.r=this.value;tradeRenderCards()"><option value="">Toutes les raretés</option><option value="fin"${trd.r === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${rars.map(r => `<option value="${r}"${trd.r === r ? ' selected' : ''}>${hubEsc(RAR_LABEL[r] || r)}</option>`).join('')}</select></div><div class="trd-list" id="trd-live-cards" style="margin-top:8px;"></div>
-                <div class="trd-act" style="margin-top:12px;">${t.myAccepted ? `<button onclick="tradeUnaccept()">↩ Retirer mon accord</button>` : `<button class="go" ${!(t.mine && t.theirs) ? 'disabled' : ''} onclick="tradeDecision(true)">✔ Accepter cet échange</button>`}<button onclick="tradeDecision(false)">✖ Refuser / quitter</button></div>`}
-                <button class="host-btn" style="margin-top:14px;" onclick="tradeToggleHistory()">📜 ${trd.historyOpen ? 'Masquer' : 'Voir'} l'historique des échanges</button>
-                <div id="trd-history" class="trd-history" style="display:${trd.historyOpen ? '' : 'none'};"></div>`;
-            if (!final) tradeRenderCards(mineRef);
-            if (trd.historyOpen) tradeLoadHistory();
-        }
-        function tradeFinalHtml(t) {
-            return `<div class="trd-final"><h3>⚠️ Confirmation finale</h3><p>Vérifie une dernière fois les deux cartes. L'échange ne sera effectué que lorsque vous aurez <b>tous les deux confirmé</b>.</p><div class="trd-accept-state"><span class="${t.myConfirmed ? 'on' : ''}">${t.myConfirmed ? '✔ Confirmé' : '… En attente'} • toi</span><span class="${t.theirConfirmed ? 'on' : ''}">${t.theirConfirmed ? '✔ Confirmé' : '… En attente'} • ${hubEsc(t.other.pseudo)}</span></div><div class="trd-act">${t.myConfirmed ? '<button class="go" disabled>✔ Confirmation envoyée</button>' : '<button class="go" onclick="tradeConfirm(true)">✅ CONFIRMER DÉFINITIVEMENT</button>'}<button onclick="tradeConfirm(false)">✖ Annuler l'échange</button></div></div>`;
-        }
-        function tradeRenderCards(mineRef) {
-            const box = document.getElementById('trd-live-cards'); if (!box) return;
+        function tradeLists(selected) {
+            const g = document.getElementById('trd-l-give'); if (!g) return;
             const rk = r => { const i = TRD_ORD.indexOf(r); return i < 0 ? 99 : i; };
-            const q = trd.q.toLowerCase();
-            const f = trd.mine.filter(c => (!q || (c.name + ' ' + c.anime).toLowerCase().includes(q)) && (!trd.r || (trd.r === 'fin' ? !!c.finish : c.rarity === trd.r)))
-                .sort((a,b) => rk(a.rarity)-rk(b.rarity) || a.name.localeCompare(b.name,'fr'));
-            const sel = mineRef || (trd.active?.mineRef ? trd.active.mineRef.key + '#' + (trd.active.mineRef.finish || '') : '');
-            box.innerHTML = (f.length > 100 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : 100 premières affichées, utilise la recherche pour filtrer.</p>` : '') + f.slice(0,100).map(c => {
+            const f = trd.mine.filter(c => (!trd.q1 || (c.name + ' ' + c.anime).toLowerCase().includes(trd.q1.toLowerCase())) && (!trd.r1 || (trd.r1 === 'fin' ? !!c.finish : c.rarity === trd.r1)))
+                .sort((a, b) => rk(a.rarity) - rk(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || a.name.localeCompare(b.name, 'fr'));
+            const sel = selected != null ? selected : (trd.session && trd.session.me.card ? trdId(trd.session.me.card) : '');
+            g.innerHTML = (f.length > 100 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (100 premières affichées)</p>` : '') + f.slice(0, 100).map(c => {
                 const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
-                const id = trdId(c);
-                return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === id ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSetOffer(${JSON.stringify(id).replace(/"/g,'&quot;')})">${img}${c.finish ? `<span class="tm-fin">${hubEsc(TRD_FIN[c.finish] || c.finish)}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${hubEsc(trdRarity(c))}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
-            }).join('') || '<p class="tl-hint">Aucune carte avec ce filtre.</p>';
+                return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === trdId(c) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSelect(${JSON.stringify(trdId(c)).replace(/"/g, '&quot;')})">${img}${c.finish ? `<span class="tm-fin">${TRD_FIN[c.finish]}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${RAR_LABEL[c.rarity] || (c.rarity === 'collector' ? '⭐ Collector' : c.rarity)}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
+            }).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
-        async function tradeSetOffer(id) {
-            const t = trd.active; if (!t || t.status !== 'negotiating') return;
-            const current = t.mineRef ? t.mineRef.key + '#' + (t.mineRef.finish || '') : '';
-            const [card, finish] = current === id ? ['', null] : trdSplit(id);
-            const d = await v7post('/api/trade/offer', { id: t.id, card, finish });
+        async function tradeOpen() {
+            const sel = document.getElementById('trd-friend'), fid = +(sel && sel.value || 0);
+            if (!fid) return toast('Choisis un ami connecté.', 'var(--accent-pink)');
+            const d = await v7post('/api/trade/live/open', { friendId: fid });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            trd.active = d.active; tradeRenderLive();
+            trd.session = d.session; tradeRender(); toast('🔴 Table d’échange ouverte.', '#48dbfb');
+        }
+        async function tradeSelect(id) {
+            if (!trd.session) return;
+            const [key, finish] = trdSplit(id);
+            const d = await v7post('/api/trade/live/select', { key, finish });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            trd.session = d.session; tradeRender();
         }
         async function tradeDecision(accept) {
-            const t = trd.active; if (!t) return;
-            const d = await v7post('/api/trade/decision', { id:t.id, accept:!!accept });
+            const d = await v7post('/api/trade/live/decision', { accept: !!accept });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            if (d.closed) { trd.active=null; trd.mine=[]; toast('Échange fermé.', '#48dbfb'); return loadTrade(); }
-            trd.active=d.active; tradeRenderLive();
-        }
-        async function tradeUnaccept() {
-            const t=trd.active; if (!t) return;
-            const d=await v7post('/api/trade/unaccept',{id:t.id});
-            if (!d || !d.ok) return toast('❌ '+((d&&d.error)||'Impossible'),'var(--accent-pink)');
-            trd.active=d.active; tradeRenderLive();
+            if (d.closed) { trd.session = null; loadTrade(); return; }
+            trd.session = d.session; tradeRender();
         }
         async function tradeConfirm(confirm) {
-            const t=trd.active; if (!t) return;
-            const d=await v7post('/api/trade/confirm',{id:t.id,confirm:!!confirm});
-            if (!d || !d.ok) return toast('❌ '+((d&&d.error)||'Impossible'),'var(--accent-pink)');
-            if (d.done) { toast(`✅ Échange terminé${d.got ? ` : tu reçois ${hubEsc(d.got)}` : ''} !`,'#00ff88'); confetti(1200); trd.active=null; trd.mine=[]; return loadTrade(true); }
-            if (d.closed) { trd.active=null; trd.mine=[]; return loadTrade(); }
-            trd.active=d.active; tradeRenderLive();
+            const d = await v7post('/api/trade/live/confirm', { confirm: !!confirm });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (d.done) { trd.session = null; confetti(1100); await loadTrade(); return; }
+            trd.session = d.session; tradeRender();
         }
-        async function tradeToggleHistory() {
-            trd.historyOpen=!trd.historyOpen;
-            if (trd.active) tradeRenderLive(); else loadTrade();
-        }
+        function tradeHistoryToggle(on) { trd.showHistory = !!on; const b = document.getElementById('trd-history'); if (b) b.style.display = on ? '' : 'none'; if (on) tradeLoadHistory(); }
         async function tradeLoadHistory() {
-            const box=document.getElementById('trd-history'); if(!box) return;
-            box.innerHTML='<p class="tl-hint">Chargement de l’historique…</p>';
-            const d=await v7get('/api/trade/history');
-            if(!d||!d.ok){ box.innerHTML='<p class="tl-hint">Historique indisponible.</p>'; return; }
-            trd.history=d.history||[];
-            const status={done:'✅ Terminé',refused:'❌ Refusé',cancelled:'✖ Annulé',failed:'⚠️ Échec',expired:'⌛ Expiré'};
-            box.innerHTML=trd.history.length?`<h3 class="adm-h">📜 Historique des échanges</h3>${trd.history.map(x=>`<div class="trd-history-row"><span><b>Toi</b><br>${x.mine?hubEsc(x.mine.name):'—'}${x.mine?.finish?'<br><small>'+hubEsc(TRD_FIN[x.mine.finish]||x.mine.finish)+'</small>':''}</span><span>⇄<br><small>${hubEsc(status[x.status]||x.status)}</small></span><span><b>${hubEsc(x.other||'Joueur')}</b><br>${x.theirs?hubEsc(x.theirs.name):'—'}${x.theirs?.finish?'<br><small>'+hubEsc(TRD_FIN[x.theirs.finish]||x.theirs.finish)+'</small>':''}<br><small>${new Date(x.at).toLocaleString('fr-FR')}</small></span></div>`).join('')}`:'<p class="tl-hint">Aucun échange récent.</p>';
+            const b = document.getElementById('trd-history'); if (!b || !trd.showHistory) return;
+            b.innerHTML = '<p class="tl-hint">Chargement de l’historique…</p>';
+            const d = await v7get('/api/trade/history'); if (!d || !d.ok) { b.innerHTML = '<p class="tl-hint">Historique indisponible.</p>'; return; }
+            const lab = { done:'✅ Terminé', refused:'❌ Refusé', cancelled:'Annulé', failed:'⚠️ Échoué', expired:'⌛ Expiré' };
+            b.innerHTML = d.history.length ? `<h3 class="adm-h">🕘 Historique</h3>${d.history.map(h => `<div class="trd-row"><div><b>${hubEsc(h.other.name || 'Joueur')}</b> • <small>${new Date(h.at).toLocaleString('fr-FR')}</small> • ${lab[h.status] || hubEsc(h.status)}</div><div class="trd-swap">${trdCard(h.mine.card, '—')}<span>⇄</span>${trdCard(h.other.card, '—')}</div></div>`).join('')}` : '<p class="tl-hint">Aucun ancien échange.</p>';
         }
 
         // --- fusion ---
@@ -11496,6 +11425,9 @@
                 <div class="h3-evt-row"><b>👹 Boss spécial</b><select id="h3-boss-hp"><option value="2000">2 000 PV</option><option value="3000" selected>3 000 PV</option><option value="6000">6 000 PV</option><option value="12000">12 000 PV</option></select><button class="btn-action" onclick="h3Event('boss',{hp:+document.getElementById('h3-boss-hp').value})">Lancer</button></div>
                 <div class="h3-evt-row"><b>⚡ Tournoi surprise</b><select id="h3-sur-m"><option value="2">dans 2 min</option><option value="5" selected>dans 5 min</option><option value="10">dans 10 min</option></select><button class="btn-action" onclick="h3Event('surprise',{minutes:+document.getElementById('h3-sur-m').value})">Lancer</button></div>
                 <div id="h3-evt-state" class="tl-hint" style="text-align:left;"></div></div>
+            <div class="opt-panel"><h2>🟢 Joueurs connectés <span id="h3-online-count" class="tl-hint"></span></h2>
+                <p class="tl-hint" style="text-align:left;">Pseudos actuellement connectés au site. La liste se met à jour automatiquement.</p>
+                <div id="h3-online"><p class="tl-hint">Chargement…</p></div><button onclick="h3OnlineLoad()">↻ Actualiser</button></div>
             <div class="opt-panel"><h2>🛡️ Modération</h2>
                 <div class="ch-in"><input id="h3-mod-q" class="v7-input" placeholder="🔎 Chercher un joueur (pseudo)" onkeydown="if(event.key==='Enter')h3ModSearch()"><button onclick="h3ModSearch()">Chercher</button></div>
                 <input id="h3-mod-reason" class="v7-input" maxlength="120" placeholder="Raison pour muter / bannir (facultatif)">
@@ -11509,7 +11441,14 @@
             const orig = window.switchTab;
             window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'admin') h3AdminLoad(); return r; };
         })();
-        function h3AdminLoad() { h3ModLoad(); h3AnnLoad(); h3StatsLoad(); v7get('/api/event').then(e => { if (e && e.ok) h3EvtState(e); }); }
+        function h3AdminLoad() { h3OnlineLoad(); h3ModLoad(); h3AnnLoad(); h3StatsLoad(); v7get('/api/event').then(e => { if (e && e.ok) h3EvtState(e); }); }
+        async function h3OnlineLoad() {
+            const box = document.getElementById('h3-online'); if (!box) return;
+            const d = await v7get('/api/admin/online'); if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Liste indisponible.</p>'; return; }
+            const n = document.getElementById('h3-online-count'); if (n) n.textContent = `• ${d.count} joueur${d.count > 1 ? 's' : ''} • ${d.connections} connexion${d.connections > 1 ? 's' : ''}`;
+            box.innerHTML = d.players.length ? `<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px;">${d.players.map(p => `<span class="rg-chip" style="border-color:#00ff88;"><span style="color:#00ff88">●</span> <b>${v7esc(p.name)}</b>${p.guest ? ' <small>(invité)</small>' : ''}${p.connections > 1 ? ` <small>×${p.connections}</small>` : ''}</span>`).join('')}</div>` : '<p class="tl-hint">Aucun joueur connecté.</p>';
+        }
+        setInterval(() => { if (!document.hidden && document.getElementById('admin')?.classList.contains('active')) h3OnlineLoad(); }, 5000);
         function h3EvtState(e) {
             const el = document.getElementById('h3-evt-state'); if (!el) return;
             const L = [];
