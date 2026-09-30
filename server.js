@@ -370,130 +370,22 @@ async function fetchFandomPageImageBySearch(host, name) {
     return pages.length ? pageImageFromApiPage(pages[0]) : null;
 }
 
-// Images personnages : statiques vérifiées + thèmes + Fandom + secours AniList.
-// Les anciens "missing" en base ne bloquent plus définitivement une image : ils sont retentés
-// au redémarrage puis avec un délai, ce qui permet de réparer les photos sans vider la DB.
+// Image vérifiée de chaque perso (char-images.json) : prioritaire, jamais de perso sans image
+// même si Fandom ne répond pas ou si une ancienne recherche ratée est restée en cache.
 const STATIC_CHAR_IMAGES = (() => {
     try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'char-images.json'), 'utf8')); }
     catch (e) { console.warn('[Images] char-images.json introuvable :', e.message); return {}; }
 })();
-
-const THEME_CHAR_IMAGES = (() => {
-    const out = {};
-    const add = (universeKey, name, img) => {
-        if (!universeKey || !name || !img) return;
-        const key = normalizeImageKey(cleanImageCharacterName(name));
-        if (!key) return;
-        out[universeKey] = out[universeKey] || {};
-        if (!out[universeKey][key]) out[universeKey][key] = img;
-    };
-    for (const file of ['qap-themes.json', 'tierlist-themes.json']) {
-        try {
-            const themes = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8')).themes || [];
-            for (const theme of themes) {
-                if (theme.kind !== 'chars') continue;
-                for (const item of (theme.items || [])) {
-                    const u = resolveImageUniverseKey(item.sub);
-                    add(u, item.name, item.img);
-                }
-            }
-        } catch (_) {}
-    }
-    return out;
-})();
-
 function staticCharImage(universeKey, name) {
-    if (!name) return null;
-    const key = normalizeImageKey(cleanImageCharacterName(name));
-    return STATIC_CHAR_IMAGES[universeKey]?.[key]
-        || THEME_CHAR_IMAGES[universeKey]?.[key]
-        || null;
-}
-
-const IMAGE_ANILIST_MEDIA_HINTS = {
-    naruto:[/naruto/i,/boruto/i], onepiece:[/one piece/i], bleach:[/bleach/i],
-    hxh:[/hunter x hunter/i,/hunter × hunter/i], snk:[/shingeki no kyojin/i,/attack on titan/i],
-    sds:[/nanatsu no taizai/i,/seven deadly sins/i], deathnote:[/death note/i],
-    cote:[/youkoso jitsuryoku/i,/classroom of the elite/i], solo:[/solo leveling/i,/ore dake level up/i],
-    clover:[/black clover/i], fireforce:[/enen no shouboutai/i,/fire force/i],
-    mushoku:[/mushoku tensei/i], rezero:[/re:?zero/i], fairy:[/fairy tail/i],
-    bluelock:[/blue lock/i], fma:[/fullmetal alchemist/i,/hagane no renkinjutsushi/i],
-    chainsaw:[/chainsaw man/i], wakfu:[/wakfu/i], demonslayer:[/kimetsu no yaiba/i,/demon slayer/i],
-    pokemon:[/pok[eé]mon/i,/pokemon/i], dragonball:[/dragon ball/i],
-    hellsparadise:[/jigokuraku/i,/hell'?s paradise/i], gachiakuta:[/gachiakuta/i],
-    haikyuu:[/haikyuu/i], jjk:[/jujutsu kaisen/i], jojo:[/jojo/i,/jojo'?s bizarre adventure/i],
-    tensura:[/tensei shitara slime/i,/tensura/i,/that time i got reincarnated as a slime/i],
-    opm:[/one punch man/i], sao:[/sword art online/i], tokyoghoul:[/tokyo ghoul/i],
-    tokyorevengers:[/tokyo revengers/i]
-};
-const CHARACTER_ANILIST_CACHE = new Map();
-const CHARACTER_IMAGE_RETRY_AT = new Map();
-
-function imageNameScore(wantedName, candidateNames) {
-    const wanted = normalizeImageKey(wantedName);
-    if (!wanted) return 0;
-    let best = 0;
-    const wt = new Set(wanted.split(' ').filter(Boolean));
-    for (const raw of candidateNames.filter(Boolean)) {
-        const n = normalizeImageKey(raw);
-        if (!n) continue;
-        if (n === wanted) best = Math.max(best, 100);
-        else if (n.includes(wanted) || wanted.includes(n)) best = Math.max(best, 55);
-        const nt = new Set(n.split(' ').filter(Boolean));
-        let overlap = 0;
-        wt.forEach(t => { if (nt.has(t)) overlap++; });
-        best = Math.max(best, overlap * 18);
-    }
-    return best;
-}
-
-async function fetchAniListCharacterImage(universeKey, name) {
-    const cacheKey = `${universeKey}|${normalizeImageKey(name)}`;
-    if (CHARACTER_ANILIST_CACHE.has(cacheKey)) return CHARACTER_ANILIST_CACHE.get(cacheKey);
-
-    const query = `query($s:String){Page(perPage:12){characters(search:$s,sort:FAVOURITES_DESC){
-        id name{full native alternative} image{large}
-        media(perPage:20,sort:POPULARITY_DESC){nodes{type title{romaji english native}}}
-    }}}`;
-    let hit = null;
-    try {
-        const r = await fetch('https://graphql.anilist.co', {
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json','User-Agent':'AnimeGame/1.0'},
-            body:JSON.stringify({ query, variables:{ s:name } }),
-            signal:AbortSignal.timeout(12000)
-        });
-        if (!r.ok) throw new Error(`AniList HTTP ${r.status}`);
-        const d = await r.json();
-        const chars = d?.data?.Page?.characters || [];
-        const hints = IMAGE_ANILIST_MEDIA_HINTS[universeKey] || [];
-        let best = null, bestScore = -1;
-        for (const c of chars) {
-            if (!c?.image?.large || /default\.jpg$/i.test(c.image.large)) continue;
-            const nScore = imageNameScore(name, [c.name?.full, c.name?.native, ...(c.name?.alternative || [])]);
-            const titles = (c.media?.nodes || []).flatMap(m => [m?.title?.romaji, m?.title?.english, m?.title?.native]).filter(Boolean);
-            const mediaOk = !hints.length || titles.some(t => hints.some(rx => rx.test(t)));
-            if (!mediaOk || nScore < 18) continue;
-            const score = nScore + 120 + Math.min(20, titles.length);
-            if (score > bestScore) { bestScore = score; best = c; }
-        }
-        if (best) hit = {
-            imageUrl:best.image.large,
-            sourceUrl:`https://anilist.co/character/${best.id}`,
-            title:best.name?.full || name
-        };
-    } catch (_) {}
-    CHARACTER_ANILIST_CACHE.set(cacheKey, hit);
-    if (CHARACTER_ANILIST_CACHE.size > 4000) CHARACTER_ANILIST_CACHE.delete(CHARACTER_ANILIST_CACHE.keys().next().value);
-    return hit;
+    const m = STATIC_CHAR_IMAGES[universeKey];
+    return m && name ? m[normalizeImageKey(cleanImageCharacterName(name))] || null : null;
 }
 
 async function resolveCharacterImage(universeKey, displayName) {
     const fixed = staticCharImage(universeKey, displayName);
     if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
-
     const host = FANDOM_WIKIS[universeKey];
-    if ((!host && universeKey !== 'pokemon') || !displayName) {
+    if (!host || !displayName) {
         return { imageUrl:null, sourceUrl:null, status:'unsupported' };
     }
 
@@ -501,44 +393,41 @@ async function resolveCharacterImage(universeKey, displayName) {
     const cacheKey = `${universeKey}|${normalizeImageKey(cleanName)}`;
 
     const cached = await getCachedCharacterImage(universeKey, cleanName);
-    if (cached?.imageUrl) return cached;
-    if (cached && !cached.imageUrl) {
-        const retryAt = CHARACTER_IMAGE_RETRY_AT.get(cacheKey) || 0;
-        if (Date.now() < retryAt) return cached;
-        CHARACTER_IMAGE_RETRY_AT.set(cacheKey, Date.now() + 6 * 60 * 60 * 1000);
-    }
+    // Un "ok" est permanent. Un missing de plus de 7 jours peut être retenté côté DB
+    // lors d'un futur nettoyage; ici on évite de spammer Fandom.
+    if (cached) return cached;
 
-    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
+    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) {
+        return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
+    }
 
     const task = (async () => {
         try {
+            // Les alias DLE servent aussi pour les recherches d'images.
             let searchName = cleanName;
             try {
                 const n = normalizeImageKey(cleanName);
-                const alias = typeof DLE_MASTER_ALIASES !== 'undefined' ? DLE_MASTER_ALIASES[universeKey]?.[n] : null;
+                const alias = typeof DLE_MASTER_ALIASES !== 'undefined'
+                    ? DLE_MASTER_ALIASES[universeKey]?.[n]
+                    : null;
                 if (alias && typeof DLE_MASTER_NAMES !== 'undefined') {
-                    const found = (DLE_MASTER_NAMES[universeKey] || []).find(x => normalizeImageKey(x) === alias);
+                    const found = (DLE_MASTER_NAMES[universeKey] || [])
+                        .find(x => normalizeImageKey(x) === alias);
                     if (found) searchName = found;
                 }
             } catch (_) {}
 
-            let hit = null;
-            if (host) {
-                hit = await fetchFandomPageImageByExactTitle(host, searchName);
-                if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
-                if (!hit && searchName !== cleanName) hit = await fetchFandomPageImageBySearch(host, cleanName);
-            }
-            if (!hit) hit = await fetchAniListCharacterImage(universeKey, searchName);
-            if (!hit && searchName !== cleanName) hit = await fetchAniListCharacterImage(universeKey, cleanName);
+            let hit = await fetchFandomPageImageByExactTitle(host, searchName);
+            if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
 
             const result = hit
-                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl || null, status:'ok' }
+                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl, status:'ok' }
                 : { imageUrl:null, sourceUrl:null, status:'missing' };
 
             await saveCachedCharacterImage(universeKey, cleanName, result);
             return result;
         } catch (e) {
-            console.warn(`[Character image] ${universeKey}/${cleanName}:`, e.message);
+            console.warn(`[Fandom image] ${universeKey}/${cleanName}:`, e.message);
             return { imageUrl:null, sourceUrl:null, status:'error' };
         } finally {
             CHARACTER_IMAGE_INFLIGHT.delete(cacheKey);
@@ -679,23 +568,6 @@ async function applyImpostorModeRanking(room, { impostorsWin, noImpostorRoundWin
 
         await recordMatchResult(p.userId, won, eloDelta);
         notifyProfileUpdate(p.id, p.userId);
-    }
-
-    // Le classement général existait déjà via l'ELO, mais ces parties n'étaient pas
-    // enregistrées dans game_results : elles étaient donc absentes du classement par jeu.
-    if (!room._progImpostorRecorded) {
-        room._progImpostorRecorded = true;
-        const modeKey = room.mode === 'note'
-            ? 'note'
-            : (room.subMode === 'hardcore' ? 'undercover:hardcore' : 'undercover:normal');
-        const entries = room.players.map(p => {
-            let won;
-            if (noImpostorRoundWin) won = true;
-            else if (p.isImpostor) won = impostorsWin;
-            else won = !impostorsWin;
-            return { player: p, points: won ? 100 : 20, won };
-        });
-        await progRecord(room, modeKey, null, entries);
     }
 }
 
@@ -9540,7 +9412,7 @@ const BLINDTEST_EXTRA_CHOICES = [
 // ===== Openings joués directement depuis YouTube (pas de fichier mp3 à héberger) =====
 // footage = la vidéo montre des images de l'anime (utilisée aussi par le mini-jeu Scene Guessr)
 const BT_BAD_IDS = new Set(); // vidéos non intégrables détectées en jeu
-const BLINDTEST_YT_TRACKS = [{"anime": "One Piece", "title": "Hiroshi Kitadani - We Are!", "id": "gcjdXMfYIe4", "footage": true}, {"anime": "One Piece", "title": "Folder5 - Believe", "id": "QwSkErUIF9k", "footage": true}, {"anime": "One Piece", "title": "D-51 - Brand New World", "id": "0uh9U5CXgso", "footage": true}, {"anime": "One Piece", "title": "The Babystars - Hikari e", "id": "GXkN2Du52j4", "footage": true}, {"anime": "One Piece", "title": "BOYSTYLE - Kokoro no Chizu", "id": "lj6tjz5VkQM", "footage": true}, {"anime": "One Piece", "title": "TVXQ - Share the World", "id": "6y5mvWkI7TE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Over the Top", "id": "pAI961THYkE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Us!", "id": "NYryrD9lpsw", "footage": true}, {"anime": "One Piece", "title": "SEKAI NO OWARI - Saikou Toutatsuten", "id": "kXNwlScpt_c", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Aaaassu!", "id": "r7zV2RtNlw0", "footage": true}, {"anime": "One Piece", "title": "Maki Otsuki - Memories", "id": "T1_gMAN4TjA", "footage": false}, {"anime": "One Piece", "title": "Ado - New Genesis", "id": "6lnnPnr_0SU", "footage": true}, {"anime": "Bleach", "title": "ORANGE RANGE - Asterisk", "id": "wW9TwZdWpjw", "footage": true}, {"anime": "Bleach", "title": "High and Mighty Color - Ichirin no Hana", "id": "eIm0dpBjQPg", "footage": true}, {"anime": "Bleach", "title": "UVERworld - D-tecnoLife", "id": "h1MoLQ9Wcv0", "footage": true}, {"anime": "Bleach", "title": "Aqua Timez - Alones", "id": "WEN4qOcVKeM", "footage": true}, {"anime": "Bleach", "title": "Beat Crusaders - Tonight, Tonight, Tonight", "id": "oi3wY1-EwDs", "footage": true}, {"anime": "Bleach", "title": "Tatsuya Kitani - Scar", "id": "mjeR7vUrDvM", "footage": true}, {"anime": "Naruto", "title": "nobodyknows+ - Hero's Come Back!!", "id": "vxvP9zSOL7s", "footage": true}, {"anime": "Naruto", "title": "HOME MADE Kazoku - Kanashimi wo Yasashisa ni (little by little)", "id": "XwJEFzsqNoY", "footage": true}, {"anime": "Naruto", "title": "HEARTS GROW - Yura Yura", "id": "-m8kR0FQ7Wk", "footage": true}, {"anime": "Naruto", "title": "NICO Touches the Walls - Diver", "id": "P1yJ51DH-18", "footage": true}, {"anime": "Naruto", "title": "The Cro-Magnons - Totsugeki Rock", "id": "ZR5ZCVQ0puE", "footage": true}, {"anime": "Naruto", "title": "tacica - newsong", "id": "yu12tTrkJ-g", "footage": true}, {"anime": "Naruto", "title": "7!! - Lovers", "id": "KmrTuNXVrf4", "footage": true}, {"anime": "Naruto", "title": "Daisuke - Moshimo", "id": "PBsMuTPEJ_A", "footage": true}, {"anime": "Boruto", "title": "KANA-BOON - Baton Road", "id": "48wCQXl83-s", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - Cha-La Head-Cha-La", "id": "-CebN43ppk8", "footage": true}, {"anime": "Dragon Ball", "title": "Hiroki Takahashi - Makafushigi Adventure!", "id": "M4fM1GdUCbU", "footage": true}, {"anime": "Dragon Ball", "title": "FIELD OF VIEW - Dan Dan Kokoro Hikareteku", "id": "Hm1hM_Ljcsk", "footage": true}, {"anime": "Dragon Ball", "title": "Kazuya Yoshii - Chozetsu Dynamic!", "id": "ASA8NsKQywU", "footage": true}, {"anime": "Dragon Ball", "title": "Kiyoshi Hikawa - Limit Break x Survivor", "id": "BMgpnQcQPok", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - We Gotta Power", "id": "1KCturR5CIk", "footage": true}, {"anime": "Hunter x Hunter", "title": "Keno - Ohayou", "id": "QNwxM1uy8wg", "footage": true}, {"anime": "Hunter x Hunter", "title": "Fear, and Loathing in Las Vegas - Just Awake", "id": "R9kgxfc8tOg", "footage": true}, {"anime": "Death Note", "title": "Maximum the Hormone - What's up, people?!", "id": "ZXDtsF9jmZU", "footage": true}, {"anime": "Death Note", "title": "Nightmare - Alumina", "id": "3YDFjbNVUGI", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Porno Graffitti - Melissa", "id": "jwslD4qNn9U", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Sukima Switch - Golden Time Lover", "id": "uvHyMazZ29I", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Chemistry - Period", "id": "86VlDpO0qo0", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "SID - Rain", "id": "cMsDqVx777k", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "NICO Touches the Walls - Hologram", "id": "K071t7ockJk", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Homura", "id": "N2p1K-UAtfA", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Akeboshi", "id": "XIUDjQ5sVKk", "footage": true}, {"anime": "Demon Slayer", "title": "MY FIRST STORY x HYDE - Mugen", "id": "Hk6qHGRgK-s", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "Who-ya Extended - VIVID VICE", "id": "MWUuLV1oGks", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "King Gnu - Ichizu", "id": "9qwULTpB-mk", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Red Swan (YOSHIKI feat. HYDE)", "id": "gg0Xg6H9Obw", "footage": true}, {"anime": "L'Attaque des Titans", "title": "SiM - The Rumbling", "id": "6MuAxGB3o_4", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Shinsei Kamattechan - Boku no Sensou", "id": "pQgJCloa6wM", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Jiyuu no Tsubasa", "id": "ErgcCrXU0Ig", "footage": true}, {"anime": "Spy x Family", "title": "BUMP OF CHICKEN - SOUVENIR", "id": "C1G0rBB6fnY", "footage": true}, {"anime": "Spy x Family", "title": "Ado - Kura Kura", "id": "kLhPtrXMb7w", "footage": true}, {"anime": "Frieren", "title": "YOASOBI - Yuusha", "id": "GcliqznvOc4", "footage": true}, {"anime": "Oshi no Ko", "title": "GEMN - Fatal", "id": "vyis0G1jEIo", "footage": true}, {"anime": "Solo Leveling", "title": "SawanoHiroyuki[nZk]:TOMORROW X TOGETHER - LEveL", "id": "sSyUREZzGc4", "footage": true}, {"anime": "Blue Lock", "title": "UNISON SQUARE GARDEN - Chaos ga Kiwamaru", "id": "oX2HOWzc7mA", "footage": true}, {"anime": "Kaiju No. 8", "title": "YUNGBLUD - Abyss", "id": "OcpgYeSdp4c", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR - 99", "id": "F5OJPUXJvHk", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 99.9", "id": "D6g-qbYEEX8", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 1", "id": "xRIOnDruOZM", "footage": true}, {"anime": "One Punch Man", "title": "JAM Project - THE HERO!!", "id": "atxYe-nOa9w", "footage": true}, {"anime": "Tokyo Ghoul", "title": "TK from Ling tosite sigure - katharsis", "id": "S2H_YNYRw2E", "footage": true}, {"anime": "Re:Zero", "title": "Konomi Suzuki - Redo", "id": "V5cW93SRfW4", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - Paradisus-Paradoxum", "id": "LEiQ11iagns", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - STYX HELIX", "id": "IiaeDOO113A", "footage": true}, {"anime": "Mushoku Tensei", "title": "Yuiko Ohara - Tabibito no Uta", "id": "pEoCT-Kv5CI", "footage": true}, {"anime": "Tensura", "title": "Takuma Terashima - Nameless story", "id": "ZhvUomsfG8o", "footage": true}, {"anime": "Black Clover", "title": "Kankaku Piero - Haruka Mirai", "id": "SaKb0tOt32Q", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Catcher", "id": "8-6tfOK47uc", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Rover", "id": "AmWsVoF_vDo", "footage": true}, {"anime": "Fairy Tail", "title": "FUNKIST - Snow Fairy", "id": "9jvVBVcZ0-Y", "footage": true}, {"anime": "Fairy Tail", "title": "BoA - MASAYUME CHASING", "id": "zrP9PnyCUnw", "footage": true}, {"anime": "Sword Art Online", "title": "LiSA - ADAMAS", "id": "MMuAqR_MjS8", "footage": true}, {"anime": "Sword Art Online", "title": "ASCA - Resister", "id": "UuEjcECCfKQ", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - Imagination", "id": "yq4xb6fSflw", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - I'm a Believer", "id": "f0pv9dZ8g8Q", "footage": true}, {"anime": "Haikyuu", "title": "Sukima Switch - Ah Yeah!!", "id": "WYpwBsdRBmY", "footage": true}, {"anime": "Haikyuu", "title": "BURNOUT SYNDROMES - Phoenix", "id": "-ws5iQDK814", "footage": true}, {"anime": "My Hero Academia", "title": "Lenny code fiction - Make my story", "id": "mGic3vNgl9E", "footage": true}, {"anime": "Blue Exorcist", "title": "UVERworld - CORE PRIDE", "id": "s99s4VCtCP8", "footage": true}, {"anime": "Soul Eater", "title": "T.M.Revolution - resonance", "id": "wD9nWYaVZuA", "footage": true}, {"anime": "Akame ga Kill!", "title": "Sora Amamiya - Skyreach", "id": "wVFWBoKP-lQ", "footage": true}, {"anime": "Neon Genesis Evangelion", "title": "Yoko Takahashi - Zankoku na Tenshi no These", "id": "1Y9Y1tRAJJM", "footage": false}, {"anime": "Cowboy Bebop", "title": "The Seatbelts - Tank!", "id": "0hfOyOBHIq4", "footage": true}, {"anime": "Fate/Zero", "title": "LiSA - oath sign", "id": "t1Wkgj7mntM", "footage": true}, {"anime": "Guilty Crown", "title": "supercell - My Dearest", "id": "W10RXr9c44Y", "footage": true}, {"anime": "Gintama", "title": "Tommy heavenly6 - Pray", "id": "trD3YCDToVM", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - I Wanna Be...", "id": "1cFsA6Qt34s", "footage": true}, {"anime": "Gintama", "title": "DOES - Donten", "id": "UBAaakDXruQ", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Sakura Mitsutsuki", "id": "xzEL6XQHFfw", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Samurai Heart (Some Like It Hot!!)", "id": "wA0UX2NDDwA", "footage": true}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Rikka Ihara - Love Dramatic", "id": "kpL0ozexEPo", "footage": true}, {"anime": "Steins;Gate", "title": "Kanako Itou - Hacking to the Gate", "id": "dy7gr0vaNho", "footage": true}, {"anime": "Code Geass", "title": "FLOW - WORLD END", "id": "SrxKIQhBBN4", "footage": true}, {"anime": "Dororo", "title": "QUEEN BEE - Kaen", "id": "T0vyOdp5iuk", "footage": true}, {"anime": "Vinland Saga", "title": "Survive Said The Prophet - MUKANJYO", "id": "48jwtvQ7X6o", "footage": true}, {"anime": "Vinland Saga", "title": "MAN WITH A MISSION - Dark Crow", "id": "c2L6D1-Dif8", "footage": true}, {"anime": "Yuri!!! on Ice", "title": "DEAN FUJIOKA - History Maker", "id": "5u3RGhznctE", "footage": true}, {"anime": "K-On!", "title": "Sakurakou K-ON Bu - Cagayake! GIRLS", "id": "Sz2Hw6SCLy8", "footage": true}, {"anime": "Anohana", "title": "Galileo Galilei - Aoi Shiori", "id": "sDPiBP9AGvA", "footage": true}, {"anime": "Anohana", "title": "ZONE (cast) - secret base ~Kimi ga Kureta Mono~", "id": "zyO5Mj6tLoU", "footage": true}, {"anime": "Toradora!", "title": "Yui Horie - Vanilla Salt", "id": "fD4jOs8Y_aQ", "footage": true}, {"anime": "No Game No Life", "title": "Konomi Suzuki - This game", "id": "cxTMiloKCJg", "footage": true}, {"anime": "Magi", "title": "Porno Graffitti - Matataku Hoshi no Shita de", "id": "huAlCl7hS60", "footage": true}, {"anime": "Death Parade", "title": "BRADIO - Flyers", "id": "RmyeBnIKQ38", "footage": true}, {"anime": "Kekkai Sensen", "title": "UNISON SQUARE GARDEN - Sugar Song to Bitter Step", "id": "vZ6aZdfQepw", "footage": true}, {"anime": "Bakemonogatari", "title": "Kana Hanazawa - Renai Circulation", "id": "AW7_dqi9X7M", "footage": true}, {"anime": "Tower of God", "title": "Stray Kids - TOP", "id": "apII5VFTce0", "footage": true}, {"anime": "Slam Dunk", "title": "BAAD - Kimi ga Suki da to Sakebitai", "id": "ec2lT4VzLdw", "footage": true}, {"anime": "Slam Dunk", "title": "WANDS - Sekai ga Owaru made wa", "id": "oB4XV1RBU9o", "footage": true}, {"anime": "Détective Conan", "title": "The High-Lows - Mune ga Dokidoki", "id": "cr-L2iLsUOY", "footage": true}, {"anime": "Sailor Moon", "title": "DALI - Moonlight Densetsu", "id": "IuZfkCvPEPI", "footage": true}, {"anime": "Yu Yu Hakusho", "title": "Matsuko Mawatari - Hohoemi no Bakudan", "id": "urZWmEgm72Q", "footage": true}, {"anime": "Saint Seiya", "title": "MAKE-UP - Pegasus Fantasy", "id": "Bu533OKYHyc", "footage": true}, {"anime": "Inuyasha", "title": "V6 - Change the World", "id": "0OWjGrUOKrI", "footage": true}, {"anime": "City Hunter", "title": "TM NETWORK - Get Wild", "id": "i6DSE6L1pXM", "footage": true}, {"anime": "Nana", "title": "Anna Inspi'Nana (Black Stones) - Rose", "id": "ALOUUQ6s1DU", "footage": true}, {"anime": "Great Teacher Onizuka", "title": "L'Arc~en~Ciel - Driver's High", "id": "_aWO-8j0kqM", "footage": true}, {"anime": "Samurai Champloo", "title": "Nujabes feat. Shing02 - Battlecry", "id": "2mwU7X7qCkk", "footage": true}, {"anime": "Psycho-Pass", "title": "Ling tosite sigure - abnormalize", "id": "yXKPtn_LSds", "footage": true}, {"anime": "Erased", "title": "ASIAN KUNG-FU GENERATION - Re:Re:", "id": "6GLdwo1032s", "footage": true}, {"anime": "Kill la Kill", "title": "Eir Aoi - Sirius", "id": "a81JGBKAX5U", "footage": true}, {"anime": "Gurren Lagann", "title": "Shoko Nakagawa - Sorairo Days", "id": "ZqXP_hEC4yE", "footage": true}, {"anime": "Made in Abyss", "title": "Miyu Tomita & Mariya Ise - Deep in Abyss", "id": "-NaNX1xAtSg", "footage": true}, {"anime": "Violet Evergarden", "title": "TRUE - Sincerely", "id": "ZAKuyZEyZjY", "footage": true}, {"anime": "Your Lie in April", "title": "Goose house - Hikaru Nara", "id": "fBsfD0Eytjw", "footage": true}, {"anime": "Dr. Stone", "title": "BURNOUT SYNDROMES - Good Morning World!", "id": "ot8QwURRCDs", "footage": true}, {"anime": "Assassination Classroom", "title": "3-nen E-gumi Utatan - Seishun Satsubatsu-ron", "id": "3cdZ9tIkVLI", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - Can Do", "id": "0lDNmBmb0Dg", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - The Other self", "id": "aiwgCaFkYZI", "footage": true}, {"anime": "Bocchi the Rock!", "title": "Kessoku Band - Seishun Complex", "id": "vIpzAad2f8k", "footage": true}, {"anime": "Horimiya", "title": "Yoh Kamiyama - Iro Kousui", "id": "Cmd31U5g3Lo", "footage": true}, {"anime": "Fruits Basket", "title": "Beverly - Again", "id": "ad7E-dgeYIA", "footage": true}, {"anime": "Bungo Stray Dogs", "title": "GRANRODEO - TRASH CANDY", "id": "tx_TZEAPI0k", "footage": true}, {"anime": "Hell's Paradise", "title": "millennium parade x Ringo Sheena - W●RK", "id": "Rr1UQlJxXB8", "footage": true}, {"anime": "Classroom of the Elite", "title": "ZAQ - Caste Room", "id": "AhJxfSt5jN8", "footage": true}, {"anime": "Pokémon", "title": "Rica Matsumoto - Mezase Pokémon Master", "id": "Y38TXKeC1Jk", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Hiroaki \"Tommy\" Tominaga - JoJo Sono Chi no Sadame", "id": "wPdX66-Ag2s", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "THE DU - Crazy Noisy Bizarre Town", "id": "QUVeKcAT1CI", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Coda - Fighting Gold", "id": "b7JJ0cHk2ew", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Karen Aoki & Daisuke Hasegawa - Great Days", "id": "ATYTLw-Nl0s", "footage": true}, {"anime": "Seven Deadly Sins", "title": "FLOW x GRANRODEO - Howling", "id": "VYd8M3Iw5_A", "footage": true}, {"anime": "Rent-a-Girlfriend", "title": "the peggies - Centimeter", "id": "eNV0koBJ0uU", "footage": true}, {"anime": "Ao Haru Ride", "title": "CHiCO with HoneyWorks - Sekai wa Koi ni Ochiteiru", "id": "IACs-yJoXKM", "footage": true}, {"anime": "Lucky Star", "title": "Aya Hirano et al. - Motteke! Sailor Fuku", "id": "J5wCUB5u6_s", "footage": true}, {"anime": "Durarara!!", "title": "THEATRE BROOK - Uragiri no Yuuyake", "id": "wJqJuv_omGE", "footage": true}, {"anime": "One Piece", "title": "5050 - Jungle P", "id": "za-f01oYJf4", "footage": true}, {"anime": "One Piece", "title": "Kishidan - Fight Together", "id": "by0PpbRo5gM", "footage": true}, {"anime": "One Piece", "title": "GENERATIONS from EXILE TRIBE - Hard Knock Days", "id": "UT081FsYe2s", "footage": true}, {"anime": "One Piece", "title": "AAA - Wake up!", "id": "CKKk6ra0XMc", "footage": true}, {"anime": "One Piece", "title": "Namie Amuro - Hope", "id": "Oo52vQyAR6w", "footage": true}, {"anime": "One Piece", "title": "Kishidan & Hiroshi Kitadani - We Can!", "id": "fVBPA5qkHuc", "footage": true}, {"anime": "Naruto", "title": "Sambomaster - Seishun Kyousoukyoku", "id": "0OqZhwSRYwE", "footage": false}, {"anime": "Naruto", "title": "Stance Punks - No Boy, No Cry", "id": "gO2z86PoQRY", "footage": true}, {"anime": "Naruto", "title": "Snorkel - Namikaze Satellite", "id": "u9h3FiMhkzg", "footage": false}, {"anime": "Naruto", "title": "FLOW - Re:member", "id": "FvTjwbKsO9g", "footage": true}, {"anime": "Naruto", "title": "LONG SHOT PARTY - distance", "id": "r6EPMvIhtyA", "footage": true}, {"anime": "Naruto", "title": "Joe Inoue - Closer", "id": "BTLFZ2DCjn0", "footage": true}, {"anime": "Naruto", "title": "Motohiro Hata - Toumei Datta Sekai", "id": "bOnJTM--wgM", "footage": true}, {"anime": "Naruto", "title": "NICO Touches the Walls - Niwaka Ame ni mo Makezu", "id": "CankCx2L2Vw", "footage": false}, {"anime": "Naruto", "title": "Nogizaka46 - Tsuki no Ookisa", "id": "p-NVCtQm7Oc", "footage": false}, {"anime": "Naruto", "title": "DOES - Guren", "id": "VpNk2dJTHWQ", "footage": false}, {"anime": "Naruto", "title": "Yamazaru - Kaze", "id": "k0Oo_XW7dMs", "footage": false}, {"anime": "Naruto", "title": "Sukima Switch - LINE", "id": "X_tmHq4yhuY", "footage": true}, {"anime": "Naruto", "title": "Anly - Kara no Kokoro", "id": "k1JEebVVlDE", "footage": true}, {"anime": "Bleach", "title": "YUI - Rolling Star", "id": "PSDIaaRC3jc", "footage": true}, {"anime": "Bleach", "title": "ASIAN KUNG-FU GENERATION - After Dark", "id": "Rv5V-5CErRE", "footage": true}, {"anime": "Bleach", "title": "Kelun - Chu-Bura", "id": "lskHdGUEWfQ", "footage": true}, {"anime": "Bleach", "title": "Aqua Timez - Velonica", "id": "almG54sVBuw", "footage": true}, {"anime": "Bleach", "title": "Porno Graffitti - Anima Rossa", "id": "d3ze_mYwhR0", "footage": true}, {"anime": "Bleach", "title": "miwa - Change", "id": "i0we6am_25g", "footage": true}, {"anime": "Bleach", "title": "SID - Ranbu no Melody", "id": "5emM3JGI5JA", "footage": true}, {"anime": "Bleach", "title": "SCANDAL - Harukaze", "id": "X0Zu20nbeVI", "footage": true}, {"anime": "Dragon Ball", "title": "Takayoshi Tanimoto - Dragon Soul", "id": "48eSSpsZiLE", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "L'Arc~en~Ciel - Ready Steady Go", "id": "ZVHKq1zLpp0", "footage": false}, {"anime": "Fullmetal Alchemist", "title": "Cool Joke - Undo", "id": "gIkYDNbtYxg", "footage": false}, {"anime": "Fullmetal Alchemist", "title": "ASIAN KUNG-FU GENERATION - Rewrite", "id": "VcsSgDulm0I", "footage": false}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Shoukei to Shikabane no Michi", "id": "NCRcTZiahss", "footage": false}, {"anime": "My Hero Academia", "title": "SUPER BEAVER - Hitamuki", "id": "cM1F9TbJhkk", "footage": true}, {"anime": "Tokyo Ghoul", "title": "Österreich - Munou", "id": "qM8wxM_mcRw", "footage": true}, {"anime": "Sword Art Online", "title": "Eir Aoi - IGNITE", "id": "S_ydIAWAE6I", "footage": false}, {"anime": "Sword Art Online", "title": "Eir Aoi - INNOCENCE", "id": "vdPPA-2ErW8", "footage": true}, {"anime": "Sword Art Online", "title": "Haruka Tomatsu - courage", "id": "6pH1AZzYwF0", "footage": true}, {"anime": "Black Clover", "title": "Kumi Koda - Guess Who Is Back", "id": "URwMxNidO-8", "footage": true}, {"anime": "Haikyuu", "title": "BURNOUT SYNDROMES - Hikariare", "id": "dfMb37KGqdE", "footage": false}, {"anime": "One Punch Man", "title": "JAM Project - Seijaku no Apostle", "id": "x0HOqxqycOU", "footage": false}, {"anime": "Vinland Saga", "title": "Anonymouz - River", "id": "V-uTOWL8X0w", "footage": true}, {"anime": "Mushoku Tensei", "title": "LONGMAN - Spiral", "id": "fE9trKOuT3Q", "footage": true}, {"anime": "Tensura", "title": "TRUE - Storyteller", "id": "dsIVdR71dGs", "footage": true}, {"anime": "Re:Zero", "title": "Mayu Maeshima - Long shot", "id": "lUmLhQBGtYw", "footage": true}, {"anime": "Overlord", "title": "OxT - Clattanoia", "id": "KOWcj7XKnfQ", "footage": true}, {"anime": "Overlord", "title": "OxT - GO CRY GO", "id": "v4OKxyQdTvg", "footage": true}, {"anime": "Overlord", "title": "MYTH & ROID - VORACITY", "id": "vci9YwpFFcA", "footage": true}, {"anime": "Konosuba", "title": "Machico - Fantastic Dreamer", "id": "fpG3BPNQepY", "footage": true}, {"anime": "Konosuba", "title": "Machico - TOMORROW", "id": "vdcddjV0l5o", "footage": true}, {"anime": "Tokyo Revengers", "title": "Official HIGE DANDISM - White Noise", "id": "7-zwLnF11pY", "footage": true}, {"anime": "Gachiakuta", "title": "Paledusk - HUGs", "id": "9f89PWhv8YE", "footage": true}, {"anime": "Les Carnets de l'Apothicaire", "title": "Ryokuoushoku Shakai - Hana ni Natte", "id": "EQ-DKvLQlyQ", "footage": true}, {"anime": "Cyberpunk Edgerunners", "title": "Franz Ferdinand - This Fffire", "id": "mH2wmyeiIpA", "footage": false}, {"anime": "Fire Force", "title": "coldrain - MAYDAY", "id": "t0WClcc-aVs", "footage": true}, {"anime": "Beastars", "title": "ALI - Wild Side", "id": "ETvIJFa1c-0", "footage": false}, {"anime": "Berserk", "title": "PENPALS - Tell Me Why", "id": "bSupYK20_Cs", "footage": false}, {"anime": "Ghost in the Shell", "title": "Origa - Inner Universe", "id": "v1lBZ3urwBU", "footage": false}, {"anime": "Nichijou", "title": "Hyadain - Hyadain no Kakakata Kataomoi-C", "id": "qUk1ZoCGqsA", "footage": true}, {"anime": "Toradora!", "title": "Rie Kugimiya, Yui Horie & Eri Kitamura - Pre-Parade", "id": "DqeRXMmn544", "footage": true}, {"anime": "Clannad", "title": "Lia - Toki wo Kizamu Uta", "id": "ldgUJONSMrM", "footage": false}, {"anime": "Charlotte", "title": "Lia - Bravely You", "id": "RT1vyF9nFfQ", "footage": true}, {"anime": "Steins;Gate", "title": "Kanako Itou - Fatima", "id": "1xJbdY9B3A8", "footage": true}, {"anime": "Code Geass", "title": "Jinn - Kaidoku Funou", "id": "0-Tivlwd6eY", "footage": true}, {"anime": "Soul Eater", "title": "Tommy heavenly6 - Papermoon", "id": "-eYK3YP524A", "footage": true}, {"anime": "D.Gray-man", "title": "abingdon boys school - Innocent Sorrow", "id": "cY-AiueP4tU", "footage": true}, {"anime": "Claymore", "title": "Nightmare - Raison d'Être", "id": "MonKYx6Aahc", "footage": false}, {"anime": "Hajime no Ippo", "title": "Shocking Lemon - Inner Light", "id": "dmdOSIzsq3Q", "footage": false}, {"anime": "Eyeshield 21", "title": "Coming Century - Breakthrough", "id": "L01k_S5TxPY", "footage": false}, {"anime": "Blue Exorcist", "title": "ROOKiEZ is PUNK'D - IN MY WORLD", "id": "FYnyjFIlync", "footage": false}, {"anime": "Neon Genesis Evangelion", "title": "Hikaru Utada - One Last Kiss", "id": "s64_FQY9-1c", "footage": false}, {"anime": "Mirai Nikki", "title": "Yousei Teikoku - Kuusou Mesorogiwi", "id": "jAkCxVKznJk", "footage": true}, {"anime": "Elfen Lied", "title": "Kumiko Noma - Lilium", "id": "9GaVESwssxU", "footage": true}, {"anime": "Higurashi", "title": "Eiko Shimamiya - Higurashi no Naku Koro ni", "id": "9opZi6PluKI", "footage": false}, {"anime": "Another", "title": "ALI PROJECT - Kyoumu Densen", "id": "l1X2lnWaRws", "footage": false}, {"anime": "Tokyo Mew Mew", "title": "Rika Komatsu - My Sweet Heart", "id": "V5kcqdpgMm8", "footage": false}, {"anime": "Cardcaptor Sakura", "title": "Megumi Hinata - Catch You Catch Me", "id": "WXxvp_suXh8", "footage": true}, {"anime": "Zom 100", "title": "KANA-BOON - Song of the Dead", "id": "Tt4_enX63K0", "footage": false}, {"anime": "Bungo Stray Dogs", "title": "SCREEN mode - Reason Living", "id": "iEcOzINHOUE", "footage": true}, {"anime": "Ranking of Kings", "title": "King Gnu - BOY", "id": "s5SSAXK6bQE", "footage": true}, {"anime": "86", "title": "Hitorie - 3-bun 29-byou", "id": "eZIMFWAxMxQ", "footage": true}, {"anime": "Shangri-La Frontier", "title": "FZMZ - BROKEN GAMES", "id": "X_YHXdCcmVc", "footage": false}, {"anime": "Dungeon Meshi", "title": "BUMP OF CHICKEN - Sleep Walking Orchestra", "id": "92TZBzM9Pg8", "footage": false}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Airi Suzuki - DADDY! DADDY! DO!", "id": "2Od7QCsyqkE", "footage": false}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Suu - GIRI GIRI", "id": "vptdHEUZN10", "footage": false}, {"anime": "Megalobox", "title": "LEO Imai - Bite", "id": "ByMrJy5p7q8", "footage": true}, {"anime": "Kabaneri of the Iron Fortress", "title": "EGOIST - Kabaneri of the Iron Fortress", "id": "BpAZbM6FYkE", "footage": true}, {"anime": "Psycho-Pass", "title": "Nothing's Carved in Stone - Out of Control", "id": "25JgZIivnJU", "footage": true}, {"anime": "Beck", "title": "Beat Crusaders - Hit in the USA", "id": "xg91QwPT0v0", "footage": true}, {"anime": "Baccano!", "title": "Paris Match - Gun's & Roses", "id": "msU5chB-uB0", "footage": false}, {"anime": "JoJo's Bizarre Adventure", "title": "Daisuke Hasegawa - STAND PROUD", "id": "dOQWNEv4_6U", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Jin Hashimoto - Sono Chi no Kioku ~end of THE WORLD~", "id": "BPyQM7FmG8g", "footage": false}, {"anime": "JoJo's Bizarre Adventure", "title": "Daisuke Hasegawa - Traitor's Requiem", "id": "6rX1EtxwLbk", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Ichigo & The Akeboshi Rockets - STONE OCEAN", "id": "9l5VL-JM_Ws", "footage": true}, {"anime": "Digimon", "title": "Kouji Wada - Butter-Fly", "id": "jB7ecG_12x8", "footage": true}, {"anime": "Shaman King", "title": "Megumi Hayashibara - Over Soul", "id": "R_tOznduSu0", "footage": true}, {"anime": "Summertime Render", "title": "Macaroni Enpitsu - Hoshi ga Oyogu", "id": "D_LSxWZAhO8", "footage": false}, {"anime": "Log Horizon", "title": "MAN WITH A MISSION - database", "id": "MtPBQ4BhzOY", "footage": true}, {"anime": "Aldnoah.Zero", "title": "Kalafina - heavenly blue", "id": "RtrSVZlcMC0", "footage": false}, {"anime": "Nisekoi", "title": "ClariS - CLICK", "id": "nHnIZ8pkhmA", "footage": false}, {"anime": "Oregairu", "title": "Nagi Yanagi - Yukitoki", "id": "jtyUegcAlZA", "footage": false}, {"anime": "Fate/stay night", "title": "Mashiro Ayano - ideal white", "id": "wl_b8GpWbQA", "footage": true}, {"anime": "Fate/Zero", "title": "Kalafina - to the beginning", "id": "4cNbQ1x__jA", "footage": false}, {"anime": "La Mélancolie de Haruhi Suzumiya", "title": "Aya Hirano - Bouken Desho Desho?", "id": "EzSL38lwUCQ", "footage": false}, {"anime":"Sakamoto Days","title":"Vaundy - Hashire SAKAMOTO","id":"9SfUmSi358Q","footage":true}, {"anime":"Re:Zero","title":"Konomi Suzuki - Reweave","id":"ZaiPQrrzy2E","footage":false}, {"anime":"Blue Lock","title":"UNISON SQUARE GARDEN - Boujaku no Charisma","id":"qU1XxZ37j7g","footage":true}, {"anime":"My Hero Academia","title":"TK from Ling tosite sigure - Tagatame","id":"YEKboKtPx-w","footage":true}, {"anime":"My Hero Academia","title":"Yuuri - Curtain Call","id":"b3f6Shks9g4","footage":true}, {"anime":"Alya Sometimes Hides Her Feelings in Russian","title":"Sumire Uesaka - Ichiban Kagayaku Hoshi","id":"MBM7qyH-YDY","footage":true}, {"anime":"Hell's Paradise","title":"millennium parade × Sheena Ringo - WORK","id":"04WuoQMhhxw","footage":true}, {"anime":"Hell's Paradise","title":"Tatsuya Kitani feat. BABYMETAL - Kasuka na Hana","id":"3zgow3WAYs8","footage":true}, {"anime":"Call of the Night","title":"Creepy Nuts - Daten","id":"sbqcZgEsCek","footage":true}, {"anime":"Blue Box","title":"Official HIGE DANdism - Same Blue","id":"d0jg9hNHqn8","footage":true}, {"anime":"WIND BREAKER","title":"natori - Zettai Reido","id":"IuSAC8ZDf1A","footage":true}];
+const BLINDTEST_YT_TRACKS = [{"anime": "One Piece", "title": "Hiroshi Kitadani - We Are!", "id": "gcjdXMfYIe4", "footage": true}, {"anime": "One Piece", "title": "Folder5 - Believe", "id": "QwSkErUIF9k", "footage": true}, {"anime": "One Piece", "title": "D-51 - Brand New World", "id": "0uh9U5CXgso", "footage": true}, {"anime": "One Piece", "title": "The Babystars - Hikari e", "id": "GXkN2Du52j4", "footage": true}, {"anime": "One Piece", "title": "BOYSTYLE - Kokoro no Chizu", "id": "lj6tjz5VkQM", "footage": true}, {"anime": "One Piece", "title": "TVXQ - Share the World", "id": "6y5mvWkI7TE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Over the Top", "id": "pAI961THYkE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Us!", "id": "NYryrD9lpsw", "footage": true}, {"anime": "One Piece", "title": "SEKAI NO OWARI - Saikou Toutatsuten", "id": "kXNwlScpt_c", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Aaaassu!", "id": "r7zV2RtNlw0", "footage": true}, {"anime": "One Piece", "title": "Maki Otsuki - Memories", "id": "T1_gMAN4TjA", "footage": false}, {"anime": "One Piece", "title": "Ado - New Genesis", "id": "6lnnPnr_0SU", "footage": true}, {"anime": "Bleach", "title": "ORANGE RANGE - Asterisk", "id": "wW9TwZdWpjw", "footage": true}, {"anime": "Bleach", "title": "High and Mighty Color - Ichirin no Hana", "id": "eIm0dpBjQPg", "footage": true}, {"anime": "Bleach", "title": "UVERworld - D-tecnoLife", "id": "h1MoLQ9Wcv0", "footage": true}, {"anime": "Bleach", "title": "Aqua Timez - Alones", "id": "WEN4qOcVKeM", "footage": true}, {"anime": "Bleach", "title": "Beat Crusaders - Tonight, Tonight, Tonight", "id": "oi3wY1-EwDs", "footage": true}, {"anime": "Bleach", "title": "Tatsuya Kitani - Scar", "id": "mjeR7vUrDvM", "footage": true}, {"anime": "Naruto", "title": "nobodyknows+ - Hero's Come Back!!", "id": "vxvP9zSOL7s", "footage": true}, {"anime": "Naruto", "title": "HOME MADE Kazoku - Kanashimi wo Yasashisa ni (little by little)", "id": "XwJEFzsqNoY", "footage": true}, {"anime": "Naruto", "title": "HEARTS GROW - Yura Yura", "id": "-m8kR0FQ7Wk", "footage": true}, {"anime": "Naruto", "title": "NICO Touches the Walls - Diver", "id": "P1yJ51DH-18", "footage": true}, {"anime": "Naruto", "title": "The Cro-Magnons - Totsugeki Rock", "id": "ZR5ZCVQ0puE", "footage": true}, {"anime": "Naruto", "title": "tacica - newsong", "id": "yu12tTrkJ-g", "footage": true}, {"anime": "Naruto", "title": "7!! - Lovers", "id": "KmrTuNXVrf4", "footage": true}, {"anime": "Naruto", "title": "Daisuke - Moshimo", "id": "PBsMuTPEJ_A", "footage": true}, {"anime": "Boruto", "title": "KANA-BOON - Baton Road", "id": "48wCQXl83-s", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - Cha-La Head-Cha-La", "id": "-CebN43ppk8", "footage": true}, {"anime": "Dragon Ball", "title": "Hiroki Takahashi - Makafushigi Adventure!", "id": "M4fM1GdUCbU", "footage": true}, {"anime": "Dragon Ball", "title": "FIELD OF VIEW - Dan Dan Kokoro Hikareteku", "id": "Hm1hM_Ljcsk", "footage": true}, {"anime": "Dragon Ball", "title": "Kazuya Yoshii - Chozetsu Dynamic!", "id": "ASA8NsKQywU", "footage": true}, {"anime": "Dragon Ball", "title": "Kiyoshi Hikawa - Limit Break x Survivor", "id": "BMgpnQcQPok", "footage": true}, {"anime": "Dragon Ball", "title": "Hironobu Kageyama - We Gotta Power", "id": "1KCturR5CIk", "footage": true}, {"anime": "Hunter x Hunter", "title": "Keno - Ohayou", "id": "QNwxM1uy8wg", "footage": true}, {"anime": "Hunter x Hunter", "title": "Fear, and Loathing in Las Vegas - Just Awake", "id": "R9kgxfc8tOg", "footage": true}, {"anime": "Death Note", "title": "Maximum the Hormone - What's up, people?!", "id": "ZXDtsF9jmZU", "footage": true}, {"anime": "Death Note", "title": "Nightmare - Alumina", "id": "3YDFjbNVUGI", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Porno Graffitti - Melissa", "id": "jwslD4qNn9U", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Sukima Switch - Golden Time Lover", "id": "uvHyMazZ29I", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "Chemistry - Period", "id": "86VlDpO0qo0", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "SID - Rain", "id": "cMsDqVx777k", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "NICO Touches the Walls - Hologram", "id": "K071t7ockJk", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Homura", "id": "N2p1K-UAtfA", "footage": true}, {"anime": "Demon Slayer", "title": "LiSA - Akeboshi", "id": "XIUDjQ5sVKk", "footage": true}, {"anime": "Demon Slayer", "title": "MY FIRST STORY x HYDE - Mugen", "id": "Hk6qHGRgK-s", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "Who-ya Extended - VIVID VICE", "id": "MWUuLV1oGks", "footage": true}, {"anime": "Jujutsu Kaisen", "title": "King Gnu - Ichizu", "id": "9qwULTpB-mk", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Red Swan (YOSHIKI feat. HYDE)", "id": "gg0Xg6H9Obw", "footage": true}, {"anime": "L'Attaque des Titans", "title": "SiM - The Rumbling", "id": "6MuAxGB3o_4", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Shinsei Kamattechan - Boku no Sensou", "id": "pQgJCloa6wM", "footage": true}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Jiyuu no Tsubasa", "id": "ErgcCrXU0Ig", "footage": true}, {"anime": "Spy x Family", "title": "BUMP OF CHICKEN - SOUVENIR", "id": "C1G0rBB6fnY", "footage": true}, {"anime": "Spy x Family", "title": "Ado - Kura Kura", "id": "kLhPtrXMb7w", "footage": true}, {"anime": "Frieren", "title": "YOASOBI - Yuusha", "id": "GcliqznvOc4", "footage": true}, {"anime": "Oshi no Ko", "title": "GEMN - Fatal", "id": "vyis0G1jEIo", "footage": true}, {"anime": "Solo Leveling", "title": "SawanoHiroyuki[nZk]:TOMORROW X TOGETHER - LEveL", "id": "sSyUREZzGc4", "footage": true}, {"anime": "Blue Lock", "title": "UNISON SQUARE GARDEN - Chaos ga Kiwamaru", "id": "oX2HOWzc7mA", "footage": true}, {"anime": "Kaiju No. 8", "title": "YUNGBLUD - Abyss", "id": "OcpgYeSdp4c", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR - 99", "id": "F5OJPUXJvHk", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 99.9", "id": "D6g-qbYEEX8", "footage": true}, {"anime": "Mob Psycho 100", "title": "MOB CHOIR feat. sajou no hana - 1", "id": "xRIOnDruOZM", "footage": true}, {"anime": "One Punch Man", "title": "JAM Project - THE HERO!!", "id": "atxYe-nOa9w", "footage": true}, {"anime": "Tokyo Ghoul", "title": "TK from Ling tosite sigure - katharsis", "id": "S2H_YNYRw2E", "footage": true}, {"anime": "Re:Zero", "title": "Konomi Suzuki - Redo", "id": "V5cW93SRfW4", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - Paradisus-Paradoxum", "id": "LEiQ11iagns", "footage": true}, {"anime": "Re:Zero", "title": "MYTH & ROID - STYX HELIX", "id": "IiaeDOO113A", "footage": true}, {"anime": "Mushoku Tensei", "title": "Yuiko Ohara - Tabibito no Uta", "id": "pEoCT-Kv5CI", "footage": true}, {"anime": "Tensura", "title": "Takuma Terashima - Nameless story", "id": "ZhvUomsfG8o", "footage": true}, {"anime": "Black Clover", "title": "Kankaku Piero - Haruka Mirai", "id": "SaKb0tOt32Q", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Catcher", "id": "8-6tfOK47uc", "footage": true}, {"anime": "Black Clover", "title": "Vickeblanka - Black Rover", "id": "AmWsVoF_vDo", "footage": true}, {"anime": "Fairy Tail", "title": "FUNKIST - Snow Fairy", "id": "9jvVBVcZ0-Y", "footage": true}, {"anime": "Fairy Tail", "title": "BoA - MASAYUME CHASING", "id": "zrP9PnyCUnw", "footage": true}, {"anime": "Sword Art Online", "title": "LiSA - ADAMAS", "id": "MMuAqR_MjS8", "footage": true}, {"anime": "Sword Art Online", "title": "ASCA - Resister", "id": "UuEjcECCfKQ", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - Imagination", "id": "yq4xb6fSflw", "footage": true}, {"anime": "Haikyuu", "title": "SPYAIR - I'm a Believer", "id": "f0pv9dZ8g8Q", "footage": true}, {"anime": "Haikyuu", "title": "Sukima Switch - Ah Yeah!!", "id": "WYpwBsdRBmY", "footage": true}, {"anime": "Haikyuu", "title": "BURNOUT SYNDROMES - Phoenix", "id": "-ws5iQDK814", "footage": true}, {"anime": "My Hero Academia", "title": "Lenny code fiction - Make my story", "id": "mGic3vNgl9E", "footage": true}, {"anime": "Blue Exorcist", "title": "UVERworld - CORE PRIDE", "id": "s99s4VCtCP8", "footage": true}, {"anime": "Soul Eater", "title": "T.M.Revolution - resonance", "id": "wD9nWYaVZuA", "footage": true}, {"anime": "Akame ga Kill!", "title": "Sora Amamiya - Skyreach", "id": "wVFWBoKP-lQ", "footage": true}, {"anime": "Neon Genesis Evangelion", "title": "Yoko Takahashi - Zankoku na Tenshi no These", "id": "1Y9Y1tRAJJM", "footage": false}, {"anime": "Cowboy Bebop", "title": "The Seatbelts - Tank!", "id": "0hfOyOBHIq4", "footage": true}, {"anime": "Fate/Zero", "title": "LiSA - oath sign", "id": "t1Wkgj7mntM", "footage": true}, {"anime": "Guilty Crown", "title": "supercell - My Dearest", "id": "W10RXr9c44Y", "footage": true}, {"anime": "Gintama", "title": "Tommy heavenly6 - Pray", "id": "trD3YCDToVM", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - I Wanna Be...", "id": "1cFsA6Qt34s", "footage": true}, {"anime": "Gintama", "title": "DOES - Donten", "id": "UBAaakDXruQ", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Sakura Mitsutsuki", "id": "xzEL6XQHFfw", "footage": true}, {"anime": "Gintama", "title": "SPYAIR - Samurai Heart (Some Like It Hot!!)", "id": "wA0UX2NDDwA", "footage": true}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Rikka Ihara - Love Dramatic", "id": "kpL0ozexEPo", "footage": true}, {"anime": "Steins;Gate", "title": "Kanako Itou - Hacking to the Gate", "id": "dy7gr0vaNho", "footage": true}, {"anime": "Code Geass", "title": "FLOW - WORLD END", "id": "SrxKIQhBBN4", "footage": true}, {"anime": "Dororo", "title": "QUEEN BEE - Kaen", "id": "T0vyOdp5iuk", "footage": true}, {"anime": "Vinland Saga", "title": "Survive Said The Prophet - MUKANJYO", "id": "48jwtvQ7X6o", "footage": true}, {"anime": "Vinland Saga", "title": "MAN WITH A MISSION - Dark Crow", "id": "c2L6D1-Dif8", "footage": true}, {"anime": "Yuri!!! on Ice", "title": "DEAN FUJIOKA - History Maker", "id": "5u3RGhznctE", "footage": true}, {"anime": "K-On!", "title": "Sakurakou K-ON Bu - Cagayake! GIRLS", "id": "Sz2Hw6SCLy8", "footage": true}, {"anime": "Anohana", "title": "Galileo Galilei - Aoi Shiori", "id": "sDPiBP9AGvA", "footage": true}, {"anime": "Anohana", "title": "ZONE (cast) - secret base ~Kimi ga Kureta Mono~", "id": "zyO5Mj6tLoU", "footage": true}, {"anime": "Toradora!", "title": "Yui Horie - Vanilla Salt", "id": "fD4jOs8Y_aQ", "footage": true}, {"anime": "No Game No Life", "title": "Konomi Suzuki - This game", "id": "cxTMiloKCJg", "footage": true}, {"anime": "Magi", "title": "Porno Graffitti - Matataku Hoshi no Shita de", "id": "huAlCl7hS60", "footage": true}, {"anime": "Death Parade", "title": "BRADIO - Flyers", "id": "RmyeBnIKQ38", "footage": true}, {"anime": "Kekkai Sensen", "title": "UNISON SQUARE GARDEN - Sugar Song to Bitter Step", "id": "vZ6aZdfQepw", "footage": true}, {"anime": "Bakemonogatari", "title": "Kana Hanazawa - Renai Circulation", "id": "AW7_dqi9X7M", "footage": true}, {"anime": "Tower of God", "title": "Stray Kids - TOP", "id": "apII5VFTce0", "footage": true}, {"anime": "Slam Dunk", "title": "BAAD - Kimi ga Suki da to Sakebitai", "id": "ec2lT4VzLdw", "footage": true}, {"anime": "Slam Dunk", "title": "WANDS - Sekai ga Owaru made wa", "id": "oB4XV1RBU9o", "footage": true}, {"anime": "Détective Conan", "title": "The High-Lows - Mune ga Dokidoki", "id": "cr-L2iLsUOY", "footage": true}, {"anime": "Sailor Moon", "title": "DALI - Moonlight Densetsu", "id": "IuZfkCvPEPI", "footage": true}, {"anime": "Yu Yu Hakusho", "title": "Matsuko Mawatari - Hohoemi no Bakudan", "id": "urZWmEgm72Q", "footage": true}, {"anime": "Saint Seiya", "title": "MAKE-UP - Pegasus Fantasy", "id": "Bu533OKYHyc", "footage": true}, {"anime": "Inuyasha", "title": "V6 - Change the World", "id": "0OWjGrUOKrI", "footage": true}, {"anime": "City Hunter", "title": "TM NETWORK - Get Wild", "id": "i6DSE6L1pXM", "footage": true}, {"anime": "Nana", "title": "Anna Inspi'Nana (Black Stones) - Rose", "id": "ALOUUQ6s1DU", "footage": true}, {"anime": "Great Teacher Onizuka", "title": "L'Arc~en~Ciel - Driver's High", "id": "_aWO-8j0kqM", "footage": true}, {"anime": "Samurai Champloo", "title": "Nujabes feat. Shing02 - Battlecry", "id": "2mwU7X7qCkk", "footage": true}, {"anime": "Psycho-Pass", "title": "Ling tosite sigure - abnormalize", "id": "yXKPtn_LSds", "footage": true}, {"anime": "Erased", "title": "ASIAN KUNG-FU GENERATION - Re:Re:", "id": "6GLdwo1032s", "footage": true}, {"anime": "Kill la Kill", "title": "Eir Aoi - Sirius", "id": "a81JGBKAX5U", "footage": true}, {"anime": "Gurren Lagann", "title": "Shoko Nakagawa - Sorairo Days", "id": "ZqXP_hEC4yE", "footage": true}, {"anime": "Made in Abyss", "title": "Miyu Tomita & Mariya Ise - Deep in Abyss", "id": "-NaNX1xAtSg", "footage": true}, {"anime": "Violet Evergarden", "title": "TRUE - Sincerely", "id": "ZAKuyZEyZjY", "footage": true}, {"anime": "Your Lie in April", "title": "Goose house - Hikaru Nara", "id": "fBsfD0Eytjw", "footage": true}, {"anime": "Dr. Stone", "title": "BURNOUT SYNDROMES - Good Morning World!", "id": "ot8QwURRCDs", "footage": true}, {"anime": "Assassination Classroom", "title": "3-nen E-gumi Utatan - Seishun Satsubatsu-ron", "id": "3cdZ9tIkVLI", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - Can Do", "id": "0lDNmBmb0Dg", "footage": true}, {"anime": "Kuroko no Basket", "title": "GRANRODEO - The Other self", "id": "aiwgCaFkYZI", "footage": true}, {"anime": "Bocchi the Rock!", "title": "Kessoku Band - Seishun Complex", "id": "vIpzAad2f8k", "footage": true}, {"anime": "Horimiya", "title": "Yoh Kamiyama - Iro Kousui", "id": "Cmd31U5g3Lo", "footage": true}, {"anime": "Fruits Basket", "title": "Beverly - Again", "id": "ad7E-dgeYIA", "footage": true}, {"anime": "Bungo Stray Dogs", "title": "GRANRODEO - TRASH CANDY", "id": "tx_TZEAPI0k", "footage": true}, {"anime": "Hell's Paradise", "title": "millennium parade x Ringo Sheena - W●RK", "id": "Rr1UQlJxXB8", "footage": true}, {"anime": "Classroom of the Elite", "title": "ZAQ - Caste Room", "id": "AhJxfSt5jN8", "footage": true}, {"anime": "Pokémon", "title": "Rica Matsumoto - Mezase Pokémon Master", "id": "Y38TXKeC1Jk", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Hiroaki \"Tommy\" Tominaga - JoJo Sono Chi no Sadame", "id": "wPdX66-Ag2s", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "THE DU - Crazy Noisy Bizarre Town", "id": "QUVeKcAT1CI", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Coda - Fighting Gold", "id": "b7JJ0cHk2ew", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Karen Aoki & Daisuke Hasegawa - Great Days", "id": "ATYTLw-Nl0s", "footage": true}, {"anime": "Seven Deadly Sins", "title": "FLOW x GRANRODEO - Howling", "id": "VYd8M3Iw5_A", "footage": true}, {"anime": "Rent-a-Girlfriend", "title": "the peggies - Centimeter", "id": "eNV0koBJ0uU", "footage": true}, {"anime": "Ao Haru Ride", "title": "CHiCO with HoneyWorks - Sekai wa Koi ni Ochiteiru", "id": "IACs-yJoXKM", "footage": true}, {"anime": "Lucky Star", "title": "Aya Hirano et al. - Motteke! Sailor Fuku", "id": "J5wCUB5u6_s", "footage": true}, {"anime": "Durarara!!", "title": "THEATRE BROOK - Uragiri no Yuuyake", "id": "wJqJuv_omGE", "footage": true}, {"anime": "One Piece", "title": "5050 - Jungle P", "id": "za-f01oYJf4", "footage": true}, {"anime": "One Piece", "title": "Kishidan - Fight Together", "id": "by0PpbRo5gM", "footage": true}, {"anime": "One Piece", "title": "GENERATIONS from EXILE TRIBE - Hard Knock Days", "id": "UT081FsYe2s", "footage": true}, {"anime": "One Piece", "title": "AAA - Wake up!", "id": "CKKk6ra0XMc", "footage": true}, {"anime": "One Piece", "title": "Namie Amuro - Hope", "id": "Oo52vQyAR6w", "footage": true}, {"anime": "One Piece", "title": "Kishidan & Hiroshi Kitadani - We Can!", "id": "fVBPA5qkHuc", "footage": true}, {"anime": "Naruto", "title": "Sambomaster - Seishun Kyousoukyoku", "id": "0OqZhwSRYwE", "footage": false}, {"anime": "Naruto", "title": "Stance Punks - No Boy, No Cry", "id": "gO2z86PoQRY", "footage": true}, {"anime": "Naruto", "title": "Snorkel - Namikaze Satellite", "id": "u9h3FiMhkzg", "footage": false}, {"anime": "Naruto", "title": "FLOW - Re:member", "id": "FvTjwbKsO9g", "footage": true}, {"anime": "Naruto", "title": "LONG SHOT PARTY - distance", "id": "r6EPMvIhtyA", "footage": true}, {"anime": "Naruto", "title": "Joe Inoue - Closer", "id": "BTLFZ2DCjn0", "footage": true}, {"anime": "Naruto", "title": "Motohiro Hata - Toumei Datta Sekai", "id": "bOnJTM--wgM", "footage": true}, {"anime": "Naruto", "title": "NICO Touches the Walls - Niwaka Ame ni mo Makezu", "id": "CankCx2L2Vw", "footage": false}, {"anime": "Naruto", "title": "Nogizaka46 - Tsuki no Ookisa", "id": "p-NVCtQm7Oc", "footage": false}, {"anime": "Naruto", "title": "DOES - Guren", "id": "VpNk2dJTHWQ", "footage": false}, {"anime": "Naruto", "title": "Yamazaru - Kaze", "id": "k0Oo_XW7dMs", "footage": false}, {"anime": "Naruto", "title": "Sukima Switch - LINE", "id": "X_tmHq4yhuY", "footage": true}, {"anime": "Naruto", "title": "Anly - Kara no Kokoro", "id": "k1JEebVVlDE", "footage": true}, {"anime": "Bleach", "title": "YUI - Rolling Star", "id": "PSDIaaRC3jc", "footage": true}, {"anime": "Bleach", "title": "ASIAN KUNG-FU GENERATION - After Dark", "id": "Rv5V-5CErRE", "footage": true}, {"anime": "Bleach", "title": "Kelun - Chu-Bura", "id": "lskHdGUEWfQ", "footage": true}, {"anime": "Bleach", "title": "Aqua Timez - Velonica", "id": "almG54sVBuw", "footage": true}, {"anime": "Bleach", "title": "Porno Graffitti - Anima Rossa", "id": "d3ze_mYwhR0", "footage": true}, {"anime": "Bleach", "title": "miwa - Change", "id": "i0we6am_25g", "footage": true}, {"anime": "Bleach", "title": "SID - Ranbu no Melody", "id": "5emM3JGI5JA", "footage": true}, {"anime": "Bleach", "title": "SCANDAL - Harukaze", "id": "X0Zu20nbeVI", "footage": true}, {"anime": "Dragon Ball", "title": "Takayoshi Tanimoto - Dragon Soul", "id": "48eSSpsZiLE", "footage": true}, {"anime": "Fullmetal Alchemist", "title": "L'Arc~en~Ciel - Ready Steady Go", "id": "ZVHKq1zLpp0", "footage": false}, {"anime": "Fullmetal Alchemist", "title": "Cool Joke - Undo", "id": "gIkYDNbtYxg", "footage": false}, {"anime": "Fullmetal Alchemist", "title": "ASIAN KUNG-FU GENERATION - Rewrite", "id": "VcsSgDulm0I", "footage": false}, {"anime": "L'Attaque des Titans", "title": "Linked Horizon - Shoukei to Shikabane no Michi", "id": "NCRcTZiahss", "footage": false}, {"anime": "My Hero Academia", "title": "SUPER BEAVER - Hitamuki", "id": "cM1F9TbJhkk", "footage": true}, {"anime": "Tokyo Ghoul", "title": "Österreich - Munou", "id": "qM8wxM_mcRw", "footage": true}, {"anime": "Sword Art Online", "title": "Eir Aoi - IGNITE", "id": "S_ydIAWAE6I", "footage": false}, {"anime": "Sword Art Online", "title": "Eir Aoi - INNOCENCE", "id": "vdPPA-2ErW8", "footage": true}, {"anime": "Sword Art Online", "title": "Haruka Tomatsu - courage", "id": "6pH1AZzYwF0", "footage": true}, {"anime": "Black Clover", "title": "Kumi Koda - Guess Who Is Back", "id": "URwMxNidO-8", "footage": true}, {"anime": "Haikyuu", "title": "BURNOUT SYNDROMES - Hikariare", "id": "dfMb37KGqdE", "footage": false}, {"anime": "One Punch Man", "title": "JAM Project - Seijaku no Apostle", "id": "x0HOqxqycOU", "footage": false}, {"anime": "Vinland Saga", "title": "Anonymouz - River", "id": "V-uTOWL8X0w", "footage": true}, {"anime": "Mushoku Tensei", "title": "LONGMAN - Spiral", "id": "fE9trKOuT3Q", "footage": true}, {"anime": "Tensura", "title": "TRUE - Storyteller", "id": "dsIVdR71dGs", "footage": true}, {"anime": "Re:Zero", "title": "Mayu Maeshima - Long shot", "id": "lUmLhQBGtYw", "footage": true}, {"anime": "Overlord", "title": "OxT - Clattanoia", "id": "KOWcj7XKnfQ", "footage": true}, {"anime": "Overlord", "title": "OxT - GO CRY GO", "id": "v4OKxyQdTvg", "footage": true}, {"anime": "Overlord", "title": "MYTH & ROID - VORACITY", "id": "vci9YwpFFcA", "footage": true}, {"anime": "Konosuba", "title": "Machico - Fantastic Dreamer", "id": "fpG3BPNQepY", "footage": true}, {"anime": "Konosuba", "title": "Machico - TOMORROW", "id": "vdcddjV0l5o", "footage": true}, {"anime": "Tokyo Revengers", "title": "Official HIGE DANDISM - White Noise", "id": "7-zwLnF11pY", "footage": true}, {"anime": "Gachiakuta", "title": "Paledusk - HUGs", "id": "9f89PWhv8YE", "footage": true}, {"anime": "Les Carnets de l'Apothicaire", "title": "Ryokuoushoku Shakai - Hana ni Natte", "id": "EQ-DKvLQlyQ", "footage": true}, {"anime": "Cyberpunk Edgerunners", "title": "Franz Ferdinand - This Fffire", "id": "mH2wmyeiIpA", "footage": false}, {"anime": "Fire Force", "title": "coldrain - MAYDAY", "id": "t0WClcc-aVs", "footage": true}, {"anime": "Beastars", "title": "ALI - Wild Side", "id": "ETvIJFa1c-0", "footage": false}, {"anime": "Berserk", "title": "PENPALS - Tell Me Why", "id": "bSupYK20_Cs", "footage": false}, {"anime": "Ghost in the Shell", "title": "Origa - Inner Universe", "id": "v1lBZ3urwBU", "footage": false}, {"anime": "Nichijou", "title": "Hyadain - Hyadain no Kakakata Kataomoi-C", "id": "qUk1ZoCGqsA", "footage": true}, {"anime": "Toradora!", "title": "Rie Kugimiya, Yui Horie & Eri Kitamura - Pre-Parade", "id": "DqeRXMmn544", "footage": true}, {"anime": "Clannad", "title": "Lia - Toki wo Kizamu Uta", "id": "ldgUJONSMrM", "footage": false}, {"anime": "Charlotte", "title": "Lia - Bravely You", "id": "RT1vyF9nFfQ", "footage": true}, {"anime": "Steins;Gate", "title": "Kanako Itou - Fatima", "id": "1xJbdY9B3A8", "footage": true}, {"anime": "Code Geass", "title": "Jinn - Kaidoku Funou", "id": "0-Tivlwd6eY", "footage": true}, {"anime": "Soul Eater", "title": "Tommy heavenly6 - Papermoon", "id": "-eYK3YP524A", "footage": true}, {"anime": "D.Gray-man", "title": "abingdon boys school - Innocent Sorrow", "id": "cY-AiueP4tU", "footage": true}, {"anime": "Claymore", "title": "Nightmare - Raison d'Être", "id": "MonKYx6Aahc", "footage": false}, {"anime": "Hajime no Ippo", "title": "Shocking Lemon - Inner Light", "id": "dmdOSIzsq3Q", "footage": false}, {"anime": "Eyeshield 21", "title": "Coming Century - Breakthrough", "id": "L01k_S5TxPY", "footage": false}, {"anime": "Blue Exorcist", "title": "ROOKiEZ is PUNK'D - IN MY WORLD", "id": "FYnyjFIlync", "footage": false}, {"anime": "Neon Genesis Evangelion", "title": "Hikaru Utada - One Last Kiss", "id": "s64_FQY9-1c", "footage": false}, {"anime": "Mirai Nikki", "title": "Yousei Teikoku - Kuusou Mesorogiwi", "id": "jAkCxVKznJk", "footage": true}, {"anime": "Elfen Lied", "title": "Kumiko Noma - Lilium", "id": "9GaVESwssxU", "footage": true}, {"anime": "Higurashi", "title": "Eiko Shimamiya - Higurashi no Naku Koro ni", "id": "9opZi6PluKI", "footage": false}, {"anime": "Another", "title": "ALI PROJECT - Kyoumu Densen", "id": "l1X2lnWaRws", "footage": false}, {"anime": "Tokyo Mew Mew", "title": "Rika Komatsu - My Sweet Heart", "id": "V5kcqdpgMm8", "footage": false}, {"anime": "Cardcaptor Sakura", "title": "Megumi Hinata - Catch You Catch Me", "id": "WXxvp_suXh8", "footage": true}, {"anime": "Zom 100", "title": "KANA-BOON - Song of the Dead", "id": "Tt4_enX63K0", "footage": false}, {"anime": "Bungo Stray Dogs", "title": "SCREEN mode - Reason Living", "id": "iEcOzINHOUE", "footage": true}, {"anime": "Ranking of Kings", "title": "King Gnu - BOY", "id": "s5SSAXK6bQE", "footage": true}, {"anime": "86", "title": "Hitorie - 3-bun 29-byou", "id": "eZIMFWAxMxQ", "footage": true}, {"anime": "Shangri-La Frontier", "title": "FZMZ - BROKEN GAMES", "id": "X_YHXdCcmVc", "footage": false}, {"anime": "Dungeon Meshi", "title": "BUMP OF CHICKEN - Sleep Walking Orchestra", "id": "92TZBzM9Pg8", "footage": false}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Airi Suzuki - DADDY! DADDY! DO!", "id": "2Od7QCsyqkE", "footage": false}, {"anime": "Kaguya-sama", "title": "Masayuki Suzuki feat. Suu - GIRI GIRI", "id": "vptdHEUZN10", "footage": false}, {"anime": "Megalobox", "title": "LEO Imai - Bite", "id": "ByMrJy5p7q8", "footage": true}, {"anime": "Kabaneri of the Iron Fortress", "title": "EGOIST - Kabaneri of the Iron Fortress", "id": "BpAZbM6FYkE", "footage": true}, {"anime": "Psycho-Pass", "title": "Nothing's Carved in Stone - Out of Control", "id": "25JgZIivnJU", "footage": true}, {"anime": "Beck", "title": "Beat Crusaders - Hit in the USA", "id": "xg91QwPT0v0", "footage": true}, {"anime": "Baccano!", "title": "Paris Match - Gun's & Roses", "id": "msU5chB-uB0", "footage": false}, {"anime": "JoJo's Bizarre Adventure", "title": "Daisuke Hasegawa - STAND PROUD", "id": "dOQWNEv4_6U", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Jin Hashimoto - Sono Chi no Kioku ~end of THE WORLD~", "id": "BPyQM7FmG8g", "footage": false}, {"anime": "JoJo's Bizarre Adventure", "title": "Daisuke Hasegawa - Traitor's Requiem", "id": "6rX1EtxwLbk", "footage": true}, {"anime": "JoJo's Bizarre Adventure", "title": "Ichigo & The Akeboshi Rockets - STONE OCEAN", "id": "9l5VL-JM_Ws", "footage": true}, {"anime": "Digimon", "title": "Kouji Wada - Butter-Fly", "id": "jB7ecG_12x8", "footage": true}, {"anime": "Shaman King", "title": "Megumi Hayashibara - Over Soul", "id": "R_tOznduSu0", "footage": true}, {"anime": "Summertime Render", "title": "Macaroni Enpitsu - Hoshi ga Oyogu", "id": "D_LSxWZAhO8", "footage": false}, {"anime": "Log Horizon", "title": "MAN WITH A MISSION - database", "id": "MtPBQ4BhzOY", "footage": true}, {"anime": "Aldnoah.Zero", "title": "Kalafina - heavenly blue", "id": "RtrSVZlcMC0", "footage": false}, {"anime": "Nisekoi", "title": "ClariS - CLICK", "id": "nHnIZ8pkhmA", "footage": false}, {"anime": "Oregairu", "title": "Nagi Yanagi - Yukitoki", "id": "jtyUegcAlZA", "footage": false}, {"anime": "Fate/stay night", "title": "Mashiro Ayano - ideal white", "id": "wl_b8GpWbQA", "footage": true}, {"anime": "Fate/Zero", "title": "Kalafina - to the beginning", "id": "4cNbQ1x__jA", "footage": false}, {"anime": "La Mélancolie de Haruhi Suzumiya", "title": "Aya Hirano - Bouken Desho Desho?", "id": "EzSL38lwUCQ", "footage": false}];
 BLINDTEST_YT_TRACKS.forEach((t, i) => {
     const n = 1000 + i;
     BLINDTEST_TRACKS.push({ n, anime: t.anime, title: t.title, yt: `${t.anime} ${t.title}`, src: null, ytId: t.id, footage: t.footage !== false });
@@ -9993,8 +9865,6 @@ io.on('connection', (socket) => {
         room.status = 'reveal';
         room.noImpostor = false;
         room.votes = {};
-        // Une nouvelle manche Undercover / Devine la note peut compter dans son classement propre.
-        room._progImpostorRecorded = false;
 
         // Système de relance propre : tout le monde repart en vie à chaque nouvelle manche
         room.players.forEach(p => { p.isAlive = true; });
@@ -11100,6 +10970,104 @@ const ARC_UNIVERSE_ANIME = {
     opm:'One Punch Man', sao:'Sword Art Online', tokyoghoul:'Tokyo Ghoul', tokyorevengers:'Tokyo Revengers'
 };
 
+// ===== Extension univers 2026 : nouveaux anime =====
+Object.assign(ARC_UNIVERSE_ANIME, {
+  "mha": "My Hero Academia",
+  "dandadan": "Dandadan",
+  "frieren": "Frieren",
+  "vinland": "Vinland Saga",
+  "berserk": "Berserk",
+  "spyfamily": "Spy x Family",
+  "oshinoko": "Oshi no Ko",
+  "drstone": "Dr. Stone",
+  "mobpsycho": "Mob Psycho 100",
+  "codegeass": "Code Geass",
+  "steinsgate": "Steins;Gate",
+  "cowboybebop": "Cowboy Bebop",
+  "evangelion": "Neon Genesis Evangelion",
+  "sakamoto": "Sakamoto Days",
+  "kaiju8": "Kaiju No. 8",
+  "mashle": "Mashle",
+  "promised": "The Promised Neverland",
+  "noragami": "Noragami",
+  "blueexorcist": "Blue Exorcist",
+  "bungou": "Bungo Stray Dogs",
+  "blackbutler": "Black Butler",
+  "assclass": "Assassination Classroom",
+  "kuroko": "Kuroko no Basket",
+  "slamdunk": "Slam Dunk",
+  "ippo": "Hajime no Ippo",
+  "gintama": "Gintama",
+  "souleater": "Soul Eater",
+  "dgrayman": "D.Gray-man",
+  "yuyuhakusho": "Yu Yu Hakusho",
+  "inuyasha": "Inuyasha",
+  "samuraichamploo": "Samurai Champloo",
+  "trigun": "Trigun",
+  "gurren": "Gurren Lagann",
+  "killlakill": "Kill la Kill",
+  "fatezero": "Fate/Zero",
+  "fatestay": "Fate/stay night",
+  "fateapo": "Fate/Apocrypha",
+  "monster": "Monster",
+  "parasyte": "Parasyte",
+  "psychopass": "Psycho-Pass",
+  "cyberpunk": "Cyberpunk: Edgerunners",
+  "devilman": "Devilman Crybaby",
+  "akame": "Akame ga Kill",
+  "kaguya": "Kaguya-sama",
+  "konosuba": "Konosuba",
+  "overlord": "Overlord",
+  "shieldhero": "The Rising of the Shield Hero",
+  "eminence": "The Eminence in Shadow",
+  "danmachi": "DanMachi",
+  "nogamenolife": "No Game No Life",
+  "madeinabyss": "Made in Abyss",
+  "kakegurui": "Kakegurui",
+  "hellsing": "Hellsing Ultimate",
+  "deathparade": "Death Parade",
+  "erased": "Erased",
+  "another": "Another",
+  "violet": "Violet Evergarden",
+  "clannad": "Clannad",
+  "anohana": "Anohana",
+  "toradora": "Toradora!",
+  "dressup": "My Dress-Up Darling",
+  "rascal": "Rascal Does Not Dream",
+  "bluebox": "Blue Box",
+  "windbreaker": "WIND BREAKER",
+  "callnight": "Call of the Night",
+  "apothecary": "The Apothecary Diaries",
+  "zom100": "Zom 100",
+  "eightysix": "86 Eighty-Six",
+  "rankingkings": "Ranking of Kings",
+  "dungeonmeshi": "Dungeon Meshi",
+  "shangrila": "Shangri-La Frontier",
+  "beastars": "Beastars",
+  "dorohedoro": "Dorohedoro",
+  "lycoris": "Lycoris Recoil",
+  "bocchi": "Bocchi the Rock!",
+  "horimiya": "Horimiya",
+  "grandblue": "Grand Blue",
+  "tokyomewmew": "Tokyo Mew Mew",
+  "sailormoon": "Sailor Moon",
+  "digimon": "Digimon",
+  "yugioh": "Yu-Gi-Oh!",
+  "beyblade": "Beyblade",
+  "cardcaptor": "Cardcaptor Sakura",
+  "conan": "Detective Conan",
+  "initiald": "Initial D",
+  "mfghost": "MF Ghost",
+  "foodwars": "Food Wars!",
+  "blacklagoon": "Black Lagoon",
+  "greatpretender": "Great Pretender",
+  "durarara": "Durarara!!",
+  "baccano": "Baccano!",
+  "recreators": "Re:Creators",
+  "yourlie": "Your Lie in April"
+});
+
+
 // Emoji Anime : [emojis, réponse, univers (pour les persos), type]
 // type 'anime' => 4 animes proposés ; type 'perso' => 4 persos du même univers proposés
 const ARC_EMOJI = [
@@ -11218,6 +11186,1032 @@ const ARC_FAMOUS_OVERRIDE = {
     clover: ['Asta','Yuno','Noelle Silva','Yami Sukehiro','Luck Voltia','Magna Swing','Finral Roulacase','Vanessa Enoteca','Charmy Pappitson','Gauche Adlai','Grey','Gordon Agrippa','Zora Ideale','Secre Swallowtail','Henry Legolant','Julius Novachrono','William Vangeance','Fuegoleon Vermillion','Mereoleona Vermillion','Leopold Vermillion','Mimosa Vermillion','Klaus Lunettes','Nozel Silva','Charlotte Roselei','Dorothy Unsworth','Rill Boismortier','Licht','Patry','Lucius Zogratis','Zenon Zogratis','Vanica Zogratis','Dante Zogratis','Liebe','Langris Vaude','Jack the Ripper','Fana','Rades Spirito','Nacht Faust','Mars'],
     fairy: ['Natsu Dragneel','Lucy Heartfilia','Gray Fullbuster','Erza Scarlet','Wendy Marvell','Happy','Carla','Gajeel Redfox','Laxus Dreyar','Juvia Lockser','Levy McGarden','Mirajane Strauss','Elfman Strauss','Lisanna Strauss','Makarov Dreyar','Gildarts Clive','Mavis Vermillion','Zeref Dragneel','Acnologia','Jellal Fernandes','Ultear Milkovich','Meredy','Sting Eucliffe','Rogue Cheney','Minerva Orland','Kagura Mikazuchi','Lyon Vastia','Cana Alberona','Freed Justine','Evergreen','Bickslow','Cobra','Hades','Irene Belserion','August','Brandish μ','Dimaria Yesta','Ichiya Vandalay Kotobuki','Panther Lily','Frosch','Lector','Jura Neekis','Yukino Agria']
 };
+
+// Pools de personnages vérifiés/curatés pour les nouveaux univers.
+// Utilisés par Tu préfères, Arcade, cartes/boosters, musée et deck.
+Object.assign(ARC_FAMOUS_OVERRIDE, {
+  "mha": [
+    "Izuku Midoriya",
+    "Katsuki Bakugo",
+    "Shoto Todoroki",
+    "All Might",
+    "Ochaco Uraraka",
+    "Tenya Iida",
+    "Tsuyu Asui",
+    "Eijiro Kirishima",
+    "Momo Yaoyorozu",
+    "Fumikage Tokoyami",
+    "Endeavor",
+    "Hawks",
+    "Shota Aizawa",
+    "Tomura Shigaraki",
+    "Dabi",
+    "Himiko Toga",
+    "All For One",
+    "Mirio Togata",
+    "Tamaki Amajiki",
+    "Nejire Hado"
+  ],
+  "dandadan": [
+    "Momo Ayase",
+    "Ken Takakura",
+    "Aira Shiratori",
+    "Jiji Enjoji",
+    "Seiko Ayase",
+    "Turbo Granny",
+    "Kinta Sakata",
+    "Vamola",
+    "Rin Sawaki",
+    "Unji Zuma",
+    "Count Saint-Germain"
+  ],
+  "frieren": [
+    "Frieren",
+    "Fern",
+    "Stark",
+    "Himmel",
+    "Heiter",
+    "Eisen",
+    "Flamme",
+    "Serie",
+    "Sein",
+    "Denken",
+    "Übel",
+    "Land",
+    "Wirbel",
+    "Laufen",
+    "Richter",
+    "Aura"
+  ],
+  "vinland": [
+    "Thorfinn",
+    "Askeladd",
+    "Canute",
+    "Thors",
+    "Einar",
+    "Gudrid",
+    "Hild",
+    "Leif Erikson",
+    "Bjorn",
+    "Thorkell",
+    "Arnheid",
+    "Ketil",
+    "Snake",
+    "Olmar",
+    "Gardar"
+  ],
+  "berserk": [
+    "Guts",
+    "Griffith",
+    "Casca",
+    "Puck",
+    "Farnese",
+    "Serpico",
+    "Schierke",
+    "Isidro",
+    "Skull Knight",
+    "Zodd",
+    "Judeau",
+    "Rickert",
+    "Corkus",
+    "Nosferatu Zodd"
+  ],
+  "spyfamily": [
+    "Loid Forger",
+    "Anya Forger",
+    "Yor Forger",
+    "Bond Forger",
+    "Yuri Briar",
+    "Fiona Frost",
+    "Franky Franklin",
+    "Damian Desmond",
+    "Becky Blackbell",
+    "Sylvia Sherwood",
+    "Henry Henderson"
+  ],
+  "oshinoko": [
+    "Aqua Hoshino",
+    "Ruby Hoshino",
+    "Ai Hoshino",
+    "Kana Arima",
+    "Akane Kurokawa",
+    "MEM-cho",
+    "Taiki Himekawa",
+    "Miyako Saito",
+    "Ichigo Saito",
+    "Hikaru Kamiki"
+  ],
+  "drstone": [
+    "Senku Ishigami",
+    "Taiju Oki",
+    "Yuzuriha Ogawa",
+    "Tsukasa Shishio",
+    "Gen Asagiri",
+    "Kohaku",
+    "Chrome",
+    "Suika",
+    "Ryusui Nanami",
+    "Ukyo Saionji",
+    "Hyoga",
+    "Kaseki",
+    "Dr. Xeno",
+    "Stanley Snyder",
+    "Francois"
+  ],
+  "mobpsycho": [
+    "Shigeo Kageyama",
+    "Arataka Reigen",
+    "Ritsu Kageyama",
+    "Teruki Hanazawa",
+    "Dimple",
+    "Toichiro Suzuki",
+    "Sho Suzuki",
+    "Serizawa",
+    "Tome Kurata",
+    "Musashi Goda"
+  ],
+  "codegeass": [
+    "Lelouch Lamperouge",
+    "Suzaku Kururugi",
+    "C.C.",
+    "Kallen Stadtfeld",
+    "Nunnally Lamperouge",
+    "Shirley Fenette",
+    "Cornelia li Britannia",
+    "Euphemia li Britannia",
+    "Charles zi Britannia",
+    "Schneizel el Britannia",
+    "Jeremiah Gottwald",
+    "Rolo Lamperouge"
+  ],
+  "steinsgate": [
+    "Rintaro Okabe",
+    "Kurisu Makise",
+    "Mayuri Shiina",
+    "Itaru Hashida",
+    "Suzuha Amane",
+    "Faris NyanNyan",
+    "Luka Urushibara",
+    "Moeka Kiryu",
+    "Yugo Tennouji"
+  ],
+  "cowboybebop": [
+    "Spike Spiegel",
+    "Jet Black",
+    "Faye Valentine",
+    "Edward Wong",
+    "Ein",
+    "Vicious",
+    "Julia",
+    "Gren"
+  ],
+  "evangelion": [
+    "Shinji Ikari",
+    "Rei Ayanami",
+    "Asuka Langley Soryu",
+    "Misato Katsuragi",
+    "Kaworu Nagisa",
+    "Gendo Ikari",
+    "Ritsuko Akagi",
+    "Toji Suzuhara",
+    "Mari Illustrious Makinami"
+  ],
+  "sakamoto": [
+    "Taro Sakamoto",
+    "Shin Asakura",
+    "Lu Shaotang",
+    "Heisuke Mashimo",
+    "Nagumo",
+    "Osaragi",
+    "Shishiba",
+    "Gaku",
+    "Slur",
+    "Akira Akao",
+    "Rion Akao"
+  ],
+  "kaiju8": [
+    "Kafka Hibino",
+    "Mina Ashiro",
+    "Reno Ichikawa",
+    "Kikoru Shinomiya",
+    "Soshiro Hoshina",
+    "Gen Narumi",
+    "Iharu Furuhashi",
+    "Haruichi Izumo",
+    "Aoi Kaguragi",
+    "Isao Shinomiya",
+    "Kaiju No. 9"
+  ],
+  "mashle": [
+    "Mash Burnedead",
+    "Finn Ames",
+    "Lance Crown",
+    "Dot Barrett",
+    "Lemon Irvine",
+    "Rayne Ames",
+    "Abel Walker",
+    "Abyss Razor",
+    "Orter Madl",
+    "Innocent Zero",
+    "Wahlberg Baigan"
+  ],
+  "promised": [
+    "Emma",
+    "Norman",
+    "Ray",
+    "Isabella",
+    "Phil",
+    "Don",
+    "Gilda",
+    "Krone",
+    "Mujika",
+    "Sonju",
+    "Peter Ratri"
+  ],
+  "noragami": [
+    "Yato",
+    "Hiyori Iki",
+    "Yukine",
+    "Bishamon",
+    "Kazuma",
+    "Kofuku",
+    "Daikoku",
+    "Nora",
+    "Ebisu",
+    "Tenjin"
+  ],
+  "blueexorcist": [
+    "Rin Okumura",
+    "Yukio Okumura",
+    "Shiemi Moriyama",
+    "Mephisto Pheles",
+    "Shura Kirigakure",
+    "Ryuji Suguro",
+    "Izumo Kamiki",
+    "Konekomaru Miwa",
+    "Renzo Shima",
+    "Amaimon",
+    "Satan"
+  ],
+  "bungou": [
+    "Atsushi Nakajima",
+    "Osamu Dazai",
+    "Doppo Kunikida",
+    "Ryunosuke Akutagawa",
+    "Chuya Nakahara",
+    "Ranpo Edogawa",
+    "Kyoka Izumi",
+    "Akiko Yosano",
+    "Fyodor Dostoevsky",
+    "Nikolai Gogol",
+    "Ougai Mori"
+  ],
+  "blackbutler": [
+    "Ciel Phantomhive",
+    "Sebastian Michaelis",
+    "Undertaker",
+    "Grell Sutcliff",
+    "Elizabeth Midford",
+    "Finnian",
+    "Mey-Rin",
+    "Baldroy",
+    "Lau",
+    "Snake"
+  ],
+  "assclass": [
+    "Koro-sensei",
+    "Nagisa Shiota",
+    "Karma Akabane",
+    "Kaede Kayano",
+    "Tadaomi Karasuma",
+    "Irina Jelavic",
+    "Gakushu Asano",
+    "Rio Nakamura",
+    "Itona Horibe",
+    "Ritsu"
+  ],
+  "kuroko": [
+    "Tetsuya Kuroko",
+    "Taiga Kagami",
+    "Seijuro Akashi",
+    "Daiki Aomine",
+    "Ryota Kise",
+    "Shintaro Midorima",
+    "Atsushi Murasakibara",
+    "Junpei Hyuga",
+    "Teppei Kiyoshi",
+    "Satsuki Momoi"
+  ],
+  "slamdunk": [
+    "Hanamichi Sakuragi",
+    "Kaede Rukawa",
+    "Takenori Akagi",
+    "Hisashi Mitsui",
+    "Ryota Miyagi",
+    "Haruko Akagi",
+    "Akira Sendoh",
+    "Shinichi Maki",
+    "Kicchou Fukuda"
+  ],
+  "ippo": [
+    "Ippo Makunouchi",
+    "Mamoru Takamura",
+    "Ichiro Miyata",
+    "Takeshi Sendo",
+    "Masaru Aoki",
+    "Tatsuya Kimura",
+    "Genji Kamogawa",
+    "Ryo Mashiba",
+    "Eiji Date"
+  ],
+  "gintama": [
+    "Gintoki Sakata",
+    "Shinpachi Shimura",
+    "Kagura",
+    "Toshiro Hijikata",
+    "Sogo Okita",
+    "Kotaro Katsura",
+    "Shinsuke Takasugi",
+    "Kamui",
+    "Isao Kondo",
+    "Tsukuyo",
+    "Tae Shimura"
+  ],
+  "souleater": [
+    "Maka Albarn",
+    "Soul Evans",
+    "Black Star",
+    "Tsubaki Nakatsukasa",
+    "Death the Kid",
+    "Liz Thompson",
+    "Patty Thompson",
+    "Crona",
+    "Medusa Gorgon",
+    "Dr. Stein",
+    "Lord Death"
+  ],
+  "dgrayman": [
+    "Allen Walker",
+    "Yu Kanda",
+    "Lenalee Lee",
+    "Lavi",
+    "Komui Lee",
+    "The Millennium Earl",
+    "Road Kamelot",
+    "Tyki Mikk",
+    "Miranda Lotto",
+    "Arystar Krory"
+  ],
+  "yuyuhakusho": [
+    "Yusuke Urameshi",
+    "Kazuma Kuwabara",
+    "Hiei",
+    "Kurama",
+    "Genkai",
+    "Koenma",
+    "Toguro",
+    "Shinobu Sensui",
+    "Botan",
+    "Keiko Yukimura"
+  ],
+  "inuyasha": [
+    "Inuyasha",
+    "Kagome Higurashi",
+    "Sesshomaru",
+    "Miroku",
+    "Sango",
+    "Shippo",
+    "Kikyo",
+    "Naraku",
+    "Koga",
+    "Rin"
+  ],
+  "samuraichamploo": [
+    "Mugen",
+    "Jin",
+    "Fuu Kasumi",
+    "Kariya Kagetoki",
+    "Sara",
+    "Shinsuke",
+    "Mukuro"
+  ],
+  "trigun": [
+    "Vash the Stampede",
+    "Nicholas D. Wolfwood",
+    "Meryl Stryfe",
+    "Milly Thompson",
+    "Millions Knives",
+    "Legato Bluesummers",
+    "Rem Saverem"
+  ],
+  "gurren": [
+    "Simon",
+    "Kamina",
+    "Yoko Littner",
+    "Nia Teppelin",
+    "Viral",
+    "Rossiu Adai",
+    "Kittan Bachika",
+    "Lordgenome",
+    "Anti-Spiral"
+  ],
+  "killlakill": [
+    "Ryuko Matoi",
+    "Satsuki Kiryuin",
+    "Mako Mankanshoku",
+    "Senketsu",
+    "Ragyo Kiryuin",
+    "Nui Harime",
+    "Ira Gamagoori",
+    "Uzu Sanageyama",
+    "Nonon Jakuzure",
+    "Hoka Inumuta"
+  ],
+  "fatezero": [
+    "Kiritsugu Emiya",
+    "Saber",
+    "Kirei Kotomine",
+    "Gilgamesh",
+    "Rider",
+    "Waver Velvet",
+    "Irisviel von Einzbern",
+    "Lancer",
+    "Berserker",
+    "Caster"
+  ],
+  "fatestay": [
+    "Shirou Emiya",
+    "Saber",
+    "Rin Tohsaka",
+    "Archer",
+    "Sakura Matou",
+    "Illyasviel von Einzbern",
+    "Kirei Kotomine",
+    "Gilgamesh",
+    "Lancer",
+    "Rider"
+  ],
+  "fateapo": [
+    "Sieg",
+    "Ruler",
+    "Saber of Red",
+    "Shirou Kotomine",
+    "Rider of Black",
+    "Archer of Black",
+    "Lancer of Red",
+    "Saber of Black",
+    "Assassin of Red"
+  ],
+  "monster": [
+    "Kenzo Tenma",
+    "Johan Liebert",
+    "Nina Fortner",
+    "Heinrich Lunge",
+    "Dieter",
+    "Eva Heinemann",
+    "Wolfgang Grimmer",
+    "Roberto"
+  ],
+  "parasyte": [
+    "Shinichi Izumi",
+    "Migi",
+    "Satomi Murano",
+    "Ryoko Tamiya",
+    "Gotou",
+    "Kana Kimishima",
+    "Mamoru Uda",
+    "Hideo Shimada"
+  ],
+  "psychopass": [
+    "Akane Tsunemori",
+    "Shinya Kogami",
+    "Shogo Makishima",
+    "Nobuchika Ginoza",
+    "Tomomi Masaoka",
+    "Yayoi Kunizuka",
+    "Shion Karanomori",
+    "Mika Shimotsuki"
+  ],
+  "cyberpunk": [
+    "David Martinez",
+    "Lucy",
+    "Rebecca",
+    "Maine",
+    "Dorio",
+    "Kiwi",
+    "Pilar",
+    "Falco",
+    "Adam Smasher"
+  ],
+  "devilman": [
+    "Akira Fudo",
+    "Ryo Asuka",
+    "Miki Makimura",
+    "Miko Kuroda",
+    "Akiko Makimura",
+    "Silene",
+    "Kaim"
+  ],
+  "akame": [
+    "Akame",
+    "Tatsumi",
+    "Esdeath",
+    "Leone",
+    "Mine",
+    "Lubbock",
+    "Najenda",
+    "Bulat",
+    "Chelsea",
+    "Kurome",
+    "Wave"
+  ],
+  "kaguya": [
+    "Kaguya Shinomiya",
+    "Miyuki Shirogane",
+    "Chika Fujiwara",
+    "Yu Ishigami",
+    "Miko Iino",
+    "Ai Hayasaka",
+    "Kei Shirogane",
+    "Nagisa Kashiwagi"
+  ],
+  "konosuba": [
+    "Kazuma Satou",
+    "Aqua",
+    "Megumin",
+    "Darkness",
+    "Wiz",
+    "Yunyun",
+    "Vanir",
+    "Eris",
+    "Chris"
+  ],
+  "overlord": [
+    "Ainz Ooal Gown",
+    "Albedo",
+    "Shalltear Bloodfallen",
+    "Demiurge",
+    "Cocytus",
+    "Aura Bella Fiora",
+    "Mare Bello Fiore",
+    "Sebas Tian",
+    "Narberal Gamma"
+  ],
+  "shieldhero": [
+    "Naofumi Iwatani",
+    "Raphtalia",
+    "Filo",
+    "Melty Q Melromarc",
+    "Motoyasu Kitamura",
+    "Ren Amaki",
+    "Itsuki Kawasumi",
+    "Rishia Ivyred",
+    "Glass"
+  ],
+  "eminence": [
+    "Cid Kagenou",
+    "Alpha",
+    "Beta",
+    "Gamma",
+    "Delta",
+    "Epsilon",
+    "Zeta",
+    "Eta",
+    "Alexia Midgar",
+    "Rose Oriana",
+    "Iris Midgar"
+  ],
+  "danmachi": [
+    "Bell Cranel",
+    "Hestia",
+    "Ais Wallenstein",
+    "Liliruca Arde",
+    "Welf Crozzo",
+    "Ryuu Lion",
+    "Freya",
+    "Syr Flova",
+    "Ottarl"
+  ],
+  "nogamenolife": [
+    "Sora",
+    "Shiro",
+    "Stephanie Dola",
+    "Jibril",
+    "Izuna Hatsuse",
+    "Tet",
+    "Kurami Zell",
+    "Fiel Nirvalen"
+  ],
+  "madeinabyss": [
+    "Riko",
+    "Reg",
+    "Nanachi",
+    "Bondrewd",
+    "Prushka",
+    "Mitty",
+    "Ozen",
+    "Marulk",
+    "Faputa"
+  ],
+  "kakegurui": [
+    "Yumeko Jabami",
+    "Mary Saotome",
+    "Ryota Suzui",
+    "Kirari Momobami",
+    "Ririka Momobami",
+    "Midari Ikishima",
+    "Itsuki Sumeragi",
+    "Sayaka Igarashi"
+  ],
+  "hellsing": [
+    "Alucard",
+    "Integra Hellsing",
+    "Seras Victoria",
+    "Alexander Anderson",
+    "The Major",
+    "Walter C. Dornez",
+    "Pip Bernadotte",
+    "The Captain"
+  ],
+  "deathparade": [
+    "Decim",
+    "Chiyuki",
+    "Nona",
+    "Ginti",
+    "Clavis",
+    "Quin",
+    "Oculus"
+  ],
+  "erased": [
+    "Satoru Fujinuma",
+    "Kayo Hinazuki",
+    "Airi Katagiri",
+    "Sachiko Fujinuma",
+    "Gaku Yashiro",
+    "Kenya Kobayashi",
+    "Hiromi Sugita"
+  ],
+  "another": [
+    "Mei Misaki",
+    "Koichi Sakakibara",
+    "Izumi Akazawa",
+    "Reiko Mikami",
+    "Naoya Teshigawara",
+    "Yukari Sakuragi"
+  ],
+  "violet": [
+    "Violet Evergarden",
+    "Gilbert Bougainvillea",
+    "Claudia Hodgins",
+    "Cattleya Baudelaire",
+    "Benedict Blue",
+    "Erica Brown",
+    "Iris Cannary",
+    "Dietfried Bougainvillea"
+  ],
+  "clannad": [
+    "Tomoya Okazaki",
+    "Nagisa Furukawa",
+    "Ushio Okazaki",
+    "Kyou Fujibayashi",
+    "Tomoyo Sakagami",
+    "Kotomi Ichinose",
+    "Fuko Ibuki",
+    "Youhei Sunohara"
+  ],
+  "anohana": [
+    "Jinta Yadomi",
+    "Meiko Honma",
+    "Naruko Anjo",
+    "Atsumu Matsuyuki",
+    "Chiriko Tsurumi",
+    "Tetsudo Hisakawa"
+  ],
+  "toradora": [
+    "Taiga Aisaka",
+    "Ryuuji Takasu",
+    "Minori Kushieda",
+    "Yusaku Kitamura",
+    "Ami Kawashima"
+  ],
+  "dressup": [
+    "Marin Kitagawa",
+    "Wakana Gojo",
+    "Sajuna Inui",
+    "Shinju Inui",
+    "Nowa Sugaya"
+  ],
+  "rascal": [
+    "Sakuta Azusagawa",
+    "Mai Sakurajima",
+    "Tomoe Koga",
+    "Rio Futaba",
+    "Nodoka Toyohama",
+    "Kaede Azusagawa",
+    "Shoko Makinohara"
+  ],
+  "bluebox": [
+    "Taiki Inomata",
+    "Chinatsu Kano",
+    "Hina Chono",
+    "Kyo Kasahara",
+    "Kengo Haryu",
+    "Ayame Moriya"
+  ],
+  "windbreaker": [
+    "Haruka Sakura",
+    "Hajime Umemiya",
+    "Hayato Suo",
+    "Akihiko Nirei",
+    "Kyotaro Sugishita",
+    "Mitsuki Kiryu",
+    "Toma Hiragi",
+    "Choji Tomiyama"
+  ],
+  "callnight": [
+    "Ko Yamori",
+    "Nazuna Nanakusa",
+    "Akira Asai",
+    "Anko Uguisu",
+    "Seri Kikyo",
+    "Nico Hirata",
+    "Kabura Honda"
+  ],
+  "apothecary": [
+    "Maomao",
+    "Jinshi",
+    "Gaoshun",
+    "Gyokuyou",
+    "Lihua",
+    "Lishu",
+    "Ah-Duo",
+    "Lakan",
+    "Loulan"
+  ],
+  "zom100": [
+    "Akira Tendo",
+    "Shizuka Mikazuki",
+    "Kenichiro Ryuuzaki",
+    "Beatrix Amerhauser",
+    "Gonzo Kosugi"
+  ],
+  "eightysix": [
+    "Vladilena Milize",
+    "Shinei Nouzen",
+    "Raiden Shuga",
+    "Anju Emma",
+    "Theoto Rikka",
+    "Kurena Kukumila",
+    "Frederica Rosenfort",
+    "Ernst Zimmerman"
+  ],
+  "rankingkings": [
+    "Bojji",
+    "Kage",
+    "Daida",
+    "Hiling",
+    "Domas",
+    "Bebin",
+    "Desha",
+    "Ouken",
+    "Mirajo"
+  ],
+  "dungeonmeshi": [
+    "Laios Touden",
+    "Marcille Donato",
+    "Chilchuck Tims",
+    "Senshi",
+    "Falin Touden",
+    "Izutsumi",
+    "Kabru",
+    "Thistle"
+  ],
+  "shangrila": [
+    "Sunraku",
+    "Psyger-0",
+    "Arthur Pencilgon",
+    "Oikatzo",
+    "Emul",
+    "Vysache",
+    "Wezaemon"
+  ],
+  "beastars": [
+    "Legoshi",
+    "Haru",
+    "Louis",
+    "Juno",
+    "Gohin",
+    "Jack",
+    "Melon",
+    "Riz"
+  ],
+  "dorohedoro": [
+    "Caiman",
+    "Nikaido",
+    "Shin",
+    "Noi",
+    "En",
+    "Fujita",
+    "Ebisu",
+    "Chota"
+  ],
+  "lycoris": [
+    "Chisato Nishikigi",
+    "Takina Inoue",
+    "Mika",
+    "Kurumi",
+    "Mizuki Nakahara",
+    "Majima",
+    "Fuki Harukawa"
+  ],
+  "bocchi": [
+    "Hitori Gotoh",
+    "Nijika Ijichi",
+    "Ryo Yamada",
+    "Ikuyo Kita",
+    "Seika Ijichi",
+    "Kikuri Hiroi"
+  ],
+  "horimiya": [
+    "Kyoko Hori",
+    "Izumi Miyamura",
+    "Toru Ishikawa",
+    "Yuki Yoshikawa",
+    "Kakeru Sengoku",
+    "Remi Ayasaki",
+    "Sakura Kono"
+  ],
+  "grandblue": [
+    "Iori Kitahara",
+    "Kohei Imamura",
+    "Chisa Kotegawa",
+    "Nanaka Kotegawa",
+    "Azusa Hamaoka",
+    "Shinji Tokita",
+    "Ryujiro Kotobuki",
+    "Aina Yoshiwara"
+  ],
+  "tokyomewmew": [
+    "Ichigo Momomiya",
+    "Mint Aizawa",
+    "Lettuce Midorikawa",
+    "Pudding Fong",
+    "Zakuro Fujiwara",
+    "Masaya Aoyama",
+    "Kish"
+  ],
+  "sailormoon": [
+    "Usagi Tsukino",
+    "Ami Mizuno",
+    "Rei Hino",
+    "Makoto Kino",
+    "Minako Aino",
+    "Mamoru Chiba",
+    "Chibiusa",
+    "Setsuna Meioh",
+    "Haruka Tenoh",
+    "Michiru Kaioh"
+  ],
+  "digimon": [
+    "Taichi Yagami",
+    "Yamato Ishida",
+    "Sora Takenouchi",
+    "Koshiro Izumi",
+    "Mimi Tachikawa",
+    "Joe Kido",
+    "Takeru Takaishi",
+    "Hikari Yagami",
+    "Agumon",
+    "Gabumon"
+  ],
+  "yugioh": [
+    "Yugi Muto",
+    "Atem",
+    "Seto Kaiba",
+    "Joey Wheeler",
+    "Tea Gardner",
+    "Bakura",
+    "Marik Ishtar",
+    "Maximillion Pegasus",
+    "Mai Valentine"
+  ],
+  "beyblade": [
+    "Tyson Granger",
+    "Kai Hiwatari",
+    "Ray Kon",
+    "Max Tate",
+    "Daichi Sumeragi",
+    "Brooklyn",
+    "Tala Valkov"
+  ],
+  "cardcaptor": [
+    "Sakura Kinomoto",
+    "Syaoran Li",
+    "Tomoyo Daidouji",
+    "Kero",
+    "Touya Kinomoto",
+    "Yukito Tsukishiro",
+    "Eriol Hiiragizawa",
+    "Meiling Li"
+  ],
+  "conan": [
+    "Conan Edogawa",
+    "Shinichi Kudo",
+    "Ran Mouri",
+    "Kogoro Mouri",
+    "Ai Haibara",
+    "Heiji Hattori",
+    "Kaito Kid",
+    "Gin",
+    "Shuichi Akai",
+    "Rei Furuya"
+  ],
+  "initiald": [
+    "Takumi Fujiwara",
+    "Keisuke Takahashi",
+    "Ryosuke Takahashi",
+    "Bunta Fujiwara",
+    "Itsuki Takeuchi",
+    "Natsuki Mogi",
+    "Kyoichi Sudo"
+  ],
+  "mfghost": [
+    "Kanata Rivington",
+    "Ren Saionji",
+    "Shun Aiba",
+    "Michael Beckenbauer",
+    "Kouki Sawatari",
+    "Kakeru Yashio"
+  ],
+  "foodwars": [
+    "Soma Yukihira",
+    "Erina Nakiri",
+    "Megumi Tadokoro",
+    "Takumi Aldini",
+    "Alice Nakiri",
+    "Ryo Kurokiba",
+    "Akira Hayama",
+    "Eishi Tsukasa",
+    "Joichiro Yukihira"
+  ],
+  "blacklagoon": [
+    "Revy",
+    "Rock",
+    "Dutch",
+    "Benny",
+    "Balalaika",
+    "Roberta",
+    "Eda",
+    "Shenhua"
+  ],
+  "greatpretender": [
+    "Makoto Edamura",
+    "Laurent Thierry",
+    "Abigail Jones",
+    "Cynthia Moore",
+    "Kudo",
+    "Dorothy"
+  ],
+  "durarara": [
+    "Mikado Ryugamine",
+    "Masaomi Kida",
+    "Anri Sonohara",
+    "Celty Sturluson",
+    "Shizuo Heiwajima",
+    "Izaya Orihara",
+    "Shinra Kishitani",
+    "Kyohei Kadota"
+  ],
+  "baccano": [
+    "Isaac Dian",
+    "Miria Harvent",
+    "Firo Prochainezo",
+    "Ennis",
+    "Claire Stanfield",
+    "Ladd Russo",
+    "Jacuzzi Splot",
+    "Nice Holystone"
+  ],
+  "recreators": [
+    "Sota Mizushino",
+    "Selesia Upitiria",
+    "Meteora Osterreich",
+    "Altair",
+    "Mamika Kirameki",
+    "Alicetaria February",
+    "Yuya Mirokuji"
+  ],
+  "yourlie": [
+    "Kosei Arima",
+    "Kaori Miyazono",
+    "Tsubaki Sawabe",
+    "Ryota Watari",
+    "Emi Igawa",
+    "Takeshi Aiza",
+    "Hiroko Seto"
+  ]
+});
+
 const ARC_FAMOUS_CACHE = new Map();
 function arcFamous(u) {
     if (ARC_FAMOUS_CACHE.has(u)) return ARC_FAMOUS_CACHE.get(u);
@@ -11993,18 +12987,7 @@ const TLT_THEMES = (() => {
     catch (e) { console.warn('[Tier list] tierlist-themes.json introuvable :', e.message); return []; }
 })();
 const TLT_BY_ID = Object.fromEntries(TLT_THEMES.map(t => [t.id, t]));
-function tltUniqueItems(items) {
-    if (!Array.isArray(items)) return items;
-    const seen = new Set(), out = [];
-    for (const item of items) {
-        const key = normalizeImageKey(item?.name || '');
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        out.push(item);
-    }
-    return out;
-}
-const tltItems = id => id === 'opening' ? tltUniqueItems(arcOpeningItems()) : TLT_BY_ID[id] ? tltUniqueItems(TLT_BY_ID[id].items) : null;
+const tltItems = id => id === 'opening' ? arcOpeningItems() : TLT_BY_ID[id] ? TLT_BY_ID[id].items : null;
 app.get('/api/tl/themes', (req, res) => res.json({ ok: true, themes: [{ id: 'opening', title: 'Tier list openings', emoji: '🎶', kind: 'openings' }, ...TLT_THEMES].map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: (tltItems(t.id) || []).length })) }));
 
 function arcItemsFor(source) {
@@ -12043,6 +13026,24 @@ app.get('/api/arcade/items', (req, res) => {
     });
 });
 
+
+// Image générique pour les thèmes Battle (les thèmes peuvent mélanger plusieurs anime).
+// AniList est interrogé par nom; on garde ensuite l'URL en cache via le navigateur.
+async function qapAniListCharacterImage(name) {
+    const clean = String(name || '').replace(/\s*[•—-].*$/, '').trim();
+    if (!clean) return null;
+    try {
+        const d = await arcAniList(`query($s:String){ Character(search:$s){ image{ large medium } } }`, { s: clean });
+        return d?.Character?.image?.large || d?.Character?.image?.medium || null;
+    } catch (_) { return null; }
+}
+async function qapAniListAnimeCover(name) {
+    if (!name) return null;
+    try {
+        const d = await arcAniList(`query($s:String){ Media(search:$s,type:ANIME,sort:SEARCH_MATCH){ coverImage{ extraLarge large medium } } }`, { s: String(name) });
+        return d?.Media?.coverImage?.extraLarge || d?.Media?.coverImage?.large || d?.Media?.coverImage?.medium || null;
+    } catch (_) { return null; }
+}
 app.get('/api/arcade/item-image', async (req, res) => {
     const source = String(req.query.source || '');
     const name = String(req.query.name || '');
@@ -12051,7 +13052,16 @@ app.get('/api/arcade/item-image', async (req, res) => {
         if (source === 'animes') url = await arcAnimeCover(name);
         else {
             const it = (arcItemsFor(source) || []).find(i => i.name === name);
-            if (it) url = it.img || await arcCharImage(source, it.raw || it.name);
+            if (it) {
+                if (it.img) url = it.img;
+                else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
+                    url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
+                } else if (source.startsWith('qt:')) {
+                    // Pour une transformation, on cherche le personnage indiqué après le nom de la forme.
+                    const charName = it.char || (String(it.sub || '').split('•')[0].trim()) || it.name;
+                    url = await qapAniListCharacterImage(charName);
+                } else url = await arcCharImage(source, it.raw || it.name);
+            }
         }
     } catch (_) {}
     res.set('Cache-Control', url ? 'public, max-age=3600' : 'no-store');
@@ -12791,10 +13801,7 @@ publicUser = function (row) {
 };
 
 const MODE_LABELS = {
-    'undercover:normal': 'Undercover Normal', 'undercover:hardcore': 'Undercover Hardcore', note: 'Devine la note',
     blindtest: 'Blind Test', dle: 'AnimeDLE', rollandgaros: 'Rolland Garros', quote: 'Citations',
-    enchere: 'Enchère', enchereaveugle: 'Enchère à l’aveugle', draw: 'Dessine le perso', guess: 'Devine le dessin',
-    chaine: 'Chaîne anime', loupgarou: 'Loup-Garou', uquiz: 'Quiz communautaire',
     'arcade:pixel': 'Pixel Anime', 'arcade:silhouette': 'Silhouette', 'arcade:emoji': 'Emoji Anime', 'arcade:quatre': '4 images = 1 anime',
     'arcade:mapguess': 'Map Guess', 'arcade:fusion': 'Fusion Anime', 'arcade:scene': 'Scene Guessr', 'arcade:link': 'Common Link',
     'arcade:popularite': 'Popularity Guess', 'arcade:bac': 'Petit bac', 'arcade:imposteur': 'Imposteur', 'arcade:audio': 'Écoute la scène',
@@ -12948,28 +13955,6 @@ emitQuoteState = function (room, roomCode) {
     progRecord(room, 'quote', qg.universeKey, room.players.map(p => ({ player: p, points: (qg.scores[p.id] || 0) * 20, won: p.name === qg.winnerName })));
 };
 
-const _endEnchereProg = endEnchere;
-endEnchere = function (room, roomCode) {
-    _endEnchereProg(room, roomCode);
-    const e = room.enchere;
-    if (!e || e.progRecorded) return;
-    e.progRecorded = true;
-    progRecord(room, 'enchere', e.universeKey, room.players.map(p => ({
-        player: p, points: e.totals?.[p.id] || 0, won: !!e.winnerId && e.winnerId === p.id
-    })));
-};
-
-const _endEnchereAveugleProg = endEnchereAveugle;
-endEnchereAveugle = function (room, roomCode) {
-    _endEnchereAveugleProg(room, roomCode);
-    const e = room.enchereAveugle;
-    if (!e || e.progRecorded) return;
-    e.progRecorded = true;
-    progRecord(room, 'enchereaveugle', e.universeKey, room.players.map(p => ({
-        player: p, points: e.totals?.[p.id] || 0, won: !!e.winnerId && e.winnerId === p.id
-    })));
-};
-
 // ---- API profil & classements ----
 function authUserId(req) {
     const h = req.headers.authorization || '';
@@ -13006,9 +13991,8 @@ app.get('/api/leaderboard', async (req, res) => {
             const params = [];
             let where = period === 'week' ? `created_at > now() - interval '7 days'` : 'true';
             if (mode) { params.push(mode); where += ` AND mode = $${params.length}`; }
-            const order = mode ? 'wins DESC, points DESC, games ASC, pseudo ASC' : 'points DESC, wins DESC, games ASC, pseudo ASC';
             rows = (await pool.query(`SELECT user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games,
-                sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY ${order} LIMIT 50`, params)).rows;
+                sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY points DESC LIMIT 25`, params)).rows;
         } catch (_) {}
     } else {
         const since = period === 'week' ? Date.now() - 7 * 86400000 : 0;
@@ -13017,12 +14001,9 @@ app.get('/api/leaderboard', async (req, res) => {
             const o = agg[r.user_id] = agg[r.user_id] || { user_id: r.user_id, pseudo: r.pseudo, points: 0, games: 0, wins: 0 };
             o.points += r.points; o.games++; o.wins += r.won ? 1 : 0;
         });
-        rows = Object.values(agg).sort((a, b) => mode
-            ? (b.wins - a.wins || b.points - a.points || a.games - b.games || String(a.pseudo).localeCompare(String(b.pseudo)))
-            : (b.points - a.points || b.wins - a.wins || a.games - b.games || String(a.pseudo).localeCompare(String(b.pseudo)))).slice(0, 50);
+        rows = Object.values(agg).sort((a, b) => b.points - a.points).slice(0, 25);
     }
-    rows = rows.map(r => ({ ...r, winrate: r.games ? Math.round((r.wins / r.games) * 100) : 0 }));
-    res.json({ ok: true, period, mode, label: mode ? (MODE_LABELS[mode] || mode) : 'Classement global', metric: mode ? 'wins' : 'points', rows, modes: MODE_LABELS });
+    res.json({ ok: true, period, mode, rows, modes: MODE_LABELS });
 });
 
 /* =====================================================================
@@ -14854,11 +15835,9 @@ app.get('/api/avatar/search', (req, res) => {
     res.json({ ok: true, results: out.slice(0, 24) });
 });
 app.get('/api/avatar/img', async (req, res) => {
-    const u = String(req.query.u || '');
-    const requested = String(req.query.n || '').trim();
-    if (!ARC_UNIVERSE_ANIME[u] || !requested) return res.status(404).end();
-    const c = avatarFind(u, requested);
-    const url = await arcCharImage(u, c ? c.raw : requested);
+    const c = avatarFind(String(req.query.u || ''), String(req.query.n || ''));
+    if (!c) return res.status(404).end();
+    const url = await arcCharImage(String(req.query.u), c.raw);
     if (!url) return res.status(404).end();
     res.redirect('/api/img?u=' + encodeURIComponent(url));
 });
@@ -15801,42 +16780,25 @@ function botTick(b) {
         return;
     }
 }
-app.post('/api/admin/bots', async (req, res) => {
-    try {
-        const uid = authUserId(req);
-        const admin = await isAdmin(req);
-        const beta = !!uid && await isBetaUid(uid);
-        if (!admin && !beta) return res.status(403).json({ ok: false, error: 'Réservé aux admins et bêta testeurs.' });
-
-        const b = req.body || {};
-        const code = String(b.roomCode || '');
-        const room = rooms[code];
-        if (!room) return res.json({ ok: false, error: 'Salon introuvable.' });
-
-        // Un bêta-testeur peut manipuler les bots uniquement dans un salon où son compte est présent.
-        // Les admins conservent leur accès global de test.
-        if (!admin && !room.players.some(p => p && p.userId === uid && !p.disconnected)) {
-            return res.status(403).json({ ok: false, error: 'Tu dois être dans ce salon pour y ajouter des bots.' });
-        }
-
-        if (b.remove) {
-            let n = 0;
-            [...ALL_BOTS].forEach(bot => { if (bot.room === code) { botKill(bot); n++; } });
-            return res.json({ ok: true, removed: n });
-        }
-        const n = Math.max(1, Math.min(8, +b.n || 1));
-        const out = [];
-        for (let i = 0; i < n; i++) {
-            const r = botSpawn(code, b.skill);
-            if (!r.ok) return res.json(r);
-            out.push(r.name);
-            await new Promise(r2 => setTimeout(r2, 120));
-        }
-        res.json({ ok: true, names: out });
-    } catch (e) {
-        res.status(500).json({ ok: false, error: e.message });
+app.post('/api/admin/bots', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const code = String(b.roomCode || '');
+    if (!rooms[code]) return res.json({ ok: false, error: 'Salon introuvable.' });
+    if (b.remove) {
+        let n = 0;
+        [...ALL_BOTS].forEach(bot => { if (bot.room === code) { botKill(bot); n++; } });
+        return res.json({ ok: true, removed: n });
     }
-});
+    const n = Math.max(1, Math.min(8, +b.n || 1));
+    const out = [];
+    for (let i = 0; i < n; i++) {
+        const r = botSpawn(code, b.skill);
+        if (!r.ok) return res.json(r);
+        out.push(r.name);
+        await new Promise(r2 => setTimeout(r2, 120));
+    }
+    res.json({ ok: true, names: out });
+}));
 
 /* =====================================================================
    DESSINE LE PERSO : MODE STREAM — le streamer dessine, le chat Twitch/TikTok
@@ -16416,11 +17378,11 @@ app.get('/api/cards', async (req, res) => {
         cards = list.map((c, i) => {
             const m = mine.get(u + '|' + c.display);
             const rarity = cardRarityAt(u, i);
-            return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0, missing: true, img: cardImg({ u, display: c.display }) };
+            return m ? { name: c.display, rarity, n: m.n, shiny: m.shiny, img: cardImg({ u, display: c.display }) } : { name: null, rarity, n: 0 };
         });
         cardAllSpecials(u).forEach(c => {
             const m = mine.get(c.key);
-            cards.push(m ? { name: c.display, rarity: c.tier, n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: c.tier, n: 0, secret: true, missing: true, img: cardImg(c) });
+            cards.push(m ? { name: c.display, rarity: c.tier, n: m.n, shiny: m.shiny, img: cardImg(c), secret: true } : { name: null, rarity: c.tier, n: 0, secret: true });
         });
     }
     const all = [...mine.values()];
@@ -16978,97 +17940,23 @@ app.post('/api/cards/fuse', async (req, res) => {
         : await cardAward({ userId: uid, id: null }, pick.u, pick.display, { silent: true, shinyRate: 1 / 10 });
     res.json({ ok: true, used, card });
 });
-// Échanges — système direct à deux joueurs
-// Chaque joueur ne voit que SA collection. Il choisit sa carte, l'autre choisit la sienne,
-// puis il faut un accord des deux joueurs + une confirmation finale des deux côtés.
-const LIVE_TRADES = new Map();       // tradeId -> session
-const LIVE_TRADE_USER = new Map();  // userId -> tradeId
-
-function tradeCardInfo(key, fin) {
-    if (!key) return null;
-    const i = cardInfoOfKey(String(key)) || { name: String(key).split('|')[1] || 'Carte', anime: '', rarity: 'commune', img: '' };
-    return { key: String(key), name: i.name, anime: i.anime, img: i.img, imgs: i.imgs || null, rarity: i.rarity, finish: fin || null };
-}
-function liveTradeSide(t, uid) { return t.a.uid === uid ? t.a : t.b; }
-function liveTradeOther(t, uid) { return t.a.uid === uid ? t.b : t.a; }
-function liveTradeSession(uid) {
-    const id = LIVE_TRADE_USER.get(+uid);
-    const t = id ? LIVE_TRADES.get(id) : null;
-    if (!t || t.status !== 'active') { if (id) LIVE_TRADE_USER.delete(+uid); return null; }
-    return t;
-}
-function liveTradeView(t, uid) {
-    if (!t) return null;
-    const me = liveTradeSide(t, +uid), other = liveTradeOther(t, +uid);
-    return {
-        id: t.id, phase: t.phase, createdAt: t.at, updatedAt: t.updatedAt,
-        me: { uid: me.uid, name: me.name, card: tradeCardInfo(me.key, me.fin), accepted: !!me.accepted, confirmed: !!me.confirmed },
-        other: { uid: other.uid, name: other.name, card: tradeCardInfo(other.key, other.fin), accepted: !!other.accepted, confirmed: !!other.confirmed }
-    };
-}
-async function liveTradePush(t) {
-    if (!t) return;
-    emitUser(t.a.uid, 'trade_live_state', { ok: true, session: liveTradeView(t, t.a.uid) });
-    emitUser(t.b.uid, 'trade_live_state', { ok: true, session: liveTradeView(t, t.b.uid) });
-}
-async function tradeHistoryAdd(t, status, extra = {}) {
-    try {
-        const h = {
-            id: t.id, status, at: t.at, endedAt: hubNow(),
-            aUid: t.a.uid, aName: t.a.name, aKey: t.a.key || null, aFin: t.a.fin || null,
-            bUid: t.b.uid, bName: t.b.name, bKey: t.b.key || null, bFin: t.b.fin || null,
-            ...extra
-        };
-        await kvSet('trade_history', h.id, h);
-    } catch (_) {}
-}
-async function closeLiveTrade(t, status, extra = {}) {
-    if (!t) return;
-    t.status = status;
-    LIVE_TRADES.delete(t.id);
-    LIVE_TRADE_USER.delete(t.a.uid);
-    LIVE_TRADE_USER.delete(t.b.uid);
-    await tradeHistoryAdd(t, status, extra);
-    emitUser(t.a.uid, 'trade_live_closed', { id: t.id, status, by: extra.by || null });
-    emitUser(t.b.uid, 'trade_live_closed', { id: t.id, status, by: extra.by || null });
-}
-async function liveTradeFriends(uid) {
-    const f = await friendsOf(uid);
-    return f.map(x => ({ ...x, online: userOnline(x.id), busy: !!liveTradeSession(x.id) }));
-}
-
+// Échanges
 app.get('/api/trade', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    res.json({ ok: true, session: liveTradeView(liveTradeSession(uid), uid), friends: await liveTradeFriends(uid) });
+    const all = (await kvList('trade')).map(x => x.v).filter(t => (t.from === uid || t.to === uid) && (t.status === 'open' || hubNow() - t.at < 3 * 86400000));
+    const side = (key, fin) => { const i = cardInfoOfKey(key) || { name: key.split('|')[1], anime: '', rarity: 'commune', img: '' }; return { name: i.name, anime: i.anime, img: i.img, imgs: i.imgs || null, rarity: i.rarity, finish: fin || null }; };
+    const view = t => { const g = side(t.give, t.giveFin), w = side(t.want, t.wantFin);
+        return { ...t, giveName: g.name, giveAnime: g.anime, giveImg: g.img, giveImgs: g.imgs, giveRarity: g.rarity, giveFin: g.finish, wantName: w.name, wantAnime: w.anime, wantImg: w.img, wantImgs: w.imgs, wantRarity: w.rarity, wantFin: w.finish }; };
+    res.json({ ok: true, incoming: all.filter(t => t.to === uid).sort((a, b) => b.at - a.at).map(view), outgoing: all.filter(t => t.from === uid).sort((a, b) => b.at - a.at).map(view), friends: await friendsOf(uid) });
 });
-app.get('/api/trade/history', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const rows = (await kvList('trade_history')).map(x => x.v)
-        .filter(t => t.aUid === uid || t.bUid === uid)
-        .sort((a, b) => (b.endedAt || b.at || 0) - (a.endedAt || a.at || 0)).slice(0, 60);
-    // On conserve aussi les anciens échanges terminés pour ne pas perdre l'historique existant.
-    const legacy = (await kvList('trade')).map(x => x.v)
-        .filter(t => (t.from === uid || t.to === uid) && t.status !== 'open')
-        .map(t => ({ id: 'legacy:' + t.id, status: t.status, at: t.at, endedAt: t.at, aUid: t.from, aName: t.fromName, aKey: t.give, aFin: t.giveFin || null, bUid: t.to, bName: t.toName, bKey: t.want, bFin: t.wantFin || null }));
-    const all = [...rows, ...legacy].sort((a, b) => (b.endedAt || b.at || 0) - (a.endedAt || a.at || 0)).slice(0, 60);
-    res.json({ ok: true, history: all.map(t => {
-        const mineA = t.aUid === uid;
-        const mine = mineA ? { name: t.aName, card: tradeCardInfo(t.aKey, t.aFin) } : { name: t.bName, card: tradeCardInfo(t.bKey, t.bFin) };
-        const other = mineA ? { name: t.bName, card: tradeCardInfo(t.bKey, t.bFin) } : { name: t.aName, card: tradeCardInfo(t.aKey, t.aFin) };
-        return { id: t.id, status: t.status, at: t.endedAt || t.at, mine, other };
-    }) });
-});
-
 // fiche d'une carte à partir de sa clé (normale, spéciale, Duo, Collector)
 function cardInfoOfKey(k) {
     const p = String(k).split('|');
-    if (p[0] === 'collector') { const [, week, u, display] = p; return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: 'collector', img: cardImg({ u, display }), week }; }
-    if (p[0] === 'duo') { const d = DUO_CARDS().find(x => x.name === p[1]); return d ? { u: 'duo', name: d.name, display: d.name, anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] } : null; }
-    if (p[0] === 'altart') { const a = typeof altArtById === 'function' ? altArtById(p[1]) : null; return a ? { ...a, name: a.name, display: a.name, rarity: 'altart', altart: true } : null; }
-    if (p[0] === 'moment') { const m = typeof momentById === 'function' ? momentById(p[1]) : null; return m ? { ...m, name: m.name, display: m.name, rarity: 'moment', moment: true } : null; }
+    if (p[0] === 'collector') { const [, week, u, display] = p; return { name: display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: 'collector', img: cardImg({ u, display }), week }; }
+    if (p[0] === 'duo') { const d = DUO_CARDS().find(x => x.name === p[1]); return d ? { name: d.name, anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] } : null; }
     const [u, display, sec] = p;
     if (!ARC_UNIVERSE_ANIME[u]) return null;
-    return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display }) };
+    return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display }) };
 }
 // toutes les cartes échangeables, une ligne par version (normale, Holo, Gold…)
 async function cardListOf(uid) {
@@ -17101,102 +17989,47 @@ async function finMove(from, to, key, f) {
 }
 app.get('/api/trade/cards', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    // Sécurité du nouveau système : impossible de consulter la collection d'un autre joueur.
-    if (req.query.friend) return res.status(403).json({ ok: false, error: 'En échange direct, chacun ne voit que ses propres cartes.' });
-    res.json({ ok: true, cards: await cardListOf(uid) });
+    const fid = +req.query.friend || 0;
+    if (fid && !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Ce joueur n’est pas ton ami.' });
+    res.json({ ok: true, cards: await cardListOf(fid || uid) });
 });
-app.post('/api/trade/live/open', async (req, res) => {
+app.post('/api/trade/propose', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const fid = +(req.body || {}).friendId || 0;
-    if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Choisis un ami.' });
-    if (!userOnline(fid)) return res.json({ ok: false, error: 'Cet ami doit être connecté pour un échange en direct.' });
-    if (liveTradeSession(uid)) return res.json({ ok: false, error: 'Tu as déjà un échange en cours.' });
-    if (liveTradeSession(fid)) return res.json({ ok: false, error: 'Cet ami est déjà dans un échange.' });
-    const t = {
-        id: 'lt' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), status: 'active', phase: 'select', at: hubNow(), updatedAt: hubNow(), locked: false,
-        a: { uid, name: await pseudoOf(uid), key: null, fin: null, accepted: false, confirmed: false },
-        b: { uid: fid, name: await pseudoOf(fid), key: null, fin: null, accepted: false, confirmed: false }
-    };
-    LIVE_TRADES.set(t.id, t); LIVE_TRADE_USER.set(uid, t.id); LIVE_TRADE_USER.set(fid, t.id);
-    emitUser(fid, 'trade_live_invite', { id: t.id, from: t.a.name });
-    await liveTradePush(t);
-    res.json({ ok: true, session: liveTradeView(t, uid) });
+    const { friendId, give, want } = req.body || {};
+    const giveFin = FIN_IDS.includes((req.body || {}).giveFin) ? req.body.giveFin : null, wantFin = FIN_IDS.includes((req.body || {}).wantFin) ? req.body.wantFin : null;
+    const fid = +friendId;
+    if (!fid || fid === uid || !(await areFriends(uid, fid))) return res.json({ ok: false, error: 'Tu ne peux échanger qu’avec tes amis.' });
+    if (!(await tradeHas(uid, String(give), giveFin))) return res.json({ ok: false, error: 'Tu n’as pas cette carte (ou plus dans cette version).' });
+    if (!(await tradeHas(fid, String(want), wantFin))) return res.json({ ok: false, error: 'Ton ami n’a pas cette carte (ou plus dans cette version).' });
+    const open = (await kvList('trade')).filter(x => x.v.from === uid && x.v.status === 'open').length;
+    if (open >= 10) return res.json({ ok: false, error: '10 propositions en attente maximum.' });
+    const t = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), from: uid, fromName: await pseudoOf(uid), to: fid, toName: await pseudoOf(fid), give: String(give), want: String(want), giveFin, wantFin, status: 'open', at: hubNow() };
+    await kvSet('trade', t.id, t);
+    emitUser(fid, 'trade_new', { from: t.fromName, give: (cardInfoOfKey(t.give) || {}).name || t.give.split('|')[1], want: (cardInfoOfKey(t.want) || {}).name || t.want.split('|')[1] });
+    res.json({ ok: true });
 });
-app.post('/api/trade/live/select', async (req, res) => {
+app.post('/api/trade/respond', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
-    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
-    if (t.locked) return res.json({ ok: false, error: 'Échange en cours de validation.' });
-    const key = String((req.body || {}).key || ''), fin = FIN_IDS.includes((req.body || {}).finish) ? req.body.finish : null;
-    if (!key || !(await tradeHas(uid, key, fin))) return res.json({ ok: false, error: 'Tu ne possèdes plus cette carte.' });
-    const me = liveTradeSide(t, uid);
-    me.key = key; me.fin = fin;
-    // Toute modification annule immédiatement les accords déjà donnés des deux côtés.
-    t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false; t.phase = 'select'; t.updatedAt = hubNow();
-    await liveTradePush(t);
-    res.json({ ok: true, session: liveTradeView(t, uid) });
-});
-app.post('/api/trade/live/decision', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
-    if (!(req.body || {}).accept) {
-        const by = await pseudoOf(uid); await closeLiveTrade(t, 'refused', { by });
-        emitUser(liveTradeOther(t, uid).uid, 'trade_done', { text: `❌ ${by} a refusé l’échange.` });
-        return res.json({ ok: true, closed: true });
+    const { id, accept } = req.body || {};
+    const t = await kvGet('trade', String(id));
+    if (!t || t.status !== 'open' || (t.to !== uid && t.from !== uid)) return res.json({ ok: false, error: 'Échange introuvable.' });
+    if (!accept || t.from === uid) {
+        t.status = t.from === uid ? 'cancelled' : 'refused';
+        await kvSet('trade', t.id, t);
+        if (t.status === 'refused') emitUser(t.from, 'trade_done', { text: `❌ ${t.toName} a refusé ton échange` });
+        return res.json({ ok: true });
     }
-    if (!t.a.key || !t.b.key) return res.json({ ok: false, error: 'Les deux joueurs doivent poser une carte.' });
-    const me = liveTradeSide(t, uid); me.accepted = true; me.confirmed = false; t.updatedAt = hubNow();
-    if (t.a.accepted && t.b.accepted) { t.phase = 'confirm'; t.a.confirmed = t.b.confirmed = false; }
-    await liveTradePush(t);
-    res.json({ ok: true, session: liveTradeView(t, uid) });
+    // on vérifie que chacun a encore sa carte, puis on échange un exemplaire
+    if (!(await tradeHas(t.to, t.want, t.wantFin)) || !(await tradeHas(t.from, t.give, t.giveFin))) { t.status = 'failed'; await kvSet('trade', t.id, t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' }); }
+    t.status = 'done';
+    await kvSet('trade', t.id, t);
+    const a = await cardTake(t.from, t.give), b = await cardTake(t.to, t.want);
+    if (a) { await cardGive(t.to, { key: t.give }, a.shiny); if (t.giveFin) await finMove(t.from, t.to, t.give, t.giveFin); }
+    if (b) { await cardGive(t.from, { key: t.want }, b.shiny); if (t.wantFin) await finMove(t.to, t.from, t.want, t.wantFin); }
+    const gn = (cardInfoOfKey(t.give) || {}).name || t.give.split('|')[1], wn = (cardInfoOfKey(t.want) || {}).name || t.want.split('|')[1];
+    emitUser(t.from, 'trade_done', { text: `🔁 ${t.toName} a accepté : tu reçois ${wn}${t.wantFin ? ' (' + FINISHES.find(f => f.id === t.wantFin).label + ')' : ''} !` });
+    res.json({ ok: true, got: gn + (t.giveFin ? ' (' + FINISHES.find(f => f.id === t.giveFin).label + ')' : '') });
 });
-app.post('/api/trade/live/confirm', async (req, res) => {
-    const uid = needUid(req, res); if (!uid) return;
-    const t = liveTradeSession(uid); if (!t) return res.json({ ok: false, error: 'Aucun échange direct en cours.' });
-    if (t.phase !== 'confirm') return res.json({ ok: false, error: 'Les deux joueurs doivent d’abord accepter.' });
-    if (!(req.body || {}).confirm) {
-        t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false; t.updatedAt = hubNow();
-        await liveTradePush(t); return res.json({ ok: true, session: liveTradeView(t, uid) });
-    }
-    liveTradeSide(t, uid).confirmed = true; t.updatedAt = hubNow();
-    if (!(t.a.confirmed && t.b.confirmed)) { await liveTradePush(t); return res.json({ ok: true, session: liveTradeView(t, uid) }); }
-    if (t.locked) return res.json({ ok: false, error: 'Validation déjà en cours.' });
-    t.locked = true;
-    try {
-        if (!(await tradeHas(t.a.uid, t.a.key, t.a.fin)) || !(await tradeHas(t.b.uid, t.b.key, t.b.fin))) {
-            t.locked = false; t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false;
-            await liveTradePush(t); return res.json({ ok: false, error: 'Une des cartes n’est plus disponible.' });
-        }
-        const takeA = await cardTake(t.a.uid, t.a.key);
-        if (!takeA) { t.locked = false; return res.json({ ok: false, error: 'Ta carte n’est plus disponible.' }); }
-        const takeB = await cardTake(t.b.uid, t.b.key);
-        if (!takeB) {
-            await cardGive(t.a.uid, { key: t.a.key }, takeA.shiny);
-            t.locked = false; t.phase = 'select'; t.a.accepted = t.b.accepted = false; t.a.confirmed = t.b.confirmed = false;
-            await liveTradePush(t); return res.json({ ok: false, error: 'La carte de l’autre joueur n’est plus disponible.' });
-        }
-        await cardGive(t.b.uid, { key: t.a.key }, takeA.shiny);
-        await cardGive(t.a.uid, { key: t.b.key }, takeB.shiny);
-        if (t.a.fin) await finMove(t.a.uid, t.b.uid, t.a.key, t.a.fin);
-        if (t.b.fin) await finMove(t.b.uid, t.a.uid, t.b.key, t.b.fin);
-        const aGot = tradeCardInfo(t.b.key, t.b.fin), bGot = tradeCardInfo(t.a.key, t.a.fin);
-        await closeLiveTrade(t, 'done');
-        emitUser(t.a.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${aGot.name}${aGot.finish ? ' (' + (FINISHES.find(f => f.id === aGot.finish)?.label || aGot.finish) + ')' : ''} !` });
-        emitUser(t.b.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${bGot.name}${bGot.finish ? ' (' + (FINISHES.find(f => f.id === bGot.finish)?.label || bGot.finish) + ')' : ''} !` });
-        return res.json({ ok: true, done: true, got: aGot.name });
-    } catch (e) {
-        t.locked = false;
-        return res.status(500).json({ ok: false, error: 'Échange interrompu : ' + e.message });
-    }
-});
-// Ancien système d'offres désactivé : évite que de vieux clients puissent encore consulter/choisir la carte d'un autre joueur.
-app.post('/api/trade/propose', async (req, res) => res.status(410).json({ ok: false, error: 'Les propositions ont été remplacées par les échanges en direct.' }));
-app.post('/api/trade/respond', async (req, res) => res.status(410).json({ ok: false, error: 'Les propositions ont été remplacées par les échanges en direct.' }));
-
-// Nettoie les tables abandonnées après 30 minutes d'inactivité.
-setInterval(() => {
-    const now = hubNow();
-    for (const t of LIVE_TRADES.values()) if (now - t.updatedAt > 30 * 60000) closeLiveTrade(t, 'expired').catch(() => {});
-}, 60000);
 
 /* =====================================================================
    ANIME DE LA SEMAINE : brillantes x3 + carte collector après 15 persos trouvés
@@ -18023,10 +18856,7 @@ const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 1
 async function deckOf(uid) {
     const keys = (await kvGet('deck', uid, { keys: [] })).keys || [];
     const mine = await cardsOf(uid);
-    return keys.filter(k => mine.get(k) && !String(k).startsWith('moment|')).map(k => {
-        const m = mine.get(k), info = cardInfoOfKey(k); if (!info) return null;
-        return { key: k, u: info.u, name: info.name, anime: info.anime, rarity: info.rarity || keyRarity(k) || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null };
-    }).filter(Boolean);
+    return keys.filter(k => mine.get(k)).map(k => { const [u, display] = k.split('|'); const m = mine.get(k); return { key: k, u, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }) }; });
 }
 function deckPct(deck, universe) {
     const us = String(universe || '').split(/[+:]/);
@@ -18043,7 +18873,7 @@ app.post('/api/deck', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
     const mine = await cardsOf(uid);
-    if (keys.some(k => !mine.get(k) || k.startsWith('collector|') || k.startsWith('moment|'))) return res.json({ ok: false, error: 'Carte introuvable dans ta collection ou non jouable dans un deck.' });
+    if (keys.some(k => !mine.get(k) || k.startsWith('collector|'))) return res.json({ ok: false, error: 'Carte introuvable dans ta collection.' });
     await kvSet('deck', uid, { keys });
     const deck = await deckOf(uid);
     res.json({ ok: true, deck, pct: deckPct(deck, '') });
@@ -18709,20 +19539,9 @@ app.get('/api/tl/search', async (req, res) => {
     } catch (e) { res.json({ ok: false, error: 'Recherche indisponible, réessaie.' }); }
 });
 const TL_IMG_OK = u => { try { const h = new URL(u).hostname; return /^https:/.test(u) && ARC_IMG_HOSTS.test(h); } catch (_) { return false; } };
-function tlUniqueSavedItems(items) {
-    const seen = new Set(), out = [];
-    for (const item of (Array.isArray(items) ? items : [])) {
-        const key = normalizeImageKey(item?.name || '');
-        if (!key || seen.has(key)) continue;
-        seen.add(key);
-        out.push(item);
-    }
-    return out;
-}
 function utlView(t, uid) {
     const rs = Object.values(t.ratings || {});
-    const uniqueItems = tlUniqueSavedItems(t.items);
-    return { id: t.id, title: t.title, author: t.author, mine: t.authorId === uid, plays: t.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (t.ratings || {})[uid] || null : null, created: t.created, n: uniqueItems.length, cover: uniqueItems.slice(0, 4).map(i => i.img).filter(Boolean) };
+    return { id: t.id, title: t.title, author: t.author, mine: t.authorId === uid, plays: t.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (t.ratings || {})[uid] || null : null, created: t.created, n: t.items.length, cover: t.items.slice(0, 4).map(i => i.img).filter(Boolean) };
 }
 app.get('/api/tl/community', async (req, res) => {
     const uid = authUserId(req);
@@ -18737,7 +19556,7 @@ app.get('/api/tl/one', async (req, res) => {
     const t = await kvGet('utl', String(req.query.id || ''), null);
     if (!t || t.deleted) return res.json({ ok: false, error: 'Tier list introuvable.' });
     if (req.query.play) { t.plays = (t.plays || 0) + 1; kvSet('utl', t.id, t); }
-    res.json({ ok: true, tl: utlView(t, uid), items: tlUniqueSavedItems(t.items) });
+    res.json({ ok: true, tl: utlView(t, uid), items: t.items });
 });
 app.post('/api/tl/create', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -19260,20 +20079,6 @@ app.get('/api/admin/players', adminOnly(async (req, res) => { // chercher un jou
     res.json({ ok: true, players: [...out.values()].slice(0, 30).map(p => ({ ...p, muted: !!modActive(MOD.mute, p.key), banned: !!modActive(MOD.ban, p.key) })) });
 }));
 
-// Liste temps réel des pseudos connectés, visible uniquement dans l'administration.
-app.get('/api/admin/online', adminOnly(async (req, res) => {
-    const out = new Map();
-    for (const sock of io.sockets.sockets.values()) {
-        if (!sock.user || !sock.user.pseudo) continue;
-        const key = modKey(sock.user);
-        const cur = out.get(key) || { key, name: String(sock.user.pseudo).slice(0, 30), guest: !sock.user.id, connections: 0 };
-        cur.connections++;
-        out.set(key, cur);
-    }
-    const players = [...out.values()].sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
-    res.json({ ok: true, count: players.length, connections: io.sockets.sockets.size, players });
-}));
-
 /* =====================================================================
    ANNONCES PROGRAMMÉES
    ===================================================================== */
@@ -19329,10 +20134,10 @@ app.get('/api/admin/stats2', adminOnly(async (req, res) => {
    (la carte est retirée de la collection pendant la vente, 5 % de taxe sur la vente)
    ===================================================================== */
 const MARKET_TAX = 0.05, MARKET_MAX = 20, MARKET_MIN = 5, MARKET_PRICE_MAX = 100000;
-const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999], halloween: [3000, 10000] , altart: [2500, 12000], moment: [3500, 16000] };
+const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999], halloween: [3000, 10000] };
 function marketView(l, uid) {
-    const info = cardInfoOfKey(l.key) || {};
-    return { id: l.id, key: l.key, name: info.name || l.key.split('|')[1] || 'Carte', anime: info.anime || '', u: info.u || '', rarity: info.rarity || keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: info.img || '', imgs: info.imgs || null };
+    const [u, display] = l.key.split('|');
+    return { id: l.id, name: display, anime: ARC_UNIVERSE_ANIME[u] || '', u, rarity: keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: cardImg({ u, display }) };
 }
 async function marketAll() { return (await kvList('market')).map(x => x.v); }
 app.get('/api/market', async (req, res) => {
@@ -19352,7 +20157,7 @@ app.post('/api/market/sell', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const key = String((req.body || {}).key || ''), price = Math.round(+(req.body || {}).price);
     if (!(price >= MARKET_MIN && price <= MARKET_PRICE_MAX)) return res.json({ ok: false, error: `Prix entre ${MARKET_MIN} et ${MARKET_PRICE_MAX} pièces.` });
-    if (!cardInfoOfKey(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
+    if (!keyRarity(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
     const active = (await marketAll()).filter(l => l.seller === uid && l.status === 'open').length;
     if (active >= MARKET_MAX) return res.json({ ok: false, error: `${MARKET_MAX} ventes en cours maximum.` });
     const deck = (await kvGet('deck', uid, { keys: [] })).keys || [];
@@ -19404,7 +20209,7 @@ app.post('/api/market/buy', async (req, res) => {
         const isNew = await cardGive(uid, { key: l.key }, l.shiny);
         const gain = Math.max(1, Math.round(l.price * (1 - MARKET_TAX)));
         await ecoAddCoins(l.seller, gain);
-        emitUser(l.seller, 'market_sold', { name: (cardInfoOfKey(l.key)?.name || l.key.split('|')[1]), price: l.price, gain, buyer: l.buyerName });
+        emitUser(l.seller, 'market_sold', { name: l.key.split('|')[1], price: l.price, gain, buyer: l.buyerName });
         const card = { ...marketView(l, uid), isNew, coins: 0 };
         res.json({ ok: true, card, coins: ((await ecoGet(uid)) || {}).coins });
     } finally { MARKET_LOCK.delete(id); }
@@ -19654,48 +20459,23 @@ app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
    ===================================================================== */
 
 /* ---------- PLUS OU MOINS : deux persos, lequel est le plus fort / le plus populaire ---------- */
-// Les comparaisons de puissance ont leur propre barème : elles ne dépendent plus des notes Enchère.
-// On compare la meilleure version canonique du personnage, sous un seul nom, et on évite les duels trop proches.
-const PM_POWER_OVERRIDES = {"naruto":{"Naruto Uzumaki":100,"Hagoromo Otsutsuki":98,"Kaguya Otsutsuki":97,"Sasuke Uchiha":95,"Madara Uchiha":94,"Kakashi Hatake":91,"Obito Uchiha":90,"Might Guy":88,"Hashirama Senju":84,"Minato Namikaze":81,"Tobirama Senju":78,"Itachi Uchiha":75,"Nagato":74,"Kabuto Yakushi":71,"Orochimaru":69,"Killer Bee":68,"Sakura Haruno":66,"Jiraiya":64,"Kisame Hoshigaki":61,"Gaara":60,"Deidara":56,"Sasori":54,"Rock Lee":51,"Shikamaru Nara":47,"Neji Hyuga":45,"Temari":43,"Kankuro":41,"Sai":40,"Choji Akimichi":38,"Yamato":37,"Shino Aburame":35,"Kiba Inuzuka":33,"Hinata Hyuga":32,"Tenten":26,"Ino Yamanaka":25,"Iruka Umino":18,"Konohamaru Sarutobi":17,"Mizuki":8},"onepiece":{"Imu":100,"Joy Boy":100,"Gol D. Roger":97,"Edward Newgate":97,"Monkey D. Garp":96,"Shanks":94,"Dracule Mihawk":94,"Kaido":93,"Monkey D. Luffy":92,"Marshall D. Teach":91,"Sengoku":89,"Sakazuki":88,"Charlotte Linlin":87,"Silvers Rayleigh":86,"Kuzan":85,"Borsalino":83,"Issho":80,"Aramaki":79,"Benn Beckman":78,"Sabo":76,"Trafalgar D. Water Law":75,"Roronoa Zoro":74,"Eustass Kid":73,"Yamato":72,"Sanji":71,"Marco":70,"Shiryu":68,"Charlotte Katakuri":66,"King":65,"Boa Hancock":63,"Crocodile":62,"Rob Lucci":60,"Donquixote Doflamingo":58,"Jinbe":55,"Queen":54,"Koby":53,"Bartholomew Kuma":52,"Magellan":51,"Killer":49,"Franky":44,"Nico Robin":42,"Brook":40,"Jewelry Bonney":39,"Nami":34,"Tony Tony Chopper":32,"Usopp":28,"Carrot":25,"Tashigi":20},"bleach":{"Yhwach":100,"Ichigo Kurosaki":98,"Sosuke Aizen":96,"Ichibe Hyosube":95,"Senjumaru Shutara":92,"Genryusai Shigekuni Yamamoto":91,"Kenpachi Zaraki":90,"Gerard Valkyrie":89,"Jugram Haschwalth":88,"Lille Barro":87,"Uryu Ishida":86,"Oetsu Nimaiya":85,"Pernida Parnkgjas":83,"Shunsui Kyoraku":81,"Kisuke Urahara":80,"Toshiro Hitsugaya":79,"Byakuya Kuchiki":78,"Askin Nakk Le Vaar":77,"Retsu Unohana":75,"Mayuri Kurotsuchi":74,"Yoruichi Shihoin":72,"Ulquiorra Cifer":70,"Renji Abarai":68,"Rukia Kuchiki":67,"Grimmjow Jaegerjaquez":65,"Coyote Starrk":64,"Baraggan Louisenbairn":62,"Gin Ichimaru":60,"Soi Fon":58,"Kaname Tosen":56,"Sajin Komamura":54,"Shinji Hirako":53,"Nnoitra Gilga":47,"Ikkaku Madarame":39,"Yasutora Sado":36,"Orihime Inoue":34,"Hanataro Yamada":15,"Kon":10,"Ganju Shiba":9},"sds":{"Arthur Pendragon":100,"Demon King":98,"Meliodas":97,"Escanor":95,"Ban":92,"Mael":90,"King":89,"Elizabeth Liones":85,"Zeldris":84,"Merlin":82,"Ludociel":80,"Diane":76,"Gowther":74,"Chandler":73,"Cusack":72,"Sariel":68,"Tarmiel":67,"Drole":64,"Gloxinia":63,"Monspeet":61,"Derieri":60,"Estarossa":58,"Galand":53,"Grayroad":49,"Melascula":47,"Hendrickson":42,"Dreyfus":40,"Howzer":36,"Gilthunder":34,"Jericho":31,"Guila":27,"Elaine":25,"Hawk":14,"Twigo":10},"clover":{"Lucius Zogratis":100,"Asta":99,"Yuno":97,"Lucifero":95,"Mereoleona Vermillion":93,"Julius Novachrono":91,"Noelle Silva":90,"Yami Sukehiro":88,"Nacht Faust":85,"Acier Silva":84,"Fuegoleon Vermillion":81,"Zenon Zogratis":79,"Dante Zogratis":77,"Vanica Zogratis":76,"Dorothy Unsworth":75,"Morris":74,"William Vangeance":72,"Nozel Silva":71,"Luck Voltia":68,"Magna Swing":64,"Jack the Ripper":63,"Charlotte Roselei":61,"Rill Boismortier":58,"Gadjah":57,"Langris Vaude":55,"Charmy Pappitson":53,"Gauche Adlai":50,"Finral Roulacase":47,"Vanessa Enoteca":45,"Zora Ideale":43,"Gordon Agrippa":39,"Grey":38,"Leopold Vermillion":37,"Mimosa Vermillion":28,"Klaus Lunettes":27,"Sekke Bronzazza":12},"fairy":{"Acnologia":100,"Ignia":99,"Zeref Dragneel":98,"Natsu Dragneel":97,"August":93,"Irene Belserion":92,"Gildarts Clive":90,"Laxus Dreyar":87,"Erza Scarlet":84,"Gray Fullbuster":81,"Jellal Fernandes":80,"Mirajane Strauss":77,"Wendy Marvell":74,"Brandish μ":73,"God Serena":72,"Larcade Dragneel":71,"Mard Geer":68,"Hades":66,"Makarov Dreyar":64,"Gajeel Redfox":62,"Lucy Heartfilia":61,"Sting Eucliffe":58,"Rogue Cheney":56,"Cobra":53,"Minerva Orland":51,"Kagura Mikazuchi":49,"Juvia Lockser":44,"Elfman Strauss":42,"Freed Justine":39,"Cana Alberona":37,"Bickslow":34,"Evergreen":33,"Lisanna Strauss":29,"Happy":15,"Panther Lily":14},"haikyuu":{"Wakatsu Kiryū":95,"Wakatoshi Ushijima":97},"bluelock":{"Marc Snuffy":99,"Julian Loki":98,"Noel Noa":100}};
-
-const pmBaseName = n => String(n || '')
-    .replace(/\s+[—–-]\s+.*$/, '')
-    .replace(/\s+prime$/i, '')
-    .replace(/\s+(?:gear\s*5|forme\s+finale|forme\s+ultime|fin\s+de\s+série|post-purgatoire|ailes\s+complètes|the\s+one\s+ultimate|adulte)$/i, '')
-    .trim();
-
+const PM_BASE_AUDITED = ['naruto', 'onepiece', 'bleach', 'sds', 'clover', 'fairy'];
+const pmBaseName = n => String(n || '').replace(/\s+[—–-]\s+.*$/, '').replace(/\s+prime$/i, '').trim();
 let PM_POWER = null;
 function pmPower() {
     if (PM_POWER) return PM_POWER;
     PM_POWER = [];
-
-    for (const u of Object.keys(ARC_UNIVERSE_ANIME)) {
-        if (u === 'pokemon') {
-            const ratings = { ...(ENCHERE_POWER_OVERRIDES[u] || {}), ...(PM_POWER_OVERRIDES[u] || {}) };
-            const seen = new Map();
-            for (const [name, value] of Object.entries(ratings)) {
-                const display = arcDisplayName(u, pmBaseName(name));
-                const key = normalizeRG(display);
-                if (!key) continue;
-                const old = seen.get(key);
-                if (!old || Number(value) > old.value) seen.set(key, { u, name:display, base:display, value:Number(value) || 0 });
-            }
-            PM_POWER.push(...seen.values());
-            continue;
-        }
-
-        const ratings = { ...(ENCHERE_POWER_OVERRIDES[u] || {}), ...(PM_POWER_OVERRIDES[u] || {}) };
-        const seen = new Map();
-        for (const [name, value] of Object.entries(ratings)) {
-            const cleaned = pmBaseName(name);
-            const display = arcDisplayName(u, cleaned);
-            const key = normalizeRG(display);
-            if (!key) continue;
-            const row = { u, name:display, base:display, value:Math.max(1, Math.min(100, Number(value) || 0)) };
-            const old = seen.get(key);
-            if (!old || row.value > old.value) seen.set(key, row);
-        }
-        PM_POWER.push(...seen.values());
+    for (const [u, uni] of Object.entries(ENCHERE_UNIVERSES)) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const ov = ENCHERE_POWER_OVERRIDES[u] || {};
+        const seen = new Set();
+        (uni.characters || []).forEach(c => {
+            const audited = PM_BASE_AUDITED.includes(u) || ov[c.name] != null;
+            const base = pmBaseName(c.name);
+            if (!audited || !base || seen.has(base)) return; // une seule forme par perso
+            seen.add(base);
+            PM_POWER.push({ u, name: c.name, base, value: +c.value || 0 });
+        });
     }
     return PM_POWER;
 }
@@ -19710,7 +20490,7 @@ function pmBuild(g) {
             const us = [...new Set(pool.map(p => p.u))];
             const u = pmPick(us), list = pool.filter(p => p.u === u);
             if (list.length < 4) continue;
-            const a = pmPick(list), b = pmPick(list.filter(x => x !== a && Math.abs(x.value - a.value) >= 10));
+            const a = pmPick(list), b = pmPick(list.filter(x => x !== a && Math.abs(x.value - a.value) >= 8));
             if (!b) continue;
             const key = [a.name, b.name].sort().join('|'); if (g.pmUsed.includes(key)) continue;
             g.pmUsed.push(key);
@@ -20679,15 +21459,10 @@ app.get('/api/cards/extra', async (req, res) => {
         if (e && !e.owned.includes('frame:album')) { e.owned.push('frame:album'); await ecoSave(uid, e); albumFrame = true; }
     }
     const vit = await kvGet('vitrine', String(uid), []);
-    const showcaseCards = vit.map(k => {
-        if (!mine.has(k)) return null;
-        const info = cardInfoOfKey(k); if (!info) return null;
-        return { ...info, key: k, finish: (best[k] || {}).f || null, serial: (best[k] || {}).ser || null, shiny: mine.get(k).shiny > 0 };
-    }).filter(Boolean);
-    const altArts = ALT_ART_CARDS().map(c => { const key = 'altart|' + c.id, m = mine.get(key); return { ...c, key, rarity: 'altart', owned: !!m, n: m ? m.n : 0, shiny: m ? m.shiny : 0 }; });
-    const moments = MOMENT_CARDS().map(c => { const key = 'moment|' + c.id, m = mine.get(key); return { ...c, key, rarity: 'moment', owned: !!m, n: m ? m.n : 0, shiny: m ? m.shiny : 0 }; });
-    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, altArts, altArtTotal: altArts.length, moments, momentTotal: moments.length,
-        showcase: vit, showcaseCards, museum: vit, museumCards: showcaseCards, albumFrame,
+    const showcaseCards = vit.map(k => { const [u, name, sec] = k.split('|'); if (!mine.has(k)) return null;
+        if (u === 'duo') { const d = DUO_CARDS().find(x => x.name === name); return d ? { key: k, name, anime: d.sub, imgs: d.imgs, rarity: 'duo' } : null; }
+        return { key: k, u, name, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display: name }), secret: !!sec, finish: (best[k] || {}).f || null, serial: (best[k] || {}).ser || null, shiny: mine.get(k).shiny > 0 }; }).filter(Boolean);
+    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, showcase: vit, showcaseCards, albumFrame,
         seasons: Object.entries(SEASON_CARDS).filter(([, s]) => seasonActive(s)).map(([id, s]) => ({ id, label: s.label })) });
 });
 // fiche d'une carte (mode inspection) : mes finitions + combien il en existe sur le serveur
@@ -20700,16 +21475,15 @@ app.get('/api/cards/info', async (req, res) => {
     let total = 0;
     if (HAS_DB) { try { total = +((await pool.query('SELECT COALESCE(SUM(n),0)::int AS t FROM cards WHERE ckey=$1', [key])).rows[0].t) || 0; } catch (_) {} }
     else CARDS_MEM.forEach(mm => { const o = mm.get(key); if (o) total += o.n; });
-    const info = cardInfoOfKey(key), u = info && info.u, name = info && info.name;
+    const [u, name] = key.split('|');
     res.json({ ok: true, key, n: m ? m.n : 0, shiny: m ? m.shiny : 0, mine: Object.fromEntries(FIN_IDS.filter(f => fin[f]).map(f => [f, fin[f]])), serials: fin.ser || {},
-        world: Object.fromEntries(FIN_IDS.filter(f => g[f]).map(f => [f, g[f]])), total, numberedMax: NUMBERED_MAX, quote: info && info.rarity !== 'moment' && ARC_UNIVERSE_ANIME[u] ? cardQuote(u, name) : null,
-        canUpgrade: !!m && m.n >= 6 && !fin.galaxy && !key.startsWith('altart|') && !key.startsWith('moment|'), showcase: (await kvGet('vitrine', String(uid), [])).includes(key) });
+        world: Object.fromEntries(FIN_IDS.filter(f => g[f]).map(f => [f, g[f]])), total, numberedMax: NUMBERED_MAX, quote: ARC_UNIVERSE_ANIME[u] ? cardQuote(u, name) : null,
+        canUpgrade: !!m && m.n >= 6 && !fin.galaxy, showcase: (await kvGet('vitrine', String(uid), [])).includes(key) });
 });
 // améliorer la finition : 5 doublons d'une carte → Holo, puis Gold, puis Galaxie
 app.post('/api/cards/upgrade', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const key = String((req.body || {}).key || '').slice(0, 200);
-    if (key.startsWith('altart|') || key.startsWith('moment|')) return res.json({ ok:false, error:'Les Alt Arts et cartes Moment ne se transforment pas en finition.' });
     const m = (await cardsOf(uid)).get(key);
     if (!m || m.n < 6) return res.json({ ok: false, error: 'Il faut 6 exemplaires de cette carte (tu en gardes 1).' });
     const fin = (await kvGet('fin', String(uid), {}))[key] || {};
@@ -20727,7 +21501,7 @@ app.post('/api/cards/showcase', async (req, res) => {
     const mine = await cardsOf(uid);
     let v = await kvGet('vitrine', String(uid), []);
     if (v.includes(key)) v = v.filter(k => k !== key);
-    else { if (!mine.has(key)) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' }); if (v.length >= 10) return res.json({ ok:false, error:'Ton Musée est plein (10/10). Retire une carte avant d’en exposer une autre.' }); v = [key, ...v]; }
+    else { if (!mine.has(key)) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' }); v = [key, ...v].slice(0, 3); }
     await kvSet('vitrine', String(uid), v);
     res.json({ ok: true, showcase: v });
 });
@@ -20739,9 +21513,9 @@ publicProfile = async function (pseudo) {
     if (!p) return p;
     try {
         const fin = await kvGet('fin', String(p.uid), {}), vit = await kvGet('vitrine', String(p.uid), []), mine = await cardsOf(p.uid);
-        const view = k => { const m = mine.get(k), info = cardInfoOfKey(k); if (!m || !info) return null; const f = finBestOf(fin[k]); return { key:k, name: info.name, anime: info.anime, rarity: info.rarity || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null, finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
+        const view = k => { const [u, display, sec] = k.split('|'); const m = mine.get(k); if (!m || !ARC_UNIVERSE_ANIME[u]) return null; const f = finBestOf(fin[k]); return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: sec || keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }), finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
         const top = vit.map(view).filter(Boolean);
-        p.showcase = top; p.museum = top;
+        p.showcase = top;
         p.cards = top.concat(p.cards.filter(c => !top.some(t => t.name === c.name))).slice(0, 12);
         p.cards.forEach(c => { if (c.finish) return; const k = Object.keys(fin).find(k => k.split('|')[1] === c.name); const f = k && finBestOf(fin[k]); if (f) { c.finish = f; c.finishLabel = FINISHES.find(x => x.id === f).label; } });
     } catch (_) {}
@@ -20777,13 +21551,8 @@ app.get('/api/cards/mine', async (req, res) => {
     const out = [];
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
-        const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
-        const special = (k.startsWith('altart|') || k.startsWith('moment|')) ? cardInfoOfKey(k) : null;
-        if (special) {
-            out.push({ key:k, name:special.name, n:v.n, shiny:v.shiny||0, finish:null, finishes:{}, serial:null, u:special.u, anime:special.anime, rarity:special.rarity, img:special.img, source:special.source||null });
-            return;
-        }
         const [u, name, sec] = k.split('|');
+        const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
         const base = { key: k, name, n: v.n, shiny: v.shiny || 0, finish: best, finishes, serial: best && e.ser && e.ser[best] ? Math.min(...e.ser[best]) : null };
         if (u === 'duo') { const d = duos[name]; if (d) out.push({ ...base, u: 'duo', anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] }); return; }
         const r = keyRarity(k); if (!r) return;
@@ -20833,1042 +21602,3 @@ cardLuck = async function (uid) {
 setTimeout(() => {
     try { arcUniverses().forEach(u => { cardPool(u); cardAllSpecials(u); }); cardQuote('naruto', 'Naruto Uzumaki'); Object.keys(SEASON_CARDS).forEach(seasonChars); hwBuiltin(); } catch (e) { console.warn('[cartes] préchauffage :', e.message); }
 }, 4000);
-
-/* =====================================================================
-   PARTY MIX + COMBAT DE CARTES + BINGO ANIME
-   - Party Mix : 3 à 8 épreuves, score cumulé, aucune élimination
-   - Combat de cartes : 1v1, deck équipé de 5 cartes, rareté cosmétique
-   - Bingo Anime : grille privée 3x3, univers au choix, score libre (+1/-1), chrono 60s ou infini
-   ===================================================================== */
-
-ARC_GAMES.partymix  = { label:'Party Mix',          icon:'🎮', universe:false, rounds:1,  roundMs:18000, answer:'choice' };
-ARC_GAMES.mix_dle   = { label:'AnimeDLE Express',   icon:'🎴', universe:false, rounds:2,  roundMs:20000, answer:'choice' };
-ARC_GAMES.mix_quote = { label:'Citations Express',  icon:'💬', universe:false, rounds:2,  roundMs:18000, answer:'choice' };
-ARC_GAMES.mix_blind = { label:'Blind Test Express', icon:'🎧', universe:false, rounds:2,  roundMs:20000, answer:'choice' };
-ARC_GAMES.cardbattle= { label:'Combat de cartes',    icon:'⚔️', universe:false, rounds:5,  roundMs:25000, answer:'cardbattle' };
-ARC_GAMES.bingo     = { label:'Bingo Anime',         icon:'🎟️', universe:false, rounds:1,  roundMs:60000, answer:'bingo' };
-
-MODE_LABELS['arcade:partymix'] = 'Party Mix';
-MODE_LABELS['arcade:cardbattle'] = 'Combat de cartes';
-MODE_LABELS['arcade:bingo'] = 'Bingo Anime';
-if (typeof PUBLIC_MODE_LABELS !== 'undefined') PUBLIC_MODE_LABELS.arcade = 'Mini-jeu';
-
-const PARTY_MIX_ALLOWED = new Set(['mix_dle','mix_quote','plusmoins','mix_blind','pixel','silhouette','emoji','quatre','attaque','scene','mapguess','link','imposteur','popularite']);
-const PARTY_MIX_FALLBACK = ['mix_dle','mix_quote','plusmoins','mix_blind','pixel'];
-
-function partyMixParse(raw) {
-    const s = String(raw || '');
-    if (!s.startsWith('partymix:')) return null;
-    const body = s.slice('partymix:'.length);
-    const [gamesRaw, perRaw] = body.split('~');
-    const games = [...new Set(String(gamesRaw || '').split(',').map(x => x.trim()).filter(x => PARTY_MIX_ALLOWED.has(x)))].slice(0, 8);
-    const valid = games.length >= 3 ? games : PARTY_MIX_FALLBACK.slice();
-    const per = Math.max(1, Math.min(3, Number(perRaw) || 2));
-    return { games: valid, per };
-}
-
-/* ---------- Questions Party Mix propres à DLE / Citations / Blind Test ---------- */
-const _arcBuildRoundPCB = arcBuildRound;
-arcBuildRound = async function (g) {
-    if (g.game === 'mix_quote') {
-        const entries = [];
-        for (const [u, qd] of Object.entries(QUOTE_UNIVERSES || {})) {
-            for (const q of (qd.quotes || [])) if (q && q.text && q.speaker) entries.push({ u, anime:qd.name || ARC_UNIVERSE_ANIME[u] || u, ...q });
-        }
-        let pool = entries.filter(q => !g.used.has('mixq|' + q.u + '|' + normalizeRG(q.text)));
-        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('mixq|')) g.used.delete(k); pool = entries; }
-        const q = arcPick(pool);
-        if (!q) return null;
-        g.used.add('mixq|' + q.u + '|' + normalizeRG(q.text));
-        const same = [...new Set(entries.filter(x => x.u === q.u).map(x => x.speaker).filter(Boolean))];
-        const all = [...new Set(entries.map(x => x.speaker).filter(Boolean))];
-        const wrong = arcShuffle([...same.filter(x => normalizeRG(x) !== normalizeRG(q.speaker)), ...all.filter(x => normalizeRG(x) !== normalizeRG(q.speaker))])
-            .filter((x, i, a) => a.findIndex(y => normalizeRG(y) === normalizeRG(x)) === i).slice(0, 3);
-        return { u:q.u, quote:{ text:q.text, anime:q.anime }, answer:q.speaker, choices:arcShuffle([q.speaker, ...wrong]) };
-    }
-
-    if (g.game === 'mix_dle') {
-        const candidates = arcShuffle(arcUniverses()).filter(u => DLE_UNIVERSES[u]);
-        for (const u of candidates) {
-            let data = null;
-            try { data = dleExpandedUniverse(u); } catch (_) { data = null; }
-            const chars = (data?.characters || []).filter(c => c?.name && c?.attrs && !g.used.has('mixd|' + u + '|' + normalizeRG(c.name)));
-            if (chars.length < 4) continue;
-            const target = arcPick(chars);
-            g.used.add('mixd|' + u + '|' + normalizeRG(target.name));
-            const cats = arcShuffle((data.categories || []).filter(c => target.attrs[c.key] != null && String(target.attrs[c.key]).trim() && !/^non précisé$/i.test(String(target.attrs[c.key])))).slice(0, 3);
-            if (!cats.length) continue;
-            const wrong = arcShuffle(chars.filter(c => normalizeRG(c.name) !== normalizeRG(target.name))).slice(0, 3).map(c => c.name);
-            return {
-                u,
-                dle:{ anime:data.name || ARC_UNIVERSE_ANIME[u] || u, clues:cats.map(c => ({ label:c.label, value:String(target.attrs[c.key]) })) },
-                answer:target.name,
-                choices:arcShuffle([target.name, ...wrong])
-            };
-        }
-        return null;
-    }
-
-    if (g.game === 'mix_blind') {
-        const usable = (BLINDTEST_YT_TRACKS || []).filter(t => t?.id && t?.anime && !BT_BAD_IDS.has(t.id));
-        let pool = usable.filter(t => !g.used.has('mixb|' + t.id));
-        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('mixb|')) g.used.delete(k); pool = usable; }
-        const track = arcPick(pool);
-        if (!track) return null;
-        g.used.add('mixb|' + track.id);
-        const animeNames = [...new Set(usable.map(t => t.anime).filter(Boolean))];
-        const wrong = arcShuffle(animeNames.filter(a => a !== track.anime)).slice(0, 3);
-        return { video:track.id, frac:0.12 + Math.random() * 0.52, answer:track.anime, song:track.title || null, choices:arcShuffle([track.anime, ...wrong]) };
-    }
-
-    if (g.game === 'cardbattle') {
-        const cat = g.cardBattle?.categories?.[Math.max(0, g.round)] || CARD_BATTLE_CATS[Math.max(0, g.round) % CARD_BATTLE_CATS.length];
-        return { cardCategory:cat, answer:cat?.label || 'Combat' };
-    }
-
-    if (g.game === 'bingo') {
-        if (!g.bingo) return null;
-        const cat = BINGO_TRAITS[(g.bingo.traitOrder || [])[Math.max(0, g.round)] ?? Math.max(0, g.round) % BINGO_TRAITS.length];
-        const desired = cat?.id;
-        let pool = bingoCatalog().filter(c => (!desired || c.tags.includes(desired)) && !g.used.has('bingoc|' + c.u + '|' + normalizeRG(c.name)));
-        if (!pool.length) pool = bingoCatalog().filter(c => !g.used.has('bingoc|' + c.u + '|' + normalizeRG(c.name)));
-        if (!pool.length) { for (const k of [...g.used]) if (k.startsWith('bingoc|')) g.used.delete(k); pool = bingoCatalog().filter(c => !desired || c.tags.includes(desired)); }
-        const c = arcPick(pool);
-        if (!c) return null;
-        g.used.add('bingoc|' + c.u + '|' + normalizeRG(c.name));
-        let img = c.img || null;
-        if (!img) { try { img = (await resolveCharacterImage(c.u, c.name))?.imageUrl || null; } catch (_) {} }
-        return { bingoChar:{ name:c.name, anime:ARC_UNIVERSE_ANIME[c.u] || c.anime || '', u:c.u, img:img ? arcToken(img) : null, tags:c.tags }, answer:c.tags.map(id => BINGO_TRAIT_BY_ID[id]?.label).filter(Boolean).join(' • ') };
-    }
-
-    return _arcBuildRoundPCB(g);
-};
-
-/* ---------- Combat de cartes ---------- */
-const CARD_BATTLE_CATS = [
-    { id:'power', label:'Puissance', emoji:'💥' },
-    { id:'intelligence', label:'Intelligence', emoji:'🧠' },
-    { id:'speed', label:'Vitesse', emoji:'⚡' },
-    { id:'aura', label:'Aura', emoji:'🔥' },
-    { id:'power', label:'Puissance', emoji:'💥' }
-];
-
-function cbNormName(n) { return normalizeRG(pmBaseName(String(n || ''))); }
-function cbPower(c) {
-    if (!c) return 50;
-    if (c.u === 'duo') return 82;
-    const ov = ENCHERE_POWER_OVERRIDES?.[c.u] || {};
-    const target = cbNormName(c.name);
-    for (const [n, v] of Object.entries(ov)) if (cbNormName(n) === target) return Math.max(1, Math.min(100, Number(v) || 50));
-    const list = ENCHERE_UNIVERSES?.[c.u]?.characters || [];
-    const found = list.find(x => cbNormName(x.name) === target);
-    if (found && Number.isFinite(+found.value)) return Math.max(1, Math.min(100, +found.value));
-    return 48 + (hubHash((c.u || '') + '|' + target + '|power') % 31); // 48..78 si aucune note auditée
-}
-function cbStableStat(c, stat) {
-    const n = 45 + (hubHash((c.u || '') + '|' + cbNormName(c.name) + '|' + stat) % 46); // 45..90
-    return Math.max(1, Math.min(100, n));
-}
-function cbCard(c) {
-    return {
-        key:c.key, name:c.name, anime:c.anime || ARC_UNIVERSE_ANIME[c.u] || '', u:c.u,
-        rarity:c.rarity || 'commune', shiny:!!c.shiny, finish:c.finish || null, img:c.img || null,
-        stats:{ power:cbPower(c), intelligence:cbStableStat(c,'intelligence'), speed:cbStableStat(c,'speed'), aura:cbStableStat(c,'aura') }
-    };
-}
-function cbSendDeck(socketId, g) {
-    if (!g?.cardBattle?.decks?.[socketId]) return;
-    io.to(socketId).emit('arc_card_deck', { cards:g.cardBattle.decks[socketId], used:[...(g.cardBattle.used[socketId] || new Set())] });
-}
-
-/* ---------- Bingo Anime ---------- */
-const BINGO_TRAITS = [
-    {id:'hair_white',label:'Cheveux blancs',emoji:'⚪'}, {id:'hair_black',label:'Cheveux noirs',emoji:'⚫'}, {id:'hair_blond',label:'Cheveux blonds',emoji:'🟡'}, {id:'hair_red',label:'Cheveux rouges',emoji:'🔴'}, {id:'hair_blue',label:'Cheveux bleus',emoji:'🔵'},
-    {id:'male',label:'Homme',emoji:'♂️'}, {id:'female',label:'Femme',emoji:'♀️'}, {id:'sword',label:'Épéiste / lame',emoji:'⚔️'}, {id:'fire',label:'Utilisateur de feu',emoji:'🔥'}, {id:'lightning',label:'Foudre / électricité',emoji:'⚡'},
-    {id:'water',label:'Eau / glace',emoji:'💧'}, {id:'magic',label:'Magie / pouvoir mystique',emoji:'✨'}, {id:'demon',label:'Démon / fléau',emoji:'😈'}, {id:'dead',label:'Personnage mort',emoji:'🕯️'}, {id:'leader',label:'Chef / capitaine',emoji:'👑'},
-    {id:'royal',label:'Royal / noble',emoji:'🏰'}, {id:'pirate',label:'Pirate',emoji:'🏴‍☠️'}, {id:'ninja',label:'Ninja',emoji:'🥷'}, {id:'hunter',label:'Hunter',emoji:'🎯'}, {id:'shinigami',label:'Shinigami',emoji:'☠️'},
-    {id:'ghoul',label:'Goule',emoji:'🩸'}, {id:'titan',label:'Titan',emoji:'🗿'}, {id:'eye',label:'Pouvoir des yeux',emoji:'👁️'}, {id:'transform',label:'Transformation',emoji:'🔄'}, {id:'villain',label:'Antagoniste / méchant',emoji:'🦹'}
-];
-const BINGO_TRAIT_BY_ID = Object.fromEntries(BINGO_TRAITS.map(x => [x.id, x]));
-const BINGO_SIZE = 3;
-const BINGO_CELL_COUNT = BINGO_SIZE * BINGO_SIZE;
-
-// Le Bingo ne dépend pas uniquement des champs DLE : on réutilise aussi les liens
-// explicites déjà vérifiés dans le jeu (Common Link) + quelques règles sûres par univers.
-// Ça évite les faux négatifs du type Kurapika -> « Pouvoir des yeux ».
-const BINGO_LINK_RULES = [
-    [/maitrisent la glace/, ['water']],
-    [/maitrisent le feu/, ['fire']],
-    [/maitrisent la foudre/, ['lightning']],
-    [/maitrisent l'eau/, ['water']],
-    [/cheveux blancs/, ['hair_white']],
-    [/ce sont des rois/, ['leader']],
-    [/princes princesses/, ['royal']],
-    [/plusieurs sabres/, ['sword']],
-    [/capitaines d'escouade/, ['leader']],
-    [/yeux speciaux/, ['eye']],
-    [/ce sont des demons/, ['demon']],
-    [/equipage du chapeau de paille/, ['pirate']],
-    [/empereurs yonko/, ['pirate','leader']],
-    [/shinigami remplacants shinigami/, ['shinigami']],
-    [/chevaliers mages capitaines/, ['leader']],
-    [/lunes superieures/, ['demon','villain']]
-];
-function bingoLinkedTags(u, name) {
-    const out = new Set(), nn = normalizeRG(name || '');
-    if (!nn || !Array.isArray(ARC_LINKS)) return out;
-    for (const [label, chars] of ARC_LINKS) {
-        const nl = normalizeImageKey(label || '');
-        const rule = BINGO_LINK_RULES.find(([re]) => re.test(nl));
-        if (!rule) continue;
-        if ((chars || []).some(([cu, cn]) => cu === u && normalizeRG(cn || '') === nn)) {
-            for (const tag of rule[1]) out.add(tag);
-        }
-    }
-    return out;
-}
-function bingoKnownTags(u, name) {
-    const tags = new Set(bingoLinkedTags(u, name));
-    const n = normalizeRG(name || '');
-    // Dojutsu / yeux spéciaux très connus qui ne sont pas toujours décrits dans les fiches DLE.
-    if (u === 'naruto') {
-        if (/ uchiha$/.test(n) || / hyuga$/.test(n) || / otsutsuki$/.test(n) || [
-            'nagato','kakashi hatake','danzo shimura','ao','boruto uzumaki','himawari uzumaki'
-        ].includes(n)) tags.add('eye');
-    }
-    if (u === 'hxh' && n === 'kurapika') tags.add('eye');
-    if (u === 'jjk' && n === 'satoru gojo') tags.add('eye');
-    if (u === 'bleach' && n === 'yhwach') tags.add('eye');
-    if (u === 'mushoku' && n === 'rudeus greyrat') tags.add('eye');
-    if (u === 'onepiece' && n === 'viola') tags.add('eye');
-    return tags;
-}
-
-const BINGO_DEAD_NAMES = new Set([
-    'Jiraiya','Itachi Uchiha','Neji Hyuga','Minato Namikaze','Kushina Uzumaki','Hiruzen Sarutobi',
-    'Portgas D. Ace','Edward Newgate','Gol D. Roger','Pedro',
-    'Isaac Netero','Meruem','Neferpitou','Shaiapouf','Menthuthuyoupi',
-    'Erwin Smith','Sasha Blouse','Hange Zoe','Bertholdt Hoover','Marco Bott',
-    'Kyojuro Rengoku','Muzan Kibutsuji','Kokushibo','Akaza','Doma',
-    'Light Yagami','L Lawliet','Mello','Soichiro Yagami',
-    'Genryusai Shigekuni Yamamoto','Ulquiorra Cifer','Coyote Starrk',
-    'Maes Hughes','King Bradley','Van Hohenheim','Father',
-    'Toji Fushiguro'
-].map(normalizeRG));
-let BINGO_CATALOG_CACHE = null;
-function bingoText(data, c) {
-    return normalizeImageKey([c.name, ...Object.values(c.attrs || {})].filter(Boolean).join(' '));
-}
-function bingoField(data, c, labelRe) {
-    const vals = [];
-    for (const cat of (data.categories || [])) if (labelRe.test(normalizeImageKey(cat.label || ''))) vals.push(c.attrs?.[cat.key]);
-    return normalizeImageKey(vals.filter(Boolean).join(' '));
-}
-// Valeurs Bingo : on ne scanne volontairement PLUS le nom du personnage.
-// Avant, des sous-chaînes créaient des faux positifs ("Salamèche" => "lame",
-// "Iwaizumi" => "Iwa" => ninja, "Hawkeye" => "eye", "Prince" => royal...).
-// Les catégories sont maintenant déduites de champs structurés + règles sûres par univers
-// + exceptions factuelles vérifiées pour les pouvoirs secondaires/acquis.
-const BINGO_RESEARCHED_TAGS = {
-    fairy: {
-        // Natsu absorbe la foudre de Luxus et obtient Lightning Fire Dragon Mode ;
-        // il utilise ensuite directement la foudre via Lightning Dragon Mode.
-        'natsu dragneel': ['lightning'],
-        // God Serena maîtrise huit Dragon Slayer Magics, dont feu, eau et foudre.
-        'god serena': ['fire','water','lightning']
-    },
-    dragonball: { 'vegeta': ['royal'] },
-    sds: { 'elizabeth liones': ['royal'], 'meliodas': ['royal'], 'zeldris': ['royal'] },
-    tensura: { 'gazel dwargo': ['royal'] }
-};
-function bingoResearchTags(u, name) {
-    return BINGO_RESEARCHED_TAGS[u]?.[normalizeRG(name || '')] || [];
-}
-function bingoNormText(v) {
-    return normalizeImageKey(String(v || '')).replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
-}
-function bingoHasPhrase(text, ...needles) {
-    const t = ` ${bingoNormText(text)} `;
-    return needles.some(n => {
-        const x = bingoNormText(n);
-        return x && t.includes(` ${x} `);
-    });
-}
-function bingoHasStem(text, stems) {
-    const words = bingoNormText(text).split(/\s+/).filter(Boolean);
-    return words.some(w => stems.some(s => w === s || w.startsWith(s)));
-}
-
-function bingoIsMeaningful(v) {
-    const x = bingoNormText(v);
-    if (!x) return false;
-    return !/^(non|aucun|aucune|aucuns|aucunes|sans|neant|none|n a|na|inconnu|inconnue|—|-)$/.test(x);
-}
-function bingoFields(data, c, labelRe) {
-    const vals = [];
-    for (const cat of (data.categories || [])) {
-        const label = bingoNormText(cat.label || '');
-        if (labelRe.test(label)) {
-            const v = c.attrs?.[cat.key];
-            if (v !== undefined && v !== null && String(v).trim()) vals.push(v);
-        }
-    }
-    return bingoNormText(vals.join(' '));
-}
-function bingoTags(u, data, c) {
-    const tags = new Set(bingoKnownTags(u, c.name));
-    for (const t of bingoResearchTags(u, c.name)) tags.add(t);
-
-    // Champs structurés. On limite chaque règle aux types de données qui ont du sens.
-    const hair = bingoFields(data, c, /cheveux|hair/);
-    const gender = bingoFields(data, c, /sexe|genre|gender/);
-    const status = bingoFields(data, c, /(^| )(statut|status|etat|state)( |$)|vivant|mort/);
-    const role = bingoFields(data, c, /role|rang|grade|statut|affiliation|camp|guilde|compagnie|division|organisation|organisation|faction|equipage|clan|village|equipe|profession|race|espece|nature/);
-    const power = bingoFields(data, c, /element|type|nature chakra|chakra|pouvoir|capacite|technique|magie|magic|souffle|art|arme|style|fruit|zanpakuto|stand|alter|quirk|competence|dragon slayer|adolla|nen|ki|forme|transformation|mode/);
-    const weapon = bingoFields(data, c, /arme|weapon|style|zanpakuto|sabre|epee/);
-    const form = bingoFields(data, c, /(^| )(forme|transformation|mode)( |$)/);
-    const titanField = bingoFields(data, c, /^titan$/);
-    const eyeField = bingoFields(data, c, /dojutsu|yeux de shinigami|pouvoir des yeux/);
-    const supernaturalField = bingoFields(data, c, /nature chakra|type de nen|(^| )magie( |$)|type de magie|pouvoir autorite|type d alchimie|(^| )stand( |$)|(^| )technique( |$)|energie maudite|competence ultime|pouvoir notable|pouvoir style|(^| )jinki( |$)|(^| )tao( |$)|fruit du demon|adolla burst/);
-    const royalField = bingoFields(data, c, /noble royal|candidate royale/);
-
-    if (bingoHasStem(hair, ['blanc','white','argent','silver'])) tags.add('hair_white');
-    if (bingoHasStem(hair, ['noir','black'])) tags.add('hair_black');
-    if (bingoHasStem(hair, ['blond','jaune','yellow','gold'])) tags.add('hair_blond');
-    if (bingoHasStem(hair, ['rouge','roux','red'])) tags.add('hair_red');
-    if (bingoHasStem(hair, ['bleu','blue','azur'])) tags.add('hair_blue');
-    if (bingoHasPhrase(gender, 'homme','masculin','male','garcon')) tags.add('male');
-    if (bingoHasPhrase(gender, 'femme','feminin','female','fille')) tags.add('female');
-
-    // Combat / éléments : uniquement les champs de pouvoir/arme, jamais le nom.
-    if (bingoHasStem(`${weapon} ${power}`, ['epee','epeiste','sabre','katana','lame','sword','zanpakuto','zangetsu','excalibur'])) tags.add('sword');
-    if (bingoHasStem(power, ['feu','fire','flamme','katon','brasier','incendie','pyro'])) tags.add('fire');
-    if (bingoHasStem(power, ['foudre','electric','electrik','eclair','lightning','raiton','tonnerre'])) tags.add('lightning');
-    if (bingoHasStem(power, ['eau','water','suiton','glace','ice','hyoton','givre'])) tags.add('water');
-    if (bingoIsMeaningful(supernaturalField) || bingoHasStem(power, ['magie','magic','mana','grimoire','sort','malediction','nen','chakra','ki','stand','pouvoir','psychique','telekinesie','alchimie'])) tags.add('magic');
-
-    // Espèces / camps : les univers servent de garde-fou pour éviter les homonymes.
-    if (bingoHasStem(`${role} ${power}`, ['demon','diable','devil','fleau','oni'])) tags.add('demon');
-    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name)) || bingoHasStem(status, ['mort','morte','decede','deceased','dead','killed'])) tags.add('dead');
-
-    if (bingoHasStem(role, ['chef','capitaine','commandant','leader','hokage','kazekage','mizukage','raikage','tsuchikage','empereur','yonko','maitre'])) tags.add('leader');
-    if (bingoIsMeaningful(royalField) || bingoHasStem(role, ['prince','princesse','reine','noble'])) tags.add('royal');
-
-    if (u === 'onepiece' && (bingoHasStem(role, ['pirate','equipage','yonko']) || bingoHasPhrase(role, 'chapeau de paille','heart pirates','barbe blanche','barbe noire','cent betes','big mom','kuja'))) tags.add('pirate');
-    if (u === 'naruto' && bingoHasStem(role, ['ninja','shinobi','nukenin','genin','chunin','jonin','anbu','hokage','kazekage','mizukage','raikage','tsuchikage'])) tags.add('ninja');
-    if (u === 'hxh' && bingoHasStem(role, ['hunter'])) tags.add('hunter');
-    if (u === 'bleach' && bingoHasStem(role, ['shinigami','gotei','substitut'])) tags.add('shinigami');
-    if (u === 'tokyoghoul' && bingoHasStem(`${role} ${power}`, ['goule','ghoul','kagune'])) tags.add('ghoul');
-    if (u === 'snk' && (bingoIsMeaningful(titanField) || bingoHasStem(`${role} ${power}`, ['titan','assaillant','colossal','cuirasse','bestial','machoire','charrette','marteau','originel']))) tags.add('titan');
-
-    // Pouvoirs oculaires : champs de pouvoir + liste sûre de bingoKnownTags.
-    if (bingoIsMeaningful(eyeField) || bingoHasStem(power, ['sharingan','rinnegan','byakugan','dojutsu','oeil','eye','geass'])) tags.add('eye');
-
-    // Transformation : un champ explicitement dédié ou un terme de forme dans les pouvoirs.
-    if (bingoIsMeaningful(form) || bingoHasStem(power, ['transformation','transform','gear','saiyan','bankai','resurreccion','titan','jinchuriki','hybride','zoan','kakuja']) || bingoHasPhrase(power, 'mode', 'forme')) tags.add('transform');
-
-    if (bingoHasStem(role, ['antagoniste','mechant','vilain','villain','criminel','espada','akatsuki','homunculi'])) tags.add('villain');
-    if (u === 'demonslayer' && bingoHasStem(`${role} ${power}`, ['demon','lune'])) { tags.add('demon'); tags.add('villain'); }
-    if (u === 'chainsaw' && bingoHasStem(`${role} ${power}`, ['devil','demon'])) tags.add('demon');
-
-    return [...tags].filter(t => BINGO_TRAIT_BY_ID[t]);
-}
-function bingoCatalog() {
-    if (BINGO_CATALOG_CACHE) return BINGO_CATALOG_CACHE;
-    const out = [], seen = new Set();
-    for (const u of arcUniverses()) {
-        if (!DLE_UNIVERSES[u]) continue;
-        let data = null; try { data = dleExpandedUniverse(u); } catch (_) { data = null; }
-        for (const c of (data?.characters || [])) {
-            const k = u + '|' + normalizeRG(c.name); if (seen.has(k)) continue;
-            const tags = bingoTags(u, data, c); if (!tags.length) continue;
-            seen.add(k); out.push({ u, name:c.name, anime:data.name, tags, img:staticCharImage(u, c.name) || null });
-        }
-    }
-    BINGO_CATALOG_CACHE = out;
-    return out;
-}
-function bingoSubSettings(subMode) {
-    const p = String(subMode || '').split(':');
-    let duration = '60', spec = 'all';
-    if (p[0] === 'bingo') {
-        if (/^(60|inf)$/i.test(p[1] || '')) { duration = String(p[1]).toLowerCase(); spec = p[2] || 'all'; }
-        else if (p[1]) spec = p[1]; // compat ancienne URL bingo:naruto
-    }
-    const all = arcUniverses();
-    let universes = spec === 'all' ? all : [...new Set(String(spec).split('+').filter(u => all.includes(u)))];
-    if (!universes.length) { universes = all; spec = 'all'; }
-    else spec = universes.length === all.length ? 'all' : universes.join('+');
-    return { durationMs:duration === 'inf' ? null : 60000, infinite:duration === 'inf', universeSpec:spec, universes };
-}
-function bingoCatalogForUniverses(universes) {
-    const set = new Set(Array.isArray(universes) && universes.length ? universes : arcUniverses());
-    return bingoCatalog().filter(c => set.has(c.u));
-}
-function bingoAvailableTraitIds(universes) {
-    const ids = new Set();
-    for (const c of bingoCatalogForUniverses(universes)) for (const t of c.tags || []) if (BINGO_TRAIT_BY_ID[t]) ids.add(t);
-    return [...ids];
-}
-function bingoNewBoardCells(allowedIds) {
-    const base = (allowedIds || []).filter(id => BINGO_TRAIT_BY_ID[id]);
-    if (!base.length) return arcShuffle(BINGO_TRAITS.map(x => x.id)).slice(0, BINGO_CELL_COUNT);
-    const out = arcShuffle(base).slice(0, BINGO_CELL_COUNT);
-    // Un univers très pauvre peut avoir moins de 9 catégories distinctes : on complète
-    // seulement avec des catégories qui ont réellement au moins un personnage valide.
-    while (out.length < BINGO_CELL_COUNT) out.push(arcPick(base));
-    return out;
-}
-function bingoRerollCell(board, idx) {
-    if (!board || !Number.isInteger(idx) || idx < 0 || idx >= board.cells.length) return;
-    const old = board.cells[idx], visible = new Set(board.cells), allowed = (board.allowed || BINGO_TRAITS.map(x => x.id)).filter(id => BINGO_TRAIT_BY_ID[id]);
-    let pool = allowed.filter(id => id !== old && !visible.has(id));
-    if (!pool.length) pool = allowed.filter(id => id !== old);
-    if (!pool.length) pool = allowed.slice();
-    if (pool.length) board.cells[idx] = arcPick(pool);
-}
-function bingoSendBoard(socketId, g) {
-    const b = g?.bingo?.boards?.[socketId]; if (!b) return;
-    io.to(socketId).emit('arc_bingo_board', { size:BINGO_SIZE, cells:b.cells.map(id => ({ ...BINGO_TRAIT_BY_ID[id], marked:false })) });
-}
-function bingoDurationFromSub(subMode) { return bingoSubSettings(subMode).durationMs; }
-async function bingoNextCharacter(room, roomCode, socketId) {
-    const g = arcGames[roomCode], b = g?.bingo?.boards?.[socketId];
-    if (!g || g.dead || g.game !== 'bingo' || g.phase !== 'playing' || !b) return;
-    const used = g.bingo.used[socketId] || (g.bingo.used[socketId] = new Set());
-    const catalog = bingoCatalogForUniverses(g.bingo.universes);
-    let pool = catalog.filter(c => c.tags.some(t => b.cells.includes(t)) && !used.has(c.u+'|'+normalizeRG(c.name)));
-    if (!pool.length) { used.clear(); pool = catalog.filter(c => c.tags.some(t => b.cells.includes(t))); }
-    const c = arcPick(pool); if (!c) return;
-    used.add(c.u+'|'+normalizeRG(c.name));
-    let img = c.img || null;
-    if (!img) { try { img = (await resolveCharacterImage(c.u, c.name))?.imageUrl || null; } catch (_) {} }
-    if (arcGames[roomCode] !== g || g.phase !== 'playing') return;
-    const cur = { name:c.name, anime:ARC_UNIVERSE_ANIME[c.u] || c.anime || '', u:c.u, img:img ? arcToken(img) : null, tags:c.tags };
-    g.bingo.current[socketId] = cur;
-    io.to(socketId).emit('arc_bingo_character', { character:{ name:cur.name, anime:cur.anime, img:cur.img } });
-}
-function bingoFinish(room, roomCode) {
-    const g = arcGames[roomCode]; if (!g || g.game !== 'bingo' || g.phase === 'finished') return;
-    arcClearTimers(g); g.phase='finished'; g.endsAt=Date.now();
-    const vals = room.players.map(p => g.scores[p.id] || 0);
-    const best = vals.length ? Math.max(...vals) : 0;
-    g.winnerNames = room.players.filter(p => (g.scores[p.id] || 0) === best).map(p => p.name);
-    room.status='arc_over'; arcEmit(room,roomCode);
-    if (!g.recorded) {
-        g.recorded=true;
-        progRecord(room,'arcade:bingo',g.universe || 'all',room.players.map(p=>({ player:p, points:Math.max(0,g.scores[p.id]||0), won:room.players.length>1 && (g.scores[p.id]||0)===best })));
-    }
-}
-
-/* ---------- Démarrage des trois modes ---------- */
-const _startArcadePCB = startArcade;
-startArcade = function (room, roomCode) {
-    const mix = partyMixParse(room.subMode);
-    if (mix) {
-        arcStop(roomCode);
-        const g = {
-            game:mix.games[0], universe:'all', round:0, totalRounds:mix.per, phase:'loading', current:null,
-            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
-            used:new Set(), usedU:[], lastGuess:{}, mix:{ games:mix.games, idx:0, per:mix.per }
-        };
-        arcGames[roomCode]=g; room.status='arc_playing'; arcEmit(room, roomCode);
-        io.to(roomCode).emit('arc_names',{names:arcNamesFor(g)}); arcNextRound(room, roomCode); return;
-    }
-
-    const parsed = arcParseSub(room.subMode);
-    if (parsed.game === 'cardbattle') {
-        if (room.players.length !== 2) { io.to(roomCode).emit('game_error','Le Combat de cartes se joue à exactement 2 joueurs.'); return; }
-        arcStop(roomCode);
-        const g = {
-            game:'cardbattle', universe:'all', round:0, totalRounds:5, phase:'loading', current:null,
-            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
-            used:new Set(), usedU:[], lastGuess:{}, cardBattle:{ decks:{}, used:{}, picks:{}, categories:arcShuffle(CARD_BATTLE_CATS.slice(0,4)).concat(CARD_BATTLE_CATS[4]) }
-        };
-        arcGames[roomCode]=g; room.status='arc_playing';
-        Promise.all(room.players.map(async p => {
-            if (!p.userId) throw new Error(`${p.name} doit être connecté à un compte pour utiliser son deck.`);
-            const deck = (await deckOf(p.userId)).slice(0,5);
-            if (deck.length !== 5) throw new Error(`${p.name} doit équiper exactement 5 cartes dans son Deck.`);
-            g.cardBattle.decks[p.id]=deck.map(cbCard); g.cardBattle.used[p.id]=new Set();
-        })).then(() => {
-            if (arcGames[roomCode] !== g) return;
-            room.players.forEach(p => cbSendDeck(p.id,g)); arcEmit(room,roomCode); arcNextRound(room,roomCode);
-        }).catch(err => {
-            if (arcGames[roomCode] !== g) return;
-            g.message=err.message; arcFinish(room,roomCode);
-        });
-        return;
-    }
-
-    if (parsed.game === 'bingo') {
-        arcStop(roomCode);
-        const settings = bingoSubSettings(room.subMode), durationMs = settings.durationMs, boards={}, used={}, current={}, stats={};
-        const allowedTraits = bingoAvailableTraitIds(settings.universes);
-        room.players.forEach(p => { boards[p.id]={ cells:bingoNewBoardCells(allowedTraits), allowed:allowedTraits.slice() }; used[p.id]=new Set(); stats[p.id]={correct:0,wrong:0,attempts:0}; });
-        const now=Date.now();
-        const g = {
-            game:'bingo', universe:settings.universeSpec, round:0, totalRounds:null, phase:'playing', current:null,
-            answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
-            used:new Set(), usedU:settings.universes.slice(), lastGuess:{}, startedAt:now, endsAt:durationMs?now+durationMs:null,
-            bingo:{ boards, used, current, stats, durationMs, infinite:settings.infinite, universes:settings.universes.slice(), allowedTraits }
-        };
-        arcGames[roomCode]=g; room.status='arc_playing';
-        arcEmit(room,roomCode);
-        room.players.forEach(p => { bingoSendBoard(p.id,g); bingoNextCharacter(room,roomCode,p.id); });
-        if (durationMs) g.timer=setTimeout(()=>bingoFinish(room,roomCode), durationMs+100);
-        return;
-    }
-
-    return _startArcadePCB(room, roomCode);
-};
-
-/* ---------- Fin d'une épreuve Party Mix : on garde le score, personne ne sort ---------- */
-const _arcFinishPCB = arcFinish;
-arcFinish = function (room, roomCode) {
-    const g = arcGames[roomCode];
-    if (g?.game === 'bingo' && g.bingo) return bingoFinish(room, roomCode);
-    if (g?.mix && !g.message && g.mix.idx < g.mix.games.length - 1) {
-        arcClearTimers(g);
-        g.phase='intermission';
-        g.mix.nextLabel=ARC_GAMES[g.mix.games[g.mix.idx+1]]?.label || g.mix.games[g.mix.idx+1];
-        g.revealEndsAt=Date.now()+5500; arcEmit(room,roomCode);
-        g.timer=setTimeout(()=>{
-            if (g.dead || arcGames[roomCode]!==g) return;
-            g.mix.idx++; g.game=g.mix.games[g.mix.idx]; g.round=0; g.totalRounds=g.mix.per;
-            g.current=null; g.nextPromise=null; g.answers={}; g.found={}; g.gainedRound={}; g.message=null;
-            io.to(roomCode).emit('arc_names',{names:arcNamesFor(g)}); arcNextRound(room,roomCode);
-        },5500);
-        return;
-    }
-    return _arcFinishPCB(room,roomCode);
-};
-
-/* ---------- Révélation Combat de cartes ---------- */
-const _arcRevealPCB = arcReveal;
-arcReveal = function (room, roomCode) {
-    const g=arcGames[roomCode];
-    if (g?.game==='cardbattle' && g.phase==='playing' && g.cardBattle) {
-        const cat=g.current?.cardCategory || CARD_BATTLE_CATS[0];
-        const plays=[];
-        for (const p of room.players) {
-            const deck=g.cardBattle.decks[p.id] || [], used=g.cardBattle.used[p.id] || new Set();
-            let key=g.cardBattle.picks[p.id];
-            let card=deck.find(c=>c.key===key && !used.has(c.key));
-            if (!card) card=deck.find(c=>!used.has(c.key)) || deck[0];
-            if (card) { g.cardBattle.picks[p.id]=card.key; used.add(card.key); }
-            const value=card?.stats?.[cat.id] || 0;
-            plays.push({ id:p.id, name:p.name, card, value });
-            g.answers[p.id]={choice:card?.name || 'Aucune carte',correct:false};
-            g.gainedRound[p.id]=0;
-        }
-        const best=Math.max(0,...plays.map(x=>x.value));
-        const winners=plays.filter(x=>x.value===best);
-        for (const x of winners) {
-            const gain=winners.length===1?100:50;
-            g.scores[x.id]=(g.scores[x.id]||0)+gain; g.gainedRound[x.id]=gain; g.answers[x.id].correct=true;
-        }
-        g.current.cardResult={category:cat,plays};
-        g.current.answer=winners.length===1?`${winners[0].name} gagne avec ${best}`:`Égalité à ${best}`;
-        g.cardBattle.picks={};
-        room.players.forEach(p=>cbSendDeck(p.id,g));
-    }
-    return _arcRevealPCB(room,roomCode);
-};
-
-/* ---------- État public spécial ---------- */
-const _arcPublicPCB = arcPublic;
-arcPublic = function (room,g) {
-    const out=_arcPublicPCB(room,g); if(!g||!out) return out;
-    out.stage=out.stage||{};
-    if(g.mix){ out.mix={idx:g.mix.idx,total:g.mix.games.length,games:g.mix.games.map(k=>ARC_GAMES[k]?.label||k),nextLabel:g.mix.nextLabel||null}; out.gameLabel=`Party Mix • ${ARC_GAMES[g.game]?.label||g.game}`; }
-    const cur=g.current||{};
-    if(g.game==='mix_quote'&&cur.quote) out.stage.quote=cur.quote;
-    if(g.game==='mix_dle'&&cur.dle) out.stage.dle=cur.dle;
-    if(g.game==='mix_blind'&&cur.video){out.stage.video=cur.video;out.stage.frac=cur.frac;out.stage.audio=true;}
-    if(g.game==='cardbattle'&&g.cardBattle){
-        const cat=cur.cardCategory||CARD_BATTLE_CATS[0];
-        out.stage.cardBattle={category:cat,locked:room.players.filter(p=>g.cardBattle.picks[p.id]).map(p=>p.id)};
-        if(g.phase==='reveal'&&cur.cardResult) out.stage.cardBattle.plays=cur.cardResult.plays.map(x=>({name:x.name,value:x.value,card:x.card?{name:x.card.name,anime:x.card.anime,img:x.card.img}:null}));
-    }
-    if(g.game==='bingo'&&g.bingo){
-        out.stage.bingo={};
-        out.bingo={infinite:!!g.bingo.infinite,durationMs:g.bingo.durationMs||null};
-        out.roundMs=g.bingo.durationMs||60000; out.endsAt=g.endsAt||null; out.totalRounds=null;
-        out.players=out.players.map(p=>({ ...p, correctCount:g.bingo.stats[p.id]?.correct||0, wrongCount:g.bingo.stats[p.id]?.wrong||0, attempts:g.bingo.stats[p.id]?.attempts||0, done:false }));
-    }
-    return out;
-};
-
-/* ---------- Listes privées / reconnexion ---------- */
-const _arcNamesForPCB = arcNamesFor;
-arcNamesFor = function(g){ if(g&&(g.game==='cardbattle'||g.game==='bingo')) return []; return _arcNamesForPCB(g); };
-const _arcSendToPCB=arcSendTo;
-arcSendTo=function(socket,room,roomCode){
-    const ok=_arcSendToPCB(socket,room,roomCode),g=arcGames[roomCode];
-    if(ok&&g?.game==='cardbattle') cbSendDeck(socket.id,g);
-    if(ok&&g?.game==='bingo'){ bingoSendBoard(socket.id,g); const c=g.bingo?.current?.[socket.id]; if(c) socket.emit('arc_bingo_character',{character:{name:c.name,anime:c.anime,img:c.img}}); }
-    return ok;
-};
-const _arcRemapPCB=arcRemap;
-arcRemap=function(roomCode,oldId,newId){
-    _arcRemapPCB(roomCode,oldId,newId); const g=arcGames[roomCode]; if(!g||oldId===newId)return;
-    if(g.cardBattle){
-        for(const key of ['decks','used','picks']) if(g.cardBattle[key]&&Object.prototype.hasOwnProperty.call(g.cardBattle[key],oldId)){g.cardBattle[key][newId]=g.cardBattle[key][oldId];delete g.cardBattle[key][oldId];}
-    }
-    if(g.bingo?.boards?.[oldId]){g.bingo.boards[newId]=g.bingo.boards[oldId];delete g.bingo.boards[oldId];for(const key of ['used','current','stats'])if(g.bingo[key]&&Object.prototype.hasOwnProperty.call(g.bingo[key],oldId)){g.bingo[key][newId]=g.bingo[key][oldId];delete g.bingo[key][oldId];}}
-};
-
-/* ---------- Actions privées Combat/Bingo ---------- */
-io.on('connection',socket=>{
-    socket.on('arc_card_pick',({roomCode,key}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];
-        if(!room||!g||g.game!=='cardbattle'||g.phase!=='playing'||!g.cardBattle||g.answers[socket.id])return;
-        if(!room.players.some(p=>p.id===socket.id))return;
-        const deck=g.cardBattle.decks[socket.id]||[],used=g.cardBattle.used[socket.id]||new Set();
-        const card=deck.find(c=>c.key===String(key||'')); if(!card||used.has(card.key))return;
-        g.cardBattle.picks[socket.id]=card.key; g.answers[socket.id]={choice:'Carte verrouillée',correct:false}; g.gainedRound[socket.id]=0;
-        arcCheckAllDone(room,roomCode);
-    });
-
-    socket.on('arc_bingo_mark',({roomCode,idx}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];
-        if(!room||!g||g.game!=='bingo'||g.phase!=='playing'||!g.bingo)return;
-        if(!room.players.some(p=>p.id===socket.id))return;
-        const board=g.bingo.boards[socket.id], cur=g.bingo.current[socket.id]; if(!board||!cur)return;
-        idx=Number(idx); if(!Number.isInteger(idx)||idx<0||idx>=BINGO_CELL_COUNT)return;
-        const trait=board.cells[idx], correct=(cur.tags||[]).includes(trait), clickedLabel=BINGO_TRAIT_BY_ID[trait]?.label||trait;
-        g.bingo.current[socket.id]=null;
-        const st=g.bingo.stats[socket.id]||(g.bingo.stats[socket.id]={correct:0,wrong:0,attempts:0}); st.attempts++;
-        if(correct){ st.correct++; g.scores[socket.id]=(g.scores[socket.id]||0)+1; }
-        else { st.wrong++; g.scores[socket.id]=(g.scores[socket.id]||0)-1; }
-        bingoRerollCell(board,idx); bingoSendBoard(socket.id,g);
-        socket.emit('arc_feedback',{ok:correct,message:correct?`✅ ${clickedLabel} : +1 point`:`❌ ${clickedLabel} ne correspond pas : -1 point`});
-        arcEmit(room,roomCode);
-        if(g.phase==='playing') bingoNextCharacter(room,roomCode,socket.id);
-    });
-
-
-    // Blind Test du Party Mix : si la vidéo n'est pas intégrable, on remplace la manche.
-    socket.on('arc_media_error',({roomCode,round}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];
-        if(!room||!g||g.game!=='mix_blind'||g.phase!=='playing'||g.round!==round||!g.current?.video)return;
-        if(Date.now()-g.startedAt>15000)return;
-        BT_BAD_IDS.add(g.current.video);arcClearTimers(g);g.round=Math.max(0,g.round-1);g.current=null;g.nextPromise=null;arcNextRound(room,roomCode);
-    });
-});
-
-/* ---------- Progression : Party Mix compte comme un mode unique ---------- */
-const _progRecordPCB=progRecord;
-progRecord=async function(room,mode,universe,entries){
-    if(room?.mode==='arcade'&&partyMixParse(room.subMode)) mode='arcade:partymix';
-    return _progRecordPCB(room,mode,universe,entries);
-};
-
-
-// Un salon public de Combat de cartes ne peut accueillir que les deux duellistes.
-const _publicRoomMaxPCB = publicRoomMax;
-publicRoomMax = function(room) {
-    if (room?.mode === 'arcade' && String(room.subMode || '').startsWith('cardbattle')) return 2;
-    return _publicRoomMaxPCB(room);
-};
-
-
-/* =====================================================================
-   7 AJOUTS : Anime Connections, Code Anime, Remets-les dans l'ordre,
-   Grid Challenge, Album silhouettes, Musée 10 cartes, Hall of Fame
-   ===================================================================== */
-
-ARC_GAMES.connections   = { label:'Anime Connections',       icon:'🧩', universe:true,  rounds:1, roundMs:90000,  answer:'connections' };
-ARC_GAMES.codeanime     = { label:'Code Anime',              icon:'🕵️', universe:false, rounds:1, roundMs:600000, answer:'codeanime' };
-ARC_GAMES.ordre         = { label:"Remets-les dans l’ordre", icon:'⏳', universe:false, rounds:5, roundMs:45000,  answer:'order' };
-ARC_GAMES.gridchallenge = { label:'Grid Challenge',          icon:'🎯', universe:false, rounds:1, roundMs:120000, answer:'grid' };
-MODE_LABELS['arcade:connections'] = 'Anime Connections';
-MODE_LABELS['arcade:codeanime'] = 'Code Anime';
-MODE_LABELS['arcade:ordre'] = "Remets-les dans l’ordre";
-MODE_LABELS['arcade:gridchallenge'] = 'Grid Challenge';
-
-const CONNECTION_TRAITS = ['fire','lightning','water','sword','magic','eye','transform','villain','leader','royal','demon','pirate','ninja','hunter','shinigami','ghoul','titan','hair_white','hair_red','hair_blue'];
-const CONN_SKIP_VALUES = new Set(['aucun','aucune','non','none','inconnu','inconnue','unknown','n a','na','non revele','non precise','non précisé','non précisée','-']);
-function connItemId(c){ return c.u + '|' + normalizeRG(c.name); }
-function connSubSettings(subMode){
-    const p=String(subMode||'').split(':'); const all=arcUniverses(); let spec=p[1]||'all';
-    let universes=spec==='all'?all:[...new Set(String(spec).split('+').filter(u=>all.includes(u)))];
-    if(!universes.length){universes=all;spec='all';}
-    else spec=universes.length===all.length?'all':universes.join('+');
-    return {universeSpec:spec,universes};
-}
-function connCatalogForUniverses(universes){
-    const out=[],seen=new Set();
-    for(const u of (universes||arcUniverses())){
-        let data=null; try{data=dleExpandedUniverse(u);}catch(_){data=null;}
-        for(const c of (data?.characters||[])){
-            const id=u+'|'+normalizeRG(c.name); if(seen.has(id))continue; seen.add(id);
-            let tags=[]; try{tags=bingoTags(u,data,c)||[];}catch(_){}
-            out.push({id,u,name:c.name,anime:data?.name||ARC_UNIVERSE_ANIME[u]||u,tags,img:staticCharImage(u,c.name)||null,attrs:c.attrs||{}});
-        }
-    }
-    return out;
-}
-function connPrettyToken(t){
-    let x=String(t||'').replace(/\s+/g,' ').trim();
-    return x ? x.charAt(0).toUpperCase()+x.slice(1) : x;
-}
-function connCandidates(universes,cat){
-    const candidates=[],seenCand=new Set();
-    const push=(id,label,members,kind='trait')=>{
-        const uniq=[...new Set(members)].filter(Boolean); if(uniq.length<4||seenCand.has(id))return;
-        seenCand.add(id); candidates.push({id,label,members:uniq,kind});
-    };
-    for(const id of CONNECTION_TRAITS){
-        push('trait:'+id,BINGO_TRAIT_BY_ID[id]?.label||id,cat.filter(c=>(c.tags||[]).includes(id)).map(c=>c.id),'trait');
-    }
-    const itemByKey=new Map(cat.map(c=>[c.id,c]));
-    for(const u of universes){
-        let data=null; try{data=dleExpandedUniverse(u);}catch(_){data=null;}
-        if(!data)continue;
-        for(const def of (data.categories||[])){
-            const buckets=new Map(),display=new Map();
-            for(const c of (data.characters||[])){
-                const id=u+'|'+normalizeRG(c.name); if(!itemByKey.has(id))continue;
-                const raw=c.attrs?.[def.key]; if(!isRealDleValue(raw))continue;
-                let toks=[]; try{toks=dleTokenSet(raw);}catch(_){toks=[normalizeDle(raw)];}
-                if(!toks.length)toks=[normalizeDle(raw)];
-                for(const tok0 of toks){
-                    const tok=normalizeDle(tok0); if(!tok||CONN_SKIP_VALUES.has(tok)||tok.length>42)continue;
-                    if(!buckets.has(tok))buckets.set(tok,[]); buckets.get(tok).push(id);
-                    if(!display.has(tok))display.set(tok,connPrettyToken(tok0));
-                }
-            }
-            for(const [tok,members] of buckets){
-                // On évite les catégories tellement larges qu'elles rendraient presque toute la grille interchangeable.
-                if(members.length>Math.max(24,Math.ceil(cat.length*.72)))continue;
-                push(`dle:${u}:${def.key}:${tok}`,`${data.name||ARC_UNIVERSE_ANIME[u]||u} • ${def.label} : ${display.get(tok)||connPrettyToken(tok)}`,members,'dle');
-            }
-        }
-    }
-    return candidates;
-}
-function connPuzzleAmbiguous(items,groups,cat){
-    // On garde le contrôle d'ambiguïté sur les grands traits transversaux (feu, foudre, yeux, etc.).
-    const catMap=new Map((cat||[]).map(c=>[c.id,c]));
-    const tagMap=Object.fromEntries(items.map(x=>[x.id,new Set((catMap.get(x.id)?.tags||[]).filter(t=>CONNECTION_TRAITS.includes(t)))]));
-    const validSets=new Set(groups.map(g=>g.items.slice().sort().join('|'))), ids=items.map(x=>x.id);
-    for(let a=0;a<ids.length-3;a++)for(let b=a+1;b<ids.length-2;b++)for(let c=b+1;c<ids.length-1;c++)for(let d=c+1;d<ids.length;d++){
-        const arr=[ids[a],ids[b],ids[c],ids[d]], first=tagMap[arr[0]]||new Set();
-        const common=[...first].filter(t=>arr.slice(1).every(id=>(tagMap[id]||new Set()).has(t)));
-        if(common.length&&!validSets.has(arr.slice().sort().join('|')))return true;
-    }
-    return false;
-}
-function connBuildPuzzle(universes){
-    const cat=connCatalogForUniverses(universes), byId=new Map(cat.map(c=>[c.id,c]));
-    const candidates=connCandidates(universes,cat); if(candidates.length<4)return null;
-    for(let attempt=0;attempt<500;attempt++){
-        const used=new Set(),groups=[];
-        let order=arcShuffle(candidates.slice());
-        // Sur plusieurs univers, priorité aux liens transversaux ; sur un seul anime, les données DLE de cet anime prennent le relais.
-        if(universes.length>1) order=order.sort((a,b)=>(a.kind==='trait'?0:1)-(b.kind==='trait'?0:1));
-        for(const cand of order){
-            let pool=arcShuffle(cand.members.filter(id=>!used.has(id)).map(id=>byId.get(id)).filter(Boolean));
-            const picked=[];
-            if(cand.kind==='trait'&&universes.length>1){
-                const seenU=new Set(); for(const c of pool)if(!seenU.has(c.u)){picked.push(c);seenU.add(c.u);if(picked.length===4)break;}
-            }
-            if(picked.length<4)for(const c of pool)if(!picked.includes(c)){picked.push(c);if(picked.length===4)break;}
-            if(picked.length<4)continue;
-            groups.push({id:cand.id,label:cand.label,items:picked.map(c=>c.id)}); picked.forEach(c=>used.add(c.id));
-            if(groups.length===4)break;
-        }
-        if(groups.length!==4)continue;
-        const items=arcShuffle(groups.flatMap(g=>g.items.map(id=>byId.get(id)).filter(Boolean)).map(c=>({id:c.id,name:c.name,anime:c.anime,u:c.u,img:c.img||null})));
-        if(items.length===16&&!connPuzzleAmbiguous(items,groups,cat))return {groups,items};
-    }
-    // Fallback : mieux vaut une grille jouable qu'un refus si un anime possède énormément de liens qui se recoupent.
-    for(let attempt=0;attempt<250;attempt++){
-        const used=new Set(),groups=[];
-        for(const cand of arcShuffle(candidates.slice())){
-            const pool=arcShuffle(cand.members.filter(id=>!used.has(id)).map(id=>byId.get(id)).filter(Boolean));
-            if(pool.length<4)continue; const picked=pool.slice(0,4);
-            groups.push({id:cand.id,label:cand.label,items:picked.map(c=>c.id)}); picked.forEach(c=>used.add(c.id));
-            if(groups.length===4)break;
-        }
-        if(groups.length===4){const items=arcShuffle(groups.flatMap(g=>g.items.map(id=>byId.get(id)).filter(Boolean)).map(c=>({id:c.id,name:c.name,anime:c.anime,u:c.u,img:c.img||null})));if(items.length===16)return {groups,items};}
-    }
-    return null;
-}
-function connPrivate(socketId,g){
-    const solved=[...(g.connections?.solved?.[socketId] || new Set())];
-    return solved.map(id=>{const x=g.connections.puzzle.groups.find(z=>z.id===id);return x?{id:x.id,label:x.label,items:x.items}:null;}).filter(Boolean);
-}
-function connFinish(room,roomCode){ const g=arcGames[roomCode]; if(!g||g.game!=='connections'||g.phase==='finished')return; arcFinish(room,roomCode); }
-
-function codeBuildBoard(){
-    const pool=arcShuffle(bingoCatalog()).filter((c,i,a)=>a.findIndex(x=>normalizeRG(x.name)===normalizeRG(c.name))===i).slice(0,25);
-    if(pool.length<25)return null;
-    const items=pool.map((c,i)=>({id:'c'+i,name:c.name,anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'',u:c.u}));
-    const ids=arcShuffle(items.map(x=>x.id)); const roles={};
-    ids.slice(0,9).forEach(id=>roles[id]='cyan'); ids.slice(9,17).forEach(id=>roles[id]='rose'); ids.slice(17,24).forEach(id=>roles[id]='neutral'); roles[ids[24]]='assassin';
-    return {items,roles};
-}
-function codeRemaining(g,team){ return Object.entries(g.code.roles).filter(([id,r])=>r===team&&!g.code.revealed.has(id)).length; }
-function codeEndTurn(g){ g.code.turn=g.code.turn==='cyan'?'rose':'cyan'; g.code.clue=null; g.code.guessesLeft=0; }
-function codeSendPrivate(room,g){
-    for(const p of room.players){
-        const team=g.code.teams[p.id]; const captain=g.code.captains[team]===p.id;
-        io.to(p.id).emit('arc_code_private',{team,captain,map:captain?g.code.roles:null});
-    }
-}
-function codeFinish(room,roomCode,winner,reason){
-    const g=arcGames[roomCode]; if(!g||g.game!=='codeanime'||g.phase==='finished')return;
-    g.code.winner=winner; g.code.reason=reason||'';
-    room.players.forEach(p=>{ if(g.code.teams[p.id]===winner) g.scores[p.id]=(g.scores[p.id]||0)+500; });
-    arcFinish(room,roomCode);
-}
-
-let ORDER_POOL_CACHE=null;
-function orderPools(){
-    if(ORDER_POOL_CACHE)return ORDER_POOL_CACHE;
-    const out=[];
-    for(const u of arcUniverses()){
-        let d=null; try{d=dleExpandedUniverse(u);}catch(_){continue;}
-        for(const cat of (d?.categories||[])){
-            const vals=[];
-            for(const c of d.characters||[]){ const n=dleNumberValue(c.attrs?.[cat.key]); if(n!==null&&Number.isFinite(n)) vals.push({u,name:c.name,value:n}); }
-            const unique=[]; const seenV=new Set();
-            for(const x of arcShuffle(vals)){ if(seenV.has(x.value))continue; seenV.add(x.value); unique.push(x); }
-            if(unique.length>=5) out.push({u,anime:d.name||ARC_UNIVERSE_ANIME[u]||u,key:cat.key,label:cat.label,items:unique});
-        }
-    }
-    ORDER_POOL_CACHE=out; return out;
-}
-function orderBuildRound(g){
-    let pools=orderPools().filter(p=>!g.used.has('ord|'+p.u+'|'+p.key));
-    if(!pools.length){ for(const k of [...g.used])if(k.startsWith('ord|'))g.used.delete(k); pools=orderPools(); }
-    const p=arcPick(pools); if(!p)return null; g.used.add('ord|'+p.u+'|'+p.key);
-    const chosen=arcShuffle(p.items).slice(0,5).sort((a,b)=>a.value-b.value);
-    const shuffled=arcShuffle(chosen.map((x,i)=>({id:'o'+i+'_'+hubHash(x.u+'|'+x.name+'|'+x.value),name:x.name,value:x.value})));
-    const correct=chosen.map(x=>shuffled.find(y=>y.name===x.name)?.id).filter(Boolean);
-    return {u:p.u,orderPrompt:`${p.anime} • ${p.label} : du plus petit au plus grand`,orderItems:shuffled.map(({id,name})=>({id,name})),orderCorrect:correct,answer:chosen.map(x=>`${x.name} (${x.value})`).join(' → ')};
-}
-function orderScore(submitted,correct){
-    if(!Array.isArray(submitted)||submitted.length!==correct.length||new Set(submitted).size!==correct.length)return 0;
-    let pairs=0,total=0; const pos=Object.fromEntries(submitted.map((id,i)=>[id,i]));
-    for(let i=0;i<correct.length;i++)for(let j=i+1;j<correct.length;j++){total++;if(pos[correct[i]]<pos[correct[j]])pairs++;}
-    return pairs===total?150:Math.round(100*pairs/Math.max(1,total));
-}
-
-const GRID_TRAITS=['fire','lightning','water','sword','magic','eye','transform','villain','leader','royal','demon','pirate','ninja','hunter','shinigami','ghoul','titan'];
-function gridBuildPuzzle(){
-    const cat=bingoCatalog(); const byU={}; for(const c of cat)(byU[c.u]||(byU[c.u]=[])).push(c);
-    const universes=Object.keys(byU).filter(u=>byU[u].length>=12);
-    for(let tries=0;tries<500;tries++){
-        const rows=arcShuffle(universes).slice(0,3); if(rows.length<3)break;
-        const possible=GRID_TRAITS.filter(t=>rows.every(u=>byU[u].filter(c=>(c.tags||[]).includes(t)).length>=1));
-        if(possible.length<3)continue;
-        const cols=arcShuffle(possible).slice(0,3); const candidates={}; let ok=true;
-        rows.forEach((u,r)=>cols.forEach((t,c)=>{const k=r+'|'+c;candidates[k]=byU[u].filter(x=>(x.tags||[]).includes(t));if(!candidates[k].length)ok=false;}));
-        if(ok)return {rows,cols,candidates};
-    }
-    return null;
-}
-function gridPrivate(g,sid){ return {solved:g.grid?.solved?.[sid]||{}, attempts:g.grid?.attempts?.[sid]||0}; }
-function gridFinish(room,roomCode){ const g=arcGames[roomCode]; if(!g||g.game!=='gridchallenge'||g.phase==='finished')return; arcFinish(room,roomCode); }
-
-// ordre utilise le cycle de manches Arcade normal
-const _arcBuildRoundSeven = arcBuildRound;
-arcBuildRound = async function(g){
-    if(g?.game==='ordre') return orderBuildRound(g);
-    return _arcBuildRoundSeven(g);
-};
-
-// Démarrage des jeux à état continu
-const _startArcadeSeven = startArcade;
-startArcade = function(room,roomCode){
-    const game=String(room.subMode||'').split(':')[0];
-    if(game==='connections'){
-        const cs=connSubSettings(room.subMode); const puzzle=connBuildPuzzle(cs.universes); if(!puzzle){io.to(roomCode).emit('game_error',{message:'Impossible de créer une grille Connections avec cette sélection. Essaie davantage d’univers.'});return;}
-        arcStop(roomCode); const solved={},attempts={}; room.players.forEach(p=>{solved[p.id]=new Set();attempts[p.id]=0;});
-        const now=Date.now(),g={game:'connections',universe:cs.universeSpec,uniList:cs.universes,round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+90000,connections:{puzzle,solved,attempts}};
-        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);room.players.forEach(p=>io.to(p.id).emit('arc_connections_private',{solved:connPrivate(p.id,g)}));g.timer=setTimeout(()=>connFinish(room,roomCode),90100);return;
-    }
-    if(game==='codeanime'){
-        if(room.players.length<4){io.to(roomCode).emit('game_error','Code Anime demande au moins 4 joueurs (2 équipes).');return;}
-        const board=codeBuildBoard();if(!board){io.to(roomCode).emit('game_error','Impossible de créer la grille Code Anime.');return;}
-        arcStop(roomCode);const teams={},lists={cyan:[],rose:[]};room.players.forEach((p,i)=>{const t=i%2===0?'cyan':'rose';teams[p.id]=t;lists[t].push(p.id);});
-        const captains={cyan:lists.cyan[0],rose:lists.rose[0]},now=Date.now();
-        const g={game:'codeanime',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+600000,code:{...board,teams,lists,captains,revealed:new Set(),turn:'cyan',clue:null,guessesLeft:0,winner:null,reason:''}};
-        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);codeSendPrivate(room,g);g.timer=setTimeout(()=>{const a=codeRemaining(g,'cyan'),b=codeRemaining(g,'rose');codeFinish(room,roomCode,a<=b?'cyan':'rose','Temps écoulé');},600100);return;
-    }
-    if(game==='gridchallenge'){
-        const puzzle=gridBuildPuzzle();if(!puzzle){io.to(roomCode).emit('game_error','Impossible de créer une Grid Challenge avec les données actuelles.');return;}
-        arcStop(roomCode);const solved={},usedNames={},attempts={};room.players.forEach(p=>{solved[p.id]={};usedNames[p.id]=new Set();attempts[p.id]=0;});const now=Date.now();
-        const g={game:'gridchallenge',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+120000,grid:{...puzzle,solved,usedNames,attempts}};
-        arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);room.players.forEach(p=>io.to(p.id).emit('arc_grid_private',gridPrivate(g,p.id)));g.timer=setTimeout(()=>gridFinish(room,roomCode),120100);return;
-    }
-    return _startArcadeSeven(room,roomCode);
-};
-
-const _arcPublicSeven=arcPublic;
-arcPublic=function(room,g){
-    const out=_arcPublicSeven(room,g); if(!g||!out)return out; out.stage=out.stage||{};
-    if(g.game==='connections'&&g.connections){
-        out.stage.connections={items:g.connections.puzzle.items};
-        out.players=out.players.map(p=>({...p,progress:(g.connections.solved[p.id]?.size||0),done:(g.connections.solved[p.id]?.size||0)>=4}));
-    }
-    if(g.game==='codeanime'&&g.code){
-        const c=g.code;out.stage.code={items:c.items.map(x=>({...x,revealed:c.revealed.has(x.id),role:c.revealed.has(x.id)?c.roles[x.id]:null})),turn:c.turn,clue:c.clue,guessesLeft:c.guessesLeft,remaining:{cyan:codeRemaining(g,'cyan'),rose:codeRemaining(g,'rose')},teams:{cyan:c.lists.cyan,rose:c.lists.rose},captains:c.captains,winner:c.winner,reason:c.reason};
-        out.players=out.players.map(p=>({...p,team:c.teams[p.id]}));
-    }
-    if(g.game==='ordre'&&g.current?.orderItems){
-        out.stage.order={prompt:g.current.orderPrompt,items:g.current.orderItems,correct:g.phase==='reveal'||g.phase==='finished'?g.current.orderCorrect:null};
-    }
-    if(g.game==='gridchallenge'&&g.grid){
-        out.stage.grid={rows:g.grid.rows.map(u=>({u,label:ARC_UNIVERSE_ANIME[u]||u})),cols:g.grid.cols.map(id=>({id,label:BINGO_TRAIT_BY_ID[id]?.label||id,emoji:BINGO_TRAIT_BY_ID[id]?.emoji||'🎯'}))};
-        out.players=out.players.map(p=>({...p,progress:Object.keys(g.grid.solved[p.id]||{}).length,done:Object.keys(g.grid.solved[p.id]||{}).length>=9}));
-    }
-    return out;
-};
-
-const _arcSendToSeven=arcSendTo;
-arcSendTo=function(socket,room,roomCode){
-    const ok=_arcSendToSeven(socket,room,roomCode),g=arcGames[roomCode];if(!ok||!g)return ok;
-    if(g.game==='connections')socket.emit('arc_connections_private',{solved:connPrivate(socket.id,g)});
-    if(g.game==='codeanime')codeSendPrivate(room,g);
-    if(g.game==='gridchallenge')socket.emit('arc_grid_private',gridPrivate(g,socket.id));
-    return ok;
-};
-const _arcRemapSeven=arcRemap;
-arcRemap=function(roomCode,oldId,newId){
-    _arcRemapSeven(roomCode,oldId,newId);const g=arcGames[roomCode];if(!g||oldId===newId)return;
-    if(g.connections){for(const k of ['solved','attempts'])if(Object.prototype.hasOwnProperty.call(g.connections[k]||{},oldId)){g.connections[k][newId]=g.connections[k][oldId];delete g.connections[k][oldId];}}
-    if(g.code){if(g.code.teams[oldId]){const t=g.code.teams[oldId];g.code.teams[newId]=t;delete g.code.teams[oldId];g.code.lists[t]=g.code.lists[t].map(x=>x===oldId?newId:x);if(g.code.captains[t]===oldId)g.code.captains[t]=newId;}}
-    if(g.grid){for(const k of ['solved','usedNames','attempts'])if(Object.prototype.hasOwnProperty.call(g.grid[k]||{},oldId)){g.grid[k][newId]=g.grid[k][oldId];delete g.grid[k][oldId];}}
-};
-
-io.on('connection',socket=>{
-    socket.on('arc_connections_submit',({roomCode,ids}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='connections'||g.phase!=='playing'||!g.connections)return;
-        if(!room.players.some(p=>p.id===socket.id))return;ids=Array.isArray(ids)?[...new Set(ids.map(String))]:[];if(ids.length!==4)return;
-        const valid=new Set(g.connections.puzzle.items.map(x=>x.id));if(ids.some(x=>!valid.has(x)))return;
-        const solved=g.connections.solved[socket.id]||(g.connections.solved[socket.id]=new Set());g.connections.attempts[socket.id]=(g.connections.attempts[socket.id]||0)+1;
-        const key=ids.slice().sort().join('|');const match=g.connections.puzzle.groups.find(gr=>!solved.has(gr.id)&&gr.items.slice().sort().join('|')===key);
-        if(match){solved.add(match.id);g.scores[socket.id]=(g.scores[socket.id]||0)+100;socket.emit('arc_feedback',{ok:true,message:`✅ ${match.label} ! +100`});socket.emit('arc_connections_private',{solved:connPrivate(socket.id,g)});}
-        else{g.scores[socket.id]=(g.scores[socket.id]||0)-10;socket.emit('arc_feedback',{ok:false,message:'❌ Ce groupe ne partage pas le même lien : -10'});}
-        arcEmit(room,roomCode);const connected=room.players.filter(p=>!p.disconnected);if(connected.length&&connected.every(p=>(g.connections.solved[p.id]?.size||0)>=4))connFinish(room,roomCode);
-    });
-
-    socket.on('arc_code_clue',({roomCode,word,number}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const c=g.code,team=c.teams[socket.id];
-        if(!team||team!==c.turn||c.captains[team]!==socket.id||c.clue)return;word=String(word||'').trim().replace(/\s+/g,' ').slice(0,30);number=Math.max(1,Math.min(9,Number(number)||1));if(!word)return;
-        c.clue={word,number,by:socket.id};c.guessesLeft=number+1;arcEmit(room,roomCode);
-    });
-    socket.on('arc_code_guess',({roomCode,id}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const c=g.code,team=c.teams[socket.id];
-        if(!team||team!==c.turn||c.captains[team]===socket.id||!c.clue||c.guessesLeft<=0||c.revealed.has(String(id)))return;id=String(id);if(!c.roles[id])return;
-        c.revealed.add(id);const role=c.roles[id];c.guessesLeft--;
-        if(role==='assassin'){codeFinish(room,roomCode,team==='cyan'?'rose':'cyan','☠️ Assassin trouvé');return;}
-        if(role===team){room.players.filter(p=>c.teams[p.id]===team).forEach(p=>g.scores[p.id]=(g.scores[p.id]||0)+50);if(codeRemaining(g,team)===0){codeFinish(room,roomCode,team,'Tous les agents trouvés');return;}if(c.guessesLeft<=0)codeEndTurn(g);}
-        else codeEndTurn(g);
-        arcEmit(room,roomCode);codeSendPrivate(room,g);
-    });
-    socket.on('arc_code_endturn',({roomCode}={})=>{const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='codeanime'||g.phase!=='playing'||!g.code)return;const t=g.code.teams[socket.id];if(t!==g.code.turn||g.code.captains[t]===socket.id||!g.code.clue)return;codeEndTurn(g);arcEmit(room,roomCode);});
-
-    socket.on('arc_order_submit',({roomCode,ids}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='ordre'||g.phase!=='playing'||g.answers[socket.id])return;
-        const all=(g.current?.orderItems||[]).map(x=>x.id);ids=Array.isArray(ids)?ids.map(String):[];if(ids.length!==all.length||new Set(ids).size!==all.length||ids.some(id=>!all.includes(id)))return;
-        const score=orderScore(ids,g.current.orderCorrect||[]);g.scores[socket.id]=(g.scores[socket.id]||0)+score;g.gainedRound[socket.id]=score;g.answers[socket.id]={choice:ids.join(','),correct:score===150};socket.emit('arc_feedback',{ok:score===150,message:score===150?`✅ Ordre parfait ! +${score}`:`🧩 Ordre envoyé : +${score} pts`});arcCheckAllDone(room,roomCode);
-    });
-
-    socket.on('arc_grid_submit',({roomCode,row,col,text}={})=>{
-        const room=rooms[roomCode],g=arcGames[roomCode];if(!room||!g||g.game!=='gridchallenge'||g.phase!=='playing'||!g.grid)return;if(!room.players.some(p=>p.id===socket.id))return;
-        row=Number(row);col=Number(col);if(!Number.isInteger(row)||!Number.isInteger(col)||row<0||row>2||col<0||col>2)return;const key=row+'|'+col,solved=g.grid.solved[socket.id]||(g.grid.solved[socket.id]={});if(solved[key])return;
-        const guess=String(text||'').trim().slice(0,80);if(!guess)return;g.grid.attempts[socket.id]=(g.grid.attempts[socket.id]||0)+1;const cand=g.grid.candidates[key]||[];const found=cand.find(c=>arcNameMatches(c.u,{display:c.name,raw:c.name},guess));
-        const used=g.grid.usedNames[socket.id]||(g.grid.usedNames[socket.id]=new Set());
-        if(found&&used.has(connItemId(found))){socket.emit('arc_feedback',{ok:false,message:'↺ Tu as déjà utilisé ce personnage ailleurs dans la grille.'});return;}
-        if(found){solved[key]=found.name;used.add(connItemId(found));g.scores[socket.id]=(g.scores[socket.id]||0)+100;socket.emit('arc_feedback',{ok:true,message:`✅ ${found.name} ! +100`});}
-        else{g.scores[socket.id]=(g.scores[socket.id]||0)-15;socket.emit('arc_feedback',{ok:false,message:`❌ ${guess} ne correspond pas à cette intersection : -15`});}
-        socket.emit('arc_grid_private',gridPrivate(g,socket.id));arcEmit(room,roomCode);const connected=room.players.filter(p=>!p.disconnected);if(connected.length&&connected.every(p=>Object.keys(g.grid.solved[p.id]||{}).length>=9))gridFinish(room,roomCode);
-    });
-});
-
-// Hall of Fame : champions mensuels conservés sur les 12 derniers mois.
-app.get('/api/hall-of-fame', async (req,res)=>{
-    let raw=[];
-    if(HAS_DB){
-        try{raw=(await pool.query(`SELECT to_char(date_trunc('month', created_at AT TIME ZONE 'Europe/Paris'),'YYYY-MM') AS season, mode, user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games, sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE created_at >= now() - interval '12 months' GROUP BY season, mode, user_id`)).rows;}catch(e){return res.json({ok:false,error:e.message});}
-    }else{
-        const since=Date.now()-366*86400000,agg={};for(const r of PROG_MEM.results.filter(x=>x.created_at>=since)){const d=new Date(r.created_at),season=`${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`,k=[season,r.mode,r.user_id].join('|'),o=agg[k]||(agg[k]={season,mode:r.mode,user_id:r.user_id,pseudo:r.pseudo,points:0,games:0,wins:0});o.points+=r.points||0;o.games++;o.wins+=r.won?1:0;}raw=Object.values(agg);
-    }
-    const seasons={};for(const r of raw){const s=seasons[r.season]||(seasons[r.season]={season:r.season,global:{},modes:{}}),g=s.global[r.user_id]||(s.global[r.user_id]={pseudo:r.pseudo,points:0,wins:0,games:0});g.points+=+r.points||0;g.wins+=+r.wins||0;g.games+=+r.games||0;(s.modes[r.mode]||(s.modes[r.mode]=[])).push(r);}
-    const best=list=>Object.values(list).sort((a,b)=>b.wins-a.wins||b.points-a.points||a.games-b.games||String(a.pseudo).localeCompare(String(b.pseudo),'fr'))[0]||null;
-    const out=Object.values(seasons).sort((a,b)=>b.season.localeCompare(a.season)).map(s=>({season:s.season,champion:best(s.global),modes:Object.entries(s.modes).map(([mode,list])=>({mode,label:MODE_LABELS[mode]||mode,winner:best(list)})).filter(x=>x.winner).sort((a,b)=>b.winner.wins-a.winner.wins||b.winner.points-a.winner.points).slice(0,10)}));
-    res.json({ok:true,seasons:out});
-});
-
-
-/* =====================================================================
-   CARTES ALT ART + MOMENT
-   - Alt Art : version alternative d'un héros, illustrée par une scène culte
-   - Moment : carte de scène culte (miniature de la scène déjà utilisée par Scene Guessr)
-   Ces cartes sont des bonus de booster : elles n'enlèvent aucune carte du pack.
-   ===================================================================== */
-const ALT_ART_RATE = 1 / 220;
-const MOMENT_CARD_RATE = 1 / 360;
-let _ALT_ART_CACHE = null, _MOMENT_CACHE = null;
-function sceneUniverseKey(anime) {
-    const n = normalizeRG(anime);
-    return Object.keys(ARC_UNIVERSE_ANIME).find(u => normalizeRG(ARC_UNIVERSE_ANIME[u]) === n) || null;
-}
-function sceneThumb(id) { return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`; }
-function cleanMomentName(s) {
-    return String(s || '').replace(/\s*\((?:VOSTA|VF[^)]*|VO[^)]*|HD|60FPS)[^)]*\)\s*/gi, ' ')
-        .replace(/\s+/g, ' ').trim().slice(0, 72);
-}
-function ALT_ART_CARDS() {
-    if (_ALT_ART_CACHE) return _ALT_ART_CACHE;
-    const out = [];
-    for (const u of arcUniverses()) {
-        const label = ARC_UNIVERSE_ANIME[u], scene = ARC_SCENES.find(s => sceneUniverseKey(s.anime) === u);
-        const hero = arcFamous(u)[0] || cardPool(u)[0];
-        if (!label || !scene || !hero) continue;
-        out.push({ id: u, u, name: hero.display, anime: label, img: sceneThumb(scene.id), source: cleanMomentName(scene.desc), baseKey: u + '|' + hero.display });
-    }
-    return (_ALT_ART_CACHE = out);
-}
-function MOMENT_CARDS() {
-    if (_MOMENT_CACHE) return _MOMENT_CACHE;
-    const out = [], per = new Map(), seen = new Set();
-    for (const sc of ARC_SCENES) {
-        const u = sceneUniverseKey(sc.anime); if (!u || !ARC_UNIVERSE_ANIME[u]) continue;
-        const n = cleanMomentName(sc.desc), sig = u + '|' + normalizeRG(n).replace(/\b(combat complet|full hd|clip officiel|bataille finale)\b/g, '').trim();
-        if (!n || seen.has(sig) || (per.get(u) || 0) >= 2) continue;
-        seen.add(sig); per.set(u, (per.get(u) || 0) + 1);
-        out.push({ id: sc.id, u, name: n, anime: ARC_UNIVERSE_ANIME[u], img: sceneThumb(sc.id), source: n });
-    }
-    return (_MOMENT_CACHE = out);
-}
-function altArtById(id) { return ALT_ART_CARDS().find(x => x.id === String(id)) || null; }
-function momentById(id) { return MOMENT_CARDS().find(x => x.id === String(id)) || null; }
-async function awardBonusCard(uid, kind) {
-    const list = kind === 'altart' ? ALT_ART_CARDS() : MOMENT_CARDS(); if (!list.length) return null;
-    const c = list[Math.floor(Math.random() * list.length)], key = kind + '|' + c.id;
-    const isNew = await cardGive(uid, { key }, false), coins = kind === 'altart' ? 90 : 120;
-    if (!isNew) await ecoAddCoins(uid, coins);
-    return { ...c, key, rarity: kind, isNew, shiny:false, coins:isNew ? 0 : coins, bonus:true };
-}
-Object.assign(RAR_RANK, { altart: 5, moment: 5 });
-DECK_BONUS.altart = 18;
-
-const _openBoosterAltMoment = openBooster;
-openBooster = async function(uid, n, type='') {
-    const out = await _openBoosterAltMoment(uid, n, type);
-    let luck = await cardLuck(uid);
-    if (type === 'admin' && await isPrivUid(uid)) luck *= 10;
-    const slots = Math.max(1, Number(n) || (Array.isArray(out) ? out.length : 1));
-    const altChance = Math.min(.55, 1 - Math.pow(1 - ALT_ART_RATE, slots * luck));
-    const momentChance = Math.min(.45, 1 - Math.pow(1 - MOMENT_CARD_RATE, slots * luck));
-    if (Math.random() < altChance) { const c = await awardBonusCard(uid, 'altart'); if (c) out.push(c); }
-    if (Math.random() < momentChance) { const c = await awardBonusCard(uid, 'moment'); if (c) out.push(c); }
-    return out;
-};
