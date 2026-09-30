@@ -994,3 +994,50 @@
         display:none!important;
     }
 }
+
+/* =====================================================================
+   MOBILE GAME PAGE FIX — le menu dashboard ne doit jamais rester affiché
+   sous un salon / une sélection / un mini-jeu. L'inline display:none posé
+   par le code historique gagne aussi sur mobile, comme sur PC.
+   ===================================================================== */
+@media (max-width:1180px){
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display: none"],
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display:none"]{
+        display:none!important;
+    }
+}
+
+/* =====================================================================
+   GAME PAGE HARD FIX — salon / sélection / partie en page dédiée.
+   La classe est pilotée par ui-refactor.js et évite tout conflit avec les
+   display:flex/grid !important du dashboard, surtout sur Safari iOS.
+   ===================================================================== */
+body.ag-game-page .ag-desktop-shell,
+#app-root.ag-game-page .ag-desktop-shell{
+    display:none!important;
+}
+body.ag-game-page #app-root #mode #menu-selection,
+#app-root.ag-game-page #mode #menu-selection{
+    display:none!important;
+}
+body.ag-game-page #app-root > #mode,
+#app-root.ag-game-page > #mode{
+    margin-left:0!important;
+    width:100%!important;
+}
+
+@media (max-width:1180px){
+    body.ag-game-page #app-root > #mode,
+    #app-root.ag-game-page > #mode{
+        padding:10px 10px calc(18px + env(safe-area-inset-bottom,0px))!important;
+    }
+    body.ag-game-page .ag-mobile-bottom,
+    body.ag-game-page .ag-mobile-backdrop,
+    body.ag-game-page .ag-dash-top,
+    body.ag-game-page .ag-dash-sidebar{
+        display:none!important;
+    }
+    body.ag-game-page #music-player{
+        bottom:10px!important;
+    }
+}
