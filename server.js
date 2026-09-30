@@ -21462,7 +21462,7 @@ publicRoomMax = function(room) {
    Grid Challenge, Album silhouettes, Musée 10 cartes, Hall of Fame
    ===================================================================== */
 
-ARC_GAMES.connections   = { label:'Anime Connections',       icon:'🧩', universe:false, rounds:1, roundMs:90000,  answer:'connections' };
+ARC_GAMES.connections   = { label:'Anime Connections',       icon:'🧩', universe:true,  rounds:1, roundMs:90000,  answer:'connections' };
 ARC_GAMES.codeanime     = { label:'Code Anime',              icon:'🕵️', universe:false, rounds:1, roundMs:600000, answer:'codeanime' };
 ARC_GAMES.ordre         = { label:"Remets-les dans l’ordre", icon:'⏳', universe:false, rounds:5, roundMs:45000,  answer:'order' };
 ARC_GAMES.gridchallenge = { label:'Grid Challenge',          icon:'🎯', universe:false, rounds:1, roundMs:120000, answer:'grid' };
@@ -21472,41 +21472,111 @@ MODE_LABELS['arcade:ordre'] = "Remets-les dans l’ordre";
 MODE_LABELS['arcade:gridchallenge'] = 'Grid Challenge';
 
 const CONNECTION_TRAITS = ['fire','lightning','water','sword','magic','eye','transform','villain','leader','royal','demon','pirate','ninja','hunter','shinigami','ghoul','titan','hair_white','hair_red','hair_blue'];
+const CONN_SKIP_VALUES = new Set(['aucun','aucune','non','none','inconnu','inconnue','unknown','n a','na','non revele','non precise','non précisé','non précisée','-']);
 function connItemId(c){ return c.u + '|' + normalizeRG(c.name); }
-function connPuzzleAmbiguous(items,groups){
-    const tagMap=Object.fromEntries(bingoCatalog().map(c=>[connItemId(c),new Set((c.tags||[]).filter(t=>CONNECTION_TRAITS.includes(t)))]));
+function connSubSettings(subMode){
+    const p=String(subMode||'').split(':'); const all=arcUniverses(); let spec=p[1]||'all';
+    let universes=spec==='all'?all:[...new Set(String(spec).split('+').filter(u=>all.includes(u)))];
+    if(!universes.length){universes=all;spec='all';}
+    else spec=universes.length===all.length?'all':universes.join('+');
+    return {universeSpec:spec,universes};
+}
+function connCatalogForUniverses(universes){
+    const out=[],seen=new Set();
+    for(const u of (universes||arcUniverses())){
+        let data=null; try{data=dleExpandedUniverse(u);}catch(_){data=null;}
+        for(const c of (data?.characters||[])){
+            const id=u+'|'+normalizeRG(c.name); if(seen.has(id))continue; seen.add(id);
+            let tags=[]; try{tags=bingoTags(u,data,c)||[];}catch(_){}
+            out.push({id,u,name:c.name,anime:data?.name||ARC_UNIVERSE_ANIME[u]||u,tags,img:staticCharImage(u,c.name)||null,attrs:c.attrs||{}});
+        }
+    }
+    return out;
+}
+function connPrettyToken(t){
+    let x=String(t||'').replace(/\s+/g,' ').trim();
+    return x ? x.charAt(0).toUpperCase()+x.slice(1) : x;
+}
+function connCandidates(universes,cat){
+    const candidates=[],seenCand=new Set();
+    const push=(id,label,members,kind='trait')=>{
+        const uniq=[...new Set(members)].filter(Boolean); if(uniq.length<4||seenCand.has(id))return;
+        seenCand.add(id); candidates.push({id,label,members:uniq,kind});
+    };
+    for(const id of CONNECTION_TRAITS){
+        push('trait:'+id,BINGO_TRAIT_BY_ID[id]?.label||id,cat.filter(c=>(c.tags||[]).includes(id)).map(c=>c.id),'trait');
+    }
+    const itemByKey=new Map(cat.map(c=>[c.id,c]));
+    for(const u of universes){
+        let data=null; try{data=dleExpandedUniverse(u);}catch(_){data=null;}
+        if(!data)continue;
+        for(const def of (data.categories||[])){
+            const buckets=new Map(),display=new Map();
+            for(const c of (data.characters||[])){
+                const id=u+'|'+normalizeRG(c.name); if(!itemByKey.has(id))continue;
+                const raw=c.attrs?.[def.key]; if(!isRealDleValue(raw))continue;
+                let toks=[]; try{toks=dleTokenSet(raw);}catch(_){toks=[normalizeDle(raw)];}
+                if(!toks.length)toks=[normalizeDle(raw)];
+                for(const tok0 of toks){
+                    const tok=normalizeDle(tok0); if(!tok||CONN_SKIP_VALUES.has(tok)||tok.length>42)continue;
+                    if(!buckets.has(tok))buckets.set(tok,[]); buckets.get(tok).push(id);
+                    if(!display.has(tok))display.set(tok,connPrettyToken(tok0));
+                }
+            }
+            for(const [tok,members] of buckets){
+                // On évite les catégories tellement larges qu'elles rendraient presque toute la grille interchangeable.
+                if(members.length>Math.max(24,Math.ceil(cat.length*.72)))continue;
+                push(`dle:${u}:${def.key}:${tok}`,`${data.name||ARC_UNIVERSE_ANIME[u]||u} • ${def.label} : ${display.get(tok)||connPrettyToken(tok)}`,members,'dle');
+            }
+        }
+    }
+    return candidates;
+}
+function connPuzzleAmbiguous(items,groups,cat){
+    // On garde le contrôle d'ambiguïté sur les grands traits transversaux (feu, foudre, yeux, etc.).
+    const catMap=new Map((cat||[]).map(c=>[c.id,c]));
+    const tagMap=Object.fromEntries(items.map(x=>[x.id,new Set((catMap.get(x.id)?.tags||[]).filter(t=>CONNECTION_TRAITS.includes(t)))]));
     const validSets=new Set(groups.map(g=>g.items.slice().sort().join('|'))), ids=items.map(x=>x.id);
-    // 16 choose 4 = 1820 seulement : on refuse toute combinaison alternative partageant un trait.
     for(let a=0;a<ids.length-3;a++)for(let b=a+1;b<ids.length-2;b++)for(let c=b+1;c<ids.length-1;c++)for(let d=c+1;d<ids.length;d++){
         const arr=[ids[a],ids[b],ids[c],ids[d]], first=tagMap[arr[0]]||new Set();
         const common=[...first].filter(t=>arr.slice(1).every(id=>(tagMap[id]||new Set()).has(t)));
-        if(common.length && !validSets.has(arr.slice().sort().join('|'))) return true;
+        if(common.length&&!validSets.has(arr.slice().sort().join('|')))return true;
     }
     return false;
 }
-function connBuildPuzzle(){
-    const cat = bingoCatalog();
-    const by = {};
-    for (const id of CONNECTION_TRAITS) by[id] = cat.filter(c => (c.tags || []).includes(id));
-    for (let attempt=0; attempt<250; attempt++) {
-        const used = new Set(), groups=[];
-        for (const id of arcShuffle(CONNECTION_TRAITS.slice())) {
-            let pool = arcShuffle((by[id] || []).filter(c => !used.has(connItemId(c))));
-            // si possible, quatre univers différents rendent les groupes moins triviaux
-            const picked=[], seenU=new Set();
-            for (const c of pool) if (!seenU.has(c.u)) { picked.push(c); seenU.add(c.u); if (picked.length===4) break; }
-            if (picked.length<4) for (const c of pool) if (!picked.includes(c)) { picked.push(c); if (picked.length===4) break; }
-            if (picked.length<4) continue;
-            groups.push({ id, label:BINGO_TRAIT_BY_ID[id]?.label || id, items:picked.map(connItemId) });
-            picked.forEach(c => used.add(connItemId(c)));
-            if (groups.length===4) {
-                const items=[];
-                for (const g of groups) for (const key of g.items) {
-                    const c=cat.find(x=>connItemId(x)===key); if(c) items.push({ id:key, name:c.name, anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'', u:c.u });
-                }
-                if (items.length===16) { const shuffled=arcShuffle(items); if(!connPuzzleAmbiguous(shuffled,groups)) return { groups, items:shuffled }; }
+function connBuildPuzzle(universes){
+    const cat=connCatalogForUniverses(universes), byId=new Map(cat.map(c=>[c.id,c]));
+    const candidates=connCandidates(universes,cat); if(candidates.length<4)return null;
+    for(let attempt=0;attempt<500;attempt++){
+        const used=new Set(),groups=[];
+        let order=arcShuffle(candidates.slice());
+        // Sur plusieurs univers, priorité aux liens transversaux ; sur un seul anime, les données DLE de cet anime prennent le relais.
+        if(universes.length>1) order=order.sort((a,b)=>(a.kind==='trait'?0:1)-(b.kind==='trait'?0:1));
+        for(const cand of order){
+            let pool=arcShuffle(cand.members.filter(id=>!used.has(id)).map(id=>byId.get(id)).filter(Boolean));
+            const picked=[];
+            if(cand.kind==='trait'&&universes.length>1){
+                const seenU=new Set(); for(const c of pool)if(!seenU.has(c.u)){picked.push(c);seenU.add(c.u);if(picked.length===4)break;}
             }
+            if(picked.length<4)for(const c of pool)if(!picked.includes(c)){picked.push(c);if(picked.length===4)break;}
+            if(picked.length<4)continue;
+            groups.push({id:cand.id,label:cand.label,items:picked.map(c=>c.id)}); picked.forEach(c=>used.add(c.id));
+            if(groups.length===4)break;
         }
+        if(groups.length!==4)continue;
+        const items=arcShuffle(groups.flatMap(g=>g.items.map(id=>byId.get(id)).filter(Boolean)).map(c=>({id:c.id,name:c.name,anime:c.anime,u:c.u,img:c.img||null})));
+        if(items.length===16&&!connPuzzleAmbiguous(items,groups,cat))return {groups,items};
+    }
+    // Fallback : mieux vaut une grille jouable qu'un refus si un anime possède énormément de liens qui se recoupent.
+    for(let attempt=0;attempt<250;attempt++){
+        const used=new Set(),groups=[];
+        for(const cand of arcShuffle(candidates.slice())){
+            const pool=arcShuffle(cand.members.filter(id=>!used.has(id)).map(id=>byId.get(id)).filter(Boolean));
+            if(pool.length<4)continue; const picked=pool.slice(0,4);
+            groups.push({id:cand.id,label:cand.label,items:picked.map(c=>c.id)}); picked.forEach(c=>used.add(c.id));
+            if(groups.length===4)break;
+        }
+        if(groups.length===4){const items=arcShuffle(groups.flatMap(g=>g.items.map(id=>byId.get(id)).filter(Boolean)).map(c=>({id:c.id,name:c.name,anime:c.anime,u:c.u,img:c.img||null})));if(items.length===16)return {groups,items};}
     }
     return null;
 }
@@ -21600,9 +21670,9 @@ const _startArcadeSeven = startArcade;
 startArcade = function(room,roomCode){
     const game=String(room.subMode||'').split(':')[0];
     if(game==='connections'){
-        const puzzle=connBuildPuzzle(); if(!puzzle){io.to(roomCode).emit('game_error','Impossible de créer une grille Connections.');return;}
+        const cs=connSubSettings(room.subMode); const puzzle=connBuildPuzzle(cs.universes); if(!puzzle){io.to(roomCode).emit('game_error',{message:'Impossible de créer une grille Connections avec cette sélection. Essaie davantage d’univers.'});return;}
         arcStop(roomCode); const solved={},attempts={}; room.players.forEach(p=>{solved[p.id]=new Set();attempts[p.id]=0;});
-        const now=Date.now(),g={game:'connections',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+90000,connections:{puzzle,solved,attempts}};
+        const now=Date.now(),g={game:'connections',universe:cs.universeSpec,uniList:cs.universes,round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+90000,connections:{puzzle,solved,attempts}};
         arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);room.players.forEach(p=>io.to(p.id).emit('arc_connections_private',{solved:connPrivate(p.id,g)}));g.timer=setTimeout(()=>connFinish(room,roomCode),90100);return;
     }
     if(game==='codeanime'){
