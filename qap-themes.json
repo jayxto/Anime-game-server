@@ -14773,6 +14773,144 @@
           "sub": "Simon • Gurren Lagann",
           "imageSearch": "Simon Simon Super Tengen Toppa Gurren Lagann Gurren Lagann anime transformation",
           "char": "Simon"
+        },
+        {
+          "name": "Final War Deku",
+          "sub": "Izuku Midoriya • My Hero Academia",
+          "imageSearch": "Izuku Midoriya Final War Deku My Hero Academia anime transformation",
+          "char": "Izuku Midoriya"
+        },
+        {
+          "name": "Armored All Might",
+          "sub": "All Might • My Hero Academia",
+          "imageSearch": "All Might Armored All Might My Hero Academia anime transformation",
+          "char": "All Might"
+        },
+        {
+          "name": "Shigaraki Awakened",
+          "sub": "Tomura Shigaraki • My Hero Academia",
+          "imageSearch": "Tomura Shigaraki Shigaraki Awakened My Hero Academia anime transformation",
+          "char": "Tomura Shigaraki"
+        },
+        {
+          "name": "Turbo Granny Form",
+          "sub": "Ken Takakura • Dandadan",
+          "imageSearch": "Ken Takakura Turbo Granny Form Dandadan anime transformation",
+          "char": "Ken Takakura"
+        },
+        {
+          "name": "Evil Eye Possession",
+          "sub": "Jiji Enjoji • Dandadan",
+          "imageSearch": "Jiji Enjoji Evil Eye Possession Dandadan anime transformation",
+          "char": "Jiji Enjoji"
+        },
+        {
+          "name": "Psychic Awakening",
+          "sub": "Momo Ayase • Dandadan",
+          "imageSearch": "Momo Ayase Psychic Awakening Dandadan anime transformation",
+          "char": "Momo Ayase"
+        },
+        {
+          "name": "Frieren Mana Unleashed",
+          "sub": "Frieren • Frieren",
+          "imageSearch": "Frieren Frieren Mana Unleashed Frieren anime transformation",
+          "char": "Frieren"
+        },
+        {
+          "name": "Aura Scales of Obedience",
+          "sub": "Aura • Frieren",
+          "imageSearch": "Aura Aura Scales of Obedience Frieren anime transformation",
+          "char": "Aura"
+        },
+        {
+          "name": "Thorfinn Warrior Era",
+          "sub": "Thorfinn • Vinland Saga",
+          "imageSearch": "Thorfinn Thorfinn Warrior Era Vinland Saga anime transformation",
+          "char": "Thorfinn"
+        },
+        {
+          "name": "Femto",
+          "sub": "Griffith • Berserk",
+          "imageSearch": "Griffith Femto Berserk anime transformation",
+          "char": "Griffith"
+        },
+        {
+          "name": "Apostle Zodd",
+          "sub": "Nosferatu Zodd • Berserk",
+          "imageSearch": "Nosferatu Zodd Apostle Zodd Berserk anime transformation",
+          "char": "Nosferatu Zodd"
+        },
+        {
+          "name": "Chainsaw Devil",
+          "sub": "Denji • Chainsaw Man",
+          "imageSearch": "Denji Chainsaw Devil Chainsaw Man anime transformation",
+          "char": "Denji"
+        },
+        {
+          "name": "Gun Fiend",
+          "sub": "Aki Hayakawa • Chainsaw Man",
+          "imageSearch": "Aki Hayakawa Gun Fiend Chainsaw Man anime transformation",
+          "char": "Aki Hayakawa"
+        },
+        {
+          "name": "Hero of Hell",
+          "sub": "Pochita • Chainsaw Man",
+          "imageSearch": "Pochita Hero of Hell Chainsaw Man anime transformation",
+          "char": "Pochita"
+        },
+        {
+          "name": "Dragon Form",
+          "sub": "Rimuru Tempest • Tensura",
+          "imageSearch": "Rimuru Tempest Dragon Form Tensura anime transformation",
+          "char": "Rimuru Tempest"
+        },
+        {
+          "name": "Demon Lord Milim",
+          "sub": "Milim Nava • Tensura",
+          "imageSearch": "Milim Nava Demon Lord Milim Tensura anime transformation",
+          "char": "Milim Nava"
+        },
+        {
+          "name": "Demon Lord Diablo",
+          "sub": "Diablo • Tensura",
+          "imageSearch": "Diablo Demon Lord Diablo Tensura anime transformation",
+          "char": "Diablo"
+        },
+        {
+          "name": "Awakened Garou",
+          "sub": "Garou • One Punch Man",
+          "imageSearch": "Garou Awakened Garou One Punch Man anime transformation",
+          "char": "Garou"
+        },
+        {
+          "name": "Cosmic Fear Garou",
+          "sub": "Garou • One Punch Man",
+          "imageSearch": "Garou Cosmic Fear Garou One Punch Man anime transformation",
+          "char": "Garou"
+        },
+        {
+          "name": "Centipede Mode",
+          "sub": "Ken Kaneki • Tokyo Ghoul",
+          "imageSearch": "Ken Kaneki Centipede Mode Tokyo Ghoul anime transformation",
+          "char": "Ken Kaneki"
+        },
+        {
+          "name": "Kakuja",
+          "sub": "Ken Kaneki • Tokyo Ghoul",
+          "imageSearch": "Ken Kaneki Kakuja Tokyo Ghoul anime transformation",
+          "char": "Ken Kaneki"
+        },
+        {
+          "name": "Demon King Form",
+          "sub": "Anos Voldigoad • The Misfit of Demon King Academy",
+          "imageSearch": "Anos Voldigoad Demon King Form The Misfit of Demon King Academy anime transformation",
+          "char": "Anos Voldigoad"
+        },
+        {
+          "name": "Spirit Form",
+          "sub": "Emilia • Re:Zero",
+          "imageSearch": "Emilia Spirit Form Re:Zero anime transformation",
+          "char": "Emilia"
         }
       ]
     },
@@ -18347,6 +18485,11 @@
           "name": "Thorfinn vs Thorkell",
           "sub": "Vinland Saga",
           "video": "7HMp8KC9dq8"
+        },
+        {
+          "name": "Reigen vs Claw",
+          "sub": "Mob Psycho 100",
+          "video": "fJvQARLUouI"
         }
       ]
     },
@@ -18580,6 +18723,136 @@
           "name": "Sports Festival",
           "sub": "My Hero Academia",
           "media": "anime"
+        },
+        {
+          "name": "Hero Killer",
+          "sub": "My Hero Academia",
+          "media": "anime"
+        },
+        {
+          "name": "Shie Hassaikai",
+          "sub": "My Hero Academia",
+          "media": "anime"
+        },
+        {
+          "name": "Joint Training",
+          "sub": "My Hero Academia",
+          "media": "anime"
+        },
+        {
+          "name": "Final War",
+          "sub": "My Hero Academia",
+          "media": "anime"
+        },
+        {
+          "name": "Turbo Granny",
+          "sub": "Dandadan",
+          "media": "anime"
+        },
+        {
+          "name": "Acrobatic Silky",
+          "sub": "Dandadan",
+          "media": "anime"
+        },
+        {
+          "name": "Cursed House",
+          "sub": "Dandadan",
+          "media": "anime"
+        },
+        {
+          "name": "Evil Eye",
+          "sub": "Dandadan",
+          "media": "anime"
+        },
+        {
+          "name": "Aura the Guillotine",
+          "sub": "Frieren",
+          "media": "anime"
+        },
+        {
+          "name": "Journey to Äußerst",
+          "sub": "Frieren",
+          "media": "anime"
+        },
+        {
+          "name": "Baltic Sea War",
+          "sub": "Vinland Saga",
+          "media": "anime"
+        },
+        {
+          "name": "Slave / Farmland",
+          "sub": "Vinland Saga",
+          "media": "anime"
+        },
+        {
+          "name": "Eastern Expedition",
+          "sub": "Vinland Saga",
+          "media": "anime"
+        },
+        {
+          "name": "Conviction",
+          "sub": "Berserk",
+          "media": "anime"
+        },
+        {
+          "name": "Falcon of the Millennium Empire",
+          "sub": "Berserk",
+          "media": "anime"
+        },
+        {
+          "name": "Swordsmith Village",
+          "sub": "Demon Slayer",
+          "media": "anime"
+        },
+        {
+          "name": "Public Safety",
+          "sub": "Chainsaw Man",
+          "media": "anime"
+        },
+        {
+          "name": "Bomb Girl",
+          "sub": "Chainsaw Man",
+          "media": "anime"
+        },
+        {
+          "name": "Culling Game",
+          "sub": "Jujutsu Kaisen",
+          "media": "anime"
+        },
+        {
+          "name": "Ishval",
+          "sub": "Fullmetal Alchemist",
+          "media": "anime"
+        },
+        {
+          "name": "L",
+          "sub": "Death Note",
+          "media": "anime"
+        },
+        {
+          "name": "Yotsuba",
+          "sub": "Death Note",
+          "media": "anime"
+        },
+        {
+          "name": "Sisters",
+          "sub": "A Certain Magical Index",
+          "media": "anime"
+        },
+        {
+          "name": "Mother’s Rosario",
+          "sub": "Sword Art Online",
+          "media": "anime"
+        },
+        {
+          "name": "Royal Selection",
+          "sub": "Re:Zero",
+          "media": "anime"
+        },
+        {
+          "name": "Sanctuary",
+          "sub": "Re:Zero",
+          "media": "anime"
         }
       ]
     },
@@ -18630,12 +18903,92 @@
           "media": "anime"
         },
         {
-          "name": "Sword Art Online",
+          "name": "Saga of Tanya the Evil",
           "sub": "Isekai",
           "media": "anime"
         },
         {
-          "name": "Re:Creators",
+          "name": "Log Horizon",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Grimgar of Fantasy and Ash",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Tsukimichi: Moonlit Fantasy",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "So I’m a Spider, So What?",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Cautious Hero",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Arifureta",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "The World’s Finest Assassin Gets Reincarnated in Another World",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Campfire Cooking in Another World",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Handyman Saitou in Another World",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "The Faraway Paladin",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Ascendance of a Bookworm",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "My Next Life as a Villainess",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "The Saint’s Magic Power Is Omnipotent",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Reincarnated as a Sword",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Skeleton Knight in Another World",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "Uncle from Another World",
+          "sub": "Isekai",
+          "media": "anime"
+        },
+        {
+          "name": "The Wrong Way to Use Healing Magic",
           "sub": "Isekai",
           "media": "anime"
         }
@@ -18794,6 +19147,86 @@
         },
         {
           "name": "Bungo Stray Dogs",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Slam Dunk",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Kuroko no Basket",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Hajime no Ippo",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Blue Box",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "WIND BREAKER",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "The Elusive Samurai",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Rurouni Kenshin",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Magi",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Noragami",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Beelzebub",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Toriko",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "World Trigger",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Undead Unluck",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Mission: Yozakura Family",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Detective Conan",
+          "sub": "Shonen",
+          "media": "anime"
+        },
+        {
+          "name": "Yu-Gi-Oh!",
           "sub": "Shonen",
           "media": "anime"
         }

@@ -12212,6 +12212,13 @@ Object.assign(ARC_FAMOUS_OVERRIDE, {
   ]
 });
 
+// Extension V2 — personnages supplémentaires contrôlés à partir des castings officiels et des personnages majeurs.
+for (const [u, names] of Object.entries({"mha": ["Minoru Mineta", "Kyoka Jiro", "Mezo Shoji", "Mashirao Ojiro", "Hanta Sero", "Toru Hagakure", "Koji Koda", "Rikido Sato", "Yuga Aoyama", "Mina Ashido", "Neito Monoma", "Itsuka Kendo", "Hitoshi Shinso", "Mei Hatsume", "Eri", "Sir Nighteye", "Fat Gum", "Ryukyu", "Mirko", "Best Jeanist", "Edgeshot", "Mt. Lady", "Present Mic", "Gran Torino", "Gentle Criminal", "La Brava", "Stain", "Overhaul", "Twice", "Spinner", "Mr. Compress", "Kurogiri", "Re-Destro", "Lady Nagant"], "dandadan": ["Manjiro", "Serpoians", "Flatwoods Monster", "Acrobatic Silky", "Dover Demon", "Taro", "Hana", "Naki Kito", "Evil Eye", "Chiquitita"], "frieren": ["Kanne", "Lawine", "Methode", "Ehre", "Scharf", "Edel", "Lernen", "Sense", "Genau", "Kraft", "Hero of the South", "Qual", "Lugner", "Linie", "Draht", "Revolte", "Hemon", "Zoltraak Demon", "Sword Demon"], "vinland": ["Floki", "Sweyn", "Ragnar", "Wulf", "Atli", "Torgrim", "Ylva", "Helga", "Halfdan", "Sigurd", "Karli", "Cordelia", "Hakon", "Droott", "Badger", "Fox", "Pater"]})) {
+    const base = ARC_FAMOUS_OVERRIDE[u] || (ARC_FAMOUS_OVERRIDE[u] = []);
+    const have = new Set(base.map(x => normalizeRG(x)));
+    for (const n of names) if (!have.has(normalizeRG(n))) { base.push(n); have.add(normalizeRG(n)); }
+}
+
 const ARC_FAMOUS_CACHE = new Map();
 function arcFamous(u) {
     if (ARC_FAMOUS_CACHE.has(u)) return ARC_FAMOUS_CACHE.get(u);
