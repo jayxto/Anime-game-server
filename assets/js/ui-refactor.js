@@ -215,6 +215,8 @@
                     <button class="ag-dash-nav-btn" type="button" data-dash-nav="quests"><span class="ico">📜</span><span>Quêtes</span></button>
                     <button class="ag-dash-nav-btn" type="button" data-dash-nav="museum"><span class="ico">🏛</span><span>Musée</span></button>
                     <button class="ag-dash-nav-btn" type="button" data-dash-nav="settings"><span class="ico">⚙</span><span>Paramètres</span></button>
+                    <button class="ag-dash-nav-btn ag-dash-role-btn" id="ag-dash-beta" type="button" data-dash-nav="beta" style="display:none"><span class="ico">🧪</span><span>Bêta</span></button>
+                    <button class="ag-dash-nav-btn ag-dash-role-btn" id="ag-dash-admin" type="button" data-dash-nav="admin" style="display:none"><span class="ico">🛠</span><span>Admin</span></button>
                 </nav>
                 <button class="ag-dash-event" id="ag-dash-event" type="button">
                     <small>Événement en cours</small>
@@ -390,6 +392,14 @@
         else if (key === 'leaderboard') { tab('options'); later(() => scrollOption('Classements par jeu')); }
         else if (key === 'quests') { tab('mode'); later(() => q('#ag-dashboard-right')?.scrollIntoView({ behavior:'smooth', block:'start' })); }
         else if (key === 'settings') { tab('options'); later(() => window.scrollTo({ top:0, behavior:'smooth' })); }
+        else if (key === 'beta') {
+            tab('beta');
+            later(() => { if (typeof betaLoad === 'function') betaLoad(); window.scrollTo({ top:0, behavior:'smooth' }); });
+        }
+        else if (key === 'admin') {
+            tab('admin');
+            later(() => { if (typeof loadAdmin === 'function') loadAdmin(); window.scrollTo({ top:0, behavior:'smooth' }); });
+        }
         syncNav();
     }
 
@@ -406,6 +416,8 @@
             if (t === 'mode' && !['play','quests','home'].includes(dashState.section)) dashState.section = 'home';
             if (t === 'amis') dashState.section = 'friends';
             if (t === 'options' && !['leaderboard','settings'].includes(dashState.section)) dashState.section = 'settings';
+            if (t === 'beta') dashState.section = 'beta';
+            if (t === 'admin') dashState.section = 'admin';
             if (t === 'collection' && !['collection','shop','deck','trade','clan','museum'].includes(dashState.section)) dashState.section = 'collection';
             setTimeout(syncAll, 0);
             return r;
@@ -427,6 +439,8 @@
         let key = dashState.section;
         const active = q('#app-root > .tab-content.active')?.id;
         if (active === 'amis') key = 'friends';
+        else if (active === 'beta') key = 'beta';
+        else if (active === 'admin') key = 'admin';
         else if (active === 'options' && !['leaderboard','settings'].includes(key)) key = 'settings';
         else if (active === 'collection') {
             const t = q('#collection .eco-tabs button.on')?.dataset.t;
@@ -434,6 +448,36 @@
             key = map[t] || key || 'collection';
         } else if (active === 'mode' && !['home','play','quests'].includes(key)) key = 'home';
         qa('.ag-dash-nav-btn').forEach(b => b.classList.toggle('on', b.dataset.dashNav === key));
+    }
+
+    function syncRoleNav() {
+        const adminBtn = q('#ag-dash-admin');
+        const betaBtn = q('#ag-dash-beta');
+        if (!adminBtn || !betaBtn) return;
+
+        // On reprend exactement les droits déjà calculés par checkAdmin() dans core.js.
+        // Fallback sur les anciens boutons de navigation pour éviter un flash si la
+        // vérification serveur vient juste de se terminer.
+        const oldAdmin = q('#btn-admin')?.parentElement;
+        const oldBeta = q('#btn-beta')?.parentElement;
+        const adminVisibleLegacy = !!oldAdmin && getComputedStyle(oldAdmin).display !== 'none';
+        const betaVisibleLegacy = !!oldBeta && getComputedStyle(oldBeta).display !== 'none';
+        const isAdmin = window.IS_ADMIN === true || adminVisibleLegacy;
+        const isBeta = !isAdmin && (window.IS_BETA === true || betaVisibleLegacy);
+
+        adminBtn.style.display = isAdmin ? '' : 'none';
+        betaBtn.style.display = isBeta ? '' : 'none';
+
+        // Si un rôle vient d'être retiré pendant qu'on est sur son onglet,
+        // on renvoie proprement vers les paramètres.
+        if (dashState.section === 'admin' && !isAdmin) {
+            dashState.section = 'settings';
+            if (q('#app-root > .tab-content.active')?.id === 'admin' && typeof switchTab === 'function') switchTab('options');
+        }
+        if (dashState.section === 'beta' && !isBeta) {
+            dashState.section = 'settings';
+            if (q('#app-root > .tab-content.active')?.id === 'beta' && typeof switchTab === 'function') switchTab('options');
+        }
     }
 
     function syncProfile() {
@@ -509,6 +553,7 @@
 
     function syncAll() {
         syncShell();
+        syncRoleNav();
         syncNav();
         syncProfile();
         syncQuests();
