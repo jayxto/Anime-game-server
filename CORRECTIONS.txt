@@ -21,3 +21,23 @@ ANIME GAME — corrections appliquées
 
 Fichiers à déployer : server.js, index.html, char-images.json, qap-themes.json,
 tierlist-themes.json, package.json.
+
+4. Échanges directs
+- Ancien système de propositions supprimé de l'interface.
+- Chaque joueur ne parcourt que sa propre collection.
+- Table d'échange en direct : chacun pose une carte et voit en temps réel la carte posée par l'autre.
+- Double accord, puis confirmation finale obligatoire des deux joueurs avant transfert.
+- Toute modification de carte annule automatiquement les accords précédents.
+- L'historique n'est plus affiché en permanence : bouton « Voir l'historique des échanges ».
+- Un échange direct ne peut démarrer qu'avec un ami actuellement connecté.
+
+5. Options repliables
+- Toutes les catégories de Options et du panneau Admin ont une flèche ▼/▶.
+- Un clic sur le titre replie/déplie la catégorie.
+- L'état de chaque catégorie est mémorisé dans le navigateur.
+
+6. Admin — joueurs connectés
+- Nouvelle catégorie « Joueurs connectés » avec les pseudos en ligne.
+- Comptes et invités sont distingués.
+- Plusieurs connexions du même compte sont regroupées.
+- Actualisation automatique toutes les 10 secondes lorsque le panneau Admin est ouvert.
