@@ -107,18 +107,135 @@
         apply();
     }
 
-    function patchModeCategoryEvent() {
-        if (typeof window.modeCat !== 'function' || window.modeCat.__refactorWrapped) return;
-        const old = window.modeCat;
-        const wrapped = function () {
-            const r = old.apply(this, arguments);
+    /* Catégories robustes : on reprend le contrôle du filtre historique afin
+       qu'il fonctionne aussi avec les modes ajoutés dynamiquement après le chargement. */
+    function setupModeCategories(grid) {
+        const bar = document.getElementById('mode-cats');
+        if (!bar) return;
+
+        const CATS = [
+            ['all', '⭐ Tout'],
+            ['stream', '🎥 Avec le chat'],
+            ['bluff', '🕵️ Bluff & Undercover'],
+            ['quiz', '🧠 Quiz & mini-jeux'],
+            ['musique', '🎵 Musique'],
+            ['fun', '🎨 Dessin & fun'],
+            ['strat', '💰 Stratégie & tournois']
+        ];
+        const VALID = new Set(CATS.map(x => x[0]));
+        const STREAM_ARC = new Set(['attaque','emoji','quatre','mapguess','scene','link','imposteur','audio','plusmoins','survie','chaos']);
+        let current = 'all';
+        try { current = localStorage.getItem('modeCat') || 'all'; } catch (_) {}
+        if (!VALID.has(current)) current = 'all';
+
+        const directCards = () => [...grid.children].filter(c => !c.classList.contains('mc-stream-info'));
+        const titleOf = c => norm(c.querySelector('h3')?.textContent || c.textContent || '');
+
+        function categoriesFor(card) {
+            if (card.classList.contains('arc-menu')) return ['quiz','stream'];
+            const t = titleOf(card);
+            const cats = new Set();
+            const add = (...xs) => xs.forEach(x => cats.add(x));
+
+            if (/undercover/.test(t)) add('bluff');
+            if (/loup.?garou/.test(t)) add('bluff');
+            if (/devine le perso/.test(t)) add('bluff','quiz');
+            if (/devine la note|citation|chaine de persos|quiz des joueurs|animedle|rolland garos|roland garros/.test(t)) add('quiz');
+            if (/blind test|battle d.openings/.test(t)) add('musique','stream');
+            if (/tu preferes|qui a le plus|dessine le perso|tier list|jeu de connexion|party mix/.test(t)) add('fun');
+            if (/bingo anime/.test(t)) add('quiz','fun');
+            if (/combat de cartes|tournoi|enchere/.test(t)) add('strat');
+            if (/mini.jeux/.test(t)) add('quiz','stream');
+
+            // Un mode non classé reste accessible dans Quiz plutôt que de disparaître.
+            if (!cats.size) add('quiz');
+            return [...cats];
+        }
+
+        function refreshMeta() {
+            directCards().forEach(card => {
+                card.dataset.cat = categoriesFor(card).join(' ');
+            });
+            grid.querySelectorAll('.arc-game-btn').forEach(btn => {
+                const raw = btn.getAttribute('onclick') || '';
+                const m = raw.match(/openArcadeGame\(['\"]([^'\"]+)['\"]\)/);
+                if (m) btn.dataset.stream = STREAM_ARC.has(m[1]) ? '1' : '0';
+                else if (!btn.dataset.stream) btn.dataset.stream = '0';
+            });
+        }
+
+        function count(cat) {
+            if (cat === 'all') return directCards().length;
+            return directCards().filter(c => (c.dataset.cat || '').split(/\s+/).includes(cat)).length;
+        }
+
+        function rebuildButtons() {
+            bar.innerHTML = CATS.map(([id,label]) =>
+                `<button type="button" data-mode-cat="${id}" class="${id === current ? 'on' : ''}${id === 'stream' ? ' stream' : ''}">${label}${id !== 'all' ? `<b>${count(id)}</b>` : ''}</button>`
+            ).join('');
+        }
+
+        function apply(cat, doScroll = true) {
+            if (!VALID.has(cat)) cat = 'all';
+            current = cat;
+            refreshMeta();
+            try { localStorage.setItem('modeCat', cat); } catch (_) {}
+
+            directCards().forEach(card => {
+                const cats = (card.dataset.cat || '').split(/\s+/);
+                card.classList.toggle('mc-hidden', cat !== 'all' && !cats.includes(cat));
+            });
+
+            const info = grid.querySelector(':scope > .mc-stream-info');
+            if (info) info.classList.toggle('mc-hidden', cat !== 'stream');
+
+            grid.querySelectorAll('.arc-game-btn').forEach(btn => {
+                btn.classList.toggle('mc-hidden', cat === 'stream' && btn.dataset.stream !== '1');
+            });
+
+            const arc = grid.querySelector(':scope > .arc-menu');
+            if (arc) {
+                arc.classList.toggle('arc-stream-view', cat === 'stream');
+                const mh = arc.querySelector('h3');
+                if (mh) {
+                    mh.dataset.orig = mh.dataset.orig || mh.textContent;
+                    mh.textContent = cat === 'stream' ? '🕹️ Mini-jeux jouables avec le chat' : mh.dataset.orig;
+                }
+            }
+
+            bar.querySelectorAll('[data-mode-cat]').forEach(b => b.classList.toggle('on', b.dataset.modeCat === cat));
             window.dispatchEvent(new Event('mode-category-changed'));
-            const arc = document.querySelector('#menu-selection .arc-menu');
-            if (arc) arc.classList.toggle('arc-stream-view', arguments[0] === 'stream');
-            return r;
-        };
-        wrapped.__refactorWrapped = true;
-        window.modeCat = wrapped;
+            if (doScroll) bar.scrollIntoView({ block:'nearest', behavior:'smooth' });
+        }
+
+        function refreshAll() {
+            refreshMeta();
+            rebuildButtons();
+            apply(current, false);
+        }
+
+        // Plus d'onclick inline fragile : une délégation unique fonctionne sur PC et mobile.
+        if (bar.dataset.agCatsBound !== '1') {
+            bar.dataset.agCatsBound = '1';
+            bar.addEventListener('click', e => {
+                const btn = e.target.closest('[data-mode-cat]');
+                if (!btn || !bar.contains(btn)) return;
+                e.preventDefault();
+                apply(btn.dataset.modeCat, true);
+            });
+        }
+
+        const controller = cat => apply(cat, true);
+        controller.__refactorWrapped = true;
+        window.modeCat = controller;
+        refreshAll();
+
+        // Les nouveaux modes / mini-jeux peuvent arriver après le chargement du menu.
+        let refreshTimer = null;
+        new MutationObserver(() => {
+            clearTimeout(refreshTimer);
+            refreshTimer = setTimeout(refreshAll, 20);
+        }).observe(grid, { childList:true, subtree:true });
     }
 
     function init() {
@@ -132,14 +249,13 @@
         grid.classList.add('game-library-grid');
         markCards(grid);
         setupMiniGames(grid);
-        patchModeCategoryEvent();
+        setupModeCategories(grid);
         setupSearch(menu, grid);
 
         // Les nouveaux modes peuvent être injectés après le DOMContentLoaded.
         new MutationObserver(() => {
             markCards(grid);
             setupMiniGames(grid);
-            patchModeCategoryEvent();
         }).observe(grid, { childList: true, subtree: true });
     }
 
@@ -169,7 +285,12 @@
         if (!active) return false;
         if (active.id !== 'mode') return true;
         const menu = q('#menu-selection');
-        return !!menu && getComputedStyle(menu).display !== 'none';
+        if (!menu) return false;
+        // Le code historique masque le menu en inline quand un salon / jeu s'ouvre.
+        // On teste d'abord cette valeur car le dashboard mobile utilise des !important
+        // et ne doit jamais ressusciter visuellement un menu que le jeu vient de fermer.
+        if (menu.style.display === 'none') return false;
+        return getComputedStyle(menu).display !== 'none';
     }
 
     function buildShell() {
@@ -598,34 +719,78 @@
         syncEvent();
     }
 
-    // Sur PC, le dashboard ne doit exister que sur le menu principal.
-    // Dès que le code historique masque #menu-selection pour ouvrir un salon,
-    // une sélection d'univers ou une partie, on retire immédiatement le shell
-    // et on remonte en haut de la vraie page de jeu.
-    function setupDesktopGamePageTransition() {
+    // PC + MOBILE : salon / sélection / partie = vraie page dédiée.
+    // Sur iPhone, un simple scrollTo(0,0) peut être ignoré pendant un changement
+    // de layout : on détecte donc la page de jeu, on masque le shell et on recale
+    // plusieurs fois le panneau actif en haut.
+    const GAME_PAGE_IDS = [
+        'waiting-room','gameplay-room','rg-room','enchere-room','enchereaveugle-room',
+        'connexion-room','dle-room','quote-room','blindtest-room','arcade-room',
+        'draw-room','guess-room','chaine-room','lg-room','uq-room',
+        'quote-universe-selection','theme-selection-container'
+    ];
+
+    function visibleGamePanel() {
+        for (const id of GAME_PAGE_IDS) {
+            const el = q('#' + id);
+            if (!el) continue;
+            const cs = getComputedStyle(el);
+            if (cs.display !== 'none' && cs.visibility !== 'hidden') return el;
+        }
+        return null;
+    }
+
+    function forceGamePageTop() {
+        const panel = visibleGamePanel();
+        try { window.scrollTo({ top:0, left:0, behavior:'auto' }); } catch (_) { window.scrollTo(0,0); }
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (panel) {
+            try { panel.scrollIntoView({ block:'start', inline:'nearest', behavior:'auto' }); } catch (_) {}
+        }
+    }
+
+    function setupGamePageTransition() {
         const menu = q('#menu-selection');
-        if (!menu || menu.dataset.agGamePageWatch === '1') return;
+        const app = q('#app-root');
+        if (!menu || !app || menu.dataset.agGamePageWatch === '1') return;
         menu.dataset.agGamePageWatch = '1';
 
-        let lastHidden = null;
+        let wasGamePage = false;
         const refresh = () => {
-            if (!isDesktop()) return;
-            const hidden = menu.style.display === 'none' || getComputedStyle(menu).display === 'none';
+            const inlineHidden = menu.style.display === 'none';
+            const panel = visibleGamePanel();
+            const gamePage = inlineHidden || !!panel;
+
+            document.body.classList.toggle('ag-game-page', gamePage);
+            app.classList.toggle('ag-game-page', gamePage);
+            if (gamePage) closeMobileMenu();
+
+            // syncShell() lit d'abord l'état inline du menu et retire le dashboard.
             syncAll();
-            if (hidden && lastHidden !== true) {
-                // Comportement d'avant : le salon / jeu commence en haut de page.
-                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+            if (gamePage && !wasGamePage) {
+                forceGamePageTop();
+                requestAnimationFrame(forceGamePageTop);
+                setTimeout(forceGamePageTop, 40);
+                setTimeout(forceGamePageTop, 140);
+                setTimeout(forceGamePageTop, 320);
             }
-            lastHidden = hidden;
+            wasGamePage = gamePage;
         };
 
-        new MutationObserver(refresh).observe(menu, { attributes: true, attributeFilter: ['style'] });
+        const observer = new MutationObserver(refresh);
+        observer.observe(menu, { attributes:true, attributeFilter:['style','class'] });
+        GAME_PAGE_IDS.forEach(id => {
+            const el = q('#' + id);
+            if (el) observer.observe(el, { attributes:true, attributeFilter:['style','class'] });
+        });
         refresh();
     }
 
     function init() {
         buildShell();
-        setupDesktopGamePageTransition();
+        setupGamePageTransition();
         syncAll();
         window.addEventListener('resize', syncAll, { passive:true });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
