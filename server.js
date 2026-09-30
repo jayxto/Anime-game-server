@@ -20805,7 +20805,7 @@ setTimeout(() => {
    PARTY MIX + COMBAT DE CARTES + BINGO ANIME
    - Party Mix : 3 à 8 épreuves, score cumulé, aucune élimination
    - Combat de cartes : 1v1, deck équipé de 5 cartes, rareté cosmétique
-   - Bingo Anime : grille privée 4x4, score libre (+1/-1), chrono 60s ou infini
+   - Bingo Anime : grille privée 3x3, univers au choix, score libre (+1/-1), chrono 60s ou infini
    ===================================================================== */
 
 ARC_GAMES.partymix  = { label:'Party Mix',          icon:'🎮', universe:false, rounds:1,  roundMs:18000, answer:'choice' };
@@ -20957,7 +20957,7 @@ const BINGO_TRAITS = [
     {id:'ghoul',label:'Goule',emoji:'🩸'}, {id:'titan',label:'Titan',emoji:'🗿'}, {id:'eye',label:'Pouvoir des yeux',emoji:'👁️'}, {id:'transform',label:'Transformation',emoji:'🔄'}, {id:'villain',label:'Antagoniste / méchant',emoji:'🦹'}
 ];
 const BINGO_TRAIT_BY_ID = Object.fromEntries(BINGO_TRAITS.map(x => [x.id, x]));
-const BINGO_SIZE = 4;
+const BINGO_SIZE = 3;
 const BINGO_CELL_COUNT = BINGO_SIZE * BINGO_SIZE;
 
 // Le Bingo ne dépend pas uniquement des champs DLE : on réutilise aussi les liens
@@ -21083,30 +21083,57 @@ function bingoCatalog() {
     BINGO_CATALOG_CACHE = out;
     return out;
 }
-function bingoNewBoardCells() {
-    return arcShuffle(BINGO_TRAITS.map(x => x.id)).slice(0, BINGO_CELL_COUNT);
+function bingoSubSettings(subMode) {
+    const p = String(subMode || '').split(':');
+    let duration = '60', spec = 'all';
+    if (p[0] === 'bingo') {
+        if (/^(60|inf)$/i.test(p[1] || '')) { duration = String(p[1]).toLowerCase(); spec = p[2] || 'all'; }
+        else if (p[1]) spec = p[1]; // compat ancienne URL bingo:naruto
+    }
+    const all = arcUniverses();
+    let universes = spec === 'all' ? all : [...new Set(String(spec).split('+').filter(u => all.includes(u)))];
+    if (!universes.length) { universes = all; spec = 'all'; }
+    else spec = universes.length === all.length ? 'all' : universes.join('+');
+    return { durationMs:duration === 'inf' ? null : 60000, infinite:duration === 'inf', universeSpec:spec, universes };
+}
+function bingoCatalogForUniverses(universes) {
+    const set = new Set(Array.isArray(universes) && universes.length ? universes : arcUniverses());
+    return bingoCatalog().filter(c => set.has(c.u));
+}
+function bingoAvailableTraitIds(universes) {
+    const ids = new Set();
+    for (const c of bingoCatalogForUniverses(universes)) for (const t of c.tags || []) if (BINGO_TRAIT_BY_ID[t]) ids.add(t);
+    return [...ids];
+}
+function bingoNewBoardCells(allowedIds) {
+    const base = (allowedIds || []).filter(id => BINGO_TRAIT_BY_ID[id]);
+    if (!base.length) return arcShuffle(BINGO_TRAITS.map(x => x.id)).slice(0, BINGO_CELL_COUNT);
+    const out = arcShuffle(base).slice(0, BINGO_CELL_COUNT);
+    // Un univers très pauvre peut avoir moins de 9 catégories distinctes : on complète
+    // seulement avec des catégories qui ont réellement au moins un personnage valide.
+    while (out.length < BINGO_CELL_COUNT) out.push(arcPick(base));
+    return out;
 }
 function bingoRerollCell(board, idx) {
     if (!board || !Number.isInteger(idx) || idx < 0 || idx >= board.cells.length) return;
-    const old = board.cells[idx], visible = new Set(board.cells);
-    let pool = BINGO_TRAITS.map(x => x.id).filter(id => id !== old && !visible.has(id));
-    if (!pool.length) pool = BINGO_TRAITS.map(x => x.id).filter(id => id !== old);
+    const old = board.cells[idx], visible = new Set(board.cells), allowed = (board.allowed || BINGO_TRAITS.map(x => x.id)).filter(id => BINGO_TRAIT_BY_ID[id]);
+    let pool = allowed.filter(id => id !== old && !visible.has(id));
+    if (!pool.length) pool = allowed.filter(id => id !== old);
+    if (!pool.length) pool = allowed.slice();
     if (pool.length) board.cells[idx] = arcPick(pool);
 }
 function bingoSendBoard(socketId, g) {
     const b = g?.bingo?.boards?.[socketId]; if (!b) return;
     io.to(socketId).emit('arc_bingo_board', { size:BINGO_SIZE, cells:b.cells.map(id => ({ ...BINGO_TRAIT_BY_ID[id], marked:false })) });
 }
-function bingoDurationFromSub(subMode) {
-    const m = /^bingo:(60|inf)$/i.exec(String(subMode || ''));
-    return m && m[1].toLowerCase() === 'inf' ? null : 60000;
-}
+function bingoDurationFromSub(subMode) { return bingoSubSettings(subMode).durationMs; }
 async function bingoNextCharacter(room, roomCode, socketId) {
     const g = arcGames[roomCode], b = g?.bingo?.boards?.[socketId];
     if (!g || g.dead || g.game !== 'bingo' || g.phase !== 'playing' || !b) return;
     const used = g.bingo.used[socketId] || (g.bingo.used[socketId] = new Set());
-    let pool = bingoCatalog().filter(c => c.tags.some(t => b.cells.includes(t)) && !used.has(c.u+'|'+normalizeRG(c.name)));
-    if (!pool.length) { used.clear(); pool = bingoCatalog().filter(c => c.tags.some(t => b.cells.includes(t))); }
+    const catalog = bingoCatalogForUniverses(g.bingo.universes);
+    let pool = catalog.filter(c => c.tags.some(t => b.cells.includes(t)) && !used.has(c.u+'|'+normalizeRG(c.name)));
+    if (!pool.length) { used.clear(); pool = catalog.filter(c => c.tags.some(t => b.cells.includes(t))); }
     const c = arcPick(pool); if (!c) return;
     used.add(c.u+'|'+normalizeRG(c.name));
     let img = c.img || null;
@@ -21125,7 +21152,7 @@ function bingoFinish(room, roomCode) {
     room.status='arc_over'; arcEmit(room,roomCode);
     if (!g.recorded) {
         g.recorded=true;
-        progRecord(room,'arcade:bingo','all',room.players.map(p=>({ player:p, points:Math.max(0,g.scores[p.id]||0), won:room.players.length>1 && (g.scores[p.id]||0)===best })));
+        progRecord(room,'arcade:bingo',g.universe || 'all',room.players.map(p=>({ player:p, points:Math.max(0,g.scores[p.id]||0), won:room.players.length>1 && (g.scores[p.id]||0)===best })));
     }
 }
 
@@ -21171,14 +21198,15 @@ startArcade = function (room, roomCode) {
 
     if (parsed.game === 'bingo') {
         arcStop(roomCode);
-        const durationMs = bingoDurationFromSub(room.subMode), boards={}, used={}, current={}, stats={};
-        room.players.forEach(p => { boards[p.id]={ cells:bingoNewBoardCells() }; used[p.id]=new Set(); stats[p.id]={correct:0,wrong:0,attempts:0}; });
+        const settings = bingoSubSettings(room.subMode), durationMs = settings.durationMs, boards={}, used={}, current={}, stats={};
+        const allowedTraits = bingoAvailableTraitIds(settings.universes);
+        room.players.forEach(p => { boards[p.id]={ cells:bingoNewBoardCells(allowedTraits), allowed:allowedTraits.slice() }; used[p.id]=new Set(); stats[p.id]={correct:0,wrong:0,attempts:0}; });
         const now=Date.now();
         const g = {
-            game:'bingo', universe:'all', round:0, totalRounds:null, phase:'playing', current:null,
+            game:'bingo', universe:settings.universeSpec, round:0, totalRounds:null, phase:'playing', current:null,
             answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
-            used:new Set(), usedU:[], lastGuess:{}, startedAt:now, endsAt:durationMs?now+durationMs:null,
-            bingo:{ boards, used, current, stats, durationMs, infinite:!durationMs }
+            used:new Set(), usedU:settings.universes.slice(), lastGuess:{}, startedAt:now, endsAt:durationMs?now+durationMs:null,
+            bingo:{ boards, used, current, stats, durationMs, infinite:settings.infinite, universes:settings.universes.slice(), allowedTraits }
         };
         arcGames[roomCode]=g; room.status='arc_playing';
         arcEmit(room,roomCode);
