@@ -108,12 +108,24 @@
             };
             const bonusOf = c => (dk.rules[c.rarity] || 0) + (c.shiny ? 2 : 0) + (c.finish ? (dk.finDeck[c.finish] || 0) : 0);
             deckPctLocal = function () { let p = 0; dk.keys.forEach(k => { const c = dk.cards.find(x => x.key === k); if (c) p += bonusOf(c); }); return p; };
+            window.deckEquipBest = async function () {
+                const playable = (dk.cards || []).filter(c => c && c.key && !String(c.key).startsWith('moment|') && !String(c.key).startsWith('collector|'));
+                if (!playable.length) return toast('Tu n’as aucune carte jouable dans le deck.', 'var(--accent-pink)');
+                const best = playable.slice().sort((a, b) => bonusOf(b) - bonusOf(a) || rIdx(a.rarity) - rIdx(b.rarity) || String(a.name || '').localeCompare(String(b.name || ''), 'fr')).slice(0, 5);
+                dk.keys = best.map(c => c.key);
+                deckRender();
+                const d = await v7post('/api/deck', { keys: dk.keys });
+                if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible d’enregistrer le deck'), 'var(--accent-pink)');
+                dk.pct = d.pct;
+                toast(`⚡ Meilleur deck équipé : +${d.pct} % de pièces`, '#00ff88');
+                deckRender();
+            };
             deckRender = function () {
                 const el = document.getElementById('eco-deck'); if (!el) return;
                 const slot = i => { const c = dk.cards.find(x => x.key === dk.keys[i]); return c ? `<div class="dk-slot" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${cardHtml({ ...c, n: 1 })}<small>+${bonusOf(c)} %</small></div>` : `<div class="dk-slot empty">＋<small>Emplacement ${i + 1}</small></div>`; };
                 el.innerHTML = `<div class="shop-head">🎴 Ton deck : <b>+${deckPctLocal()} %</b> de pièces à chaque partie <span class="tl-hint">• Commune +2 %, Rare +4 %, Épique +6 %, Légendaire +10 %, Mythique +14 %, Duo +16 %, Secrète +20 %, Éveillée +22 %, Divine +25 %, Cosmique +30 %, Légende vivante +35 %, Éternelle +40 %, Oméga +50 %, brillante +2 % • <b>finitions</b> : Holo / Reverse +1 %, Pailletée +2 %, Gold / Dark +4 %, Full Art / Manga +5 %, Galaxie +6 %, Glitch +7 %, Signée +8 %, Numérotée +10 % • bonus doublé si la partie est sur l’anime de la carte</span></div>
                     <div class="dk-slots">${[0, 1, 2, 3, 4].map(slot).join('')}</div>
-                    <div style="display:flex;justify-content:flex-end;"><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
+                    <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;"><button class="host-btn" style="width:auto;margin:0;" onclick="deckEquipBest()">⚡ Équiper les 5 meilleures</button><button class="btn-action" style="width:auto;margin:0;" onclick="deckSave()">💾 Enregistrer</button></div>
                     ${cardFilterBar(dk.f, dk.cards)}<div class="cf-count" id="dk-count"></div><div class="pg-bar" id="dk-pg1"></div><div class="trd-list dk-list" id="dk-list"></div><div class="pg-bar" id="dk-pg2"></div>`;
                 cardFilterBind(el, dk.f, () => { dk.page = 1; deckList(); });
                 deckList();
