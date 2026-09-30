@@ -2705,7 +2705,7 @@
         </div>
         <div class="opt-panel">
             <h2>🤖 Bots de test</h2>
-            <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
+            <p class="tl-hint" style="text-align:left;">Crée ou rejoins un salon : dans le salon d'attente, la barre « Bots de test » est disponible pour les admins et bêta testeurs. Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand il n'y a plus de joueur réel.</p>
         </div>
         <div class="opt-panel">
             <h2>🧑‍🎤 Ajouter un perso</h2>
@@ -9500,7 +9500,7 @@
             window.IS_BETA = !!(bt && bt.beta);
             const bb2 = document.getElementById('btn-beta'); if (bb2) bb2.parentElement.style.display = window.IS_BETA && !window.IS_ADMIN ? '' : 'none';
             if (window.IS_ADMIN) betaAdminLoad();
-            const bb = document.getElementById('admin-bots-box'); if (bb) bb.style.display = window.IS_ADMIN ? 'flex' : 'none';
+            const bb = document.getElementById('admin-bots-box'); if (bb) bb.style.display = (window.IS_ADMIN || window.IS_BETA) ? 'flex' : 'none';
         }
         socket.on('connect', () => setTimeout(checkAdmin, 700));
         async function loadAdmin() {

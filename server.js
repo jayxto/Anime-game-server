@@ -15801,25 +15801,42 @@ function botTick(b) {
         return;
     }
 }
-app.post('/api/admin/bots', adminOnly(async (req, res) => {
-    const b = req.body || {};
-    const code = String(b.roomCode || '');
-    if (!rooms[code]) return res.json({ ok: false, error: 'Salon introuvable.' });
-    if (b.remove) {
-        let n = 0;
-        [...ALL_BOTS].forEach(bot => { if (bot.room === code) { botKill(bot); n++; } });
-        return res.json({ ok: true, removed: n });
+app.post('/api/admin/bots', async (req, res) => {
+    try {
+        const uid = authUserId(req);
+        const admin = await isAdmin(req);
+        const beta = !!uid && await isBetaUid(uid);
+        if (!admin && !beta) return res.status(403).json({ ok: false, error: 'Réservé aux admins et bêta testeurs.' });
+
+        const b = req.body || {};
+        const code = String(b.roomCode || '');
+        const room = rooms[code];
+        if (!room) return res.json({ ok: false, error: 'Salon introuvable.' });
+
+        // Un bêta-testeur peut manipuler les bots uniquement dans un salon où son compte est présent.
+        // Les admins conservent leur accès global de test.
+        if (!admin && !room.players.some(p => p && p.userId === uid && !p.disconnected)) {
+            return res.status(403).json({ ok: false, error: 'Tu dois être dans ce salon pour y ajouter des bots.' });
+        }
+
+        if (b.remove) {
+            let n = 0;
+            [...ALL_BOTS].forEach(bot => { if (bot.room === code) { botKill(bot); n++; } });
+            return res.json({ ok: true, removed: n });
+        }
+        const n = Math.max(1, Math.min(8, +b.n || 1));
+        const out = [];
+        for (let i = 0; i < n; i++) {
+            const r = botSpawn(code, b.skill);
+            if (!r.ok) return res.json(r);
+            out.push(r.name);
+            await new Promise(r2 => setTimeout(r2, 120));
+        }
+        res.json({ ok: true, names: out });
+    } catch (e) {
+        res.status(500).json({ ok: false, error: e.message });
     }
-    const n = Math.max(1, Math.min(8, +b.n || 1));
-    const out = [];
-    for (let i = 0; i < n; i++) {
-        const r = botSpawn(code, b.skill);
-        if (!r.ok) return res.json(r);
-        out.push(r.name);
-        await new Promise(r2 => setTimeout(r2, 120));
-    }
-    res.json({ ok: true, names: out });
-}));
+});
 
 /* =====================================================================
    DESSINE LE PERSO : MODE STREAM — le streamer dessine, le chat Twitch/TikTok
