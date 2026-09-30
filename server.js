@@ -370,22 +370,130 @@ async function fetchFandomPageImageBySearch(host, name) {
     return pages.length ? pageImageFromApiPage(pages[0]) : null;
 }
 
-// Image vérifiée de chaque perso (char-images.json) : prioritaire, jamais de perso sans image
-// même si Fandom ne répond pas ou si une ancienne recherche ratée est restée en cache.
+// Images personnages : statiques vérifiées + thèmes + Fandom + secours AniList.
+// Les anciens "missing" en base ne bloquent plus définitivement une image : ils sont retentés
+// au redémarrage puis avec un délai, ce qui permet de réparer les photos sans vider la DB.
 const STATIC_CHAR_IMAGES = (() => {
     try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'char-images.json'), 'utf8')); }
     catch (e) { console.warn('[Images] char-images.json introuvable :', e.message); return {}; }
 })();
+
+const THEME_CHAR_IMAGES = (() => {
+    const out = {};
+    const add = (universeKey, name, img) => {
+        if (!universeKey || !name || !img) return;
+        const key = normalizeImageKey(cleanImageCharacterName(name));
+        if (!key) return;
+        out[universeKey] = out[universeKey] || {};
+        if (!out[universeKey][key]) out[universeKey][key] = img;
+    };
+    for (const file of ['qap-themes.json', 'tierlist-themes.json']) {
+        try {
+            const themes = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8')).themes || [];
+            for (const theme of themes) {
+                if (theme.kind !== 'chars') continue;
+                for (const item of (theme.items || [])) {
+                    const u = resolveImageUniverseKey(item.sub);
+                    add(u, item.name, item.img);
+                }
+            }
+        } catch (_) {}
+    }
+    return out;
+})();
+
 function staticCharImage(universeKey, name) {
-    const m = STATIC_CHAR_IMAGES[universeKey];
-    return m && name ? m[normalizeImageKey(cleanImageCharacterName(name))] || null : null;
+    if (!name) return null;
+    const key = normalizeImageKey(cleanImageCharacterName(name));
+    return STATIC_CHAR_IMAGES[universeKey]?.[key]
+        || THEME_CHAR_IMAGES[universeKey]?.[key]
+        || null;
+}
+
+const IMAGE_ANILIST_MEDIA_HINTS = {
+    naruto:[/naruto/i,/boruto/i], onepiece:[/one piece/i], bleach:[/bleach/i],
+    hxh:[/hunter x hunter/i,/hunter × hunter/i], snk:[/shingeki no kyojin/i,/attack on titan/i],
+    sds:[/nanatsu no taizai/i,/seven deadly sins/i], deathnote:[/death note/i],
+    cote:[/youkoso jitsuryoku/i,/classroom of the elite/i], solo:[/solo leveling/i,/ore dake level up/i],
+    clover:[/black clover/i], fireforce:[/enen no shouboutai/i,/fire force/i],
+    mushoku:[/mushoku tensei/i], rezero:[/re:?zero/i], fairy:[/fairy tail/i],
+    bluelock:[/blue lock/i], fma:[/fullmetal alchemist/i,/hagane no renkinjutsushi/i],
+    chainsaw:[/chainsaw man/i], wakfu:[/wakfu/i], demonslayer:[/kimetsu no yaiba/i,/demon slayer/i],
+    pokemon:[/pok[eé]mon/i,/pokemon/i], dragonball:[/dragon ball/i],
+    hellsparadise:[/jigokuraku/i,/hell'?s paradise/i], gachiakuta:[/gachiakuta/i],
+    haikyuu:[/haikyuu/i], jjk:[/jujutsu kaisen/i], jojo:[/jojo/i,/jojo'?s bizarre adventure/i],
+    tensura:[/tensei shitara slime/i,/tensura/i,/that time i got reincarnated as a slime/i],
+    opm:[/one punch man/i], sao:[/sword art online/i], tokyoghoul:[/tokyo ghoul/i],
+    tokyorevengers:[/tokyo revengers/i]
+};
+const CHARACTER_ANILIST_CACHE = new Map();
+const CHARACTER_IMAGE_RETRY_AT = new Map();
+
+function imageNameScore(wantedName, candidateNames) {
+    const wanted = normalizeImageKey(wantedName);
+    if (!wanted) return 0;
+    let best = 0;
+    const wt = new Set(wanted.split(' ').filter(Boolean));
+    for (const raw of candidateNames.filter(Boolean)) {
+        const n = normalizeImageKey(raw);
+        if (!n) continue;
+        if (n === wanted) best = Math.max(best, 100);
+        else if (n.includes(wanted) || wanted.includes(n)) best = Math.max(best, 55);
+        const nt = new Set(n.split(' ').filter(Boolean));
+        let overlap = 0;
+        wt.forEach(t => { if (nt.has(t)) overlap++; });
+        best = Math.max(best, overlap * 18);
+    }
+    return best;
+}
+
+async function fetchAniListCharacterImage(universeKey, name) {
+    const cacheKey = `${universeKey}|${normalizeImageKey(name)}`;
+    if (CHARACTER_ANILIST_CACHE.has(cacheKey)) return CHARACTER_ANILIST_CACHE.get(cacheKey);
+
+    const query = `query($s:String){Page(perPage:12){characters(search:$s,sort:FAVOURITES_DESC){
+        id name{full native alternative} image{large}
+        media(perPage:20,sort:POPULARITY_DESC){nodes{type title{romaji english native}}}
+    }}}`;
+    let hit = null;
+    try {
+        const r = await fetch('https://graphql.anilist.co', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json','User-Agent':'AnimeGame/1.0'},
+            body:JSON.stringify({ query, variables:{ s:name } }),
+            signal:AbortSignal.timeout(12000)
+        });
+        if (!r.ok) throw new Error(`AniList HTTP ${r.status}`);
+        const d = await r.json();
+        const chars = d?.data?.Page?.characters || [];
+        const hints = IMAGE_ANILIST_MEDIA_HINTS[universeKey] || [];
+        let best = null, bestScore = -1;
+        for (const c of chars) {
+            if (!c?.image?.large || /default\.jpg$/i.test(c.image.large)) continue;
+            const nScore = imageNameScore(name, [c.name?.full, c.name?.native, ...(c.name?.alternative || [])]);
+            const titles = (c.media?.nodes || []).flatMap(m => [m?.title?.romaji, m?.title?.english, m?.title?.native]).filter(Boolean);
+            const mediaOk = !hints.length || titles.some(t => hints.some(rx => rx.test(t)));
+            if (!mediaOk || nScore < 18) continue;
+            const score = nScore + 120 + Math.min(20, titles.length);
+            if (score > bestScore) { bestScore = score; best = c; }
+        }
+        if (best) hit = {
+            imageUrl:best.image.large,
+            sourceUrl:`https://anilist.co/character/${best.id}`,
+            title:best.name?.full || name
+        };
+    } catch (_) {}
+    CHARACTER_ANILIST_CACHE.set(cacheKey, hit);
+    if (CHARACTER_ANILIST_CACHE.size > 4000) CHARACTER_ANILIST_CACHE.delete(CHARACTER_ANILIST_CACHE.keys().next().value);
+    return hit;
 }
 
 async function resolveCharacterImage(universeKey, displayName) {
     const fixed = staticCharImage(universeKey, displayName);
     if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
+
     const host = FANDOM_WIKIS[universeKey];
-    if (!host || !displayName) {
+    if ((!host && universeKey !== 'pokemon') || !displayName) {
         return { imageUrl:null, sourceUrl:null, status:'unsupported' };
     }
 
@@ -393,41 +501,44 @@ async function resolveCharacterImage(universeKey, displayName) {
     const cacheKey = `${universeKey}|${normalizeImageKey(cleanName)}`;
 
     const cached = await getCachedCharacterImage(universeKey, cleanName);
-    // Un "ok" est permanent. Un missing de plus de 7 jours peut être retenté côté DB
-    // lors d'un futur nettoyage; ici on évite de spammer Fandom.
-    if (cached) return cached;
-
-    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) {
-        return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
+    if (cached?.imageUrl) return cached;
+    if (cached && !cached.imageUrl) {
+        const retryAt = CHARACTER_IMAGE_RETRY_AT.get(cacheKey) || 0;
+        if (Date.now() < retryAt) return cached;
+        CHARACTER_IMAGE_RETRY_AT.set(cacheKey, Date.now() + 6 * 60 * 60 * 1000);
     }
+
+    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
 
     const task = (async () => {
         try {
-            // Les alias DLE servent aussi pour les recherches d'images.
             let searchName = cleanName;
             try {
                 const n = normalizeImageKey(cleanName);
-                const alias = typeof DLE_MASTER_ALIASES !== 'undefined'
-                    ? DLE_MASTER_ALIASES[universeKey]?.[n]
-                    : null;
+                const alias = typeof DLE_MASTER_ALIASES !== 'undefined' ? DLE_MASTER_ALIASES[universeKey]?.[n] : null;
                 if (alias && typeof DLE_MASTER_NAMES !== 'undefined') {
-                    const found = (DLE_MASTER_NAMES[universeKey] || [])
-                        .find(x => normalizeImageKey(x) === alias);
+                    const found = (DLE_MASTER_NAMES[universeKey] || []).find(x => normalizeImageKey(x) === alias);
                     if (found) searchName = found;
                 }
             } catch (_) {}
 
-            let hit = await fetchFandomPageImageByExactTitle(host, searchName);
-            if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
+            let hit = null;
+            if (host) {
+                hit = await fetchFandomPageImageByExactTitle(host, searchName);
+                if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
+                if (!hit && searchName !== cleanName) hit = await fetchFandomPageImageBySearch(host, cleanName);
+            }
+            if (!hit) hit = await fetchAniListCharacterImage(universeKey, searchName);
+            if (!hit && searchName !== cleanName) hit = await fetchAniListCharacterImage(universeKey, cleanName);
 
             const result = hit
-                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl, status:'ok' }
+                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl || null, status:'ok' }
                 : { imageUrl:null, sourceUrl:null, status:'missing' };
 
             await saveCachedCharacterImage(universeKey, cleanName, result);
             return result;
         } catch (e) {
-            console.warn(`[Fandom image] ${universeKey}/${cleanName}:`, e.message);
+            console.warn(`[Character image] ${universeKey}/${cleanName}:`, e.message);
             return { imageUrl:null, sourceUrl:null, status:'error' };
         } finally {
             CHARACTER_IMAGE_INFLIGHT.delete(cacheKey);
@@ -11863,7 +11974,18 @@ const TLT_THEMES = (() => {
     catch (e) { console.warn('[Tier list] tierlist-themes.json introuvable :', e.message); return []; }
 })();
 const TLT_BY_ID = Object.fromEntries(TLT_THEMES.map(t => [t.id, t]));
-const tltItems = id => id === 'opening' ? arcOpeningItems() : TLT_BY_ID[id] ? TLT_BY_ID[id].items : null;
+function tltUniqueItems(items) {
+    if (!Array.isArray(items)) return items;
+    const seen = new Set(), out = [];
+    for (const item of items) {
+        const key = normalizeImageKey(item?.name || '');
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(item);
+    }
+    return out;
+}
+const tltItems = id => id === 'opening' ? tltUniqueItems(arcOpeningItems()) : TLT_BY_ID[id] ? tltUniqueItems(TLT_BY_ID[id].items) : null;
 app.get('/api/tl/themes', (req, res) => res.json({ ok: true, themes: [{ id: 'opening', title: 'Tier list openings', emoji: '🎶', kind: 'openings' }, ...TLT_THEMES].map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: (tltItems(t.id) || []).length })) }));
 
 function arcItemsFor(source) {
@@ -14684,9 +14806,11 @@ app.get('/api/avatar/search', (req, res) => {
     res.json({ ok: true, results: out.slice(0, 24) });
 });
 app.get('/api/avatar/img', async (req, res) => {
-    const c = avatarFind(String(req.query.u || ''), String(req.query.n || ''));
-    if (!c) return res.status(404).end();
-    const url = await arcCharImage(String(req.query.u), c.raw);
+    const u = String(req.query.u || '');
+    const requested = String(req.query.n || '').trim();
+    if (!ARC_UNIVERSE_ANIME[u] || !requested) return res.status(404).end();
+    const c = avatarFind(u, requested);
+    const url = await arcCharImage(u, c ? c.raw : requested);
     if (!url) return res.status(404).end();
     res.redirect('/api/img?u=' + encodeURIComponent(url));
 });
@@ -18388,9 +18512,20 @@ app.get('/api/tl/search', async (req, res) => {
     } catch (e) { res.json({ ok: false, error: 'Recherche indisponible, réessaie.' }); }
 });
 const TL_IMG_OK = u => { try { const h = new URL(u).hostname; return /^https:/.test(u) && ARC_IMG_HOSTS.test(h); } catch (_) { return false; } };
+function tlUniqueSavedItems(items) {
+    const seen = new Set(), out = [];
+    for (const item of (Array.isArray(items) ? items : [])) {
+        const key = normalizeImageKey(item?.name || '');
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(item);
+    }
+    return out;
+}
 function utlView(t, uid) {
     const rs = Object.values(t.ratings || {});
-    return { id: t.id, title: t.title, author: t.author, mine: t.authorId === uid, plays: t.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (t.ratings || {})[uid] || null : null, created: t.created, n: t.items.length, cover: t.items.slice(0, 4).map(i => i.img).filter(Boolean) };
+    const uniqueItems = tlUniqueSavedItems(t.items);
+    return { id: t.id, title: t.title, author: t.author, mine: t.authorId === uid, plays: t.plays || 0, rating: rs.length ? Math.round(10 * rs.reduce((a, b) => a + b, 0) / rs.length) / 10 : null, votes: rs.length, myRating: uid ? (t.ratings || {})[uid] || null : null, created: t.created, n: uniqueItems.length, cover: uniqueItems.slice(0, 4).map(i => i.img).filter(Boolean) };
 }
 app.get('/api/tl/community', async (req, res) => {
     const uid = authUserId(req);
@@ -18405,7 +18540,7 @@ app.get('/api/tl/one', async (req, res) => {
     const t = await kvGet('utl', String(req.query.id || ''), null);
     if (!t || t.deleted) return res.json({ ok: false, error: 'Tier list introuvable.' });
     if (req.query.play) { t.plays = (t.plays || 0) + 1; kvSet('utl', t.id, t); }
-    res.json({ ok: true, tl: utlView(t, uid), items: t.items });
+    res.json({ ok: true, tl: utlView(t, uid), items: tlUniqueSavedItems(t.items) });
 });
 app.post('/api/tl/create', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -19308,23 +19443,48 @@ app.post('/api/admin/money/grant', adminOnly(async (req, res) => {
    ===================================================================== */
 
 /* ---------- PLUS OU MOINS : deux persos, lequel est le plus fort / le plus populaire ---------- */
-const PM_BASE_AUDITED = ['naruto', 'onepiece', 'bleach', 'sds', 'clover', 'fairy'];
-const pmBaseName = n => String(n || '').replace(/\s+[—–-]\s+.*$/, '').replace(/\s+prime$/i, '').trim();
+// Les comparaisons de puissance ont leur propre barème : elles ne dépendent plus des notes Enchère.
+// On compare la meilleure version canonique du personnage, sous un seul nom, et on évite les duels trop proches.
+const PM_POWER_OVERRIDES = {"naruto":{"Naruto Uzumaki":100,"Hagoromo Otsutsuki":98,"Kaguya Otsutsuki":97,"Sasuke Uchiha":95,"Madara Uchiha":94,"Kakashi Hatake":91,"Obito Uchiha":90,"Might Guy":88,"Hashirama Senju":84,"Minato Namikaze":81,"Tobirama Senju":78,"Itachi Uchiha":75,"Nagato":74,"Kabuto Yakushi":71,"Orochimaru":69,"Killer Bee":68,"Sakura Haruno":66,"Jiraiya":64,"Kisame Hoshigaki":61,"Gaara":60,"Deidara":56,"Sasori":54,"Rock Lee":51,"Shikamaru Nara":47,"Neji Hyuga":45,"Temari":43,"Kankuro":41,"Sai":40,"Choji Akimichi":38,"Yamato":37,"Shino Aburame":35,"Kiba Inuzuka":33,"Hinata Hyuga":32,"Tenten":26,"Ino Yamanaka":25,"Iruka Umino":18,"Konohamaru Sarutobi":17,"Mizuki":8},"onepiece":{"Imu":100,"Joy Boy":100,"Gol D. Roger":97,"Edward Newgate":97,"Monkey D. Garp":96,"Shanks":94,"Dracule Mihawk":94,"Kaido":93,"Monkey D. Luffy":92,"Marshall D. Teach":91,"Sengoku":89,"Sakazuki":88,"Charlotte Linlin":87,"Silvers Rayleigh":86,"Kuzan":85,"Borsalino":83,"Issho":80,"Aramaki":79,"Benn Beckman":78,"Sabo":76,"Trafalgar D. Water Law":75,"Roronoa Zoro":74,"Eustass Kid":73,"Yamato":72,"Sanji":71,"Marco":70,"Shiryu":68,"Charlotte Katakuri":66,"King":65,"Boa Hancock":63,"Crocodile":62,"Rob Lucci":60,"Donquixote Doflamingo":58,"Jinbe":55,"Queen":54,"Koby":53,"Bartholomew Kuma":52,"Magellan":51,"Killer":49,"Franky":44,"Nico Robin":42,"Brook":40,"Jewelry Bonney":39,"Nami":34,"Tony Tony Chopper":32,"Usopp":28,"Carrot":25,"Tashigi":20},"bleach":{"Yhwach":100,"Ichigo Kurosaki":98,"Sosuke Aizen":96,"Ichibe Hyosube":95,"Senjumaru Shutara":92,"Genryusai Shigekuni Yamamoto":91,"Kenpachi Zaraki":90,"Gerard Valkyrie":89,"Jugram Haschwalth":88,"Lille Barro":87,"Uryu Ishida":86,"Oetsu Nimaiya":85,"Pernida Parnkgjas":83,"Shunsui Kyoraku":81,"Kisuke Urahara":80,"Toshiro Hitsugaya":79,"Byakuya Kuchiki":78,"Askin Nakk Le Vaar":77,"Retsu Unohana":75,"Mayuri Kurotsuchi":74,"Yoruichi Shihoin":72,"Ulquiorra Cifer":70,"Renji Abarai":68,"Rukia Kuchiki":67,"Grimmjow Jaegerjaquez":65,"Coyote Starrk":64,"Baraggan Louisenbairn":62,"Gin Ichimaru":60,"Soi Fon":58,"Kaname Tosen":56,"Sajin Komamura":54,"Shinji Hirako":53,"Nnoitra Gilga":47,"Ikkaku Madarame":39,"Yasutora Sado":36,"Orihime Inoue":34,"Hanataro Yamada":15,"Kon":10,"Ganju Shiba":9},"sds":{"Arthur Pendragon":100,"Demon King":98,"Meliodas":97,"Escanor":95,"Ban":92,"Mael":90,"King":89,"Elizabeth Liones":85,"Zeldris":84,"Merlin":82,"Ludociel":80,"Diane":76,"Gowther":74,"Chandler":73,"Cusack":72,"Sariel":68,"Tarmiel":67,"Drole":64,"Gloxinia":63,"Monspeet":61,"Derieri":60,"Estarossa":58,"Galand":53,"Grayroad":49,"Melascula":47,"Hendrickson":42,"Dreyfus":40,"Howzer":36,"Gilthunder":34,"Jericho":31,"Guila":27,"Elaine":25,"Hawk":14,"Twigo":10},"clover":{"Lucius Zogratis":100,"Asta":99,"Yuno":97,"Lucifero":95,"Mereoleona Vermillion":93,"Julius Novachrono":91,"Noelle Silva":90,"Yami Sukehiro":88,"Nacht Faust":85,"Acier Silva":84,"Fuegoleon Vermillion":81,"Zenon Zogratis":79,"Dante Zogratis":77,"Vanica Zogratis":76,"Dorothy Unsworth":75,"Morris":74,"William Vangeance":72,"Nozel Silva":71,"Luck Voltia":68,"Magna Swing":64,"Jack the Ripper":63,"Charlotte Roselei":61,"Rill Boismortier":58,"Gadjah":57,"Langris Vaude":55,"Charmy Pappitson":53,"Gauche Adlai":50,"Finral Roulacase":47,"Vanessa Enoteca":45,"Zora Ideale":43,"Gordon Agrippa":39,"Grey":38,"Leopold Vermillion":37,"Mimosa Vermillion":28,"Klaus Lunettes":27,"Sekke Bronzazza":12},"fairy":{"Acnologia":100,"Ignia":99,"Zeref Dragneel":98,"Natsu Dragneel":97,"August":93,"Irene Belserion":92,"Gildarts Clive":90,"Laxus Dreyar":87,"Erza Scarlet":84,"Gray Fullbuster":81,"Jellal Fernandes":80,"Mirajane Strauss":77,"Wendy Marvell":74,"Brandish μ":73,"God Serena":72,"Larcade Dragneel":71,"Mard Geer":68,"Hades":66,"Makarov Dreyar":64,"Gajeel Redfox":62,"Lucy Heartfilia":61,"Sting Eucliffe":58,"Rogue Cheney":56,"Cobra":53,"Minerva Orland":51,"Kagura Mikazuchi":49,"Juvia Lockser":44,"Elfman Strauss":42,"Freed Justine":39,"Cana Alberona":37,"Bickslow":34,"Evergreen":33,"Lisanna Strauss":29,"Happy":15,"Panther Lily":14},"haikyuu":{"Wakatsu Kiryū":95,"Wakatoshi Ushijima":97},"bluelock":{"Marc Snuffy":99,"Julian Loki":98,"Noel Noa":100}};
+
+const pmBaseName = n => String(n || '')
+    .replace(/\s+[—–-]\s+.*$/, '')
+    .replace(/\s+prime$/i, '')
+    .replace(/\s+(?:gear\s*5|forme\s+finale|forme\s+ultime|fin\s+de\s+série|post-purgatoire|ailes\s+complètes|the\s+one\s+ultimate|adulte)$/i, '')
+    .trim();
+
 let PM_POWER = null;
 function pmPower() {
     if (PM_POWER) return PM_POWER;
     PM_POWER = [];
-    for (const [u, uni] of Object.entries(ENCHERE_UNIVERSES)) {
-        if (!ARC_UNIVERSE_ANIME[u]) continue;
-        const ov = ENCHERE_POWER_OVERRIDES[u] || {};
-        const seen = new Set();
-        (uni.characters || []).forEach(c => {
-            const audited = PM_BASE_AUDITED.includes(u) || ov[c.name] != null;
-            const base = pmBaseName(c.name);
-            if (!audited || !base || seen.has(base)) return; // une seule forme par perso
-            seen.add(base);
-            PM_POWER.push({ u, name: c.name, base, value: +c.value || 0 });
-        });
+
+    for (const u of Object.keys(ARC_UNIVERSE_ANIME)) {
+        if (u === 'pokemon') {
+            const ratings = { ...(ENCHERE_POWER_OVERRIDES[u] || {}), ...(PM_POWER_OVERRIDES[u] || {}) };
+            const seen = new Map();
+            for (const [name, value] of Object.entries(ratings)) {
+                const display = arcDisplayName(u, pmBaseName(name));
+                const key = normalizeRG(display);
+                if (!key) continue;
+                const old = seen.get(key);
+                if (!old || Number(value) > old.value) seen.set(key, { u, name:display, base:display, value:Number(value) || 0 });
+            }
+            PM_POWER.push(...seen.values());
+            continue;
+        }
+
+        const ratings = { ...(ENCHERE_POWER_OVERRIDES[u] || {}), ...(PM_POWER_OVERRIDES[u] || {}) };
+        const seen = new Map();
+        for (const [name, value] of Object.entries(ratings)) {
+            const cleaned = pmBaseName(name);
+            const display = arcDisplayName(u, cleaned);
+            const key = normalizeRG(display);
+            if (!key) continue;
+            const row = { u, name:display, base:display, value:Math.max(1, Math.min(100, Number(value) || 0)) };
+            const old = seen.get(key);
+            if (!old || row.value > old.value) seen.set(key, row);
+        }
+        PM_POWER.push(...seen.values());
     }
     return PM_POWER;
 }
@@ -19339,7 +19499,7 @@ function pmBuild(g) {
             const us = [...new Set(pool.map(p => p.u))];
             const u = pmPick(us), list = pool.filter(p => p.u === u);
             if (list.length < 4) continue;
-            const a = pmPick(list), b = pmPick(list.filter(x => x !== a && Math.abs(x.value - a.value) >= 8));
+            const a = pmPick(list), b = pmPick(list.filter(x => x !== a && Math.abs(x.value - a.value) >= 10));
             if (!b) continue;
             const key = [a.name, b.name].sort().join('|'); if (g.pmUsed.includes(key)) continue;
             g.pmUsed.push(key);

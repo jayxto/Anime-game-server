@@ -1,0 +1,23 @@
+ANIME GAME — corrections appliquées
+
+1. Plus ou moins / puissance
+- Barème de puissance dédié au mode Plus ou moins (séparé de l'Enchère).
+- Alias/formes d'un même personnage regroupés.
+- Duels de puissance trop proches évités (écart minimal de 10 points).
+- Corrections ciblées des univers dont les anciennes notes étaient les plus incohérentes.
+
+2. Images
+- 149 images statiques supplémentaires récupérées depuis les thèmes existants.
+- Recherche Fandom conservée + secours AniList.
+- Les anciens résultats "missing" peuvent être retentés.
+- Le navigateur ne mémorise plus définitivement les échecs d'image.
+- L'endpoint avatar accepte aussi un nom valide qui n'est pas dans le petit pool avatar.
+
+3. Tier lists
+- Déduplication côté serveur.
+- Déduplication côté navigateur avant construction du pool.
+- Déduplication des anciennes tier lists communautaires à la lecture.
+- Le fichier tierlist-themes.json fourni ne contenait pas de doublon exact interne ; le garde-fou empêche leur apparition au chargement.
+
+Fichiers à déployer : server.js, index.html, char-images.json, qap-themes.json,
+tierlist-themes.json, package.json.

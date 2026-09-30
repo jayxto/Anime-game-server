@@ -6430,8 +6430,8 @@
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
                 if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
-                try { stored = localStorage.getItem('itemimg2:' + k); } catch (e) {}
-                if (stored) return resolve(stored === '-' ? null : '/api/img?u=' + encodeURIComponent(stored));
+                try { stored = localStorage.getItem('itemimg3:' + k); } catch (e) {}
+                if (stored) return resolve('/api/img?u=' + encodeURIComponent(stored));
                 itemImgQueue.push({ source, name: item.name, k, resolve });
                 itemImagePump();
             });
@@ -6445,7 +6445,10 @@
                     .then(r => r.json()).catch(() => null)
                     .then(d => {
                         const url = d && d.imageUrl;
-                        try { localStorage.setItem('itemimg2:' + job.k, url || '-'); } catch (e) {}
+                        try {
+                            if (url) localStorage.setItem('itemimg3:' + job.k, url);
+                            else localStorage.removeItem('itemimg3:' + job.k);
+                        } catch (e) {}
                         if (!url) delete ITEM_IMG_CACHE[job.k];
                         job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
                     })
@@ -6682,6 +6685,17 @@
                     tlRateUi(d.tl);
                 } else { data = await loadItems(source); document.getElementById('tl-rate').style.display = 'none'; }
             } catch (e) { document.getElementById('tl-board').innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
+            // Une tier list travaille avec le nom comme identifiant : on supprime donc les doublons
+            // avant de reconstruire le pool (y compris les anciennes listes communautaires).
+            const uniqueItems = [];
+            const seenItemNames = new Set();
+            for (const item of (Array.isArray(data.items) ? data.items : [])) {
+                const key = String(item?.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+                if (!key || seenItemNames.has(key)) continue;
+                seenItemNames.add(key);
+                uniqueItems.push(item);
+            }
+            data.items = uniqueItems;
             const names = data.items.map(i => i.name);
             let saved = null;
             try { saved = JSON.parse(localStorage.getItem('tierlist:' + source) || 'null'); } catch (e) {}
