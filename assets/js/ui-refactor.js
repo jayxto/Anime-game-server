@@ -598,8 +598,34 @@
         syncEvent();
     }
 
+    // Sur PC, le dashboard ne doit exister que sur le menu principal.
+    // Dès que le code historique masque #menu-selection pour ouvrir un salon,
+    // une sélection d'univers ou une partie, on retire immédiatement le shell
+    // et on remonte en haut de la vraie page de jeu.
+    function setupDesktopGamePageTransition() {
+        const menu = q('#menu-selection');
+        if (!menu || menu.dataset.agGamePageWatch === '1') return;
+        menu.dataset.agGamePageWatch = '1';
+
+        let lastHidden = null;
+        const refresh = () => {
+            if (!isDesktop()) return;
+            const hidden = menu.style.display === 'none' || getComputedStyle(menu).display === 'none';
+            syncAll();
+            if (hidden && lastHidden !== true) {
+                // Comportement d'avant : le salon / jeu commence en haut de page.
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            }
+            lastHidden = hidden;
+        };
+
+        new MutationObserver(refresh).observe(menu, { attributes: true, attributeFilter: ['style'] });
+        refresh();
+    }
+
     function init() {
         buildShell();
+        setupDesktopGamePageTransition();
         syncAll();
         window.addEventListener('resize', syncAll, { passive:true });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
