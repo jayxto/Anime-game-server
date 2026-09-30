@@ -20969,7 +20969,7 @@ const BINGO_LINK_RULES = [
     [/maitrisent la foudre/, ['lightning']],
     [/maitrisent l'eau/, ['water']],
     [/cheveux blancs/, ['hair_white']],
-    [/ce sont des rois/, ['royal','leader']],
+    [/ce sont des rois/, ['leader']],
     [/princes princesses/, ['royal']],
     [/plusieurs sabres/, ['sword']],
     [/capitaines d'escouade/, ['leader']],
@@ -21031,42 +21031,114 @@ function bingoField(data, c, labelRe) {
     for (const cat of (data.categories || [])) if (labelRe.test(normalizeImageKey(cat.label || ''))) vals.push(c.attrs?.[cat.key]);
     return normalizeImageKey(vals.filter(Boolean).join(' '));
 }
+// Valeurs Bingo : on ne scanne volontairement PLUS le nom du personnage.
+// Avant, des sous-chaînes créaient des faux positifs ("Salamèche" => "lame",
+// "Iwaizumi" => "Iwa" => ninja, "Hawkeye" => "eye", "Prince" => royal...).
+// Les catégories sont maintenant déduites de champs structurés + règles sûres par univers
+// + exceptions factuelles vérifiées pour les pouvoirs secondaires/acquis.
+const BINGO_RESEARCHED_TAGS = {
+    fairy: {
+        // Natsu absorbe la foudre de Luxus et obtient Lightning Fire Dragon Mode ;
+        // il utilise ensuite directement la foudre via Lightning Dragon Mode.
+        'natsu dragneel': ['lightning'],
+        // God Serena maîtrise huit Dragon Slayer Magics, dont feu, eau et foudre.
+        'god serena': ['fire','water','lightning']
+    },
+    dragonball: { 'vegeta': ['royal'] },
+    sds: { 'elizabeth liones': ['royal'], 'meliodas': ['royal'], 'zeldris': ['royal'] },
+    tensura: { 'gazel dwargo': ['royal'] }
+};
+function bingoResearchTags(u, name) {
+    return BINGO_RESEARCHED_TAGS[u]?.[normalizeRG(name || '')] || [];
+}
+function bingoNormText(v) {
+    return normalizeImageKey(String(v || '')).replace(/[’']/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function bingoHasPhrase(text, ...needles) {
+    const t = ` ${bingoNormText(text)} `;
+    return needles.some(n => {
+        const x = bingoNormText(n);
+        return x && t.includes(` ${x} `);
+    });
+}
+function bingoHasStem(text, stems) {
+    const words = bingoNormText(text).split(/\s+/).filter(Boolean);
+    return words.some(w => stems.some(s => w === s || w.startsWith(s)));
+}
+
+function bingoIsMeaningful(v) {
+    const x = bingoNormText(v);
+    if (!x) return false;
+    return !/^(non|aucun|aucune|aucuns|aucunes|sans|neant|none|n a|na|inconnu|inconnue|—|-)$/.test(x);
+}
+function bingoFields(data, c, labelRe) {
+    const vals = [];
+    for (const cat of (data.categories || [])) {
+        const label = bingoNormText(cat.label || '');
+        if (labelRe.test(label)) {
+            const v = c.attrs?.[cat.key];
+            if (v !== undefined && v !== null && String(v).trim()) vals.push(v);
+        }
+    }
+    return bingoNormText(vals.join(' '));
+}
 function bingoTags(u, data, c) {
-    const txt = bingoText(data, c), tags = new Set(bingoKnownTags(u, c.name));
-    const has = re => re.test(txt);
-    const hair = bingoField(data, c, /cheveux|hair/);
-    const gender = bingoField(data, c, /sexe|genre|gender/);
-    const status = bingoField(data, c, /statut|status|etat|state/);
-    if (/blanc|argent|silver|white/.test(hair)) tags.add('hair_white');
-    if (/noir|black/.test(hair)) tags.add('hair_black');
-    if (/blond|blonde|jaune|yellow/.test(hair)) tags.add('hair_blond');
-    if (/rouge|roux|red/.test(hair)) tags.add('hair_red');
-    if (/bleu|blue|azur/.test(hair)) tags.add('hair_blue');
-    if (/\bhomme\b|masculin|male|garcon/.test(gender)) tags.add('male');
-    if (/\bfemme\b|feminin|female|fille/.test(gender)) tags.add('female');
-    if (has(/epee|epeiste|sabre|katana|lame|sword|zangetsu|zanpakuto/)) tags.add('sword');
-    if (has(/\bfeu\b|fire|flamme|mera mera|katon|brasier|explosion/)) tags.add('fire');
-    if (has(/foudre|electric|eclair|lightning|raiton/)) tags.add('lightning');
-    if (has(/\beau\b|water|suiton|glace|\bice\b|hyorinmaru/)) tags.add('water');
-    if (has(/magie|magic|mana|grimoire|sort|malediction|\bnen\b|chakra|\bki\b|\bstand\b|fruit du demon|pouvoir/)) tags.add('magic');
-    if (has(/demon|fl[eé]au|diable|devil|\boni\b/)) tags.add('demon');
-    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name)) || /mort|morte|decede|deceased|dead|killed/.test(status)) tags.add('dead');
-    if (has(/chef|capitaine|commandant|hokage|kazekage|empereur|roi|leader|maitre de guilde/)) tags.add('leader');
-    if (has(/royal|royaute|prince|princesse|\broi\b|\breine\b|noble|famille royale/)) tags.add('royal');
-    if (has(/pirate/) || (u === 'onepiece' && !has(/marine|gouvernement|revolutionnaire|cipher pol|cp0|cp9/) && has(/chapeau de paille|heart|roux|barbe blanche|barbe noire|cent betes|big mom|kuja|thriller bark/))) tags.add('pirate');
-    if (has(/ninja|shinobi|nukenin|hokage|kazekage|mizukage|raikage|tsuchikage|konoha|suna|kiri|iwa|kumo/)) tags.add('ninja');
-    if (has(/\bhunter\b|association des hunters/)) tags.add('hunter');
-    if (u === 'bleach' && has(/shinigami|gotei|substitut/)) tags.add('shinigami');
-    if (u === 'tokyoghoul' && has(/goule|ghoul|kagune/)) tags.add('ghoul');
-    if (u === 'snk' && has(/titan|assaillant|colossal|cuirasse|bestial|feminin|machoire|charrette|marteau|originel/)) tags.add('titan');
-    if (has(/sharingan|rinnegan|byakugan|dojutsu|oeil|eyes?|six eyes|geass/)) tags.add('eye');
-    if (has(/transformation|transform|forme|gear|super saiyan|bankai|resurreccion|titan|jinchuriki|hybride/)) tags.add('transform');
-    if (has(/antagoniste|mechant|vilain|villain|criminel|espada|akatsuki|homunculi|lune superieure|fl[eé]au/)) tags.add('villain');
-    // règles d'univers utiles quand les profils ne contiennent pas le mot générique
-    if (u === 'dragonball' && has(/antagoniste/)) tags.add('villain');
-    if (u === 'demonslayer' && has(/demon|lune/)) { tags.add('demon'); tags.add('villain'); }
-    if (u === 'chainsaw' && has(/devil|demon/)) tags.add('demon');
-    return [...tags];
+    const tags = new Set(bingoKnownTags(u, c.name));
+    for (const t of bingoResearchTags(u, c.name)) tags.add(t);
+
+    // Champs structurés. On limite chaque règle aux types de données qui ont du sens.
+    const hair = bingoFields(data, c, /cheveux|hair/);
+    const gender = bingoFields(data, c, /sexe|genre|gender/);
+    const status = bingoFields(data, c, /(^| )(statut|status|etat|state)( |$)|vivant|mort/);
+    const role = bingoFields(data, c, /role|rang|grade|statut|affiliation|camp|guilde|compagnie|division|organisation|organisation|faction|equipage|clan|village|equipe|profession|race|espece|nature/);
+    const power = bingoFields(data, c, /element|type|nature chakra|chakra|pouvoir|capacite|technique|magie|magic|souffle|art|arme|style|fruit|zanpakuto|stand|alter|quirk|competence|dragon slayer|adolla|nen|ki|forme|transformation|mode/);
+    const weapon = bingoFields(data, c, /arme|weapon|style|zanpakuto|sabre|epee/);
+    const form = bingoFields(data, c, /(^| )(forme|transformation|mode)( |$)/);
+    const titanField = bingoFields(data, c, /^titan$/);
+    const eyeField = bingoFields(data, c, /dojutsu|yeux de shinigami|pouvoir des yeux/);
+    const supernaturalField = bingoFields(data, c, /nature chakra|type de nen|(^| )magie( |$)|type de magie|pouvoir autorite|type d alchimie|(^| )stand( |$)|(^| )technique( |$)|energie maudite|competence ultime|pouvoir notable|pouvoir style|(^| )jinki( |$)|(^| )tao( |$)|fruit du demon|adolla burst/);
+    const royalField = bingoFields(data, c, /noble royal|candidate royale/);
+
+    if (bingoHasStem(hair, ['blanc','white','argent','silver'])) tags.add('hair_white');
+    if (bingoHasStem(hair, ['noir','black'])) tags.add('hair_black');
+    if (bingoHasStem(hair, ['blond','jaune','yellow','gold'])) tags.add('hair_blond');
+    if (bingoHasStem(hair, ['rouge','roux','red'])) tags.add('hair_red');
+    if (bingoHasStem(hair, ['bleu','blue','azur'])) tags.add('hair_blue');
+    if (bingoHasPhrase(gender, 'homme','masculin','male','garcon')) tags.add('male');
+    if (bingoHasPhrase(gender, 'femme','feminin','female','fille')) tags.add('female');
+
+    // Combat / éléments : uniquement les champs de pouvoir/arme, jamais le nom.
+    if (bingoHasStem(`${weapon} ${power}`, ['epee','epeiste','sabre','katana','lame','sword','zanpakuto','zangetsu','excalibur'])) tags.add('sword');
+    if (bingoHasStem(power, ['feu','fire','flamme','katon','brasier','incendie','pyro'])) tags.add('fire');
+    if (bingoHasStem(power, ['foudre','electric','electrik','eclair','lightning','raiton','tonnerre'])) tags.add('lightning');
+    if (bingoHasStem(power, ['eau','water','suiton','glace','ice','hyoton','givre'])) tags.add('water');
+    if (bingoIsMeaningful(supernaturalField) || bingoHasStem(power, ['magie','magic','mana','grimoire','sort','malediction','nen','chakra','ki','stand','pouvoir','psychique','telekinesie','alchimie'])) tags.add('magic');
+
+    // Espèces / camps : les univers servent de garde-fou pour éviter les homonymes.
+    if (bingoHasStem(`${role} ${power}`, ['demon','diable','devil','fleau','oni'])) tags.add('demon');
+    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name)) || bingoHasStem(status, ['mort','morte','decede','deceased','dead','killed'])) tags.add('dead');
+
+    if (bingoHasStem(role, ['chef','capitaine','commandant','leader','hokage','kazekage','mizukage','raikage','tsuchikage','empereur','yonko','maitre'])) tags.add('leader');
+    if (bingoIsMeaningful(royalField) || bingoHasStem(role, ['prince','princesse','reine','noble'])) tags.add('royal');
+
+    if (u === 'onepiece' && (bingoHasStem(role, ['pirate','equipage','yonko']) || bingoHasPhrase(role, 'chapeau de paille','heart pirates','barbe blanche','barbe noire','cent betes','big mom','kuja'))) tags.add('pirate');
+    if (u === 'naruto' && bingoHasStem(role, ['ninja','shinobi','nukenin','genin','chunin','jonin','anbu','hokage','kazekage','mizukage','raikage','tsuchikage'])) tags.add('ninja');
+    if (u === 'hxh' && bingoHasStem(role, ['hunter'])) tags.add('hunter');
+    if (u === 'bleach' && bingoHasStem(role, ['shinigami','gotei','substitut'])) tags.add('shinigami');
+    if (u === 'tokyoghoul' && bingoHasStem(`${role} ${power}`, ['goule','ghoul','kagune'])) tags.add('ghoul');
+    if (u === 'snk' && (bingoIsMeaningful(titanField) || bingoHasStem(`${role} ${power}`, ['titan','assaillant','colossal','cuirasse','bestial','machoire','charrette','marteau','originel']))) tags.add('titan');
+
+    // Pouvoirs oculaires : champs de pouvoir + liste sûre de bingoKnownTags.
+    if (bingoIsMeaningful(eyeField) || bingoHasStem(power, ['sharingan','rinnegan','byakugan','dojutsu','oeil','eye','geass'])) tags.add('eye');
+
+    // Transformation : un champ explicitement dédié ou un terme de forme dans les pouvoirs.
+    if (bingoIsMeaningful(form) || bingoHasStem(power, ['transformation','transform','gear','saiyan','bankai','resurreccion','titan','jinchuriki','hybride','zoan','kakuja']) || bingoHasPhrase(power, 'mode', 'forme')) tags.add('transform');
+
+    if (bingoHasStem(role, ['antagoniste','mechant','vilain','villain','criminel','espada','akatsuki','homunculi'])) tags.add('villain');
+    if (u === 'demonslayer' && bingoHasStem(`${role} ${power}`, ['demon','lune'])) { tags.add('demon'); tags.add('villain'); }
+    if (u === 'chainsaw' && bingoHasStem(`${role} ${power}`, ['devil','demon'])) tags.add('demon');
+
+    return [...tags].filter(t => BINGO_TRAIT_BY_ID[t]);
 }
 function bingoCatalog() {
     if (BINGO_CATALOG_CACHE) return BINGO_CATALOG_CACHE;
@@ -21074,7 +21146,7 @@ function bingoCatalog() {
     for (const u of arcUniverses()) {
         if (!DLE_UNIVERSES[u]) continue;
         let data = null; try { data = dleExpandedUniverse(u); } catch (_) { data = null; }
-        for (const c of (data?.characters || []).slice(0, 70)) {
+        for (const c of (data?.characters || [])) {
             const k = u + '|' + normalizeRG(c.name); if (seen.has(k)) continue;
             const tags = bingoTags(u, data, c); if (!tags.length) continue;
             seen.add(k); out.push({ u, name:c.name, anime:data.name, tags, img:staticCharImage(u, c.name) || null });
