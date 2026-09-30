@@ -148,8 +148,8 @@
 })();
 
 /* =====================================================================
-   UI REFACTOR V3 — DASHBOARD PC
-   Shell desktop uniquement. Toutes les fonctions métier existantes restent
+   UI REFACTOR V4 — DASHBOARD RESPONSIVE
+   Shell desktop + mobile. Toutes les fonctions métier existantes restent
    celles du site (switchTab, ecoTab, startDaily, createRoom, etc.).
    ===================================================================== */
 (() => {
@@ -198,6 +198,7 @@
                         <span class="ag-dash-avatar" id="ag-dash-avatar">AG</span>
                         <span class="ag-dash-profile-copy"><b id="ag-dash-name">Joueur</b><small id="ag-dash-rank">Anime Game</small></span>
                     </button>
+                    <button type="button" class="ag-mobile-menu-toggle" id="ag-mobile-menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
                 </div>
             </div>
             <aside class="ag-dash-sidebar">
@@ -223,13 +224,27 @@
                     <b id="ag-dash-event-title">Défis & événements</b>
                     <span id="ag-dash-event-sub">Boss, anime de la semaine et tournois</span>
                 </button>
-            </aside>`;
+            </aside>
+            <button class="ag-mobile-backdrop" id="ag-mobile-backdrop" type="button" aria-label="Fermer le menu"></button>
+            <nav class="ag-mobile-bottom" aria-label="Navigation mobile">
+                <button class="ag-mobile-nav-btn on" type="button" data-dash-nav="home"><span>⌂</span><small>Accueil</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="play"><span>🎮</span><small>Jouer</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="collection"><span>🃏</span><small>Collection</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="friends"><span>👥</span><small>Amis</small></button>
+                <button class="ag-mobile-nav-btn" type="button" id="ag-mobile-more"><span>☰</span><small>Menu</small></button>
+            </nav>`;
         app.appendChild(shell);
 
         const menu = q('#menu-selection');
         if (menu) buildHomeBlocks(menu);
 
-        qa('[data-dash-nav]', shell).forEach(b => b.addEventListener('click', () => navigate(b.dataset.dashNav)));
+        qa('[data-dash-nav]', shell).forEach(b => b.addEventListener('click', () => {
+            navigate(b.dataset.dashNav);
+            closeMobileMenu();
+        }));
+        q('#ag-mobile-menu-toggle', shell)?.addEventListener('click', toggleMobileMenu);
+        q('#ag-mobile-more', shell)?.addEventListener('click', toggleMobileMenu);
+        q('#ag-mobile-backdrop', shell)?.addEventListener('click', closeMobileMenu);
         q('#ag-dash-news', shell)?.addEventListener('click', () => {
             if (typeof openChangelog === 'function') openChangelog();
             else navigate('settings');
@@ -242,6 +257,21 @@
         wrapSwitchTab();
         syncAll();
     }
+
+    function mobileMenuOpen() { return document.body.classList.contains('ag-mobile-menu-open'); }
+
+    function setMobileMenu(open) {
+        const yes = !!open && !isDesktop();
+        document.body.classList.toggle('ag-mobile-menu-open', yes);
+        const btn = q('#ag-mobile-menu-toggle');
+        if (btn) {
+            btn.setAttribute('aria-expanded', yes ? 'true' : 'false');
+            btn.textContent = yes ? '✕' : '☰';
+        }
+    }
+
+    function toggleMobileMenu() { setMobileMenu(!mobileMenuOpen()); }
+    function closeMobileMenu() { setMobileMenu(false); }
 
     function buildHomeBlocks(menu) {
         if (!q('#ag-home-hero')) {
@@ -375,6 +405,7 @@
     }
 
     function navigate(key) {
+        closeMobileMenu();
         dashState.section = key;
         const later = (fn, ms = 70) => setTimeout(fn, ms);
         const tab = t => { if (typeof switchTab === 'function') switchTab(t); };
@@ -429,10 +460,14 @@
     function syncShell() {
         const app = q('#app-root');
         if (!app) return;
-        const on = isDesktop() && appVisible() && menuIsHome();
+        const on = appVisible() && menuIsHome();
+        const mobile = on && !isDesktop();
         dashState.shell = on;
         app.classList.toggle('ag-dashboard-shell-on', on);
+        app.classList.toggle('ag-dashboard-mobile-on', mobile);
         document.body.classList.toggle('ag-dashboard-on', on);
+        document.body.classList.toggle('ag-dashboard-mobile', mobile);
+        if (!mobile) closeMobileMenu();
     }
 
     function syncNav() {
@@ -448,6 +483,9 @@
             key = map[t] || key || 'collection';
         } else if (active === 'mode' && !['home','play','quests'].includes(key)) key = 'home';
         qa('.ag-dash-nav-btn').forEach(b => b.classList.toggle('on', b.dataset.dashNav === key));
+        qa('.ag-mobile-nav-btn[data-dash-nav]').forEach(b => b.classList.toggle('on', b.dataset.dashNav === key));
+        const more = q('#ag-mobile-more');
+        if (more) more.classList.toggle('on', !['home','play','collection','friends'].includes(key));
     }
 
     function syncRoleNav() {
@@ -564,6 +602,7 @@
         buildShell();
         syncAll();
         window.addEventListener('resize', syncAll, { passive:true });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
         setInterval(syncAll, 900);
         dashState.friendTimer = setInterval(loadDashFriends, 30000);
         setTimeout(loadDashFriends, 600);
