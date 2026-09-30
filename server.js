@@ -20805,7 +20805,7 @@ setTimeout(() => {
    PARTY MIX + COMBAT DE CARTES + BINGO ANIME
    - Party Mix : 3 à 8 épreuves, score cumulé, aucune élimination
    - Combat de cartes : 1v1, deck équipé de 5 cartes, rareté cosmétique
-   - Bingo Anime : grille privée 5x5, validation serveur, première ligne gagnante
+   - Bingo Anime : grille privée 4x4, score libre (+1/-1), chrono 60s ou infini
    ===================================================================== */
 
 ARC_GAMES.partymix  = { label:'Party Mix',          icon:'🎮', universe:false, rounds:1,  roundMs:18000, answer:'choice' };
@@ -20813,7 +20813,7 @@ ARC_GAMES.mix_dle   = { label:'AnimeDLE Express',   icon:'🎴', universe:false,
 ARC_GAMES.mix_quote = { label:'Citations Express',  icon:'💬', universe:false, rounds:2,  roundMs:18000, answer:'choice' };
 ARC_GAMES.mix_blind = { label:'Blind Test Express', icon:'🎧', universe:false, rounds:2,  roundMs:20000, answer:'choice' };
 ARC_GAMES.cardbattle= { label:'Combat de cartes',    icon:'⚔️', universe:false, rounds:5,  roundMs:25000, answer:'cardbattle' };
-ARC_GAMES.bingo     = { label:'Bingo Anime',         icon:'🎟️', universe:false, rounds:40, roundMs:16000, answer:'bingo' };
+ARC_GAMES.bingo     = { label:'Bingo Anime',         icon:'🎟️', universe:false, rounds:1,  roundMs:60000, answer:'bingo' };
 
 MODE_LABELS['arcade:partymix'] = 'Party Mix';
 MODE_LABELS['arcade:cardbattle'] = 'Combat de cartes';
@@ -20957,6 +20957,60 @@ const BINGO_TRAITS = [
     {id:'ghoul',label:'Goule',emoji:'🩸'}, {id:'titan',label:'Titan',emoji:'🗿'}, {id:'eye',label:'Pouvoir des yeux',emoji:'👁️'}, {id:'transform',label:'Transformation',emoji:'🔄'}, {id:'villain',label:'Antagoniste / méchant',emoji:'🦹'}
 ];
 const BINGO_TRAIT_BY_ID = Object.fromEntries(BINGO_TRAITS.map(x => [x.id, x]));
+const BINGO_SIZE = 4;
+const BINGO_CELL_COUNT = BINGO_SIZE * BINGO_SIZE;
+
+// Le Bingo ne dépend pas uniquement des champs DLE : on réutilise aussi les liens
+// explicites déjà vérifiés dans le jeu (Common Link) + quelques règles sûres par univers.
+// Ça évite les faux négatifs du type Kurapika -> « Pouvoir des yeux ».
+const BINGO_LINK_RULES = [
+    [/maitrisent la glace/, ['water']],
+    [/maitrisent le feu/, ['fire']],
+    [/maitrisent la foudre/, ['lightning']],
+    [/maitrisent l'eau/, ['water']],
+    [/cheveux blancs/, ['hair_white']],
+    [/ce sont des rois/, ['royal','leader']],
+    [/princes princesses/, ['royal']],
+    [/plusieurs sabres/, ['sword']],
+    [/capitaines d'escouade/, ['leader']],
+    [/yeux speciaux/, ['eye']],
+    [/ce sont des demons/, ['demon']],
+    [/equipage du chapeau de paille/, ['pirate']],
+    [/empereurs yonko/, ['pirate','leader']],
+    [/shinigami remplacants shinigami/, ['shinigami']],
+    [/chevaliers mages capitaines/, ['leader']],
+    [/lunes superieures/, ['demon','villain']]
+];
+function bingoLinkedTags(u, name) {
+    const out = new Set(), nn = normalizeRG(name || '');
+    if (!nn || !Array.isArray(ARC_LINKS)) return out;
+    for (const [label, chars] of ARC_LINKS) {
+        const nl = normalizeImageKey(label || '');
+        const rule = BINGO_LINK_RULES.find(([re]) => re.test(nl));
+        if (!rule) continue;
+        if ((chars || []).some(([cu, cn]) => cu === u && normalizeRG(cn || '') === nn)) {
+            for (const tag of rule[1]) out.add(tag);
+        }
+    }
+    return out;
+}
+function bingoKnownTags(u, name) {
+    const tags = new Set(bingoLinkedTags(u, name));
+    const n = normalizeRG(name || '');
+    // Dojutsu / yeux spéciaux très connus qui ne sont pas toujours décrits dans les fiches DLE.
+    if (u === 'naruto') {
+        if (/ uchiha$/.test(n) || / hyuga$/.test(n) || / otsutsuki$/.test(n) || [
+            'nagato','kakashi hatake','danzo shimura','ao','boruto uzumaki','himawari uzumaki'
+        ].includes(n)) tags.add('eye');
+    }
+    if (u === 'hxh' && n === 'kurapika') tags.add('eye');
+    if (u === 'jjk' && n === 'satoru gojo') tags.add('eye');
+    if (u === 'bleach' && n === 'yhwach') tags.add('eye');
+    if (u === 'mushoku' && n === 'rudeus greyrat') tags.add('eye');
+    if (u === 'onepiece' && n === 'viola') tags.add('eye');
+    return tags;
+}
+
 const BINGO_DEAD_NAMES = new Set([
     'Jiraiya','Itachi Uchiha','Neji Hyuga','Minato Namikaze','Kushina Uzumaki','Hiruzen Sarutobi',
     'Portgas D. Ace','Edward Newgate','Gol D. Roger','Pedro',
@@ -20978,10 +21032,11 @@ function bingoField(data, c, labelRe) {
     return normalizeImageKey(vals.filter(Boolean).join(' '));
 }
 function bingoTags(u, data, c) {
-    const txt = bingoText(data, c), tags = new Set();
+    const txt = bingoText(data, c), tags = new Set(bingoKnownTags(u, c.name));
     const has = re => re.test(txt);
     const hair = bingoField(data, c, /cheveux|hair/);
     const gender = bingoField(data, c, /sexe|genre|gender/);
+    const status = bingoField(data, c, /statut|status|etat|state/);
     if (/blanc|argent|silver|white/.test(hair)) tags.add('hair_white');
     if (/noir|black/.test(hair)) tags.add('hair_black');
     if (/blond|blonde|jaune|yellow/.test(hair)) tags.add('hair_blond');
@@ -20995,7 +21050,7 @@ function bingoTags(u, data, c) {
     if (has(/\beau\b|water|suiton|glace|\bice\b|hyorinmaru/)) tags.add('water');
     if (has(/magie|magic|mana|grimoire|sort|malediction|\bnen\b|chakra|\bki\b|\bstand\b|fruit du demon|pouvoir/)) tags.add('magic');
     if (has(/demon|fl[eé]au|diable|devil|\boni\b/)) tags.add('demon');
-    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name))) tags.add('dead');
+    if (BINGO_DEAD_NAMES.has(normalizeRG(c.name)) || /mort|morte|decede|deceased|dead|killed/.test(status)) tags.add('dead');
     if (has(/chef|capitaine|commandant|hokage|kazekage|empereur|roi|leader|maitre de guilde/)) tags.add('leader');
     if (has(/royal|royaute|prince|princesse|\broi\b|\breine\b|noble|famille royale/)) tags.add('royal');
     if (has(/pirate/) || (u === 'onepiece' && !has(/marine|gouvernement|revolutionnaire|cipher pol|cp0|cp9/) && has(/chapeau de paille|heart|roux|barbe blanche|barbe noire|cent betes|big mom|kuja|thriller bark/))) tags.add('pirate');
@@ -21028,17 +21083,50 @@ function bingoCatalog() {
     BINGO_CATALOG_CACHE = out;
     return out;
 }
-function bingoHasLine(marked) {
-    const yes = i => marked.has(i);
-    for (let r=0;r<5;r++) if ([0,1,2,3,4].every(c => yes(r*5+c))) return true;
-    for (let c=0;c<5;c++) if ([0,1,2,3,4].every(r => yes(r*5+c))) return true;
-    if ([0,6,12,18,24].every(yes)) return true;
-    if ([4,8,12,16,20].every(yes)) return true;
-    return false;
+function bingoNewBoardCells() {
+    return arcShuffle(BINGO_TRAITS.map(x => x.id)).slice(0, BINGO_CELL_COUNT);
+}
+function bingoRerollCell(board, idx) {
+    if (!board || !Number.isInteger(idx) || idx < 0 || idx >= board.cells.length) return;
+    const old = board.cells[idx], visible = new Set(board.cells);
+    let pool = BINGO_TRAITS.map(x => x.id).filter(id => id !== old && !visible.has(id));
+    if (!pool.length) pool = BINGO_TRAITS.map(x => x.id).filter(id => id !== old);
+    if (pool.length) board.cells[idx] = arcPick(pool);
 }
 function bingoSendBoard(socketId, g) {
     const b = g?.bingo?.boards?.[socketId]; if (!b) return;
-    io.to(socketId).emit('arc_bingo_board', { cells:b.cells.map((id, i) => ({ ...BINGO_TRAIT_BY_ID[id], marked:b.marked.has(i) })) });
+    io.to(socketId).emit('arc_bingo_board', { size:BINGO_SIZE, cells:b.cells.map(id => ({ ...BINGO_TRAIT_BY_ID[id], marked:false })) });
+}
+function bingoDurationFromSub(subMode) {
+    const m = /^bingo:(60|inf)$/i.exec(String(subMode || ''));
+    return m && m[1].toLowerCase() === 'inf' ? null : 60000;
+}
+async function bingoNextCharacter(room, roomCode, socketId) {
+    const g = arcGames[roomCode], b = g?.bingo?.boards?.[socketId];
+    if (!g || g.dead || g.game !== 'bingo' || g.phase !== 'playing' || !b) return;
+    const used = g.bingo.used[socketId] || (g.bingo.used[socketId] = new Set());
+    let pool = bingoCatalog().filter(c => c.tags.some(t => b.cells.includes(t)) && !used.has(c.u+'|'+normalizeRG(c.name)));
+    if (!pool.length) { used.clear(); pool = bingoCatalog().filter(c => c.tags.some(t => b.cells.includes(t))); }
+    const c = arcPick(pool); if (!c) return;
+    used.add(c.u+'|'+normalizeRG(c.name));
+    let img = c.img || null;
+    if (!img) { try { img = (await resolveCharacterImage(c.u, c.name))?.imageUrl || null; } catch (_) {} }
+    if (arcGames[roomCode] !== g || g.phase !== 'playing') return;
+    const cur = { name:c.name, anime:ARC_UNIVERSE_ANIME[c.u] || c.anime || '', u:c.u, img:img ? arcToken(img) : null, tags:c.tags };
+    g.bingo.current[socketId] = cur;
+    io.to(socketId).emit('arc_bingo_character', { character:{ name:cur.name, anime:cur.anime, img:cur.img } });
+}
+function bingoFinish(room, roomCode) {
+    const g = arcGames[roomCode]; if (!g || g.game !== 'bingo' || g.phase === 'finished') return;
+    arcClearTimers(g); g.phase='finished'; g.endsAt=Date.now();
+    const vals = room.players.map(p => g.scores[p.id] || 0);
+    const best = vals.length ? Math.max(...vals) : 0;
+    g.winnerNames = room.players.filter(p => (g.scores[p.id] || 0) === best).map(p => p.name);
+    room.status='arc_over'; arcEmit(room,roomCode);
+    if (!g.recorded) {
+        g.recorded=true;
+        progRecord(room,'arcade:bingo','all',room.players.map(p=>({ player:p, points:Math.max(0,g.scores[p.id]||0), won:room.players.length>1 && (g.scores[p.id]||0)===best })));
+    }
 }
 
 /* ---------- Démarrage des trois modes ---------- */
@@ -21083,16 +21171,20 @@ startArcade = function (room, roomCode) {
 
     if (parsed.game === 'bingo') {
         arcStop(roomCode);
-        const traits = BINGO_TRAITS.map((_,i)=>i);
-        const boards = {};
-        room.players.forEach(p => { boards[p.id]={ cells:arcShuffle(BINGO_TRAITS.map(x=>x.id)), marked:new Set() }; });
+        const durationMs = bingoDurationFromSub(room.subMode), boards={}, used={}, current={}, stats={};
+        room.players.forEach(p => { boards[p.id]={ cells:bingoNewBoardCells() }; used[p.id]=new Set(); stats[p.id]={correct:0,wrong:0,attempts:0}; });
+        const now=Date.now();
         const g = {
-            game:'bingo', universe:'all', round:0, totalRounds:40, phase:'loading', current:null,
+            game:'bingo', universe:'all', round:0, totalRounds:null, phase:'playing', current:null,
             answers:{}, found:{}, gainedRound:{}, scores:Object.fromEntries(room.players.map(p => [p.id,0])),
-            used:new Set(), usedU:[], lastGuess:{}, bingo:{ boards, traitOrder:arcShuffle(traits), winnerId:null }
+            used:new Set(), usedU:[], lastGuess:{}, startedAt:now, endsAt:durationMs?now+durationMs:null,
+            bingo:{ boards, used, current, stats, durationMs, infinite:!durationMs }
         };
         arcGames[roomCode]=g; room.status='arc_playing';
-        room.players.forEach(p => bingoSendBoard(p.id,g)); arcEmit(room,roomCode); arcNextRound(room,roomCode); return;
+        arcEmit(room,roomCode);
+        room.players.forEach(p => { bingoSendBoard(p.id,g); bingoNextCharacter(room,roomCode,p.id); });
+        if (durationMs) g.timer=setTimeout(()=>bingoFinish(room,roomCode), durationMs+100);
+        return;
     }
 
     return _startArcadePCB(room, roomCode);
@@ -21102,11 +21194,7 @@ startArcade = function (room, roomCode) {
 const _arcFinishPCB = arcFinish;
 arcFinish = function (room, roomCode) {
     const g = arcGames[roomCode];
-    // Bingo : la partie ne se termine pas aux points. On continue par blocs jusqu'à la première ligne de 5.
-    if (g?.game === 'bingo' && g.bingo && !g.bingo.winnerId && !g.message) {
-        g.totalRounds = Math.max(g.totalRounds || 40, g.round) + 25;
-        return arcNextRound(room, roomCode);
-    }
+    if (g?.game === 'bingo' && g.bingo) return bingoFinish(room, roomCode);
     if (g?.mix && !g.message && g.mix.idx < g.mix.games.length - 1) {
         arcClearTimers(g);
         g.phase='intermission';
@@ -21170,9 +21258,11 @@ arcPublic = function (room,g) {
         out.stage.cardBattle={category:cat,locked:room.players.filter(p=>g.cardBattle.picks[p.id]).map(p=>p.id)};
         if(g.phase==='reveal'&&cur.cardResult) out.stage.cardBattle.plays=cur.cardResult.plays.map(x=>({name:x.name,value:x.value,card:x.card?{name:x.card.name,anime:x.card.anime,img:x.card.img}:null}));
     }
-    if(g.game==='bingo'&&g.bingo&&cur.bingoChar){
-        out.stage.bingo={character:{name:cur.bingoChar.name,anime:cur.bingoChar.anime,img:cur.bingoChar.img}};
-        if(g.phase==='reveal'||g.phase==='finished') out.stage.bingo.revealTraits=(cur.bingoChar.tags||[]).map(id=>BINGO_TRAIT_BY_ID[id]).filter(Boolean);
+    if(g.game==='bingo'&&g.bingo){
+        out.stage.bingo={};
+        out.bingo={infinite:!!g.bingo.infinite,durationMs:g.bingo.durationMs||null};
+        out.roundMs=g.bingo.durationMs||60000; out.endsAt=g.endsAt||null; out.totalRounds=null;
+        out.players=out.players.map(p=>({ ...p, correctCount:g.bingo.stats[p.id]?.correct||0, wrongCount:g.bingo.stats[p.id]?.wrong||0, attempts:g.bingo.stats[p.id]?.attempts||0, done:false }));
     }
     return out;
 };
@@ -21184,7 +21274,7 @@ const _arcSendToPCB=arcSendTo;
 arcSendTo=function(socket,room,roomCode){
     const ok=_arcSendToPCB(socket,room,roomCode),g=arcGames[roomCode];
     if(ok&&g?.game==='cardbattle') cbSendDeck(socket.id,g);
-    if(ok&&g?.game==='bingo') bingoSendBoard(socket.id,g);
+    if(ok&&g?.game==='bingo'){ bingoSendBoard(socket.id,g); const c=g.bingo?.current?.[socket.id]; if(c) socket.emit('arc_bingo_character',{character:{name:c.name,anime:c.anime,img:c.img}}); }
     return ok;
 };
 const _arcRemapPCB=arcRemap;
@@ -21193,7 +21283,7 @@ arcRemap=function(roomCode,oldId,newId){
     if(g.cardBattle){
         for(const key of ['decks','used','picks']) if(g.cardBattle[key]&&Object.prototype.hasOwnProperty.call(g.cardBattle[key],oldId)){g.cardBattle[key][newId]=g.cardBattle[key][oldId];delete g.cardBattle[key][oldId];}
     }
-    if(g.bingo?.boards?.[oldId]){g.bingo.boards[newId]=g.bingo.boards[oldId];delete g.bingo.boards[oldId];if(g.bingo.winnerId===oldId)g.bingo.winnerId=newId;}
+    if(g.bingo?.boards?.[oldId]){g.bingo.boards[newId]=g.bingo.boards[oldId];delete g.bingo.boards[oldId];for(const key of ['used','current','stats'])if(g.bingo[key]&&Object.prototype.hasOwnProperty.call(g.bingo[key],oldId)){g.bingo[key][newId]=g.bingo[key][oldId];delete g.bingo[key][oldId];}}
 };
 
 /* ---------- Actions privées Combat/Bingo ---------- */
@@ -21210,30 +21300,21 @@ io.on('connection',socket=>{
 
     socket.on('arc_bingo_mark',({roomCode,idx}={})=>{
         const room=rooms[roomCode],g=arcGames[roomCode];
-        if(!room||!g||g.game!=='bingo'||g.phase!=='playing'||!g.bingo||g.answers[socket.id])return;
+        if(!room||!g||g.game!=='bingo'||g.phase!=='playing'||!g.bingo)return;
         if(!room.players.some(p=>p.id===socket.id))return;
-        const board=g.bingo.boards[socket.id]; if(!board)return;
-        idx=Number(idx);
-        if(idx===-1){g.answers[socket.id]={choice:'Passer',correct:false};g.gainedRound[socket.id]=0;socket.emit('arc_feedback',{ok:false,message:'⏭️ Tu passes sur ce personnage.'});arcCheckAllDone(room,roomCode);return;}
-        if(!Number.isInteger(idx)||idx<0||idx>=25||board.marked.has(idx))return;
-        const trait=board.cells[idx],tags=g.current?.bingoChar?.tags||[];
-        const correct=tags.includes(trait);
-        g.answers[socket.id]={choice:BINGO_TRAIT_BY_ID[trait]?.label||trait,correct};
-        g.gainedRound[socket.id]=correct?100:0;
-        if(correct){
-            board.marked.add(idx);g.scores[socket.id]=(g.scores[socket.id]||0)+100;bingoSendBoard(socket.id,g);
-            socket.emit('arc_feedback',{ok:true,message:`✅ ${BINGO_TRAIT_BY_ID[trait]?.label||'Case'} !`});
-            if(bingoHasLine(board.marked)&&!g.bingo.winnerId){
-                g.bingo.winnerId=socket.id;g.scores[socket.id]=(g.scores[socket.id]||0)+10000;g.gainedRound[socket.id]+=10000;
-                g.message=null;g.winnerNames=[room.players.find(p=>p.id===socket.id)?.name||'Joueur'];
-                arcClearTimers(g);g.phase='finished';room.status='arc_over';arcEmit(room,roomCode);
-                // Enregistrement progression : on passe par la chaîne habituelle une seule fois.
-                if(!g.recorded){g.recorded=true;progRecord(room,'arcade:bingo','all',room.players.map(p=>({player:p,points:g.scores[p.id]||0,won:p.id===socket.id})));}
-                return;
-            }
-        } else socket.emit('arc_feedback',{ok:false,message:'❌ Cette case ne correspond pas à ce personnage.'});
-        arcCheckAllDone(room,roomCode);
+        const board=g.bingo.boards[socket.id], cur=g.bingo.current[socket.id]; if(!board||!cur)return;
+        idx=Number(idx); if(!Number.isInteger(idx)||idx<0||idx>=BINGO_CELL_COUNT)return;
+        const trait=board.cells[idx], correct=(cur.tags||[]).includes(trait), clickedLabel=BINGO_TRAIT_BY_ID[trait]?.label||trait;
+        g.bingo.current[socket.id]=null;
+        const st=g.bingo.stats[socket.id]||(g.bingo.stats[socket.id]={correct:0,wrong:0,attempts:0}); st.attempts++;
+        if(correct){ st.correct++; g.scores[socket.id]=(g.scores[socket.id]||0)+1; }
+        else { st.wrong++; g.scores[socket.id]=(g.scores[socket.id]||0)-1; }
+        bingoRerollCell(board,idx); bingoSendBoard(socket.id,g);
+        socket.emit('arc_feedback',{ok:correct,message:correct?`✅ ${clickedLabel} : +1 point`:`❌ ${clickedLabel} ne correspond pas : -1 point`});
+        arcEmit(room,roomCode);
+        if(g.phase==='playing') bingoNextCharacter(room,roomCode,socket.id);
     });
+
 
     // Blind Test du Party Mix : si la vidéo n'est pas intégrable, on remplace la manche.
     socket.on('arc_media_error',({roomCode,round}={})=>{
