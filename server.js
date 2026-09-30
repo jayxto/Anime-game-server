@@ -17045,11 +17045,13 @@ app.get('/api/trade/history', async (req, res) => {
 // fiche d'une carte à partir de sa clé (normale, spéciale, Duo, Collector)
 function cardInfoOfKey(k) {
     const p = String(k).split('|');
-    if (p[0] === 'collector') { const [, week, u, display] = p; return { name: display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: 'collector', img: cardImg({ u, display }), week }; }
-    if (p[0] === 'duo') { const d = DUO_CARDS().find(x => x.name === p[1]); return d ? { name: d.name, anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] } : null; }
+    if (p[0] === 'collector') { const [, week, u, display] = p; return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u] || '', rarity: 'collector', img: cardImg({ u, display }), week }; }
+    if (p[0] === 'duo') { const d = DUO_CARDS().find(x => x.name === p[1]); return d ? { u: 'duo', name: d.name, display: d.name, anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] } : null; }
+    if (p[0] === 'altart') { const a = typeof altArtById === 'function' ? altArtById(p[1]) : null; return a ? { ...a, name: a.name, display: a.name, rarity: 'altart', altart: true } : null; }
+    if (p[0] === 'moment') { const m = typeof momentById === 'function' ? momentById(p[1]) : null; return m ? { ...m, name: m.name, display: m.name, rarity: 'moment', moment: true } : null; }
     const [u, display, sec] = p;
     if (!ARC_UNIVERSE_ANIME[u]) return null;
-    return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display }) };
+    return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display }) };
 }
 // toutes les cartes échangeables, une ligne par version (normale, Holo, Gold…)
 async function cardListOf(uid) {
@@ -18004,7 +18006,10 @@ const DECK_BONUS = { commune: 2, rare: 4, epique: 6, legendaire: 10, mythique: 1
 async function deckOf(uid) {
     const keys = (await kvGet('deck', uid, { keys: [] })).keys || [];
     const mine = await cardsOf(uid);
-    return keys.filter(k => mine.get(k)).map(k => { const [u, display] = k.split('|'); const m = mine.get(k); return { key: k, u, name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }) }; });
+    return keys.filter(k => mine.get(k) && !String(k).startsWith('moment|')).map(k => {
+        const m = mine.get(k), info = cardInfoOfKey(k); if (!info) return null;
+        return { key: k, u: info.u, name: info.name, anime: info.anime, rarity: info.rarity || keyRarity(k) || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null };
+    }).filter(Boolean);
 }
 function deckPct(deck, universe) {
     const us = String(universe || '').split(/[+:]/);
@@ -18021,7 +18026,7 @@ app.post('/api/deck', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
     const mine = await cardsOf(uid);
-    if (keys.some(k => !mine.get(k) || k.startsWith('collector|'))) return res.json({ ok: false, error: 'Carte introuvable dans ta collection.' });
+    if (keys.some(k => !mine.get(k) || k.startsWith('collector|') || k.startsWith('moment|'))) return res.json({ ok: false, error: 'Carte introuvable dans ta collection ou non jouable dans un deck.' });
     await kvSet('deck', uid, { keys });
     const deck = await deckOf(uid);
     res.json({ ok: true, deck, pct: deckPct(deck, '') });
@@ -19307,10 +19312,10 @@ app.get('/api/admin/stats2', adminOnly(async (req, res) => {
    (la carte est retirée de la collection pendant la vente, 5 % de taxe sur la vente)
    ===================================================================== */
 const MARKET_TAX = 0.05, MARKET_MAX = 20, MARKET_MIN = 5, MARKET_PRICE_MAX = 100000;
-const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999], halloween: [3000, 10000] };
+const MARKET_HINT = { commune: [10, 40], rare: [40, 120], epique: [120, 400], legendaire: [400, 1500], mythique: [1500, 4000], secrete: [4000, 12000], divine: [12000, 30000], cosmique: [30000, 80000], eternelle: [80000, 200000], omega: [200000, 999999], halloween: [3000, 10000] , altart: [2500, 12000], moment: [3500, 16000] };
 function marketView(l, uid) {
-    const [u, display] = l.key.split('|');
-    return { id: l.id, name: display, anime: ARC_UNIVERSE_ANIME[u] || '', u, rarity: keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: cardImg({ u, display }) };
+    const info = cardInfoOfKey(l.key) || {};
+    return { id: l.id, key: l.key, name: info.name || l.key.split('|')[1] || 'Carte', anime: info.anime || '', u: info.u || '', rarity: info.rarity || keyRarity(l.key) || 'commune', shiny: !!l.shiny, price: l.price, seller: l.sellerName, mine: l.seller === uid, at: l.at, status: l.status, buyer: l.buyerName || null, soldAt: l.soldAt || null, img: info.img || '', imgs: info.imgs || null };
 }
 async function marketAll() { return (await kvList('market')).map(x => x.v); }
 app.get('/api/market', async (req, res) => {
@@ -19330,7 +19335,7 @@ app.post('/api/market/sell', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const key = String((req.body || {}).key || ''), price = Math.round(+(req.body || {}).price);
     if (!(price >= MARKET_MIN && price <= MARKET_PRICE_MAX)) return res.json({ ok: false, error: `Prix entre ${MARKET_MIN} et ${MARKET_PRICE_MAX} pièces.` });
-    if (!keyRarity(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
+    if (!cardInfoOfKey(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
     const active = (await marketAll()).filter(l => l.seller === uid && l.status === 'open').length;
     if (active >= MARKET_MAX) return res.json({ ok: false, error: `${MARKET_MAX} ventes en cours maximum.` });
     const deck = (await kvGet('deck', uid, { keys: [] })).keys || [];
@@ -19382,7 +19387,7 @@ app.post('/api/market/buy', async (req, res) => {
         const isNew = await cardGive(uid, { key: l.key }, l.shiny);
         const gain = Math.max(1, Math.round(l.price * (1 - MARKET_TAX)));
         await ecoAddCoins(l.seller, gain);
-        emitUser(l.seller, 'market_sold', { name: l.key.split('|')[1], price: l.price, gain, buyer: l.buyerName });
+        emitUser(l.seller, 'market_sold', { name: (cardInfoOfKey(l.key)?.name || l.key.split('|')[1]), price: l.price, gain, buyer: l.buyerName });
         const card = { ...marketView(l, uid), isNew, coins: 0 };
         res.json({ ok: true, card, coins: ((await ecoGet(uid)) || {}).coins });
     } finally { MARKET_LOCK.delete(id); }
@@ -20657,10 +20662,15 @@ app.get('/api/cards/extra', async (req, res) => {
         if (e && !e.owned.includes('frame:album')) { e.owned.push('frame:album'); await ecoSave(uid, e); albumFrame = true; }
     }
     const vit = await kvGet('vitrine', String(uid), []);
-    const showcaseCards = vit.map(k => { const [u, name, sec] = k.split('|'); if (!mine.has(k)) return null;
-        if (u === 'duo') { const d = DUO_CARDS().find(x => x.name === name); return d ? { key: k, name, anime: d.sub, imgs: d.imgs, rarity: 'duo' } : null; }
-        return { key: k, u, name, anime: ARC_UNIVERSE_ANIME[u], rarity: keyRarity(k) || sec || 'commune', img: cardImg({ u, display: name }), secret: !!sec, finish: (best[k] || {}).f || null, serial: (best[k] || {}).ser || null, shiny: mine.get(k).shiny > 0 }; }).filter(Boolean);
-    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, showcase: vit, showcaseCards, museum: vit, museumCards: showcaseCards, albumFrame,
+    const showcaseCards = vit.map(k => {
+        if (!mine.has(k)) return null;
+        const info = cardInfoOfKey(k); if (!info) return null;
+        return { ...info, key: k, finish: (best[k] || {}).f || null, serial: (best[k] || {}).ser || null, shiny: mine.get(k).shiny > 0 };
+    }).filter(Boolean);
+    const altArts = ALT_ART_CARDS().map(c => { const key = 'altart|' + c.id, m = mine.get(key); return { ...c, key, rarity: 'altart', owned: !!m, n: m ? m.n : 0, shiny: m ? m.shiny : 0 }; });
+    const moments = MOMENT_CARDS().map(c => { const key = 'moment|' + c.id, m = mine.get(key); return { ...c, key, rarity: 'moment', owned: !!m, n: m ? m.n : 0, shiny: m ? m.shiny : 0 }; });
+    res.json({ ok: true, fin: best, duos, duoTotal: DUO_CARDS().length, altArts, altArtTotal: altArts.length, moments, momentTotal: moments.length,
+        showcase: vit, showcaseCards, museum: vit, museumCards: showcaseCards, albumFrame,
         seasons: Object.entries(SEASON_CARDS).filter(([, s]) => seasonActive(s)).map(([id, s]) => ({ id, label: s.label })) });
 });
 // fiche d'une carte (mode inspection) : mes finitions + combien il en existe sur le serveur
@@ -20673,15 +20683,16 @@ app.get('/api/cards/info', async (req, res) => {
     let total = 0;
     if (HAS_DB) { try { total = +((await pool.query('SELECT COALESCE(SUM(n),0)::int AS t FROM cards WHERE ckey=$1', [key])).rows[0].t) || 0; } catch (_) {} }
     else CARDS_MEM.forEach(mm => { const o = mm.get(key); if (o) total += o.n; });
-    const [u, name] = key.split('|');
+    const info = cardInfoOfKey(key), u = info && info.u, name = info && info.name;
     res.json({ ok: true, key, n: m ? m.n : 0, shiny: m ? m.shiny : 0, mine: Object.fromEntries(FIN_IDS.filter(f => fin[f]).map(f => [f, fin[f]])), serials: fin.ser || {},
-        world: Object.fromEntries(FIN_IDS.filter(f => g[f]).map(f => [f, g[f]])), total, numberedMax: NUMBERED_MAX, quote: ARC_UNIVERSE_ANIME[u] ? cardQuote(u, name) : null,
-        canUpgrade: !!m && m.n >= 6 && !fin.galaxy, showcase: (await kvGet('vitrine', String(uid), [])).includes(key) });
+        world: Object.fromEntries(FIN_IDS.filter(f => g[f]).map(f => [f, g[f]])), total, numberedMax: NUMBERED_MAX, quote: info && info.rarity !== 'moment' && ARC_UNIVERSE_ANIME[u] ? cardQuote(u, name) : null,
+        canUpgrade: !!m && m.n >= 6 && !fin.galaxy && !key.startsWith('altart|') && !key.startsWith('moment|'), showcase: (await kvGet('vitrine', String(uid), [])).includes(key) });
 });
 // améliorer la finition : 5 doublons d'une carte → Holo, puis Gold, puis Galaxie
 app.post('/api/cards/upgrade', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const key = String((req.body || {}).key || '').slice(0, 200);
+    if (key.startsWith('altart|') || key.startsWith('moment|')) return res.json({ ok:false, error:'Les Alt Arts et cartes Moment ne se transforment pas en finition.' });
     const m = (await cardsOf(uid)).get(key);
     if (!m || m.n < 6) return res.json({ ok: false, error: 'Il faut 6 exemplaires de cette carte (tu en gardes 1).' });
     const fin = (await kvGet('fin', String(uid), {}))[key] || {};
@@ -20711,7 +20722,7 @@ publicProfile = async function (pseudo) {
     if (!p) return p;
     try {
         const fin = await kvGet('fin', String(p.uid), {}), vit = await kvGet('vitrine', String(p.uid), []), mine = await cardsOf(p.uid);
-        const view = k => { const [u, display, sec] = k.split('|'); const m = mine.get(k); if (!m || !ARC_UNIVERSE_ANIME[u]) return null; const f = finBestOf(fin[k]); return { name: display, anime: ARC_UNIVERSE_ANIME[u], rarity: sec || keyRarity(k) || 'commune', shiny: m.shiny > 0, img: cardImg({ u, display }), finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
+        const view = k => { const m = mine.get(k), info = cardInfoOfKey(k); if (!m || !info) return null; const f = finBestOf(fin[k]); return { key:k, name: info.name, anime: info.anime, rarity: info.rarity || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null, finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
         const top = vit.map(view).filter(Boolean);
         p.showcase = top; p.museum = top;
         p.cards = top.concat(p.cards.filter(c => !top.some(t => t.name === c.name))).slice(0, 12);
@@ -20749,8 +20760,13 @@ app.get('/api/cards/mine', async (req, res) => {
     const out = [];
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
-        const [u, name, sec] = k.split('|');
         const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
+        const special = (k.startsWith('altart|') || k.startsWith('moment|')) ? cardInfoOfKey(k) : null;
+        if (special) {
+            out.push({ key:k, name:special.name, n:v.n, shiny:v.shiny||0, finish:null, finishes:{}, serial:null, u:special.u, anime:special.anime, rarity:special.rarity, img:special.img, source:special.source||null });
+            return;
+        }
+        const [u, name, sec] = k.split('|');
         const base = { key: k, name, n: v.n, shiny: v.shiny || 0, finish: best, finishes, serial: best && e.ser && e.ser[best] ? Math.min(...e.ser[best]) : null };
         if (u === 'duo') { const d = duos[name]; if (d) out.push({ ...base, u: 'duo', anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] }); return; }
         const r = keyRarity(k); if (!r) return;
@@ -21702,3 +21718,70 @@ app.get('/api/hall-of-fame', async (req,res)=>{
     const out=Object.values(seasons).sort((a,b)=>b.season.localeCompare(a.season)).map(s=>({season:s.season,champion:best(s.global),modes:Object.entries(s.modes).map(([mode,list])=>({mode,label:MODE_LABELS[mode]||mode,winner:best(list)})).filter(x=>x.winner).sort((a,b)=>b.winner.wins-a.winner.wins||b.winner.points-a.winner.points).slice(0,10)}));
     res.json({ok:true,seasons:out});
 });
+
+
+/* =====================================================================
+   CARTES ALT ART + MOMENT
+   - Alt Art : version alternative d'un héros, illustrée par une scène culte
+   - Moment : carte de scène culte (miniature de la scène déjà utilisée par Scene Guessr)
+   Ces cartes sont des bonus de booster : elles n'enlèvent aucune carte du pack.
+   ===================================================================== */
+const ALT_ART_RATE = 1 / 220;
+const MOMENT_CARD_RATE = 1 / 360;
+let _ALT_ART_CACHE = null, _MOMENT_CACHE = null;
+function sceneUniverseKey(anime) {
+    const n = normalizeRG(anime);
+    return Object.keys(ARC_UNIVERSE_ANIME).find(u => normalizeRG(ARC_UNIVERSE_ANIME[u]) === n) || null;
+}
+function sceneThumb(id) { return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`; }
+function cleanMomentName(s) {
+    return String(s || '').replace(/\s*\((?:VOSTA|VF[^)]*|VO[^)]*|HD|60FPS)[^)]*\)\s*/gi, ' ')
+        .replace(/\s+/g, ' ').trim().slice(0, 72);
+}
+function ALT_ART_CARDS() {
+    if (_ALT_ART_CACHE) return _ALT_ART_CACHE;
+    const out = [];
+    for (const u of arcUniverses()) {
+        const label = ARC_UNIVERSE_ANIME[u], scene = ARC_SCENES.find(s => sceneUniverseKey(s.anime) === u);
+        const hero = arcFamous(u)[0] || cardPool(u)[0];
+        if (!label || !scene || !hero) continue;
+        out.push({ id: u, u, name: hero.display, anime: label, img: sceneThumb(scene.id), source: cleanMomentName(scene.desc), baseKey: u + '|' + hero.display });
+    }
+    return (_ALT_ART_CACHE = out);
+}
+function MOMENT_CARDS() {
+    if (_MOMENT_CACHE) return _MOMENT_CACHE;
+    const out = [], per = new Map(), seen = new Set();
+    for (const sc of ARC_SCENES) {
+        const u = sceneUniverseKey(sc.anime); if (!u || !ARC_UNIVERSE_ANIME[u]) continue;
+        const n = cleanMomentName(sc.desc), sig = u + '|' + normalizeRG(n).replace(/\b(combat complet|full hd|clip officiel|bataille finale)\b/g, '').trim();
+        if (!n || seen.has(sig) || (per.get(u) || 0) >= 2) continue;
+        seen.add(sig); per.set(u, (per.get(u) || 0) + 1);
+        out.push({ id: sc.id, u, name: n, anime: ARC_UNIVERSE_ANIME[u], img: sceneThumb(sc.id), source: n });
+    }
+    return (_MOMENT_CACHE = out);
+}
+function altArtById(id) { return ALT_ART_CARDS().find(x => x.id === String(id)) || null; }
+function momentById(id) { return MOMENT_CARDS().find(x => x.id === String(id)) || null; }
+async function awardBonusCard(uid, kind) {
+    const list = kind === 'altart' ? ALT_ART_CARDS() : MOMENT_CARDS(); if (!list.length) return null;
+    const c = list[Math.floor(Math.random() * list.length)], key = kind + '|' + c.id;
+    const isNew = await cardGive(uid, { key }, false), coins = kind === 'altart' ? 90 : 120;
+    if (!isNew) await ecoAddCoins(uid, coins);
+    return { ...c, key, rarity: kind, isNew, shiny:false, coins:isNew ? 0 : coins, bonus:true };
+}
+Object.assign(RAR_RANK, { altart: 5, moment: 5 });
+DECK_BONUS.altart = 18;
+
+const _openBoosterAltMoment = openBooster;
+openBooster = async function(uid, n, type='') {
+    const out = await _openBoosterAltMoment(uid, n, type);
+    let luck = await cardLuck(uid);
+    if (type === 'admin' && await isPrivUid(uid)) luck *= 10;
+    const slots = Math.max(1, Number(n) || (Array.isArray(out) ? out.length : 1));
+    const altChance = Math.min(.55, 1 - Math.pow(1 - ALT_ART_RATE, slots * luck));
+    const momentChance = Math.min(.45, 1 - Math.pow(1 - MOMENT_CARD_RATE, slots * luck));
+    if (Math.random() < altChance) { const c = await awardBonusCard(uid, 'altart'); if (c) out.push(c); }
+    if (Math.random() < momentChance) { const c = await awardBonusCard(uid, 'moment'); if (c) out.push(c); }
+    return out;
+};

@@ -1955,6 +1955,10 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
+                        <button class="arc-game-btn" data-seven="connections" onclick="openArcadeGame('connections')"><span class="arc-ico">🧩</span><b>Anime Connections</b><span>16 persos → retrouve 4 groupes de 4 qui partagent un lien</span></button>
+                        <button class="arc-game-btn" data-seven="codeanime" onclick="openArcadeGame('codeanime')"><span class="arc-ico">🕵️</span><b>Code Anime</b><span>Deux équipes, un indice + un nombre, et un assassin à éviter</span></button>
+                        <button class="arc-game-btn" data-seven="ordre" onclick="openArcadeGame('ordre')"><span class="arc-ico">⏳</span><b>Remets-les dans l’ordre</b><span>Classe 5 persos selon une donnée objective</span></button>
+                        <button class="arc-game-btn" data-seven="gridchallenge" onclick="openArcadeGame('gridchallenge')"><span class="arc-ico">🎯</span><b>Grid Challenge</b><span>3 univers × 3 catégories à remplir avec des persos valides</span></button>
                     </div>
                 </div>
 
@@ -10453,7 +10457,7 @@
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -11783,11 +11787,11 @@
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -11798,7 +11802,8 @@
                 halloween: [40, ['#ff7a00', '#ffb347', '#8a2be2', '#39ff14', '#111111'], 230, 'orbit'],
                 eveillee: [46, ['#ff2d55', '#ff8a00', '#ffffff', '#b3001b'], 260, 'up'], legende: [64, ['#ff4500', '#ffd700', '#ffffff', '#ff2a5f'], 320, 'out'],
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
-                valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out']
+                valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
+                altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out']
             };
             function smParticles(host, rar) {
                 const cfg = PARTS[rar]; if (!cfg) return;
@@ -12634,6 +12639,13 @@
         .tcard.r-legende .tc-rar{background:linear-gradient(90deg,#ff4500,#ffd700,#ff2a5f);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
         .tcard.r-duo{border:2px solid #00e5a0;box-shadow:0 0 12px rgba(0,229,160,.6);}
         .tcard.r-duo .tc-rar{color:#00e5a0;font-weight:900;}
+        .tcard.r-altart{border:3px solid transparent;background:linear-gradient(#111522,#111522) padding-box,linear-gradient(135deg,#00f0ff,#7b5cff,#ff2a95,#00f0ff) border-box;background-size:auto,300% 300%;animation:secretGlow 5s linear infinite;box-shadow:0 0 18px rgba(0,240,255,.38),0 0 34px rgba(123,92,255,.25);}
+        .tcard.r-altart .tc-img::after{content:'ALT ART';position:absolute;right:5px;bottom:5px;padding:2px 5px;border-radius:5px;background:rgba(5,8,18,.78);color:#9ff7ff;font-size:.58rem;font-weight:1000;letter-spacing:.7px;z-index:4;}
+        .tcard.r-altart .tc-rar{background:linear-gradient(90deg,#00f0ff,#a889ff,#ff7acb);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        .tcard.r-moment{border:3px solid #ffb000;background:linear-gradient(160deg,#1f1305,#101018 65%);box-shadow:0 0 16px rgba(255,176,0,.55),0 0 30px rgba(255,70,70,.18);}
+        .tcard.r-moment .tc-img::after{content:'🎬 MOMENT';position:absolute;right:5px;bottom:5px;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.78);color:#ffd56a;font-size:.58rem;font-weight:1000;letter-spacing:.5px;z-index:4;}
+        .tcard.r-moment .tc-rar{color:#ffd56a;font-weight:900;text-shadow:0 0 8px rgba(255,176,0,.5);}
+
         .tcard.r-noel{border:3px solid transparent;background:linear-gradient(#10150f,#10150f) padding-box,repeating-linear-gradient(45deg,#e8363d 0 8px,#fff 8px 16px,#1faa59 16px 24px,#fff 24px 32px) border-box;box-shadow:0 0 12px rgba(232,54,61,.5);}
         .tcard.r-noel .tc-img::after{content:'❄ ❅ ❆ ❄ ❅';position:absolute;inset:0;color:#fff;font-size:.8rem;letter-spacing:10px;word-break:break-all;opacity:.8;animation:rSnow 5s linear infinite;text-shadow:0 0 4px #9df;}
         .tcard.r-noel .tc-rar{color:#ff6b6b;font-weight:900;}
@@ -12726,8 +12738,8 @@
             const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff' };
             const FIN_ORDER = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
             const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'noel', 'valentin', 'ete'];
-            Object.assign(RAR_LABEL, { eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️' });
-            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️' });
+            Object.assign(RAR_LABEL, { eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
             const CARD_CACHE = window.CARD_CACHE = {};
             const esc = s => v7esc(s == null ? '' : String(s));
             function keyOf(c) {
@@ -12886,7 +12898,7 @@
                     <p class="tl-hint" style="text-align:left;">Chaque carte que tu gagnes peut sortir avec une <b>finition</b> en plus de sa rareté (la chance x2 / x10 marche aussi). Passe la souris sur une carte, ou clique dessus pour l’inspecter en 3D.</p>
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
-                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png', 'https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
+                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png', 'https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
                     <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
@@ -12913,6 +12925,15 @@
                 const s2 = document.createElement('div');
                 s2.innerHTML = `<h3 class="adm-h">🎴 Cartes Duo <small class="tl-hint">${X.duos.length}/${X.duoTotal} • 1 carte sur 300 dans les boosters</small></h3>${X.duos.length ? `<div class="card-grid">${X.duos.map(c => cardHtml(c)).join('')}</div>` : '<p class="tl-hint">Pas encore de carte Duo : elles tombent au hasard dans les boosters.</p>'}`;
                 box.insertBefore(s2, list);
+                const renderSpecialSet = (title, arr, total, rateText) => {
+                    if (!Array.isArray(arr) || !total) return;
+                    const own = arr.filter(c => c.owned).length;
+                    const s = document.createElement('div');
+                    s.innerHTML = `<h3 class="adm-h">${title} <small class="tl-hint">${own}/${total} • ${rateText}</small></h3><div class="card-grid">${arr.map(c => c.owned ? cardHtml(c) : cardHtml({ rarity:c.rarity, img:c.img })).join('')}</div>`;
+                    box.insertBefore(s, list);
+                };
+                renderSpecialSet('🖼️ Alt Arts', X.altArts, X.altArtTotal, 'illustrations alternatives exclusives aux boosters');
+                renderSpecialSet('🎬 Cartes Moment', X.moments, X.momentTotal, 'scènes cultes exclusives aux boosters');
             };
         })();
     </script>
@@ -12936,13 +12957,13 @@
         .trd-mini .tm-fin{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:900;padding:1px 5px;border-radius:99px;background:rgba(0,0,0,.8);border:1px solid var(--fc,#fff);}
         .trd-mini .tm-duo{display:flex;width:100%;height:70px;border-radius:6px;overflow:hidden;}
         .trd-mini .tm-duo img{width:50%;height:70px;object-fit:cover;object-position:top;border-radius:0;}
-        .trd-mini.r-eveillee{border-color:#ff2d55;} .trd-mini.r-legende{border-color:#ff4500;} .trd-mini.r-duo{border-color:#00e5a0;}
+        .trd-mini.r-eveillee{border-color:#ff2d55;} .trd-mini.r-legende{border-color:#ff4500;} .trd-mini.r-duo{border-color:#00e5a0;} .trd-mini.r-altart{border-color:#00f0ff;} .trd-mini.r-moment{border-color:#ffb000;}
         .trd-mini.f-dark img{filter:invert(1) hue-rotate(180deg);} .trd-mini.f-manga img{filter:grayscale(1) contrast(1.5);} .trd-mini.f-gold img{filter:sepia(.45) saturate(1.5);}
     </style>
     <script>
         (function () {
-            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -13095,7 +13116,7 @@ ARC_UI.gridchallenge={title:'🎯 GRID CHALLENGE',sub:'3 univers × 3 catégorie
 let arcConnPrivate={solved:[]},arcConnSelection=[],arcCodePrivate=null,arcOrderIds=[],arcOrderKey='',arcGridPrivate={solved:{},attempts:0};
 
 (function addSevenGameButtons(){
-    const run=()=>{const grid=document.querySelector('.arc-menu .arc-game-grid');if(!grid||grid.querySelector('[data-seven="connections"]'))return;
+    const run=()=>{const grid=document.querySelector('.arc-menu .arc-menu-grid');if(!grid||grid.querySelector('[data-seven="connections"]'))return;
         const defs=[['connections','🧩','Anime Connections','16 persos → forme 4 groupes de 4'],['codeanime','🕵️','Code Anime','2 équipes, indices secrets et assassin'],['ordre','⏳','Remets-les dans l’ordre','Classe 5 persos selon une donnée'],['gridchallenge','🎯','Grid Challenge','3 univers × 3 catégories à remplir']];
         defs.forEach(([id,ico,name,sub])=>{const b=document.createElement('button');b.className='arc-game-btn';b.dataset.seven=id;b.innerHTML=`<span class="arc-ico">${ico}</span><b>${name}</b><span>${sub}</span>`;b.onclick=()=>openArcadeGame(id);grid.appendChild(b);});};
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else setTimeout(run,0);
@@ -13148,5 +13169,48 @@ async function loadHallOfFame(){
     box.innerHTML=d.seasons.map(s=>{const month=new Date(s.season+'-01T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});const c=s.champion;return `<div class="hof-season"><h3>📅 ${escHtml(month.charAt(0).toUpperCase()+month.slice(1))}</h3>${c?`<div class="hof-champ">👑 Champion global : <b>${escHtml(c.pseudo)}</b> • ${c.points} pts • ${c.wins} V</div>`:''}<div class="hof-modes">${(s.modes||[]).map(x=>`<div class="hof-mode"><b>${escHtml(x.label)}</b><br>🏆 ${escHtml(x.winner.pseudo)} • ${x.winner.wins} V • ${x.winner.points} pts</div>`).join('')}</div></div>`;}).join('');
 }
 </script>
+
+<style id="opt-collapse-style">
+    #options .opt-collapse-head,#admin .opt-collapse-head{display:flex;align-items:center;gap:10px;cursor:default;}
+    #options .opt-collapse-head .opt-collapse-btn,#admin .opt-collapse-head .opt-collapse-btn{
+        margin-left:auto;flex:0 0 auto;width:34px;height:30px;border-radius:8px;border:1px solid #41415b;
+        background:#171724;color:var(--accent-cyan);font-size:1rem;font-weight:1000;cursor:pointer;line-height:1;
+    }
+    #options .opt-collapse-head .opt-collapse-btn:hover,#admin .opt-collapse-head .opt-collapse-btn:hover{border-color:var(--accent-cyan);background:#202034;}
+    #options .opt-collapse-body,#admin .opt-collapse-body{display:block;}
+    #options .opt-collapsed>.opt-collapse-body,#admin .opt-collapsed>.opt-collapse-body{display:none!important;}
+    #options .opt-collapsed>.opt-collapse-head,#admin .opt-collapsed>.opt-collapse-head{margin-bottom:0!important;}
+</style>
+<script>
+/* ===== OPTIONS / ADMIN : catégories repliables ===== */
+(function(){
+    const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase().replace(/[^a-z0-9à-ÿ]+/gi,'-').slice(0,80);
+    function make(panel,scope){
+        if(!panel||panel.dataset.optCollapseReady==='1')return;
+        const h=[...panel.children].find(x=>x.tagName==='H2'); if(!h)return;
+        panel.dataset.optCollapseReady='1';
+        h.classList.add('opt-collapse-head');
+        const title=(h.textContent||'section').trim();
+        const key='animegame:collapse:v3:'+scope+':'+(panel.id||norm(title));
+        const body=document.createElement('div'); body.className='opt-collapse-body';
+        let n=h.nextSibling; while(n){const next=n.nextSibling; body.appendChild(n); n=next;}
+        panel.appendChild(body);
+        const b=document.createElement('button'); b.type='button'; b.className='opt-collapse-btn'; b.setAttribute('aria-label','Réduire ou ouvrir '+title); h.appendChild(b);
+        let collapsed=false; try{collapsed=localStorage.getItem(key)==='1';}catch(_){}
+        const apply=()=>{panel.classList.toggle('opt-collapsed',collapsed);b.textContent=collapsed?'▶':'▼';b.title=collapsed?'Ouvrir la catégorie':'Réduire la catégorie';b.setAttribute('aria-expanded',collapsed?'false':'true');};
+        b.onclick=e=>{e.preventDefault();e.stopPropagation();collapsed=!collapsed;try{localStorage.setItem(key,collapsed?'1':'0');}catch(_){}apply();};
+        apply();
+    }
+    function scan(){
+        const opts=document.getElementById('options');
+        if(opts)[...opts.children].filter(x=>x.nodeType===1&&[...x.children].some(c=>c.tagName==='H2')).forEach(x=>make(x,'options'));
+        const adm=document.getElementById('admin');
+        if(adm)adm.querySelectorAll('.opt-panel').forEach(x=>make(x,'admin'));
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan);else scan();
+    const obs=new MutationObserver(()=>scan()); if(document.body)obs.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
 </body>
 </html>
