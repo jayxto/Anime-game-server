@@ -1,0 +1,804 @@
+# Image cache report
+
+Generated: 2026-10-01T12:32:11.031Z
+
+- Character entries: **1736**
+- Already cached: **0**
+- Downloaded / converted: **1088**
+- Missing images resolved automatically: **0**
+- Character failures: **648**
+- Extra JSON image URLs: **1697**
+- Extra images downloaded: **1042**
+- Hard-coded code image URLs detected (report only): **4**
+- Approx. size reduction this run: **84%**
+
+## Failed characters
+
+- **bleach — toshiro hitsugaya**: char-images: HTTP 404
+- **bleach — jushiro ukitake**: char-images: HTTP 404
+- **bleach — uryu ishida**: char-images: HTTP 404
+- **bleach — shunsui kyoraku**: char-images: HTTP 404
+- **bleach — kaname tosen**: char-images: HTTP 404
+- **bleach — baraggan louisenbairn**: char-images: HTTP 404
+- **bleach — sosuke aizen**: char-images: HTTP 404
+- **bleach — yoruichi shihoin**: char-images: HTTP 404
+- **bleach — nnoitra gilga**: char-images: HTTP 404
+- **bleach — kukaku shiba**: char-images: HTTP 404
+- **bleach — hanataro yamada**: char-images: HTTP 404
+- **bleach — ganju shiba**: char-images: HTTP 404
+- **bluelock — alexis ness**: char-images: HTTP 404
+- **bluelock — charles chevalier**: char-images: HTTP 404
+- **bluelock — yo hiori**: char-images: HTTP 404
+- **bluelock — lavinho**: char-images: HTTP 404
+- **bluelock — oliver aiku**: char-images: HTTP 404
+- **bluelock — don lorenzo**: char-images: HTTP 404
+- **bluelock — chris prince**: char-images: HTTP 404
+- **bluelock — michael kaiser**: char-images: HTTP 404
+- **bluelock — marc snuffy**: char-images: HTTP 404
+- **bluelock — miroku darai**: char-images: HTTP 404
+- **bluelock — teppei neru**: char-images: HTTP 404
+- **bluelock — kazuma niou**: char-images: HTTP 404
+- **bluelock — gen fukaku**: char-images: HTTP 404
+- **bluelock — ryosuke kira**: char-images: HTTP 404
+- **bluelock — shuto sendou**: char-images: HTTP 404
+- **chainsaw — pochita**: char-images: HTTP 404
+- **chainsaw — aldo**: char-images: HTTP 404
+- **chainsaw — tsugihagi**: char-images: HTTP 404
+- **chainsaw — tolka**: char-images: HTTP 404
+- **chainsaw — cosmo**: char-images: HTTP 404
+- **chainsaw — quanxi**: char-images: HTTP 404
+- **chainsaw — santa claus**: char-images: HTTP 404
+- **chainsaw — pingtsi**: char-images: HTTP 404
+- **chainsaw — asa mitaka**: char-images: HTTP 404
+- **chainsaw — long**: char-images: HTTP 404
+- **chainsaw — hirofumi yoshida**: char-images: HTTP 404
+- **chainsaw — yoru**: char-images: HTTP 404
+- **chainsaw — fami**: char-images: HTTP 404
+- **chainsaw — haruka iseumi**: char-images: HTTP 404
+- **chainsaw — nayuta**: char-images: HTTP 404
+- **chainsaw — seigi akoku**: char-images: HTTP 404
+- **chainsaw — nobana higashiyama**: char-images: HTTP 404
+- **chainsaw — barem bridge**: char-images: HTTP 404
+- **chainsaw — miri sugo**: char-images: HTTP 404
+- **chainsaw — gun devil**: char-images: HTTP 404
+- **chainsaw — spear hybrid**: char-images: HTTP 404
+- **chainsaw — whip hybrid**: char-images: HTTP 404
+- **chainsaw — darkness devil**: char-images: HTTP 404
+- **chainsaw — demon des tenebres**: char-images: HTTP 404
+- **chainsaw — falling devil**: char-images: HTTP 404
+- **chainsaw — justice devil**: char-images: HTTP 404
+- **chainsaw — demon de la chute**: char-images: HTTP 404
+- **chainsaw — demon de la justice**: char-images: HTTP 404
+- **chainsaw — hell devil**: char-images: HTTP 404
+- **chainsaw — demon de l'enfer**: char-images: HTTP 404
+- **chainsaw — aging devil**: char-images: HTTP 404
+- **chainsaw — yuko**: char-images: HTTP 404
+- **chainsaw — michiko tendo**: char-images: HTTP 404
+- **chainsaw — fumiko mifune**: char-images: HTTP 404
+- **clover — patry**: char-images: HTTP 404
+- **clover — patolli**: char-images: HTTP 404
+- **clover — rades spirito**: char-images: HTTP 404
+- **clover — secre swallowtail**: char-images: HTTP 404
+- **clover — lucius zogratis**: char-images: HTTP 404
+- **cote — miyabi nagumo**: char-images: HTTP 404
+- **cote — tsubasa nanase**: char-images: HTTP 404
+- **cote — nanase tsubasa**: char-images: HTTP 404
+- **cote — takuya yagami**: char-images: HTTP 404
+- **cote — ken sudo**: char-images: HTTP 404
+- **cote — rokusuke koenji**: char-images: HTTP 404
+- **cote — kazuma sakagami**: char-images: HTTP 404
+- **cote — ichika amasawa**: char-images: HTTP 404
+- **cote — kazuomi hosen**: char-images: HTTP 404
+- **cote — maya sato**: char-images: HTTP 404
+- **cote — fuka kiryuin**: char-images: HTTP 404
+- **deathnote — midora**: char-images: HTTP 404
+- **deathnote — calikarcha**: char-images: HTTP 404
+- **deathnote — soichiro yagami**: char-images: HTTP 404
+- **deathnote — shingo mido**: char-images: HTTP 404
+- **deathnote — armonia justin beyondormason**: char-images: HTTP 404
+- **deathnote — deridovely**: char-images: HTTP 404
+- **deathnote — zellogi**: char-images: HTTP 404
+- **deathnote — nu**: char-images: HTTP 404
+- **demonslayer — kokushibo**: char-images: HTTP 404
+- **demonslayer — kanae kocho**: char-images: HTTP 404
+- **demonslayer — shinjuro rengoku**: char-images: HTTP 404
+- **demonslayer — gyokko**: char-images: HTTP 404
+- **demonslayer — senjuro rengoku**: char-images: HTTP 404
+- **demonslayer — michikatsu tsugikuni**: char-images: HTTP 404
+- **demonslayer — tanjuro kamado**: char-images: HTTP 404
+- **demonslayer — hand demon**: char-images: HTTP 404
+- **demonslayer — kanata ubuyashiki**: char-images: HTTP 404
+- **dragonball — sangohan**: char-images: HTTP 404
+- **dragonball — son gohan**: char-images: HTTP 404
+- **dragonball — sangoten**: char-images: HTTP 404
+- **dragonball — roi vegeta**: char-images: HTTP 404
+- **dragonball — goten**: char-images: HTTP 404
+- **dragonball — broly**: char-images: HTTP 404
+- **dragonball — king vegeta**: char-images: HTTP 404
+- **dragonball — tarble**: char-images: HTTP 404
+- **dragonball — gine**: char-images: HTTP 404
+- **dragonball — vegito**: char-images: HTTP 404
+- **dragonball — vegeto**: char-images: HTTP 404
+- **dragonball — gogeta**: char-images: HTTP 404
+- **dragonball — king cold**: char-images: HTTP 404
+- **dragonball — roi cold**: char-images: HTTP 404
+- **dragonball — dodoria**: char-images: HTTP 404
+- **dragonball — jeece**: char-images: HTTP 404
+- **dragonball — jeice**: char-images: HTTP 404
+- **dragonball — cooler**: char-images: HTTP 404
+- **dragonball — burter**: char-images: HTTP 404
+- **dragonball — barta**: char-images: HTTP 404
+- **dragonball — zarbon**: char-images: HTTP 404
+- **dragonball — recoome**: char-images: HTTP 404
+- **dragonball — guldo**: char-images: HTTP 404
+- **dragonball — dabura**: char-images: HTTP 404
+- **dragonball — dr gero**: char-images: HTTP 404
+- **dragonball — docteur gero**: char-images: HTTP 404
+- **dragonball — android 19**: char-images: HTTP 404
+- **dragonball — kibito**: char-images: HTTP 404
+- **dragonball — babidi**: char-images: HTTP 404
+- **dragonball — champa**: char-images: HTTP 404
+- **dragonball — c 19**: char-images: HTTP 404
+- **dragonball — grand pretre**: char-images: HTTP 404
+- **dragonball — grand priest**: char-images: HTTP 404
+- **dragonball — son goku**: char-images: HTTP 404
+- **dragonball — sangoku**: char-images: HTTP 404
+- **dragonball — frost**: char-images: HTTP 404
+- **dragonball — cabba**: char-images: HTTP 404
+- **dragonball — magetta**: char-images: HTTP 404
+- **dragonball — botamo**: char-images: HTTP 404
+- **dragonball — kefla**: char-images: HTTP 404
+- **dragonball — paragus**: char-images: HTTP 404
+- **dragonball — toppo**: char-images: HTTP 404
+- **dragonball — gotenks**: char-images: HTTP 404
+- **dragonball — dyspo**: char-images: HTTP 404
+- **dragonball — elec**: char-images: HTTP 404
+- **dragonball — merus**: char-images: HTTP 404
+- **dragonball — moro**: char-images: HTTP 404
+- **dragonball — gas**: char-images: HTTP 404
+- **dragonball — janemba**: char-images: HTTP 404
+- **dragonball — granolah**: char-images: HTTP 404
+- **dragonball — nail**: char-images: HTTP 404
+- **dragonball — android 13**: char-images: HTTP 404
+- **dragonball — grand chef**: char-images: HTTP 404
+- **dragonball — guru**: char-images: HTTP 404
+- **dragonball — c 13**: char-images: HTTP 404
+- **dragonball — baby**: char-images: HTTP 404
+- **dragonball — android 21**: char-images: HTTP 404
+- **dragonball — c 21**: char-images: HTTP 404
+- **dragonball — porunga**: char-images: HTTP 404
+- **dragonball — omega shenron**: char-images: HTTP 404
+- **dragonball — li shenron**: char-images: HTTP 404
+- **dragonball — bojack**: char-images: HTTP 404
+- **dragonball — garlic jr**: char-images: HTTP 404
+- **dragonball — garlic junior**: char-images: HTTP 404
+- **dragonball — tullece**: char-images: HTTP 404
+- **dragonball — jaco**: char-images: HTTP 404
+- **dragonball — sorbet**: char-images: HTTP 404
+- **dragonball — turles**: char-images: HTTP 404
+- **dragonball — lord slug**: char-images: HTTP 404
+- **dragonball — marcarita**: char-images: HTTP 404
+- **dragonball — belmod**: char-images: HTTP 404
+- **dragonball — tagoma**: char-images: HTTP 404
+- **dragonball — heles**: char-images: HTTP 404
+- **dragonball — marron**: char-images: HTTP 404
+- **dragonball — quitela**: char-images: HTTP 404
+- **fairy — lector**: char-images: HTTP 404
+- **fairy — jura neekis**: char-images: HTTP 404
+- **fairy — dimaria yesta**: char-images: HTTP 404
+- **fairy — irene belserion**: char-images: HTTP 404
+- **fairy — brandish**: char-images: HTTP 404
+- **fairy — august**: char-images: HTTP 404
+- **fairy — hades**: char-images: HTTP 404
+- **fireforce — kurono yuichiro**: char-images: HTTP 404
+- **fireforce — giovanni**: char-images: HTTP 404
+- **fireforce — inca kasugatani**: char-images: HTTP 404
+- **fireforce — ritsu**: char-images: HTTP 404
+- **fireforce — akitaru obi**: char-images: HTTP 404
+- **fireforce — pan ko paat**: char-images: HTTP 404
+- **fireforce — dragon**: char-images: HTTP 404
+- **fireforce — yuichiro kurono**: char-images: HTTP 404
+- **fma — heymans breda**: char-images: HTTP 404
+- **fma — yoki**: char-images: HTTP 404
+- **fma — grumman**: char-images: HTTP 404
+- **fma — denny brosh**: char-images: HTTP 404
+- **fma — alexander**: char-images: HTTP 404
+- **fma — tim marcoh**: char-images: HTTP 404
+- **fma — frank archer**: char-images: HTTP 404
+- **fma — chris mustang**: char-images: HTTP 404
+- **fma — cornello**: char-images: HTTP 404
+- **fma — rebecca catalina**: char-images: HTTP 404
+- **fma — isaac mcdougal**: char-images: HTTP 404
+- **fma — basque grand**: char-images: HTTP 404
+- **gachiakuta — delmon**: char-images: HTTP 404
+- **gachiakuta — riyo reaper**: char-images: HTTP 404
+- **gachiakuta — guita**: char-images: HTTP 404
+- **gachiakuta — follo**: char-images: HTTP 404
+- **gachiakuta — tomme**: char-images: HTTP 404
+- **gachiakuta — august**: char-images: HTTP 404
+- **gachiakuta — bro**: char-images: HTTP 404
+- **gachiakuta — dear**: char-images: HTTP 404
+- **gachiakuta — gris**: char-images: HTTP 404
+- **gachiakuta — corvus**: char-images: HTTP 404
+- **gachiakuta — eishia**: char-images: HTTP 404
+- **gachiakuta — noerde**: char-images: HTTP 404
+- **gachiakuta — bundus**: char-images: HTTP 404
+- **gachiakuta — cthoni**: char-images: HTTP 404
+- **gachiakuta — remlin**: char-images: HTTP 404
+- **gachiakuta — fu**: char-images: HTTP 404
+- **gachiakuta — alice**: char-images: HTTP 404
+- **haikyuu — tamahiko teshiro**: char-images: HTTP 404
+- **haikyuu — shinji watari**: char-images: HTTP 404
+- **haikyuu — suguru daisho**: char-images: HTTP 404
+- **haikyuu — reon ohira**: char-images: HTTP 404
+- **haikyuu — yuji terushima**: char-images: HTTP 404
+- **hellsparadise — lan ban**: char-images: HTTP 404
+- **hellsparadise — isuzu**: char-images: HTTP 404
+- **hellsparadise — kiyomaru**: char-images: HTTP 404
+- **hellsparadise — yamada asaemon kisho**: char-images: HTTP 404
+- **hxh — tsubone**: char-images: HTTP 404
+- **hxh — hanzo**: char-images: HTTP 404
+- **hxh — buhara**: char-images: HTTP 404
+- **hxh — lippo**: char-images: HTTP 404
+- **hxh — amane**: char-images: HTTP 404
+- **hxh — pokkle**: char-images: HTTP 404
+- **hxh — milluki zoldyck**: char-images: HTTP 404
+- **hxh — bodoro**: char-images: HTTP 404
+- **hxh — kikyo zoldyck**: char-images: HTTP 404
+- **hxh — geretta**: char-images: HTTP 404
+- **hxh — squala**: char-images: HTTP 404
+- **hxh — tonpa**: char-images: HTTP 404
+- **hxh — basho**: char-images: HTTP 404
+- **hxh — light nostrade**: char-images: HTTP 404
+- **fairy — yukino agria**: char-images: HTTP 404
+- **hxh — dalzollene**: char-images: HTTP 404
+- **hxh — baise**: char-images: HTTP 404
+- **hxh — bonolenov ndongo**: char-images: HTTP 404
+- **hxh — franklin bordeau**: char-images: HTTP 404
+- **hxh — sub**: char-images: HTTP 404
+- **hxh — kortopi**: char-images: HTTP 404
+- **hxh — razor**: char-images: HTTP 404
+- **hxh — genthru**: char-images: HTTP 404
+- **hxh — shalnark**: char-images: HTTP 404
+- **hxh — bara**: char-images: HTTP 404
+- **hxh — goreinu**: char-images: HTTP 404
+- **hxh — tsezguerra**: char-images: HTTP 404
+- **hxh — reina**: char-images: HTTP 404
+- **hxh — cheetu**: char-images: HTTP 404
+- **hxh — abengane**: char-images: HTTP 404
+- **hxh — leol**: char-images: HTTP 404
+- **hxh — pike**: char-images: HTTP 404
+- **hxh — zazan**: char-images: HTTP 404
+- **hxh — welfin**: char-images: HTTP 404
+- **hxh — rammot**: char-images: HTTP 404
+- **hxh — kastro**: char-images: HTTP 404
+- **hxh — gyro**: char-images: HTTP 404
+- **hxh — bloster**: char-images: HTTP 404
+- **hxh — cheadle yorkshire**: char-images: HTTP 404
+- **hxh — mizaistom nana**: char-images: HTTP 404
+- **jjk — jinichi zenin**: char-images: HTTP 404
+- **jjk — shoko ieiri**: char-images: HTTP 404
+- **jjk — hajime kashimo**: char-images: HTTP 404
+- **jjk — mechamaru**: char-images: HTTP 404
+- **jjk — hiromi higuruma**: char-images: HTTP 404
+- **jjk — tengen**: char-images: HTTP 404
+- **jjk — ogi zenin**: char-images: HTTP 404
+- **jjk — naoya zenin**: char-images: HTTP 404
+- **jjk — angel**: char-images: HTTP 404
+- **jjk — hana kurusu**: char-images: HTTP 404
+- **jjk — fumihiko takaba**: char-images: HTTP 404
+- **jjk — remi**: char-images: HTTP 404
+- **jjk — reggie star**: char-images: HTTP 404
+- **jjk — rin amai**: char-images: HTTP 404
+- **jjk — iori hazenoki**: char-images: HTTP 404
+- **jjk — chizuru hari**: char-images: HTTP 404
+- **jjk — kirara hoshi**: char-images: HTTP 404
+- **jjk — ryu ishigori**: char-images: HTTP 404
+- **jjk — dhruv lakdawalla**: char-images: HTTP 404
+- **jjk — yorozu**: char-images: HTTP 404
+- **jjk — takako uro**: char-images: HTTP 404
+- **jjk — charles bernard**: char-images: HTTP 404
+- **jjk — kurourushi**: char-images: HTTP 404
+- **jjk — rika orimoto**: char-images: HTTP 404
+- **jojo — mariah**: char-images: HTTP 404
+- **jojo — jean pierre polnareff**: char-images: HTTP 404
+- **jojo — johnny joestar**: char-images: HTTP 404
+- **jojo — giorno giovanna**: char-images: HTTP 404
+- **jojo — oingo**: char-images: HTTP 404
+- **jojo — vanilla ice**: char-images: HTTP 404
+- **jojo — jolyne cujoh**: char-images: HTTP 404
+- **jojo — bruno bucciarati**: char-images: HTTP 404
+- **jojo — guido mista**: char-images: HTTP 404
+- **jojo — pet shop**: char-images: HTTP 404
+- **jojo — narancia ghirga**: char-images: HTTP 404
+- **jojo — trish una**: char-images: HTTP 404
+- **jojo — leone abbacchio**: char-images: HTTP 404
+- **jojo — pannacotta fugo**: char-images: HTTP 404
+- **jojo — vinegar doppio**: char-images: HTTP 404
+- **jojo — diavolo**: char-images: HTTP 404
+- **jojo — prosciutto**: char-images: HTTP 404
+- **jojo — risotto nero**: char-images: HTTP 404
+- **jojo — pesci**: char-images: HTTP 404
+- **jojo — formaggio**: char-images: HTTP 404
+- **jojo — ghiaccio**: char-images: HTTP 404
+- **jojo — illuso**: char-images: HTTP 404
+- **jojo — melone**: char-images: HTTP 404
+- **jojo — foo fighters**: char-images: HTTP 404
+- **jojo — ermes costello**: char-images: HTTP 404
+- **jojo — narciso anasui**: char-images: HTTP 404
+- **jojo — josuke higashikata gappy**: char-images: HTTP 404
+- **jojo — weather report**: char-images: HTTP 404
+- **jojo — diego brando**: char-images: HTTP 404
+- **jojo — emporio alnino**: char-images: HTTP 404
+- **jojo — gyro zeppeli**: char-images: HTTP 404
+- **jojo — funny valentine**: char-images: HTTP 404
+- **jojo — enrico pucci**: char-images: HTTP 404
+- **jojo — hot pants**: char-images: HTTP 404
+- **jojo — lucy steel**: char-images: HTTP 404
+- **jojo — n'doul**: char-images: HTTP 404
+- **jojo — alessi**: char-images: HTTP 404
+- **jojo — george joestar**: char-images: HTTP 404
+- **jojo — keicho nijimura**: char-images: HTTP 404
+- **jojo — daniel j d'arby**: char-images: HTTP 404
+- **jojo — mikitaka hazekura**: char-images: HTTP 404
+- **jojo — cioccolata**: char-images: HTTP 404
+- **jojo — squalo**: char-images: HTTP 404
+- **jojo — gwess**: char-images: HTTP 404
+- **jojo — tiziano**: char-images: HTTP 404
+- **jojo — polpo**: char-images: HTTP 404
+- **jojo — telence t d'arby**: char-images: HTTP 404
+- **jojo — secco**: char-images: HTTP 404
+- **jojo — johngalli a**: char-images: HTTP 404
+- **jojo — sports maxx**: char-images: HTTP 404
+- **jojo — rikiel**: char-images: HTTP 404
+- **jojo — ringo roadagain**: char-images: HTTP 404
+- **jojo — blackmore**: char-images: HTTP 404
+- **jojo — pocoloco**: char-images: HTTP 404
+- **jojo — sandman**: char-images: HTTP 404
+- **jojo — mountain tim**: char-images: HTTP 404
+- **jojo — magent magent**: char-images: HTTP 404
+- **jojo — axl ro**: char-images: HTTP 404
+- **jojo — dr ferdinand**: char-images: HTTP 404
+- **jojo — wekapipo**: char-images: HTTP 404
+- **jojo — joshu higashikata**: char-images: HTTP 404
+- **jojo — yasuho hirose**: char-images: HTTP 404
+- **jojo — norisuke higashikata iv**: char-images: HTTP 404
+- **jojo — jobin higashikata**: char-images: HTTP 404
+- **jojo — toru**: char-images: HTTP 404
+- **jojo — tsurugi higashikata**: char-images: HTTP 404
+- **jojo — versus**: char-images: HTTP 404
+- **mushoku — zanoba shirone**: char-images: HTTP 404
+- **mushoku — sara**: char-images: HTTP 404
+- **mushoku — pursena adoldia**: char-images: HTTP 404
+- **mushoku — soldat heckler**: char-images: HTTP 404
+- **mushoku — linia dedoldia**: char-images: HTTP 404
+- **mushoku — badigadi**: char-images: HTTP 404
+- **mushoku — randolph marianne**: char-images: HTTP 404
+- **mushoku — atofe**: char-images: HTTP 404
+- **mushoku — ariel anemoi asura**: char-images: HTTP 404
+- **mushoku — cliff grimoire**: char-images: HTTP 404
+- **mushoku — geese nukadia**: char-images: HTTP 404
+- **mushoku — luke notos greyrat**: char-images: HTTP 404
+- **mushoku — julie**: char-images: HTTP 404
+- **naruto — danzo shimura**: char-images: HTTP 404
+- **naruto — gai maito**: char-images: HTTP 404
+- **naruto — might guy**: char-images: HTTP 404
+- **naruto — kakuzu**: char-images: HTTP 404
+- **naruto — a**: char-images: HTTP 404
+- **naruto — yahiko**: char-images: HTTP 404
+- **naruto — samui**: char-images: HTTP 404
+- **naruto — kurenai yuhi**: char-images: HTTP 404
+- **naruto — rin nohara**: char-images: HTTP 404
+- **naruto — omoi**: char-images: HTTP 404
+- **naruto — rasa**: char-images: HTTP 404
+- **naruto — yagura karatachi**: char-images: HTTP 404
+- **naruto — karui**: char-images: HTTP 404
+- **naruto — baki**: char-images: HTTP 404
+- **naruto — ao**: char-images: HTTP 404
+- **naruto — chiyo**: char-images: HTTP 404
+- **naruto — chojuro**: char-images: HTTP 404
+- **naruto — suigetsu hozuki**: char-images: HTTP 404
+- **naruto — jugo**: char-images: HTTP 404
+- **naruto — akatsuchi**: char-images: HTTP 404
+- **naruto — mangetsu hozuki**: char-images: HTTP 404
+- **naruto — onoki**: char-images: HTTP 404
+- **naruto — kurotsuchi**: char-images: HTTP 404
+- **naruto — hanzo**: char-images: HTTP 404
+- **naruto — mifune**: char-images: HTTP 404
+- **naruto — gengetsu hozuki**: char-images: HTTP 404
+- **naruto — izuna uchiha**: char-images: HTTP 404
+- **naruto — izuna uchiwa**: char-images: HTTP 404
+- **naruto — mu**: char-images: HTTP 404
+- **naruto — mito uzumaki**: char-images: HTTP 404
+- **naruto — fugaku uchiha**: char-images: HTTP 404
+- **naruto — fugaku uchiwa**: char-images: HTTP 404
+- **naruto — hagoromo otsutsuki**: char-images: HTTP 404
+- **naruto — indra otsutsuki**: char-images: HTTP 404
+- **naruto — hamura otsutsuki**: char-images: HTTP 404
+- **naruto — kaguya otsutsuki**: char-images: HTTP 404
+- **naruto — ashura otsutsuki**: char-images: HTTP 404
+- **naruto — isshiki otsutsuki**: char-images: HTTP 404
+- **naruto — momoshiki otsutsuki**: char-images: HTTP 404
+- **naruto — metal lee**: char-images: HTTP 404
+- **naruto — chocho akimichi**: char-images: HTTP 404
+- **naruto — kinshiki otsutsuki**: char-images: HTTP 404
+- **naruto — toneri otsutsuki**: char-images: HTTP 404
+- **naruto — isobu**: char-images: HTTP 404
+- **naruto — matatabi**: char-images: HTTP 404
+- **naruto — gyuki**: char-images: HTTP 404
+- **naruto — yugito nii**: char-images: HTTP 404
+- **naruto — hiashi hyuga**: char-images: HTTP 404
+- **naruto — son goku**: char-images: HTTP 404
+- **naruto — roshi**: char-images: HTTP 404
+- **naruto — han**: char-images: HTTP 404
+- **naruto — utakata**: char-images: HTTP 404
+- **naruto — kokuo**: char-images: HTTP 404
+- **naruto — saiken**: char-images: HTTP 404
+- **naruto — ibiki morino**: char-images: HTTP 404
+- **naruto — kotetsu hagane**: char-images: HTTP 404
+- **naruto — chomei**: char-images: HTTP 404
+- **naruto — jirobo**: char-images: HTTP 404
+- **naruto — kidomaru**: char-images: HTTP 404
+- **naruto — izumo kamizuki**: char-images: HTTP 404
+- **naruto — sakon**: char-images: HTTP 404
+- **naruto — dosu kinuta**: char-images: HTTP 404
+- **naruto — zaku abumi**: char-images: HTTP 404
+- **naruto — nawaki**: char-images: HTTP 404
+- **naruto — sakumo hatake**: char-images: HTTP 404
+- **naruto — dan kato**: char-images: HTTP 404
+- **naruto — fu**: char-images: HTTP 404
+- **naruto — hizashi hyuga**: char-images: HTTP 404
+- **naruto — inoichi yamanaka**: char-images: HTTP 404
+- **naruto — choza akimichi**: char-images: HTTP 404
+- **onepiece — rob lucci**: char-images: HTTP 404
+- **onepiece — charlotte linlin**: char-images: HTTP 404
+- **onepiece — tony tony chopper**: char-images: HTTP 404
+- **onepiece — eustass kid**: char-images: HTTP 404
+- **onepiece — arlong**: char-images: HTTP 404
+- **onepiece — sakazuki**: char-images: HTTP 404
+- **onepiece — bartholomew kuma**: char-images: HTTP 404
+- **onepiece — charlotte katakuri**: char-images: HTTP 404
+- **onepiece — magellan**: char-images: HTTP 404
+- **onepiece — tashigi**: char-images: HTTP 404
+- **onepiece — emporio ivankov**: char-images: HTTP 404
+- **onepiece — silvers rayleigh**: char-images: HTTP 404
+- **onepiece — killer**: char-images: HTTP 404
+- **onepiece — gecko moria**: char-images: HTTP 404
+- **onepiece — kozuki momonosuke**: char-images: HTTP 404
+- **onepiece — vegapunk**: char-images: HTTP 404
+- **onepiece — sengoku**: char-images: HTTP 404
+- **onepiece — shirahoshi**: char-images: HTTP 404
+- **onepiece — kalifa**: char-images: HTTP 404
+- **onepiece — gol d roger**: char-images: HTTP 404
+- **onepiece — benn beckman**: char-images: HTTP 404
+- **onepiece — kinemon**: char-images: HTTP 404
+- **onepiece — hody jones**: char-images: HTTP 404
+- **onepiece — kin'emon**: char-images: HTTP 404
+- **opm — amai mask**: char-images: HTTP 404
+- **opm — okamaitachi**: char-images: HTTP 404
+- **opm — geryuganshoop**: char-images: HTTP 404
+- **opm — melzargard**: char-images: HTTP 404
+- **opm — boros**: char-images: HTTP 404
+- **opm — bushidrill**: char-images: HTTP 404
+- **opm — blast**: char-images: HTTP 404
+- **opm — groribas**: char-images: HTTP 404
+- **opm — psykos**: char-images: HTTP 404
+- **opm — fuhrer ugly**: char-images: HTTP 404
+- **opm — gouketsu**: char-images: HTTP 404
+- **opm — vaccine man**: char-images: HTTP 404
+- **opm — homeless emperor**: char-images: HTTP 404
+- **opm — deep sea king**: char-images: HTTP 404
+- **opm — mosquito girl**: char-images: HTTP 404
+- **opm — beast king**: char-images: HTTP 404
+- **opm — dr genus**: char-images: HTTP 404
+- **opm — carnage kabuto**: char-images: HTTP 404
+- **rezero — lye batenkaitos**: char-images: HTTP 404
+- **rezero — roy alphard**: char-images: HTTP 404
+- **rezero — pandora**: char-images: HTTP 404
+- **rezero — capella emerada lugunica**: char-images: HTTP 404
+- **rezero — joshua juukulius**: char-images: HTTP 404
+- **rezero — louis arneb**: char-images: HTTP 404
+- **rezero — meili portroute**: char-images: HTTP 404 | fandom: HTTP 404
+- **rezero — hetaro**: char-images: HTTP 404
+- **rezero — sirius romanee conti**: char-images: HTTP 404
+- **rezero — tivey**: char-images: HTTP 404
+- **rezero — heinkel van astrea**: char-images: HTTP 404
+- **sao — sheyta**: char-images: HTTP 404
+- **sao — kizmel**: char-images: HTTP 404
+- **sao — iskahn**: char-images: HTTP 404
+- **sao — xaxa**: char-images: HTTP 404 | fandom: HTTP 404
+- **opm — iaian**: char-images: HTTP 404
+- **sao — pitohui**: char-images: HTTP 404 | fandom: HTTP 404
+- **sao — yuuki konno**: char-images: HTTP 404 | fandom: HTTP 404
+- **sao — death gun**: char-images: HTTP 404 | fandom: HTTP 404
+- **sao — lilpilin**: char-images: HTTP 404
+- **sao — m**: char-images: HTTP 404
+- **sao — llenn**: char-images: HTTP 404
+- **sao — fukaziroh**: char-images: HTTP 404 | fandom: HTTP 404
+- **sds — chandler**: char-images: HTTP 404
+- **sds — ludociel**: char-images: HTTP 404
+- **sds — mael**: char-images: HTTP 404
+- **sds — percival**: char-images: HTTP 404
+- **sds — tristan**: char-images: HTTP 404
+- **sds — grayroad**: char-images: HTTP 404
+- **snk — rod reiss**: char-images: HTTP 404
+- **snk — eren kruger**: char-images: HTTP 404
+- **snk — marlowe freudenberg**: char-images: HTTP 404
+- **snk — djel sannes**: char-images: HTTP 404
+- **snk — ymir fritz**: char-images: HTTP 404
+- **snk — frieda reiss**: char-images: HTTP 404
+- **snk — uri reiss**: char-images: HTTP 404
+- **snk — gunther schultz**: char-images: HTTP 404
+- **snk — faye yeager**: char-images: HTTP 404
+- **snk — mitabi jarnach**: char-images: HTTP 404
+- **snk — faye jager**: char-images: HTTP 404
+- **snk — nifa**: char-images: HTTP 404
+- **sds — cusack**: char-images: HTTP 404
+- **snk — alma**: char-images: HTTP 404
+- **snk — franz kefka**: char-images: HTTP 404
+- **snk — karl fritz**: char-images: HTTP 404
+- **snk — daz**: char-images: HTTP 404
+- **snk — karina braun**: char-images: HTTP 404
+- **snk — traute carven**: char-images: HTTP 404
+- **snk — hannah diamant**: char-images: HTTP 404
+- **solo — thomas andre**: char-images: HTTP 404
+- **solo — choi jong in**: char-images: HTTP 404
+- **solo — cha hae in**: char-images: HTTP 404
+- **solo — park kyung hye**: char-images: HTTP 404
+- **solo — antares**: char-images: HTTP 404
+- **solo — song chi yul**: char-images: HTTP 404
+- **solo — beru**: char-images: HTTP 404
+- **solo — kim sangshik**: char-images: HTTP 404
+- **solo — kang taeshik**: char-images: HTTP 404
+- **solo — hwang dongsoo**: char-images: HTTP 404
+- **solo — hwang dongsuk**: char-images: HTTP 404
+- **solo — lim tae gyu**: char-images: HTTP 404
+- **solo — christopher reed**: char-images: HTTP 404
+- **solo — bellion**: char-images: HTTP 404
+- **solo — ma dongwook**: char-images: HTTP 404
+- **solo — norma selner**: char-images: HTTP 404
+- **solo — tusk**: char-images: HTTP 404
+- **solo — tank**: char-images: HTTP 404
+- **solo — ashborn**: char-images: HTTP 404
+- **solo — sillad**: char-images: HTTP 404
+- **solo — rakan**: char-images: HTTP 404
+- **solo — baran**: char-images: HTTP 404
+- **solo — kaisel**: char-images: HTTP 404
+- **solo — siddharth bachchan**: char-images: HTTP 404
+- **solo — querehsha**: char-images: HTTP 404
+- **solo — esil radiru**: char-images: HTTP 404
+- **snk — ilse langnar**: char-images: HTTP 404
+- **solo — yogumunt**: char-images: HTTP 404
+- **solo — legia**: char-images: HTTP 404
+- **solo — kamish**: char-images: HTTP 404
+- **solo — tarnak**: char-images: HTTP 404
+- **solo — vulcan**: char-images: HTTP 404
+- **solo — goto ryuji**: char-images: HTTP 404
+- **solo — architect**: char-images: HTTP 404
+- **solo — l'architecte**: char-images: HTTP 404
+- **solo — kandiaru**: char-images: HTTP 404
+- **solo — cerberus**: char-images: HTTP 404
+- **solo — adam white**: char-images: HTTP 404
+- **solo — sung il hwan**: char-images: HTTP 404
+- **solo — lennart niermann**: char-images: HTTP 404
+- **solo — kasaka**: char-images: HTTP 404
+- **solo — liu zhigang**: char-images: HTTP 404
+- **tensura — luminous valentine**: char-images: HTTP 404
+- **tensura — testarossa**: char-images: HTTP 404
+- **tensura — ultima**: char-images: HTTP 404
+- **tensura — carrera**: char-images: HTTP 404
+- **tensura — guy crimson**: char-images: HTTP 404
+- **tensura — zegion**: char-images: HTTP 404
+- **tensura — apito**: char-images: HTTP 404
+- **tensura — carrion**: char-images: HTTP 404
+- **tensura — dino**: char-images: HTTP 404
+- **tensura — kumara**: char-images: HTTP 404
+- **tensura — adalmann**: char-images: HTTP 404
+- **tensura — footman**: char-images: HTTP 404
+- **tensura — kagali**: char-images: HTTP 404
+- **tensura — dagruel**: char-images: HTTP 404
+- **tensura — velgrynd**: char-images: HTTP 404
+- **tensura — velzard**: char-images: HTTP 404
+- **tensura — masayuki honjo**: char-images: HTTP 404
+- **tensura — beretta**: char-images: HTTP 404
+- **tokyoghoul — shinsanpei aura**: char-images: HTTP 404
+- **tokyoghoul — koori ui**: char-images: HTTP 404
+- **tokyoghoul — mougan tanakamaru**: char-images: HTTP 404
+- **tokyoghoul — shachi**: char-images: HTTP 404
+- **tokyoghoul — kurona yasuhisa**: char-images: HTTP 404
+- **tokyoghoul — nashiro yasuhisa**: char-images: HTTP 404
+- **tokyorevengers — kanji mochizuki**: char-images: HTTP 404
+- **tokyorevengers — shuji hanma**: char-images: HTTP 404
+- **tokyorevengers — shinichiro sano**: char-images: HTTP 404
+- **tokyorevengers — yuzuha shiba**: char-images: HTTP 404
+- **tokyorevengers — izana kurokawa**: char-images: HTTP 404
+- **tokyorevengers — shion madarame**: char-images: HTTP 404
+- **tokyorevengers — kakucho**: char-images: HTTP 404
+- **tokyorevengers — taiju shiba**: char-images: HTTP 404
+- **tokyorevengers — rindo haitani**: char-images: HTTP 404
+- **tokyorevengers — takeomi akashi**: char-images: HTTP 404
+- **tokyorevengers — senju kawaragi**: char-images: HTTP 404
+- **tokyorevengers — keizo arashi**: char-images: HTTP 404
+- **tokyorevengers — wakasa imaushi**: char-images: HTTP 404
+- **tokyorevengers — south terano**: char-images: HTTP 404
+- **wakfu — amalia sheran sharm**: char-images: HTTP 404
+- **wakfu — yugo**: char-images: HTTP 404
+- **wakfu — evangelyne**: char-images: HTTP 404
+- **wakfu — ruel stroud**: char-images: HTTP 404
+- **wakfu — nox**: char-images: HTTP 404
+- **wakfu — qilby**: char-images: HTTP 404
+- **wakfu — adamai**: char-images: HTTP 404
+- **wakfu — tristepin de percedal**: char-images: HTTP 404
+- **wakfu — az**: char-images: HTTP 404
+- **wakfu — grougaloragran**: char-images: HTTP 404
+- **wakfu — oropo**: char-images: HTTP 404
+- **wakfu — alibert**: char-images: HTTP 404
+- **wakfu — chibi**: char-images: HTTP 404
+- **wakfu — goultard**: char-images: HTTP 404
+- **wakfu — shinonome**: char-images: HTTP 404
+- **wakfu — phaeris**: char-images: HTTP 404
+- **wakfu — ush galesh**: char-images: HTTP 404
+- **wakfu — baltazar**: char-images: HTTP 404
+- **wakfu — glip**: char-images: HTTP 404
+- **wakfu — echo**: char-images: HTTP 404
+- **wakfu — harebourg**: char-images: HTTP 404
+- **wakfu — atcham**: char-images: HTTP 404
+- **wakfu — flopin**: char-images: HTTP 404
+- **wakfu — elely**: char-images: HTTP 404
+- **wakfu — black bump**: char-images: HTTP 404
+- **wakfu — rubilax**: char-images: HTTP 404
+- **wakfu — pin**: char-images: HTTP 404
+- **wakfu — remington smisse**: char-images: HTTP 404
+- **wakfu — kerubim crepin**: char-images: HTTP 404
+- **wakfu — grany smisse**: char-images: HTTP 404
+- **wakfu — kabrok**: char-images: HTTP 404
+- **wakfu — miranda**: char-images: HTTP 404
+- **wakfu — maskemane**: char-images: HTTP 404
+- **wakfu — aurora**: char-images: HTTP 404
+- **wakfu — joris jurgen**: char-images: HTTP 404
+- **wakfu — armand sheran sharm**: char-images: HTTP 404
+- **wakfu — rushu**: char-images: HTTP 404
+- **wakfu — toross mordal**: char-images: HTTP 404
+- **wakfu — moon**: char-images: HTTP 404
+- **wakfu — ogrest**: char-images: HTTP 404
+- **wakfu — mina**: char-images: HTTP 404
+
+## External failures
+
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/6/6c/Kaguya_%C5%8Ctsutsuki.png/revision/latest?cb=20180824113908: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/0/05/Ep344UryuProfile3.png/revision/latest?cb=20230125214916&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/shingekinokyojin/images/0/0f/Ymir_Fritz_character_image.png/revision/latest?cb=20191228063655: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/swordartonline/images/6/61/Konno_Yuuki.png/revision/latest?cb=20191009174316: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/b/b9/Vegapunk_Anime_Infobox.png/revision/latest?cb=20240428020834: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/c/cd/Broly_Infobox_image.png/revision/latest?cb=20170525181624: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/0/03/Ep375ShunsuiProfile.png/revision/latest?cb=20221205191725&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/2/2e/Charlotte_Katakuri_Anime_Infobox.png/revision/latest?cb=20230204155539: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/4/44/Ep363HitsugayaProfile.png/revision/latest?cb=20231105055501&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/6/62/Ep246YoruichiShih%C5%8Din.png/revision/latest?cb=20231105202606&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/c/c1/Shirahoshi_Anime_Infobox.png/revision/latest?cb=20240814220909: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/1/1e/Tashigi_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20251127120726: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/chainsaw-man/images/9/9b/Volume_20_%28Textless%29.png/revision/latest?cb=20250503033800: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/1/17/DBH_Universe_Mission_2_-_Android_21.png/revision/latest?cb=20230807202034: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/2/24/Gol_D._Roger_Anime_Infobox.png/revision/latest?cb=20230612100153: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest?cb=20230601221758: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/f/f8/DiavoloProfile.png/revision/latest?cb=20190117232641: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/d/d9/Johnny_Joestar_Part_7.jpg/revision/latest?cb=20181104035833: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/2/23/Andre1.jpg/revision/latest?cb=20211103151323: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/9/91/Cha_Hae-In.png/revision/latest?cb=20240119133508: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepunchman/images/d/d0/Blast_Manga_Profile.png/revision/latest?cb=20231117004524: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepunchman/images/8/83/Boros_Manga.png/revision/latest?cb=20200311024257: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/7/7a/Guy_Novel_Colour.png/revision/latest?cb=20180928134016: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/tokyo-revengers/images/8/8f/Izana_Kurokawa_%28Manga%29.png/revision/latest?cb=20220411060906: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bluelock/images/f/f0/Michael_Kaiser.png/revision/latest?cb=20221203160355: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/hunterxhunter/images/9/9f/Tonpa_HE_Portrait.png/revision/latest?cb=20130503200318: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/3/3e/Suigetsu_H%C5%8Dzuki.png/revision/latest?cb=20171012002428: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/d/d2/Danzo_full.png/revision/latest?cb=20140807015514: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/1/1a/Kakuzu_UNSR.png/revision/latest?cb=20170529102009: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/f/f1/Ep29Hanatar%C5%8DYamada.png/revision/latest?cb=20210402011948&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jujutsu-kaisen/images/9/94/Mechamaru_Ultimate_%28Anime%29.png/revision/latest?cb=20240620131440: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jujutsu-kaisen/images/2/27/Naoya_Zenin_%28Anime%29.png/revision/latest?cb=20251230174702: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/2/22/Screen_Shot_2020-01-10_at_9.23.11_am.png/revision/latest?cb=20200110092513: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jjba/images/8/88/Fugo_Manga.jpg/revision/latest?cb=20191227000817: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/d/d2/Inoichi_Yamanaka.png/revision/latest?cb=20150409122740: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/a/a8/Ch%C5%8Dza_Akimichi.png/revision/latest?cb=20180304093618: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/c/c3/Tanjuro_anime.png/revision/latest?cb=20210628160831: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/deathnote/images/e/eb/Soichiro_Yagami.PNG/revision/latest?cb=20250630094521: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/3/3f/Sakumo_Hatake.png/revision/latest?cb=20150504191510: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/8/8d/Bartholomew_Kuma_Anime_Infobox.png/revision/latest?cb=20221012030835: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/f/f2/Fugaku.png/revision/latest?cb=20180502064054: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/2/24/Yondaime_Kazekage.png/revision/latest?cb=20210806012316: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/e/ee/Hiashi_Hyuga.png/revision/latest?cb=20150109142633: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/a/ab/ParagusDVD.png/revision/latest?cb=20100809114554: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/shingekinokyojin/images/5/52/Rod_Reiss_character_image.png/revision/latest?cb=20190830190253: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/d/d8/Charlotte_Linlin_Anime_Infobox.png/revision/latest?cb=20180423150804: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/2/22/King_Cold_episode_122.png/revision/latest?cb=20241217033208: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/6/65/King_Vegeta.png/revision/latest?cb=20210428223509: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/blackclover/images/3/31/Lucius_profile.png/revision/latest?cb=20230322165647: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/chainsaw-man/images/5/54/Pochita_anime_design.png/revision/latest?cb=20220919121110: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest?cb=20191124100115: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/4/47/Eustass_Kid_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240505021859: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/c/c9/Super_Hero_-_Goten_artwork.jpg/revision/latest?cb=20220920183551: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/onepiece/images/8/8b/Kouzuki_Momonosuke_Anime_Infobox.png/revision/latest?cb=20240904123638: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/tokyo-revengers/images/1/1d/Shinichiro_Sano_%28Manga%29.png/revision/latest?cb=20221219161723: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/hunterxhunter/images/1/1a/Milluki_Zoldyck_2011.png/revision/latest?cb=20150111053829: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/dragonball/images/4/4e/Cooler%27s_Revenge_-_Cooler_prepares_to_transform.png/revision/latest?cb=20250111151725: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/bleach/images/2/22/Ep390GanjuProfile.png/revision/latest?cb=20230928064838&path-prefix=en: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/tokyo-revengers/images/d/d2/Taiju_Shiba_%28Manga%29.png/revision/latest?cb=20220718074906: HTTP 404
+- **qap-themes.json** — https://static.wikia.nocookie.net/naruto/images/b/bd/Indra_%C5%8Ctsutsuki.png/revision/latest?cb=20220214090844: HTTP 404
+- **qap-themes.json** — https://wallpapercrafter.com/th8001/568293-bleach-kurosaki-ichigo-kurosaki-ichigo-final-getsuga.jpg: HTTP 403
+- **qap-themes.json** — https://i.ytimg.com/vi/CmMa8dXn71I/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/OGFNX4aPCe0/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/zJn-hyLSdbU/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/ldbpfouF60Q/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/AGEuQ3Q6Tm4/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/kD6XWRVpcYA/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/ksXLy4gezZo/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/In5qd9-J7Rc/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/-EZjAeR9jDg/hqdefault.jpg: HTTP 404
+- **qap-themes.json** — https://i.ytimg.com/vi/hjh23tn0jtg/hqdefault.jpg: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/bleach/images/6/62/Ep246YoruichiShih%C5%8Din.png/revision/latest?cb=20231105202606&path-prefix=en: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/c/c1/Shirahoshi_Anime_Infobox.png/revision/latest?cb=20240814220909: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/chainsaw-man/images/9/9b/Volume_20_%28Textless%29.png/revision/latest?cb=20250503033800: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/1/1e/Tashigi_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20251127120726: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/1/17/DBH_Universe_Mission_2_-_Android_21.png/revision/latest?cb=20230807202034: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/2/2e/Charlotte_Katakuri_Anime_Infobox.png/revision/latest?cb=20230204155539: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/d/d7/Rob_Lucci_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20230102052113: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jujutsu-kaisen/images/0/02/Hajime_Kashimo_%28Anime%29.png/revision/latest?cb=20260205162107: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/c/cd/Broly_Infobox_image.png/revision/latest?cb=20170525181624: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/hunterxhunter/images/0/0f/Genthru_Portrait_2011.png/revision/latest?cb=20230521235202: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepunchman/images/8/83/Boros_Manga.png/revision/latest?cb=20200311024257: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/f/f8/DiavoloProfile.png/revision/latest?cb=20190117232641: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/f/f6/Pucci.png/revision/latest?cb=20140719141037: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/d/d9/Johnny_Joestar_Part_7.jpg/revision/latest?cb=20181104035833: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/f/f0/Valentine_Normal.png/revision/latest?cb=20231101221527: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/1/1f/Baran1.jpg/revision/latest?cb=20210803222849: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/nanatsu-no-taizai/images/b/b2/Mael_Anime_Infobox.png/revision/latest?cb=20211114215723: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/tokyo-revengers/images/8/8f/Izana_Kurokawa_%28Manga%29.png/revision/latest?cb=20220411060906: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/naruto/images/6/6c/Kaguya_%C5%8Ctsutsuki.png/revision/latest?cb=20180824113908: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/naruto/images/d/d2/Danzo_full.png/revision/latest?cb=20140807015514: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/naruto/images/8/89/Momoshiki_%C5%8Ctsutsuki.png/revision/latest?cb=20240702223234: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/d/d8/Charlotte_Linlin_Anime_Infobox.png/revision/latest?cb=20180423150804: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/onepiece/images/b/be/Gecko_Moria_Anime_Infobox.png/revision/latest?cb=20181127062446: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/1/14/Moro_%28Digitial_Colored_Manga%29.jpg/revision/latest?cb=20201003082939: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/chainsaw-man/images/9/97/Santa_Claus_%28Tolka%27s_Master%29_Infobox.png/revision/latest?cb=20231222204442: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/fairytail/images/9/9b/Hades_Prop.JPG/revision/latest?cb=20111109201753: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/blackclover/images/3/31/Lucius_profile.png/revision/latest?cb=20230322165647: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/f/f3/Antares1.jpg/revision/latest?cb=20211013150039: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656: HTTP 404
+- **tierlist-themes.json** — https://static.wikia.nocookie.net/solo-leveling/images/9/91/Cha_Hae-In.png/revision/latest?cb=20240119133508: HTTP 404
+
+## Image URLs still hard-coded in JS/HTML
+
+Reported only so server-side fetch logic is not accidentally broken.
+- index.html: https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png -> /assets/images/external/ac8ee6dd6d539710.webp
+- index.html: https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png -> /assets/images/external/bb9ced46bc32e375.webp
+- server.js: https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png
+- server.js: https://i.ytimg.com/vi/${id}/hqdefault.jpg
