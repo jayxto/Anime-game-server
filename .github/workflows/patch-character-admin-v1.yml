@@ -1,0 +1,405 @@
+name: Patch character catalog and admin
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/patch-character-admin-v1.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: patch-character-admin-v1
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply character/admin/navigation patch
+        shell: bash
+        run: |
+          cat > /tmp/patch_character_admin.py <<'PY'
+          from pathlib import Path
+          
+          SERVER = Path('server.js')
+          UI = Path('assets/js/ui-refactor.js')
+          SERVER_MARK = '// PATCH CHARACTER ADMIN V1'
+          UI_MARK = '/* Admin character viewer v1 */'
+          
+          server = SERVER.read_text(encoding='utf-8')
+          ui = UI.read_text(encoding='utf-8')
+          server_changed = False
+          ui_changed = False
+          
+          def must_replace(text, old, new, label):
+              if old not in text:
+                  raise RuntimeError(f'Patch introuvable: {label}')
+              return text.replace(old, new, 1)
+          
+          if SERVER_MARK not in server:
+              old = r'''function resolveImageUniverseKey(rawUniverse) {
+              const raw = String(rawUniverse || '').trim();
+              if (FANDOM_WIKIS[raw]) return raw;
+              return FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)] || null;
+          }'''
+              new = r'''function resolveImageUniverseKey(rawUniverse) {
+              const raw = String(rawUniverse || '').trim();
+              if (!raw) return null;
+              if (FANDOM_WIKIS[raw]) return raw;
+              const alias = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)];
+              if (alias) return alias;
+              // Les nouveaux anime n'ont pas tous un wiki Fandom configuré : on accepte
+              // directement leur clé/nom ARC et resolveCharacterImage utilisera AniList.
+              try {
+                  if (typeof ARC_UNIVERSE_ANIME !== 'undefined') {
+                      if (ARC_UNIVERSE_ANIME[raw]) return raw;
+                      const wanted = normalizeImageKey(raw);
+                      const hit = Object.entries(ARC_UNIVERSE_ANIME).find(([, label]) => normalizeImageKey(label) === wanted);
+                      if (hit) return hit[0];
+                  }
+              } catch (_) {}
+              return null;
+          }'''
+              server = must_replace(server, old, new, 'resolveImageUniverseKey')
+          
+              old = r'''    const host = FANDOM_WIKIS[universeKey];
+              if ((!host && universeKey !== 'pokemon') || !displayName) {
+                  return { imageUrl:null, sourceUrl:null, status:'unsupported' };
+              }'''
+              new = r'''    const host = FANDOM_WIKIS[universeKey] || null;
+              // Un wiki Fandom n'est plus obligatoire : tous les nouveaux univers peuvent
+              // tomber sur AniList. Cela évite que les cartes/personnages soient sans photo.
+              if (!displayName) {
+                  return { imageUrl:null, sourceUrl:null, status:'missing' };
+              }'''
+              server = must_replace(server, old, new, 'fallback AniList nouveaux univers')
+          
+              # Renforce le filtre AniList des nouveaux anime quand la structure correspond.
+              old = r'''        const hints = IMAGE_ANILIST_MEDIA_HINTS[universeKey] || [];
+                  let best = null, bestScore = -1;
+                  for (const c of chars) {
+                      if (!c?.image?.large || /default\.jpg$/i.test(c.image.large)) continue;
+                      const nScore = imageNameScore(name, [c.name?.full, c.name?.native, ...(c.name?.alternative || [])]);
+                      const titles = (c.media?.nodes || []).flatMap(m => [m?.title?.romaji, m?.title?.english, m?.title?.native]).filter(Boolean);
+                      const mediaOk = !hints.length || titles.some(t => hints.some(rx => rx.test(t)));'''
+              new = r'''        const hints = IMAGE_ANILIST_MEDIA_HINTS[universeKey] || [];
+                  let mediaLabel = '';
+                  try { if (typeof ARC_UNIVERSE_ANIME !== 'undefined') mediaLabel = ARC_UNIVERSE_ANIME[universeKey] || ''; } catch (_) {}
+                  let best = null, bestScore = -1;
+                  for (const c of chars) {
+                      if (!c?.image?.large || /default\.jpg$/i.test(c.image.large)) continue;
+                      const nScore = imageNameScore(name, [c.name?.full, c.name?.native, ...(c.name?.alternative || [])]);
+                      const titles = (c.media?.nodes || []).flatMap(m => [m?.title?.romaji, m?.title?.english, m?.title?.native]).filter(Boolean);
+                      const mediaOk = hints.length
+                          ? titles.some(t => hints.some(rx => rx.test(t)))
+                          : (!mediaLabel || titles.some(t => {
+                              const a = normalizeImageKey(t), b = normalizeImageKey(mediaLabel);
+                              return a === b || a.includes(b) || b.includes(a);
+                          }));'''
+              if old in server:
+                  server = server.replace(old, new, 1)
+              else:
+                  print('Note: filtre média AniList non remplacé (structure différente).')
+          
+              catalog = r'''
+          // PATCH CHARACTER ADMIN V1
+          // Catalogue unique des personnages réellement présents dans les données du jeu.
+          // Les images restent des liens : /api/avatar/img résout local/Fandom/AniList à la demande.
+          app.get('/api/character-catalog', (req, res) => {
+              try {
+                  const rows = new Map();
+                  const add = (u, anime, name, originalImg, source) => {
+                      name = String(name || '').trim();
+                      anime = String(anime || '').trim();
+                      if (!name) return;
+                      let arcAnime = '';
+                      try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
+                      if (!anime) anime = arcAnime || u || 'Autre';
+                      if (!u && anime) {
+                          try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                          try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
+                      }
+                      if (arcAnime) anime = arcAnime;
+                      const group = u || normalizeImageKey(anime) || 'autre';
+                      const k = group + '|' + normalizeImageKey(name);
+                      let img = originalImg || null;
+                      try {
+                          if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) {
+                              img = '/api/avatar/img?u=' + encodeURIComponent(u) + '&n=' + encodeURIComponent(name);
+                          }
+                      } catch (_) {}
+                      const old = rows.get(k);
+                      if (old) {
+                          old.sources.add(source || 'jeu');
+                          if (!old.originalImg && originalImg) old.originalImg = originalImg;
+                          if (old.name === old.name.toLowerCase() && name !== name.toLowerCase()) old.name = name;
+                          if ((!old.anime || old.anime === old.u) && anime) old.anime = anime;
+                          if (!old.img && img) old.img = img;
+                          return;
+                      }
+                      rows.set(k, { u:u || null, anime, name, img, originalImg:originalImg || null, sources:new Set([source || 'jeu']) });
+                  };
+          
+                  try {
+                      for (const [u, byName] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+                          for (const [name, img] of Object.entries(byName || {})) add(u, '', name, img, 'char-images');
+                      }
+                  } catch (_) {}
+          
+                  try {
+                      if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                          for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                              const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                              for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                          }
+                      }
+                  } catch (_) {}
+          
+                  try {
+                      if (typeof RG_POOLS_V2 !== 'undefined') {
+                          for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                              const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                              for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                          }
+                      }
+                  } catch (_) {}
+          
+                  try {
+                      if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                          for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                              const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                              for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                          }
+                      }
+                  } catch (_) {}
+          
+                  for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+                      try {
+                          const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                          for (const theme of (parsed.themes || [])) {
+                              if (theme.kind !== 'chars') continue;
+                              for (const item of (theme.items || [])) {
+                                  const anime = String(item.sub || theme.title || '').trim();
+                                  const u = resolveImageUniverseKey(anime);
+                                  add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                              }
+                          }
+                      } catch (_) {}
+                  }
+          
+                  const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
+                      .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
+                  const animes = [...new Set(characters.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
+                  res.json({ ok:true, count:characters.length, animes, characters });
+              } catch (e) {
+                  console.error('[character catalog]', e);
+                  res.status(500).json({ ok:false, count:0, animes:[], characters:[], error:'catalogue indisponible' });
+              }
+          });
+          '''
+              marker = "app.get('/api/character-image', async (req, res) => {"
+              if marker not in server:
+                  raise RuntimeError('Route /api/character-image introuvable')
+              server = server.replace(marker, catalog + '\n' + marker, 1)
+          
+              bridge = r'''
+          
+          // PATCH CHARACTER POOL BRIDGE V1
+          // Tous les nouveaux univers de personnages sont aussi utilisables par les modes
+          // qui lisent les gros pools (ex. Rolland Garos). AnimeDLE reste séparé car il exige
+          // des attributs complets propres à chaque univers.
+          try {
+              if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined' && typeof ARC_UNIVERSE_ANIME !== 'undefined') {
+                  for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                      if (!ARC_UNIVERSE_ANIME[u] || !Array.isArray(names) || !names.length) continue;
+                      if (typeof RG_UNIVERSES !== 'undefined' && !RG_UNIVERSES[u]) RG_UNIVERSES[u] = { name:ARC_UNIVERSE_ANIME[u], raw:names.join('\n') };
+                      if (typeof RG_POOLS_V2 !== 'undefined' && !RG_POOLS_V2[u]) RG_POOLS_V2[u] = names.slice();
+                  }
+              }
+          } catch (e) { console.warn('[pool bridge]', e.message); }
+          '''
+              server += bridge
+              server_changed = True
+          
+          if UI_MARK not in ui:
+              old = r'''            const inlineHidden = menu.style.display === 'none';
+                      const panel = visibleGamePanel();
+                      const gamePage = inlineHidden || !!panel;'''
+              new = r'''            const inlineHidden = menu.style.display === 'none';
+                      const panel = visibleGamePanel();
+                      const activeTab = q('#app-root > .tab-content.active');
+                      // Une partie peut continuer derrière la Collection. On ne masque le shell
+                      // que quand l'onglet MODE est réellement affiché.
+                      const gamePage = (!activeTab || activeTab.id === 'mode') && (inlineHidden || !!panel);'''
+              ui = must_replace(ui, old, new, 'navigation Collection pendant une partie')
+          
+              old = r'''        GAME_PAGE_IDS.forEach(id => {
+                      const el = q('#' + id);
+                      if (el) observer.observe(el, { attributes:true, attributeFilter:['style','class'] });
+                  });
+                  refresh();'''
+              new = r'''        GAME_PAGE_IDS.forEach(id => {
+                      const el = q('#' + id);
+                      if (el) observer.observe(el, { attributes:true, attributeFilter:['style','class'] });
+                  });
+                  // Collection/Admin changent l'onglet actif sans forcément toucher au style
+                  // du menu de jeu : on observe donc également les tabs.
+                  qa('#app-root > .tab-content').forEach(el => observer.observe(el, { attributes:true, attributeFilter:['style','class'] }));
+                  refresh();'''
+              ui = must_replace(ui, old, new, 'observer onglets dashboard')
+          
+              admin_ui = r'''
+          
+          /* Admin character viewer v1 */
+          (() => {
+              const PAGE = 80;
+              const state = { all:[], filtered:[], page:0, status:new Map(), loaded:false };
+              const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+              const keyOf = x => String(x.u || x.anime || '') + '|' + String(x.name || '');
+          
+              function css() {
+                  if (document.getElementById('ag-charadmin-style')) return;
+                  const s = document.createElement('style'); s.id = 'ag-charadmin-style';
+                  s.textContent = `
+                  .ag-charadmin{margin-top:18px}.ag-charadmin-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+                  .ag-charadmin-tools{display:grid;grid-template-columns:minmax(180px,2fr) minmax(160px,1fr) minmax(130px,.8fr);gap:8px;margin:12px 0}
+                  .ag-charadmin-tools input,.ag-charadmin-tools select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#111827;color:#fff}
+                  .ag-charadmin-stats{font-size:.82rem;opacity:.8;margin:8px 0 12px}.ag-charadmin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+                  .ag-charcard{position:relative;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,25,.78);border-radius:12px;overflow:hidden;min-width:0}
+                  .ag-charcard img{width:100%;height:170px;object-fit:cover;background:#0b1020;display:block}.ag-charcard.bad img{opacity:.18}.ag-charcard.bad{border-color:rgba(255,70,100,.65)}
+                  .ag-charcard-copy{padding:9px}.ag-charcard-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ag-charcard-copy small{display:block;opacity:.67;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+                  .ag-charstate{position:absolute;top:7px;right:7px;font-size:.68rem;font-weight:900;padding:3px 6px;border-radius:999px;background:#5b6475;color:white}.ag-charcard.ok .ag-charstate{background:#118a58}.ag-charcard.bad .ag-charstate{background:#b82d48}
+                  .ag-charcard-actions{display:flex;gap:5px;margin-top:7px}.ag-charcard-actions button,.ag-charcard-actions a{flex:1;font-size:.68rem;padding:6px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:inherit;text-decoration:none;text-align:center}
+                  .ag-charadmin-more{display:block;margin:14px auto 2px;padding:9px 18px}.ag-charadmin-empty{padding:25px;text-align:center;opacity:.7}
+                  @media(max-width:650px){.ag-charadmin-tools{grid-template-columns:1fr}.ag-charadmin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ag-charcard img{height:150px}}
+                  `;
+                  document.head.appendChild(s);
+              }
+          
+              function ensure() {
+                  const admin = document.getElementById('admin');
+                  if (!admin || document.getElementById('ag-charadmin')) return;
+                  css();
+                  const wrap = document.createElement('div');
+                  wrap.id = 'ag-charadmin'; wrap.className = 'opt-panel ag-charadmin';
+                  wrap.innerHTML = `
+                    <div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue commun des modes. Les images sont chargées par lien, sans téléchargement local obligatoire.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div>
+                    <div id="ag-charadmin-body" style="display:none">
+                      <div class="ag-charadmin-tools"><input id="ag-charadmin-q" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images cassées détectées</option><option value="ok">Images OK détectées</option></select></div>
+                      <div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button>
+                    </div>`;
+                  admin.appendChild(wrap);
+                  document.getElementById('ag-charadmin-load').addEventListener('click', load);
+                  document.getElementById('ag-charadmin-q').addEventListener('input', apply);
+                  document.getElementById('ag-charadmin-anime').addEventListener('change', apply);
+                  document.getElementById('ag-charadmin-status').addEventListener('change', apply);
+                  document.getElementById('ag-charadmin-more').addEventListener('click', () => { state.page++; render(false); });
+              }
+          
+              async function load() {
+                  const btn = document.getElementById('ag-charadmin-load');
+                  if (state.loaded) { document.getElementById('ag-charadmin-body').style.display = ''; apply(); return; }
+                  btn.disabled = true; btn.textContent = 'Chargement…';
+                  try {
+                      const r = await fetch('/api/character-catalog', { cache:'no-store' });
+                      const d = await r.json();
+                      if (!d.ok) throw new Error(d.error || 'catalogue');
+                      state.all = Array.isArray(d.characters) ? d.characters : [];
+                      const sel = document.getElementById('ag-charadmin-anime');
+                      (d.animes || []).forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; sel.appendChild(o); });
+                      state.loaded = true; document.getElementById('ag-charadmin-body').style.display = ''; btn.textContent = 'Catalogue chargé'; btn.disabled = true;
+                      apply();
+                  } catch (e) {
+                      btn.disabled = false; btn.textContent = 'Réessayer';
+                      const st = document.getElementById('ag-charadmin-stats'); if (st) st.textContent = '❌ Impossible de charger le catalogue.';
+                  }
+              }
+          
+              function apply() {
+                  if (!state.loaded) return;
+                  const q = String(document.getElementById('ag-charadmin-q').value || '').trim().toLowerCase();
+                  const anime = document.getElementById('ag-charadmin-anime').value;
+                  const wantedStatus = document.getElementById('ag-charadmin-status').value;
+                  state.filtered = state.all.filter(x => {
+                      if (anime && x.anime !== anime) return false;
+                      if (q && !(String(x.name).toLowerCase().includes(q) || String(x.anime).toLowerCase().includes(q))) return false;
+                      if (wantedStatus && state.status.get(keyOf(x)) !== wantedStatus) return false;
+                      return true;
+                  });
+                  state.page = 0; render(true);
+              }
+          
+              function render(reset) {
+                  const grid = document.getElementById('ag-charadmin-grid');
+                  if (reset) grid.innerHTML = '';
+                  const start = state.page * PAGE, end = Math.min(state.filtered.length, start + PAGE);
+                  const slice = state.filtered.slice(start, end);
+                  if (!slice.length && !grid.children.length) grid.innerHTML = '<div class="ag-charadmin-empty">Aucun personnage avec ces filtres.</div>';
+                  for (const x of slice) {
+                      const k = keyOf(x), known = state.status.get(k) || '';
+                      const c = document.createElement('div'); c.className = 'ag-charcard ' + known;
+                      c.dataset.key = k;
+                      const img = x.img || x.originalImg || '';
+                      c.innerHTML = `<span class="ag-charstate">${known === 'ok' ? 'OK' : known === 'bad' ? 'CASSÉE' : '…'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(img)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small title="${esc(x.anime)}">${esc(x.anime)}</small><div class="ag-charcard-actions"><button type="button" data-copy>Copier</button><a href="${esc(img)}" target="_blank" rel="noopener">Image</a></div></div>`;
+                      const im = c.querySelector('img'), badge = c.querySelector('.ag-charstate');
+                      const set = val => {
+                          state.status.set(k, val);
+                          c.classList.remove('ok','bad'); c.classList.add(val); badge.textContent = val === 'ok' ? 'OK' : 'CASSÉE';
+                          stats();
+                      };
+                      im.addEventListener('load', () => set('ok'), { once:true });
+                      im.addEventListener('error', () => set('bad'), { once:true });
+                      c.querySelector('[data-copy]').addEventListener('click', async () => { try { await navigator.clipboard.writeText(`${x.anime} — ${x.name}`); } catch (_) {} });
+                      grid.appendChild(c);
+                  }
+                  const more = document.getElementById('ag-charadmin-more');
+                  more.style.display = end < state.filtered.length ? '' : 'none';
+                  stats();
+              }
+          
+              function stats() {
+                  const el = document.getElementById('ag-charadmin-stats'); if (!el) return;
+                  const ok = [...state.status.values()].filter(x => x === 'ok').length;
+                  const bad = [...state.status.values()].filter(x => x === 'bad').length;
+                  el.textContent = `${state.all.length} personnages au total • ${state.filtered.length} avec les filtres • ${ok} images OK testées • ${bad} cassées détectées`;
+              }
+          
+              if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensure, {once:true}); else ensure();
+          })();
+          '''
+              ui += admin_ui
+              ui_changed = True
+          
+          if server_changed:
+              SERVER.write_text(server, encoding='utf-8')
+          if ui_changed:
+              UI.write_text(ui, encoding='utf-8')
+          print(f'Patch terminé. server={"modifié" if server_changed else "déjà OK"} ui={"modifié" if ui_changed else "déjà OK"}')
+          PY
+          python /tmp/patch_character_admin.py
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check server.js
+          node --check assets/js/ui-refactor.js
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js assets/js/ui-refactor.js
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "feat: character catalog admin and collection navigation"
+          git push
