@@ -6846,7 +6846,7 @@
       "originalBytes": 41290,
       "webpBytes": 19412,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:23.568Z"
+      "updatedAt": "2026-10-01T18:40:22.958Z"
     },
     "dragonball|granolah": {
       "universe": "dragonball",
@@ -6857,7 +6857,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:23.513Z"
+      "updatedAt": "2026-10-01T18:40:11.902Z"
     },
     "dragonball|mai": {
       "universe": "dragonball",
@@ -6874,7 +6874,7 @@
       "originalBytes": 40064,
       "webpBytes": 13742,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:23.568Z"
+      "updatedAt": "2026-10-01T18:40:22.959Z"
     },
     "dragonball|mercenary tao": {
       "universe": "dragonball",
@@ -6891,7 +6891,7 @@
       "originalBytes": 49376,
       "webpBytes": 24984,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:23.568Z"
+      "updatedAt": "2026-10-01T18:40:22.959Z"
     },
     "dragonball|nail": {
       "universe": "dragonball",
@@ -6902,7 +6902,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:23.568Z"
+      "updatedAt": "2026-10-01T18:40:22.958Z"
     },
     "dragonball|tao pai pai": {
       "universe": "dragonball",
@@ -6919,7 +6919,7 @@
       "originalBytes": 49376,
       "webpBytes": 24984,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:23.568Z"
+      "updatedAt": "2026-10-01T18:40:22.959Z"
     },
     "dragonball|upa": {
       "universe": "dragonball",
@@ -6936,7 +6936,7 @@
       "originalBytes": 22861,
       "webpBytes": 8214,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:23.569Z"
+      "updatedAt": "2026-10-01T18:40:22.959Z"
     },
     "dragonball|android 13": {
       "universe": "dragonball",
@@ -6947,7 +6947,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:24.152Z"
+      "updatedAt": "2026-10-01T18:43:52.250Z"
     },
     "dragonball|grand chef": {
       "universe": "dragonball",
@@ -6958,7 +6958,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:27.846Z"
+      "updatedAt": "2026-10-01T18:43:20.413Z"
     },
     "dragonball|guru": {
       "universe": "dragonball",
@@ -6967,9 +6967,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/dragonball/images/d/de/Guru_DBZ_Ep_76_001.png/revision/latest?cb=20170915040925",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:24.771Z"
+      "updatedAt": "2026-10-01T18:40:58.120Z"
     },
     "dragonball|c 13": {
       "universe": "dragonball",
@@ -6980,7 +6981,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:25.329Z"
+      "updatedAt": "2026-10-01T18:46:15.451Z"
     },
     "dragonball|baby": {
       "universe": "dragonball",
@@ -6991,7 +6992,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:26.049Z"
+      "updatedAt": "2026-10-01T18:41:18.026Z"
     },
     "dragonball|android 21": {
       "universe": "dragonball",
@@ -7002,7 +7003,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:26.532Z"
+      "updatedAt": "2026-10-01T18:44:47.565Z"
     },
     "dragonball|c 21": {
       "universe": "dragonball",
@@ -7013,7 +7014,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:27.355Z"
+      "updatedAt": "2026-10-01T18:47:32.602Z"
     },
     "dragonball|porunga": {
       "universe": "dragonball",
@@ -7024,7 +7025,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:27.297Z"
+      "updatedAt": "2026-10-01T18:42:24.214Z"
     },
     "dragonball|omega shenron": {
       "universe": "dragonball",
@@ -7035,7 +7036,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:29.858Z"
+      "updatedAt": "2026-10-01T18:45:44.678Z"
     },
     "dragonball|bra": {
       "universe": "dragonball",
@@ -7052,7 +7053,7 @@
       "originalBytes": 38259,
       "webpBytes": 15994,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:29.858Z"
+      "updatedAt": "2026-10-01T18:46:48.417Z"
     },
     "dragonball|li shenron": {
       "universe": "dragonball",
@@ -7063,7 +7064,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:28.861Z"
+      "updatedAt": "2026-10-01T18:46:37.627Z"
     },
     "dragonball|bojack": {
       "universe": "dragonball",
@@ -7074,7 +7075,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:29.061Z"
+      "updatedAt": "2026-10-01T18:44:58.263Z"
     },
     "dragonball|garlic jr": {
       "universe": "dragonball",
@@ -7085,7 +7086,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:30.217Z"
+      "updatedAt": "2026-10-01T18:48:05.534Z"
     },
     "dragonball|garlic junior": {
       "universe": "dragonball",
@@ -7094,9 +7095,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/dragonball/images/1/15/Garlic_Jr_anime.png/revision/latest?cb=20260521233638",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:30.239Z"
+      "updatedAt": "2026-10-01T18:48:18.875Z"
     },
     "dragonball|tullece": {
       "universe": "dragonball",
@@ -7107,7 +7109,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:31.547Z"
+      "updatedAt": "2026-10-01T18:47:21.727Z"
     },
     "dragonball|jaco": {
       "universe": "dragonball",
@@ -7118,7 +7120,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:31.645Z"
+      "updatedAt": "2026-10-01T18:47:43.698Z"
     },
     "dragonball|sorbet": {
       "universe": "dragonball",
@@ -7129,7 +7131,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:32.503Z"
+      "updatedAt": "2026-10-01T18:47:54.492Z"
     },
     "dragonball|turles": {
       "universe": "dragonball",
@@ -7140,7 +7142,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:30.323Z"
+      "updatedAt": "2026-10-01T18:46:48.417Z"
     },
     "dragonball|lord slug": {
       "universe": "dragonball",
@@ -34123,5 +34125,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T18:40:00.864Z"
+  "generatedAt": "2026-10-01T18:48:18.875Z"
 }
