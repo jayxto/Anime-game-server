@@ -104,6 +104,110 @@ const slug = v => String(v || 'unknown').normalize('NFKD').replace(/[\u0300-\u03
 const hash = v => crypto.createHash('sha1').update(String(v)).digest('hex').slice(0, 16);
 const remote = v => typeof v === 'string' && /^https?:\/\//i.test(v);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const franchiseQueries = {
+  naruto:['Naruto','Naruto Shippuden','Boruto: Naruto Next Generations'],
+  onepiece:['One Piece'],
+  bleach:['Bleach','Bleach: Thousand-Year Blood War'],
+  hxh:['Hunter x Hunter'], hunterxhunter:['Hunter x Hunter'],
+  snk:['Attack on Titan'], aot:['Attack on Titan'], attackontitan:['Attack on Titan'],
+  nanatsu:['The Seven Deadly Sins'], sevendeadlysins:['The Seven Deadly Sins'],
+  deathnote:['Death Note'], cote:['Classroom of the Elite'], classroomoftheelite:['Classroom of the Elite'],
+  sololeveling:['Solo Leveling'], blackclover:['Black Clover'], clover:['Black Clover'], fireforce:['Fire Force'],
+  mushokutensei:['Mushoku Tensei'], rezero:['Re:Zero'], fairy:['Fairy Tail'], fairytail:['Fairy Tail'],
+  bluelock:['Blue Lock'], fma:['Fullmetal Alchemist'], fullmetalalchemist:['Fullmetal Alchemist'],
+  chainsaw:['Chainsaw Man'], chainsawman:['Chainsaw Man'], demonslayer:['Demon Slayer'], kimetsu:['Demon Slayer'],
+  pokemon:['Pokemon'], dragonball:['Dragon Ball','Dragon Ball Z','Dragon Ball Super','Dragon Ball GT'],
+  hellsparadise:["Hell's Paradise"], jigokuraku:["Hell's Paradise"], gachakuta:['Gachiakuta'],
+  haikyuu:['Haikyuu'], jujika:['Juujika no Rokunin'], jojo:["JoJo's Bizarre Adventure"],
+  tensura:['That Time I Got Reincarnated as a Slime'], onepunchman:['One Punch Man'], opm:['One Punch Man'],
+  sao:['Sword Art Online'], swordartonline:['Sword Art Online'], tokyoghoul:['Tokyo Ghoul'],
+  tokyo_revengers:['Tokyo Revengers'], tokyorevengers:['Tokyo Revengers']
+};
+
+let jikanGate = Promise.resolve();
+let jikanNextAt = 0;
+async function jikanRequest(url) {
+  let release;
+  const prev = jikanGate;
+  jikanGate = new Promise(r => { release = r; });
+  await prev.catch(() => {});
+  try {
+    const wait = Math.max(0, jikanNextAt - Date.now());
+    if (wait) await sleep(wait);
+    let last;
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      try {
+        const r = await fetchTimed(url, { headers: { 'Accept':'application/json', 'User-Agent': USER_AGENT } }, 25000);
+        if (r.status === 429) {
+          const ra = Number(r.headers.get('retry-after') || 1);
+          await sleep(Math.max(1200, ra * 1000));
+          last = new Error('HTTP 429');
+          continue;
+        }
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const json = await r.json();
+        jikanNextAt = Date.now() + 420;
+        return json;
+      } catch (e) {
+        last = e;
+        await sleep(650 * attempt);
+      }
+    }
+    throw last || new Error('Jikan request failed');
+  } finally {
+    jikanNextAt = Math.max(jikanNextAt, Date.now() + 420);
+    release();
+  }
+}
+
+const jikanRosterPromises = new Map();
+function universeQueries(universe) {
+  const k = keyCompact(universe);
+  return franchiseQueries[k] || [animeAliases[k] || String(universe).replace(/[_-]+/g,' ')];
+}
+async function getJikanRoster(universe) {
+  const uk = keyCompact(universe);
+  if (jikanRosterPromises.has(uk)) return jikanRosterPromises.get(uk);
+  const promise = (async () => {
+    const roster = [];
+    const seenChar = new Set();
+    const seenMedia = new Set();
+    for (const q of universeQueries(universe)) {
+      for (const mediaType of ['anime','manga']) {
+        try {
+          const search = await jikanRequest(`https://api.jikan.moe/v4/${mediaType}?q=${encodeURIComponent(q)}&limit=5`);
+          const media = Array.isArray(search?.data) ? search.data : [];
+          const ranked = media.map(m => {
+            const titles = [m?.title, m?.title_english, m?.title_japanese, ...(m?.titles || []).map(t=>t?.title)].filter(Boolean);
+            return { m, s: scoreNames(titles, [q]) };
+          }).sort((a,b)=>b.s-a.s).filter(x=>x.s>=50).slice(0,3);
+          for (const {m} of ranked) {
+            const mk = `${mediaType}:${m.mal_id}`;
+            if (seenMedia.has(mk)) continue;
+            seenMedia.add(mk);
+            try {
+              const chars = await jikanRequest(`https://api.jikan.moe/v4/${mediaType}/${m.mal_id}/characters`);
+              for (const row of (chars?.data || [])) {
+                const c = row?.character || row;
+                const cid = c?.mal_id;
+                if (!cid || seenChar.has(cid)) continue;
+                seenChar.add(cid);
+                const names = [c?.name, ...(c?.nicknames || [])].filter(Boolean);
+                const image = c?.images?.jpg?.image_url || c?.images?.webp?.image_url;
+                if (image) roster.push({ names, image, source: `jikan-${mediaType}-roster`, media: m?.title, malId: cid });
+              }
+            } catch {}
+          }
+        } catch {}
+      }
+    }
+    return roster;
+  })();
+  jikanRosterPromises.set(uk, promise);
+  return promise;
+}
+
 const repoUrl = p => '/' + path.relative(ROOT, p).split(path.sep).join('/');
 
 function imageUrl(v) {
@@ -285,24 +389,30 @@ async function resolveAniList(universe, queries) {
 }
 
 async function resolveJikan(universe, queries) {
+  // First use a cached roster for the whole franchise. This is much more reliable
+  // than asking Jikan once per missing character, and it avoids rate-limit storms.
+  try {
+    const roster = await getJikanRoster(universe);
+    const ranked = roster.map(x => ({ x, s: scoreNames(x.names, queries) })).sort((a,b)=>b.s-a.s);
+    const top = ranked.find(v => v.s >= 65 && v.x?.image);
+    if (top) return { url: top.x.image, source: top.x.source, matched: top.x.names?.[0] || queries[0], media: top.x.media };
+  } catch {}
+
+  // Direct global character search as a second pass for manga-only / obscure entries.
   for (const q of queries) {
     try {
-      const url = `https://api.jikan.moe/v4/characters?q=${encodeURIComponent(q)}&limit=10`;
-      const r = await fetchTimed(url, { headers: { 'Accept': 'application/json', 'User-Agent': USER_AGENT } }, 20000);
-      if (!r.ok) continue;
-      const j = await r.json();
+      const j = await jikanRequest(`https://api.jikan.moe/v4/characters?q=${encodeURIComponent(q)}&limit=12`);
       const data = Array.isArray(j?.data) ? j.data : [];
-      const media = animeAliases[keyCompact(universe)] || universe;
-      const scored = data.map(x => {
-        const names = [x?.name, ...(x?.nicknames || [])];
-        let s = scoreNames(names, queries);
-        const animeList = (x?.anime || []).map(a => a?.anime?.title).filter(Boolean);
-        if (animeList.some(t => key(t).includes(key(media)) || key(media).includes(key(t)))) s += 15;
-        return { s, x };
-      }).sort((a, b) => b.s - a.s);
-      const top = scored.find(v => v.s >= 60 && v.x?.images?.jpg?.image_url);
-      if (top) return { url: top.x.images.jpg.image_url, source: 'jikan', matched: top.x?.name || q };
-      await sleep(450);
+      const scored = data.map(x => ({
+        s: scoreNames([x?.name, ...(x?.nicknames || [])], queries),
+        x
+      })).sort((a,b)=>b.s-a.s);
+      const top = scored.find(v => v.s >= 70 && (v.x?.images?.jpg?.image_url || v.x?.images?.webp?.image_url));
+      if (top) return {
+        url: top.x.images.jpg?.image_url || top.x.images.webp?.image_url,
+        source: 'jikan-character-search',
+        matched: top.x?.name || q
+      };
     } catch {}
   }
   return null;
