@@ -5219,7 +5219,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:01.362Z"
+      "updatedAt": "2026-10-01T18:21:41.283Z"
     },
     "dragonball|freezer": {
       "universe": "dragonball",
@@ -5462,7 +5462,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:58.769Z"
+      "updatedAt": "2026-10-01T18:20:44.238Z"
     },
     "dragonball|yamcha": {
       "universe": "dragonball",
@@ -5479,7 +5479,7 @@
       "originalBytes": 23684,
       "webpBytes": 13276,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.227Z"
+      "updatedAt": "2026-10-01T18:20:01.384Z"
     },
     "dragonball|tortue geniale": {
       "universe": "dragonball",
@@ -5496,7 +5496,7 @@
       "originalBytes": 26045,
       "webpBytes": 14298,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.227Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|master roshi": {
       "universe": "dragonball",
@@ -5513,7 +5513,7 @@
       "originalBytes": 26045,
       "webpBytes": 14298,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.227Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|bulma": {
       "universe": "dragonball",
@@ -5530,7 +5530,7 @@
       "originalBytes": 36904,
       "webpBytes": 19686,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.227Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|chi chi": {
       "universe": "dragonball",
@@ -5547,7 +5547,7 @@
       "originalBytes": 27753,
       "webpBytes": 10678,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|pan": {
       "universe": "dragonball",
@@ -5564,7 +5564,7 @@
       "originalBytes": 54681,
       "webpBytes": 22712,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|videl": {
       "universe": "dragonball",
@@ -5581,7 +5581,7 @@
       "originalBytes": 139306,
       "webpBytes": 9204,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|hercule": {
       "universe": "dragonball",
@@ -5598,7 +5598,7 @@
       "originalBytes": 45087,
       "webpBytes": 21764,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|mr satan": {
       "universe": "dragonball",
@@ -5615,7 +5615,7 @@
       "originalBytes": 45087,
       "webpBytes": 21764,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|uub": {
       "universe": "dragonball",
@@ -5632,7 +5632,7 @@
       "originalBytes": 30598,
       "webpBytes": 10206,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|oob": {
       "universe": "dragonball",
@@ -5649,7 +5649,7 @@
       "originalBytes": 30598,
       "webpBytes": 10206,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|bardock": {
       "universe": "dragonball",
@@ -5666,7 +5666,7 @@
       "originalBytes": 124079,
       "webpBytes": 10384,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|baddack": {
       "universe": "dragonball",
@@ -5683,7 +5683,7 @@
       "originalBytes": 124079,
       "webpBytes": 10384,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.385Z"
     },
     "dragonball|raditz": {
       "universe": "dragonball",
@@ -5700,7 +5700,7 @@
       "originalBytes": 30045,
       "webpBytes": 14158,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.386Z"
     },
     "dragonball|nappa": {
       "universe": "dragonball",
@@ -5717,7 +5717,7 @@
       "originalBytes": 39406,
       "webpBytes": 21766,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:58.228Z"
+      "updatedAt": "2026-10-01T18:20:01.386Z"
     },
     "demonslayer|kanata ubuyashiki": {
       "universe": "demonslayer",
@@ -5728,7 +5728,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:59.484Z"
+      "updatedAt": "2026-10-01T18:21:28.111Z"
     },
     "dragonball|sangohan": {
       "universe": "dragonball",
@@ -5739,7 +5739,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:00.523Z"
+      "updatedAt": "2026-10-01T18:25:19.357Z"
     },
     "dragonball|son gohan": {
       "universe": "dragonball",
@@ -5748,9 +5748,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:59.730Z"
+      "updatedAt": "2026-10-01T18:25:10.660Z"
     },
     "dragonball|captain ginyu": {
       "universe": "dragonball",
@@ -5767,7 +5768,7 @@
       "originalBytes": 34726,
       "webpBytes": 16018,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:01.415Z"
+      "updatedAt": "2026-10-01T18:25:10.660Z"
     },
     "dragonball|capitaine ginyu": {
       "universe": "dragonball",
@@ -5784,7 +5785,7 @@
       "originalBytes": 34726,
       "webpBytes": 16018,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:01.415Z"
+      "updatedAt": "2026-10-01T18:25:10.660Z"
     },
     "dragonball|sangoten": {
       "universe": "dragonball",
@@ -5817,7 +5818,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:00.866Z"
+      "updatedAt": "2026-10-01T18:23:18.391Z"
     },
     "dragonball|broly": {
       "universe": "dragonball",
@@ -5828,7 +5829,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:02.024Z"
+      "updatedAt": "2026-10-01T18:23:40.301Z"
     },
     "dragonball|king vegeta": {
       "universe": "dragonball",
@@ -5850,7 +5851,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:03.470Z"
+      "updatedAt": "2026-10-01T18:24:46.467Z"
     },
     "dragonball|android 16": {
       "universe": "dragonball",
@@ -34122,5 +34123,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T18:20:00.029Z"
+  "generatedAt": "2026-10-01T18:25:19.357Z"
 }
