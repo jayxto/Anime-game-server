@@ -25648,7 +25648,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:51.849Z"
+      "updatedAt": "2026-10-01T21:44:57.686Z"
     },
     "wakfu|kerubim crepin": {
       "universe": "wakfu",
@@ -25659,7 +25659,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:53.565Z"
+      "updatedAt": "2026-10-01T21:45:10.564Z"
     },
     "wakfu|grany smisse": {
       "universe": "wakfu",
@@ -25670,7 +25670,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:52.329Z"
+      "updatedAt": "2026-10-01T21:45:31.211Z"
     },
     "wakfu|kabrok": {
       "universe": "wakfu",
@@ -25703,7 +25703,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:53.696Z"
+      "updatedAt": "2026-10-01T21:44:35.807Z"
     },
     "wakfu|aurora": {
       "universe": "wakfu",
@@ -25714,7 +25714,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:54.657Z"
+      "updatedAt": "2026-10-01T21:45:19.767Z"
     },
     "wakfu|joris jurgen": {
       "universe": "wakfu",
@@ -25725,7 +25725,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:56.105Z"
+      "updatedAt": "2026-10-01T21:46:49.747Z"
     },
     "wakfu|armand sheran sharm": {
       "universe": "wakfu",
@@ -25736,7 +25736,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:56.131Z"
+      "updatedAt": "2026-10-01T21:47:00.231Z"
     },
     "wakfu|rushu": {
       "universe": "wakfu",
@@ -25747,7 +25747,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:56.127Z"
+      "updatedAt": "2026-10-01T21:46:14.954Z"
     },
     "wakfu|toross mordal": {
       "universe": "wakfu",
@@ -25758,7 +25758,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:56.365Z"
+      "updatedAt": "2026-10-01T21:47:21.298Z"
     },
     "wakfu|moon": {
       "universe": "wakfu",
@@ -25769,7 +25769,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:57.471Z"
+      "updatedAt": "2026-10-01T21:46:37.446Z"
     },
     "wakfu|ogrest": {
       "universe": "wakfu",
@@ -25780,7 +25780,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:49:54.775Z"
+      "updatedAt": "2026-10-01T21:45:41.798Z"
     },
     "wakfu|mina": {
       "universe": "wakfu",
@@ -34132,5 +34132,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T21:44:13.582Z"
+  "generatedAt": "2026-10-01T21:47:21.298Z"
 }
