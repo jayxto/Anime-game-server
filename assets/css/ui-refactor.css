@@ -1041,3 +1041,7 @@ body.ag-game-page #app-root > #mode,
         bottom:10px!important;
     }
 }
+
+/* Streamer : ne jamais masquer Plus ou moins / Survie / Chaos à cause de la limite des 10 mini-jeux */
+#mode .arc-menu.arc-stream-view .arc-game-btn:nth-child(n+11){display:grid!important}
+#mode .arc-menu.arc-stream-view .arc-game-btn.mc-hidden{display:none!important}
