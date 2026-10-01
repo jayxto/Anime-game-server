@@ -2447,7 +2447,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:39.159Z"
+      "updatedAt": "2026-10-01T18:05:27.815Z"
     },
     "clover|grey": {
       "universe": "clover",
@@ -2560,7 +2560,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:40.772Z"
+      "updatedAt": "2026-10-01T18:04:32.416Z"
     },
     "clover|mereoleona vermillion": {
       "universe": "clover",
@@ -2696,7 +2696,7 @@
       "originalBytes": 166080,
       "webpBytes": 16826,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.389Z"
     },
     "clover|licht": {
       "universe": "clover",
@@ -2713,7 +2713,7 @@
       "originalBytes": 97331,
       "webpBytes": 9584,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.389Z"
     },
     "clover|zenon zogratis": {
       "universe": "clover",
@@ -2730,7 +2730,7 @@
       "originalBytes": 27828,
       "webpBytes": 16866,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.389Z"
     },
     "clover|vanica zogratis": {
       "universe": "clover",
@@ -2747,7 +2747,7 @@
       "originalBytes": 164991,
       "webpBytes": 21844,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.389Z"
     },
     "clover|dante zogratis": {
       "universe": "clover",
@@ -2764,7 +2764,7 @@
       "originalBytes": 204794,
       "webpBytes": 22922,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|liebe": {
       "universe": "clover",
@@ -2781,7 +2781,7 @@
       "originalBytes": 88861,
       "webpBytes": 6880,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|langris vaude": {
       "universe": "clover",
@@ -2798,7 +2798,7 @@
       "originalBytes": 181373,
       "webpBytes": 16220,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|nacht faust": {
       "universe": "clover",
@@ -2815,7 +2815,7 @@
       "originalBytes": 72109,
       "webpBytes": 9578,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|jack the ripper": {
       "universe": "clover",
@@ -2832,7 +2832,7 @@
       "originalBytes": 162248,
       "webpBytes": 14446,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|fana": {
       "universe": "clover",
@@ -2849,7 +2849,7 @@
       "originalBytes": 163682,
       "webpBytes": 14684,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.162Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "clover|mars": {
       "universe": "clover",
@@ -2866,7 +2866,7 @@
       "originalBytes": 202148,
       "webpBytes": 19096,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:39.163Z"
+      "updatedAt": "2026-10-01T18:03:05.390Z"
     },
     "chainsaw|yuko": {
       "universe": "chainsaw",
@@ -2875,9 +2875,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/chainsaw-man/images/0/00/Volume_13_%28Textless%29.png/revision/latest?cb=20251129105216",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:41.780Z"
+      "updatedAt": "2026-10-01T18:03:17.148Z"
     },
     "chainsaw|michiko tendo": {
       "universe": "chainsaw",
@@ -2888,7 +2889,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:42.364Z"
+      "updatedAt": "2026-10-01T18:04:23.031Z"
     },
     "cote|kiyotaka ayanokoji": {
       "universe": "cote",
@@ -2905,7 +2906,7 @@
       "originalBytes": 158374,
       "webpBytes": 15674,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|suzune horikita": {
       "universe": "cote",
@@ -2922,7 +2923,7 @@
       "originalBytes": 121942,
       "webpBytes": 14078,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|kikyo kushida": {
       "universe": "cote",
@@ -2939,7 +2940,7 @@
       "originalBytes": 177609,
       "webpBytes": 22410,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|kei karuizawa": {
       "universe": "cote",
@@ -2956,7 +2957,7 @@
       "originalBytes": 184347,
       "webpBytes": 25972,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|kakeru ryuen": {
       "universe": "cote",
@@ -2973,7 +2974,7 @@
       "originalBytes": 133248,
       "webpBytes": 17096,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|arisu sakayanagi": {
       "universe": "cote",
@@ -2990,7 +2991,7 @@
       "originalBytes": 22075,
       "webpBytes": 19688,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.365Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "cote|honami ichinose": {
       "universe": "cote",
@@ -3007,7 +3008,7 @@
       "originalBytes": 160963,
       "webpBytes": 19272,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.366Z"
+      "updatedAt": "2026-10-01T18:05:27.816Z"
     },
     "clover|fuegoleon vermillion": {
       "universe": "clover",
@@ -3035,7 +3036,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:45:41.440Z"
+      "updatedAt": "2026-10-01T18:05:16.782Z"
     },
     "cote|manabu horikita": {
       "universe": "cote",
@@ -3052,7 +3053,7 @@
       "originalBytes": 149545,
       "webpBytes": 16400,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.366Z"
+      "updatedAt": "2026-10-01T18:05:27.817Z"
     },
     "cote|yosuke hirata": {
       "universe": "cote",
@@ -3069,7 +3070,7 @@
       "originalBytes": 121303,
       "webpBytes": 12938,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:45:42.366Z"
+      "updatedAt": "2026-10-01T18:05:27.817Z"
     },
     "cote|kanji ike": {
       "universe": "cote",
@@ -34121,5 +34122,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T18:03:04.001Z"
+  "generatedAt": "2026-10-01T18:05:27.817Z"
 }
