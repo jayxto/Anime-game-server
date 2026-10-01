@@ -14298,7 +14298,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:35.834Z"
+      "updatedAt": "2026-10-01T19:45:54.225Z"
     },
     "jojo|terunosuke miyamoto": {
       "universe": "jojo",
@@ -14360,7 +14360,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:35.995Z"
+      "updatedAt": "2026-10-01T19:46:05.332Z"
     },
     "jojo|enrico pucci": {
       "universe": "jojo",
@@ -14371,7 +14371,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:36.176Z"
+      "updatedAt": "2026-10-01T19:46:16.424Z"
     },
     "jojo|hot pants": {
       "universe": "jojo",
@@ -14382,7 +14382,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:36.445Z"
+      "updatedAt": "2026-10-01T19:46:49.406Z"
     },
     "jojo|lucy steel": {
       "universe": "jojo",
@@ -14393,7 +14393,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:36.715Z"
+      "updatedAt": "2026-10-01T19:47:44.647Z"
     },
     "jojo|n'doul": {
       "universe": "jojo",
@@ -14404,7 +14404,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:37.750Z"
+      "updatedAt": "2026-10-01T19:49:46.633Z"
     },
     "jojo|alessi": {
       "universe": "jojo",
@@ -14415,7 +14415,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:38.587Z"
+      "updatedAt": "2026-10-01T19:47:11.670Z"
     },
     "jojo|george joestar": {
       "universe": "jojo",
@@ -14426,7 +14426,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:38.655Z"
+      "updatedAt": "2026-10-01T19:49:13.216Z"
     },
     "jojo|keicho nijimura": {
       "universe": "jojo",
@@ -14437,7 +14437,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:38.892Z"
+      "updatedAt": "2026-10-01T19:49:35.151Z"
     },
     "jojo|daniel j d'arby": {
       "universe": "jojo",
@@ -14448,7 +14448,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:39.361Z"
+      "updatedAt": "2026-10-01T19:50:08.577Z"
     },
     "jojo|mikitaka hazekura": {
       "universe": "jojo",
@@ -14459,7 +14459,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:39.690Z"
+      "updatedAt": "2026-10-01T19:50:30.498Z"
     },
     "jojo|cioccolata": {
       "universe": "jojo",
@@ -14470,7 +14470,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:41.116Z"
+      "updatedAt": "2026-10-01T19:50:19.341Z"
     },
     "jojo|squalo": {
       "universe": "jojo",
@@ -14479,9 +14479,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:41.097Z"
+      "updatedAt": "2026-10-01T19:50:43.525Z"
     },
     "jojo|gwess": {
       "universe": "jojo",
@@ -14492,7 +14493,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:41.382Z"
+      "updatedAt": "2026-10-01T19:50:52.444Z"
     },
     "jojo|tiziano": {
       "universe": "jojo",
@@ -14501,9 +14502,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:41.756Z"
+      "updatedAt": "2026-10-01T19:51:16.570Z"
     },
     "jojo|polpo": {
       "universe": "jojo",
@@ -14514,7 +14516,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:42.132Z"
+      "updatedAt": "2026-10-01T19:51:25.620Z"
     },
     "jojo|telence t d'arby": {
       "universe": "jojo",
@@ -14525,7 +14527,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:40.609Z"
+      "updatedAt": "2026-10-01T19:51:03.735Z"
     },
     "jojo|secco": {
       "universe": "jojo",
@@ -14536,7 +14538,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:43.051Z"
+      "updatedAt": "2026-10-01T19:51:36.664Z"
     },
     "jojo|johngalli a": {
       "universe": "jojo",
@@ -14547,7 +14549,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:44.170Z"
+      "updatedAt": "2026-10-01T19:54:00.238Z"
     },
     "jojo|sports maxx": {
       "universe": "jojo",
@@ -14558,7 +14560,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:44.143Z"
+      "updatedAt": "2026-10-01T19:54:11.315Z"
     },
     "jojo|rikiel": {
       "universe": "jojo",
@@ -14569,7 +14571,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:44.250Z"
+      "updatedAt": "2026-10-01T19:52:20.770Z"
     },
     "jojo|ringo roadagain": {
       "universe": "jojo",
@@ -14591,7 +14593,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:44.547Z"
+      "updatedAt": "2026-10-01T19:52:31.826Z"
     },
     "jojo|pocoloco": {
       "universe": "jojo",
@@ -14602,7 +14604,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:43.892Z"
+      "updatedAt": "2026-10-01T19:52:09.747Z"
     },
     "jojo|sandman": {
       "universe": "jojo",
@@ -14613,7 +14615,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:45.446Z"
+      "updatedAt": "2026-10-01T19:52:42.897Z"
     },
     "jojo|mountain tim": {
       "universe": "jojo",
@@ -14635,7 +14637,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:46.737Z"
+      "updatedAt": "2026-10-01T19:54:44.196Z"
     },
     "jojo|axl ro": {
       "universe": "jojo",
@@ -34128,5 +34130,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T19:45:20.997Z"
+  "generatedAt": "2026-10-01T19:54:44.196Z"
 }
