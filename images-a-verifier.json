@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-01T12:32:11.031Z",
+  "generatedAt": "2026-10-01T13:23:31.905Z",
   "characters": [
     {
       "universe": "bleach",
-      "name": "toshiro hitsugaya",
-      "current": "https://static.wikia.nocookie.net/bleach/images/4/44/Ep363HitsugayaProfile.png/revision/latest?cb=20231105055501&path-prefix=en",
+      "name": "shunsui kyoraku",
+      "current": "https://static.wikia.nocookie.net/bleach/images/0/03/Ep375ShunsuiProfile.png/revision/latest?cb=20221205191725&path-prefix=en",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -19,32 +19,8 @@
     },
     {
       "universe": "bleach",
-      "name": "uryu ishida",
-      "current": "https://static.wikia.nocookie.net/bleach/images/0/05/Ep344UryuProfile3.png/revision/latest?cb=20230125214916&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bleach",
-      "name": "shunsui kyoraku",
-      "current": "https://static.wikia.nocookie.net/bleach/images/0/03/Ep375ShunsuiProfile.png/revision/latest?cb=20221205191725&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bleach",
-      "name": "kaname tosen",
-      "current": "https://static.wikia.nocookie.net/bleach/images/e/ef/Ep289TosenProfile.png/revision/latest?cb=20230824023725&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bleach",
-      "name": "baraggan louisenbairn",
-      "current": "https://static.wikia.nocookie.net/bleach/images/9/93/Ep226BaragganProfile.png/revision/latest?cb=20230831172929&path-prefix=en",
+      "name": "toshiro hitsugaya",
+      "current": "https://static.wikia.nocookie.net/bleach/images/4/44/Ep363HitsugayaProfile.png/revision/latest?cb=20231105055501&path-prefix=en",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -59,24 +35,16 @@
     },
     {
       "universe": "bleach",
+      "name": "uryu ishida",
+      "current": "https://static.wikia.nocookie.net/bleach/images/0/05/Ep344UryuProfile3.png/revision/latest?cb=20230125214916&path-prefix=en",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "bleach",
       "name": "yoruichi shihoin",
       "current": "https://static.wikia.nocookie.net/bleach/images/6/62/Ep246YoruichiShih%C5%8Din.png/revision/latest?cb=20231105202606&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bleach",
-      "name": "nnoitra gilga",
-      "current": "https://static.wikia.nocookie.net/bleach/images/1/10/Ep190NnoitraProfile.png/revision/latest?cb=20221225060324&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bleach",
-      "name": "kukaku shiba",
-      "current": "https://static.wikia.nocookie.net/bleach/images/c/c7/Ep374KukakuProfile2.png/revision/latest?cb=20260810114449&path-prefix=en",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -91,32 +59,8 @@
     },
     {
       "universe": "bleach",
-      "name": "ganju shiba",
-      "current": "https://static.wikia.nocookie.net/bleach/images/2/22/Ep390GanjuProfile.png/revision/latest?cb=20230928064838&path-prefix=en",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bluelock",
-      "name": "alexis ness",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/1/18/Alexis_Ness.png/revision/latest?cb=20220315172442",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bluelock",
-      "name": "charles chevalier",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/6/6d/Charles.png/revision/latest?cb=20250731185927",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "bluelock",
-      "name": "yo hiori",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/6/65/Yo_Hiori.png/revision/latest?cb=20251123132659",
+      "name": "kukaku shiba",
+      "current": "https://static.wikia.nocookie.net/bleach/images/c/c7/Ep374KukakuProfile2.png/revision/latest?cb=20260810114449&path-prefix=en",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -131,8 +75,8 @@
     },
     {
       "universe": "bluelock",
-      "name": "oliver aiku",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/f/fc/Oliver_Aiku.png/revision/latest?cb=20210221131507",
+      "name": "yo hiori",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/6/65/Yo_Hiori.png/revision/latest?cb=20251123132659",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -147,8 +91,8 @@
     },
     {
       "universe": "bluelock",
-      "name": "chris prince",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/f/f1/Chris_Prince.png/revision/latest?cb=20250624032843",
+      "name": "oliver aiku",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/f/fc/Oliver_Aiku.png/revision/latest?cb=20210221131507",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -171,8 +115,8 @@
     },
     {
       "universe": "bluelock",
-      "name": "miroku darai",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/4/45/Miroku_Darai.png/revision/latest?cb=20240608102911",
+      "name": "chris prince",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/f/f1/Chris_Prince.png/revision/latest?cb=20250624032843",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -187,6 +131,14 @@
     },
     {
       "universe": "bluelock",
+      "name": "miroku darai",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/4/45/Miroku_Darai.png/revision/latest?cb=20240608102911",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "bluelock",
       "name": "kazuma niou",
       "current": "https://static.wikia.nocookie.net/bluelock/images/0/0b/Kazuma_Nio.png/revision/latest?cb=20210221143918",
       "errors": [
@@ -195,16 +147,16 @@
     },
     {
       "universe": "bluelock",
-      "name": "gen fukaku",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/4/44/Gen_Fukaku.png/revision/latest?cb=20240608110756",
+      "name": "ryosuke kira",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/b/b1/Ryosuke_Kira.png/revision/latest?cb=20191027101038",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "bluelock",
-      "name": "ryosuke kira",
-      "current": "https://static.wikia.nocookie.net/bluelock/images/b/b1/Ryosuke_Kira.png/revision/latest?cb=20191027101038",
+      "name": "gen fukaku",
+      "current": "https://static.wikia.nocookie.net/bluelock/images/4/44/Gen_Fukaku.png/revision/latest?cb=20240608110756",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -235,22 +187,6 @@
     },
     {
       "universe": "chainsaw",
-      "name": "tsugihagi",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/9b/Tsugihagi.png/revision/latest?cb=20220814142254",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
-      "name": "tolka",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/2/28/Tolka.png/revision/latest?cb=20200412235739",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
       "name": "cosmo",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/9c/Cosmo.png/revision/latest?cb=20220827192741",
       "errors": [
@@ -267,10 +203,11 @@
     },
     {
       "universe": "chainsaw",
-      "name": "santa claus",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/97/Santa_Claus_%28Tolka%27s_Master%29_Infobox.png/revision/latest?cb=20231222204442",
+      "name": "tsugihagi",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/9b/Tsugihagi.png/revision/latest?cb=20220814142254",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -291,10 +228,19 @@
     },
     {
       "universe": "chainsaw",
-      "name": "long",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/0/00/Long-1.png/revision/latest?cb=20200412235820",
+      "name": "santa claus",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/97/Santa_Claus_%28Tolka%27s_Master%29_Infobox.png/revision/latest?cb=20231222204442",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "tolka",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/2/28/Tolka.png/revision/latest?cb=20200412235739",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -315,24 +261,16 @@
     },
     {
       "universe": "chainsaw",
-      "name": "fami",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/e4/Volume_14_%28Textless%29.png/revision/latest?cb=20250505195335",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
-      "name": "haruka iseumi",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/b/b1/Haruka.png/revision/latest?cb=20230425034157",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
       "name": "nayuta",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/9/94/Nayuta_Part_2.png/revision/latest?cb=20230422123541",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "fami",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/e4/Volume_14_%28Textless%29.png/revision/latest?cb=20250505195335",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -347,16 +285,25 @@
     },
     {
       "universe": "chainsaw",
-      "name": "nobana higashiyama",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/5/57/Nobana_Higashiyama.png/revision/latest?cb=20230425034752",
+      "name": "haruka iseumi",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/b/b1/Haruka.png/revision/latest?cb=20230425034157",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "chainsaw",
-      "name": "barem bridge",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/eb/Barem_Part_2_Profile.png/revision/latest?cb=20240902225444",
+      "name": "long",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/0/00/Long-1.png/revision/latest?cb=20200412235820",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "nobana higashiyama",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/5/57/Nobana_Higashiyama.png/revision/latest?cb=20230425034752",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -371,14 +318,6 @@
     },
     {
       "universe": "chainsaw",
-      "name": "gun devil",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/eb/Gun_devil.png/revision/latest?cb=20240921222645",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
       "name": "spear hybrid",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/3/3c/Spear_Hybrid_Part_2.png/revision/latest?cb=20240903071604",
       "errors": [
@@ -387,8 +326,8 @@
     },
     {
       "universe": "chainsaw",
-      "name": "whip hybrid",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/a/a9/Whip_Hybrid_Part_2.png/revision/latest?cb=20240902225123",
+      "name": "gun devil",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/eb/Gun_devil.png/revision/latest?cb=20240921222645",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -403,8 +342,16 @@
     },
     {
       "universe": "chainsaw",
-      "name": "demon des tenebres",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/6/62/Darkness_Devil.png/revision/latest?cb=20230114131607",
+      "name": "barem bridge",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/e/eb/Barem_Part_2_Profile.png/revision/latest?cb=20240902225444",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "whip hybrid",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/a/a9/Whip_Hybrid_Part_2.png/revision/latest?cb=20240902225123",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -419,23 +366,16 @@
     },
     {
       "universe": "chainsaw",
+      "name": "demon des tenebres",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/6/62/Darkness_Devil.png/revision/latest?cb=20230114131607",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
       "name": "justice devil",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/8/8c/Justice_Devil.png/revision/latest?cb=20231010151853",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
-      "name": "demon de la chute",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/4/4c/Falling_Devil.png/revision/latest?cb=20240407093830",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
-      "name": "demon de la justice",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/8/8c/Justice_Devil.png/revision/latest?cb=20231010151853",
       "errors": [
         "char-images: HTTP 404"
@@ -451,14 +391,6 @@
     },
     {
       "universe": "chainsaw",
-      "name": "demon de l'enfer",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/d/db/Hell_Devil.png/revision/latest?cb=20220814155530",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "chainsaw",
       "name": "aging devil",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/8/8d/Aging_Devil.png/revision/latest?cb=20241206033528",
       "errors": [
@@ -467,10 +399,11 @@
     },
     {
       "universe": "chainsaw",
-      "name": "yuko",
-      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/0/00/Volume_13_%28Textless%29.png/revision/latest?cb=20251129105216",
+      "name": "demon de la chute",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/4/4c/Falling_Devil.png/revision/latest?cb=20240407093830",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -478,21 +411,32 @@
       "name": "michiko tendo",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/b/bb/Michiko_Tendo_anime.png/revision/latest?cb=20221206175345",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "demon de l'enfer",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/d/db/Hell_Devil.png/revision/latest?cb=20220814155530",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "chainsaw",
+      "name": "demon de la justice",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/8/8c/Justice_Devil.png/revision/latest?cb=20231010151853",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
       "universe": "chainsaw",
       "name": "fumiko mifune",
       "current": "https://static.wikia.nocookie.net/chainsaw-man/images/b/b9/Volume_19_%28Textless%29.png/revision/latest?cb=20260826195726",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "clover",
-      "name": "patry",
-      "current": "https://static.wikia.nocookie.net/blackclover/images/b/bc/Patolli_profile.png/revision/latest?cb=20190805192436",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -514,6 +458,32 @@
       ]
     },
     {
+      "universe": "chainsaw",
+      "name": "yuko",
+      "current": "https://static.wikia.nocookie.net/chainsaw-man/images/0/00/Volume_13_%28Textless%29.png/revision/latest?cb=20251129105216",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "clover",
+      "name": "patry",
+      "current": "https://static.wikia.nocookie.net/blackclover/images/b/bc/Patolli_profile.png/revision/latest?cb=20190805192436",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "clover",
+      "name": "lucius zogratis",
+      "current": "https://static.wikia.nocookie.net/blackclover/images/3/31/Lucius_profile.png/revision/latest?cb=20230322165647",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
       "universe": "clover",
       "name": "secre swallowtail",
       "current": "https://static.wikia.nocookie.net/blackclover/images/e/eb/Secre_after_Heart_Kingdom_training.png/revision/latest?cb=20191115065752",
@@ -522,9 +492,9 @@
       ]
     },
     {
-      "universe": "clover",
-      "name": "lucius zogratis",
-      "current": "https://static.wikia.nocookie.net/blackclover/images/3/31/Lucius_profile.png/revision/latest?cb=20230322165647",
+      "universe": "cote",
+      "name": "nanase tsubasa",
+      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/9/9d/Tsubasa_Nanase_LN_visual.png/revision/latest?cb=20191025111603",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -547,40 +517,8 @@
     },
     {
       "universe": "cote",
-      "name": "nanase tsubasa",
-      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/9/9d/Tsubasa_Nanase_LN_visual.png/revision/latest?cb=20191025111603",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "cote",
       "name": "takuya yagami",
       "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/2/24/Takuya_Yagami_LN_2nd_Year_Arc_visual.png/revision/latest?cb=20191025132826",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "cote",
-      "name": "ken sudo",
-      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/b/b0/Ken_Sud%C5%8D_LN_visual.png/revision/latest?cb=20170901054140",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "cote",
-      "name": "rokusuke koenji",
-      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/0/02/Rokusuke_K%C5%8Denji_LN_visual.png/revision/latest?cb=20170901064534",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "cote",
-      "name": "kazuma sakagami",
-      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/d/dd/Kazuma_Sakagami_Manga.png/revision/latest?cb=20240227215506",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -595,8 +533,32 @@
     },
     {
       "universe": "cote",
+      "name": "kazuma sakagami",
+      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/d/dd/Kazuma_Sakagami_Manga.png/revision/latest?cb=20240227215506",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "cote",
+      "name": "ken sudo",
+      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/b/b0/Ken_Sud%C5%8D_LN_visual.png/revision/latest?cb=20170901054140",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "cote",
       "name": "kazuomi hosen",
       "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/0/05/Kazuomi_H%C5%8Dsen_LN_2nd_Year_Arc_visual.png/revision/latest?cb=20191025132152",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "cote",
+      "name": "rokusuke koenji",
+      "current": "https://static.wikia.nocookie.net/youkoso-jitsuryoku-shijou-shugi-no-kyoushitsu-e/images/0/02/Rokusuke_K%C5%8Denji_LN_visual.png/revision/latest?cb=20170901064534",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -619,26 +581,20 @@
     },
     {
       "universe": "deathnote",
-      "name": "midora",
-      "current": "https://static.wikia.nocookie.net/deathnote/images/a/af/DN_015B.png/revision/latest?cb=20181011162134",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "deathnote",
-      "name": "calikarcha",
-      "current": "https://static.wikia.nocookie.net/deathnote/images/6/6b/CalikarchaAnime.png/revision/latest?cb=20160606004834",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "deathnote",
       "name": "soichiro yagami",
       "current": "https://static.wikia.nocookie.net/deathnote/images/e/eb/Soichiro_Yagami.PNG/revision/latest?cb=20250630094521",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "deathnote",
+      "name": "midora",
+      "current": "https://static.wikia.nocookie.net/deathnote/images/a/af/DN_015B.png/revision/latest?cb=20181011162134",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -646,15 +602,17 @@
       "name": "shingo mido",
       "current": "https://static.wikia.nocookie.net/deathnote/images/a/a1/MidoManga.jpeg/revision/latest?cb=20250720053507",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
       "universe": "deathnote",
-      "name": "armonia justin beyondormason",
-      "current": "https://static.wikia.nocookie.net/deathnote/images/6/6f/ArmoniaResponsibility.jpg/revision/latest?cb=20250708074932",
+      "name": "calikarcha",
+      "current": "https://static.wikia.nocookie.net/deathnote/images/6/6b/CalikarchaAnime.png/revision/latest?cb=20160606004834",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -662,7 +620,17 @@
       "name": "deridovely",
       "current": "https://static.wikia.nocookie.net/deathnote/images/d/df/Deridovely_color_01.jpg/revision/latest?cb=20250706132009",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "deathnote",
+      "name": "armonia justin beyondormason",
+      "current": "https://static.wikia.nocookie.net/deathnote/images/6/6f/ArmoniaResponsibility.jpg/revision/latest?cb=20250708074932",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -670,13 +638,23 @@
       "name": "zellogi",
       "current": "https://static.wikia.nocookie.net/deathnote/images/e/e5/ZellogiBlancEtNoir.jpg/revision/latest?cb=20250703141630",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
       "universe": "deathnote",
       "name": "nu",
       "current": "https://static.wikia.nocookie.net/deathnote/images/1/1f/Nu.PNG/revision/latest?cb=20080501034705",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "demonslayer",
+      "name": "kanae kocho",
+      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/d/dc/Kanae_Kocho.png/revision/latest?cb=20240805215736",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -691,8 +669,8 @@
     },
     {
       "universe": "demonslayer",
-      "name": "kanae kocho",
-      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/d/dc/Kanae_Kocho.png/revision/latest?cb=20240805215736",
+      "name": "gyokko",
+      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -707,24 +685,8 @@
     },
     {
       "universe": "demonslayer",
-      "name": "gyokko",
-      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "demonslayer",
       "name": "senjuro rengoku",
       "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/8/85/Senjuro_anime.png/revision/latest?cb=20241228054713",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "demonslayer",
-      "name": "michikatsu tsugikuni",
-      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -747,6 +709,14 @@
     },
     {
       "universe": "demonslayer",
+      "name": "michikatsu tsugikuni",
+      "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "demonslayer",
       "name": "kanata ubuyashiki",
       "current": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/6/6e/Kanata_anime.png/revision/latest?cb=20190713175822",
       "errors": [
@@ -755,32 +725,8 @@
     },
     {
       "universe": "dragonball",
-      "name": "sangohan",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "son gohan",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "sangoten",
       "current": "https://static.wikia.nocookie.net/dragonball/images/c/c9/Super_Hero_-_Goten_artwork.jpg/revision/latest?cb=20220920183551",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "roi vegeta",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/6/65/King_Vegeta.png/revision/latest?cb=20210428223509",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -819,6 +765,33 @@
     },
     {
       "universe": "dragonball",
+      "name": "son gohan",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "sangohan",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "roi vegeta",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/6/65/King_Vegeta.png/revision/latest?cb=20210428223509",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
       "name": "gine",
       "current": "https://static.wikia.nocookie.net/dragonball/images/5/5e/Broly_-_Gine_following_Bardock.png/revision/latest?cb=20240601102128",
       "errors": [
@@ -827,7 +800,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "vegito",
+      "name": "vegeto",
       "current": "https://static.wikia.nocookie.net/dragonball/images/5/53/Vegito.jpg/revision/latest?cb=20250317214139",
       "errors": [
         "char-images: HTTP 404"
@@ -835,7 +808,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "vegeto",
+      "name": "vegito",
       "current": "https://static.wikia.nocookie.net/dragonball/images/5/53/Vegito.jpg/revision/latest?cb=20250317214139",
       "errors": [
         "char-images: HTTP 404"
@@ -859,14 +832,6 @@
     },
     {
       "universe": "dragonball",
-      "name": "roi cold",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/2/22/King_Cold_episode_122.png/revision/latest?cb=20241217033208",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "dodoria",
       "current": "https://static.wikia.nocookie.net/dragonball/images/f/fd/Dodoria_DBZ_Ep_49_002.png/revision/latest?cb=20170827051359",
       "errors": [
@@ -875,16 +840,8 @@
     },
     {
       "universe": "dragonball",
-      "name": "jeece",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Jeice_DBZ_Episode_71.png/revision/latest?cb=20210519195015",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "jeice",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Jeice_DBZ_Episode_71.png/revision/latest?cb=20210519195015",
+      "name": "roi cold",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/2/22/King_Cold_episode_122.png/revision/latest?cb=20241217033208",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -893,6 +850,14 @@
       "universe": "dragonball",
       "name": "cooler",
       "current": "https://static.wikia.nocookie.net/dragonball/images/4/4e/Cooler%27s_Revenge_-_Cooler_prepares_to_transform.png/revision/latest?cb=20250111151725",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "jeice",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Jeice_DBZ_Episode_71.png/revision/latest?cb=20210519195015",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -931,6 +896,15 @@
     },
     {
       "universe": "dragonball",
+      "name": "jeece",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Jeice_DBZ_Episode_71.png/revision/latest?cb=20210519195015",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
       "name": "guldo",
       "current": "https://static.wikia.nocookie.net/dragonball/images/c/cb/GULDO.jpg/revision/latest?cb=20140228015925",
       "errors": [
@@ -963,6 +937,14 @@
     },
     {
       "universe": "dragonball",
+      "name": "kibito",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/c/ce/Kibito-0.jpg/revision/latest?cb=20170521172437",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
       "name": "android 19",
       "current": "https://static.wikia.nocookie.net/dragonball/images/1/1f/Android_19_DBZ_Episode_130.png/revision/latest?cb=20210904181928",
       "errors": [
@@ -971,8 +953,8 @@
     },
     {
       "universe": "dragonball",
-      "name": "kibito",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/c/ce/Kibito-0.jpg/revision/latest?cb=20170521172437",
+      "name": "c 19",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/1/1f/Android_19_DBZ_Episode_130.png/revision/latest?cb=20210904181928",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -995,14 +977,6 @@
     },
     {
       "universe": "dragonball",
-      "name": "c 19",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/1/1f/Android_19_DBZ_Episode_130.png/revision/latest?cb=20210904181928",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "grand pretre",
       "current": "https://static.wikia.nocookie.net/dragonball/images/7/78/Daishinkan1.png/revision/latest?cb=20170815212212",
       "errors": [
@@ -1011,15 +985,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "grand priest",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/7/78/Daishinkan1.png/revision/latest?cb=20170815212212",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "son goku",
+      "name": "sangoku",
       "current": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513",
       "errors": [
         "char-images: HTTP 404"
@@ -1027,7 +993,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "sangoku",
+      "name": "son goku",
       "current": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513",
       "errors": [
         "char-images: HTTP 404"
@@ -1059,6 +1025,15 @@
     },
     {
       "universe": "dragonball",
+      "name": "grand priest",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/7/78/Daishinkan1.png/revision/latest?cb=20170815212212",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
       "name": "botamo",
       "current": "https://static.wikia.nocookie.net/dragonball/images/f/f1/Botamo_Super_ep_32_HD_profile.png/revision/latest?cb=20170724092514",
       "errors": [
@@ -1075,16 +1050,16 @@
     },
     {
       "universe": "dragonball",
-      "name": "paragus",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/a/ab/ParagusDVD.png/revision/latest?cb=20100809114554",
+      "name": "toppo",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/8/87/Top.png/revision/latest?cb=20180123150059",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "dragonball",
-      "name": "toppo",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/8/87/Top.png/revision/latest?cb=20180123150059",
+      "name": "paragus",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/a/ab/ParagusDVD.png/revision/latest?cb=20100809114554",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1099,14 +1074,6 @@
     },
     {
       "universe": "dragonball",
-      "name": "dyspo",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/f/f4/Dyspoo.png/revision/latest?cb=20170823113011",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "elec",
       "current": "https://static.wikia.nocookie.net/dragonball/images/7/78/Elec_full_body.png/revision/latest?cb=20220901162013",
       "errors": [
@@ -1115,16 +1082,24 @@
     },
     {
       "universe": "dragonball",
-      "name": "merus",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/4/42/Merus_profile.png/revision/latest?cb=20201014202831",
+      "name": "moro",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/1/14/Moro_%28Digitial_Colored_Manga%29.jpg/revision/latest?cb=20201003082939",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "dragonball",
-      "name": "moro",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/1/14/Moro_%28Digitial_Colored_Manga%29.jpg/revision/latest?cb=20201003082939",
+      "name": "dyspo",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/f/f4/Dyspoo.png/revision/latest?cb=20170823113011",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "merus",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/4/42/Merus_profile.png/revision/latest?cb=20201014202831",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1163,7 +1138,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "android 13",
+      "name": "c 13",
       "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Android_13_-_Super_Android_13_-_005.png/revision/latest?cb=20240906012340",
       "errors": [
         "char-images: HTTP 404"
@@ -1171,23 +1146,7 @@
     },
     {
       "universe": "dragonball",
-      "name": "grand chef",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/d/de/Guru_DBZ_Ep_76_001.png/revision/latest?cb=20170915040925",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "guru",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/d/de/Guru_DBZ_Ep_76_001.png/revision/latest?cb=20170915040925",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
-      "name": "c 13",
+      "name": "android 13",
       "current": "https://static.wikia.nocookie.net/dragonball/images/3/35/Android_13_-_Super_Android_13_-_005.png/revision/latest?cb=20240906012340",
       "errors": [
         "char-images: HTTP 404"
@@ -1211,18 +1170,28 @@
     },
     {
       "universe": "dragonball",
-      "name": "c 21",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/1/17/DBH_Universe_Mission_2_-_Android_21.png/revision/latest?cb=20230807202034",
+      "name": "porunga",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/8/88/Porunga_is_summoned_by_Dende.png/revision/latest?cb=20250214203821",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "dragonball",
-      "name": "porunga",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/8/88/Porunga_is_summoned_by_Dende.png/revision/latest?cb=20250214203821",
+      "name": "grand chef",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/d/de/Guru_DBZ_Ep_76_001.png/revision/latest?cb=20170915040925",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "guru",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/d/de/Guru_DBZ_Ep_76_001.png/revision/latest?cb=20170915040925",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -1251,6 +1220,15 @@
     },
     {
       "universe": "dragonball",
+      "name": "c 21",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/1/17/DBH_Universe_Mission_2_-_Android_21.png/revision/latest?cb=20230807202034",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
       "name": "garlic jr",
       "current": "https://static.wikia.nocookie.net/dragonball/images/1/15/Garlic_Jr_anime.png/revision/latest?cb=20260521233638",
       "errors": [
@@ -1259,15 +1237,15 @@
     },
     {
       "universe": "dragonball",
-      "name": "garlic junior",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/1/15/Garlic_Jr_anime.png/revision/latest?cb=20260521233638",
+      "name": "tullece",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/0/0b/The_Tree_of_Might_-_Turles_looking_down_at_Gohan.jpg/revision/latest?cb=20210927023245",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "dragonball",
-      "name": "tullece",
+      "name": "turles",
       "current": "https://static.wikia.nocookie.net/dragonball/images/0/0b/The_Tree_of_Might_-_Turles_looking_down_at_Gohan.jpg/revision/latest?cb=20210927023245",
       "errors": [
         "char-images: HTTP 404"
@@ -1291,14 +1269,6 @@
     },
     {
       "universe": "dragonball",
-      "name": "turles",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/0/0b/The_Tree_of_Might_-_Turles_looking_down_at_Gohan.jpg/revision/latest?cb=20210927023245",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "lord slug",
       "current": "https://static.wikia.nocookie.net/dragonball/images/8/88/Lord_Slug_-_Lord_Slug_-_007.png/revision/latest?cb=20250308100918",
       "errors": [
@@ -1311,6 +1281,15 @@
       "current": "https://static.wikia.nocookie.net/dragonball/images/0/02/U11Angel.png/revision/latest?cb=20170823155611",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "dragonball",
+      "name": "garlic junior",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/1/15/Garlic_Jr_anime.png/revision/latest?cb=20260521233638",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -1339,14 +1318,6 @@
     },
     {
       "universe": "dragonball",
-      "name": "marron",
-      "current": "https://static.wikia.nocookie.net/dragonball/images/b/bd/Marron_naso1.jpg/revision/latest?cb=20071210151352",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "dragonball",
       "name": "quitela",
       "current": "https://static.wikia.nocookie.net/dragonball/images/4/44/HakaishinQuitela.png/revision/latest?cb=20170703013641",
       "errors": [
@@ -1354,25 +1325,9 @@
       ]
     },
     {
-      "universe": "fairy",
-      "name": "lector",
-      "current": "https://static.wikia.nocookie.net/fairytail/images/9/95/Lector_anime.PNG/revision/latest?cb=20121006041513",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fairy",
-      "name": "jura neekis",
-      "current": "https://static.wikia.nocookie.net/fairytail/images/2/26/Jura_Avatar.png/revision/latest?cb=20121208100641",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fairy",
-      "name": "dimaria yesta",
-      "current": "https://static.wikia.nocookie.net/fairytail/images/0/07/Dimaria%27s_image.png/revision/latest?cb=20190106111252",
+      "universe": "dragonball",
+      "name": "marron",
+      "current": "https://static.wikia.nocookie.net/dragonball/images/b/bd/Marron_naso1.jpg/revision/latest?cb=20071210151352",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1387,10 +1342,19 @@
     },
     {
       "universe": "fairy",
-      "name": "brandish",
-      "current": "https://static.wikia.nocookie.net/fairytail/images/1/13/Brandish_Anime.png/revision/latest?cb=20181209133059",
+      "name": "dimaria yesta",
+      "current": "https://static.wikia.nocookie.net/fairytail/images/0/07/Dimaria%27s_image.png/revision/latest?cb=20190106111252",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fairy",
+      "name": "jura neekis",
+      "current": "https://static.wikia.nocookie.net/fairytail/images/2/26/Jura_Avatar.png/revision/latest?cb=20121208100641",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -1398,7 +1362,42 @@
       "name": "august",
       "current": "https://static.wikia.nocookie.net/fairytail/images/3/34/August%27s_profile_image.png/revision/latest?cb=20181209133055",
       "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fairy",
+      "name": "yukino agria",
+      "current": "https://static.wikia.nocookie.net/fairytail/images/5/52/Yukino_X792.png/revision/latest?cb=20181029104434",
+      "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fairy",
+      "name": "lector",
+      "current": "https://static.wikia.nocookie.net/fairytail/images/9/95/Lector_anime.PNG/revision/latest?cb=20121006041513",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fireforce",
+      "name": "inca kasugatani",
+      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/3/36/Inca.png/revision/latest?cb=20201025070422",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fairy",
+      "name": "brandish",
+      "current": "https://static.wikia.nocookie.net/fairytail/images/1/13/Brandish_Anime.png/revision/latest?cb=20181209133059",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -1406,13 +1405,14 @@
       "name": "hades",
       "current": "https://static.wikia.nocookie.net/fairytail/images/9/9b/Hades_Prop.JPG/revision/latest?cb=20111109201753",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
       "universe": "fireforce",
-      "name": "kurono yuichiro",
-      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/1/19/Kurono_Y%C5%ABichiro.png/revision/latest?cb=20201025070532",
+      "name": "ritsu",
+      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/b/bf/Ritsu_Infobox.png/revision/latest?cb=20201011094256",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1427,24 +1427,8 @@
     },
     {
       "universe": "fireforce",
-      "name": "inca kasugatani",
-      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/3/36/Inca.png/revision/latest?cb=20201025070422",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fireforce",
-      "name": "ritsu",
-      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/b/bf/Ritsu_Infobox.png/revision/latest?cb=20201011094256",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fireforce",
-      "name": "akitaru obi",
-      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/9/9e/Akitaru_%C5%8Cbi.png/revision/latest?cb=20191021082921",
+      "name": "dragon",
+      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/1/1c/Dragon_Anime.png/revision/latest?cb=20241206101003",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1459,8 +1443,8 @@
     },
     {
       "universe": "fireforce",
-      "name": "dragon",
-      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/1/1c/Dragon_Anime.png/revision/latest?cb=20241206101003",
+      "name": "akitaru obi",
+      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/9/9e/Akitaru_%C5%8Cbi.png/revision/latest?cb=20191021082921",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1483,8 +1467,8 @@
     },
     {
       "universe": "fma",
-      "name": "yoki",
-      "current": "https://static.wikia.nocookie.net/fma/images/2/2a/Yoki.png/revision/latest?cb=20130403010333",
+      "name": "tim marcoh",
+      "current": "https://static.wikia.nocookie.net/fma/images/8/88/Marcoh.png/revision/latest?cb=20130321233603",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1507,6 +1491,14 @@
     },
     {
       "universe": "fma",
+      "name": "yoki",
+      "current": "https://static.wikia.nocookie.net/fma/images/2/2a/Yoki.png/revision/latest?cb=20130403010333",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fma",
       "name": "alexander",
       "current": "https://static.wikia.nocookie.net/fma/images/d/d9/Alexander.png/revision/latest?cb=20140909125420",
       "errors": [
@@ -1514,33 +1506,18 @@
       ]
     },
     {
-      "universe": "fma",
-      "name": "tim marcoh",
-      "current": "https://static.wikia.nocookie.net/fma/images/8/88/Marcoh.png/revision/latest?cb=20130321233603",
+      "universe": "fireforce",
+      "name": "kurono yuichiro",
+      "current": "https://static.wikia.nocookie.net/fire-brigade-of-flames/images/1/19/Kurono_Y%C5%ABichiro.png/revision/latest?cb=20201025070532",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
       "universe": "fma",
       "name": "frank archer",
       "current": "https://static.wikia.nocookie.net/fma/images/c/c7/Archer_ep31.jpg/revision/latest?cb=20100622120740",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fma",
-      "name": "chris mustang",
-      "current": "https://static.wikia.nocookie.net/fma/images/5/51/Avatar_madam.png/revision/latest?cb=20180313184755",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "fma",
-      "name": "cornello",
-      "current": "https://static.wikia.nocookie.net/fma/images/3/38/Avatar_cornello.png/revision/latest?cb=20180412024019",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1555,8 +1532,8 @@
     },
     {
       "universe": "fma",
-      "name": "isaac mcdougal",
-      "current": "https://static.wikia.nocookie.net/fma/images/d/d5/Avatar_isaac.png/revision/latest?cb=20171002153137",
+      "name": "cornello",
+      "current": "https://static.wikia.nocookie.net/fma/images/3/38/Avatar_cornello.png/revision/latest?cb=20180412024019",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1565,6 +1542,14 @@
       "universe": "fma",
       "name": "basque grand",
       "current": "https://static.wikia.nocookie.net/fma/images/8/80/Avatar_basque.png/revision/latest?cb=20180406163928",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fma",
+      "name": "isaac mcdougal",
+      "current": "https://static.wikia.nocookie.net/fma/images/d/d5/Avatar_isaac.png/revision/latest?cb=20171002153137",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1591,6 +1576,15 @@
       "current": "https://static.wikia.nocookie.net/gachiakuta/images/f/fe/Guita_Hebby_Fantasia_%28Anime%29.png/revision/latest?cb=20251007111029",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "fma",
+      "name": "chris mustang",
+      "current": "https://static.wikia.nocookie.net/fma/images/5/51/Avatar_madam.png/revision/latest?cb=20180313184755",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -1667,14 +1661,6 @@
     },
     {
       "universe": "gachiakuta",
-      "name": "bundus",
-      "current": "https://static.wikia.nocookie.net/gachiakuta/images/e/e9/Bundus_Begalkeit_%28Anime%29.png/revision/latest?cb=20251007111423",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "gachiakuta",
       "name": "cthoni",
       "current": "https://static.wikia.nocookie.net/gachiakuta/images/6/60/Cthoni_Andor_%28Anime%29.png/revision/latest?cb=20250819042713",
       "errors": [
@@ -1701,6 +1687,14 @@
       "universe": "gachiakuta",
       "name": "alice",
       "current": "https://static.wikia.nocookie.net/gachiakuta/images/7/70/Alice_Stilza_%28Anime%29.png/revision/latest?cb=20250722132157",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "gachiakuta",
+      "name": "bundus",
+      "current": "https://static.wikia.nocookie.net/gachiakuta/images/e/e9/Bundus_Begalkeit_%28Anime%29.png/revision/latest?cb=20251007111423",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1747,8 +1741,8 @@
     },
     {
       "universe": "hellsparadise",
-      "name": "lan ban",
-      "current": "https://static.wikia.nocookie.net/jigokuraku/images/c/cb/Main.png/revision/latest?cb=20190120062933",
+      "name": "kiyomaru",
+      "current": "https://static.wikia.nocookie.net/jigokuraku/images/d/da/Yamada_Asaemon_Kiyomaru_Infobox_%28Anime%29.png/revision/latest?cb=20260202121916",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1763,8 +1757,8 @@
     },
     {
       "universe": "hellsparadise",
-      "name": "kiyomaru",
-      "current": "https://static.wikia.nocookie.net/jigokuraku/images/d/da/Yamada_Asaemon_Kiyomaru_Infobox_%28Anime%29.png/revision/latest?cb=20260202121916",
+      "name": "lan ban",
+      "current": "https://static.wikia.nocookie.net/jigokuraku/images/c/cb/Main.png/revision/latest?cb=20190120062933",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1773,14 +1767,6 @@
       "universe": "hellsparadise",
       "name": "yamada asaemon kisho",
       "current": "https://static.wikia.nocookie.net/jigokuraku/images/8/88/Yamada_Asaemon_Kisho_Anime_Infobox.png/revision/latest?cb=20230415171158",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "tsubone",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/9/9e/Tsubone_2011_Full_Body_Design.png/revision/latest?cb=20230418015629",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1797,6 +1783,14 @@
       "universe": "hxh",
       "name": "buhara",
       "current": "https://static.wikia.nocookie.net/hunterxhunter/images/f/f2/HxH2011_EP6_Buhara_Portrait.png/revision/latest?cb=20230309030834",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "hxh",
+      "name": "tsubone",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/9/9e/Tsubone_2011_Full_Body_Design.png/revision/latest?cb=20230418015629",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1835,16 +1829,16 @@
     },
     {
       "universe": "hxh",
-      "name": "bodoro",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/e/e5/Bodoro_2011.PNG/revision/latest?cb=20120110031330",
+      "name": "kikyo zoldyck",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/8/80/Kikyo_Zoldyck_HE_Portrait.png/revision/latest?cb=20190630232207",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "hxh",
-      "name": "kikyo zoldyck",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/8/80/Kikyo_Zoldyck_HE_Portrait.png/revision/latest?cb=20190630232207",
+      "name": "bodoro",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/e/e5/Bodoro_2011.PNG/revision/latest?cb=20120110031330",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1867,16 +1861,16 @@
     },
     {
       "universe": "hxh",
-      "name": "tonpa",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/9/9f/Tonpa_HE_Portrait.png/revision/latest?cb=20130503200318",
+      "name": "basho",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/2/2c/Basho_YC_Portrait.png/revision/latest?cb=20181210233824",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "hxh",
-      "name": "basho",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/2/2c/Basho_YC_Portrait.png/revision/latest?cb=20181210233824",
+      "name": "tonpa",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/9/9f/Tonpa_HE_Portrait.png/revision/latest?cb=20130503200318",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1890,9 +1884,9 @@
       ]
     },
     {
-      "universe": "fairy",
-      "name": "yukino agria",
-      "current": "https://static.wikia.nocookie.net/fairytail/images/5/52/Yukino_X792.png/revision/latest?cb=20181029104434",
+      "universe": "hxh",
+      "name": "baise",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/1/16/Baise2011-crop.png/revision/latest?cb=20230510200018",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1901,14 +1895,6 @@
       "universe": "hxh",
       "name": "dalzollene",
       "current": "https://static.wikia.nocookie.net/hunterxhunter/images/b/bc/Dalzollene_2011.png/revision/latest?cb=20230510204036",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "baise",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/1/16/Baise2011-crop.png/revision/latest?cb=20230510200018",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1931,16 +1917,16 @@
     },
     {
       "universe": "hxh",
-      "name": "sub",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/7/7c/HxH2011_EP65_Sub_Portrait.png/revision/latest?cb=20230521233123",
+      "name": "kortopi",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/8/8c/HxH2011_EP56_Kortopi_Portrait.png/revision/latest?cb=20230123004840",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "hxh",
-      "name": "kortopi",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/8/8c/HxH2011_EP56_Kortopi_Portrait.png/revision/latest?cb=20230123004840",
+      "name": "sub",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/7/7c/HxH2011_EP65_Sub_Portrait.png/revision/latest?cb=20230521233123",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -1963,64 +1949,8 @@
     },
     {
       "universe": "hxh",
-      "name": "shalnark",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/c/c3/HxH2011_EP53_Shalnark_Portrait.png/revision/latest?cb=20221008053250",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
       "name": "bara",
       "current": "https://static.wikia.nocookie.net/hunterxhunter/images/b/b6/Bara_GI_Portrait.png/revision/latest?cb=20190126105451",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "goreinu",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/7/7e/Goreinu_GI_Portrait.png/revision/latest?cb=20190123171404",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "tsezguerra",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/0/00/2011_EP59_Tsezguerra_Portrait.png/revision/latest?cb=20240324165921",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "reina",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/1/1d/2011_EP77_Reina_Portrait.png/revision/latest?cb=20230529191504",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "cheetu",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/a/a4/Cheetu_CA_Portrait.png/revision/latest?cb=20181219190314",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "abengane",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/8/86/Abengane2011.png/revision/latest?cb=20121223051318",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "hxh",
-      "name": "leol",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/4/47/Leol_anime.png/revision/latest?cb=20130519034558",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2059,16 +1989,16 @@
     },
     {
       "universe": "hxh",
-      "name": "kastro",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/3/35/Kastro-2011.png/revision/latest?cb=20230410000810",
+      "name": "gyro",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/7/7d/Gyro_2011.png/revision/latest?cb=20140610224441",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "hxh",
-      "name": "gyro",
-      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/7/7d/Gyro_2011.png/revision/latest?cb=20140610224441",
+      "name": "kastro",
+      "current": "https://static.wikia.nocookie.net/hunterxhunter/images/3/35/Kastro-2011.png/revision/latest?cb=20230410000810",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2099,16 +2029,16 @@
     },
     {
       "universe": "jjk",
-      "name": "jinichi zenin",
-      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/9/9a/Jinichi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182805",
+      "name": "shoko ieiri",
+      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/a/af/Shoko_Ieiri_%28Anime_2%29.png/revision/latest?cb=20231124131631",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "jjk",
-      "name": "shoko ieiri",
-      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/a/af/Shoko_Ieiri_%28Anime_2%29.png/revision/latest?cb=20231124131631",
+      "name": "jinichi zenin",
+      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/9/9a/Jinichi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182805",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2139,16 +2069,16 @@
     },
     {
       "universe": "jjk",
-      "name": "tengen",
-      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/1/16/Tengen_%28Anime%29.png/revision/latest?cb=20251119121513",
+      "name": "ogi zenin",
+      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "jjk",
-      "name": "ogi zenin",
-      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831",
+      "name": "tengen",
+      "current": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/1/16/Tengen_%28Anime%29.png/revision/latest?cb=20251119121513",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2291,14 +2221,6 @@
     },
     {
       "universe": "jojo",
-      "name": "mariah",
-      "current": "https://static.wikia.nocookie.net/jjba/images/9/9a/Mariah.png/revision/latest?cb=20150311154455",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
       "name": "jean pierre polnareff",
       "current": "https://static.wikia.nocookie.net/jjba/images/7/78/Polnareff_manga_profile.png/revision/latest?cb=20191217153714",
       "errors": [
@@ -2307,8 +2229,8 @@
     },
     {
       "universe": "jojo",
-      "name": "johnny joestar",
-      "current": "https://static.wikia.nocookie.net/jjba/images/d/d9/Johnny_Joestar_Part_7.jpg/revision/latest?cb=20181104035833",
+      "name": "mariah",
+      "current": "https://static.wikia.nocookie.net/jjba/images/9/9a/Mariah.png/revision/latest?cb=20150311154455",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2317,6 +2239,14 @@
       "universe": "jojo",
       "name": "giorno giovanna",
       "current": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "jolyne cujoh",
+      "current": "https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2339,8 +2269,8 @@
     },
     {
       "universe": "jojo",
-      "name": "jolyne cujoh",
-      "current": "https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209",
+      "name": "johnny joestar",
+      "current": "https://static.wikia.nocookie.net/jjba/images/d/d9/Johnny_Joestar_Part_7.jpg/revision/latest?cb=20181104035833",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2379,24 +2309,16 @@
     },
     {
       "universe": "jojo",
-      "name": "trish una",
-      "current": "https://static.wikia.nocookie.net/jjba/images/4/49/TrishFirstOutfit.PNG/revision/latest?cb=20180327033643",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "leone abbacchio",
-      "current": "https://static.wikia.nocookie.net/jjba/images/d/d3/Screen_Shot_2020-01-10_at_9.23.00_am.png/revision/latest?cb=20200110092405",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
       "name": "pannacotta fugo",
       "current": "https://static.wikia.nocookie.net/jjba/images/8/88/Fugo_Manga.jpg/revision/latest?cb=20191227000817",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "trish una",
+      "current": "https://static.wikia.nocookie.net/jjba/images/4/49/TrishFirstOutfit.PNG/revision/latest?cb=20180327033643",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2411,8 +2333,24 @@
     },
     {
       "universe": "jojo",
+      "name": "leone abbacchio",
+      "current": "https://static.wikia.nocookie.net/jjba/images/d/d3/Screen_Shot_2020-01-10_at_9.23.00_am.png/revision/latest?cb=20200110092405",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
       "name": "diavolo",
       "current": "https://static.wikia.nocookie.net/jjba/images/f/f8/DiavoloProfile.png/revision/latest?cb=20190117232641",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "pesci",
+      "current": "https://static.wikia.nocookie.net/jjba/images/c/cb/Pesci_prof.png/revision/latest?cb=20181127115135",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2435,8 +2373,8 @@
     },
     {
       "universe": "jojo",
-      "name": "pesci",
-      "current": "https://static.wikia.nocookie.net/jjba/images/c/cb/Pesci_prof.png/revision/latest?cb=20181127115135",
+      "name": "illuso",
+      "current": "https://static.wikia.nocookie.net/jjba/images/5/5b/Illu.jpg/revision/latest?cb=20140522014058",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2453,14 +2391,6 @@
       "universe": "jojo",
       "name": "ghiaccio",
       "current": "https://static.wikia.nocookie.net/jjba/images/9/9b/Ghiaccio_prof.png/revision/latest?cb=20150626164127",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "illuso",
-      "current": "https://static.wikia.nocookie.net/jjba/images/5/5b/Illu.jpg/revision/latest?cb=20140522014058",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2499,16 +2429,16 @@
     },
     {
       "universe": "jojo",
-      "name": "josuke higashikata gappy",
-      "current": "https://static.wikia.nocookie.net/jjba/images/2/28/JOsuke4_infobox_manga.jpg/revision/latest?cb=20200520183708",
+      "name": "weather report",
+      "current": "https://static.wikia.nocookie.net/jjba/images/c/c7/Weather_report_profile.png/revision/latest?cb=20230202132139",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "jojo",
-      "name": "weather report",
-      "current": "https://static.wikia.nocookie.net/jjba/images/c/c7/Weather_report_profile.png/revision/latest?cb=20230202132139",
+      "name": "josuke higashikata gappy",
+      "current": "https://static.wikia.nocookie.net/jjba/images/2/28/JOsuke4_infobox_manga.jpg/revision/latest?cb=20200520183708",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2547,16 +2477,16 @@
     },
     {
       "universe": "jojo",
-      "name": "enrico pucci",
-      "current": "https://static.wikia.nocookie.net/jjba/images/f/f6/Pucci.png/revision/latest?cb=20140719141037",
+      "name": "hot pants",
+      "current": "https://static.wikia.nocookie.net/jjba/images/f/f9/Hot_Pants.png/revision/latest?cb=20150212160734",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "jojo",
-      "name": "hot pants",
-      "current": "https://static.wikia.nocookie.net/jjba/images/f/f9/Hot_Pants.png/revision/latest?cb=20150212160734",
+      "name": "enrico pucci",
+      "current": "https://static.wikia.nocookie.net/jjba/images/f/f6/Pucci.png/revision/latest?cb=20140719141037",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2571,16 +2501,16 @@
     },
     {
       "universe": "jojo",
-      "name": "n'doul",
-      "current": "https://static.wikia.nocookie.net/jjba/images/f/f2/NDoul_Infobox.jpg/revision/latest?cb=20241014143700",
+      "name": "alessi",
+      "current": "https://static.wikia.nocookie.net/jjba/images/1/19/Alessi_Infobox.jpg/revision/latest?cb=20180827135539",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "jojo",
-      "name": "alessi",
-      "current": "https://static.wikia.nocookie.net/jjba/images/1/19/Alessi_Infobox.jpg/revision/latest?cb=20180827135539",
+      "name": "n'doul",
+      "current": "https://static.wikia.nocookie.net/jjba/images/f/f2/NDoul_Infobox.jpg/revision/latest?cb=20241014143700",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2627,32 +2557,8 @@
     },
     {
       "universe": "jojo",
-      "name": "squalo",
-      "current": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
       "name": "gwess",
       "current": "https://static.wikia.nocookie.net/jjba/images/b/ba/Guess.png/revision/latest?cb=20190318012833",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "tiziano",
-      "current": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "polpo",
-      "current": "https://static.wikia.nocookie.net/jjba/images/6/64/POLPO_FULL_COLOR.png/revision/latest?cb=20181031142040",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2667,10 +2573,27 @@
     },
     {
       "universe": "jojo",
+      "name": "polpo",
+      "current": "https://static.wikia.nocookie.net/jjba/images/6/64/POLPO_FULL_COLOR.png/revision/latest?cb=20181031142040",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
       "name": "secco",
       "current": "https://static.wikia.nocookie.net/jjba/images/9/97/Secco.png/revision/latest?cb=20140823134207",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "squalo",
+      "current": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -2683,32 +2606,17 @@
     },
     {
       "universe": "jojo",
+      "name": "tiziano",
+      "current": "https://static.wikia.nocookie.net/jjba/images/4/4e/TSbros.png/revision/latest/scale-to-width-down/369?cb=20170304041335",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
       "name": "sports maxx",
       "current": "https://static.wikia.nocookie.net/jjba/images/8/8e/Sportsmax.jpg/revision/latest?cb=20150112073331",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "rikiel",
-      "current": "https://static.wikia.nocookie.net/jjba/images/8/81/Rikiel.png/revision/latest?cb=20190324034227",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "ringo roadagain",
-      "current": "https://static.wikia.nocookie.net/jjba/images/a/aa/Ringo_Roadagain.png/revision/latest?cb=20250502003049",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
-      "name": "blackmore",
-      "current": "https://static.wikia.nocookie.net/jjba/images/8/8b/BlackmoreProfile.png/revision/latest?cb=20181022185717",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2723,6 +2631,22 @@
     },
     {
       "universe": "jojo",
+      "name": "rikiel",
+      "current": "https://static.wikia.nocookie.net/jjba/images/8/81/Rikiel.png/revision/latest?cb=20190324034227",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "blackmore",
+      "current": "https://static.wikia.nocookie.net/jjba/images/8/8b/BlackmoreProfile.png/revision/latest?cb=20181022185717",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
       "name": "sandman",
       "current": "https://static.wikia.nocookie.net/jjba/images/7/73/Sandman_body_c44pg23.png/revision/latest?cb=20181022185323",
       "errors": [
@@ -2731,8 +2655,8 @@
     },
     {
       "universe": "jojo",
-      "name": "mountain tim",
-      "current": "https://static.wikia.nocookie.net/jjba/images/6/66/MountainTim.png/revision/latest?cb=20150212154904",
+      "name": "ringo roadagain",
+      "current": "https://static.wikia.nocookie.net/jjba/images/a/aa/Ringo_Roadagain.png/revision/latest?cb=20250502003049",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2755,6 +2679,14 @@
     },
     {
       "universe": "jojo",
+      "name": "mountain tim",
+      "current": "https://static.wikia.nocookie.net/jjba/images/6/66/MountainTim.png/revision/latest?cb=20150212154904",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
       "name": "dr ferdinand",
       "current": "https://static.wikia.nocookie.net/jjba/images/b/b6/Dr_Ferdinand.png/revision/latest?cb=20170302042927",
       "errors": [
@@ -2771,14 +2703,6 @@
     },
     {
       "universe": "jojo",
-      "name": "joshu higashikata",
-      "current": "https://static.wikia.nocookie.net/jjba/images/3/3d/Joshu_Higashikata.png/revision/latest?cb=20180728064627",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "jojo",
       "name": "yasuho hirose",
       "current": "https://static.wikia.nocookie.net/jjba/images/b/bb/Yasuho_Hirose-1.png/revision/latest?cb=20200112051254",
       "errors": [
@@ -2789,6 +2713,22 @@
       "universe": "jojo",
       "name": "norisuke higashikata iv",
       "current": "https://static.wikia.nocookie.net/jjba/images/d/dd/Norisuke_Higashikata_IV.png/revision/latest?cb=20190319184057",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "jojo",
+      "name": "joshu higashikata",
+      "current": "https://static.wikia.nocookie.net/jjba/images/3/3d/Joshu_Higashikata.png/revision/latest?cb=20180728064627",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "mushoku",
+      "name": "zanoba shirone",
+      "current": "https://static.wikia.nocookie.net/mushokutensei/images/6/68/MT-AN-S2-Zanoba-FullBody.png/revision/latest?cb=20230810051232",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2827,16 +2767,16 @@
     },
     {
       "universe": "mushoku",
-      "name": "zanoba shirone",
-      "current": "https://static.wikia.nocookie.net/mushokutensei/images/6/68/MT-AN-S2-Zanoba-FullBody.png/revision/latest?cb=20230810051232",
+      "name": "sara",
+      "current": "https://static.wikia.nocookie.net/mushokutensei/images/6/60/MT-AN-S2-Sara-FullBody.png/revision/latest?cb=20230512000718",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "mushoku",
-      "name": "sara",
-      "current": "https://static.wikia.nocookie.net/mushokutensei/images/6/60/MT-AN-S2-Sara-FullBody.png/revision/latest?cb=20230512000718",
+      "name": "linia dedoldia",
+      "current": "https://static.wikia.nocookie.net/mushokutensei/images/3/37/MT-AN-S2-Linia-FullBody.png/revision/latest?cb=20230808020402",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2853,14 +2793,6 @@
       "universe": "mushoku",
       "name": "soldat heckler",
       "current": "https://static.wikia.nocookie.net/mushokutensei/images/3/32/SoldatAnime.png/revision/latest?cb=20230516163006",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "mushoku",
-      "name": "linia dedoldia",
-      "current": "https://static.wikia.nocookie.net/mushokutensei/images/3/37/MT-AN-S2-Linia-FullBody.png/revision/latest?cb=20230808020402",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2907,6 +2839,14 @@
     },
     {
       "universe": "mushoku",
+      "name": "julie",
+      "current": "https://static.wikia.nocookie.net/mushokutensei/images/5/54/MT-AN-S2-Julie-FullBody.png/revision/latest?cb=20230814154343",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "mushoku",
       "name": "geese nukadia",
       "current": "https://static.wikia.nocookie.net/mushokutensei/images/4/4e/Geese_Anime.png/revision/latest?cb=20211015153953",
       "errors": [
@@ -2922,14 +2862,6 @@
       ]
     },
     {
-      "universe": "mushoku",
-      "name": "julie",
-      "current": "https://static.wikia.nocookie.net/mushokutensei/images/5/54/MT-AN-S2-Julie-FullBody.png/revision/latest?cb=20230814154343",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
       "universe": "naruto",
       "name": "danzo shimura",
       "current": "https://static.wikia.nocookie.net/naruto/images/d/d2/Danzo_full.png/revision/latest?cb=20140807015514",
@@ -2939,7 +2871,7 @@
     },
     {
       "universe": "naruto",
-      "name": "gai maito",
+      "name": "might guy",
       "current": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456",
       "errors": [
         "char-images: HTTP 404"
@@ -2947,7 +2879,7 @@
     },
     {
       "universe": "naruto",
-      "name": "might guy",
+      "name": "gai maito",
       "current": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456",
       "errors": [
         "char-images: HTTP 404"
@@ -2963,8 +2895,8 @@
     },
     {
       "universe": "naruto",
-      "name": "a",
-      "current": "https://static.wikia.nocookie.net/naruto/images/3/3c/Raikage_hat.svg/revision/latest?cb=20180103164759",
+      "name": "samui",
+      "current": "https://static.wikia.nocookie.net/naruto/images/2/23/Samui.png/revision/latest?cb=20230111063822",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -2979,16 +2911,25 @@
     },
     {
       "universe": "naruto",
-      "name": "samui",
-      "current": "https://static.wikia.nocookie.net/naruto/images/2/23/Samui.png/revision/latest?cb=20230111063822",
+      "name": "kurenai yuhi",
+      "current": "https://static.wikia.nocookie.net/naruto/images/6/67/Kurenai_Part_I.png/revision/latest?cb=20150207094753",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "kurenai yuhi",
-      "current": "https://static.wikia.nocookie.net/naruto/images/6/67/Kurenai_Part_I.png/revision/latest?cb=20150207094753",
+      "name": "a",
+      "current": "https://static.wikia.nocookie.net/naruto/images/3/3c/Raikage_hat.svg/revision/latest?cb=20180103164759",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "naruto",
+      "name": "rasa",
+      "current": "https://static.wikia.nocookie.net/naruto/images/2/24/Yondaime_Kazekage.png/revision/latest?cb=20210806012316",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3005,14 +2946,6 @@
       "universe": "naruto",
       "name": "omoi",
       "current": "https://static.wikia.nocookie.net/naruto/images/9/9f/Omoi_Part_II.png/revision/latest?cb=20200919231029",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "naruto",
-      "name": "rasa",
-      "current": "https://static.wikia.nocookie.net/naruto/images/2/24/Yondaime_Kazekage.png/revision/latest?cb=20210806012316",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3059,16 +2992,16 @@
     },
     {
       "universe": "naruto",
-      "name": "chojuro",
-      "current": "https://static.wikia.nocookie.net/naruto/images/d/d8/Chojuro_2.png/revision/latest?cb=20170913102939",
+      "name": "suigetsu hozuki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/3/3e/Suigetsu_H%C5%8Dzuki.png/revision/latest?cb=20171012002428",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "suigetsu hozuki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/3/3e/Suigetsu_H%C5%8Dzuki.png/revision/latest?cb=20171012002428",
+      "name": "chojuro",
+      "current": "https://static.wikia.nocookie.net/naruto/images/d/d8/Chojuro_2.png/revision/latest?cb=20170913102939",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3091,16 +3024,16 @@
     },
     {
       "universe": "naruto",
-      "name": "mangetsu hozuki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/c/ce/Hozuki_Mangetsu.png/revision/latest?cb=20160115164605",
+      "name": "onoki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/6/67/%C5%8Cnoki.png/revision/latest?cb=20181203071043",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "onoki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/6/67/%C5%8Cnoki.png/revision/latest?cb=20181203071043",
+      "name": "mangetsu hozuki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/c/ce/Hozuki_Mangetsu.png/revision/latest?cb=20160115164605",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3123,14 +3056,6 @@
     },
     {
       "universe": "naruto",
-      "name": "mifune",
-      "current": "https://static.wikia.nocookie.net/naruto/images/e/ee/Mifune.png/revision/latest?cb=20150514152216",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "naruto",
       "name": "gengetsu hozuki",
       "current": "https://static.wikia.nocookie.net/naruto/images/9/9f/Gengetsu_H%C5%8Dzuki.png/revision/latest?cb=20150417014745",
       "errors": [
@@ -3139,15 +3064,15 @@
     },
     {
       "universe": "naruto",
-      "name": "izuna uchiha",
-      "current": "https://static.wikia.nocookie.net/naruto/images/8/83/Izuna_Uchiha.png/revision/latest?cb=20170818214808",
+      "name": "mifune",
+      "current": "https://static.wikia.nocookie.net/naruto/images/e/ee/Mifune.png/revision/latest?cb=20150514152216",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "izuna uchiwa",
+      "name": "izuna uchiha",
       "current": "https://static.wikia.nocookie.net/naruto/images/8/83/Izuna_Uchiha.png/revision/latest?cb=20170818214808",
       "errors": [
         "char-images: HTTP 404"
@@ -3179,8 +3104,8 @@
     },
     {
       "universe": "naruto",
-      "name": "fugaku uchiwa",
-      "current": "https://static.wikia.nocookie.net/naruto/images/f/f2/Fugaku.png/revision/latest?cb=20180502064054",
+      "name": "indra otsutsuki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/b/bd/Indra_%C5%8Ctsutsuki.png/revision/latest?cb=20220214090844",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3195,10 +3120,11 @@
     },
     {
       "universe": "naruto",
-      "name": "indra otsutsuki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/b/bd/Indra_%C5%8Ctsutsuki.png/revision/latest?cb=20220214090844",
+      "name": "izuna uchiwa",
+      "current": "https://static.wikia.nocookie.net/naruto/images/8/83/Izuna_Uchiha.png/revision/latest?cb=20170818214808",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -3219,10 +3145,11 @@
     },
     {
       "universe": "naruto",
-      "name": "ashura otsutsuki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/5/56/Asura_%C5%8Ctsutsuki.png/revision/latest?cb=20220214090535",
+      "name": "fugaku uchiwa",
+      "current": "https://static.wikia.nocookie.net/naruto/images/f/f2/Fugaku.png/revision/latest?cb=20180502064054",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -3247,6 +3174,15 @@
       "current": "https://static.wikia.nocookie.net/naruto/images/9/93/Metal_Lee.png/revision/latest?cb=20180824114015",
       "errors": [
         "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "naruto",
+      "name": "ashura otsutsuki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/5/56/Asura_%C5%8Ctsutsuki.png/revision/latest?cb=20220214090535",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -3283,16 +3219,16 @@
     },
     {
       "universe": "naruto",
-      "name": "matatabi",
-      "current": "https://static.wikia.nocookie.net/naruto/images/a/a7/Matatabi.png/revision/latest?cb=20140818015320",
+      "name": "gyuki",
+      "current": "https://static.wikia.nocookie.net/naruto/images/d/d7/Gyuki.png/revision/latest?cb=20140817221249",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "gyuki",
-      "current": "https://static.wikia.nocookie.net/naruto/images/d/d7/Gyuki.png/revision/latest?cb=20140817221249",
+      "name": "matatabi",
+      "current": "https://static.wikia.nocookie.net/naruto/images/a/a7/Matatabi.png/revision/latest?cb=20140818015320",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3323,14 +3259,6 @@
     },
     {
       "universe": "naruto",
-      "name": "roshi",
-      "current": "https://static.wikia.nocookie.net/naruto/images/3/37/Roshi_OL.png/revision/latest?cb=20210323164638",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "naruto",
       "name": "han",
       "current": "https://static.wikia.nocookie.net/naruto/images/3/3c/Han.png/revision/latest?cb=20220205121445",
       "errors": [
@@ -3355,6 +3283,14 @@
     },
     {
       "universe": "naruto",
+      "name": "roshi",
+      "current": "https://static.wikia.nocookie.net/naruto/images/3/37/Roshi_OL.png/revision/latest?cb=20210323164638",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "naruto",
       "name": "saiken",
       "current": "https://static.wikia.nocookie.net/naruto/images/5/58/Saiken.png/revision/latest?cb=20140211075946",
       "errors": [
@@ -3363,16 +3299,16 @@
     },
     {
       "universe": "naruto",
-      "name": "ibiki morino",
-      "current": "https://static.wikia.nocookie.net/naruto/images/4/4b/Ibiki_Part_I.png/revision/latest?cb=20220218113218",
+      "name": "kotetsu hagane",
+      "current": "https://static.wikia.nocookie.net/naruto/images/8/81/Kotetsu_Hagane.png/revision/latest?cb=20160115135316",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "naruto",
-      "name": "kotetsu hagane",
-      "current": "https://static.wikia.nocookie.net/naruto/images/8/81/Kotetsu_Hagane.png/revision/latest?cb=20160115135316",
+      "name": "ibiki morino",
+      "current": "https://static.wikia.nocookie.net/naruto/images/4/4b/Ibiki_Part_I.png/revision/latest?cb=20220218113218",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3403,6 +3339,14 @@
     },
     {
       "universe": "naruto",
+      "name": "dosu kinuta",
+      "current": "https://static.wikia.nocookie.net/naruto/images/b/b0/Dosu_Kinuta.png/revision/latest?cb=20210421154038",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "naruto",
       "name": "izumo kamizuki",
       "current": "https://static.wikia.nocookie.net/naruto/images/5/5d/Izumo_Kamizuki.png/revision/latest?cb=20140111135444",
       "errors": [
@@ -3413,14 +3357,6 @@
       "universe": "naruto",
       "name": "sakon",
       "current": "https://static.wikia.nocookie.net/naruto/images/2/2e/Sakon_and_Ukon.png/revision/latest?cb=20210726001946",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "naruto",
-      "name": "dosu kinuta",
-      "current": "https://static.wikia.nocookie.net/naruto/images/b/b0/Dosu_Kinuta.png/revision/latest?cb=20210421154038",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3491,24 +3427,8 @@
     },
     {
       "universe": "onepiece",
-      "name": "rob lucci",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Rob_Lucci_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20230102052113",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "onepiece",
       "name": "charlotte linlin",
       "current": "https://static.wikia.nocookie.net/onepiece/images/d/d8/Charlotte_Linlin_Anime_Infobox.png/revision/latest?cb=20180423150804",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "onepiece",
-      "name": "tony tony chopper",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3523,6 +3443,22 @@
     },
     {
       "universe": "onepiece",
+      "name": "tony tony chopper",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "onepiece",
+      "name": "rob lucci",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Rob_Lucci_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20230102052113",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "onepiece",
       "name": "arlong",
       "current": "https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629",
       "errors": [
@@ -3531,16 +3467,16 @@
     },
     {
       "universe": "onepiece",
-      "name": "sakazuki",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511",
+      "name": "bartholomew kuma",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/8/8d/Bartholomew_Kuma_Anime_Infobox.png/revision/latest?cb=20221012030835",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "onepiece",
-      "name": "bartholomew kuma",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/8/8d/Bartholomew_Kuma_Anime_Infobox.png/revision/latest?cb=20221012030835",
+      "name": "sakazuki",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3571,16 +3507,16 @@
     },
     {
       "universe": "onepiece",
-      "name": "emporio ivankov",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/d/de/Emporio_Ivankov_Anime_Infobox.png/revision/latest?cb=20180624120810",
+      "name": "silvers rayleigh",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest?cb=20230601221758",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "onepiece",
-      "name": "silvers rayleigh",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest?cb=20230601221758",
+      "name": "emporio ivankov",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/d/de/Emporio_Ivankov_Anime_Infobox.png/revision/latest?cb=20180624120810",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3635,8 +3571,8 @@
     },
     {
       "universe": "onepiece",
-      "name": "kalifa",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/b/b3/Kalifa_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240915021516",
+      "name": "benn beckman",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/1/12/Benn_Beckman_Anime_Infobox.png/revision/latest?cb=20240623091906",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3651,16 +3587,8 @@
     },
     {
       "universe": "onepiece",
-      "name": "benn beckman",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/1/12/Benn_Beckman_Anime_Infobox.png/revision/latest?cb=20240623091906",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "onepiece",
-      "name": "kinemon",
-      "current": "https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest?cb=20191124100115",
+      "name": "kalifa",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/b/b3/Kalifa_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240915021516",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3675,7 +3603,7 @@
     },
     {
       "universe": "onepiece",
-      "name": "kin'emon",
+      "name": "kinemon",
       "current": "https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest?cb=20191124100115",
       "errors": [
         "char-images: HTTP 404"
@@ -3685,6 +3613,14 @@
       "universe": "opm",
       "name": "amai mask",
       "current": "https://static.wikia.nocookie.net/onepunchman/images/f/fc/SweetMaskProfile.png/revision/latest?cb=20191130211509",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "onepiece",
+      "name": "kin'emon",
+      "current": "https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest?cb=20191124100115",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3715,6 +3651,14 @@
     },
     {
       "universe": "opm",
+      "name": "iaian",
+      "current": "https://static.wikia.nocookie.net/onepunchman/images/2/25/Iaian_Anime_Profile.jpg/revision/latest?cb=20200312215502",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "opm",
       "name": "boros",
       "current": "https://static.wikia.nocookie.net/onepunchman/images/8/83/Boros_Manga.png/revision/latest?cb=20200311024257",
       "errors": [
@@ -3723,16 +3667,16 @@
     },
     {
       "universe": "opm",
-      "name": "bushidrill",
-      "current": "https://static.wikia.nocookie.net/onepunchman/images/5/54/Bushidrill_Anime_Profile.png/revision/latest?cb=20190916162709",
+      "name": "blast",
+      "current": "https://static.wikia.nocookie.net/onepunchman/images/d/d0/Blast_Manga_Profile.png/revision/latest?cb=20231117004524",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "opm",
-      "name": "blast",
-      "current": "https://static.wikia.nocookie.net/onepunchman/images/d/d0/Blast_Manga_Profile.png/revision/latest?cb=20231117004524",
+      "name": "bushidrill",
+      "current": "https://static.wikia.nocookie.net/onepunchman/images/5/54/Bushidrill_Anime_Profile.png/revision/latest?cb=20190916162709",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3803,16 +3747,16 @@
     },
     {
       "universe": "opm",
-      "name": "beast king",
-      "current": "https://static.wikia.nocookie.net/onepunchman/images/e/e8/Beast_King_Anime_Profile.png/revision/latest?cb=20151018181037",
+      "name": "dr genus",
+      "current": "https://static.wikia.nocookie.net/onepunchman/images/0/06/Genus_anime.png/revision/latest?cb=20200131172315",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "opm",
-      "name": "dr genus",
-      "current": "https://static.wikia.nocookie.net/onepunchman/images/0/06/Genus_anime.png/revision/latest?cb=20200131172315",
+      "name": "beast king",
+      "current": "https://static.wikia.nocookie.net/onepunchman/images/e/e8/Beast_King_Anime_Profile.png/revision/latest?cb=20151018181037",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3859,6 +3803,14 @@
     },
     {
       "universe": "rezero",
+      "name": "hetaro",
+      "current": "https://static.wikia.nocookie.net/rezero/images/d/df/Hetaro_Pearlbaton_Anime.png/revision/latest?cb=20160807200322",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "rezero",
       "name": "joshua juukulius",
       "current": "https://static.wikia.nocookie.net/rezero/images/6/6c/Joshua_Juukulius_Anime_design.png/revision/latest?cb=20241002163700",
       "errors": [
@@ -3867,8 +3819,8 @@
     },
     {
       "universe": "rezero",
-      "name": "louis arneb",
-      "current": "https://static.wikia.nocookie.net/rezero/images/a/a8/Episode_79_Rui_No.1.png/revision/latest?cb=20260820204041",
+      "name": "sirius romanee conti",
+      "current": "https://static.wikia.nocookie.net/rezero/images/8/8a/Sirius_S3_anime_PV3_2nd.png/revision/latest?cb=20240624150246",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3884,18 +3836,11 @@
     },
     {
       "universe": "rezero",
-      "name": "hetaro",
-      "current": "https://static.wikia.nocookie.net/rezero/images/d/df/Hetaro_Pearlbaton_Anime.png/revision/latest?cb=20160807200322",
+      "name": "louis arneb",
+      "current": "https://static.wikia.nocookie.net/rezero/images/a/a8/Episode_79_Rui_No.1.png/revision/latest?cb=20260820204041",
       "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "rezero",
-      "name": "sirius romanee conti",
-      "current": "https://static.wikia.nocookie.net/rezero/images/8/8a/Sirius_S3_anime_PV3_2nd.png/revision/latest?cb=20240624150246",
-      "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -3910,14 +3855,6 @@
       "universe": "rezero",
       "name": "heinkel van astrea",
       "current": "https://static.wikia.nocookie.net/rezero/images/5/5a/Episode_52_Anime_Site_Preview_3.png/revision/latest?cb=20241008151610",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sao",
-      "name": "sheyta",
-      "current": "https://static.wikia.nocookie.net/swordartonline/images/c/c3/Scheta.png/revision/latest?cb=20191219175628",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3948,9 +3885,18 @@
       ]
     },
     {
-      "universe": "opm",
-      "name": "iaian",
-      "current": "https://static.wikia.nocookie.net/onepunchman/images/2/25/Iaian_Anime_Profile.jpg/revision/latest?cb=20200312215502",
+      "universe": "sao",
+      "name": "sheyta",
+      "current": "https://static.wikia.nocookie.net/swordartonline/images/c/c3/Scheta.png/revision/latest?cb=20191219175628",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "sao",
+      "name": "lilpilin",
+      "current": "https://static.wikia.nocookie.net/swordartonline/images/f/fe/Vol_15_-_004-005.png/revision/latest?cb=20160607192240",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -3959,15 +3905,6 @@
       "universe": "sao",
       "name": "pitohui",
       "current": "https://static.wikia.nocookie.net/swordartonline/images/8/87/Kanzaki_Elsa.png/revision/latest?cb=20180316142744",
-      "errors": [
-        "char-images: HTTP 404",
-        "fandom: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sao",
-      "name": "yuuki konno",
-      "current": "https://static.wikia.nocookie.net/swordartonline/images/6/61/Konno_Yuuki.png/revision/latest?cb=20191009174316",
       "errors": [
         "char-images: HTTP 404",
         "fandom: HTTP 404"
@@ -3984,26 +3921,11 @@
     },
     {
       "universe": "sao",
-      "name": "lilpilin",
-      "current": "https://static.wikia.nocookie.net/swordartonline/images/f/fe/Vol_15_-_004-005.png/revision/latest?cb=20160607192240",
+      "name": "yuuki konno",
+      "current": "https://static.wikia.nocookie.net/swordartonline/images/6/61/Konno_Yuuki.png/revision/latest?cb=20191009174316",
       "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sao",
-      "name": "m",
-      "current": "https://static.wikia.nocookie.net/swordartonline/images/c/cb/Asougi_Goushi.png/revision/latest?cb=20180311193753",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sao",
-      "name": "llenn",
-      "current": "https://static.wikia.nocookie.net/swordartonline/images/d/db/Kohiruimaki_Karen.png/revision/latest?cb=20180511211721",
-      "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -4016,59 +3938,12 @@
       ]
     },
     {
-      "universe": "sds",
-      "name": "chandler",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/c/c5/Chandler_anime.png/revision/latest?cb=20210620224349",
+      "universe": "sao",
+      "name": "m",
+      "current": "https://static.wikia.nocookie.net/swordartonline/images/c/cb/Asougi_Goushi.png/revision/latest?cb=20180311193753",
       "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "ludociel",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/1/11/Ludociel_Anime_Infobox.png/revision/latest?cb=20210627205714",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "mael",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/b/b2/Mael_Anime_Infobox.png/revision/latest?cb=20211114215723",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "percival",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/e/ea/Current_Percival.png/revision/latest?cb=20260813200918",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "tristan",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/7/7e/Tristan_with_Beltreipe_Outfit.png/revision/latest?cb=20250426210913",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "grayroad",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/6/67/Grayroad_Intro_Anime.png/revision/latest?cb=20191219163819",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
-      "name": "rod reiss",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/5/52/Rod_Reiss_character_image.png/revision/latest?cb=20190830190253",
-      "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -4089,40 +3964,16 @@
     },
     {
       "universe": "snk",
-      "name": "djel sannes",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/f/f2/Djel_Sannes_character_image.png/revision/latest?cb=20170516092042",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
-      "name": "ymir fritz",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/0/0f/Ymir_Fritz_character_image.png/revision/latest?cb=20191228063655",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
-      "name": "frieda reiss",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/d/db/Frieda_Reiss_character_image.png/revision/latest?cb=20190909115353",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
-      "name": "uri reiss",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/c/cb/Uri_Reiss_character_image.png/revision/latest?cb=20181017190101",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
       "name": "gunther schultz",
       "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/b/bd/Gunther_Schultz_character_image.png/revision/latest?cb=20190403160720",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "snk",
+      "name": "ilse langnar",
+      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/9/94/Ilse_Langnar_character_image.png/revision/latest?cb=20170112030815",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4145,24 +3996,8 @@
     },
     {
       "universe": "snk",
-      "name": "faye jager",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/f/fc/Faye_Yeager_character_image.png/revision/latest?cb=20190405121514",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "snk",
       "name": "nifa",
       "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/2/24/Nifa_character_image.png/revision/latest?cb=20190402194900",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "sds",
-      "name": "cusack",
-      "current": "https://static.wikia.nocookie.net/nanatsu-no-taizai/images/2/2d/Cusack_anime.png/revision/latest?cb=20210620224712",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4177,8 +4012,8 @@
     },
     {
       "universe": "snk",
-      "name": "franz kefka",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/e/e1/Franz_Kefka_character_image.png/revision/latest?cb=20190325145249",
+      "name": "karina braun",
+      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/8/86/Karina_Braun_character_image.png/revision/latest?cb=20170609085553",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4201,16 +4036,25 @@
     },
     {
       "universe": "snk",
-      "name": "karina braun",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/8/86/Karina_Braun_character_image.png/revision/latest?cb=20170609085553",
+      "name": "faye jager",
+      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/f/fc/Faye_Yeager_character_image.png/revision/latest?cb=20190405121514",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "snk",
+      "name": "franz kefka",
+      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/e/e1/Franz_Kefka_character_image.png/revision/latest?cb=20190325145249",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
-      "universe": "snk",
-      "name": "traute carven",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/c/c2/Traute_Carven_%28Anime%29_character_image.png/revision/latest?cb=20180826201538",
+      "universe": "solo",
+      "name": "thomas andre",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/2/23/Andre1.jpg/revision/latest?cb=20211103151323",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4224,9 +4068,9 @@
       ]
     },
     {
-      "universe": "solo",
-      "name": "thomas andre",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/2/23/Andre1.jpg/revision/latest?cb=20211103151323",
+      "universe": "snk",
+      "name": "traute carven",
+      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/c/c2/Traute_Carven_%28Anime%29_character_image.png/revision/latest?cb=20180826201538",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4241,8 +4085,8 @@
     },
     {
       "universe": "solo",
-      "name": "cha hae in",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/9/91/Cha_Hae-In.png/revision/latest?cb=20240119133508",
+      "name": "liu zhigang",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/a/a3/Zhigang8.jpg/revision/latest?cb=20210427152441",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4251,6 +4095,14 @@
       "universe": "solo",
       "name": "park kyung hye",
       "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/14/%EA%B2%BD%ED%98%9C2.jpg/revision/latest?cb=20210903172012",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "solo",
+      "name": "cha hae in",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/9/91/Cha_Hae-In.png/revision/latest?cb=20240119133508",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4273,16 +4125,16 @@
     },
     {
       "universe": "solo",
-      "name": "beru",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143",
+      "name": "kim sangshik",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/19/%EC%83%81%EC%8B%9D1.jpg/revision/latest?cb=20240312161942",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "solo",
-      "name": "kim sangshik",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/19/%EC%83%81%EC%8B%9D1.jpg/revision/latest?cb=20240312161942",
+      "name": "beru",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4337,14 +4189,6 @@
     },
     {
       "universe": "solo",
-      "name": "ma dongwook",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/6/6c/Ma.png/revision/latest?cb=20210803231350",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "solo",
       "name": "norma selner",
       "current": "https://static.wikia.nocookie.net/solo-leveling/images/b/b1/Norma1.jpg/revision/latest?cb=20210423041333",
       "errors": [
@@ -4353,8 +4197,8 @@
     },
     {
       "universe": "solo",
-      "name": "tusk",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/d/d9/Tusk0.jpg/revision/latest?cb=20250205103358",
+      "name": "ma dongwook",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/6/6c/Ma.png/revision/latest?cb=20210803231350",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4369,8 +4213,24 @@
     },
     {
       "universe": "solo",
+      "name": "tusk",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/d/d9/Tusk0.jpg/revision/latest?cb=20250205103358",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "solo",
       "name": "ashborn",
       "current": "https://static.wikia.nocookie.net/solo-leveling/images/8/82/Ashborn2.jpg/revision/latest?cb=20220101111314",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "solo",
+      "name": "baran",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/1f/Baran1.jpg/revision/latest?cb=20210803222849",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4387,14 +4247,6 @@
       "universe": "solo",
       "name": "rakan",
       "current": "https://static.wikia.nocookie.net/solo-leveling/images/5/57/Beast2.jpg/revision/latest?cb=20210322160822",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "solo",
-      "name": "baran",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/1/1f/Baran1.jpg/revision/latest?cb=20210803222849",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4425,16 +4277,16 @@
     },
     {
       "universe": "solo",
-      "name": "esil radiru",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/a/a2/Esil6.jpg/revision/latest?cb=20210803222432",
+      "name": "legia",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/2/23/Legia8.jpg/revision/latest?cb=20210815173629",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
-      "universe": "snk",
-      "name": "ilse langnar",
-      "current": "https://static.wikia.nocookie.net/shingekinokyojin/images/9/94/Ilse_Langnar_character_image.png/revision/latest?cb=20170112030815",
+      "universe": "solo",
+      "name": "esil radiru",
+      "current": "https://static.wikia.nocookie.net/solo-leveling/images/a/a2/Esil6.jpg/revision/latest?cb=20210803222432",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4443,14 +4295,6 @@
       "universe": "solo",
       "name": "yogumunt",
       "current": "https://static.wikia.nocookie.net/solo-leveling/images/6/6f/Yogumunt3.jpg/revision/latest?cb=20211117162942",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "solo",
-      "name": "legia",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/2/23/Legia8.jpg/revision/latest?cb=20210815173629",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4552,9 +4396,9 @@
       ]
     },
     {
-      "universe": "solo",
-      "name": "liu zhigang",
-      "current": "https://static.wikia.nocookie.net/solo-leveling/images/a/a3/Zhigang8.jpg/revision/latest?cb=20210427152441",
+      "universe": "tensura",
+      "name": "testarossa",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/9/9e/Testarossa_LN.png/revision/latest?cb=20250903072845",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4569,8 +4413,8 @@
     },
     {
       "universe": "tensura",
-      "name": "testarossa",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/9/9e/Testarossa_LN.png/revision/latest?cb=20250903072845",
+      "name": "carrera",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/9/95/Carrera_LN.png/revision/latest?cb=20210531221712",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4579,14 +4423,6 @@
       "universe": "tensura",
       "name": "ultima",
       "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/4/45/Ultima_LN.png/revision/latest?cb=20220219055228",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "tensura",
-      "name": "carrera",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/9/95/Carrera_LN.png/revision/latest?cb=20210531221712",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4625,6 +4461,14 @@
     },
     {
       "universe": "tensura",
+      "name": "kumara",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/d/d6/Kumara_Human_%28Adult%29_LN.png/revision/latest?cb=20220422180532",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "tensura",
       "name": "dino",
       "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/e/e5/DinoLN.png/revision/latest?cb=20210124222908",
       "errors": [
@@ -4633,8 +4477,8 @@
     },
     {
       "universe": "tensura",
-      "name": "kumara",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/d/d6/Kumara_Human_%28Adult%29_LN.png/revision/latest?cb=20220422180532",
+      "name": "dagruel",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/1/15/Dagruel_Manga.png/revision/latest?cb=20220830112443",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4665,14 +4509,6 @@
     },
     {
       "universe": "tensura",
-      "name": "dagruel",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/1/15/Dagruel_Manga.png/revision/latest?cb=20220830112443",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "tensura",
       "name": "velgrynd",
       "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/c/c0/Velgrynd_LN.png/revision/latest?cb=20210525224438",
       "errors": [
@@ -4681,24 +4517,16 @@
     },
     {
       "universe": "tensura",
-      "name": "velzard",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/5/52/LN_20_08.jpg/revision/latest?cb=20220929152738",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "tensura",
-      "name": "masayuki honjo",
-      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/f/f1/Masayuki_Honjou_LN.png/revision/latest?cb=20221002130521",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "tensura",
       "name": "beretta",
       "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/2/29/Beretta.png/revision/latest?cb=20190101081733",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "tensura",
+      "name": "velzard",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/5/52/LN_20_08.jpg/revision/latest?cb=20220929152738",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4713,8 +4541,8 @@
     },
     {
       "universe": "tokyoghoul",
-      "name": "koori ui",
-      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/d/d5/Ui_during_the_Rushima_Landing_Operation.png/revision/latest?cb=20160929161300",
+      "name": "nashiro yasuhisa",
+      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/c/cf/Nashiro_Yasuhisa.png/revision/latest?cb=20141101173044",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4729,8 +4557,8 @@
     },
     {
       "universe": "tokyoghoul",
-      "name": "shachi",
-      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/6/69/Shachi_encounters_Arima.png/revision/latest?cb=20160522232923",
+      "name": "koori ui",
+      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/d/d5/Ui_during_the_Rushima_Landing_Operation.png/revision/latest?cb=20160929161300",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4744,11 +4572,12 @@
       ]
     },
     {
-      "universe": "tokyoghoul",
-      "name": "nashiro yasuhisa",
-      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/c/cf/Nashiro_Yasuhisa.png/revision/latest?cb=20141101173044",
+      "universe": "tensura",
+      "name": "masayuki honjo",
+      "current": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/f/f1/Masayuki_Honjou_LN.png/revision/latest?cb=20221002130521",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -4777,6 +4606,23 @@
     },
     {
       "universe": "tokyorevengers",
+      "name": "shion madarame",
+      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/6/6f/Shion_Madarame_%28Manga%29.png/revision/latest?cb=20220411114811",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "tokyoghoul",
+      "name": "shachi",
+      "current": "https://static.wikia.nocookie.net/tokyoghoul/images/6/69/Shachi_encounters_Arima.png/revision/latest?cb=20160522232923",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "tokyorevengers",
       "name": "yuzuha shiba",
       "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/3/3d/Yuzuha_Shiba_%28Manga%29.png/revision/latest?cb=20220412064227",
       "errors": [
@@ -4787,14 +4633,6 @@
       "universe": "tokyorevengers",
       "name": "izana kurokawa",
       "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/8/8f/Izana_Kurokawa_%28Manga%29.png/revision/latest?cb=20220411060906",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "tokyorevengers",
-      "name": "shion madarame",
-      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/6/6f/Shion_Madarame_%28Manga%29.png/revision/latest?cb=20220411114811",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4841,16 +4679,16 @@
     },
     {
       "universe": "tokyorevengers",
-      "name": "keizo arashi",
-      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/3/3e/Keizo_Arashi_%28Manga%29.png/revision/latest?cb=20220411051203",
+      "name": "wakasa imaushi",
+      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/2/21/Wakasa_Imaushi_%28Manga%29.png/revision/latest?cb=20230117182633",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "tokyorevengers",
-      "name": "wakasa imaushi",
-      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/2/21/Wakasa_Imaushi_%28Manga%29.png/revision/latest?cb=20230117182633",
+      "name": "keizo arashi",
+      "current": "https://static.wikia.nocookie.net/tokyo-revengers/images/3/3e/Keizo_Arashi_%28Manga%29.png/revision/latest?cb=20220411051203",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -4937,6 +4775,14 @@
     },
     {
       "universe": "wakfu",
+      "name": "shinonome",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/f/f7/Shinonome.jpg/revision/latest?cb=20170911165031",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
       "name": "grougaloragran",
       "current": "https://static.wikia.nocookie.net/wakfu/images/a/a9/Grou.jpg/revision/latest?cb=20170914224832",
       "errors": [
@@ -4961,14 +4807,6 @@
     },
     {
       "universe": "wakfu",
-      "name": "chibi",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/2/21/Chibi_2.jpg/revision/latest?cb=20181112234620",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
       "name": "goultard",
       "current": "https://static.wikia.nocookie.net/wakfu/images/b/b5/Goultard.png/revision/latest?cb=20170912214853",
       "errors": [
@@ -4977,8 +4815,8 @@
     },
     {
       "universe": "wakfu",
-      "name": "shinonome",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/f/f7/Shinonome.jpg/revision/latest?cb=20170911165031",
+      "name": "chibi",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/2/21/Chibi_2.jpg/revision/latest?cb=20181112234620",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -5001,16 +4839,16 @@
     },
     {
       "universe": "wakfu",
-      "name": "baltazar",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/7/70/Baltazar.png/revision/latest?cb=20180427040849",
+      "name": "glip",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/a/a1/1577-1583241751-big-1-.jpg/revision/latest?cb=20200609235336",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "wakfu",
-      "name": "glip",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/a/a1/1577-1583241751-big-1-.jpg/revision/latest?cb=20200609235336",
+      "name": "mina",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/6/6b/Mina.png/revision/latest?cb=20190928061525",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -5033,6 +4871,14 @@
     },
     {
       "universe": "wakfu",
+      "name": "flopin",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/3/33/Illu_flopin.png/revision/latest?cb=20170912025112",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
       "name": "atcham",
       "current": "https://static.wikia.nocookie.net/wakfu/images/e/e3/Atcham.png/revision/latest?cb=20170919032106",
       "errors": [
@@ -5041,10 +4887,11 @@
     },
     {
       "universe": "wakfu",
-      "name": "flopin",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/3/33/Illu_flopin.png/revision/latest?cb=20170912025112",
+      "name": "baltazar",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/7/70/Baltazar.png/revision/latest?cb=20180427040849",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ]
     },
     {
@@ -5089,24 +4936,8 @@
     },
     {
       "universe": "wakfu",
-      "name": "kerubim crepin",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/5/5b/Old_kerub.jpg/revision/latest?cb=20200626164250",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
       "name": "grany smisse",
       "current": "https://static.wikia.nocookie.net/wakfu/images/7/7c/Granny_Smisse.jpg/revision/latest?cb=20181213041753",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
-      "name": "kabrok",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/d/d5/Kabrok_pic.png/revision/latest?cb=20180527120537",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -5121,16 +4952,16 @@
     },
     {
       "universe": "wakfu",
-      "name": "maskemane",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/a/af/Timeline_1_-_Primordial.jpg/revision/latest?cb=20170912222951",
+      "name": "kabrok",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/d/d5/Kabrok_pic.png/revision/latest?cb=20180527120537",
       "errors": [
         "char-images: HTTP 404"
       ]
     },
     {
       "universe": "wakfu",
-      "name": "aurora",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/8/89/Aurora.png/revision/latest?cb=20180628190257",
+      "name": "maskemane",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/a/af/Timeline_1_-_Primordial.jpg/revision/latest?cb=20170912222951",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -5145,32 +4976,8 @@
     },
     {
       "universe": "wakfu",
-      "name": "armand sheran sharm",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/b/ba/3_m0Exs.jpg/revision/latest?cb=20171029145513",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
-      "name": "rushu",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/3/30/Rushu_3.jpg/revision/latest?cb=20181208112337",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
-      "name": "toross mordal",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/c/c8/Toross.webp/revision/latest?cb=20250528201717",
-      "errors": [
-        "char-images: HTTP 404"
-      ]
-    },
-    {
-      "universe": "wakfu",
-      "name": "moon",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/3/39/Lunaraltar1.jpg/revision/latest?cb=20230723012956",
+      "name": "aurora",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/8/89/Aurora.png/revision/latest?cb=20180628190257",
       "errors": [
         "char-images: HTTP 404"
       ]
@@ -5185,19 +4992,47 @@
     },
     {
       "universe": "wakfu",
-      "name": "mina",
-      "current": "https://static.wikia.nocookie.net/wakfu/images/6/6b/Mina.png/revision/latest?cb=20190928061525",
+      "name": "kerubim crepin",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/5/5b/Old_kerub.jpg/revision/latest?cb=20200626164250",
+      "errors": [
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
+      "name": "armand sheran sharm",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/b/ba/3_m0Exs.jpg/revision/latest?cb=20171029145513",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
+      "name": "toross mordal",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/c/c8/Toross.webp/revision/latest?cb=20250528201717",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
+      "name": "rushu",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/3/30/Rushu_3.jpg/revision/latest?cb=20181208112337",
+      "errors": [
+        "char-images: HTTP 404"
+      ]
+    },
+    {
+      "universe": "wakfu",
+      "name": "moon",
+      "current": "https://static.wikia.nocookie.net/wakfu/images/3/39/Lunaraltar1.jpg/revision/latest?cb=20230723012956",
       "errors": [
         "char-images: HTTP 404"
       ]
     }
   ],
   "external": [
-    {
-      "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/naruto/images/6/6c/Kaguya_%C5%8Ctsutsuki.png/revision/latest?cb=20180824113908",
-      "error": "HTTP 404"
-    },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/bleach/images/0/05/Ep344UryuProfile3.png/revision/latest?cb=20230125214916&path-prefix=en",
@@ -5210,7 +5045,7 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824",
+      "url": "https://static.wikia.nocookie.net/naruto/images/6/6c/Kaguya_%C5%8Ctsutsuki.png/revision/latest?cb=20180824113908",
       "error": "HTTP 404"
     },
     {
@@ -5220,7 +5055,7 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/a/af/Tony_Tony_Chopper_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240720150824",
       "error": "HTTP 404"
     },
     {
@@ -5230,17 +5065,22 @@
     },
     {
       "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/dragonball/images/3/3b/Gohan_anime_profile_3.png/revision/latest/scale-to-width-down/281?cb=20250617191059",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/onepiece/images/b/b9/Vegapunk_Anime_Infobox.png/revision/latest?cb=20240428020834",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535",
+      "url": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/naruto/images/3/31/Might_Guy.png/revision/latest?cb=20150401084456",
+      "url": "https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535",
       "error": "HTTP 404"
     },
     {
@@ -5260,12 +5100,12 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/2/2e/Charlotte_Katakuri_Anime_Infobox.png/revision/latest?cb=20230204155539",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/2/2e/Charlotte_Katakuri_Anime_Infobox.png/revision/latest?cb=20230204155539",
+      "url": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838",
       "error": "HTTP 404"
     },
     {
@@ -5275,12 +5115,12 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024",
+      "url": "https://static.wikia.nocookie.net/bleach/images/4/44/Ep363HitsugayaProfile.png/revision/latest?cb=20231105055501&path-prefix=en",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/bleach/images/4/44/Ep363HitsugayaProfile.png/revision/latest?cb=20231105055501&path-prefix=en",
+      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/5/5f/Kokushibo_back_facing.png/revision/latest?cb=20260812005024",
       "error": "HTTP 404"
     },
     {
@@ -5290,12 +5130,12 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656",
+      "url": "https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/solo-leveling/images/1/1b/Beru0.jpg/revision/latest?cb=20250130140143",
+      "url": "https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656",
       "error": "HTTP 404"
     },
     {
@@ -5315,17 +5155,17 @@
     },
     {
       "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest?cb=20230601221758",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/dragonball/images/1/17/DBH_Universe_Mission_2_-_Android_21.png/revision/latest?cb=20230807202034",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/onepiece/images/2/24/Gol_D._Roger_Anime_Infobox.png/revision/latest?cb=20230612100153",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/b/b1/Silvers_Rayleigh_Anime_Infobox.png/revision/latest?cb=20230601221758",
       "error": "HTTP 404"
     },
     {
@@ -5355,7 +5195,7 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepunchman/images/d/d0/Blast_Manga_Profile.png/revision/latest?cb=20231117004524",
+      "url": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/7/7a/Guy_Novel_Colour.png/revision/latest?cb=20180928134016",
       "error": "HTTP 404"
     },
     {
@@ -5365,7 +5205,7 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/tensei-shitara-slime-datta-ken/images/7/7a/Guy_Novel_Colour.png/revision/latest?cb=20180928134016",
+      "url": "https://static.wikia.nocookie.net/onepunchman/images/d/d0/Blast_Manga_Profile.png/revision/latest?cb=20231117004524",
       "error": "HTTP 404"
     },
     {
@@ -5385,22 +5225,22 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/naruto/images/3/3e/Suigetsu_H%C5%8Dzuki.png/revision/latest?cb=20171012002428",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/naruto/images/d/d2/Danzo_full.png/revision/latest?cb=20140807015514",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/naruto/images/1/1a/Kakuzu_UNSR.png/revision/latest?cb=20170529102009",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/naruto/images/d/d2/Danzo_full.png/revision/latest?cb=20140807015514",
       "error": "HTTP 404"
     },
     {
@@ -5435,7 +5275,7 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/naruto/images/d/d2/Inoichi_Yamanaka.png/revision/latest?cb=20150409122740",
+      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/c/c3/Tanjuro_anime.png/revision/latest?cb=20210628160831",
       "error": "HTTP 404"
     },
     {
@@ -5445,17 +5285,17 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/c/c3/Tanjuro_anime.png/revision/latest?cb=20210628160831",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/deathnote/images/e/eb/Soichiro_Yagami.PNG/revision/latest?cb=20250630094521",
+      "url": "https://static.wikia.nocookie.net/naruto/images/d/d2/Inoichi_Yamanaka.png/revision/latest?cb=20150409122740",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/naruto/images/3/3f/Sakumo_Hatake.png/revision/latest?cb=20150504191510",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/deathnote/images/e/eb/Soichiro_Yagami.PNG/revision/latest?cb=20250630094521",
       "error": "HTTP 404"
     },
     {
@@ -5475,17 +5315,17 @@
     },
     {
       "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/naruto/images/e/ee/Hiashi_Hyuga.png/revision/latest?cb=20150109142633",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/dragonball/images/a/ab/ParagusDVD.png/revision/latest?cb=20100809114554",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/4/4f/Ogi_Zenin_%28Anime%29.png/revision/latest?cb=20260126182831",
       "error": "HTTP 404"
     },
     {
@@ -5500,12 +5340,12 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/dragonball/images/2/22/King_Cold_episode_122.png/revision/latest?cb=20241217033208",
+      "url": "https://static.wikia.nocookie.net/dragonball/images/6/65/King_Vegeta.png/revision/latest?cb=20210428223509",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/dragonball/images/6/65/King_Vegeta.png/revision/latest?cb=20210428223509",
+      "url": "https://static.wikia.nocookie.net/dragonball/images/2/22/King_Cold_episode_122.png/revision/latest?cb=20241217033208",
       "error": "HTTP 404"
     },
     {
@@ -5515,17 +5355,12 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/chainsaw-man/images/5/54/Pochita_anime_design.png/revision/latest?cb=20220919121110",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/onepiece/images/e/ec/Kin%27emon_Anime_Infobox.png/revision/latest?cb=20191124100115",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/4/47/Eustass_Kid_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240505021859",
+      "url": "https://static.wikia.nocookie.net/chainsaw-man/images/5/54/Pochita_anime_design.png/revision/latest?cb=20220919121110",
       "error": "HTTP 404"
     },
     {
@@ -5555,12 +5390,17 @@
     },
     {
       "file": "qap-themes.json",
-      "url": "https://static.wikia.nocookie.net/bleach/images/2/22/Ep390GanjuProfile.png/revision/latest?cb=20230928064838&path-prefix=en",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/4/47/Eustass_Kid_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20240505021859",
       "error": "HTTP 404"
     },
     {
       "file": "qap-themes.json",
       "url": "https://static.wikia.nocookie.net/tokyo-revengers/images/d/d2/Taiju_Shiba_%28Manga%29.png/revision/latest?cb=20220718074906",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
+      "url": "https://static.wikia.nocookie.net/bleach/images/2/22/Ep390GanjuProfile.png/revision/latest?cb=20230928064838&path-prefix=en",
       "error": "HTTP 404"
     },
     {
@@ -5590,6 +5430,11 @@
     },
     {
       "file": "qap-themes.json",
+      "url": "https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "qap-themes.json",
       "url": "https://i.ytimg.com/vi/ldbpfouF60Q/hqdefault.jpg",
       "error": "HTTP 404"
     },
@@ -5611,11 +5456,6 @@
     {
       "file": "qap-themes.json",
       "url": "https://i.ytimg.com/vi/In5qd9-J7Rc/hqdefault.jpg",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "qap-themes.json",
-      "url": "https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg",
       "error": "HTTP 404"
     },
     {
@@ -5670,22 +5510,22 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "tierlist-themes.json",
       "url": "https://static.wikia.nocookie.net/jujutsu-kaisen/images/0/02/Hajime_Kashimo_%28Anime%29.png/revision/latest?cb=20260205162107",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/d/d7/Sakazuki_Anime_Post_Timeskip_Infobox.png/revision/latest?cb=20220829052511",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
       "url": "https://static.wikia.nocookie.net/dragonball/images/b/ba/Goku_anime_profile.png/revision/latest?cb=20250723190513",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "tierlist-themes.json",
+      "url": "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2b/Anime_Gyokko_2.png/revision/latest?cb=20260811214404",
       "error": "HTTP 404"
     },
     {
@@ -5710,12 +5550,12 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838",
+      "url": "https://static.wikia.nocookie.net/jjba/images/f/f8/DiavoloProfile.png/revision/latest?cb=20190117232641",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/f/f8/DiavoloProfile.png/revision/latest?cb=20190117232641",
+      "url": "https://static.wikia.nocookie.net/jjba/images/c/c3/Screen_Shot_2020-01-10_at_9.23.23_am.png/revision/latest?cb=20230528225838",
       "error": "HTTP 404"
     },
     {
@@ -5750,12 +5590,12 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/tokyo-revengers/images/8/8f/Izana_Kurokawa_%28Manga%29.png/revision/latest?cb=20220411060906",
+      "url": "https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/3/3e/Jolyne_infobox_manga.jpg/revision/latest?cb=20181124040209",
+      "url": "https://static.wikia.nocookie.net/tokyo-revengers/images/8/8f/Izana_Kurokawa_%28Manga%29.png/revision/latest?cb=20220411060906",
       "error": "HTTP 404"
     },
     {
@@ -5780,12 +5620,17 @@
     },
     {
       "file": "tierlist-themes.json",
+      "url": "https://static.wikia.nocookie.net/onepiece/images/b/be/Gecko_Moria_Anime_Infobox.png/revision/latest?cb=20181127062446",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "tierlist-themes.json",
       "url": "https://static.wikia.nocookie.net/onepiece/images/0/01/Arlong_Anime_Infobox.png/revision/latest?cb=20230403145629",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/onepiece/images/b/be/Gecko_Moria_Anime_Infobox.png/revision/latest?cb=20181127062446",
+      "url": "https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en",
       "error": "HTTP 404"
     },
     {
@@ -5795,7 +5640,7 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/bleach/images/a/a1/Ep414AizenTYBWProfile.png/revision/latest?cb=20260912235200&path-prefix=en",
+      "url": "https://static.wikia.nocookie.net/fairytail/images/9/9b/Hades_Prop.JPG/revision/latest?cb=20111109201753",
       "error": "HTTP 404"
     },
     {
@@ -5810,17 +5655,7 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/fairytail/images/9/9b/Hades_Prop.JPG/revision/latest?cb=20111109201753",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "tierlist-themes.json",
       "url": "https://static.wikia.nocookie.net/blackclover/images/3/31/Lucius_profile.png/revision/latest?cb=20230322165647",
-      "error": "HTTP 404"
-    },
-    {
-      "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535",
       "error": "HTTP 404"
     },
     {
@@ -5830,12 +5665,27 @@
     },
     {
       "file": "tierlist-themes.json",
-      "url": "https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656",
+      "url": "https://static.wikia.nocookie.net/dragonball/images/7/71/Dr.GeroEp130.png/revision/latest?cb=20160922141535",
       "error": "HTTP 404"
     },
     {
       "file": "tierlist-themes.json",
       "url": "https://static.wikia.nocookie.net/solo-leveling/images/9/91/Cha_Hae-In.png/revision/latest?cb=20240119133508",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "tierlist-themes.json",
+      "url": "https://static.wikia.nocookie.net/jjba/images/a/ac/Screen_Shot_2020-01-10_at_8.36.26_am.png/revision/latest?cb=20200110083656",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "server.js",
+      "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png",
+      "error": "HTTP 404"
+    },
+    {
+      "file": "server.js",
+      "url": "https://i.ytimg.com/vi/${id}/hqdefault.jpg",
       "error": "HTTP 404"
     }
   ]
