@@ -6596,7 +6596,7 @@
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
                 if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
-                try { stored = localStorage.getItem('itemimg3:' + k); } catch (e) {}
+                try { stored = localStorage.getItem('itemimg5:' + k); } catch (e) {}
                 if (stored) return resolve('/api/img?u=' + encodeURIComponent(stored));
                 itemImgQueue.push({ source, name: item.name, k, resolve });
                 itemImagePump();
@@ -6604,7 +6604,7 @@
             return ITEM_IMG_CACHE[k];
         }
         function itemImagePump() {
-            while (itemImgRunning < 4 && itemImgQueue.length) {
+            while (itemImgRunning < 8 && itemImgQueue.length) {
                 const job = itemImgQueue.shift();
                 itemImgRunning++;
                 fetch(`/api/arcade/item-image?source=${encodeURIComponent(job.source)}&name=${encodeURIComponent(job.name)}`)
@@ -6612,8 +6612,8 @@
                     .then(d => {
                         const url = d && d.imageUrl;
                         try {
-                            if (url) localStorage.setItem('itemimg3:' + job.k, url);
-                            else localStorage.removeItem('itemimg3:' + job.k);
+                            if (url) localStorage.setItem('itemimg5:' + job.k, url);
+                            else localStorage.removeItem('itemimg5:' + job.k);
                         } catch (e) {}
                         if (!url) delete ITEM_IMG_CACHE[job.k];
                         job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
@@ -12304,7 +12304,9 @@
     </script>
     <script>
         /* ---------- Page Jouer rangée par catégories ---------- */
-        (function () {
+        /* Désactivé : le gestionnaire unique est assets/js/ui-refactor.js.
+           Deux gestionnaires concurrents causaient les catégories mortes sur iOS. */
+        (function () { return;
             const grid = [...document.querySelectorAll('#menu-selection div')].find(d => d.style && d.style.gridTemplateColumns === '1fr' && d.querySelector('.arc-menu'));
             if (!grid || grid.dataset.cats) return;
             grid.dataset.cats = '1'; grid.classList.add('mode-grid-2');

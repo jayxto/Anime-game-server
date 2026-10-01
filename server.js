@@ -150,7 +150,18 @@ const FANDOM_WIKIS = {
     opm: 'onepunchman.fandom.com',
     sao: 'swordartonline.fandom.com',
     tokyoghoul: 'tokyoghoul.fandom.com',
-    tokyorevengers: 'tokyorevengers.fandom.com'
+    tokyorevengers: 'tokyorevengers.fandom.com',
+    mha: 'myheroacademia.fandom.com', dandadan: 'dandadan.fandom.com', frieren: 'frieren.fandom.com',
+    berserk: 'berserk.fandom.com', codegeass: 'codegeass.fandom.com', mobpsycho: 'mob-psycho-100.fandom.com',
+    kaiju8: 'kaiju-no-8.fandom.com', mashle: 'mashle.fandom.com', noragami: 'noragami.fandom.com',
+    blueexorcist: 'aonoexorcist.fandom.com', bungou: 'bungostraydogs.fandom.com', dgrayman: 'dgrayman.fandom.com',
+    yuyuhakusho: 'yuyuhakusho.fandom.com', inuyasha: 'inuyasha.fandom.com', gurren: 'gurrenlagann.fandom.com',
+    killlakill: 'kill-la-kill.fandom.com', fate: 'typemoon.fandom.com', akame: 'akamegakill.fandom.com',
+    overlord: 'overlordmaruyama.fandom.com', shieldhero: 'shield-hero.fandom.com', eminence: 'the-eminence-in-shadow.fandom.com',
+    danmachi: 'danmachi.fandom.com', madeinabyss: 'madeinabyss.fandom.com', hellsing: 'hellsing.fandom.com',
+    devilman: 'devilman.fandom.com', evangelion: 'evangelion.fandom.com', sailormoon: 'sailormoon.fandom.com',
+    digimon: 'digimon.fandom.com', yugioh: 'yugioh.fandom.com', soul: 'souleater.fandom.com', trigun: 'trigun.fandom.com',
+    vinland: 'vinlandsaga.fandom.com', misfit: 'maou-gakuin.fandom.com'
 };
 
 const FANDOM_UNIVERSE_ALIASES = {
@@ -192,7 +203,15 @@ const FANDOM_UNIVERSE_ALIASES = {
     'sword art online':'sao',
     'sao':'sao',
     'tokyo ghoul':'tokyoghoul',
-    'tokyo revengers':'tokyorevengers'
+    'tokyo revengers':'tokyorevengers',
+    'my hero academia':'mha','dandadan':'dandadan','frieren':'frieren','berserk':'berserk','code geass':'codegeass',
+    'mob psycho 100':'mobpsycho','kaiju no 8':'kaiju8','mashle':'mashle','noragami':'noragami','blue exorcist':'blueexorcist',
+    'bungo stray dogs':'bungou','d gray man':'dgrayman','d.gray-man':'dgrayman','yu yu hakusho':'yuyuhakusho','inuyasha':'inuyasha',
+    'gurren lagann':'gurren','tengen toppa gurren lagann':'gurren','kill la kill':'killlakill','fate stay night':'fate','fate/stay night':'fate',
+    'akame ga kill':'akame','overlord':'overlord','the rising of the shield hero':'shieldhero','the eminence in shadow':'eminence',
+    'danmachi':'danmachi','made in abyss':'madeinabyss','hellsing ultimate':'hellsing','devilman crybaby':'devilman',
+    'neon genesis evangelion':'evangelion','sailor moon':'sailormoon','digimon':'digimon','yu gi oh':'yugioh','yu-gi-oh!':'yugioh',
+    'soul eater':'soul','trigun':'trigun','vinland saga':'vinland','the misfit of demon king academy':'misfit'
 };
 
 const CHARACTER_IMAGE_CACHE = new Map();
@@ -374,31 +393,37 @@ async function fetchFandomPageImageBySearch(host, name) {
 // Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
 // l'image principale de la page personnage (qui est précisément la cause de "Sasuke normal").
 async function fetchFandomTransformationImage(host, character, form) {
-    const clean = x => normalizeImageKey(String(x||'')).split(' ').filter(t => t.length > 2 && !['mode','form','forme','anime','transformation'].includes(t));
-    const want = [...new Set([...clean(character), ...clean(form)])];
-    const searches = [`${character} ${form}`, form, character].filter(Boolean);
+    const stop = new Set(['mode','form','forme','anime','transformation','final','true','full','power','awakened','awakening']);
+    const toks = x => normalizeImageKey(String(x||'')).split(' ').filter(t => t.length > 2 && !stop.has(t));
+    const formTokens = toks(form), charTokens = toks(character);
+    // Une image de transformation doit contenir des mots de LA FORME dans son nom de fichier.
+    // Le nom du personnage seul n'est plus suffisant (cause d'Armin normal / Ichigo normal).
+    const searches = [`${character} ${form}`, form].filter(Boolean);
     let files = [];
     for (const term of searches) {
         try {
-            const sp = new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'5',prop:'images',imlimit:'100',format:'json',origin:'*'});
-            const d = await fetchJsonWithTimeout(`https://${host}/api.php?${sp}`, 12000);
+            const sp = new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'3',prop:'images',imlimit:'60',format:'json',origin:'*'});
+            const d = await fetchJsonWithTimeout(`https://${host}/api.php?${sp}`, 4500);
             for (const pg of Object.values(d?.query?.pages||{})) for (const im of (pg.images||[])) if (im?.title) files.push(im.title);
         } catch (_) {}
     }
     files = [...new Set(files)].filter(t => /^File:/i.test(t) && !/logo|icon|symbol|map|volume|chapter|cover|game|card|render.*logo/i.test(t));
-    const score = title => {
+    const hits = title => {
         const n = normalizeImageKey(title.replace(/^File:/i,''));
-        let sc = 0; for (const t of want) if (n.includes(t)) sc += t.length > 5 ? 5 : 3;
-        for (const t of clean(form)) if (n.includes(t)) sc += 8;
-        if (/anime|episode|screenshot|png|webp|jpg|jpeg/.test(n)) sc += 1;
-        return sc;
+        const fh = formTokens.filter(t => n.includes(t));
+        const ch = charTokens.filter(t => n.includes(t));
+        return { n, fh, ch };
     };
+    const need = formTokens.length <= 1 ? 1 : Math.min(2, formTokens.length);
+    // IMPORTANT: au moins 1/2 mots distinctifs de la forme, jamais juste le perso.
+    files = files.filter(f => hits(f).fh.length >= need);
+    const score = title => { const h=hits(title); return h.fh.length*20 + h.ch.length*4 + (/anime|episode|screenshot/.test(h.n)?2:0); };
     files.sort((a,b)=>score(b)-score(a));
-    const best = files.filter(f=>score(f) >= Math.max(8, clean(form).length ? 8 : 12)).slice(0,12);
+    const best = files.slice(0,8);
     if (!best.length) return null;
     try {
         const qp = new URLSearchParams({action:'query',titles:best.join('|'),prop:'imageinfo',iiprop:'url|mime',iiurlwidth:'900',format:'json',origin:'*'});
-        const d = await fetchJsonWithTimeout(`https://${host}/api.php?${qp}`, 12000);
+        const d = await fetchJsonWithTimeout(`https://${host}/api.php?${qp}`, 4500);
         const pages = Object.values(d?.query?.pages||{}).sort((a,b)=>score(b.title)-score(a.title));
         for (const pg of pages) {
             const ii=pg.imageinfo?.[0]; const u=ii?.thumburl||ii?.url;
@@ -13238,7 +13263,14 @@ async function qapAniListAnimeCover(name) {
         return d?.Media?.coverImage?.extraLarge || d?.Media?.coverImage?.large || d?.Media?.coverImage?.medium || null;
     } catch (_) { return null; }
 }
+const QAP_ITEM_IMAGE_CACHE = new Map();
 app.get('/api/arcade/item-image', async (req, res) => {
+    const cacheKey = String(req.query.source||'') + '|' + String(req.query.name||'');
+    const cached = QAP_ITEM_IMAGE_CACHE.get(cacheKey);
+    if (cached && Date.now() - cached.at < (cached.url ? 86400000 : 300000)) {
+        res.set('Cache-Control', cached.url ? 'public, max-age=86400' : 'no-store');
+        return res.json({ok:!!cached.url,imageUrl:cached.url});
+    }
     const source = String(req.query.source || '');
     const name = String(req.query.name || '');
     let url = null;
@@ -13267,16 +13299,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
                                 const charName = String(it.char || parts[0] || '').trim();
                                 // D'abord les fichiers/galeries dont le nom correspond réellement à la forme.
                                 try { url = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
-                                // Puis les pages ciblées, toujours sans fallback portrait personnage.
-                                const searches = [
-                                    `${charName} ${form}`.trim(),
-                                    form
-                                ];
-                                for (const searchName of searches) {
-                                    if (!searchName || url) continue;
-                                    try { url = await fetchFandomPageImageByExactTitle(host, searchName); } catch (_) {}
-                                    if (!url) { try { url = await fetchFandomPageImageBySearch(host, searchName); } catch (_) {} }
-                                }
+                                // Aucun fallback vers l'image principale d'une page : elle représente souvent le personnage normal.
                             }
                         }
                         // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
@@ -13295,7 +13318,8 @@ app.get('/api/arcade/item-image', async (req, res) => {
             }
         }
     } catch (_) {}
-    res.set('Cache-Control', url ? 'public, max-age=3600' : 'no-store');
+    QAP_ITEM_IMAGE_CACHE.set(cacheKey, {url:url||null, at:Date.now()});
+    res.set('Cache-Control', url ? 'public, max-age=86400' : 'no-store');
     res.json({ ok: !!url, imageUrl: url });
 });
 
