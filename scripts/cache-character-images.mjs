@@ -2,7 +2,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import sharp from 'sharp';
+
+const execFileAsync = promisify(execFile);
 
 const ROOT = process.cwd();
 const CHAR_FILE = path.join(ROOT, 'char-images.json');
@@ -23,7 +27,10 @@ const QUALITY = Math.max(60, Math.min(Number(process.env.IMAGE_CACHE_QUALITY || 
 const REFRESH = process.argv.includes('--refresh') || process.env.IMAGE_CACHE_REFRESH === '1';
 const CHECK_ONLY = process.argv.includes('--check-only');
 const DEEP = process.argv.includes('--deep') || process.env.IMAGE_CACHE_DEEP !== '0';
-const USER_AGENT = 'ANIME-GAME image-cache/3.0 (jayxto/Anime-game-server)';
+const USER_AGENT = 'ANIME-GAME image-cache/5.0 (jayxto/Anime-game-server)';
+const CHECKPOINT_EVERY = Math.max(5, Number(process.env.IMAGE_CACHE_CHECKPOINT_EVERY || 25));
+let checkpointChain = Promise.resolve();
+let lastCheckpointDone = 0;
 
 const animeAliases = {
   naruto: 'Naruto', onepiece: 'One Piece', bleach: 'Bleach', hxh: 'Hunter x Hunter', hunterxhunter: 'Hunter x Hunter',
@@ -458,6 +465,38 @@ function progress(done, total, msg) {
   if (done < 5 || done % 25 === 0 || done === total) console.log(`[${done}/${total}] ${msg}`);
 }
 
+
+async function checkpointCharacters(map, manifest, done, total) {
+  if (CHECK_ONLY) return;
+  const shouldCheckpoint = done === total || done - lastCheckpointDone >= CHECKPOINT_EVERY;
+  if (!shouldCheckpoint) return;
+
+  checkpointChain = checkpointChain.then(async () => {
+    if (done !== total && done - lastCheckpointDone < CHECKPOINT_EVERY) return;
+    manifest.generatedAt = new Date().toISOString();
+    await writeJson(CHAR_FILE, map);
+    await writeJson(MANIFEST_FILE, manifest);
+
+    try {
+      await execFileAsync('git', ['add', '--', 'char-images.json', 'assets/images']);
+      const { stdout } = await execFileAsync('git', ['diff', '--cached', '--name-only']);
+      if (!stdout.trim()) {
+        lastCheckpointDone = Math.max(lastCheckpointDone, done);
+        console.log(`[checkpoint ${done}/${total}] nothing new to commit`);
+        return;
+      }
+      await execFileAsync('git', ['commit', '-m', `chore: image cache checkpoint ${done}-${total}`], { maxBuffer: 10 * 1024 * 1024 });
+      await execFileAsync('git', ['push'], { maxBuffer: 10 * 1024 * 1024 });
+      lastCheckpointDone = Math.max(lastCheckpointDone, done);
+      console.log(`[checkpoint ${done}/${total}] saved to GitHub`);
+    } catch (e) {
+      console.error(`[checkpoint ${done}/${total}] save failed: ${e.stderr || e.message}`);
+    }
+  });
+
+  await checkpointChain;
+}
+
 async function buildAliasIndex(map, manifest) {
   const index = new Map();
   const jobs = leaves(map).filter(x => x.parts.length >= 2);
@@ -507,7 +546,7 @@ async function cacheCharacters() {
       if (!CHECK_ONLY) setAt(map, job.parts, local);
       manifest.characters[id] = { ...old, universe, name, localUrl: local, sourceUrl: old.sourceUrl || (remote(current) ? current : null), status: 'cached', updatedAt: new Date().toISOString() };
       report.cachedCharacters++;
-      done++; progress(done, jobs.length, `${universe} / ${name} cached`); return;
+      done++; progress(done, jobs.length, `${universe} / ${name} cached`); await checkpointCharacters(map, manifest, done, jobs.length); return;
     }
 
     // 2) alias reuse from already-known successful image
@@ -520,7 +559,7 @@ async function cacheCharacters() {
       if (!CHECK_ONLY) setAt(map, job.parts, reusedLocal);
       manifest.characters[id] = { ...old, universe, name, localUrl: reusedLocal, sourceUrl: old.sourceUrl || (remote(current) ? current : null), status: 'alias-reused', updatedAt: new Date().toISOString() };
       report.aliasReusedCharacters++;
-      done++; progress(done, jobs.length, `${universe} / ${name} alias reused`); return;
+      done++; progress(done, jobs.length, `${universe} / ${name} alias reused`); await checkpointCharacters(map, manifest, done, jobs.length); return;
     }
 
     const candidates = [];
@@ -569,7 +608,7 @@ async function cacheCharacters() {
       report.failedCharacters.push({ universe, name, current, errors });
     }
 
-    done++; progress(done, jobs.length, `${universe} / ${name} ${success ? 'ok' : 'FAILED'}`);
+    done++; progress(done, jobs.length, `${universe} / ${name} ${success ? 'ok' : 'FAILED'}`); await checkpointCharacters(map, manifest, done, jobs.length);
   });
 
   manifest.generatedAt = new Date().toISOString();
@@ -700,7 +739,7 @@ async function writeReports() {
 }
 
 async function main() {
-  console.log(`Starting image cache v3 • refresh=${REFRESH} • deep=${DEEP}`);
+  console.log(`Starting image cache v5-checkpoint • refresh=${REFRESH} • deep=${DEEP}`);
   await fs.mkdir(CHAR_ROOT, { recursive: true });
   await fs.mkdir(EXTRA_ROOT, { recursive: true });
   const manifest = await cacheCharacters();
