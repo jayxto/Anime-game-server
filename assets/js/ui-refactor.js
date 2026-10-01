@@ -211,7 +211,10 @@
                 const mh = arc.querySelector('h3');
                 if (mh) {
                     mh.dataset.orig = mh.dataset.orig || mh.textContent;
-                    mh.textContent = cat === 'stream' ? '🕹️ Mini-jeux jouables avec le chat' : mh.dataset.orig;
+                    const wantedTitle = cat === 'stream' ? '🕹️ Mini-jeux jouables avec le chat' : mh.dataset.orig;
+                    // IMPORTANT mobile : ne pas réécrire le même textContent à chaque refresh.
+                    // Sinon le MutationObserver se relance en boucle et finit par bloquer les taps/clics sur iPhone.
+                    if (mh.textContent !== wantedTitle) mh.textContent = wantedTitle;
                 }
             }
 
@@ -226,26 +229,29 @@
             apply(current, false);
         }
 
-        // Plus d'onclick inline fragile : une délégation unique fonctionne sur PC et mobile.
+        // Délégation unique PC/mobile. On évite les listeners touchstart globaux en capture :
+        // sur Safari ils peuvent intercepter les gestes de toute la page et rendre l'UI non cliquable.
         if (bar.dataset.agCatsBound !== '1') {
             bar.dataset.agCatsBound = '1';
-            const activateCat = e => {
-                const btn = e.target.closest('[data-mode-cat]');
+            let lastPointerAt = 0;
+            const activate = (e) => {
+                const btn = e.target && e.target.closest ? e.target.closest('[data-mode-cat]') : null;
                 if (!btn || !bar.contains(btn)) return;
-                e.preventDefault(); e.stopPropagation();
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
                 apply(btn.dataset.modeCat, true);
             };
-            let lastTouch = 0;
-            bar.addEventListener('touchend', e => {
-                const btn = e.target.closest('[data-mode-cat]');
-                if (!btn || !bar.contains(btn)) return;
-                lastTouch = Date.now();
-                e.preventDefault(); e.stopPropagation();
-                apply(btn.dataset.modeCat, true);
-            }, {passive:false});
+            if (window.PointerEvent) {
+                bar.addEventListener('pointerup', e => {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    lastPointerAt = Date.now();
+                    activate(e);
+                }, {passive:false});
+            }
             bar.addEventListener('click', e => {
-                if (Date.now() - lastTouch < 700) { e.preventDefault(); e.stopPropagation(); return; }
-                activateCat(e);
+                // Pointer/touch génère souvent un click synthétique juste après : on ne l'exécute pas deux fois.
+                if (Date.now() - lastPointerAt < 500) return;
+                activate(e);
             }, {passive:false});
         }
 
@@ -255,10 +261,13 @@
         refreshAll();
 
         // Les nouveaux modes / mini-jeux peuvent arriver après le chargement du menu.
+        // Le rafraîchissement est volontairement limité pour ne pas saturer le thread principal sur mobile.
         let refreshTimer = null;
-        new MutationObserver(() => {
+        new MutationObserver(muts => {
+            // Ignore nos propres changements de libellé dans l'entête mini-jeux.
+            if (muts.every(m => m.target?.closest?.('.arc-menu-refactor-head'))) return;
             clearTimeout(refreshTimer);
-            refreshTimer = setTimeout(refreshAll, 20);
+            refreshTimer = setTimeout(refreshAll, 120);
         }).observe(grid, { childList:true, subtree:true });
     }
 
@@ -813,6 +822,8 @@
     }
 
     function init() {
+        // Sécurité : un état de tiroir laissé ouvert ne doit jamais poser un backdrop invisible au-dessus de la page.
+        document.body.classList.remove('ag-mobile-menu-open');
         buildShell();
         setupGamePageTransition();
         syncAll();
@@ -835,16 +846,5 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true });
     else init();
 
-    // iOS/Safari : intercepter le toucher avant les overlays du dashboard/audio.
-    // Cela rend les catégories Jouer fiables même quand une couche visuelle passe au-dessus.
-    const mobileCategoryTap = e => {
-        const btn = e.target && e.target.closest ? e.target.closest('#mode-cats [data-mode-cat], #mode-cats button') : null;
-        if (!btn) return;
-        let cat = btn.dataset.modeCat || '';
-        if (!cat) { const m = (btn.getAttribute('onclick') || '').match(/modeCat\(['\"]([^'\"]+)/); cat = m ? m[1] : ''; }
-        if (!cat || typeof window.modeCat !== 'function') return;
-        e.preventDefault(); e.stopPropagation();
-        window.modeCat(cat);
-    };
-    document.addEventListener('touchstart', mobileCategoryTap, {capture:true,passive:false});
+    // Hotfix mobile : aucun listener touchstart global en capture.
 })();
