@@ -148,6 +148,7 @@
             if (/devine la note|citation|chaine de persos|quiz des joueurs|animedle|rolland garos|roland garros/.test(t)) add('quiz');
             if (/blind test|battle d.openings/.test(t)) add('musique','stream');
             if (/tu preferes|qui a le plus|dessine le perso|tier list|jeu de connexion|party mix/.test(t)) add('fun');
+            if (/tu preferes|qui a le plus|dessine le perso/.test(t)) add('stream');
             if (/bingo anime/.test(t)) add('quiz','fun');
             if (/combat de cartes|tournoi|enchere/.test(t)) add('strat');
             if (/mini.jeux/.test(t)) add('quiz','stream');
@@ -201,6 +202,12 @@
             const arc = grid.querySelector(':scope > .arc-menu');
             if (arc) {
                 arc.classList.toggle('arc-stream-view', cat === 'stream');
+                // En vue streamer on affiche TOUS les mini-jeux compatibles, même ceux après la 10e tuile.
+                // C'est ce qui remettait notamment « Plus ou moins » hors de la vue sur mobile.
+                if (cat === 'stream') arc.classList.remove('arc-compact');
+                else {
+                    try { if (localStorage.getItem('arcMiniExpanded') !== '1') arc.classList.add('arc-compact'); } catch (_) {}
+                }
                 const mh = arc.querySelector('h3');
                 if (mh) {
                     mh.dataset.orig = mh.dataset.orig || mh.textContent;
