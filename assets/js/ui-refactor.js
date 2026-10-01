@@ -217,12 +217,16 @@
         // Plus d'onclick inline fragile : une délégation unique fonctionne sur PC et mobile.
         if (bar.dataset.agCatsBound !== '1') {
             bar.dataset.agCatsBound = '1';
-            bar.addEventListener('click', e => {
+            const activateCat = e => {
                 const btn = e.target.closest('[data-mode-cat]');
                 if (!btn || !bar.contains(btn)) return;
-                e.preventDefault();
+                e.preventDefault(); e.stopPropagation();
                 apply(btn.dataset.modeCat, true);
-            });
+            };
+            bar.addEventListener('click', activateCat, {passive:false});
+            // Safari/iOS : certaines couches du dashboard interceptent le click synthétique.
+            // pointerup/touchend garantit que les catégories répondent au doigt.
+            bar.addEventListener('pointerup', e => { if (e.pointerType === 'touch') activateCat(e); }, {passive:false});
         }
 
         const controller = cat => apply(cat, true);
