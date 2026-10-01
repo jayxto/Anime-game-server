@@ -13213,15 +13213,44 @@ app.get('/api/arcade/item-image', async (req, res) => {
                 else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
                     url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
                 } else if (source.startsWith('qt:')) {
-                    // Transformations : rechercher d'abord la forme exacte (ex. Gear 5), puis fallback personnage.
-                    if (it.imageSearch) {
-                        try {
-                            const q = String(it.imageSearch).replace(/\s+anime(?:\s+transformation)?$/i, '').trim();
-                            url = await qapAniListCharacterImage(q);
-                        } catch (_) {}
+                    const qapThemeId = source.slice(3);
+                    if (qapThemeId === 'transformation') {
+                        // STRICT : une transformation ne doit JAMAIS retomber sur le portrait normal du perso.
+                        // On cherche la page/image de la FORME elle-même sur le wiki de l'univers.
+                        // Si aucune image de forme n'est trouvée, on renvoie null plutôt qu'une mauvaise image.
+                        if (it.img) url = it.img;
+                        if (!url) {
+                            const parts = String(it.sub || '').split('•').map(s => s.trim()).filter(Boolean);
+                            const animeName = parts.length > 1 ? parts[parts.length - 1] : '';
+                            const universeKey = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(animeName)] || null;
+                            const host = universeKey ? FANDOM_WIKIS[universeKey] : null;
+                            if (host) {
+                                const form = String(it.name || '').trim();
+                                const charName = String(it.char || parts[0] || '').trim();
+                                // Essais ciblés, du plus précis au plus général, sans fallback portrait personnage.
+                                const searches = [
+                                    `${charName} ${form}`.trim(),
+                                    form
+                                ];
+                                for (const searchName of searches) {
+                                    if (!searchName || url) continue;
+                                    try { url = await fetchFandomPageImageByExactTitle(host, searchName); } catch (_) {}
+                                    if (!url) { try { url = await fetchFandomPageImageBySearch(host, searchName); } catch (_) {} }
+                                }
+                            }
+                        }
+                        // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
+                        // généralement le portrait standard et provoquerait précisément les mauvaises formes.
+                    } else {
+                        if (it.imageSearch) {
+                            try {
+                                const q = String(it.imageSearch).replace(/\s+anime(?:\s+transformation)?$/i, '').trim();
+                                url = await qapAniListCharacterImage(q);
+                            } catch (_) {}
+                        }
+                        const charName = it.char || (String(it.sub || '').split('•')[0].trim()) || it.name;
+                        if (!url) url = await qapAniListCharacterImage(charName);
                     }
-                    const charName = it.char || (String(it.sub || '').split('•')[0].trim()) || it.name;
-                    if (!url) url = await qapAniListCharacterImage(charName);
                 } else url = await arcCharImage(source, it.raw || it.name);
             }
         }
