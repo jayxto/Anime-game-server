@@ -3406,6 +3406,7 @@
             tupref:         { title:'🤔 TU PRÉFÈRES…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true },
             arc_connections:{ title:'🧩 ANIME CONNECTIONS', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Les 16 personnages et les 4 liens seront générés uniquement avec ta sélection.', tag:'', all:true },
+            arc_codeanime:{ title:'🕵️ CODE ANIME', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Les 25 cartes seront prises uniquement dans ta sélection.', tag:'', all:true },
             arc_bingo:      { title:'🎟️ BINGO ANIME', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Seuls les personnages de ta sélection apparaîtront.', tag:'', all:true }
         };
         let QUOTE_COUNTS = {};
@@ -13115,7 +13116,7 @@
 <script>
 /* ===== 7 AJOUTS UI ===== */
 ARC_UI.connections={title:'🧩 ANIME CONNECTIONS',sub:'16 persos avec leurs images • choisis un ou plusieurs univers • retrouve 4 groupes de 4 qui partagent un lien',universe:true};
-ARC_UI.codeanime={title:'🕵️ CODE ANIME',sub:'Deux équipes • un indice + un nombre • évite l’assassin',universe:false};
+ARC_UI.codeanime={title:'🕵️ CODE ANIME',sub:'Choisis un univers, plusieurs ou tous • deux équipes • un indice + un nombre • évite l’assassin',universe:true};
 ARC_UI.ordre={title:'⏳ REMETS-LES DANS L’ORDRE',sub:'Classe 5 personnages selon une donnée objective • score partiel si tu es proche',universe:false};
 ARC_UI.gridchallenge={title:'🎯 GRID CHALLENGE',sub:'3 univers × 3 catégories • trouve un perso valide dans chaque intersection',universe:false};
 let arcConnPrivate={solved:[]},arcConnSelection=[],arcCodePrivate=null,arcOrderIds=[],arcOrderKey='',arcGridPrivate={solved:{},attempts:0};

@@ -13985,12 +13985,13 @@ resolveCharacterImage = async function (universeKey, displayName) {
     if (universeKey && universeKey !== 'pokemon' && displayName) {
         try {
             const clean = cleanImageCharacterName(displayName);
-            let url = await arcAniImage(universeKey, clean);
-            // Les nouveaux univers n'ont pas tous un wiki Fandom/ARC_ANI_MEDIA dédié.
-            // Fallback global AniList par nom : évite les cartes/personnages sans photo.
-            if (!url && typeof qapAniListCharacterImage === 'function') {
-                url = await qapAniListCharacterImage(clean);
-            }
+            // Priorité à la recherche directe AniList : une requête courte au lieu de
+            // construire toute la distribution d'un anime avant d'afficher UNE carte.
+            // Sur mobile cela retire plusieurs secondes d'attente à Pixel/Zoom/Silhouette.
+            let url = null;
+            if (typeof qapAniListCharacterImage === 'function') url = await qapAniListCharacterImage(clean);
+            // Le mapping complet reste un secours pour les homonymes / noms alternatifs.
+            if (!url) url = await arcAniImage(universeKey, clean);
             if (url) {
                 saveCachedCharacterImage(universeKey, clean, { imageUrl:url, sourceUrl:null, status:'ok' }).catch(() => {});
                 return { imageUrl: url, sourceUrl: null, status: 'ok' };
