@@ -28,12 +28,12 @@ const animeAliases = {
   naruto:'Naruto',onepiece:'One Piece',bleach:'Bleach',hxh:'Hunter x Hunter',hunterxhunter:'Hunter x Hunter',
   snk:'Attack on Titan',aot:'Attack on Titan',attackontitan:'Attack on Titan',nanatsu:'The Seven Deadly Sins',
   sevendeadlysins:'The Seven Deadly Sins',deathnote:'Death Note',cote:'Classroom of the Elite',
-  classroomoftheelite:'Classroom of the Elite',sololeveling:'Solo Leveling',blackclover:'Black Clover',
+  classroomoftheelite:'Classroom of the Elite',sololeveling:'Solo Leveling',blackclover:'Black Clover',clover:'Black Clover',
   fireforce:'Fire Force',mushokutensei:'Mushoku Tensei: Jobless Reincarnation',rezero:'Re:ZERO -Starting Life in Another World-',
-  fairytail:'Fairy Tail',bluelock:'Blue Lock',fma:'Fullmetal Alchemist: Brotherhood',
+  fairytail:'Fairy Tail',fairy:'Fairy Tail',bluelock:'Blue Lock',fma:'Fullmetal Alchemist: Brotherhood',
   fullmetalalchemist:'Fullmetal Alchemist: Brotherhood',chainsaw:'Chainsaw Man',chainsawman:'Chainsaw Man',wakfu:'Wakfu',
   demonslayer:'Demon Slayer: Kimetsu no Yaiba',kimetsu:'Demon Slayer: Kimetsu no Yaiba',pokemon:'Pokémon',
-  dragonball:'Dragon Ball',hellsparadise:"Hell's Paradise",jigokuraku:"Hell's Paradise",gachakuta:'Gachiakuta',
+  dragonball:'Dragon Ball',hellsparadise:"Hell's Paradise",jigokuraku:"Hell's Paradise",gachakuta:'Gachiakuta',gachiakuta:'Gachiakuta',
   haikyuu:'Haikyu!!',jujika:'Juujika no Rokunin',jojo:"JoJo's Bizarre Adventure",tensura:'That Time I Got Reincarnated as a Slime',
   onepunchman:'One Punch Man',sao:'Sword Art Online',swordartonline:'Sword Art Online',tokyoghoul:'Tokyo Ghoul',
   tokyo_revengers:'Tokyo Revengers',tokyorevengers:'Tokyo Revengers'
@@ -44,13 +44,13 @@ const fandomWikis = {
   hunterxhunter:'hunterxhunter.fandom.com',snk:'attackontitan.fandom.com',aot:'attackontitan.fandom.com',
   attackontitan:'attackontitan.fandom.com',nanatsu:'nanatsu-no-taizai.fandom.com',sevendeadlysins:'nanatsu-no-taizai.fandom.com',
   deathnote:'deathnote.fandom.com',cote:'you-zitsu.fandom.com',classroomoftheelite:'you-zitsu.fandom.com',
-  sololeveling:'solo-leveling.fandom.com',blackclover:'blackclover.fandom.com',fireforce:'fire-force.fandom.com',
-  mushokutensei:'mushokutensei.fandom.com',rezero:'rezero.fandom.com',fairytail:'fairytail.fandom.com',
+  sololeveling:'solo-leveling.fandom.com',blackclover:'blackclover.fandom.com',clover:'blackclover.fandom.com',fireforce:'fire-force.fandom.com',
+  mushokutensei:'mushokutensei.fandom.com',rezero:'rezero.fandom.com',fairytail:'fairytail.fandom.com',fairy:'fairytail.fandom.com',
   bluelock:'bluelock.fandom.com',fma:'fma.fandom.com',fullmetalalchemist:'fma.fandom.com',
   chainsaw:'chainsaw-man.fandom.com',chainsawman:'chainsaw-man.fandom.com',wakfu:'wakfu.fandom.com',
   demonslayer:'kimetsu-no-yaiba.fandom.com',kimetsu:'kimetsu-no-yaiba.fandom.com',pokemon:'pokemon.fandom.com',
   dragonball:'dragonball.fandom.com',hellsparadise:'jigokuraku.fandom.com',jigokuraku:'jigokuraku.fandom.com',
-  gachakuta:'gachiakuta.fandom.com',haikyuu:'haikyuu.fandom.com',jojo:'jojo.fandom.com',tensura:'tensura.fandom.com',
+  gachakuta:'gachiakuta.fandom.com',gachiakuta:'gachiakuta.fandom.com',haikyuu:'haikyuu.fandom.com',jojo:'jojo.fandom.com',tensura:'tensura.fandom.com',
   onepunchman:'onepunchman.fandom.com',sao:'swordartonline.fandom.com',swordartonline:'swordartonline.fandom.com',
   tokyoghoul:'tokyoghoul.fandom.com',tokyo_revengers:'tokyorevengers.fandom.com',tokyorevengers:'tokyorevengers.fandom.com'
 };
@@ -105,7 +105,7 @@ async function cacheCharacters(){
     if(!REFRESH&&await exists(out)){if(!CHECK_ONLY)setAt(map,job.parts,local);manifest.characters[id]={...old,universe,name,localUrl:local,sourceUrl:old.sourceUrl||(remote(current)?current:null),status:'cached'};report.cachedCharacters++;done++;progress(done,jobs.length,`${universe} / ${name} cached`);return;}
     const candidates=[];const add=(url,source,page=null)=>{if(imageUrl(url)&&!candidates.some(x=>x.url===url))candidates.push({url,source,page});};add(remote(current)?current:null,'char-images');add(old.sourceUrl,'manifest');let success=null,resolved=false,errors=[];
     for(const c of candidates){try{success={...c,...await convert(c.url,out)};break;}catch(e){errors.push(`${c.source}: ${e.message}`);}}
-    if(!success){const a=await resolveAniList(universe,name);if(a){resolved=true;add(a.url,a.source,a.page);}const f=await resolveFandom(universe,name);if(f){resolved=true;add(f.url,f.source,f.page);}for(const c of candidates.slice(2)){try{success={...c,...await convert(c.url,out)};break;}catch(e){errors.push(`${c.source}: ${e.message}`);}}}
+    if(!success){const retryFrom=candidates.length;const a=await resolveAniList(universe,name);if(a)add(a.url,a.source,a.page);const f=await resolveFandom(universe,name);if(f)add(f.url,f.source,f.page);for(const c of candidates.slice(retryFrom)){try{success={...c,...await convert(c.url,out)};resolved=true;break;}catch(e){errors.push(`${c.source}: ${e.message}`);}}}
     if(success){if(!CHECK_ONLY)setAt(map,job.parts,local);manifest.characters[id]={universe,name,localUrl:local,sourceUrl:success.url,resolvedBy:success.source,sourcePage:success.page||null,finalSourceUrl:success.finalUrl||success.url,originalDimensions:[success.width,success.height],originalBytes:success.before,webpBytes:success.after,status:'ok',updatedAt:new Date().toISOString()};report.downloadedCharacters++;if(resolved)report.resolvedCharacters++;}
     else{manifest.characters[id]={...old,universe,name,localUrl:local,sourceUrl:old.sourceUrl||(remote(current)?current:null),status:'failed',errors,updatedAt:new Date().toISOString()};report.failedCharacters.push({universe,name,current,errors});}
     done++;progress(done,jobs.length,`${universe} / ${name} ${success?'ok':'FAILED'}`);
@@ -123,18 +123,38 @@ async function cacheDataFiles(manifest){
 }
 
 async function walkJs(dir){try{const es=await fs.readdir(dir,{withFileTypes:true}),out=[];for(const e of es){const p=path.join(dir,e.name);if(e.isDirectory())out.push(...await walkJs(p));else if(/\.(js|mjs|html)$/i.test(e.name))out.push(p);}return out;}catch{return[];}}
-async function scanCode(manifest){const files=[];for(const n of CODE_FILES){const p=path.join(ROOT,n);try{await fs.access(p);files.push(p);}catch{}}files.push(...await walkJs(JS_DIR));const seen=new Set(),rx=/https?:\/\/[^\s'"`<>\\)]+/g;for(const file of files){let text='';try{text=await fs.readFile(file,'utf8');}catch{continue;}for(const raw of text.match(rx)||[]){const url=raw.replace(/[;,]+$/,'');if(!imageUrl(url)||seen.has(url))continue;seen.add(url);report.codeImageUrls.push({file:path.relative(ROOT,file),url,local:manifest.external?.[url]?.localUrl||null});}}report.codeImageUrlsFound=report.codeImageUrls.length;}
+async function cacheCode(manifest){
+  const files=[];for(const n of CODE_FILES){const p=path.join(ROOT,n);try{await fs.access(p);files.push(p);}catch{}}files.push(...await walkJs(JS_DIR));
+  const rx=/https?:\/\/[^\s'"`<>\\)]+/g;
+  for(const file of files){
+    let text='';try{text=await fs.readFile(file,'utf8');}catch{continue;}
+    const urls=[...new Set((text.match(rx)||[]).map(x=>x.replace(/[;,]+$/,'')).filter(imageUrl))];
+    if(!urls.length)continue;
+    let changed=false;
+    for(const url of urls){
+      report.codeImageUrlsFound++;
+      const out=path.join(EXTRA_ROOT,hash(url)+'.webp'),local=repoUrl(out);
+      let ok=false;
+      if(!REFRESH&&await exists(out)){ok=true;report.externalCached++;}
+      else{try{const info=await convert(url,out);manifest.external[url]={localUrl:local,finalSourceUrl:info.finalUrl,originalBytes:info.before,webpBytes:info.after,status:'ok',updatedAt:new Date().toISOString()};report.externalDownloaded++;ok=true;}catch(e){report.externalFailed.push({file:path.relative(ROOT,file),url,error:e.message});}}
+      if(ok){manifest.external[url]={...(manifest.external[url]||{}),localUrl:local,status:'ok'};text=text.split(url).join(local);changed=true;}
+      report.codeImageUrls.push({file:path.relative(ROOT,file),url,local:ok?local:null});
+    }
+    if(changed&&!CHECK_ONLY){await fs.writeFile(file,text);report.rewrittenFiles.push(path.relative(ROOT,file));}
+  }
+  if(!CHECK_ONLY)await writeJson(MANIFEST_FILE,manifest);
+}
 
 async function writeReports(){
   report.generatedAt=new Date().toISOString();
   if(!CHECK_ONLY){await writeJson(REPORT_FILE,report);await writeJson(MISSING_FILE,{generatedAt:report.generatedAt,characters:report.failedCharacters,external:report.externalFailed});}
   const saved=report.bytesBefore?Math.round((1-report.bytesAfter/report.bytesBefore)*100):0;
-  const lines=['# Image cache report','',`Generated: ${report.generatedAt}`,'',`- Character entries: **${report.characterEntries}**`,`- Already cached: **${report.cachedCharacters}**`,`- Downloaded / converted: **${report.downloadedCharacters}**`,`- Missing images resolved automatically: **${report.resolvedCharacters}**`,`- Character failures: **${report.failedCharacters.length}**`,`- Extra JSON image URLs: **${report.externalFound}**`,`- Extra images downloaded: **${report.externalDownloaded}**`,`- Hard-coded code image URLs detected (report only): **${report.codeImageUrlsFound}**`,`- Approx. size reduction this run: **${saved}%**`,'','## Failed characters',''];
+  const lines=['# Image cache report','',`Generated: ${report.generatedAt}`,'',`- Character entries: **${report.characterEntries}**`,`- Already cached: **${report.cachedCharacters}**`,`- Downloaded / converted: **${report.downloadedCharacters}**`,`- Missing images resolved automatically: **${report.resolvedCharacters}**`,`- Character failures: **${report.failedCharacters.length}**`,`- Extra JSON image URLs: **${report.externalFound}**`,`- Extra images downloaded: **${report.externalDownloaded}**`,`- Hard-coded code image URLs processed: **${report.codeImageUrlsFound}**`,`- Approx. size reduction this run: **${saved}%**`,'','## Failed characters',''];
   if(!report.failedCharacters.length)lines.push('None.');else for(const x of report.failedCharacters)lines.push(`- **${x.universe} — ${x.name}**: ${(x.errors||[]).join(' | ')||'not found'}`);
   lines.push('','## External failures','');if(!report.externalFailed.length)lines.push('None.');else for(const x of report.externalFailed)lines.push(`- **${x.file}** — ${x.url}: ${x.error}`);
-  lines.push('','## Image URLs still hard-coded in JS/HTML','','Reported only so server-side fetch logic is not accidentally broken.');for(const x of report.codeImageUrls.slice(0,400))lines.push(`- ${x.file}: ${x.url}${x.local?` -> ${x.local}`:''}`);
+  lines.push('','## Image URLs found in JS/HTML','','These are cached locally when downloadable.');for(const x of report.codeImageUrls.slice(0,400))lines.push(`- ${x.file}: ${x.url}${x.local?` -> ${x.local}`:''}`);
   if(!CHECK_ONLY)await fs.writeFile(REPORT_MD,lines.join('\n')+'\n');
 }
 
-async function main(){console.log(`Image cache: ${CONCURRENCY} workers, ${SIZE}px WebP q${QUALITY}`);await fs.mkdir(CHAR_ROOT,{recursive:true});await fs.mkdir(EXTRA_ROOT,{recursive:true});const manifest=await cacheCharacters();await cacheDataFiles(manifest);await scanCode(manifest);await writeReports();console.log(`Done: ${report.downloadedCharacters} character images downloaded, ${report.failedCharacters.length} failed; ${report.externalDownloaded} extra images downloaded.`);if(report.failedCharacters.length)process.exitCode=2;}
+async function main(){console.log(`Image cache: ${CONCURRENCY} workers, ${SIZE}px WebP q${QUALITY}`);await fs.mkdir(CHAR_ROOT,{recursive:true});await fs.mkdir(EXTRA_ROOT,{recursive:true});const manifest=await cacheCharacters();await cacheDataFiles(manifest);await cacheCode(manifest);await writeReports();console.log(`Done: ${report.downloadedCharacters} character images downloaded, ${report.failedCharacters.length} failed; ${report.externalDownloaded} extra images downloaded.`);if(report.failedCharacters.length)process.exitCode=2;}
 main().catch(e=>{console.error(e);process.exitCode=1;});
