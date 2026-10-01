@@ -793,7 +793,10 @@
         const refresh = () => {
             const inlineHidden = menu.style.display === 'none';
             const panel = visibleGamePanel();
-            const gamePage = inlineHidden || !!panel;
+            const activeTab = q('#app-root > .tab-content.active');
+            // Une partie peut continuer derrière la Collection. On ne masque le shell
+            // que quand l'onglet MODE est réellement affiché.
+            const gamePage = (!activeTab || activeTab.id === 'mode') && (inlineHidden || !!panel);
 
             document.body.classList.toggle('ag-game-page', gamePage);
             app.classList.toggle('ag-game-page', gamePage);
@@ -818,6 +821,9 @@
             const el = q('#' + id);
             if (el) observer.observe(el, { attributes:true, attributeFilter:['style','class'] });
         });
+        // Collection/Admin changent l'onglet actif sans forcément toucher au style
+        // du menu de jeu : on observe donc également les tabs.
+        qa('#app-root > .tab-content').forEach(el => observer.observe(el, { attributes:true, attributeFilter:['style','class'] }));
         refresh();
     }
 
@@ -847,4 +853,122 @@
     else init();
 
     // Hotfix mobile : aucun listener touchstart global en capture.
+})();
+
+
+/* Admin character viewer v1 */
+(() => {
+    const PAGE = 80;
+    const state = { all:[], filtered:[], page:0, status:new Map(), loaded:false };
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const keyOf = x => String(x.u || x.anime || '') + '|' + String(x.name || '');
+
+    function css() {
+        if (document.getElementById('ag-charadmin-style')) return;
+        const s = document.createElement('style'); s.id = 'ag-charadmin-style';
+        s.textContent = `
+        .ag-charadmin{margin-top:18px}.ag-charadmin-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+        .ag-charadmin-tools{display:grid;grid-template-columns:minmax(180px,2fr) minmax(160px,1fr) minmax(130px,.8fr);gap:8px;margin:12px 0}
+        .ag-charadmin-tools input,.ag-charadmin-tools select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#111827;color:#fff}
+        .ag-charadmin-stats{font-size:.82rem;opacity:.8;margin:8px 0 12px}.ag-charadmin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+        .ag-charcard{position:relative;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,25,.78);border-radius:12px;overflow:hidden;min-width:0}
+        .ag-charcard img{width:100%;height:170px;object-fit:cover;background:#0b1020;display:block}.ag-charcard.bad img{opacity:.18}.ag-charcard.bad{border-color:rgba(255,70,100,.65)}
+        .ag-charcard-copy{padding:9px}.ag-charcard-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ag-charcard-copy small{display:block;opacity:.67;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+        .ag-charstate{position:absolute;top:7px;right:7px;font-size:.68rem;font-weight:900;padding:3px 6px;border-radius:999px;background:#5b6475;color:white}.ag-charcard.ok .ag-charstate{background:#118a58}.ag-charcard.bad .ag-charstate{background:#b82d48}
+        .ag-charcard-actions{display:flex;gap:5px;margin-top:7px}.ag-charcard-actions button,.ag-charcard-actions a{flex:1;font-size:.68rem;padding:6px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:inherit;text-decoration:none;text-align:center}
+        .ag-charadmin-more{display:block;margin:14px auto 2px;padding:9px 18px}.ag-charadmin-empty{padding:25px;text-align:center;opacity:.7}
+        @media(max-width:650px){.ag-charadmin-tools{grid-template-columns:1fr}.ag-charadmin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ag-charcard img{height:150px}}
+        `;
+        document.head.appendChild(s);
+    }
+
+    function ensure() {
+        const admin = document.getElementById('admin');
+        if (!admin || document.getElementById('ag-charadmin')) return;
+        css();
+        const wrap = document.createElement('div');
+        wrap.id = 'ag-charadmin'; wrap.className = 'opt-panel ag-charadmin';
+        wrap.innerHTML = `
+          <div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue commun des modes. Les images sont chargées par lien, sans téléchargement local obligatoire.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div>
+          <div id="ag-charadmin-body" style="display:none">
+            <div class="ag-charadmin-tools"><input id="ag-charadmin-q" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images cassées détectées</option><option value="ok">Images OK détectées</option></select></div>
+            <div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button>
+          </div>`;
+        admin.appendChild(wrap);
+        document.getElementById('ag-charadmin-load').addEventListener('click', load);
+        document.getElementById('ag-charadmin-q').addEventListener('input', apply);
+        document.getElementById('ag-charadmin-anime').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-status').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-more').addEventListener('click', () => { state.page++; render(false); });
+    }
+
+    async function load() {
+        const btn = document.getElementById('ag-charadmin-load');
+        if (state.loaded) { document.getElementById('ag-charadmin-body').style.display = ''; apply(); return; }
+        btn.disabled = true; btn.textContent = 'Chargement…';
+        try {
+            const r = await fetch('/api/character-catalog', { cache:'no-store' });
+            const d = await r.json();
+            if (!d.ok) throw new Error(d.error || 'catalogue');
+            state.all = Array.isArray(d.characters) ? d.characters : [];
+            const sel = document.getElementById('ag-charadmin-anime');
+            (d.animes || []).forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; sel.appendChild(o); });
+            state.loaded = true; document.getElementById('ag-charadmin-body').style.display = ''; btn.textContent = 'Catalogue chargé'; btn.disabled = true;
+            apply();
+        } catch (e) {
+            btn.disabled = false; btn.textContent = 'Réessayer';
+            const st = document.getElementById('ag-charadmin-stats'); if (st) st.textContent = '❌ Impossible de charger le catalogue.';
+        }
+    }
+
+    function apply() {
+        if (!state.loaded) return;
+        const q = String(document.getElementById('ag-charadmin-q').value || '').trim().toLowerCase();
+        const anime = document.getElementById('ag-charadmin-anime').value;
+        const wantedStatus = document.getElementById('ag-charadmin-status').value;
+        state.filtered = state.all.filter(x => {
+            if (anime && x.anime !== anime) return false;
+            if (q && !(String(x.name).toLowerCase().includes(q) || String(x.anime).toLowerCase().includes(q))) return false;
+            if (wantedStatus && state.status.get(keyOf(x)) !== wantedStatus) return false;
+            return true;
+        });
+        state.page = 0; render(true);
+    }
+
+    function render(reset) {
+        const grid = document.getElementById('ag-charadmin-grid');
+        if (reset) grid.innerHTML = '';
+        const start = state.page * PAGE, end = Math.min(state.filtered.length, start + PAGE);
+        const slice = state.filtered.slice(start, end);
+        if (!slice.length && !grid.children.length) grid.innerHTML = '<div class="ag-charadmin-empty">Aucun personnage avec ces filtres.</div>';
+        for (const x of slice) {
+            const k = keyOf(x), known = state.status.get(k) || '';
+            const c = document.createElement('div'); c.className = 'ag-charcard ' + known;
+            c.dataset.key = k;
+            const img = x.img || x.originalImg || '';
+            c.innerHTML = `<span class="ag-charstate">${known === 'ok' ? 'OK' : known === 'bad' ? 'CASSÉE' : '…'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(img)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small title="${esc(x.anime)}">${esc(x.anime)}</small><div class="ag-charcard-actions"><button type="button" data-copy>Copier</button><a href="${esc(img)}" target="_blank" rel="noopener">Image</a></div></div>`;
+            const im = c.querySelector('img'), badge = c.querySelector('.ag-charstate');
+            const set = val => {
+                state.status.set(k, val);
+                c.classList.remove('ok','bad'); c.classList.add(val); badge.textContent = val === 'ok' ? 'OK' : 'CASSÉE';
+                stats();
+            };
+            im.addEventListener('load', () => set('ok'), { once:true });
+            im.addEventListener('error', () => set('bad'), { once:true });
+            c.querySelector('[data-copy]').addEventListener('click', async () => { try { await navigator.clipboard.writeText(`${x.anime} — ${x.name}`); } catch (_) {} });
+            grid.appendChild(c);
+        }
+        const more = document.getElementById('ag-charadmin-more');
+        more.style.display = end < state.filtered.length ? '' : 'none';
+        stats();
+    }
+
+    function stats() {
+        const el = document.getElementById('ag-charadmin-stats'); if (!el) return;
+        const ok = [...state.status.values()].filter(x => x === 'ok').length;
+        const bad = [...state.status.values()].filter(x => x === 'bad').length;
+        el.textContent = `${state.all.length} personnages au total • ${state.filtered.length} avec les filtres • ${ok} images OK testées • ${bad} cassées détectées`;
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensure, {once:true}); else ensure();
 })();

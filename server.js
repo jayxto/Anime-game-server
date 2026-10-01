@@ -229,8 +229,21 @@ function normalizeImageKey(value) {
 
 function resolveImageUniverseKey(rawUniverse) {
     const raw = String(rawUniverse || '').trim();
+    if (!raw) return null;
     if (FANDOM_WIKIS[raw]) return raw;
-    return FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)] || null;
+    const alias = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)];
+    if (alias) return alias;
+    // Les nouveaux anime n'ont pas tous un wiki Fandom configuré : on accepte
+    // directement leur clé/nom ARC et resolveCharacterImage utilisera AniList.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined') {
+            if (ARC_UNIVERSE_ANIME[raw]) return raw;
+            const wanted = normalizeImageKey(raw);
+            const hit = Object.entries(ARC_UNIVERSE_ANIME).find(([, label]) => normalizeImageKey(label) === wanted);
+            if (hit) return hit[0];
+        }
+    } catch (_) {}
+    return null;
 }
 
 function cleanImageCharacterName(name) {
@@ -572,12 +585,19 @@ async function fetchAniListCharacterImage(universeKey, name) {
         const d = await r.json();
         const chars = d?.data?.Page?.characters || [];
         const hints = IMAGE_ANILIST_MEDIA_HINTS[universeKey] || [];
+        let mediaLabel = '';
+        try { if (typeof ARC_UNIVERSE_ANIME !== 'undefined') mediaLabel = ARC_UNIVERSE_ANIME[universeKey] || ''; } catch (_) {}
         let best = null, bestScore = -1;
         for (const c of chars) {
             if (!c?.image?.large || /default\.jpg$/i.test(c.image.large)) continue;
             const nScore = imageNameScore(name, [c.name?.full, c.name?.native, ...(c.name?.alternative || [])]);
             const titles = (c.media?.nodes || []).flatMap(m => [m?.title?.romaji, m?.title?.english, m?.title?.native]).filter(Boolean);
-            const mediaOk = !hints.length || titles.some(t => hints.some(rx => rx.test(t)));
+            const mediaOk = hints.length
+                ? titles.some(t => hints.some(rx => rx.test(t)))
+                : (!mediaLabel || titles.some(t => {
+                    const a = normalizeImageKey(t), b = normalizeImageKey(mediaLabel);
+                    return a === b || a.includes(b) || b.includes(a);
+                }));
             if (!mediaOk || nScore < 18) continue;
             const score = nScore + 120 + Math.min(20, titles.length);
             if (score > bestScore) { bestScore = score; best = c; }
@@ -597,9 +617,11 @@ async function resolveCharacterImage(universeKey, displayName) {
     const fixed = staticCharImage(universeKey, displayName);
     if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
 
-    const host = FANDOM_WIKIS[universeKey];
-    if ((!host && universeKey !== 'pokemon') || !displayName) {
-        return { imageUrl:null, sourceUrl:null, status:'unsupported' };
+    const host = FANDOM_WIKIS[universeKey] || null;
+    // Un wiki Fandom n'est plus obligatoire : tous les nouveaux univers peuvent
+    // tomber sur AniList. Cela évite que les cartes/personnages soient sans photo.
+    if (!displayName) {
+        return { imageUrl:null, sourceUrl:null, status:'missing' };
     }
 
     const cleanName = cleanImageCharacterName(displayName);
@@ -653,6 +675,102 @@ async function resolveCharacterImage(universeKey, displayName) {
     CHARACTER_IMAGE_INFLIGHT.set(cacheKey, task);
     return task;
 }
+
+
+// PATCH CHARACTER ADMIN V1
+// Catalogue unique des personnages réellement présents dans les données du jeu.
+// Les images restent des liens : /api/avatar/img résout local/Fandom/AniList à la demande.
+app.get('/api/character-catalog', (req, res) => {
+    try {
+        const rows = new Map();
+        const add = (u, anime, name, originalImg, source) => {
+            name = String(name || '').trim();
+            anime = String(anime || '').trim();
+            if (!name) return;
+            let arcAnime = '';
+            try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
+            if (!anime) anime = arcAnime || u || 'Autre';
+            if (!u && anime) {
+                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
+            }
+            if (arcAnime) anime = arcAnime;
+            const group = u || normalizeImageKey(anime) || 'autre';
+            const k = group + '|' + normalizeImageKey(name);
+            let img = originalImg || null;
+            try {
+                if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) {
+                    img = '/api/avatar/img?u=' + encodeURIComponent(u) + '&n=' + encodeURIComponent(name);
+                }
+            } catch (_) {}
+            const old = rows.get(k);
+            if (old) {
+                old.sources.add(source || 'jeu');
+                if (!old.originalImg && originalImg) old.originalImg = originalImg;
+                if (old.name === old.name.toLowerCase() && name !== name.toLowerCase()) old.name = name;
+                if ((!old.anime || old.anime === old.u) && anime) old.anime = anime;
+                if (!old.img && img) old.img = img;
+                return;
+            }
+            rows.set(k, { u:u || null, anime, name, img, originalImg:originalImg || null, sources:new Set([source || 'jeu']) });
+        };
+
+        try {
+            for (const [u, byName] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+                for (const [name, img] of Object.entries(byName || {})) add(u, '', name, img, 'char-images');
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+        } catch (_) {}
+
+        for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    for (const item of (theme.items || [])) {
+                        const anime = String(item.sub || theme.title || '').trim();
+                        const u = resolveImageUniverseKey(anime);
+                        add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                    }
+                }
+            } catch (_) {}
+        }
+
+        const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
+            .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
+        const animes = [...new Set(characters.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
+        res.json({ ok:true, count:characters.length, animes, characters });
+    } catch (e) {
+        console.error('[character catalog]', e);
+        res.status(500).json({ ok:false, count:0, animes:[], characters:[], error:'catalogue indisponible' });
+    }
+});
 
 app.get('/api/character-image', async (req, res) => {
     const rawUniverse = String(req.query.universeKey || req.query.universe || '').trim();
@@ -23207,3 +23325,18 @@ openBooster = async function(uid, n, type='') {
     if (Math.random() < momentChance) { const c = await awardBonusCard(uid, 'moment'); if (c) out.push(c); }
     return out;
 };
+
+
+// PATCH CHARACTER POOL BRIDGE V1
+// Tous les nouveaux univers de personnages sont aussi utilisables par les modes
+// qui lisent les gros pools (ex. Rolland Garos). AnimeDLE reste séparé car il exige
+// des attributs complets propres à chaque univers.
+try {
+    if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined' && typeof ARC_UNIVERSE_ANIME !== 'undefined') {
+        for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+            if (!ARC_UNIVERSE_ANIME[u] || !Array.isArray(names) || !names.length) continue;
+            if (typeof RG_UNIVERSES !== 'undefined' && !RG_UNIVERSES[u]) RG_UNIVERSES[u] = { name:ARC_UNIVERSE_ANIME[u], raw:names.join('\n') };
+            if (typeof RG_POOLS_V2 !== 'undefined' && !RG_POOLS_V2[u]) RG_POOLS_V2[u] = names.slice();
+        }
+    }
+} catch (e) { console.warn('[pool bridge]', e.message); }
