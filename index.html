@@ -6589,22 +6589,24 @@
         const ITEM_IMG_CACHE = {};
         const itemImgQueue = [];
         let itemImgRunning = 0;
+        const ITEM_IMG_MAX = 4; // évite de saturer Render/Fandom sur mobile
         function itemImageKey(source, name) { return source + '|' + name; }
-        function itemImage(source, item) {
+        function itemImage(source, item, priority = 'normal') {
             const k = itemImageKey(source, item.name);
             if (ITEM_IMG_CACHE[k]) return ITEM_IMG_CACHE[k];
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
                 if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
-                try { stored = localStorage.getItem('itemimg5:' + k); } catch (e) {}
+                try { stored = localStorage.getItem('itemimg6:' + k); } catch (e) {}
                 if (stored) return resolve('/api/img?u=' + encodeURIComponent(stored));
-                itemImgQueue.push({ source, name: item.name, k, resolve });
+                const job = { source, name: item.name, k, resolve };
+                if (priority === 'high') itemImgQueue.unshift(job); else itemImgQueue.push(job);
                 itemImagePump();
             });
             return ITEM_IMG_CACHE[k];
         }
         function itemImagePump() {
-            while (itemImgRunning < 8 && itemImgQueue.length) {
+            while (itemImgRunning < ITEM_IMG_MAX && itemImgQueue.length) {
                 const job = itemImgQueue.shift();
                 itemImgRunning++;
                 fetch(`/api/arcade/item-image?source=${encodeURIComponent(job.source)}&name=${encodeURIComponent(job.name)}`)
@@ -6612,8 +6614,8 @@
                     .then(d => {
                         const url = d && d.imageUrl;
                         try {
-                            if (url) localStorage.setItem('itemimg5:' + job.k, url);
-                            else localStorage.removeItem('itemimg5:' + job.k);
+                            if (url) localStorage.setItem('itemimg6:' + job.k, url);
+                            else localStorage.removeItem('itemimg6:' + job.k);
                         } catch (e) {}
                         if (!url) delete ITEM_IMG_CACHE[job.k];
                         job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
@@ -7106,8 +7108,7 @@
             rk.textContent = '🌍 Voir le classement mondial';
             rk.onclick = () => bbShowRanking(body, true);
             body.appendChild(rk);
-            // précharge quelques images
-            data.items.slice(0, 16).forEach(it => itemImage(source, it));
+            // Pas de préchargement massif ici : le duel courant passe en priorité.
         }
         // Thèmes « Qui a le plus… » avec leurs propres persos (pères, duos, animaux, OST…)
         async function openQapThemes() {
@@ -7171,7 +7172,7 @@
             [8, 16, 32, 64, 128, 256, 512, 1024].filter(n => n <= N).forEach(n => { const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} persos`; b.onclick = () => { bb.qi = pickQ(); bbStart(n); }; ts.appendChild(b); });
             if (N >= 8 && ![8, 16, 32, 64, 128, 256, 512, 1024].includes(N)) { const b = document.createElement('button'); b.className = 'btn-action'; b.style.cssText = 'background:#ff9f43;color:#111;'; b.textContent = `🌍 Tous les ${N} persos`; b.onclick = () => { bb.qi = pickQ(); bbStart(N); }; ts.appendChild(b); }
             body.appendChild(ts);
-            bb.all.slice(0, 12).forEach(it => itemImage(bb.source, it));
+            // Pas de préchargement massif : évite que les premières cartes attendent derrière 12 requêtes inutiles.
         }
         // Mode manches : question + 2 persos au hasard à chaque manche
         function qapPair() {
@@ -7241,9 +7242,11 @@
                 const duo = document.createElement('div'); duo.className = 'bb-duoimg';
                 it0.imgs.slice(0, 2).forEach(u => { const im = document.createElement('img'); im.src = '/api/img?u=' + encodeURIComponent(u); im.alt = ''; im.onload = () => card.classList.remove('noimg'); duo.appendChild(im); });
                 card.insertBefore(duo, cap);
-            } else itemImage(bb.source, it0).then(src => {
+            } else itemImage(bb.source, it0, 'high').then(src => {
                 if (!src) return;
                 const im = document.createElement('img'); im.src = src; im.alt = name;
+                im.loading = 'eager'; im.decoding = 'async';
+                try { im.fetchPriority = 'high'; } catch (_) {}
                 im.onload = () => card.classList.remove('noimg');
                 im.onerror = () => im.remove();
                 card.insertBefore(im, cap);
@@ -7293,7 +7296,7 @@
             tools.appendChild(undo);
             body.appendChild(tools);
             // précharge le duel suivant
-            [bb.current[bb.idx + 2], bb.current[bb.idx + 3]].filter(Boolean).forEach(n => itemImage(bb.source, bbItem(n)));
+            [bb.current[bb.idx + 2], bb.current[bb.idx + 3]].filter(Boolean).forEach(n => itemImage(bb.source, bbItem(n), 'normal'));
         }
         function bbPick(side, ca, cb) {
             if (!bb || bb.done || bb.busy) return;

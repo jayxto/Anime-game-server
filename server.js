@@ -390,9 +390,51 @@ async function fetchFandomPageImageBySearch(host, name) {
 }
 
 
+// Transformations : chemins de page connus. Une page dédiée à la FORME est plus rapide
+// et plus fiable qu'une recherche de dizaines de fichiers dans une galerie.
+const TRANSFORM_PAGE_ALIASES = {
+    'kurama chakra mode':'Nine-Tails Chakra Mode',
+    'six paths sage mode':'Six Paths Sage Mode',
+    'one for all full cowl':'Full Cowl',
+    'one for all full cowl':'Full Cowl',
+    'black asta':'Black Asta',
+    'devil union':'Devil Union',
+    'crown clown':'Crown Clown',
+    'tengen toppa gurren lagann':'Tengen Toppa Gurren Lagann',
+    'saber alter':'Saber Alter',
+    'rage shield':'Rage Shield',
+    'yoko kurama':'Yoko Kurama',
+    'war greymon':'WarGreymon',
+    'wargreymon':'WarGreymon',
+    'metalgarurumon':'MetalGarurumon',
+    'omnimon':'Omnimon'
+};
+async function fetchFandomTransformationPageFast(host, form) {
+    const raw = String(form || '').trim();
+    if (!raw) return null;
+    const norm = normalizeImageKey(raw);
+    const title = TRANSFORM_PAGE_ALIASES[norm] || raw;
+    const params = new URLSearchParams({ action:'query', titles:title, prop:'pageimages|info', piprop:'original|thumbnail', pithumbsize:'900', inprop:'url', redirects:'1', format:'json', origin:'*' });
+    try {
+        const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 3200);
+        for (const page of Object.values(data?.query?.pages || {})) {
+            if (page?.missing != null) continue;
+            // La page elle-même doit correspondre à la forme. Jamais au personnage seul.
+            const pt = normalizeImageKey(page.title || '');
+            const wanted = normalizeImageKey(title);
+            if (!(pt === wanted || pt.includes(wanted) || wanted.includes(pt))) continue;
+            const hit = pageImageFromApiPage(page);
+            if (hit?.imageUrl) return hit.imageUrl;
+        }
+    } catch (_) {}
+    return null;
+}
+
 // Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
 // l'image principale de la page personnage (qui est précisément la cause de "Sasuke normal").
 async function fetchFandomTransformationImage(host, character, form) {
+    const direct = await fetchFandomTransformationPageFast(host, form);
+    if (direct) return direct;
     const stop = new Set(['mode','form','forme','anime','transformation','final','true','full','power','awakened','awakening']);
     const toks = x => normalizeImageKey(String(x||'')).split(' ').filter(t => t.length > 2 && !stop.has(t));
     const formTokens = toks(form), charTokens = toks(character);
@@ -403,7 +445,7 @@ async function fetchFandomTransformationImage(host, character, form) {
     for (const term of searches) {
         try {
             const sp = new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'3',prop:'images',imlimit:'60',format:'json',origin:'*'});
-            const d = await fetchJsonWithTimeout(`https://${host}/api.php?${sp}`, 4500);
+            const d = await fetchJsonWithTimeout(`https://${host}/api.php?${sp}`, 3000);
             for (const pg of Object.values(d?.query?.pages||{})) for (const im of (pg.images||[])) if (im?.title) files.push(im.title);
         } catch (_) {}
     }
@@ -423,7 +465,7 @@ async function fetchFandomTransformationImage(host, character, form) {
     if (!best.length) return null;
     try {
         const qp = new URLSearchParams({action:'query',titles:best.join('|'),prop:'imageinfo',iiprop:'url|mime',iiurlwidth:'900',format:'json',origin:'*'});
-        const d = await fetchJsonWithTimeout(`https://${host}/api.php?${qp}`, 4500);
+        const d = await fetchJsonWithTimeout(`https://${host}/api.php?${qp}`, 3000);
         const pages = Object.values(d?.query?.pages||{}).sort((a,b)=>score(b.title)-score(a.title));
         for (const pg of pages) {
             const ii=pg.imageinfo?.[0]; const u=ii?.thumburl||ii?.url;
@@ -13294,12 +13336,21 @@ app.get('/api/arcade/item-image', async (req, res) => {
                             const animeName = parts.length > 1 ? parts[parts.length - 1] : '';
                             const universeKey = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(animeName)] || null;
                             const host = universeKey ? FANDOM_WIKIS[universeKey] : null;
-                            if (host) {
-                                const form = String(it.name || '').trim();
-                                const charName = String(it.char || parts[0] || '').trim();
-                                // D'abord les fichiers/galeries dont le nom correspond réellement à la forme.
+                            const form = String(it.name || '').trim();
+                            const charName = String(it.char || parts[0] || '').trim();
+                            const persistKey = `${animeName}|${charName}|${form}`;
+                            // Une fois une forme trouvée, elle est gardée en PostgreSQL : les prochains chargements
+                            // et les prochains redéploiements ne refont plus la recherche lente.
+                            try {
+                                const saved = await getCachedCharacterImage('_transform', persistKey);
+                                if (saved?.imageUrl) url = saved.imageUrl;
+                            } catch (_) {}
+                            if (!url && host) {
                                 try { url = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
-                                // Aucun fallback vers l'image principale d'une page : elle représente souvent le personnage normal.
+                                if (url) {
+                                    try { await saveCachedCharacterImage('_transform', persistKey, { imageUrl:url, sourceUrl:null, status:'ok' }); } catch (_) {}
+                                }
+                                // Aucun fallback vers le portrait normal du personnage.
                             }
                         }
                         // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
