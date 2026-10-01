@@ -7886,9 +7886,10 @@
       "sourceUrl": "https://static.wikia.nocookie.net/fairytail/images/2/26/Jura_Avatar.png/revision/latest?cb=20121208100641",
       "status": "failed",
       "errors": [
-        "char-images: HTTP 404"
+        "char-images: HTTP 404",
+        "fandom: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:35.850Z"
+      "updatedAt": "2026-10-01T18:52:44.379Z"
     },
     "fairy|dimaria yesta": {
       "universe": "fairy",
@@ -7899,7 +7900,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:37.755Z"
+      "updatedAt": "2026-10-01T18:53:26.395Z"
     },
     "fairy|irene belserion": {
       "universe": "fairy",
@@ -7910,7 +7911,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:37.001Z"
+      "updatedAt": "2026-10-01T18:53:15.460Z"
     },
     "fairy|brandish": {
       "universe": "fairy",
@@ -8408,7 +8409,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:40.225Z"
+      "updatedAt": "2026-10-01T18:54:21.784Z"
     },
     "fireforce|inca kasugatani": {
       "universe": "fireforce",
@@ -8430,7 +8431,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:39.607Z"
+      "updatedAt": "2026-10-01T18:54:10.782Z"
     },
     "fireforce|akitaru obi": {
       "universe": "fireforce",
@@ -8469,7 +8470,7 @@
       "originalBytes": 31359,
       "webpBytes": 18358,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|alphonse elric": {
       "universe": "fma",
@@ -8486,7 +8487,7 @@
       "originalBytes": 17535,
       "webpBytes": 8662,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fireforce|dragon": {
       "universe": "fireforce",
@@ -8514,7 +8515,7 @@
       "originalBytes": 95460,
       "webpBytes": 15156,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|roy mustang": {
       "universe": "fma",
@@ -8531,7 +8532,7 @@
       "originalBytes": 74521,
       "webpBytes": 13288,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|scar": {
       "universe": "fma",
@@ -8548,7 +8549,7 @@
       "originalBytes": 109252,
       "webpBytes": 8384,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|winry rockbell": {
       "universe": "fma",
@@ -8565,7 +8566,7 @@
       "originalBytes": 49897,
       "webpBytes": 19454,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|greed": {
       "universe": "fma",
@@ -8582,7 +8583,7 @@
       "originalBytes": 19157,
       "webpBytes": 8152,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|king bradley": {
       "universe": "fma",
@@ -8599,7 +8600,7 @@
       "originalBytes": 99799,
       "webpBytes": 8752,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|pere": {
       "universe": "fma",
@@ -8616,7 +8617,7 @@
       "originalBytes": 127385,
       "webpBytes": 12444,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|envy": {
       "universe": "fma",
@@ -8633,7 +8634,7 @@
       "originalBytes": 140337,
       "webpBytes": 12440,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|pinako rockbell": {
       "universe": "fma",
@@ -8650,7 +8651,7 @@
       "originalBytes": 102767,
       "webpBytes": 9872,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|father": {
       "universe": "fma",
@@ -8667,7 +8668,7 @@
       "originalBytes": 127385,
       "webpBytes": 12444,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|vato falman": {
       "universe": "fma",
@@ -8684,7 +8685,7 @@
       "originalBytes": 18787,
       "webpBytes": 8804,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.643Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|trisha elric": {
       "universe": "fma",
@@ -8701,7 +8702,7 @@
       "originalBytes": 92867,
       "webpBytes": 5390,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|van hohenheim": {
       "universe": "fma",
@@ -8718,7 +8719,7 @@
       "originalBytes": 25607,
       "webpBytes": 11252,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|jean havoc": {
       "universe": "fma",
@@ -8735,7 +8736,7 @@
       "originalBytes": 143910,
       "webpBytes": 13614,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.642Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|kain fuery": {
       "universe": "fma",
@@ -8752,7 +8753,7 @@
       "originalBytes": 20437,
       "webpBytes": 9628,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.643Z"
+      "updatedAt": "2026-10-01T18:54:21.786Z"
     },
     "fma|maes hughes": {
       "universe": "fma",
@@ -8769,7 +8770,7 @@
       "originalBytes": 98065,
       "webpBytes": 10580,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:46:39.643Z"
+      "updatedAt": "2026-10-01T18:54:21.787Z"
     },
     "fma|alex louis armstrong": {
       "universe": "fma",
@@ -9154,7 +9155,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:39.641Z"
+      "updatedAt": "2026-10-01T18:54:21.785Z"
     },
     "fma|heymans breda": {
       "universe": "fma",
@@ -11811,7 +11812,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:46:38.578Z"
+      "updatedAt": "2026-10-01T18:53:37.583Z"
     },
     "hxh|dalzollene": {
       "universe": "hxh",
@@ -34127,5 +34128,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T18:52:31.477Z"
+  "generatedAt": "2026-10-01T18:54:21.787Z"
 }
