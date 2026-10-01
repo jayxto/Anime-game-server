@@ -110,8 +110,13 @@
     /* Catégories robustes : on reprend le contrôle du filtre historique afin
        qu'il fonctionne aussi avec les modes ajoutés dynamiquement après le chargement. */
     function setupModeCategories(grid) {
-        const bar = document.getElementById('mode-cats');
-        if (!bar) return;
+        let bar = document.getElementById('mode-cats');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'mode-cats';
+            bar.className = 'mode-cats';
+            grid.parentNode.insertBefore(bar, grid);
+        }
 
         const CATS = [
             ['all', '⭐ Tout'],
@@ -223,10 +228,18 @@
                 e.preventDefault(); e.stopPropagation();
                 apply(btn.dataset.modeCat, true);
             };
-            bar.addEventListener('click', activateCat, {passive:false});
-            // Safari/iOS : certaines couches du dashboard interceptent le click synthétique.
-            // pointerup/touchend garantit que les catégories répondent au doigt.
-            bar.addEventListener('pointerup', e => { if (e.pointerType === 'touch') activateCat(e); }, {passive:false});
+            let lastTouch = 0;
+            bar.addEventListener('touchend', e => {
+                const btn = e.target.closest('[data-mode-cat]');
+                if (!btn || !bar.contains(btn)) return;
+                lastTouch = Date.now();
+                e.preventDefault(); e.stopPropagation();
+                apply(btn.dataset.modeCat, true);
+            }, {passive:false});
+            bar.addEventListener('click', e => {
+                if (Date.now() - lastTouch < 700) { e.preventDefault(); e.stopPropagation(); return; }
+                activateCat(e);
+            }, {passive:false});
         }
 
         const controller = cat => apply(cat, true);
