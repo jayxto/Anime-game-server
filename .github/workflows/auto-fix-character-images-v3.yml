@@ -1,0 +1,534 @@
+name: Auto-fix missing character images v3
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/auto-fix-character-images-v3.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-fix-character-images-v3
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Find and repair missing images
+        env:
+          SITE_URL: 'https://anime-game-server.onrender.com'
+        run: |
+          cat > /tmp/repair-character-images.mjs <<'NODE'
+          import fs from 'node:fs/promises';
+          import fssync from 'node:fs';
+          import path from 'node:path';
+
+          const SITE = String(process.env.SITE_URL || '').replace(/\/+$/, '');
+          const UA = 'ANIME-GAME image-link-repair/3.0';
+          const ANILIST = 'https://graphql.anilist.co';
+          const CHAR_FILE = 'char-images.json';
+          const REPORT_JSON = 'auto-image-repair-report.json';
+          const REPORT_MD = 'AUTO_IMAGE_REPAIR_REPORT.md';
+
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const norm = value => String(value || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[’']/g, '')
+            .replace(/&/g, ' and ')
+            .replace(/[^a-z0-9]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          const tokens = value => new Set(norm(value).split(' ').filter(Boolean));
+          const tokenKey = value => [...tokens(value)].sort().join(' ');
+
+          function nameScore(wanted, candidate) {
+            const a = norm(wanted), b = norm(candidate);
+            if (!a || !b) return 0;
+            if (a === b) return 100;
+            if (tokenKey(a) === tokenKey(b)) return 97;
+            if ((a.includes(b) || b.includes(a)) && Math.min(a.length, b.length) >= 5) {
+              const ratio = Math.min(a.length, b.length) / Math.max(a.length, b.length);
+              return 78 + Math.round(ratio * 12);
+            }
+            const A = tokens(a), B = tokens(b);
+            let common = 0;
+            for (const x of A) if (B.has(x)) common++;
+            const denom = Math.max(A.size, B.size, 1);
+            return Math.round((common / denom) * 82);
+          }
+
+          function animeScore(wanted, candidate) {
+            const a = norm(wanted), b = norm(candidate);
+            if (!a || !b) return 0;
+            if (a === b) return 100;
+            if (a.includes(b) || b.includes(a)) {
+              const ratio = Math.min(a.length, b.length) / Math.max(a.length, b.length);
+              return 80 + Math.round(ratio * 15);
+            }
+            return tokenKey(a) === tokenKey(b) ? 96 : nameScore(a, b);
+          }
+
+          async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+            const ac = new AbortController();
+            const t = setTimeout(() => ac.abort(), timeout);
+            try {
+              return await fetch(url, {
+                ...options,
+                signal: ac.signal,
+                headers: { 'User-Agent': UA, ...(options.headers || {}) }
+              });
+            } finally {
+              clearTimeout(t);
+            }
+          }
+
+          async function urlWorks(url) {
+            if (!url) return false;
+            url = String(url);
+            if (url.startsWith('/')) {
+              const local = path.join(process.cwd(), url.replace(/^\/+/, ''));
+              if (fssync.existsSync(local)) return true;
+              if (!SITE) return false;
+              url = SITE + url;
+            }
+            if (!/^https?:\/\//i.test(url)) return false;
+            try {
+              const r = await fetchWithTimeout(url, {
+                method: 'GET',
+                redirect: 'follow',
+                headers: { Range: 'bytes=0-2047', Accept: 'image/*,*/*;q=0.5' }
+              }, 12000);
+              const ct = String(r.headers.get('content-type') || '').toLowerCase();
+              try { await r.body?.cancel(); } catch {}
+              return r.ok && (!ct || ct.includes('image') || ct.includes('octet-stream'));
+            } catch {
+              return false;
+            }
+          }
+
+          async function fetchCatalog() {
+            const url = SITE + '/api/character-catalog';
+            let last = null;
+            for (let i = 0; i < 8; i++) {
+              try {
+                const r = await fetchWithTimeout(url, { cache: 'no-store' }, 30000);
+                if (r.ok) {
+                  const d = await r.json();
+                  if (d?.ok && Array.isArray(d.characters) && d.characters.length) return d;
+                }
+                last = new Error('HTTP ' + r.status);
+              } catch (e) { last = e; }
+              console.log(`Catalogue indisponible, nouvel essai ${i + 2}/8...`);
+              await sleep(15000);
+            }
+            throw last || new Error('Impossible de charger /api/character-catalog');
+          }
+
+          function parseFandomHosts(serverText) {
+            const out = {};
+            const start = serverText.search(/\b(?:const|let|var)\s+FANDOM_WIKIS\s*=\s*\{/);
+            if (start < 0) return out;
+            const brace = serverText.indexOf('{', start);
+            let depth = 0, end = -1;
+            for (let i = brace; i < serverText.length; i++) {
+              if (serverText[i] === '{') depth++;
+              else if (serverText[i] === '}') {
+                depth--;
+                if (depth === 0) { end = i + 1; break; }
+              }
+            }
+            if (end < 0) return out;
+            const block = serverText.slice(brace + 1, end - 1);
+            const rx = /(?:["']([^"']+)["']|([A-Za-z0-9_]+))\s*:\s*["']([^"']+)["']/g;
+            let m;
+            while ((m = rx.exec(block))) {
+              const key = m[1] || m[2];
+              let host = m[3].trim().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+              if (host) out[key] = host;
+            }
+            return out;
+          }
+
+          let anilistLastAt = 0;
+          async function aniQuery(query, variables) {
+            const gap = 1300 - (Date.now() - anilistLastAt);
+            if (gap > 0) await sleep(gap);
+            anilistLastAt = Date.now();
+
+            for (let attempt = 0; attempt < 5; attempt++) {
+              try {
+                const r = await fetchWithTimeout(ANILIST, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                  body: JSON.stringify({ query, variables })
+                }, 25000);
+
+                if (r.status === 429) {
+                  const wait = Math.max(12000, Number(r.headers.get('retry-after') || 15) * 1000);
+                  console.log(`AniList rate-limit: pause ${Math.round(wait / 1000)}s`);
+                  await sleep(wait);
+                  continue;
+                }
+                if (!r.ok) {
+                  const txt = await r.text().catch(() => '');
+                  throw new Error(`AniList HTTP ${r.status}: ${txt.slice(0, 200)}`);
+                }
+                const d = await r.json();
+                if (d.errors?.length) throw new Error(d.errors.map(x => x.message).join(', '));
+                return d.data;
+              } catch (e) {
+                if (attempt === 4) throw e;
+                await sleep(2500 * (attempt + 1));
+              }
+            }
+          }
+
+          const MEDIA_QUERY = `
+            query($search:String,$page:Int){
+              Media(search:$search,type:ANIME){
+                title{romaji english native}
+                characters(page:$page,perPage:50){
+                  pageInfo{hasNextPage}
+                  nodes{
+                    name{full native alternative}
+                    image{large}
+                  }
+                }
+              }
+            }`;
+
+          async function aniRoster(anime, wantedNames) {
+            const found = new Map();
+            const wanted = [...wantedNames];
+            if (!anime || !wanted.length) return found;
+
+            for (let page = 1; page <= 6; page++) {
+              let data;
+              try { data = await aniQuery(MEDIA_QUERY, { search: anime, page }); }
+              catch (e) {
+                console.log(`AniList media "${anime}" : ${e.message}`);
+                break;
+              }
+              const media = data?.Media;
+              const nodes = media?.characters?.nodes || [];
+              for (const c of nodes) {
+                if (!c?.image?.large) continue;
+                const aliases = [c.name?.full, c.name?.native, ...(c.name?.alternative || [])].filter(Boolean);
+                for (const wantedName of wanted) {
+                  if (found.has(wantedName)) continue;
+                  const best = Math.max(0, ...aliases.map(a => nameScore(wantedName, a)));
+                  if (best >= 94) found.set(wantedName, { url:c.image.large, source:'AniList roster', score:best });
+                }
+              }
+              if (!media?.characters?.pageInfo?.hasNextPage) break;
+              if (found.size === wanted.length) break;
+            }
+            return found;
+          }
+
+          const CHARACTER_QUERY = `
+            query($search:String){
+              Page(page:1,perPage:10){
+                characters(search:$search){
+                  name{full native alternative}
+                  image{large}
+                  media(perPage:25){
+                    nodes{type title{romaji english native}}
+                  }
+                }
+              }
+            }`;
+
+          async function aniCharacter(name, anime) {
+            let data;
+            try { data = await aniQuery(CHARACTER_QUERY, { search:name }); }
+            catch { return null; }
+            let best = null;
+            for (const c of (data?.Page?.characters || [])) {
+              if (!c?.image?.large) continue;
+              const aliases = [c.name?.full, c.name?.native, ...(c.name?.alternative || [])].filter(Boolean);
+              const ns = Math.max(0, ...aliases.map(a => nameScore(name, a)));
+              if (ns < 94) continue;
+              const titles = (c.media?.nodes || []).filter(m => m?.type === 'ANIME')
+                .flatMap(m => [m.title?.romaji, m.title?.english, m.title?.native]).filter(Boolean);
+              const as = anime ? Math.max(0, ...titles.map(t => animeScore(anime, t))) : 100;
+              if (anime && as < 72) continue;
+              const score = ns * 2 + as;
+              if (!best || score > best.score) best = { url:c.image.large, source:'AniList character', score };
+            }
+            return best;
+          }
+
+          async function fandomImage(host, name) {
+            if (!host || !name) return null;
+            const base = host.startsWith('http') ? host : 'https://' + host;
+            const params = new URLSearchParams({
+              action:'query',
+              format:'json',
+              origin:'*',
+              generator:'search',
+              gsrsearch:name,
+              gsrnamespace:'0',
+              gsrlimit:'6',
+              prop:'pageimages|info',
+              piprop:'original|thumbnail',
+              pithumbsize:'800',
+              inprop:'url'
+            });
+            try {
+              const r = await fetchWithTimeout(`${base}/api.php?${params}`, { redirect:'follow' }, 18000);
+              if (!r.ok) return null;
+              const d = await r.json();
+              let best = null;
+              for (const p of Object.values(d?.query?.pages || {})) {
+                const url = p?.original?.source || p?.thumbnail?.source;
+                if (!url) continue;
+                const s = nameScore(name, p.title || '');
+                if (s < 72) continue;
+                if (!best || s > best.score) best = { url, source:'Fandom', score:s, page:p.title || '' };
+              }
+              return best;
+            } catch {
+              return null;
+            }
+          }
+
+          function updateThemeFile(file, catalog, finalUrls) {
+            if (!fssync.existsSync(file)) return false;
+            const data = JSON.parse(fssync.readFileSync(file, 'utf8'));
+            let changed = false;
+
+            const byAnimeName = new Map();
+            for (const x of catalog) {
+              const k = norm(x.anime) + '|' + norm(x.name);
+              const u = x.u || '';
+              const url = finalUrls.get((u || norm(x.anime)) + '|' + norm(x.name));
+              if (url) byAnimeName.set(k, url);
+            }
+
+            for (const theme of (data.themes || [])) {
+              if (theme.kind !== 'chars') continue;
+              for (const item of (theme.items || [])) {
+                const anime = String(item.sub || theme.title || '');
+                const url = byAnimeName.get(norm(anime) + '|' + norm(item.name));
+                if (url && item.img !== url) {
+                  item.img = url;
+                  changed = true;
+                }
+              }
+            }
+            if (changed) fssync.writeFileSync(file, JSON.stringify(data, null, 2) + '\n');
+            return changed;
+          }
+
+          const catalogData = await fetchCatalog();
+          const catalog = catalogData.characters || [];
+          console.log(`Catalogue: ${catalog.length} personnages`);
+
+          const charMap = JSON.parse(await fs.readFile(CHAR_FILE, 'utf8'));
+          const serverText = await fs.readFile('server.js', 'utf8');
+          const fandomHosts = parseFandomHosts(serverText);
+          console.log(`Wikis Fandom configurés détectés: ${Object.keys(fandomHosts).length}`);
+
+          const animeToU = new Map();
+          for (const x of catalog) if (x.u && x.anime) animeToU.set(norm(x.anime), x.u);
+
+          const rows = catalog.map(x => {
+            const u = x.u || animeToU.get(norm(x.anime)) || null;
+            const n = norm(x.name);
+            const existing = u && charMap?.[u] ? charMap[u][n] : null;
+            return { ...x, u, normName:n, existing };
+          }).filter(x => x.name && x.normName);
+
+          // Déduplique le catalogue.
+          const uniq = new Map();
+          for (const x of rows) {
+            const k = (x.u || norm(x.anime)) + '|' + x.normName;
+            if (!uniq.has(k)) uniq.set(k, x);
+          }
+          const all = [...uniq.values()];
+
+          const good = new Map();
+          const missing = [];
+          let checked = 0;
+
+          // Vérification parallèle raisonnable des liens actuels.
+          let cursor = 0;
+          async function checker() {
+            while (cursor < all.length) {
+              const x = all[cursor++];
+              const k = (x.u || norm(x.anime)) + '|' + x.normName;
+              let ok = false;
+              if (x.existing) ok = await urlWorks(x.existing);
+              if (!ok && x.originalImg && x.originalImg !== x.existing) {
+                if (await urlWorks(x.originalImg)) {
+                  good.set(k, x.originalImg);
+                  ok = true;
+                }
+              }
+              if (ok) good.set(k, good.get(k) || x.existing);
+              else missing.push(x);
+              checked++;
+              if (checked % 100 === 0 || checked === all.length) {
+                console.log(`Vérification ${checked}/${all.length} • manquantes/cassées ${missing.length}`);
+              }
+            }
+          }
+          await Promise.all(Array.from({length:Math.min(16, all.length || 1)}, checker));
+
+          console.log(`À réparer: ${missing.length}`);
+
+          const repaired = new Map();
+          const sourceStats = {};
+          const record = (x, hit) => {
+            if (!hit?.url) return false;
+            const k = (x.u || norm(x.anime)) + '|' + x.normName;
+            repaired.set(k, hit.url);
+            good.set(k, hit.url);
+            sourceStats[hit.source] = (sourceStats[hit.source] || 0) + 1;
+            return true;
+          };
+
+          // 1) AniList par anime : peu de requêtes et beaucoup de personnages résolus d'un coup.
+          const groups = new Map();
+          for (const x of missing) {
+            if (!x.anime) continue;
+            const a = x.anime;
+            if (!groups.has(a)) groups.set(a, []);
+            groups.get(a).push(x);
+          }
+
+          let animeIndex = 0;
+          for (const [anime, xs] of groups) {
+            animeIndex++;
+            const unresolved = xs.filter(x => !repaired.has((x.u || norm(x.anime)) + '|' + x.normName));
+            if (!unresolved.length) continue;
+            console.log(`AniList anime ${animeIndex}/${groups.size}: ${anime} (${unresolved.length})`);
+            const roster = await aniRoster(anime, new Set(unresolved.map(x => x.name)));
+            for (const x of unresolved) {
+              const hit = roster.get(x.name);
+              if (hit) record(x, hit);
+            }
+          }
+
+          // 2) AniList recherche perso + validation de l'anime.
+          let leftovers = missing.filter(x => !repaired.has((x.u || norm(x.anime)) + '|' + x.normName));
+          console.log(`Après rosters AniList: ${leftovers.length} à chercher`);
+          for (let i = 0; i < leftovers.length; i++) {
+            const x = leftovers[i];
+            if (i % 20 === 0) console.log(`AniList personnages ${i}/${leftovers.length}`);
+            const hit = await aniCharacter(x.name, x.anime);
+            if (hit) record(x, hit);
+          }
+
+          // 3) Wiki/Fandom pour ce qui reste, surtout variantes/formes.
+          leftovers = missing.filter(x => !repaired.has((x.u || norm(x.anime)) + '|' + x.normName));
+          console.log(`Après AniList: ${leftovers.length} à chercher sur Fandom`);
+          let fCursor = 0;
+          async function fandomWorker() {
+            while (fCursor < leftovers.length) {
+              const x = leftovers[fCursor++];
+              const host = x.u ? fandomHosts[x.u] : null;
+              if (!host) continue;
+              const hit = await fandomImage(host, x.name);
+              if (hit && await urlWorks(hit.url)) record(x, hit);
+              await sleep(250);
+            }
+          }
+          await Promise.all(Array.from({length:Math.min(4, leftovers.length || 1)}, fandomWorker));
+
+          const unresolved = missing.filter(x => !repaired.has((x.u || norm(x.anime)) + '|' + x.normName));
+
+          // Écrit les liens directement dans char-images.json.
+          let mapChanges = 0;
+          for (const x of missing) {
+            const k = (x.u || norm(x.anime)) + '|' + x.normName;
+            const url = repaired.get(k);
+            if (!url || !x.u) continue;
+            if (!charMap[x.u] || typeof charMap[x.u] !== 'object' || Array.isArray(charMap[x.u])) charMap[x.u] = {};
+            if (charMap[x.u][x.normName] !== url) {
+              charMap[x.u][x.normName] = url;
+              mapChanges++;
+            }
+          }
+          await fs.writeFile(CHAR_FILE, JSON.stringify(charMap, null, 2) + '\n');
+
+          // Met aussi les liens dans les JSON qui stockent leurs images directement.
+          const tierChanged = updateThemeFile('tierlist-themes.json', all, good);
+          const qapChanged = updateThemeFile('qap-themes.json', all, good);
+
+          const report = {
+            generatedAt:new Date().toISOString(),
+            catalogCount:all.length,
+            initiallyBrokenOrMissing:missing.length,
+            repaired:repaired.size,
+            unresolved:unresolved.length,
+            charImagesChanges:mapChanges,
+            tierlistUpdated:tierChanged,
+            qapUpdated:qapChanged,
+            sources:sourceStats,
+            unresolvedCharacters:unresolved.map(x => ({u:x.u, anime:x.anime, name:x.name}))
+          };
+          await fs.writeFile(REPORT_JSON, JSON.stringify(report, null, 2) + '\n');
+
+          const md = [
+            '# Auto image repair report',
+            '',
+            `- Catalogue : **${report.catalogCount}** personnages`,
+            `- Images manquantes/cassées au départ : **${report.initiallyBrokenOrMissing}**`,
+            `- Réparées automatiquement : **${report.repaired}**`,
+            `- Encore introuvables : **${report.unresolved}**`,
+            `- Entrées ajoutées/remplacées dans char-images.json : **${report.charImagesChanges}**`,
+            `- Tier List mise à jour : **${report.tierlistUpdated ? 'oui' : 'non'}**`,
+            `- Tu préfères mis à jour : **${report.qapUpdated ? 'oui' : 'non'}**`,
+            '',
+            '## Sources',
+            ...Object.entries(sourceStats).map(([k,v]) => `- ${k}: ${v}`),
+            '',
+            '## Restent à vérifier manuellement',
+            ...(unresolved.length
+              ? unresolved.map(x => `- ${x.anime || x.u || 'Autre'} — ${x.name}`)
+              : ['- Aucune'])
+          ].join('\n') + '\n';
+          await fs.writeFile(REPORT_MD, md);
+
+          console.log('');
+          console.log(`TERMINÉ — réparées ${repaired.size}/${missing.length}, encore introuvables ${unresolved.length}`);
+          NODE
+
+          node /tmp/repair-character-images.mjs
+
+      - name: Check JSON files
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('char-images.json','utf8')); console.log('char-images.json OK')"
+          if [ -f tierlist-themes.json ]; then node -e "JSON.parse(require('fs').readFileSync('tierlist-themes.json','utf8')); console.log('tierlist-themes.json OK')"; fi
+          if [ -f qap-themes.json ]; then node -e "JSON.parse(require('fs').readFileSync('qap-themes.json','utf8')); console.log('qap-themes.json OK')"; fi
+
+      - name: Commit repaired image links
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add char-images.json tierlist-themes.json qap-themes.json AUTO_IMAGE_REPAIR_REPORT.md auto-image-repair-report.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No image links changed"
+            exit 0
+          fi
+          git commit -m "fix: auto-fill missing character image links"
+          git push
