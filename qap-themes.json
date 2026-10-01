@@ -19129,19 +19129,557 @@
       "kind": "ost",
       "items": [
         {
-          "name": "Deku vs Todoroki",
+          "name": "Naruto vs Pain, combat complet",
+          "sub": "Naruto",
+          "video": "CmMa8dXn71I",
+          "img": "https://i.ytimg.com/vi/CmMa8dXn71I/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Naruto vs Pain, combat complet 60FPS",
+          "sub": "Naruto",
+          "video": "OGFNX4aPCe0",
+          "img": "https://i.ytimg.com/vi/OGFNX4aPCe0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Luffy Gear 5 vs Kaido, combat complet",
+          "sub": "One Piece",
+          "video": "bauIj1SMbwk",
+          "img": "https://i.ytimg.com/vi/bauIj1SMbwk/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Luffy Gear 5 vs Kaido, clip officiel IGN Fan Fest 2024",
+          "sub": "One Piece",
+          "video": "iYbDA-m1u-c",
+          "img": "https://i.ytimg.com/vi/iYbDA-m1u-c/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Ichigo vs Aizen, bataille finale",
+          "sub": "Bleach",
+          "video": "zJn-hyLSdbU",
+          "img": "https://i.ytimg.com/vi/zJn-hyLSdbU/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Ichigo vs Aizen, combat complet",
+          "sub": "Bleach",
+          "video": "9CCXlnUn3z0",
+          "img": "https://i.ytimg.com/vi/9CCXlnUn3z0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Gon vs Pitou, combat complet HD",
+          "sub": "Hunter x Hunter",
+          "video": "Oc78yF8Wr58",
+          "img": "https://i.ytimg.com/vi/Oc78yF8Wr58/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Gon vs Pitou, combat complet",
+          "sub": "Hunter x Hunter",
+          "video": "NMMvLQu1xMQ",
+          "img": "https://i.ytimg.com/vi/NMMvLQu1xMQ/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Eren vs Reiner, combat complet saison 4 partie 2",
+          "sub": "L'Attaque des Titans",
+          "video": "b6fB4gIkqqk",
+          "img": "https://i.ytimg.com/vi/b6fB4gIkqqk/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Eren vs Reiner, combat complet Full HD 60fps",
+          "sub": "L'Attaque des Titans",
+          "video": "zK8jsOExJqs",
+          "img": "https://i.ytimg.com/vi/zK8jsOExJqs/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Meliodas vs Zeldris et Estarossa, combat complet",
+          "sub": "Seven Deadly Sins",
+          "video": "JgiMhAw_bc4",
+          "img": "https://i.ytimg.com/vi/JgiMhAw_bc4/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Meliodas vs Zeldris",
+          "sub": "Seven Deadly Sins",
+          "video": "VNfztmILGyQ",
+          "img": "https://i.ytimg.com/vi/VNfztmILGyQ/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "L vs Light, scène de confrontation",
+          "sub": "Death Note",
+          "video": "JeDNxOO2xTY",
+          "img": "https://i.ytimg.com/vi/JeDNxOO2xTY/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "L vs Light, combat complet 4K",
+          "sub": "Death Note",
+          "video": "PgYa9UcSkpo",
+          "img": "https://i.ytimg.com/vi/PgYa9UcSkpo/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Scène de combat d'Ayanokoji, saison 2 épisode 12",
+          "sub": "Classroom of the Elite",
+          "video": "P0SfxgQNdo0",
+          "img": "https://i.ytimg.com/vi/P0SfxgQNdo0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Sung Jinwoo vs le Roi des Fourmis, saison 2",
+          "sub": "Solo Leveling",
+          "video": "IrHTT2IEKpE",
+          "img": "https://i.ytimg.com/vi/IrHTT2IEKpE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Premier combat en solo de Jinwoo",
+          "sub": "Solo Leveling",
+          "video": "WnrfPSVtNaY",
+          "img": "https://i.ytimg.com/vi/WnrfPSVtNaY/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Asta et Yuno vs Licht, combat complet HD",
+          "sub": "Black Clover",
+          "video": "qB43JovpxYk",
+          "img": "https://i.ytimg.com/vi/qB43JovpxYk/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Asta et Yuno vs Licht, combat complet 4K",
+          "sub": "Black Clover",
+          "video": "QFfir-ApRsg",
+          "img": "https://i.ytimg.com/vi/QFfir-ApRsg/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Shinra vs Sho, combat complet partie 1",
+          "sub": "Fire Force",
+          "video": "ldbpfouF60Q",
+          "img": "https://i.ytimg.com/vi/ldbpfouF60Q/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Shinra vs Rekka, clip officiel SimulDub",
+          "sub": "Fire Force",
+          "video": "edDj1gT6c9w",
+          "img": "https://i.ytimg.com/vi/edDj1gT6c9w/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Scène de combat, saison 3",
+          "sub": "Re:Zero",
+          "video": "CChjxX-RNaE",
+          "img": "https://i.ytimg.com/vi/CChjxX-RNaE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Natsu vs Jellal, arc Tower of Heaven",
+          "sub": "Fairy Tail",
+          "video": "SEzT7yTVKx0",
+          "img": "https://i.ytimg.com/vi/SEzT7yTVKx0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Natsu et les Dragon Slayers vs Acnologia",
+          "sub": "Fairy Tail",
+          "video": "OqZE9rd17FQ",
+          "img": "https://i.ytimg.com/vi/OqZE9rd17FQ/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Isagi vs Rin, match complet",
+          "sub": "Blue Lock",
+          "video": "R-VeQxsRb_o",
+          "img": "https://i.ytimg.com/vi/R-VeQxsRb_o/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Colonel Mustang vs Envy, combat complet",
+          "sub": "Fullmetal Alchemist",
+          "video": "Lp1mbWaBs70",
+          "img": "https://i.ytimg.com/vi/Lp1mbWaBs70/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Edward vs Envy",
+          "sub": "Fullmetal Alchemist",
+          "video": "VEkFTs21ONU",
+          "img": "https://i.ytimg.com/vi/VEkFTs21ONU/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Denji vs Katana Man, combat complet",
+          "sub": "Chainsaw Man",
+          "video": "4MTnx4_34gI",
+          "img": "https://i.ytimg.com/vi/4MTnx4_34gI/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Reze vs Denji, combat complet",
+          "sub": "Chainsaw Man",
+          "video": "kD6XWRVpcYA",
+          "img": "https://i.ytimg.com/vi/kD6XWRVpcYA/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Tanjiro vs Rui, combat complet",
+          "sub": "Demon Slayer",
+          "video": "AGEuQ3Q6Tm4",
+          "img": "https://i.ytimg.com/vi/AGEuQ3Q6Tm4/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Tanjiro vs Rui en 4K",
+          "sub": "Demon Slayer",
+          "video": "oe8w45y4SL0",
+          "img": "https://i.ytimg.com/vi/oe8w45y4SL0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Ash vs Paul",
+          "sub": "Pokémon",
+          "video": "TNCqlnt2GX8",
+          "img": "https://i.ytimg.com/vi/TNCqlnt2GX8/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Ash vs Gary",
+          "sub": "Pokémon",
+          "video": "AG4GSlMhGHs",
+          "img": "https://i.ytimg.com/vi/AG4GSlMhGHs/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Goku vs Freezer, combat complet",
+          "sub": "Dragon Ball",
+          "video": "LrYGhu2jzA0",
+          "img": "https://i.ytimg.com/vi/LrYGhu2jzA0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Goku vs Freezer, saga Namek",
+          "sub": "Dragon Ball",
+          "video": "ksXLy4gezZo",
+          "img": "https://i.ytimg.com/vi/ksXLy4gezZo/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Scènes de combat de Gabimaru",
+          "sub": "Hell's Paradise",
+          "video": "AaaURRKGZys",
+          "img": "https://i.ytimg.com/vi/AaaURRKGZys/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Gabimaru vs un Tensen",
+          "sub": "Hell's Paradise",
+          "video": "pY_E5e28bAE",
+          "img": "https://i.ytimg.com/vi/pY_E5e28bAE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Karasuno vs Nekoma, dernier set",
+          "sub": "Haikyuu",
+          "video": "In5qd9-J7Rc",
+          "img": "https://i.ytimg.com/vi/In5qd9-J7Rc/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Karasuno vs Nekoma, moments du dernier set",
+          "sub": "Haikyuu",
+          "video": "oho1_yFzE5E",
+          "img": "https://i.ytimg.com/vi/oho1_yFzE5E/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Gojo vs Toji, combat complet saison 2",
+          "sub": "Jujutsu Kaisen",
+          "video": "Vd3-13xAuL0",
+          "img": "https://i.ytimg.com/vi/Vd3-13xAuL0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Yuji vs Mahito",
+          "sub": "Jujutsu Kaisen",
+          "video": "G7JP4Ui0wpg",
+          "img": "https://i.ytimg.com/vi/G7JP4Ui0wpg/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Jotaro vs Dio, combat complet",
+          "sub": "JoJo's Bizarre Adventure",
+          "video": "-909shKMi2k",
+          "img": "https://i.ytimg.com/vi/-909shKMi2k/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Jotaro vs Dio, partie 1",
+          "sub": "JoJo's Bizarre Adventure",
+          "video": "yKGcngfS3YY",
+          "img": "https://i.ytimg.com/vi/yKGcngfS3YY/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Rimuru vs Clayman",
+          "sub": "Tensura",
+          "video": "t5JcYsFGwbw",
+          "img": "https://i.ytimg.com/vi/t5JcYsFGwbw/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Le méchant utilise le pouvoir de l'amitié",
+          "sub": "Tensura",
+          "video": "7H196dcWAbc",
+          "img": "https://i.ytimg.com/vi/7H196dcWAbc/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Saitama vs Boros, combat complet",
+          "sub": "One Punch Man",
+          "video": "WUfF1RV8fAo",
+          "img": "https://i.ytimg.com/vi/WUfF1RV8fAo/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Saitama vs Boros, combat complet HD",
+          "sub": "One Punch Man",
+          "video": "4AQdwNRNCRI",
+          "img": "https://i.ytimg.com/vi/4AQdwNRNCRI/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Kirito vs Heathcliff, combat complet",
+          "sub": "Sword Art Online",
+          "video": "VlwqQuPydHs",
+          "img": "https://i.ytimg.com/vi/VlwqQuPydHs/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Kirito vs Heathcliff dans l'arène",
+          "sub": "Sword Art Online",
+          "video": "QCrhmaDjx6o",
+          "img": "https://i.ytimg.com/vi/QCrhmaDjx6o/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Kaneki vs Arima",
+          "sub": "Tokyo Ghoul",
+          "video": "Z6-dA9x4nDc",
+          "img": "https://i.ytimg.com/vi/Z6-dA9x4nDc/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Le combat sanglant",
+          "sub": "Tokyo Ghoul",
+          "video": "yagJWVIHfG8",
+          "img": "https://i.ytimg.com/vi/yagJWVIHfG8/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Mikey vs Kazutora",
+          "sub": "Tokyo Revengers",
+          "video": "3MDO2WE5IAo",
+          "img": "https://i.ytimg.com/vi/3MDO2WE5IAo/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Baji contre tout le monde",
+          "sub": "Tokyo Revengers",
+          "video": "UNhm2mBi-hE",
+          "img": "https://i.ytimg.com/vi/UNhm2mBi-hE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Midoriya vs Todoroki, combat complet",
           "sub": "My Hero Academia",
-          "video": "wpOhT35YtWg"
+          "video": "OEIimCuqZJ4",
+          "img": "https://i.ytimg.com/vi/OEIimCuqZJ4/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "United States of Smash - All Might vs All For One",
+          "sub": "My Hero Academia",
+          "video": "CDW2ReQZOQU",
+          "img": "https://i.ytimg.com/vi/CDW2ReQZOQU/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Frieren vs Frieren, combat",
+          "sub": "Frieren",
+          "video": "quedt2IB9_Q",
+          "img": "https://i.ytimg.com/vi/quedt2IB9_Q/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Stark vs le dragon",
+          "sub": "Frieren",
+          "video": "jKKm-BHJWRA",
+          "img": "https://i.ytimg.com/vi/jKKm-BHJWRA/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Mamie contre Mamie",
+          "sub": "Dandadan",
+          "video": "XfNggNeHQlo",
+          "img": "https://i.ytimg.com/vi/XfNggNeHQlo/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Mob vs Dimple",
+          "sub": "Mob Psycho 100",
+          "video": "NYQEjOMNmgw",
+          "img": "https://i.ytimg.com/vi/NYQEjOMNmgw/hqdefault.jpg",
+          "start": 0
         },
         {
           "name": "Thorfinn vs Thorkell",
           "sub": "Vinland Saga",
-          "video": "7HMp8KC9dq8"
+          "video": "LTTOBjZafEQ",
+          "img": "https://i.ytimg.com/vi/LTTOBjZafEQ/hqdefault.jpg",
+          "start": 0
         },
         {
-          "name": "Reigen vs Claw",
-          "sub": "Mob Psycho 100",
-          "video": "fJvQARLUouI"
+          "name": "Thorfinn vs Snake",
+          "sub": "Vinland Saga",
+          "video": "l3zQNgXdmj0",
+          "img": "https://i.ytimg.com/vi/l3zQNgXdmj0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Punch as Hard as You Can!!",
+          "sub": "Kaiju No. 8",
+          "video": "77wbFrtg5e4",
+          "img": "https://i.ytimg.com/vi/77wbFrtg5e4/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Clip officiel Netflix - Combat en parfaite synchronisation",
+          "sub": "Neon Genesis Evangelion",
+          "video": "j_0aBLn-FUI",
+          "img": "https://i.ytimg.com/vi/j_0aBLn-FUI/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Senku vs Tsukasa",
+          "sub": "Dr. Stone",
+          "video": "jqTUqmoaO1k",
+          "img": "https://i.ytimg.com/vi/jqTUqmoaO1k/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "David Norris vs MaxTac, combat complet",
+          "sub": "Cyberpunk: Edgerunners",
+          "video": "SLHlMRjh0_Y",
+          "img": "https://i.ytimg.com/vi/SLHlMRjh0_Y/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Adam Smasher vs David Martinez, bataille finale",
+          "sub": "Cyberpunk: Edgerunners",
+          "video": "wYf2FilBUOE",
+          "img": "https://i.ytimg.com/vi/wYf2FilBUOE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Guts vs Griffith, combat complet sous-titré",
+          "sub": "Berserk",
+          "video": "_Nyt3IY7iHE",
+          "img": "https://i.ytimg.com/vi/_Nyt3IY7iHE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Premier combat complet Griffith vs Guts",
+          "sub": "Berserk",
+          "video": "jrqVo555ggY",
+          "img": "https://i.ytimg.com/vi/jrqVo555ggY/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Momoshiki/Boruto vs Kawaki, combat complet",
+          "sub": "Boruto",
+          "video": "gX61m0gVx7Q",
+          "img": "https://i.ytimg.com/vi/gX61m0gVx7Q/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Boruto vs Kawaki, mort de Boruto, combat complet",
+          "sub": "Boruto",
+          "video": "VXgm75IqAfU",
+          "img": "https://i.ytimg.com/vi/VXgm75IqAfU/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Ran contre l'Organisation",
+          "sub": "Détective Conan",
+          "video": "KAKkwvZ96eU",
+          "img": "https://i.ytimg.com/vi/KAKkwvZ96eU/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Kagami vs Aomine dans la Zone",
+          "sub": "Kuroko no Basket",
+          "video": "vEH3n938wg8",
+          "img": "https://i.ytimg.com/vi/vEH3n938wg8/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Bataille des Zones, Kagami vs Aomine",
+          "sub": "Kuroko no Basket",
+          "video": "x3whtAlq2V8",
+          "img": "https://i.ytimg.com/vi/x3whtAlq2V8/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Hanamichi vs Rukawa, épisode 2",
+          "sub": "Slam Dunk",
+          "video": "-EZjAeR9jDg",
+          "img": "https://i.ytimg.com/vi/-EZjAeR9jDg/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Confrontation Gorille vs Hanamichi, épisode 3",
+          "sub": "Slam Dunk",
+          "video": "hjh23tn0jtg",
+          "img": "https://i.ytimg.com/vi/hjh23tn0jtg/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Slur affronte Sakamoto",
+          "sub": "Sakamoto Days",
+          "video": "05EIB6kOu6Y",
+          "img": "https://i.ytimg.com/vi/05EIB6kOu6Y/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Yugo vs Qilby, combat final",
+          "sub": "Wakfu",
+          "video": "lLj4MaBGA_0",
+          "img": "https://i.ytimg.com/vi/lLj4MaBGA_0/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Yugo vs Qilby, premier combat",
+          "sub": "Wakfu",
+          "video": "EaidSaU3zkE",
+          "img": "https://i.ytimg.com/vi/EaidSaU3zkE/hqdefault.jpg",
+          "start": 0
+        },
+        {
+          "name": "Combat de capitaines",
+          "sub": "Black Clover",
+          "video": "NuYs7Z3pdU8",
+          "img": "https://i.ytimg.com/vi/NuYs7Z3pdU8/hqdefault.jpg",
+          "start": 0
         }
       ]
     },

@@ -663,7 +663,15 @@
         .bb-tabs button{width:auto;margin:0;padding:8px 14px;font-size:.85rem;background:#11111a;border:1px solid #34344a;color:#fff;}
         .bb-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
         @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}}
-</style>
+
+        /* ===== Party Mix / Combat de cartes / Bingo Anime ===== */
+        .pm-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:14px 0}.pm-pick{display:flex;align-items:center;gap:8px;background:#101019;border:1px solid #34344a;border-radius:10px;padding:10px;cursor:pointer;font-size:.82rem}.pm-pick:has(input:checked){border-color:var(--accent-cyan);box-shadow:0 0 0 1px rgba(0,240,255,.18)}.pm-pick input{accent-color:var(--accent-cyan)}
+        .arc-mix-card{max-width:660px;margin:auto;background:#101019;border:1px solid #34344a;border-radius:14px;padding:18px;text-align:left}.arc-mix-card .big-quote{font-size:1.18rem;line-height:1.6;color:#fff;margin:8px 0}.arc-dle-clues{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin-top:12px}.arc-dle-clue{background:#171725;border:1px solid #34344a;border-radius:10px;padding:10px;text-align:center}.arc-dle-clue small{display:block;color:var(--text-muted);font-size:.68rem;text-transform:uppercase}.arc-dle-clue b{display:block;margin-top:4px;color:var(--accent-cyan)}
+        .cb-wrap{width:100%;}.cb-cat{text-align:center;font-family:'Bangers',cursive;font-size:2rem;letter-spacing:1px;color:var(--accent-yellow);margin-bottom:12px}.cb-help{text-align:center;color:var(--text-muted);font-size:.78rem;margin:-6px 0 10px}.cb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px}.cb-card{position:relative;background:#101019;border:2px solid #303044;border-radius:12px;padding:8px;cursor:pointer;transition:.15s;overflow:hidden}.cb-card:hover:not(.used):not(.locked){transform:translateY(-2px);border-color:var(--accent-cyan)}.cb-card.used{opacity:.35;filter:grayscale(.7);cursor:not-allowed}.cb-card.locked{border-color:var(--accent-yellow);box-shadow:0 0 16px rgba(255,230,0,.2)}.cb-card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;background:#09090f}.cb-name{font-weight:800;font-size:.78rem;margin-top:6px}.cb-anime{font-size:.64rem;color:var(--text-muted);min-height:1.8em}.cb-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:6px;font-size:.66rem}.cb-stats span{background:#181826;border-radius:5px;padding:3px}.cb-stat-hot{color:var(--accent-yellow);font-weight:800}.cb-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}.cb-play{text-align:center}.cb-play img{width:min(190px,100%);aspect-ratio:3/4;object-fit:cover;border-radius:12px;border:2px solid #34344a}.cb-play.win img{border-color:#00ff88;box-shadow:0 0 18px rgba(0,255,136,.22)}.cb-value{font-size:2rem;font-family:'Bangers',cursive;color:var(--accent-yellow)}
+        .bingo-wrap{width:100%;display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:14px;align-items:start}.bingo-char{background:#101019;border:1px solid #34344a;border-radius:12px;padding:9px;text-align:center}.bingo-char img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px}.bingo-char b{display:block;margin-top:7px}.bingo-char small{color:var(--text-muted)}.bingo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.bingo-cell{min-height:66px;background:#11111b;border:1px solid #34344a;border-radius:8px;padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:.66rem;cursor:pointer;line-height:1.15}.bingo-cell:hover:not(.marked){border-color:var(--accent-cyan)}.bingo-cell .em{font-size:1.05rem;margin-bottom:3px}.bingo-cell.marked{background:rgba(0,255,136,.14);border-color:#00ff88;color:#baffd8}.bingo-cell.match:not(.marked){border-color:var(--accent-yellow);box-shadow:inset 0 0 0 1px rgba(255,230,0,.35)}.bingo-pass{margin-top:9px;width:100%;background:#252538;border:1px solid #45455b;color:#fff;padding:8px;border-radius:8px;cursor:pointer}.bingo-reveal{margin-top:8px;font-size:.72rem;color:var(--accent-yellow);text-align:center}
+        @media(max-width:700px){.bingo-wrap{grid-template-columns:1fr}.bingo-char{display:grid;grid-template-columns:85px 1fr;align-items:center;text-align:left;gap:10px}.bingo-char img{width:85px}.bingo-cell{min-height:58px;font-size:.56rem;padding:3px}.cb-vs{grid-template-columns:1fr}.cb-vs>div:nth-child(2){transform:rotate(90deg)}}
+
+    </style>
 
     <style>
         /* ===== V7 : pseudos stylés, cadres, avatars ===== */
@@ -1766,7 +1774,7 @@
         .col-pct{font-family:'Bangers',cursive;font-size:2rem;color:#00ff88;}
         @media (max-width:760px){.col-wrap{grid-template-columns:1fr;}.col-big{grid-template-columns:1fr;}.col-zones{grid-template-columns:repeat(6,1fr);}.col-zone{font-size:.6rem;}}
     </style>
-    <link rel="stylesheet" href="/assets/css/ui-refactor.css?v=20261001">
+    <link rel="stylesheet" href="/assets/css/ui-refactor.css?v=20261001b">
 </head>
 <body>
 
@@ -1948,6 +1956,10 @@
                         <button class="arc-game-btn" onclick="openArcadeGame('audio')"><span class="arc-ico">🎧</span><b>Écoute la scène</b><span>Juste le son d'une scène culte → trouve l'anime</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('chrono')"><span class="arc-ico">⏱️</span><b>Chrono-quiz</b><span>60 s pour enchaîner un max de bonnes réponses</span></button>
                         <button class="arc-game-btn" onclick="openArcadeGame('draft')"><span class="arc-ico">🃏</span><b>Draft 5v5</b><span>Compose ton équipe chacun son tour, puis votez</span></button>
+                        <button class="arc-game-btn" data-seven="connections" onclick="openArcadeGame('connections')"><span class="arc-ico">🧩</span><b>Anime Connections</b><span>16 persos → retrouve 4 groupes de 4 qui partagent un lien</span></button>
+                        <button class="arc-game-btn" data-seven="codeanime" onclick="openArcadeGame('codeanime')"><span class="arc-ico">🕵️</span><b>Code Anime</b><span>Deux équipes, un indice + un nombre, et un assassin à éviter</span></button>
+                        <button class="arc-game-btn" data-seven="ordre" onclick="openArcadeGame('ordre')"><span class="arc-ico">⏳</span><b>Remets-les dans l’ordre</b><span>Classe 5 persos selon une donnée objective</span></button>
+                        <button class="arc-game-btn" data-seven="gridchallenge" onclick="openArcadeGame('gridchallenge')"><span class="arc-ico">🎯</span><b>Grid Challenge</b><span>3 univers × 3 catégories à remplir avec des persos valides</span></button>
                     </div>
                 </div>
 
@@ -1979,6 +1991,24 @@
                     <h3 style="color:var(--accent-yellow);margin-bottom:5px;">✏️ Dessine le perso <span class="quote-new">NOUVEAU</span></h3>
                     <p style="margin:0 0 12px;font-size:.85rem;">Chacun son tour, un joueur dessine un perso et les autres devinent le plus vite possible • indices au fil du temps • 2 joueurs min.</p>
                     <button class="btn-action" style="margin-top:0;background:#ff9a3c;color:#111;" onclick="openUniverseSelection('draw')">Créer une partie</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#00f0ff;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎮 Party Mix <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Choisis 3 à 8 épreuves et enchaîne-les sans élimination • AnimeDLE, Citations, Plus ou moins, Blind Test, Pixel… • un seul score général jusqu’à la fin</p>
+                    <button class="btn-action" style="margin-top:0;background:#00f0ff;color:#111;" onclick="openPartyMixSelection()">Créer mon Party Mix</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ff5e7d;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">⚔️ Combat de cartes <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Duel à 2 avec ton deck de 5 cartes • à chaque manche une stat tombe : Puissance, Intelligence, Vitesse ou Aura • choix secret • la rareté et les finitions sont cosmétiques, aucun pay-to-win</p>
+                    <button class="btn-action" style="margin-top:0;background:#ff5e7d;" onclick="createRoom('arcade','cardbattle')">Lancer un duel de cartes</button>
+                </div>
+
+                <div class="quote-mode-card" style="border-color:#ffd93d;">
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🎟️ Bingo Anime <span class="quote-new">NOUVEAU</span></h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Grille 3×3 • choisis un, plusieurs ou tous les univers • trouve un maximum de personnages qui correspondent aux catégories • +1 / -1 • 60 s ou infini</p>
+                    <button class="btn-action" style="margin-top:0;background:#ffd93d;color:#111;" onclick="openBingoSetup()">Créer un Bingo</button>
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#00ff88;">
@@ -2726,7 +2756,7 @@
 
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
-            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">🃏 Cartes</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button></div>
+            <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -2738,6 +2768,7 @@
             <div id="eco-stats" style="display:none;"></div>
             <div id="eco-deck" style="display:none;"></div>
             <div id="eco-market" style="display:none;"></div>
+            <div id="eco-museum" style="display:none;"></div>
         </div>
     </section>
 
@@ -2804,13 +2835,22 @@
         </div>
 
         <div class="opt-panel">
-            <h2>🏆 Classement</h2>
+            <h2>🏆 Classements par jeu</h2>
+            <p class="tl-hint" style="text-align:left;margin-bottom:10px;">Choisis un jeu pour voir ses meilleurs joueurs. Dans un jeu précis, le classement privilégie les <b>victoires</b>, puis les points.</p>
             <div class="bb-tabs" style="justify-content:flex-start;">
                 <button class="lb-tab on" data-p="week" onclick="setLbPeriod('week')">Cette semaine</button>
                 <button class="lb-tab" data-p="all" onclick="setLbPeriod('all')">Depuis toujours</button>
             </div>
-            <select id="lb-mode" class="lb-select" onchange="lbMode=this.value;loadLeaderboard()"><option value="">Tous les modes</option></select>
-            <div id="lb-box" style="margin-top:10px;"></div>
+            <label for="lb-mode" style="display:block;margin:10px 0 5px;font-size:.78rem;color:var(--text-muted);font-weight:800;">🎮 JEU</label>
+            <select id="lb-mode" class="lb-select" onchange="setLbMode(this.value)"><option value="">🌍 Classement global</option></select>
+            <div id="lb-current" style="font-family:'Bangers';font-size:1.35rem;color:var(--accent-cyan);margin-top:14px;">🌍 Classement global</div>
+            <div id="lb-box" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="opt-panel">
+            <h2>🏛️ Hall of Fame</h2>
+            <p class="tl-hint" style="text-align:left;">Les champions mensuels restent ici : champion global et meilleurs joueurs par jeu sur les 12 derniers mois.</p>
+            <div id="hof-box"><p class="tl-hint">Chargement…</p></div>
         </div>
 
         <div class="opt-panel">
@@ -3364,7 +3404,9 @@
             draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             qap:            { title:'🏆 QUI A LE PLUS…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             tupref:         { title:'🤔 TU PRÉFÈRES…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
-            arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true }
+            arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true },
+            arc_connections:{ title:'🧩 ANIME CONNECTIONS', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Les 16 personnages et les 4 liens seront générés uniquement avec ta sélection.', tag:'', all:true },
+            arc_bingo:      { title:'🎟️ BINGO ANIME', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Seuls les personnages de ta sélection apparaîtront.', tag:'', all:true }
         };
         let QUOTE_COUNTS = {};
         fetch('/api/quote-counts').then(r => r.json()).then(d => { if (d && d.counts) QUOTE_COUNTS = d.counts; }).catch(() => {});
@@ -3378,6 +3420,7 @@
             const pick = key => mode === 'quote' ? createQuoteRoom(key)
                 : mode === 'tupref' ? startBattleSetup('tp:' + key)
                 : mode === 'qap' ? startBattleSetup('tp:' + key, 'qap')
+                : mode === 'arc_bingo' ? createRoom('arcade', 'bingo:' + bingoPendingDuration + ':' + key)
                 : mode.startsWith('arc_') ? createRoom('arcade', mode.slice(4) + ':' + key)
                 : createRoom(mode, key);
             // plusieurs animes au choix (sauf Rolland Garros, Enchères et AnimeDLE)
@@ -3599,7 +3642,8 @@
             // Nombre de manches (mini-jeux et blind test)
             const rbox = document.getElementById('room-rounds-box');
             if (rbox) {
-                const withRounds = room.mode === 'arcade' || room.mode === 'blindtest';
+                const fixedArc = room.mode === 'arcade' && /^(?:cardbattle|bingo|partymix)/.test(String(room.subMode || ''));
+                const withRounds = (room.mode === 'arcade' && !fixedArc) || room.mode === 'blindtest';
                 rbox.style.display = withRounds ? 'flex' : 'none';
                 const sel = document.getElementById('room-rounds-select'), txt = document.getElementById('room-rounds-text');
                 const v = room.arcRounds === 0 ? '0' : (room.arcRounds ? String(room.arcRounds) : '');
@@ -5740,7 +5784,14 @@
             draft:{ title:'🃏 DRAFT 5V5', sub:'Chacun son tour, choisis tes persos… puis votez pour la meilleure équipe', universe:true },
             scene:{ title:"🎬 SCENE GUESSR", sub:"Une scène culte en vidéo (sans le son) : de quel anime vient-elle ?", universe:false }
         };
+        ARC_UI.mix_dle = { title:'🎴 ANIMEDLE EXPRESS', sub:'Trois indices, quatre personnages : trouve le bon', universe:false };
+        ARC_UI.mix_quote = { title:'💬 CITATIONS', sub:'Qui a prononcé cette citation ?', universe:false };
+        ARC_UI.mix_blind = { title:'🎧 BLIND TEST', sub:'Écoute quelques secondes et retrouve l’anime', universe:false };
+        ARC_UI.cardbattle = { title:'⚔️ COMBAT DE CARTES', sub:'Ton deck de 5 cartes • choix secret • rareté purement cosmétique', universe:false };
+        ARC_UI.bingo = { title:'🎟️ BINGO ANIME', sub:'Grille 3×3 • univers au choix • +1 bonne catégorie • -1 erreur', universe:false };
+
         let arcState = null, arcClock = 0, arcNames = [], arcMyFound = [], arcTick = null, arcRaf = null;
+        let arcCardDeck = [], arcCardUsed = new Set(), arcBingoBoard = null, arcBingoChar = null;
         let arcStageKey = '', arcImgs = {}, arcSuggIdx = 0, arcLastFeedback = null, arcYt = null;
         // Bouton « Activer le son » pour Écoute la scène (mobile : le son doit partir d'un vrai toucher)
         function arcAudioButton(box, player, key) {
@@ -5764,12 +5815,50 @@
         }
         function arcDestroyVideo() { if (arcYt) { try { arcYt.destroy(); } catch (_) {} arcYt = null; } }
 
+        let bingoPendingDuration = '60';
+        function openBingoSetup() {
+            hubModal('bingo-setup-modal', `<h3 style="color:var(--accent-yellow);">🎟️ Bingo Anime</h3>
+                <p class="tl-hint" style="text-align:left;">Choisis d'abord la durée, puis ton ou tes univers. Bonne catégorie = <b style="color:#00ff88">+1</b>, mauvaise catégorie = <b style="color:var(--accent-pink)">-1</b>. La grille est en <b>3×3</b> et chaque clic remplace la catégorie de la case.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <button class="btn-action" style="background:#ffd93d;color:#111;margin:0;" onclick="startBingoMode('60')">⏱️ 60 secondes</button>
+                    <button class="btn-action" style="background:var(--accent-cyan);color:#111;margin:0;" onclick="startBingoMode('inf')">♾️ Temps infini</button>
+                </div>`, true);
+        }
+        function startBingoMode(mode) {
+            document.getElementById('bingo-setup-modal')?.remove();
+            bingoPendingDuration = mode === 'inf' ? 'inf' : '60';
+            arcBingoBoard=null; arcBingoChar=null;
+            openUniverseSelection('arc_bingo');
+        }
+
         function openArcadeGame(game) {
             if (ARC_UI[game].universe) {
                 openUniverseSelection('arc_' + game);
             } else {
                 createRoom('arcade', game);
             }
+        }
+
+        const PARTY_MIX_OPTIONS = [
+            ['mix_dle','🎴','AnimeDLE'],['mix_quote','💬','Citations'],['plusmoins','⚖️','Plus ou moins'],['mix_blind','🎧','Blind Test'],
+            ['pixel','🖼️','Pixel Anime'],['silhouette','👤','Silhouette'],['emoji','😀','Emoji Anime'],['quatre','🧩','4 images = 1 anime'],
+            ['attaque','💥','Devine l’attaque'],['scene','🎬','Scene Guessr'],['mapguess','🗺️','Map Guess'],['link','🔗','Common Link'],
+            ['imposteur','🕵️','Imposteur'],['popularite','👥','Popularité']
+        ];
+        function openPartyMixSelection() {
+            const defaults = new Set(['mix_dle','mix_quote','plusmoins','mix_blind','pixel']);
+            hubModal('party-mix-modal', `<h3 style="color:var(--accent-yellow);">🎮 Créer un Party Mix</h3>
+                <p class="tl-hint" style="text-align:left;">Choisis entre <b>3 et 8 épreuves</b>. Tout le monde joue jusqu’au bout et le score se cumule d’un jeu à l’autre.</p>
+                <div class="pm-picker">${PARTY_MIX_OPTIONS.map(([id,em,n]) => `<label class="pm-pick"><input type="checkbox" data-pm="${id}" ${defaults.has(id)?'checked':''}> <span>${em} ${n}</span></label>`).join('')}</div>
+                <label style="display:flex;align-items:center;gap:8px;margin:8px 0 14px;">Manches par épreuve : <select id="pm-rounds" style="background:#101019;color:#fff;border:1px solid #45455b;padding:7px;border-radius:7px;"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>
+                <button class="btn-action" onclick="startPartyMixSelection()">🎮 Créer le salon</button>`, true);
+        }
+        function startPartyMixSelection() {
+            const m = document.getElementById('party-mix-modal');
+            const games = [...m.querySelectorAll('input[data-pm]:checked')].map(x => x.dataset.pm).slice(0,8);
+            if (games.length < 3) return toast('Choisis au moins 3 épreuves.', 'var(--accent-pink)');
+            const per = Math.max(1, Math.min(3, +(document.getElementById('pm-rounds')?.value || 2)));
+            m.remove(); createRoom('arcade', 'partymix:' + games.join(',') + '~' + per);
         }
 
         function arcNorm(s) {
@@ -5904,13 +5993,68 @@
 
         function arcNow() { return Date.now() + arcClock; }
 
+        function arcRenderCardBattle(q, stage) {
+            const d = q.stage?.cardBattle || {}, cat = d.category || { id:'aura', label:'Aura', emoji:'🔥' };
+            const me = (q.players || []).find(p => p.id === socket.id) || {};
+            stage.innerHTML = '';
+            const wrap = document.createElement('div'); wrap.className = 'cb-wrap';
+            const title = document.createElement('div'); title.className = 'cb-cat'; title.textContent = `${cat.emoji || '⚔️'} ${cat.label || 'Stat'}`;
+            wrap.appendChild(title);
+            if (q.phase === 'reveal' && Array.isArray(d.plays)) {
+                const vs = document.createElement('div'); vs.className = 'cb-vs';
+                d.plays.forEach((pl, i) => {
+                    const box = document.createElement('div'); box.className = 'cb-play' + ((pl.value || 0) === Math.max(...d.plays.map(x => x.value || 0)) ? ' win' : '');
+                    const c = pl.card || {};
+                    box.innerHTML = `${c.img ? `<img src="${v7esc(c.img)}" alt="">` : '<div style="font-size:4rem;">🃏</div>'}<b>${v7esc(c.name || 'Aucune carte')}</b><small style="display:block;color:var(--text-muted);">${v7esc(pl.name || '')}</small><div class="cb-value">${pl.value || 0}</div>`;
+                    vs.appendChild(box);
+                    if (i === 0) { const x=document.createElement('div'); x.style.cssText='font-family:Bangers;font-size:2rem;color:var(--accent-pink);'; x.textContent='VS'; vs.appendChild(x); }
+                });
+                wrap.appendChild(vs);
+            } else {
+                const help = document.createElement('div'); help.className='cb-help'; help.textContent = me.done ? '🔒 Carte verrouillée — attends ton adversaire.' : 'Choisis une carte encore disponible. Les cartes de ton adversaire restent secrètes.'; wrap.appendChild(help);
+                const grid = document.createElement('div'); grid.className='cb-grid';
+                if (!arcCardDeck.length) grid.innerHTML='<div class="arc-loading"><div class="arc-spin"></div><div>Chargement de ton deck…</div></div>';
+                arcCardDeck.forEach(c => {
+                    const used = arcCardUsed.has(c.key), el=document.createElement('button'); el.type='button'; el.className='cb-card'+(used?' used':'')+(me.done && !used?' locked':'');
+                    const stats=c.stats||{};
+                    el.innerHTML=`<img src="${v7esc(c.img||'')}" alt=""><div class="cb-name">${v7esc(c.name)}</div><div class="cb-anime">${v7esc(c.anime||'')}</div><div class="cb-stats"><span class="${cat.id==='power'?'cb-stat-hot':''}">💥 ${stats.power||0}</span><span class="${cat.id==='intelligence'?'cb-stat-hot':''}">🧠 ${stats.intelligence||0}</span><span class="${cat.id==='speed'?'cb-stat-hot':''}">⚡ ${stats.speed||0}</span><span class="${cat.id==='aura'?'cb-stat-hot':''}">🔥 ${stats.aura||0}</span></div>`;
+                    el.disabled = q.phase!=='playing' || me.done || used;
+                    if (!el.disabled) el.onclick=()=>{ socket.emit('arc_card_pick',{roomCode:currentRoomCode,key:c.key}); [...grid.children].forEach(x=>x.disabled=true); };
+                    grid.appendChild(el);
+                });
+                wrap.appendChild(grid);
+            }
+            stage.appendChild(wrap);
+        }
+        function arcRenderBingo(q, stage) {
+            const c=arcBingoChar||{}, me=(q.players||[]).find(p=>p.id===socket.id)||{};
+            stage.innerHTML='';
+            const wrap=document.createElement('div'); wrap.className='bingo-wrap';
+            const ch=document.createElement('div'); ch.className='bingo-char';
+            ch.innerHTML=c.name ? `${c.img?`<img src="${v7esc(c.img)}" alt="">`:'<div style="font-size:4rem;">👤</div>'}<div><b>${v7esc(c.name)}</b><small>${v7esc(c.anime||'')}</small><div style="margin-top:7px;font-size:.72rem;color:var(--text-muted);">✅ ${me.correctCount||0} • ❌ ${me.wrongCount||0}</div></div>` : '<div class="arc-loading"><div class="arc-spin"></div><div>Personnage suivant…</div></div>';
+            wrap.appendChild(ch);
+            const right=document.createElement('div'), grid=document.createElement('div'); grid.className='bingo-grid';
+            (arcBingoBoard?.cells||[]).forEach((cell,i)=>{
+                const b=document.createElement('button'); b.type='button'; b.className='bingo-cell';
+                b.innerHTML=`<span class="em">${cell.emoji||'•'}</span><span>${v7esc(cell.label)}</span>`;
+                b.disabled=q.phase!=='playing'||!c.name;
+                if(!b.disabled)b.onclick=()=>{ arcBingoChar=null; [...grid.children].forEach(x=>x.disabled=true); socket.emit('arc_bingo_mark',{roomCode:currentRoomCode,idx:i}); };
+                grid.appendChild(b);
+            });
+            if (!(arcBingoBoard?.cells||[]).length) grid.innerHTML='<div class="arc-loading" style="grid-column:1/-1"><div class="arc-spin"></div><div>Création de ta grille…</div></div>';
+            right.appendChild(grid);
+            const hint=document.createElement('div'); hint.className='bingo-reveal'; hint.textContent='Bonne catégorie : +1 • Mauvaise catégorie : -1 • La case change après chaque clic'; right.appendChild(hint);
+            wrap.appendChild(right); stage.appendChild(wrap);
+        }
+
+
         function arcRenderStage(q) {
             const stage = document.getElementById('arc-stage');
-            const key = (q.game === 'scene' || q.game === 'audio') && q.stage && q.stage.video
+            const key = (q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind') && q.stage && q.stage.video
                 ? `${q.round}|${q.game}|${q.stage.video}`
                 : `${q.round}|${q.phase === 'playing' ? 'p' : q.phase}|${q.game}|${(q.stage.imgs || []).length}|${(q.stage.names || []).filter(Boolean).length}`;
             if (q.game === 'scene' && q.phase === 'reveal' && arcYt) { try { arcYt.unMute(); arcYt.setVolume(60); } catch (_) {} }
-            if (q.game === 'audio' && q.phase !== 'playing') { const v = document.querySelector('.arc-video .arc-audio-veil'); if (v) v.remove(); }
+            if ((q.game === 'audio' || q.game === 'mix_blind') && q.phase !== 'playing') { const v = document.querySelector('.arc-video .arc-audio-veil'); if (v) v.remove(); }
             if (q.phase === 'loading') {
                 if (arcStageKey !== 'loading') stage.innerHTML = '<div class="arc-loading"><div class="arc-spin"></div><div>Préparation de la manche…</div></div>';
                 arcStageKey = 'loading';
@@ -5923,10 +6067,11 @@
                 return;
             }
             if (q.phase === 'intermission') {
-                if (arcStageKey === 'inter' + q.tour?.idx) return;
-                arcStageKey = 'inter' + q.tour?.idx;
+                const seq = q.mix || q.tour || {};
+                if (arcStageKey === 'inter' + (seq.idx || 0)) return;
+                arcStageKey = 'inter' + (seq.idx || 0);
                 arcDestroyVideo();
-                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:4rem;">🏁</div><div class="arc-ask">Fin de l'épreuve ${(q.tour?.idx || 0) + 1}/${q.tour?.total || ''}</div></div>`;
+                stage.innerHTML = `<div style="text-align:center;"><div style="font-size:4rem;">🏁</div><div class="arc-ask">Fin de l'épreuve ${(seq.idx || 0) + 1}/${seq.total || ''}</div>${q.mix&&seq.nextLabel?`<div style="color:var(--accent-cyan);margin-top:8px;">Prochaine : ${v7esc(seq.nextLabel)}</div>`:''}</div>`;
                 return;
             }
             if (key === arcStageKey) return;
@@ -5935,6 +6080,15 @@
             arcDestroyVideo();
             const reveal = q.phase !== 'playing';
             const st = q.stage || {};
+
+            if (q.game === 'cardbattle') { arcRenderCardBattle(q, stage); return; }
+            if (q.game === 'bingo') { arcRenderBingo(q, stage); return; }
+            if (q.game === 'mix_quote') {
+                const x=st.quote||{}; stage.innerHTML=`<div class="arc-mix-card"><div style="color:var(--accent-cyan);font-weight:800;">💬 ${v7esc(x.anime||'Citation')}</div><div class="big-quote">« ${v7esc(x.text||'…')} »</div><div class="tl-hint">Qui a dit ça ?</div></div>`; return;
+            }
+            if (q.game === 'mix_dle') {
+                const x=st.dle||{}; stage.innerHTML=`<div class="arc-mix-card"><div style="color:var(--accent-yellow);font-weight:800;text-align:center;">🎴 ${v7esc(x.anime||'AnimeDLE')}</div><div class="arc-dle-clues">${(x.clues||[]).map(c=>`<div class="arc-dle-clue"><small>${v7esc(c.label)}</small><b>${v7esc(c.value)}</b></div>`).join('')}</div></div>`; return;
+            }
 
             if (q.game === 'link' || q.game === 'imposteur') {
                 stage.innerHTML = '';
@@ -6007,8 +6161,8 @@
                 stage.appendChild(grid);
                 return;
             }
-            if ((q.game === 'scene' || q.game === 'audio') && st.video) {
-                const audioOnly = q.game === 'audio';
+            if ((q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind') && st.video) {
+                const audioOnly = q.game === 'audio' || q.game === 'mix_blind';
                 stage.innerHTML = '';
                 const box = document.createElement('div'); box.className = 'arc-video';
                 const holder = document.createElement('div'); holder.id = 'arc-yt-' + q.round + '-' + st.video;
@@ -6198,9 +6352,8 @@
             const time = document.getElementById('arc-time');
             const fill = document.getElementById('arc-timer-fill');
             if (q.phase === 'playing') {
-                const left = Math.max(0, q.endsAt - arcNow());
-                time.textContent = `${Math.ceil(left / 1000)}s`;
-                fill.style.width = `${100 * left / q.roundMs}%`;
+                if (q.game === 'bingo' && q.bingo?.infinite) { time.textContent='∞'; fill.style.width='100%'; }
+                else { const left = Math.max(0, (q.endsAt || arcNow()) - arcNow()); time.textContent = `${Math.ceil(left / 1000)}s`; fill.style.width = `${100 * left / Math.max(1,q.roundMs||60000)}%`; }
             } else if (q.phase === 'reveal' && q.revealEndsAt) {
                 const left = Math.max(0, q.revealEndsAt - arcNow());
                 time.textContent = `Suite dans ${Math.ceil(left / 1000)}s`;
@@ -6225,15 +6378,18 @@
             arcClock = q.serverNow - Date.now();
             const ui = ARC_UI[q.game] || {};
             document.getElementById('arc-title').textContent = ui.title || q.gameLabel;
-            document.getElementById('arc-subtitle').textContent = q.tour
-                ? `🏆 Tournoi • épreuve ${q.tour.idx + 1}/${q.tour.total} • ${ui.sub || ''}`
-                : (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
-            if (q.tour) document.getElementById('arc-title').textContent = '🏆 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
-            document.getElementById('arc-round').textContent = `Manche ${Math.max(1, q.round)}/${q.totalRounds ?? '∞'}`;
+            document.getElementById('arc-subtitle').textContent = q.mix
+                ? `🎮 Party Mix • épreuve ${q.mix.idx + 1}/${q.mix.total} • ${ui.sub || ''}`
+                : q.tour
+                    ? `🏆 Tournoi • épreuve ${q.tour.idx + 1}/${q.tour.total} • ${ui.sub || ''}`
+                    : (q.universeLabel ? q.universeLabel + ' • ' : '') + (ui.sub || '');
+            if (q.mix) document.getElementById('arc-title').textContent = '🎮 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
+            else if (q.tour) document.getElementById('arc-title').textContent = '🏆 ' + (ui.title || q.gameLabel).replace(/^\S+\s/, '');
+            document.getElementById('arc-round').textContent = q.game==='bingo' ? '🎯 Fais le meilleur score' : `Manche ${Math.max(1, q.round)}/${q.totalRounds ?? '∞'}`;
             const arcEnd = document.getElementById('arc-end-infinite');
-            if (arcEnd) arcEnd.style.display = q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none';
+            if (arcEnd) arcEnd.style.display = q.game==='bingo' && q.bingo?.infinite && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : (q.game!=='bingo' && q.totalRounds == null && q.phase !== 'finished' && q.hostId === socket.id ? 'block' : 'none');
             const doneCount = q.players.filter(p => p.done).length;
-            document.getElementById('arc-answered').textContent = `Réponses : ${doneCount}/${q.players.length}`;
+            document.getElementById('arc-answered').textContent = q.game==='bingo' ? '✅ +1  •  ❌ -1' : `Réponses : ${doneCount}/${q.players.length}`;
             const me = q.players.find(p => p.id === socket.id) || {};
             const newRound = prevRound !== q.round + '|' + q.phase && q.phase === 'playing';
             if (newRound) { arcMyFound = []; arcLastFeedback = null; }
@@ -6245,7 +6401,7 @@
                 const row = document.createElement('div'); row.className = 'quote-score';
                 const name = document.createElement('span');
                 let mark = '';
-                if (q.phase === 'playing') mark = q.answerType === 'multi' ? ` ${p.progress || 0}/4` : q.answerType === 'bac' ? ` ${p.filled || 0}/5${p.done ? ' 🛑' : ''}` : q.answerType === 'chrono' ? ` ✅ ${p.progress || 0}` : q.answerType === 'draft' ? '' : (p.done ? ' ✔️' : ' …');
+                if (q.phase === 'playing') mark = q.game==='bingo' ? ` (✅${p.correctCount||0} / ❌${p.wrongCount||0})` : q.answerType === 'multi' ? ` ${p.progress || 0}/4` : q.answerType === 'bac' ? ` ${p.filled || 0}/5${p.done ? ' 🛑' : ''}` : q.answerType === 'chrono' ? ` ✅ ${p.progress || 0}` : q.answerType === 'draft' ? '' : (p.done ? ' ✔️' : ' …');
                 else if (q.phase === 'reveal') mark = p.gained ? ` ✅ +${p.gained}` : ' ❌';
                 name.textContent = (p.offline ? '📡 ' : '') + (p.eliminated ? '☠️ ' : '') + p.name + mark;
                 if (p.eliminated) row.style.opacity = '.5';
@@ -6308,7 +6464,7 @@
                 result.style.color = 'var(--text-muted)'; result.textContent = '';
             } else if (q.phase === 'intermission') {
                 result.style.color = 'var(--accent-yellow)';
-                result.textContent = ((q.tour?.lastOutList || []).length > 1 ? `☠️ ${q.tour.lastOutList.slice(0, -1).join(', ')} et ${q.tour.lastOutList.slice(-1)[0]} sont éliminés ! ` : q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.alive ? `${q.tour.alive} encore en course. ` : '') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : '');
+                result.textContent = q.mix ? `✅ Épreuve terminée. Tous les joueurs continuent !${q.mix.nextLabel ? ' Prochaine épreuve : ' + q.mix.nextLabel : ''}` : (((q.tour?.lastOutList || []).length > 1 ? `☠️ ${q.tour.lastOutList.slice(0, -1).join(', ')} et ${q.tour.lastOutList.slice(-1)[0]} sont éliminés ! ` : q.tour?.lastOut ? `☠️ ${q.tour.lastOut} est éliminé ! ` : 'Personne n\'est éliminé cette fois. ') + (q.tour?.alive ? `${q.tour.alive} encore en course. ` : '') + (q.tour?.nextLabel ? `Prochaine épreuve : ${q.tour.nextLabel}` : ''));
             } else if (q.phase === 'playing' && me.eliminated) {
                 result.style.color = 'var(--text-muted)'; result.textContent = '☠️ Tu es éliminé du tournoi… tu regardes la suite 👀';
             } else if (q.phase === 'playing' && q.answerType === 'chrono') {
@@ -6322,15 +6478,17 @@
                 if (me.done) { result.style.color = 'var(--accent-cyan)'; result.textContent = arcLastFeedback?.ok ? arcLastFeedback.message + ' — attends les autres…' : 'Réponse envoyée, attends les autres…'; }
                 else if (arcLastFeedback) { result.style.color = arcLastFeedback.ok ? '#00ff88' : 'var(--accent-pink)'; result.textContent = arcLastFeedback.message; }
                 else if (q.answerType === 'bac') { result.style.color = q.notice ? 'var(--accent-pink)' : 'var(--text-color)'; result.textContent = q.notice || `Lettre ${q.stage.letter} : remplis les 5 cases puis appuie sur STOP !`; }
-                else { result.style.color = 'var(--text-color)'; result.textContent = q.game === 'popularite' ? 'Clique sur le perso le plus populaire !' : q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
+                else { result.style.color = 'var(--text-color)'; result.textContent = q.game === 'cardbattle' ? 'Choisis secrètement une carte de ton deck.' : q.game === 'bingo' ? 'Clique sur une catégorie qui correspond au personnage. Bonne réponse +1, erreur -1.' : q.game === 'popularite' ? 'Clique sur le perso le plus populaire !' : q.answerType === 'choice' ? 'Choisis la bonne réponse !' : 'Écris le nom (VF ou anglais) et valide avec Entrée'; }
             } else if (q.phase === 'reveal') {
                 const ok = !!me.gained;
                 result.style.color = ok ? '#00ff88' : 'var(--accent-pink)';
-                result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
+                if (q.game === 'cardbattle') result.textContent = ok ? `⚔️ +${me.gained} pts sur cette manche !` : `⚔️ Manche perdue — ${q.answer || ''}`;
+                else if (q.game === 'bingo') result.textContent = `🎟️ Score final : ${me.score || 0}`;
+                else result.textContent = q.answerType === 'bac' ? `Lettre ${q.stage.letter} : tu marques ${me.gained || 0} pts` : (ok ? `✅ +${me.gained} — ` : '❌ ') + `C'était : ${q.answer}`;
                 const bits = [];
                 if (q.roundUniverse && q.game !== 'quatre') bits.push(q.roundUniverse);
                 if (q.reveal?.place) bits.push(q.game === 'imposteur' ? q.reveal.place : '📍 ' + q.reveal.place);
-                if (q.reveal?.song) bits.push(q.game === 'scene' || q.game === 'audio' ? q.reveal.song : '🎶 ' + q.reveal.song);
+                if (q.reveal?.song) bits.push(q.game === 'scene' || q.game === 'audio' || q.game === 'mix_blind' ? q.reveal.song : '🎶 ' + q.reveal.song);
                 if (q.answerType === 'chrono') result.textContent = `⏱️ Temps écoulé ! Tu marques ${me.gained || 0} pts (${me.progress || 0} bonnes réponses)`;
                 extra.textContent = bits.join(' • ');
             } else {
@@ -6415,6 +6573,9 @@
         });
         socket.on('arc_names', d => { arcNames = Array.isArray(d?.names) ? d.names : []; });
         socket.on('arc_private', d => { arcMyFound = Array.isArray(d?.found) ? d.found : []; arcRenderFound(); });
+        socket.on('arc_card_deck', d => { arcCardDeck = Array.isArray(d?.cards) ? d.cards : []; arcCardUsed = new Set(Array.isArray(d?.used) ? d.used : []); if (arcState?.game === 'cardbattle') { arcStageKey=''; arcRenderStage(arcState); } });
+        socket.on('arc_bingo_board', d => { arcBingoBoard = d || null; if (arcState?.game === 'bingo') { arcStageKey=''; arcRenderStage(arcState); } });
+        socket.on('arc_bingo_character', d => { arcBingoChar = d?.character || null; if (arcState?.game === 'bingo') { arcStageKey=''; arcRenderStage(arcState); } });
         socket.on('arc_feedback', d => {
             arcLastFeedback = d;
             const result = document.getElementById('arc-result');
@@ -6434,8 +6595,8 @@
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
                 if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
-                try { stored = localStorage.getItem('itemimg2:' + k); } catch (e) {}
-                if (stored) return resolve(stored === '-' ? null : '/api/img?u=' + encodeURIComponent(stored));
+                try { stored = localStorage.getItem('itemimg3:' + k); } catch (e) {}
+                if (stored) return resolve('/api/img?u=' + encodeURIComponent(stored));
                 itemImgQueue.push({ source, name: item.name, k, resolve });
                 itemImagePump();
             });
@@ -6449,7 +6610,10 @@
                     .then(r => r.json()).catch(() => null)
                     .then(d => {
                         const url = d && d.imageUrl;
-                        try { localStorage.setItem('itemimg2:' + job.k, url || '-'); } catch (e) {}
+                        try {
+                            if (url) localStorage.setItem('itemimg3:' + job.k, url);
+                            else localStorage.removeItem('itemimg3:' + job.k);
+                        } catch (e) {}
                         if (!url) delete ITEM_IMG_CACHE[job.k];
                         job.resolve(url ? '/api/img?u=' + encodeURIComponent(url) : null);
                     })
@@ -6686,6 +6850,17 @@
                     tlRateUi(d.tl);
                 } else { data = await loadItems(source); document.getElementById('tl-rate').style.display = 'none'; }
             } catch (e) { document.getElementById('tl-board').innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
+            // Une tier list travaille avec le nom comme identifiant : on supprime donc les doublons
+            // avant de reconstruire le pool (y compris les anciennes listes communautaires).
+            const uniqueItems = [];
+            const seenItemNames = new Set();
+            for (const item of (Array.isArray(data.items) ? data.items : [])) {
+                const key = String(item?.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+                if (!key || seenItemNames.has(key)) continue;
+                seenItemNames.add(key);
+                uniqueItems.push(item);
+            }
+            data.items = uniqueItems;
             const names = data.items.map(i => i.name);
             let saved = null;
             try { saved = JSON.parse(localStorage.getItem('tierlist:' + source) || 'null'); } catch (e) {}
@@ -7508,19 +7683,39 @@
             let d = null;
             try { d = await (await fetch(`/api/leaderboard?period=${lbPeriod}&mode=${encodeURIComponent(lbMode)}`)).json(); } catch (e) {}
             const sel = document.getElementById('lb-mode');
-            if (d && sel && sel.options.length <= 1) Object.entries(d.modes || {}).forEach(([k, v]) => { const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o); });
-            if (!d || !d.rows || !d.rows.length) { box.innerHTML = '<p class="tl-hint">Pas encore de parties classées sur cette période.</p>'; return; }
-            box.innerHTML = d.rows.map((r, i) => `<div class="daily-row${currentUser && r.pseudo === currentUser.pseudo ? ' me' : ''}"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${escHtml(r.pseudo)}</span><span>${r.points} pts • ${r.games} parties</span></div>`).join('');
+            if (d && sel && sel.options.length <= 1) {
+                Object.entries(d.modes || {}).sort((a, b) => a[1].localeCompare(b[1], 'fr')).forEach(([k, v]) => {
+                    const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o);
+                });
+                sel.value = lbMode;
+            }
+            const cur = document.getElementById('lb-current');
+            if (cur && d) cur.textContent = (lbMode ? '🎮 ' : '🌍 ') + (d.label || 'Classement global');
+            if (!d || !d.rows || !d.rows.length) { box.innerHTML = '<p class="tl-hint">Pas encore de parties enregistrées pour ce jeu sur cette période.</p>'; return; }
+            box.innerHTML = d.rows.map((r, idx) => {
+                const pos = ['🥇', '🥈', '🥉'][idx] || (idx + 1) + '.';
+                const mine = currentUser && r.pseudo === currentUser.pseudo ? ' me' : '';
+                const right = lbMode
+                    ? `<b>${r.wins} V</b> • ${r.games} parties • ${r.winrate}% • ${r.points} pts`
+                    : `<b>${r.points} pts</b> • ${r.wins} V • ${r.games} parties`;
+                return `<div class="daily-row${mine}"><span>${pos} ${escHtml(r.pseudo)}</span><span>${right}</span></div>`;
+            }).join('');
+        }
+        function setLbMode(mode) {
+            lbMode = mode || '';
+            const sel = document.getElementById('lb-mode');
+            if (sel && sel.value !== lbMode) sel.value = lbMode;
+            loadLeaderboard();
         }
         function setLbPeriod(p) {
             lbPeriod = p;
-            document.querySelectorAll('.lb-tab').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+            document.querySelectorAll('#options .lb-tab[data-p="week"], #options .lb-tab[data-p="all"]').forEach(b => b.classList.toggle('on', b.dataset.p === p));
             loadLeaderboard();
         }
         // Chargement quand on ouvre l'onglet Options
         (function () {
             const orig = window.switchTab;
-            if (typeof orig === 'function') window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfile(); loadLeaderboard(); } return r; };
+            if (typeof orig === 'function') window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'options') { loadProfile(); loadLeaderboard(); loadHallOfFame(); } return r; };
         })();
         socket.on('profile_updated', () => { const o = document.getElementById('options'); if (o && o.classList.contains('active')) loadProfile(); });
 
@@ -9542,7 +9737,7 @@
         }
         // --- cartes ---
         function cardHtml(c, big) {
-            if (!c.name) return `<div class="tcard empty r-${c.rarity}"><div class="tc-img">?</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
+            if (!c.name) return `<div class="tcard empty r-${c.rarity} missing-card"><div class="tc-img">${c.img ? `<img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" style="filter:brightness(0);opacity:.72;" onerror="this.remove();this.parentNode.textContent='?'">` : '?'}</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
             return `<div class="tcard r-${c.rarity}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}"><div class="tc-img"><img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15"></div>
                 <div class="tc-name">${v7esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity]}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}</div>`;
         }
@@ -9555,7 +9750,7 @@
             if (!d || !d.ok) return;
             const head = `<div class="shop-head">🃏 <b>${d.owned}</b> / ${d.total} cartes • ✨ ${d.shinies} brillantes <span class="tl-hint">• trouve des persos en jouant pour gagner leur carte</span></div>`;
             if (!eco.albumU || !d.cards) {
-                box.innerHTML = head + `<div class="album-list">${d.universes.map(x => `<button onclick="loadAlbum('${x.u}')"><b>${v7esc(x.name)}</b><span class="ab"><i style="width:${Math.round(100 * x.owned / x.total)}%"></i></span><small>${x.owned}/${x.total}${x.owned >= x.total ? ' 🏆' : ''}</small></button>`).join('')}</div>`;
+                box.innerHTML = head + `<div class="album-list">${d.universes.map(x => `<button onclick="loadAlbum('${x.u}')"><b>${v7esc(x.name)}</b><span class="ab"><i style="width:${Math.round(100 * x.owned / x.total)}%"></i></span><small>${x.owned}/${x.total} • ${Math.round(100*x.owned/Math.max(1,x.total))}%${x.owned >= x.total ? ' 🏆' : ''}</small></button>`).join('')}</div>`;
                 return;
             }
             const uni = d.universes.find(x => x.u === eco.albumU) || {};
@@ -10117,8 +10312,10 @@
         socket.on('clan_event', d => toast(d.text, '#ffd700'));
         socket.on('site_settings', () => setTimeout(() => { if (hub.home) hubRenderHome(); }, 0)); // bannière chance x2 / x10
         socket.on('rare_pull', d => { toast(`${{ cosmique: '🌌', eternelle: '♾️', omega: 'Ω' }[d.rarity] || '✨'} <b>${hubEsc(d.who)}</b> vient d'obtenir <b>${hubEsc(d.name)}</b> ${d.shiny ? 'brillante ' : ''}en carte <b>${hubEsc(d.label)}</b> !`, { cosmique: '#7b5cff', eternelle: '#ffd700', omega: '#ffffff' }[d.rarity]); if (d.rarity !== 'cosmique') confetti(3000); });
-        socket.on('trade_new', d => toast(`🔁 <b>${hubEsc(d.from)}</b> te propose un échange : ${hubEsc(d.give)} contre ${hubEsc(d.want)} <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Voir</button>`, '#48dbfb'));
-        socket.on('trade_done', d => toast(d.text, '#48dbfb'));
+        socket.on('trade_live_invite', d => { toast(`🔴 <b>${hubEsc(d.from)}</b> a ouvert un échange direct avec toi <button class="toast-btn" onclick="switchTab('collection');ecoTab('trade')">Ouvrir</button>`, '#48dbfb'); if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
+        socket.on('trade_live_state', d => { if (!d || !d.ok) return; trd.session = d.session || null; if (document.getElementById('eco-trade')?.style.display !== 'none') { if (!trd.mine.length) loadTrade(); else tradeRender(); } });
+        socket.on('trade_live_closed', () => { trd.session = null; if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
+        socket.on('trade_done', d => { toast(d.text, '#48dbfb'); if (/terminé/i.test(d.text || '')) confetti(1000); if (document.getElementById('eco-trade')?.style.display !== 'none') loadTrade(); });
         function hubJoinWeekly(code) {
             if (currentRoomCode && currentRoomCode !== code) socket.emit('leave_room', { roomCode: currentRoomCode });
             switchTab('mode');
@@ -10199,7 +10396,7 @@
         /* ---------- onglets de la Collection ---------- */
         (function () {
             const orig = ecoTab;
-            const NEW = ['pass', 'trade', 'fuse', 'clan', 'stats'];
+            const NEW = ['pass', 'trade', 'fuse', 'clan', 'stats', 'museum'];
             ecoTab = function (t) {
                 if (!NEW.includes(t)) { NEW.forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = 'none'; }); return orig(t); }
                 eco.tab = t;
@@ -10207,7 +10404,7 @@
                 ['shop', 'album', 'titles', 'challenges', ...NEW].forEach(k => { const el = document.getElementById('eco-' + k); if (el) el.style.display = k === t ? '' : 'none'; });
                 const box = document.getElementById('eco-' + t);
                 if (!isAccount()) { box.innerHTML = '<p class="tl-hint">Crée un compte pour accéder à cette partie.</p>'; return; }
-                ({ pass: loadPass, trade: loadTrade, fuse: loadFuse, clan: loadClan, stats: loadStats })[t]();
+                ({ pass: loadPass, trade: loadTrade, fuse: loadFuse, clan: loadClan, stats: loadStats, museum: loadMuseum })[t]();
             };
         })();
         function collectorCard(c) {
@@ -10263,78 +10460,90 @@
             loadPass();
         }
 
-        // --- échanges ---
-        const trd = { friend: null, mine: [], theirs: [], give: null, want: null, q1: '', q2: '' };
-        async function loadTrade() {
-            const box = document.getElementById('eco-trade');
-            const d = await v7get('/api/trade');
-            if (!d || !d.ok) return;
-            const tcard = (name, anime, img, rarity, fin, imgs) => `<div class="trd-c trd-card">${cardHtml({ name, anime, img, imgs, rarity: rarity || 'commune', finish: fin || null })}<small>${hubEsc(anime || '')}</small></div>`;
-            const row = (t, inc) => `<div class="trd-row"><div class="trd-who">${inc ? `<b>${hubEsc(t.fromName)}</b> te propose` : `Tu proposes à <b>${hubEsc(t.toName)}</b>`}</div>
-                <div class="trd-swap">${tcard(t.giveName, t.giveAnime, t.giveImg, t.giveRarity, t.giveFin, t.giveImgs)}<span>⇄</span>${tcard(t.wantName, t.wantAnime, t.wantImg, t.wantRarity, t.wantFin, t.wantImgs)}</div>
-                <div class="trd-act">${t.status === 'open' ? (inc ? `<button class="go" onclick="tradeRespond('${t.id}',true)">✔ Accepter</button><button onclick="tradeRespond('${t.id}',false)">Refuser</button>` : `<button onclick="tradeRespond('${t.id}',false)">Annuler</button>`) : `<span class="tl-hint">${{ done: '✅ Échange fait', refused: '❌ Refusé', cancelled: 'Annulé', failed: 'Carte plus disponible' }[t.status] || t.status}</span>`}</div></div>`;
-            box.innerHTML = `<h3 class="adm-h">📨 Propositions reçues</h3>${d.incoming.length ? d.incoming.map(t => row(t, true)).join('') : '<p class="tl-hint">Aucune proposition pour le moment.</p>'}
-                <h3 class="adm-h">🔁 Proposer un échange</h3>
-                ${d.friends.length ? `<select id="trd-friend" class="v7-input" onchange="tradePickFriend(this.value)"><option value="">Choisis un ami…</option>${d.friends.map(f => `<option value="${f.id}"${trd.friend == f.id ? ' selected' : ''}>${hubEsc(f.pseudo)}</option>`).join('')}</select><div id="trd-pick"></div>` : '<p class="tl-hint">Ajoute des amis (Options → Amis) pour pouvoir échanger des cartes.</p>'}
-                ${d.outgoing.length ? `<h3 class="adm-h">📤 Tes propositions</h3>${d.outgoing.map(t => row(t, false)).join('')}` : ''}`;
-            if (trd.friend) tradePickFriend(trd.friend);
-        }
-        async function tradePickFriend(fid) {
-            trd.friend = fid || null; trd.give = null; trd.want = null;
-            const pick = document.getElementById('trd-pick'); if (!pick) return;
-            if (!fid) { pick.innerHTML = ''; return; }
-            pick.innerHTML = '<p class="tl-hint">Chargement…</p>';
-            const [m, t] = await Promise.all([v7get('/api/trade/cards'), v7get('/api/trade/cards?friend=' + fid)]);
-            trd.mine = (m && m.cards) || []; trd.theirs = (t && t.cards) || [];
-            tradeRenderPick();
-        }
-        function tradeRenderPick() {
-            const pick = document.getElementById('trd-pick'); if (!pick) return;
-            const rars = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const sel = (id, cur, all) => `<select class="trd-sel" onchange="trd['${id}']=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${cur === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${rars.filter(r => all.some(c => c.rarity === r)).map(r => `<option value="${r}"${cur === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select>`;
-            pick.innerHTML = `<div class="trd-cols"><div><b>Tu donnes</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()">${sel('r1', trd.r1, trd.mine)}<div class="trd-list" id="trd-l-give"></div></div>
-                <div><b>Tu reçois</b><input class="v7-input" placeholder="🔎 Chercher" value="${hubEsc(trd.q2)}" oninput="trd.q2=this.value;tradeLists()">${sel('r2', trd.r2, trd.theirs)}<div class="trd-list" id="trd-l-want"></div></div></div>
-                <div id="trd-recap" class="trd-recap"></div>
-                <button class="btn-action" id="trd-send" disabled onclick="tradePropose()">🔁 Envoyer la proposition</button>`;
-            tradeLists();
-        }
-        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        // --- échanges directs ---
+        const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
+        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
-        function tradeLists() {
-            const rk = r => { const i = TRD_ORD.indexOf(r); return i < 0 ? 99 : i; };
-            const list = (arr, sel, side, q, rf) => {
-                const f = arr.filter(c => (!q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())) && (!rf || (rf === 'fin' ? !!c.finish : c.rarity === rf)))
-                    .sort((a, b) => rk(a.rarity) - rk(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || a.name.localeCompare(b.name, 'fr'));
-                return (f.length > 90 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (90 premières affichées)</p>` : '') + f.slice(0, 90).map(c => {
-                    const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
-                    return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === trdId(c) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSel('${side}',${JSON.stringify(trdId(c)).replace(/"/g, '&quot;')})">${img}${c.finish ? `<span class="tm-fin">${TRD_FIN[c.finish]}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${RAR_LABEL[c.rarity] || (c.rarity === 'collector' ? '⭐ Collector' : c.rarity)}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
-                }).join('') || '<p class="tl-hint">Aucune carte.</p>';
-            };
-            const g = document.getElementById('trd-l-give'), w = document.getElementById('trd-l-want'), b = document.getElementById('trd-send');
-            if (g) g.innerHTML = list(trd.mine, trd.give, 'give', trd.q1, trd.r1);
-            if (w) w.innerHTML = list(trd.theirs, trd.want, 'want', trd.q2, trd.r2);
-            if (b) b.disabled = !(trd.give && trd.want);
-            const rc = document.getElementById('trd-recap');
-            if (rc) {
-                const gc = trd.mine.find(c => trdId(c) === trd.give), wc = trd.theirs.find(c => trdId(c) === trd.want);
-                const lab = c => c ? `<b>${hubEsc(c.name)}</b> <span class="trd-rar">${RAR_LABEL[c.rarity] || c.rarity}${c.finish ? ' • ' + TRD_FIN[c.finish] : ''}${c.shiny ? ' ✨' : ''}</span>` : '<i>choisis une carte</i>';
-                rc.innerHTML = `Tu donnes ${lab(gc)} <span style="color:var(--accent-cyan);">⇄</span> tu reçois ${lab(wc)}`;
+        const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
+        function trdCard(c, empty) {
+            if (!c) return `<div class="trd-c trd-card"><div style="width:86px;height:108px;border:2px dashed #3b3b55;border-radius:10px;display:grid;place-items:center;font-size:1.7rem;">${empty || '❔'}</div><small>Aucune carte</small></div>`;
+            return `<div class="trd-c trd-card">${cardHtml({ name:c.name, anime:c.anime, img:c.img, imgs:c.imgs, rarity:c.rarity || 'commune', finish:c.finish || null })}<small>${hubEsc(c.anime || '')}</small></div>`;
+        }
+        async function loadTrade() {
+            const box = document.getElementById('eco-trade'); if (!box) return;
+            const [d, cards] = await Promise.all([v7get('/api/trade'), v7get('/api/trade/cards')]);
+            if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Impossible de charger les échanges.</p>'; return; }
+            trd.friends = d.friends || []; trd.session = d.session || null; trd.mine = (cards && cards.cards) || [];
+            tradeRender();
+            if (trd.showHistory) tradeLoadHistory();
+        }
+        function tradeRender() {
+            const box = document.getElementById('eco-trade'); if (!box) return;
+            const hist = `<label style="display:flex;align-items:center;gap:8px;margin:10px 0;cursor:pointer;"><input id="trd-history-toggle" type="checkbox" ${trd.showHistory ? 'checked' : ''} onchange="tradeHistoryToggle(this.checked)"> 🕘 Voir l’historique des échanges</label><div id="trd-history" style="display:${trd.showHistory ? '' : 'none'};"></div>`;
+            if (!trd.session) {
+                const online = trd.friends.filter(f => f.online);
+                box.innerHTML = `<div class="shop-head">🔁 <b>Échange en direct</b> <span class="tl-hint">• chacun choisit uniquement dans sa propre collection</span></div>
+                    <div class="trd-row" style="padding:14px;"><b>Ouvrir une table d’échange</b><p class="tl-hint" style="margin:3px 0 8px;">Choisis un ami connecté. Tu ne verras jamais sa collection : il posera lui-même sa carte.</p>
+                    ${online.length ? `<div class="ch-in"><select id="trd-friend" class="v7-input"><option value="">Choisis un ami connecté…</option>${online.map(f => `<option value="${f.id}" ${f.busy ? 'disabled' : ''}>${hubEsc(f.pseudo)}${f.busy ? ' • déjà en échange' : ''}</option>`).join('')}</select><button class="btn-action" style="width:auto;margin:0;" onclick="tradeOpen()">Ouvrir</button></div>` : '<p class="tl-hint">Aucun ami n’est connecté pour le moment.</p>'}</div>${hist}`;
+                return;
             }
+            const s = trd.session, me = s.me, other = s.other;
+            const myPicked = me.card ? trdId(me.card) : '';
+            const status = s.phase === 'confirm'
+                ? `<div class="trd-row" style="border-color:#ffd700;text-align:center;"><b>⚠️ Confirmation finale</b><p class="tl-hint" style="margin:4px 0;">Les deux joueurs ont accepté. Vérifie une dernière fois les deux cartes.</p><div class="trd-act"><button class="go" ${me.confirmed ? 'disabled' : ''} onclick="tradeConfirm(true)">${me.confirmed ? '✅ Confirmé — attente…' : '🔒 Confirmer définitivement'}</button><button onclick="tradeConfirm(false)">↩ Revenir</button></div></div>`
+                : `<div class="trd-act"><button class="go" ${!(me.card && other.card) || me.accepted ? 'disabled' : ''} onclick="tradeDecision(true)">${me.accepted ? '✅ Accepté — attente de ' + hubEsc(other.name) : '✔ Accepter l’échange'}</button><button onclick="tradeDecision(false)">✖ Refuser / quitter</button></div>`;
+            box.innerHTML = `<div class="shop-head">🔴 <b>Échange en direct avec ${hubEsc(other.name)}</b></div>
+                <div class="trd-row"><div class="trd-swap"><div><b>Toi</b>${trdCard(me.card, '🃏')}<small>${me.accepted ? '✅ accepté' : 'en attente'}</small></div><span>⇄</span><div><b>${hubEsc(other.name)}</b>${trdCard(other.card, '⌛')}<small>${other.accepted ? '✅ accepté' : 'choisit sa carte'}</small></div></div>${status}</div>
+                <h3 class="adm-h">🃏 Tes cartes</h3><p class="tl-hint">Clique sur une carte pour la poser. Si tu changes de carte, les validations des deux joueurs sont automatiquement annulées.</p>
+                <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans tes cartes" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()"><select class="trd-sel" style="max-width:210px" onchange="trd.r1=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${trd.r1 === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${TRD_ORD.filter(r => trd.mine.some(c => c.rarity === r)).map(r => `<option value="${r}"${trd.r1 === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select></div>
+                <div class="trd-list" id="trd-l-give"></div>${hist}`;
+            tradeLists(myPicked);
         }
-        function tradeSel(side, id) { trd[side] = trd[side] === id ? null : id; tradeLists(); }
-        async function tradePropose() {
-            const sp = id => { const i = String(id).lastIndexOf('#'); return [id.slice(0, i), id.slice(i + 1) || null]; };
-            const [give, giveFin] = sp(trd.give), [want, wantFin] = sp(trd.want);
-            const d = await v7post('/api/trade/propose', { friendId: +trd.friend, give, want, giveFin, wantFin });
-            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            toast('🔁 Proposition envoyée !', '#48dbfb'); trd.give = trd.want = null; loadTrade();
+        function tradeLists(selected) {
+            const g = document.getElementById('trd-l-give'); if (!g) return;
+            const rk = r => { const i = TRD_ORD.indexOf(r); return i < 0 ? 99 : i; };
+            const f = trd.mine.filter(c => (!trd.q1 || (c.name + ' ' + c.anime).toLowerCase().includes(trd.q1.toLowerCase())) && (!trd.r1 || (trd.r1 === 'fin' ? !!c.finish : c.rarity === trd.r1)))
+                .sort((a, b) => rk(a.rarity) - rk(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || a.name.localeCompare(b.name, 'fr'));
+            const sel = selected != null ? selected : (trd.session && trd.session.me.card ? trdId(trd.session.me.card) : '');
+            g.innerHTML = (f.length > 100 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (100 premières affichées)</p>` : '') + f.slice(0, 100).map(c => {
+                const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
+                return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === trdId(c) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSelect(${JSON.stringify(trdId(c)).replace(/"/g, '&quot;')})">${img}${c.finish ? `<span class="tm-fin">${TRD_FIN[c.finish]}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${RAR_LABEL[c.rarity] || (c.rarity === 'collector' ? '⭐ Collector' : c.rarity)}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
+            }).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
-        async function tradeRespond(id, accept) {
-            const d = await v7post('/api/trade/respond', { id, accept });
+        async function tradeOpen() {
+            const sel = document.getElementById('trd-friend'), fid = +(sel && sel.value || 0);
+            if (!fid) return toast('Choisis un ami connecté.', 'var(--accent-pink)');
+            const d = await v7post('/api/trade/live/open', { friendId: fid });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
-            if (d.got) { toast(`🔁 Échange fait : tu reçois ${hubEsc(d.got)} !`, '#48dbfb'); confetti(900); }
-            loadTrade();
+            trd.session = d.session; tradeRender(); toast('🔴 Table d’échange ouverte.', '#48dbfb');
+        }
+        async function tradeSelect(id) {
+            if (!trd.session) return;
+            const [key, finish] = trdSplit(id);
+            const d = await v7post('/api/trade/live/select', { key, finish });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            trd.session = d.session; tradeRender();
+        }
+        async function tradeDecision(accept) {
+            const d = await v7post('/api/trade/live/decision', { accept: !!accept });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (d.closed) { trd.session = null; loadTrade(); return; }
+            trd.session = d.session; tradeRender();
+        }
+        async function tradeConfirm(confirm) {
+            const d = await v7post('/api/trade/live/confirm', { confirm: !!confirm });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            if (d.done) { trd.session = null; confetti(1100); await loadTrade(); return; }
+            trd.session = d.session; tradeRender();
+        }
+        function tradeHistoryToggle(on) { trd.showHistory = !!on; const b = document.getElementById('trd-history'); if (b) b.style.display = on ? '' : 'none'; if (on) tradeLoadHistory(); }
+        async function tradeLoadHistory() {
+            const b = document.getElementById('trd-history'); if (!b || !trd.showHistory) return;
+            b.innerHTML = '<p class="tl-hint">Chargement de l’historique…</p>';
+            const d = await v7get('/api/trade/history'); if (!d || !d.ok) { b.innerHTML = '<p class="tl-hint">Historique indisponible.</p>'; return; }
+            const lab = { done:'✅ Terminé', refused:'❌ Refusé', cancelled:'Annulé', failed:'⚠️ Échoué', expired:'⌛ Expiré' };
+            b.innerHTML = d.history.length ? `<h3 class="adm-h">🕘 Historique</h3>${d.history.map(h => `<div class="trd-row"><div><b>${hubEsc(h.other.name || 'Joueur')}</b> • <small>${new Date(h.at).toLocaleString('fr-FR')}</small> • ${lab[h.status] || hubEsc(h.status)}</div><div class="trd-swap">${trdCard(h.mine.card, '—')}<span>⇄</span>${trdCard(h.other.card, '—')}</div></div>`).join('')}` : '<p class="tl-hint">Aucun ancien échange.</p>';
         }
 
         // --- fusion ---
@@ -11378,6 +11587,9 @@
                 <div class="h3-evt-row"><b>👹 Boss spécial</b><select id="h3-boss-hp"><option value="2000">2 000 PV</option><option value="3000" selected>3 000 PV</option><option value="6000">6 000 PV</option><option value="12000">12 000 PV</option></select><button class="btn-action" onclick="h3Event('boss',{hp:+document.getElementById('h3-boss-hp').value})">Lancer</button></div>
                 <div class="h3-evt-row"><b>⚡ Tournoi surprise</b><select id="h3-sur-m"><option value="2">dans 2 min</option><option value="5" selected>dans 5 min</option><option value="10">dans 10 min</option></select><button class="btn-action" onclick="h3Event('surprise',{minutes:+document.getElementById('h3-sur-m').value})">Lancer</button></div>
                 <div id="h3-evt-state" class="tl-hint" style="text-align:left;"></div></div>
+            <div class="opt-panel"><h2>🟢 Joueurs connectés <span id="h3-online-count" class="tl-hint"></span></h2>
+                <p class="tl-hint" style="text-align:left;">Pseudos actuellement connectés au site. La liste se met à jour automatiquement.</p>
+                <div id="h3-online"><p class="tl-hint">Chargement…</p></div><button onclick="h3OnlineLoad()">↻ Actualiser</button></div>
             <div class="opt-panel"><h2>🛡️ Modération</h2>
                 <div class="ch-in"><input id="h3-mod-q" class="v7-input" placeholder="🔎 Chercher un joueur (pseudo)" onkeydown="if(event.key==='Enter')h3ModSearch()"><button onclick="h3ModSearch()">Chercher</button></div>
                 <input id="h3-mod-reason" class="v7-input" maxlength="120" placeholder="Raison pour muter / bannir (facultatif)">
@@ -11391,7 +11603,14 @@
             const orig = window.switchTab;
             window.switchTab = function (t) { const r = orig.apply(this, arguments); if (t === 'admin') h3AdminLoad(); return r; };
         })();
-        function h3AdminLoad() { h3ModLoad(); h3AnnLoad(); h3StatsLoad(); v7get('/api/event').then(e => { if (e && e.ok) h3EvtState(e); }); }
+        function h3AdminLoad() { h3OnlineLoad(); h3ModLoad(); h3AnnLoad(); h3StatsLoad(); v7get('/api/event').then(e => { if (e && e.ok) h3EvtState(e); }); }
+        async function h3OnlineLoad() {
+            const box = document.getElementById('h3-online'); if (!box) return;
+            const d = await v7get('/api/admin/online'); if (!d || !d.ok) { box.innerHTML = '<p class="tl-hint">Liste indisponible.</p>'; return; }
+            const n = document.getElementById('h3-online-count'); if (n) n.textContent = `• ${d.count} joueur${d.count > 1 ? 's' : ''} • ${d.connections} connexion${d.connections > 1 ? 's' : ''}`;
+            box.innerHTML = d.players.length ? `<div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px;">${d.players.map(p => `<span class="rg-chip" style="border-color:#00ff88;"><span style="color:#00ff88">●</span> <b>${v7esc(p.name)}</b>${p.guest ? ' <small>(invité)</small>' : ''}${p.connections > 1 ? ` <small>×${p.connections}</small>` : ''}</span>`).join('')}</div>` : '<p class="tl-hint">Aucun joueur connecté.</p>';
+        }
+        setInterval(() => { if (!document.hidden && document.getElementById('admin')?.classList.contains('active')) h3OnlineLoad(); }, 5000);
         function h3EvtState(e) {
             const el = document.getElementById('h3-evt-state'); if (!el) return;
             const L = [];
@@ -11573,11 +11792,11 @@
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -11588,7 +11807,8 @@
                 halloween: [40, ['#ff7a00', '#ffb347', '#8a2be2', '#39ff14', '#111111'], 230, 'orbit'],
                 eveillee: [46, ['#ff2d55', '#ff8a00', '#ffffff', '#b3001b'], 260, 'up'], legende: [64, ['#ff4500', '#ffd700', '#ffffff', '#ff2a5f'], 320, 'out'],
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
-                valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out']
+                valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
+                altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out']
             };
             function smParticles(host, rar) {
                 const cfg = PARTS[rar]; if (!cfg) return;
@@ -12424,6 +12644,13 @@
         .tcard.r-legende .tc-rar{background:linear-gradient(90deg,#ff4500,#ffd700,#ff2a5f);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
         .tcard.r-duo{border:2px solid #00e5a0;box-shadow:0 0 12px rgba(0,229,160,.6);}
         .tcard.r-duo .tc-rar{color:#00e5a0;font-weight:900;}
+        .tcard.r-altart{border:3px solid transparent;background:linear-gradient(#111522,#111522) padding-box,linear-gradient(135deg,#00f0ff,#7b5cff,#ff2a95,#00f0ff) border-box;background-size:auto,300% 300%;animation:secretGlow 5s linear infinite;box-shadow:0 0 18px rgba(0,240,255,.38),0 0 34px rgba(123,92,255,.25);}
+        .tcard.r-altart .tc-img::after{content:'ALT ART';position:absolute;right:5px;bottom:5px;padding:2px 5px;border-radius:5px;background:rgba(5,8,18,.78);color:#9ff7ff;font-size:.58rem;font-weight:1000;letter-spacing:.7px;z-index:4;}
+        .tcard.r-altart .tc-rar{background:linear-gradient(90deg,#00f0ff,#a889ff,#ff7acb);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        .tcard.r-moment{border:3px solid #ffb000;background:linear-gradient(160deg,#1f1305,#101018 65%);box-shadow:0 0 16px rgba(255,176,0,.55),0 0 30px rgba(255,70,70,.18);}
+        .tcard.r-moment .tc-img::after{content:'🎬 MOMENT';position:absolute;right:5px;bottom:5px;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.78);color:#ffd56a;font-size:.58rem;font-weight:1000;letter-spacing:.5px;z-index:4;}
+        .tcard.r-moment .tc-rar{color:#ffd56a;font-weight:900;text-shadow:0 0 8px rgba(255,176,0,.5);}
+
         .tcard.r-noel{border:3px solid transparent;background:linear-gradient(#10150f,#10150f) padding-box,repeating-linear-gradient(45deg,#e8363d 0 8px,#fff 8px 16px,#1faa59 16px 24px,#fff 24px 32px) border-box;box-shadow:0 0 12px rgba(232,54,61,.5);}
         .tcard.r-noel .tc-img::after{content:'❄ ❅ ❆ ❄ ❅';position:absolute;inset:0;color:#fff;font-size:.8rem;letter-spacing:10px;word-break:break-all;opacity:.8;animation:rSnow 5s linear infinite;text-shadow:0 0 4px #9df;}
         .tcard.r-noel .tc-rar{color:#ff6b6b;font-weight:900;}
@@ -12516,8 +12743,8 @@
             const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff' };
             const FIN_ORDER = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
             const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'noel', 'valentin', 'ete'];
-            Object.assign(RAR_LABEL, { eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️' });
-            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️' });
+            Object.assign(RAR_LABEL, { eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
             const CARD_CACHE = window.CARD_CACHE = {};
             const esc = s => v7esc(s == null ? '' : String(s));
             function keyOf(c) {
@@ -12631,7 +12858,7 @@
                     ${d.quote ? `<div class="ci-row ci-quote">« ${esc(d.quote)} »</div>` : ''}
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
                         ${d.canUpgrade ? `<button class="btn-action" style="margin:0;flex:1;" data-act="up">✨ Améliorer la finition (5 doublons)</button>` : ''}
-                        ${d.n ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="vit">${d.showcase ? '🏆 Retirer de la vitrine' : '🏆 Mettre en vitrine'}</button>` : ''}
+                        ${d.n ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="vit">${d.showcase ? '🏛️ Retirer du musée' : '🏛️ Mettre au musée'}</button>` : ''}
                         ${typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="gyro">📱 Gyroscope</button>` : ''}
                     </div>
                     ${!d.canUpgrade && d.n ? `<div class="tl-hint" style="text-align:left;">✨ Avec 6 exemplaires, tu peux fusionner 5 doublons pour passer ta carte en Holo, puis Gold, puis Galaxie.</div>` : ''}`;
@@ -12646,8 +12873,8 @@
                     if (act === 'vit') {
                         const r = await v7post('/api/cards/showcase', { key });
                         if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
-                        const on = r.showcase.includes(key); b.textContent = on ? '🏆 Retirer de la vitrine' : '🏆 Mettre en vitrine';
-                        toast(on ? '🏆 Ajoutée à ta vitrine (visible sur ton profil public)' : 'Retirée de la vitrine', '#ffd700'); return;
+                        const on = r.showcase.includes(key); b.textContent = on ? '🏛️ Retirer du musée' : '🏛️ Mettre au musée';
+                        toast(on ? '🏆 Ajoutée à ton musée (visible sur ton profil public)' : 'Retirée du musée', '#ffd700'); return;
                     }
                     if (act === 'up') {
                         if (!confirm('Fusionner 5 doublons de cette carte pour améliorer sa finition ?')) return;
@@ -12676,8 +12903,8 @@
                     <p class="tl-hint" style="text-align:left;">Chaque carte que tu gagnes peut sortir avec une <b>finition</b> en plus de sa rareté (la chance x2 / x10 marche aussi). Passe la souris sur une carte, ou clique dessus pour l’inspecter en 3D.</p>
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
-                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png', 'https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
-                    <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Mets tes 3 plus belles cartes en <b>vitrine</b> sur ton profil. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
+                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['https://s4.anilist.co/file/anilistcdn/character/large/b17-phjcWCkRuIhu.png', 'https://s4.anilist.co/file/anilistcdn/character/large/b13-SISLEw1oAD7a.png'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
+                    <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
             };
@@ -12697,12 +12924,21 @@
                 if (eco.albumU) return;
                 const list = box.querySelector('.album-list');
                 if (X.showcaseCards && X.showcaseCards.length) {
-                    const s = document.createElement('div'); s.innerHTML = `<h3 class="adm-h">🏆 Ma vitrine</h3><div class="card-grid">${X.showcaseCards.map(c => cardHtml(c)).join('')}</div>`;
+                    const s = document.createElement('div'); s.innerHTML = `<h3 class="adm-h">🏛️ Mon musée</h3><div class="card-grid">${X.showcaseCards.map(c => cardHtml(c)).join('')}</div>`;
                     box.insertBefore(s, list);
                 }
                 const s2 = document.createElement('div');
                 s2.innerHTML = `<h3 class="adm-h">🎴 Cartes Duo <small class="tl-hint">${X.duos.length}/${X.duoTotal} • 1 carte sur 300 dans les boosters</small></h3>${X.duos.length ? `<div class="card-grid">${X.duos.map(c => cardHtml(c)).join('')}</div>` : '<p class="tl-hint">Pas encore de carte Duo : elles tombent au hasard dans les boosters.</p>'}`;
                 box.insertBefore(s2, list);
+                const renderSpecialSet = (title, arr, total, rateText) => {
+                    if (!Array.isArray(arr) || !total) return;
+                    const own = arr.filter(c => c.owned).length;
+                    const s = document.createElement('div');
+                    s.innerHTML = `<h3 class="adm-h">${title} <small class="tl-hint">${own}/${total} • ${rateText}</small></h3><div class="card-grid">${arr.map(c => c.owned ? cardHtml(c) : cardHtml({ rarity:c.rarity, img:c.img })).join('')}</div>`;
+                    box.insertBefore(s, list);
+                };
+                renderSpecialSet('🖼️ Alt Arts', X.altArts, X.altArtTotal, 'illustrations alternatives exclusives aux boosters');
+                renderSpecialSet('🎬 Cartes Moment', X.moments, X.momentTotal, 'scènes cultes exclusives aux boosters');
             };
         })();
     </script>
@@ -12726,13 +12962,13 @@
         .trd-mini .tm-fin{position:absolute;top:6px;right:6px;font-size:.55rem;font-weight:900;padding:1px 5px;border-radius:99px;background:rgba(0,0,0,.8);border:1px solid var(--fc,#fff);}
         .trd-mini .tm-duo{display:flex;width:100%;height:70px;border-radius:6px;overflow:hidden;}
         .trd-mini .tm-duo img{width:50%;height:70px;object-fit:cover;object-position:top;border-radius:0;}
-        .trd-mini.r-eveillee{border-color:#ff2d55;} .trd-mini.r-legende{border-color:#ff4500;} .trd-mini.r-duo{border-color:#00e5a0;}
+        .trd-mini.r-eveillee{border-color:#ff2d55;} .trd-mini.r-legende{border-color:#ff4500;} .trd-mini.r-duo{border-color:#00e5a0;} .trd-mini.r-altart{border-color:#00f0ff;} .trd-mini.r-moment{border-color:#ffb000;}
         .trd-mini.f-dark img{filter:invert(1) hue-rotate(180deg);} .trd-mini.f-manga img{filter:grayscale(1) contrast(1.5);} .trd-mini.f-gold img{filter:sepia(.45) saturate(1.5);}
     </style>
     <script>
         (function () {
-            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -12865,6 +13101,122 @@
             };
         })();
     </script>
-    <script src="/assets/js/ui-refactor.js?v=20261001"></script>
+
+<style>
+.missing-card .tc-img{background:radial-gradient(circle at 50% 35%,#303044,#11111a 72%);overflow:hidden}.missing-card .tc-img img{width:100%;height:100%;object-fit:cover}
+.museum-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.museum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}.museum-card{background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:7px;text-align:center}.museum-card.on{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.2)}.museum-card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px}.museum-card button{width:100%;margin-top:6px;background:#252538;color:#fff;border:1px solid #45455b;border-radius:7px;padding:7px;cursor:pointer}.museum-card.on button{border-color:#ffd700;color:#ffd700}
+.hof-season{border:1px solid #303044;background:#101018;border-radius:12px;padding:10px;margin:9px 0}.hof-season h3{margin:0 0 8px;color:var(--accent-yellow)}.hof-champ{padding:8px;border-radius:8px;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.35);margin-bottom:7px}.hof-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:6px}.hof-mode{background:#151522;border-radius:8px;padding:7px;font-size:.78rem}.hof-mode b{color:var(--accent-cyan)}
+.conn-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:min(820px,100%)}.conn-card{min-height:132px;border:2px solid #34344a;background:#11111b;color:#fff;border-radius:11px;padding:6px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;overflow:hidden;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}.conn-card:hover:not(:disabled){transform:translateY(-2px)}.conn-card img{width:100%;height:88px;object-fit:cover;object-position:50% 22%;border-radius:7px;background:#08080d}.conn-card .conn-name{font-size:.76rem;line-height:1.05;text-align:center}.conn-card .conn-anime{font-size:.58rem;line-height:1;color:var(--text-muted);font-weight:600;text-align:center}.conn-card.sel{border-color:var(--accent-yellow);background:rgba(255,230,0,.12);box-shadow:0 0 14px rgba(255,230,0,.16)}.conn-card.solved{border-color:#00ff88;background:rgba(0,255,136,.14);color:#baffd8;opacity:.72}.conn-card.solved img{filter:saturate(.65)}.conn-solved{width:min(820px,100%);display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}.conn-group{background:#101018;border:1px solid #00ff88;border-radius:8px;padding:7px;font-size:.76rem}
+.code-wrap{width:min(850px,100%)}.code-top{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}.code-team{padding:6px 9px;border-radius:999px;font-weight:900}.code-team.cyan{border:2px solid #00f0ff}.code-team.rose{border:2px solid #ff2a5f}.code-clue{padding:9px;border:1px solid #ffd93d;background:rgba(255,217,61,.08);border-radius:9px;text-align:center;margin-bottom:8px}.code-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.code-card{min-height:64px;border:2px solid #34344a;background:#11111b;color:#fff;border-radius:8px;padding:4px;font-size:.72rem;font-weight:800;cursor:pointer}.code-card.cyan{background:rgba(0,240,255,.18);border-color:#00f0ff}.code-card.rose{background:rgba(255,42,95,.18);border-color:#ff2a5f}.code-card.neutral{background:#363642}.code-card.assassin{background:#050508;border-color:#fff;color:#fff}.code-card.revealed{opacity:.82}.code-clue-form{display:flex;gap:6px;margin:8px 0}.code-clue-form input,.code-clue-form select{background:#101018;color:#fff;border:1px solid #45455b;border-radius:7px;padding:8px}.code-clue-form input{flex:1}
+.order-wrap{width:min(720px,100%)}.order-prompt{font-weight:900;color:var(--accent-yellow);margin-bottom:8px;text-align:center}.order-list{display:flex;flex-direction:column;gap:6px}.order-item{display:grid;grid-template-columns:36px 1fr 70px;align-items:center;gap:6px;background:#11111b;border:2px solid #34344a;border-radius:9px;padding:7px;cursor:grab}.order-item.drag{opacity:.5}.order-move{display:flex;gap:3px}.order-move button{background:#252538;color:#fff;border:1px solid #45455b;border-radius:5px;cursor:pointer}
+.gridc-wrap{width:min(850px,100%);overflow-x:auto}.gridc{display:grid;grid-template-columns:150px repeat(3,minmax(170px,1fr));gap:5px;min-width:700px}.gridc-head,.gridc-rowhead{background:#181828;border:1px solid #3a3a52;border-radius:8px;padding:8px;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center}.gridc-cell{background:#101018;border:1px solid #34344a;border-radius:8px;padding:6px}.gridc-cell.solved{border-color:#00ff88;background:rgba(0,255,136,.12);display:flex;align-items:center;justify-content:center;font-weight:900;color:#baffd8}.gridc-cell input{width:100%;background:#0b0b10;color:#fff;border:1px solid #404058;border-radius:6px;padding:7px}.gridc-cell button{width:100%;margin-top:4px;background:#252538;color:#fff;border:1px solid #45455b;border-radius:6px;padding:5px;cursor:pointer}
+@media(max-width:700px){.conn-grid{grid-template-columns:repeat(2,1fr)}.conn-solved{grid-template-columns:1fr}.code-card{font-size:.56rem;min-height:58px}.order-item{grid-template-columns:30px 1fr 62px}}
+</style>
+<script>
+/* ===== 7 AJOUTS UI ===== */
+ARC_UI.connections={title:'🧩 ANIME CONNECTIONS',sub:'16 persos avec leurs images • choisis un ou plusieurs univers • retrouve 4 groupes de 4 qui partagent un lien',universe:true};
+ARC_UI.codeanime={title:'🕵️ CODE ANIME',sub:'Deux équipes • un indice + un nombre • évite l’assassin',universe:false};
+ARC_UI.ordre={title:'⏳ REMETS-LES DANS L’ORDRE',sub:'Classe 5 personnages selon une donnée objective • score partiel si tu es proche',universe:false};
+ARC_UI.gridchallenge={title:'🎯 GRID CHALLENGE',sub:'3 univers × 3 catégories • trouve un perso valide dans chaque intersection',universe:false};
+let arcConnPrivate={solved:[]},arcConnSelection=[],arcCodePrivate=null,arcOrderIds=[],arcOrderKey='',arcGridPrivate={solved:{},attempts:0};
+
+(function addSevenGameButtons(){
+    const run=()=>{const grid=document.querySelector('.arc-menu .arc-menu-grid');if(!grid||grid.querySelector('[data-seven="connections"]'))return;
+        const defs=[['connections','🧩','Anime Connections','16 persos → forme 4 groupes de 4'],['codeanime','🕵️','Code Anime','2 équipes, indices secrets et assassin'],['ordre','⏳','Remets-les dans l’ordre','Classe 5 persos selon une donnée'],['gridchallenge','🎯','Grid Challenge','3 univers × 3 catégories à remplir']];
+        defs.forEach(([id,ico,name,sub])=>{const b=document.createElement('button');b.className='arc-game-btn';b.dataset.seven=id;b.innerHTML=`<span class="arc-ico">${ico}</span><b>${name}</b><span>${sub}</span>`;b.onclick=()=>openArcadeGame(id);grid.appendChild(b);});};
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else setTimeout(run,0);
+})();
+
+function connSolvedIds(){const out=new Set();(arcConnPrivate.solved||[]).forEach(g=>(g.items||[]).forEach(x=>out.add(x)));return out;}
+function renderConnections(q,stage){
+    const d=q.stage.connections||{},solved=connSolvedIds();stage.innerHTML='';const wrap=document.createElement('div');wrap.style.cssText='width:100%;display:flex;flex-direction:column;align-items:center;';
+    const grid=document.createElement('div');grid.className='conn-grid';(d.items||[]).forEach(it=>{const b=document.createElement('button');b.className='conn-card'+(solved.has(it.id)?' solved':'')+(arcConnSelection.includes(it.id)?' sel':'');b.disabled=solved.has(it.id)||q.phase!=='playing';b.innerHTML=`<img alt="" loading="lazy"><span class="conn-name">${escHtml(it.name)}</span><span class="conn-anime">${escHtml(it.anime||'')}</span>`;const im=b.querySelector('img');if(it.img)im.src='/api/img?u='+encodeURIComponent(it.img);else fetch(`/api/character-image?universeKey=${encodeURIComponent(it.u||'')}&name=${encodeURIComponent(it.name)}`).then(r=>r.json()).catch(()=>null).then(x=>{if(!im.isConnected)return;if(x&&x.imageUrl)im.src='/api/img?u='+encodeURIComponent(x.imageUrl);else im.style.opacity='.12';});im.onerror=()=>{im.style.opacity='.12';};b.onclick=()=>{if(arcConnSelection.includes(it.id))arcConnSelection=arcConnSelection.filter(x=>x!==it.id);else if(arcConnSelection.length<4)arcConnSelection.push(it.id);renderConnections(q,stage);};grid.appendChild(b);});wrap.appendChild(grid);
+    if(q.phase==='playing'){const send=document.createElement('button');send.className='btn-action';send.style.cssText='max-width:420px;margin-top:10px;';send.textContent=`Valider le groupe (${arcConnSelection.length}/4)`;send.disabled=arcConnSelection.length!==4;send.onclick=()=>{socket.emit('arc_connections_submit',{roomCode:currentRoomCode,ids:arcConnSelection});arcConnSelection=[];};wrap.appendChild(send);}
+    if((arcConnPrivate.solved||[]).length){const s=document.createElement('div');s.className='conn-solved';s.innerHTML=arcConnPrivate.solved.map(g=>`<div class="conn-group"><b>✅ ${escHtml(g.label)}</b><br>${(g.items||[]).map(id=>(d.items||[]).find(x=>x.id===id)?.name||id).map(escHtml).join(' • ')}</div>`).join('');wrap.appendChild(s);}stage.appendChild(wrap);
+}
+function codeRoleLabel(r){return r==='cyan'?'cyan':r==='rose'?'rose':r==='assassin'?'assassin':'neutral';}
+function renderCodeAnime(q,stage){
+    const d=q.stage.code||{},me=q.players.find(p=>p.id===socket.id)||{},myTeam=me.team,cap=!!arcCodePrivate?.captain;stage.innerHTML='';const w=document.createElement('div');w.className='code-wrap';
+    const n=id=>(q.players.find(p=>p.id===id)||{}).name||'—';w.innerHTML=`<div class="code-top"><span class="code-team cyan">🔵 ${d.remaining?.cyan??0} restants • capitaine ${escHtml(n(d.captains?.cyan))}</span><span><b>${d.turn==='cyan'?'🔵':'🔴'} Tour équipe ${d.turn==='cyan'?'cyan':'rose'}</b></span><span class="code-team rose">🔴 ${d.remaining?.rose??0} restants • capitaine ${escHtml(n(d.captains?.rose))}</span></div>`;
+    if(d.clue)w.insertAdjacentHTML('beforeend',`<div class="code-clue">Indice : <b>${escHtml(d.clue.word)}</b> • <b>${d.clue.number}</b> ${d.guessesLeft?`• ${d.guessesLeft} choix max restants`:''}</div>`);
+    if(q.phase==='playing'&&cap&&myTeam===d.turn&&!d.clue){const f=document.createElement('div');f.className='code-clue-form';f.innerHTML=`<input maxlength="30" placeholder="Ton indice (un mot / courte expression)"><select>${[1,2,3,4,5,6,7,8,9].map(x=>`<option>${x}</option>`).join('')}</select><button class="btn-action" style="width:auto;margin:0;">Donner l’indice</button>`;f.querySelector('button').onclick=()=>socket.emit('arc_code_clue',{roomCode:currentRoomCode,word:f.querySelector('input').value,number:+f.querySelector('select').value});w.appendChild(f);}
+    const grid=document.createElement('div');grid.className='code-grid';(d.items||[]).forEach(it=>{const role=it.revealed?it.role:(arcCodePrivate?.map?arcCodePrivate.map[it.id]:null);const b=document.createElement('button');b.className='code-card'+(role?' '+codeRoleLabel(role):'')+(it.revealed?' revealed':'');b.textContent=it.name;const can=q.phase==='playing'&&!it.revealed&&!cap&&myTeam===d.turn&&!!d.clue; b.disabled=!can;b.onclick=()=>socket.emit('arc_code_guess',{roomCode:currentRoomCode,id:it.id});grid.appendChild(b);});w.appendChild(grid);
+    if(q.phase==='playing'&&!cap&&myTeam===d.turn&&d.clue){const e=document.createElement('button');e.className='host-btn';e.style.marginTop='8px';e.textContent='⏭️ Arrêter de deviner / finir le tour';e.onclick=()=>socket.emit('arc_code_endturn',{roomCode:currentRoomCode});w.appendChild(e);}stage.appendChild(w);
+}
+function renderOrder(q,stage){
+    const d=q.stage.order||{};const k=q.round+'|'+q.phase;if(arcOrderKey!==k&&q.phase==='playing'){arcOrderKey=k;arcOrderIds=(d.items||[]).map(x=>x.id);}if(!arcOrderIds.length)arcOrderIds=(d.items||[]).map(x=>x.id);stage.innerHTML='';const w=document.createElement('div');w.className='order-wrap';w.innerHTML=`<div class="order-prompt">${escHtml(d.prompt||'')}</div>`;const list=document.createElement('div');list.className='order-list';
+    const map=Object.fromEntries((d.items||[]).map(x=>[x.id,x]));arcOrderIds.forEach((id,i)=>{const it=map[id];if(!it)return;const r=document.createElement('div');r.className='order-item';r.draggable=q.phase==='playing';r.dataset.id=id;r.innerHTML=`<b>${i+1}</b><span>${escHtml(it.name)}</span><span class="order-move"><button data-d="-1">▲</button><button data-d="1">▼</button></span>`;r.addEventListener('dragstart',()=>{r.classList.add('drag');window.__ordDrag=id;});r.addEventListener('dragend',()=>r.classList.remove('drag'));r.addEventListener('dragover',e=>e.preventDefault());r.addEventListener('drop',e=>{e.preventDefault();const from=arcOrderIds.indexOf(window.__ordDrag),to=arcOrderIds.indexOf(id);if(from>=0&&to>=0){const [x]=arcOrderIds.splice(from,1);arcOrderIds.splice(to,0,x);renderOrder(q,stage);}});r.querySelectorAll('button').forEach(b=>b.onclick=e=>{e.stopPropagation();const j=i+(+b.dataset.d);if(j<0||j>=arcOrderIds.length)return;[arcOrderIds[i],arcOrderIds[j]]=[arcOrderIds[j],arcOrderIds[i]];renderOrder(q,stage);});list.appendChild(r);});w.appendChild(list);
+    if(q.phase==='playing'){const b=document.createElement('button');b.className='btn-action';b.textContent='✅ Valider cet ordre';b.onclick=()=>socket.emit('arc_order_submit',{roomCode:currentRoomCode,ids:arcOrderIds});w.appendChild(b);}if((q.phase==='reveal'||q.phase==='finished')&&d.correct){const names=d.correct.map(id=>map[id]?.name).filter(Boolean);w.insertAdjacentHTML('beforeend',`<div class="tl-hint" style="text-align:left;margin-top:8px;">✅ Ordre correct : ${names.map(escHtml).join(' → ')}</div>`);}stage.appendChild(w);
+}
+function renderGridChallenge(q,stage){
+    const d=q.stage.grid||{},sol=arcGridPrivate.solved||{};stage.innerHTML='';const w=document.createElement('div');w.className='gridc-wrap';const g=document.createElement('div');g.className='gridc';g.innerHTML='<div class="gridc-head">ANIME × CATÉGORIE</div>'+ (d.cols||[]).map(c=>`<div class="gridc-head">${c.emoji||'🎯'} ${escHtml(c.label)}</div>`).join('');
+    (d.rows||[]).forEach((r,ri)=>{g.insertAdjacentHTML('beforeend',`<div class="gridc-rowhead">${escHtml(r.label)}</div>`);(d.cols||[]).forEach((c,ci)=>{const key=ri+'|'+ci,x=document.createElement('div');x.className='gridc-cell'+(sol[key]?' solved':'');if(sol[key])x.textContent='✅ '+sol[key];else{x.innerHTML='<input maxlength="80" placeholder="Un personnage…"><button>Valider</button>';const input=x.querySelector('input');const go=()=>{if(!input.value.trim())return;socket.emit('arc_grid_submit',{roomCode:currentRoomCode,row:ri,col:ci,text:input.value.trim()});};x.querySelector('button').onclick=go;input.onkeydown=e=>{if(e.key==='Enter')go();};}g.appendChild(x);});});w.appendChild(g);stage.appendChild(w);
+}
+const _arcRenderStageSeven=arcRenderStage;arcRenderStage=function(q){const stage=document.getElementById('arc-stage');if(!stage)return;if(q.game==='connections')return renderConnections(q,stage);if(q.game==='codeanime')return renderCodeAnime(q,stage);if(q.game==='ordre')return renderOrder(q,stage);if(q.game==='gridchallenge')return renderGridChallenge(q,stage);return _arcRenderStageSeven(q);};
+const _renderArcadeSeven=renderArcade;renderArcade=function(q){_renderArcadeSeven(q);if(!q||!['connections','codeanime','ordre','gridchallenge'].includes(q.game))return;const iw=document.getElementById('arc-input-wrap'),ch=document.getElementById('arc-choices');if(iw)iw.style.display='none';if(ch)ch.style.display='none';const r=document.getElementById('arc-result'),round=document.getElementById('arc-round'),ans=document.getElementById('arc-answered'),me=q.players.find(p=>p.id===socket.id)||{};
+    if(round)round.textContent=q.game==='ordre'?`Manche ${q.round}/${q.totalRounds}`:'🎯 Partie en cours';if(ans)ans.textContent=q.game==='connections'?`${me.progress||0}/4 groupes`:q.game==='gridchallenge'?`${me.progress||0}/9 cases`:q.game==='codeanime'?'Deux équipes • capitaine + joueurs':'Classe les 5 cartes';
+    if(q.phase==='playing'&&r&&!arcLastFeedback){r.style.color='var(--text-color)';r.textContent=q.game==='connections'?'Sélectionne exactement 4 personnages qui partagent un lien.':q.game==='codeanime'?(arcCodePrivate?.captain?'Tu es capitaine : donne un indice sans révéler les couleurs.':'Trouve les agents de ton équipe à partir de l’indice du capitaine.'):q.game==='ordre'?'Glisse les cartes ou utilise ▲/▼, puis valide.':'Trouve un personnage différent pour chaque intersection.';}
+};
+socket.on('arc_connections_private',d=>{arcConnPrivate=d||{solved:[]};arcConnSelection=[];if(arcState?.game==='connections'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_code_private',d=>{arcCodePrivate=d||null;if(arcState?.game==='codeanime'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_grid_private',d=>{arcGridPrivate=d||{solved:{}};if(arcState?.game==='gridchallenge'){arcStageKey='';arcRenderStage(arcState);}});
+socket.on('arc_state',q=>{if(!q)return;if(q.game!=='connections'){arcConnPrivate={solved:[]};arcConnSelection=[];}if(q.game!=='codeanime')arcCodePrivate=null;if(q.game!=='gridchallenge')arcGridPrivate={solved:{},attempts:0};});
+
+async function loadMuseum(){
+    const box=document.getElementById('eco-museum');if(!box)return;if(!isAccount()){box.innerHTML='<p class="tl-hint">Crée un compte pour ouvrir ton Musée.</p>';return;}box.innerHTML='<div class="arc-loading"><div class="arc-spin"></div></div>';
+    const [m,x]=await Promise.all([v7get('/api/cards/mine'),v7get('/api/cards/extra')]);if(!m?.ok||!x?.ok){box.innerHTML='<p class="tl-hint">Musée indisponible.</p>';return;}const selected=new Set(x.museum||x.showcase||[]);const cards=(m.cards||[]).slice().sort((a,b)=>(selected.has(b.key)-selected.has(a.key))||String(a.anime).localeCompare(String(b.anime),'fr')||String(a.name).localeCompare(String(b.name),'fr'));
+    box.innerHTML=`<div class="museum-head"><div><h3>🏛️ Mon Musée</h3><div class="tl-hint" style="text-align:left;">Expose jusqu’à <b>10 cartes</b> sur ton profil public • ${selected.size}/10 emplacements utilisés.</div></div></div><div class="museum-grid">${cards.map(c=>`<div class="museum-card ${selected.has(c.key)?'on':''}"><img src="${escHtml(c.img||'')}" alt=""><b>${escHtml(c.name)}</b><small style="display:block;color:var(--text-muted);">${escHtml(c.anime||'')} • ${escHtml(RAR_LABEL[c.rarity]||c.rarity||'')}</small><button onclick="museumToggle('${String(c.key).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">${selected.has(c.key)?'🏛️ Retirer':'➕ Exposer'}</button></div>`).join('')}</div>`;
+}
+async function museumToggle(key){const d=await v7post('/api/cards/showcase',{key});if(!d?.ok)return toast('❌ '+((d&&d.error)||'Impossible'),'var(--accent-pink)');loadMuseum();}
+
+async function loadHallOfFame(){
+    const box=document.getElementById('hof-box');if(!box)return;let d=null;try{d=await(await fetch('/api/hall-of-fame')).json();}catch(_){}if(!d?.ok||!d.seasons?.length){box.innerHTML='<p class="tl-hint">Le Hall of Fame se remplira quand des résultats mensuels seront enregistrés.</p>';return;}
+    box.innerHTML=d.seasons.map(s=>{const month=new Date(s.season+'-01T12:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});const c=s.champion;return `<div class="hof-season"><h3>📅 ${escHtml(month.charAt(0).toUpperCase()+month.slice(1))}</h3>${c?`<div class="hof-champ">👑 Champion global : <b>${escHtml(c.pseudo)}</b> • ${c.points} pts • ${c.wins} V</div>`:''}<div class="hof-modes">${(s.modes||[]).map(x=>`<div class="hof-mode"><b>${escHtml(x.label)}</b><br>🏆 ${escHtml(x.winner.pseudo)} • ${x.winner.wins} V • ${x.winner.points} pts</div>`).join('')}</div></div>`;}).join('');
+}
+</script>
+
+<style id="opt-collapse-style">
+    #options .opt-collapse-head,#admin .opt-collapse-head{display:flex;align-items:center;gap:10px;cursor:default;}
+    #options .opt-collapse-head .opt-collapse-btn,#admin .opt-collapse-head .opt-collapse-btn{
+        margin-left:auto;flex:0 0 auto;width:34px;height:30px;border-radius:8px;border:1px solid #41415b;
+        background:#171724;color:var(--accent-cyan);font-size:1rem;font-weight:1000;cursor:pointer;line-height:1;
+    }
+    #options .opt-collapse-head .opt-collapse-btn:hover,#admin .opt-collapse-head .opt-collapse-btn:hover{border-color:var(--accent-cyan);background:#202034;}
+    #options .opt-collapse-body,#admin .opt-collapse-body{display:block;}
+    #options .opt-collapsed>.opt-collapse-body,#admin .opt-collapsed>.opt-collapse-body{display:none!important;}
+    #options .opt-collapsed>.opt-collapse-head,#admin .opt-collapsed>.opt-collapse-head{margin-bottom:0!important;}
+</style>
+<script>
+/* ===== OPTIONS / ADMIN : catégories repliables ===== */
+(function(){
+    const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase().replace(/[^a-z0-9à-ÿ]+/gi,'-').slice(0,80);
+    function make(panel,scope){
+        if(!panel||panel.dataset.optCollapseReady==='1')return;
+        const h=[...panel.children].find(x=>x.tagName==='H2'); if(!h)return;
+        panel.dataset.optCollapseReady='1';
+        h.classList.add('opt-collapse-head');
+        const title=(h.textContent||'section').trim();
+        const key='animegame:collapse:v3:'+scope+':'+(panel.id||norm(title));
+        const body=document.createElement('div'); body.className='opt-collapse-body';
+        let n=h.nextSibling; while(n){const next=n.nextSibling; body.appendChild(n); n=next;}
+        panel.appendChild(body);
+        const b=document.createElement('button'); b.type='button'; b.className='opt-collapse-btn'; b.setAttribute('aria-label','Réduire ou ouvrir '+title); h.appendChild(b);
+        let collapsed=false; try{collapsed=localStorage.getItem(key)==='1';}catch(_){}
+        const apply=()=>{panel.classList.toggle('opt-collapsed',collapsed);b.textContent=collapsed?'▶':'▼';b.title=collapsed?'Ouvrir la catégorie':'Réduire la catégorie';b.setAttribute('aria-expanded',collapsed?'false':'true');};
+        b.onclick=e=>{e.preventDefault();e.stopPropagation();collapsed=!collapsed;try{localStorage.setItem(key,collapsed?'1':'0');}catch(_){}apply();};
+        apply();
+    }
+    function scan(){
+        const opts=document.getElementById('options');
+        if(opts)[...opts.children].filter(x=>x.nodeType===1&&[...x.children].some(c=>c.tagName==='H2')).forEach(x=>make(x,'options'));
+        const adm=document.getElementById('admin');
+        if(adm)adm.querySelectorAll('.opt-panel').forEach(x=>make(x,'admin'));
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan);else scan();
+    const obs=new MutationObserver(()=>scan()); if(document.body)obs.observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+    <script src="/assets/js/ui-refactor.js?v=20261001b"></script>
 </body>
 </html>
