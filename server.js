@@ -370,6 +370,44 @@ async function fetchFandomPageImageBySearch(host, name) {
     return pages.length ? pageImageFromApiPage(pages[0]) : null;
 }
 
+
+// Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
+// l'image principale de la page personnage (qui est précisément la cause de "Sasuke normal").
+async function fetchFandomTransformationImage(host, character, form) {
+    const clean = x => normalizeImageKey(String(x||'')).split(' ').filter(t => t.length > 2 && !['mode','form','forme','anime','transformation'].includes(t));
+    const want = [...new Set([...clean(character), ...clean(form)])];
+    const searches = [`${character} ${form}`, form, character].filter(Boolean);
+    let files = [];
+    for (const term of searches) {
+        try {
+            const sp = new URLSearchParams({action:'query',generator:'search',gsrsearch:term,gsrnamespace:'0',gsrlimit:'5',prop:'images',imlimit:'100',format:'json',origin:'*'});
+            const d = await fetchJsonWithTimeout(`https://${host}/api.php?${sp}`, 12000);
+            for (const pg of Object.values(d?.query?.pages||{})) for (const im of (pg.images||[])) if (im?.title) files.push(im.title);
+        } catch (_) {}
+    }
+    files = [...new Set(files)].filter(t => /^File:/i.test(t) && !/logo|icon|symbol|map|volume|chapter|cover|game|card|render.*logo/i.test(t));
+    const score = title => {
+        const n = normalizeImageKey(title.replace(/^File:/i,''));
+        let sc = 0; for (const t of want) if (n.includes(t)) sc += t.length > 5 ? 5 : 3;
+        for (const t of clean(form)) if (n.includes(t)) sc += 8;
+        if (/anime|episode|screenshot|png|webp|jpg|jpeg/.test(n)) sc += 1;
+        return sc;
+    };
+    files.sort((a,b)=>score(b)-score(a));
+    const best = files.filter(f=>score(f) >= Math.max(8, clean(form).length ? 8 : 12)).slice(0,12);
+    if (!best.length) return null;
+    try {
+        const qp = new URLSearchParams({action:'query',titles:best.join('|'),prop:'imageinfo',iiprop:'url|mime',iiurlwidth:'900',format:'json',origin:'*'});
+        const d = await fetchJsonWithTimeout(`https://${host}/api.php?${qp}`, 12000);
+        const pages = Object.values(d?.query?.pages||{}).sort((a,b)=>score(b.title)-score(a.title));
+        for (const pg of pages) {
+            const ii=pg.imageinfo?.[0]; const u=ii?.thumburl||ii?.url;
+            if (u && /^https:/i.test(u) && /^image\//i.test(ii?.mime||'image/unknown')) return u;
+        }
+    } catch (_) {}
+    return null;
+}
+
 // Images personnages : statiques vérifiées + thèmes + Fandom + secours AniList.
 // Les anciens "missing" en base ne bloquent plus définitivement une image : ils sont retentés
 // au redémarrage puis avec un délai, ce qui permet de réparer les photos sans vider la DB.
@@ -12553,7 +12591,7 @@ async function arcBuildRound(g) {
     if (game === 'pixel' || game === 'silhouette') {
         for (let attempt = 0; attempt < 4; attempt++) {
             const u = arcPickUniverse(g);
-            const [c] = await arcFindCharacters(g, u, 1, 6);
+            const [c] = await arcFindCharacters(g, u, 1, 24);
             if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display };
         }
         return null;
@@ -13227,7 +13265,9 @@ app.get('/api/arcade/item-image', async (req, res) => {
                             if (host) {
                                 const form = String(it.name || '').trim();
                                 const charName = String(it.char || parts[0] || '').trim();
-                                // Essais ciblés, du plus précis au plus général, sans fallback portrait personnage.
+                                // D'abord les fichiers/galeries dont le nom correspond réellement à la forme.
+                                try { url = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
+                                // Puis les pages ciblées, toujours sans fallback portrait personnage.
                                 const searches = [
                                     `${charName} ${form}`.trim(),
                                     form
@@ -15445,7 +15485,7 @@ arcBuildRound = async function (g) {
     if (g.game !== 'couleur') return _arcBuildRound7(g);
     for (let tries = 0; tries < 3; tries++) {
         const u = g.universe && g.universe !== 'all' ? g.universe : arcPickUniverse(g);
-        const [c] = await arcFindCharacters(g, u, 1, 6);
+        const [c] = await arcFindCharacters(g, u, 1, 24);
         if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display };
     }
     return null;
@@ -17948,7 +17988,7 @@ arcBuildRound = async function (g) {
     if (g.game !== 'zoom') return _arcBuildRoundZoom(g);
     for (let attempt = 0; attempt < 4; attempt++) {
         const u = arcPickUniverse(g);
-        const [c] = await arcFindCharacters(g, u, 1, 6);
+        const [c] = await arcFindCharacters(g, u, 1, 24);
         // point de départ : un détail du perso (visage, main, arme…) vers le centre de l'image
         if (c) return { u, targets: [c], img: arcToken(c.url), answer: c.display, focus: { x: +(0.28 + Math.random() * 0.44).toFixed(3), y: +(0.18 + Math.random() * 0.45).toFixed(3) } };
     }
@@ -21249,7 +21289,16 @@ function fwEndsAt(wk = weekKey()) { // lundi suivant, minuit heure de Paris
     const t = Date.UTC(y, m - 1, d + 7);
     return t - parisParts(t).h * 3600000;
 }
-async function fwState(wk = weekKey()) { return kvGet('fwar', wk, { a: 0, b: 0, by: {} }); }
+async function fwState(wk = weekKey()) {
+    const m = fwMatch(wk);
+    const sig = m ? `${m.a.u}|${m.b.u}` : '';
+    let st = await kvGet('fwar', wk, { a: 0, b: 0, by: {}, match: sig });
+    // Si l'algorithme / la liste d'anime a changé pendant la semaine, un ancien camp ne doit
+    // jamais rester attaché à la nouvelle affiche. On repart proprement pour ce nouveau duel.
+    if (!st || st.match !== sig) st = { a: 0, b: 0, by: {}, match: sig };
+    st.by = st.by || {}; st.a = Number(st.a)||0; st.b = Number(st.b)||0; st.match = sig;
+    return st;
+}
 function fwCount(st) {
     const n = { a: 0, b: 0 };
     Object.values(st.by || {}).forEach(x => { if (n[x.s] !== undefined) n[x.s]++; });
@@ -22686,7 +22735,7 @@ publicRoomMax = function(room) {
    ===================================================================== */
 
 ARC_GAMES.connections   = { label:'Anime Connections',       icon:'🧩', universe:true,  rounds:1, roundMs:90000,  answer:'connections' };
-ARC_GAMES.codeanime     = { label:'Code Anime',              icon:'🕵️', universe:false, rounds:1, roundMs:600000, answer:'codeanime' };
+ARC_GAMES.codeanime     = { label:'Code Anime',              icon:'🕵️', universe:true,  rounds:1, roundMs:600000, answer:'codeanime' };
 ARC_GAMES.ordre         = { label:"Remets-les dans l’ordre", icon:'⏳', universe:false, rounds:5, roundMs:45000,  answer:'order' };
 ARC_GAMES.gridchallenge = { label:'Grid Challenge',          icon:'🎯', universe:false, rounds:1, roundMs:120000, answer:'grid' };
 MODE_LABELS['arcade:connections'] = 'Anime Connections';
@@ -22809,10 +22858,13 @@ function connPrivate(socketId,g){
 }
 function connFinish(room,roomCode){ const g=arcGames[roomCode]; if(!g||g.game!=='connections'||g.phase==='finished')return; arcFinish(room,roomCode); }
 
-function codeBuildBoard(){
-    const pool=arcShuffle(bingoCatalog()).filter((c,i,a)=>a.findIndex(x=>normalizeRG(x.name)===normalizeRG(c.name))===i).slice(0,25);
+function codeBuildBoard(universes){
+    const allowed = new Set((universes && universes.length ? universes : arcUniverses()));
+    const catalog = bingoCatalog().filter(c => allowed.has(c.u));
+    // On déduplique par univers + personnage : deux homonymes de deux anime différents restent valides.
+    const pool=arcShuffle(catalog).filter((c,i,a)=>a.findIndex(x=>x.u===c.u && normalizeRG(x.name)===normalizeRG(c.name))===i).slice(0,25);
     if(pool.length<25)return null;
-    const items=pool.map((c,i)=>({id:'c'+i,name:c.name,anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'',u:c.u}));
+    const items=pool.map((c,i)=>({id:'c'+i,name:c.name,anime:ARC_UNIVERSE_ANIME[c.u]||c.anime||'',u:c.u,img:staticCharImage(c.u,c.name)||null}));
     const ids=arcShuffle(items.map(x=>x.id)); const roles={};
     ids.slice(0,9).forEach(id=>roles[id]='cyan'); ids.slice(9,17).forEach(id=>roles[id]='rose'); ids.slice(17,24).forEach(id=>roles[id]='neutral'); roles[ids[24]]='assassin';
     return {items,roles};
@@ -22900,10 +22952,11 @@ startArcade = function(room,roomCode){
     }
     if(game==='codeanime'){
         if(room.players.length<4){io.to(roomCode).emit('game_error','Code Anime demande au moins 4 joueurs (2 équipes).');return;}
-        const board=codeBuildBoard();if(!board){io.to(roomCode).emit('game_error','Impossible de créer la grille Code Anime.');return;}
+        const cs=connSubSettings(room.subMode); // même sélection 1 / plusieurs / tous les univers que les autres modes
+        const board=codeBuildBoard(cs.universes);if(!board){io.to(roomCode).emit('game_error',{message:'Pas assez de personnages pour Code Anime avec cette sélection. Choisis davantage d’univers.'});return;}
         arcStop(roomCode);const teams={},lists={cyan:[],rose:[]};room.players.forEach((p,i)=>{const t=i%2===0?'cyan':'rose';teams[p.id]=t;lists[t].push(p.id);});
         const captains={cyan:lists.cyan[0],rose:lists.rose[0]},now=Date.now();
-        const g={game:'codeanime',universe:'all',round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+600000,code:{...board,teams,lists,captains,revealed:new Set(),turn:'cyan',clue:null,guessesLeft:0,winner:null,reason:''}};
+        const g={game:'codeanime',universe:cs.universeSpec,uniList:cs.universes,round:1,totalRounds:1,phase:'playing',current:{},answers:{},found:{},gainedRound:{},scores:Object.fromEntries(room.players.map(p=>[p.id,0])),used:new Set(),usedU:[],lastGuess:{},startedAt:now,endsAt:now+600000,code:{...board,teams,lists,captains,revealed:new Set(),turn:'cyan',clue:null,guessesLeft:0,winner:null,reason:''}};
         arcGames[roomCode]=g;room.status='arc_playing';arcEmit(room,roomCode);codeSendPrivate(room,g);g.timer=setTimeout(()=>{const a=codeRemaining(g,'cyan'),b=codeRemaining(g,'rose');codeFinish(room,roomCode,a<=b?'cyan':'rose','Temps écoulé');},600100);return;
     }
     if(game==='gridchallenge'){
