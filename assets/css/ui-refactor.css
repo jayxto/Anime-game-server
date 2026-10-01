@@ -1045,3 +1045,24 @@ body.ag-game-page #app-root > #mode,
 /* Streamer : ne jamais masquer Plus ou moins / Survie / Chaos à cause de la limite des 10 mini-jeux */
 #mode .arc-menu.arc-stream-view .arc-game-btn:nth-child(n+11){display:grid!important}
 #mode .arc-menu.arc-stream-view .arc-game-btn.mc-hidden{display:none!important}
+
+/* ===== HOTFIX INPUT MOBILE 2026-10-01 =====
+   L'overlay du menu ne doit jamais intercepter les taps quand le tiroir est fermé. */
+@media (max-width: 899px){
+  #mode-cats,[data-mode-cat],.arc-menu-refactor-toggle,.game-mode-card button,.arc-game-btn,
+  .ag-mobile-bottom button,.ag-dash-top button,.ag-dash-top input{
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
+  .ag-mobile-backdrop{
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+  body.ag-mobile-menu-open .ag-mobile-backdrop{
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  body:not(.ag-mobile-menu-open) .ag-dash-sidebar{
+    pointer-events:none!important;
+  }
+}
