@@ -814,4 +814,17 @@
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true });
     else init();
+
+    // iOS/Safari : intercepter le toucher avant les overlays du dashboard/audio.
+    // Cela rend les catégories Jouer fiables même quand une couche visuelle passe au-dessus.
+    const mobileCategoryTap = e => {
+        const btn = e.target && e.target.closest ? e.target.closest('#mode-cats [data-mode-cat], #mode-cats button') : null;
+        if (!btn) return;
+        let cat = btn.dataset.modeCat || '';
+        if (!cat) { const m = (btn.getAttribute('onclick') || '').match(/modeCat\(['\"]([^'\"]+)/); cat = m ? m[1] : ''; }
+        if (!cat || typeof window.modeCat !== 'function') return;
+        e.preventDefault(); e.stopPropagation();
+        window.modeCat(cat);
+    };
+    document.addEventListener('touchstart', mobileCategoryTap, {capture:true,passive:false});
 })();
