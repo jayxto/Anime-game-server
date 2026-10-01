@@ -14582,7 +14582,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:46.538Z"
+      "updatedAt": "2026-10-01T19:55:28.191Z"
     },
     "jojo|blackmore": {
       "universe": "jojo",
@@ -14626,7 +14626,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:46.913Z"
+      "updatedAt": "2026-10-01T19:55:39.375Z"
     },
     "jojo|magent magent": {
       "universe": "jojo",
@@ -14648,7 +14648,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:46.969Z"
+      "updatedAt": "2026-10-01T19:56:01.221Z"
     },
     "jojo|dr ferdinand": {
       "universe": "jojo",
@@ -14670,7 +14670,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:47.866Z"
+      "updatedAt": "2026-10-01T19:55:17.228Z"
     },
     "jojo|joshu higashikata": {
       "universe": "jojo",
@@ -14698,7 +14698,7 @@
       "originalBytes": 189115,
       "webpBytes": 23782,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "jojo|yasuho hirose": {
       "universe": "jojo",
@@ -14709,7 +14709,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:49.306Z"
+      "updatedAt": "2026-10-01T19:58:02.502Z"
     },
     "mushoku|roxy migurdia": {
       "universe": "mushoku",
@@ -14726,7 +14726,7 @@
       "originalBytes": 183161,
       "webpBytes": 19752,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|sylphiette": {
       "universe": "mushoku",
@@ -14743,7 +14743,7 @@
       "originalBytes": 170176,
       "webpBytes": 17470,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "jojo|norisuke higashikata iv": {
       "universe": "jojo",
@@ -14754,7 +14754,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:57:29.612Z"
     },
     "mushoku|eris boreas greyrat": {
       "universe": "mushoku",
@@ -14771,7 +14771,7 @@
       "originalBytes": 175850,
       "webpBytes": 16290,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|ruijerd superdia": {
       "universe": "mushoku",
@@ -14788,7 +14788,7 @@
       "originalBytes": 170860,
       "webpBytes": 15982,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.490Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|orsted": {
       "universe": "mushoku",
@@ -14805,7 +14805,7 @@
       "originalBytes": 153254,
       "webpBytes": 15530,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|ghislaine dedoldia": {
       "universe": "mushoku",
@@ -14822,7 +14822,7 @@
       "originalBytes": 155373,
       "webpBytes": 19970,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|paul greyrat": {
       "universe": "mushoku",
@@ -14839,7 +14839,7 @@
       "originalBytes": 173666,
       "webpBytes": 18312,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.503Z"
     },
     "mushoku|zenith greyrat": {
       "universe": "mushoku",
@@ -14856,7 +14856,7 @@
       "originalBytes": 169595,
       "webpBytes": 19202,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|nanahoshi shizuka": {
       "universe": "mushoku",
@@ -14873,7 +14873,7 @@
       "originalBytes": 115361,
       "webpBytes": 10744,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "jojo|jobin higashikata": {
       "universe": "jojo",
@@ -14901,7 +14901,7 @@
       "originalBytes": 169870,
       "webpBytes": 18914,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|norn greyrat": {
       "universe": "mushoku",
@@ -14918,7 +14918,7 @@
       "originalBytes": 183768,
       "webpBytes": 22458,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|aisha greyrat": {
       "universe": "mushoku",
@@ -14935,7 +14935,7 @@
       "originalBytes": 184398,
       "webpBytes": 20232,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|hitogami": {
       "universe": "mushoku",
@@ -14952,7 +14952,7 @@
       "originalBytes": 13115,
       "webpBytes": 1044,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|kishirika kishirisu": {
       "universe": "mushoku",
@@ -14969,7 +14969,7 @@
       "originalBytes": 182307,
       "webpBytes": 25232,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.491Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|elinalise dragonroad": {
       "universe": "mushoku",
@@ -14986,7 +14986,7 @@
       "originalBytes": 168948,
       "webpBytes": 17330,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.492Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|philip boreas greyrat": {
       "universe": "mushoku",
@@ -15003,7 +15003,7 @@
       "originalBytes": 122784,
       "webpBytes": 7572,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.492Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|hilda boreas greyrat": {
       "universe": "mushoku",
@@ -15020,7 +15020,7 @@
       "originalBytes": 138211,
       "webpBytes": 12224,
       "status": "cached",
-      "updatedAt": "2026-10-01T13:47:49.492Z"
+      "updatedAt": "2026-10-01T19:58:02.504Z"
     },
     "mushoku|sauros boreas greyrat": {
       "universe": "mushoku",
@@ -15099,7 +15099,7 @@
       "errors": [
         "char-images: HTTP 404"
       ],
-      "updatedAt": "2026-10-01T13:47:50.003Z"
+      "updatedAt": "2026-10-01T19:57:07.427Z"
     },
     "mushoku|talhand": {
       "universe": "mushoku",
@@ -34130,5 +34130,5 @@
       "updatedAt": "2026-10-01T12:32:09.589Z"
     }
   },
-  "generatedAt": "2026-10-01T19:54:44.196Z"
+  "generatedAt": "2026-10-01T19:58:02.504Z"
 }
