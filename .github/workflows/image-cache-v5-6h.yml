@@ -6,7 +6,7 @@ on:
       refresh:
         description: 'Redownload even when some cached files already exist'
         required: false
-        default: 'true'
+        default: 'false'
       deep:
         description: 'Use deep search mode'
         required: false
@@ -14,13 +14,13 @@ on:
   push:
     paths:
       - 'scripts/cache-character-images.mjs'
-      - '.github/workflows/**image-cache*.yml'
-      - 'char-images.json'
-      - 'qap-themes.json'
-      - 'tierlist-themes.json'
 
 permissions:
   contents: write
+
+concurrency:
+  group: anime-image-cache-main
+  cancel-in-progress: true
 
 jobs:
   cache-images:
@@ -37,26 +37,31 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Install image converter
         run: npm install sharp
 
-      - name: Download, repair and convert images
+      - name: Download, repair, checkpoint and convert images
         env:
           IMAGE_CACHE_REFRESH: ${{ inputs.refresh == 'true' && '1' || '0' }}
           IMAGE_CACHE_DEEP: ${{ inputs.deep == 'false' && '0' || '1' }}
           IMAGE_CACHE_CONCURRENCY: '6'
           IMAGE_CACHE_SIZE: '384'
           IMAGE_CACHE_QUALITY: '80'
+          IMAGE_CACHE_CHECKPOINT_EVERY: '25'
         run: node scripts/cache-character-images.mjs --deep
 
-      - name: Commit generated image cache
+      - name: Commit final reports and rewrites
+        if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
           if git diff --cached --quiet; then
-            echo "No changes to commit"
+            echo "No final changes to commit"
             exit 0
           fi
-          git commit -m "chore: refresh image cache"
+          git commit -m "chore: finalize image cache run"
           git push
