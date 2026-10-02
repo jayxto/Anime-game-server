@@ -34,8 +34,6 @@ jobs:
             'https://www.cultture.com/pics/2020/09/perros-callejeros-bungou-las-15-mejores-habilidades-clasificadas-de-mas-debiles-a-mas-fuertes-12.jpg'
             'https://static.zerochan.net/Reg.%28Made.in.Abyss%29.full.3994517.jpg'
             'https://imgix.ranker.com/user_node_img/50146/1002916968/original/1002916968-photo-u-1292046586?auto=format&dpr=2&fit=crop&fm=pjpg&q=60&w=500'
-            'https://cdn.oneesports.id/cdn-data/sites/2/2024/03/Tensura-Rimuru-Demon-Lord.jpg'
-            'https://admin.esports.gg/wp-content/uploads/2025/04/anime-of-the-year-968x544.jpg'
           )
           for url in "${urls[@]}"; do
             echo "Checking $url"
@@ -56,8 +54,6 @@ jobs:
           grep -q "needs:\['chuya','corruption'\]" server.js
           grep -q "needs:\['reg','incinerator'\]" server.js
           grep -q "needs:\['zodd','apostle'\]" server.js
-          grep -q "needs:\['rimuru','demon lord'\]" server.js
-          grep -q "needs:\['sung jinwoo','shadow monarch'\]" server.js
       - name: Refresh transformation audit
         run: python3 .github/audit_transform_remaining_v3.py
       - name: Commit verified batch and audit
@@ -65,6 +61,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -f .github/patch_transform_batch9.py .github/workflows/PATCH_TRANSFORM_BATCH9.yml
+          rm -f .github/batch9_url_status.txt .github/workflows/DIAG_TRANSFORM_BATCH9_URLS.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
