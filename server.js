@@ -795,7 +795,14 @@ const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
     { needs:['kaneki','dragon kaneki'], url:'https://66.media.tumblr.com/0079638e6e2c7fb1f3d92682d4a167f2/tumblr_inline_ozekdzBmGh1rbthts_540.png' },
     { needs:['ryuko','senketsu kisaragi'], url:'https://www.navitoworld.com/cdn/shop/products/Ryuko_Matoi_Senketsu_Kisaragi_Ver._GSC_00.jpg?v=1429113293' },
     { needs:['shigaraki','awakened'], url:'https://thetv.jp/i/nw/1303692/15566033.jpg?w=1284' },
-    { needs:['bondrewd','white whistle'], url:'https://static.zerochan.net/Bondrewd.full.3725399.jpg' }
+    { needs:['bondrewd','white whistle'], url:'https://static.zerochan.net/Bondrewd.full.3725399.jpg' },
+    // QAP_VERIFIED_TRANSFORM_BATCH9 — six sources confirmed reachable from GitHub Actions.
+    { needs:['akira','devilman'], url:'https://gamemag.ru/images/imagemanager/cache/cb/e00e/cbe00e_devilman-crybaby.jpg' },
+    { needs:['kaneki','centipede'], url:'https://abrakadabra.fun/uploads/posts/2022-03/1646914049_27-abrakadabra-fun-p-kaneki-s-kagune-sorokonozhki-43.jpg' },
+    { needs:['lelouch','zero'], url:'https://ogre.natalie.mu/media/news/comic/2019/0209/02.jpg?imdensity=1&impolicy=lt&imwidth=1000' },
+    { needs:['chuya','corruption'], url:'https://www.cultture.com/pics/2020/09/perros-callejeros-bungou-las-15-mejores-habilidades-clasificadas-de-mas-debiles-a-mas-fuertes-12.jpg' },
+    { needs:['reg','incinerator'], url:'https://static.zerochan.net/Reg.%28Made.in.Abyss%29.full.3994517.jpg' },
+    { needs:['zodd','apostle'], url:'https://imgix.ranker.com/user_node_img/50146/1002916968/original/1002916968-photo-u-1292046586?auto=format&dpr=2&fit=crop&fm=pjpg&q=60&w=500' }
 ];
 
 function qapVerifiedTransformSource(animeName, charName, form) {

@@ -1,8 +1,0 @@
-01 200 https://gamemag.ru/images/imagemanager/cache/cb/e00e/cbe00e_devilman-crybaby.jpg
-02 200 https://abrakadabra.fun/uploads/posts/2022-03/1646914049_27-abrakadabra-fun-p-kaneki-s-kagune-sorokonozhki-43.jpg
-03 200 https://ogre.natalie.mu/media/news/comic/2019/0209/02.jpg?imdensity=1&impolicy=lt&imwidth=1000
-04 200 https://www.cultture.com/pics/2020/09/perros-callejeros-bungou-las-15-mejores-habilidades-clasificadas-de-mas-debiles-a-mas-fuertes-12.jpg
-05 200 https://static.zerochan.net/Reg.%28Made.in.Abyss%29.full.3994517.jpg
-06 200 https://imgix.ranker.com/user_node_img/50146/1002916968/original/1002916968-photo-u-1292046586?auto=format&dpr=2&fit=crop&fm=pjpg&q=60&w=500
-07 404 https://cdn.oneesports.id/cdn-data/sites/2/2024/03/Tensura-Rimuru-Demon-Lord.jpg
-08 000 https://admin.esports.gg/wp-content/uploads/2025/04/anime-of-the-year-968x544.jpg
