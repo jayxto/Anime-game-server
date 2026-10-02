@@ -1,0 +1,83 @@
+name: Phase 3 AniList batch image fill
+on:
+  push:
+    branches: [image-coverage-100-v1]
+    paths: [.github/workflows/PHASE3_ANILIST_BATCH_IMAGES.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Start app and fetch catalog
+        env:
+          PORT: '3099'
+        run: |
+          set -euo pipefail
+          node server.js >/tmp/server.log 2>&1 & echo $! >/tmp/server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o /tmp/catalog.json; then break; fi
+            sleep 1
+          done
+          test -s /tmp/catalog.json || { cat /tmp/server.log; exit 1; }
+      - name: Batch resolve missing images through AniList
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),path=require('path'),sharp=require('sharp');
+          const cat=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
+          const chars=cat.characters||cat.items||cat.catalog||[];
+          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’'`]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+          const slug=s=>norm(s).replace(/ /g,'-')||'_global';
+          const uniq=new Map();
+          for(const x of chars){const u=x.universeKey||x.universe||x.u||x.key||x.animeKey||'';const n=x.name||x.character||x.displayName||x.label||'';if(!n)continue;const k=slug(u)+'|'+slug(n);if(!uniq.has(k))uniq.set(k,{...x,u,n});}
+          const outFile=x=>path.join('music','char-images',slug(x.u),slug(x.n)+'.webp');
+          const exists=x=>['.webp','.png','.jpg','.jpeg'].some(e=>{const f=path.join('music','char-images',slug(x.u),slug(x.n)+e);return fs.existsSync(f)&&fs.statSync(f).size>700});
+          const missing=[...uniq.values()].filter(x=>!exists(x));
+          const generic=new Set(['anime','shonen','isekai','seinen','shojo','sport','sports','film','movie']);
+          function isTitleEntry(x){const src=x.sources||[];return (!x.u && src.length && src.every(s=>s==='qap-themes') && generic.has(norm(x.anime))) || (!x.u && generic.has(norm(x.anime)));}
+          const titleItems=missing.filter(isTitleEntry);
+          const charItems=missing.filter(x=>!isTitleEntry(x));
+          console.log('MISSING_START',missing.length,'CHAR',charItems.length,'TITLE',titleItems.length);
+          function nameScore(got,want){const a=norm(got),b=norm(want);if(!a||!b)return 0;if(a===b)return 100;if(a.replace(/ /g,'')===b.replace(/ /g,''))return 98;if(a.includes(b)||b.includes(a)){const mn=Math.min(a.length,b.length),mx=Math.max(a.length,b.length);if(mn>=4)return 75+Math.round(20*mn/mx);}const A=new Set(a.split(' ')),B=new Set(b.split(' '));let c=0;for(const z of A)if(B.has(z))c++;return Math.round(c/Math.max(A.size,B.size,1)*80);}
+          function animeScore(media,want){const w=norm(want);if(!w)return 0;let best=0;for(const m of media||[]){for(const t of [m?.title?.romaji,m?.title?.english,m?.title?.native].filter(Boolean)){const a=norm(t);if(a===w)best=Math.max(best,100);else if(a.includes(w)||w.includes(a))best=Math.max(best,80);else{const A=new Set(a.split(' ')),B=new Set(w.split(' '));let c=0;for(const z of A)if(B.has(z))c++;best=Math.max(best,Math.round(c/Math.max(1,Math.min(A.size,B.size))*65));}}}return best;}
+          async function gql(query,vars){for(let a=1;a<=5;a++){try{const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'content-type':'application/json','accept':'application/json','user-agent':'AnimeGameImageCoverage/3.0'},body:JSON.stringify({query,variables:vars})});if(r.status===429){await new Promise(q=>setTimeout(q,3000*a));continue;}if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();return d.data||{};}catch(e){if(a===5)throw e;await new Promise(q=>setTimeout(q,1000*a));}}}
+          async function characterBatch(items){const vars={},defs=[],fields=[];items.forEach((x,i)=>{vars['s'+i]=x.n;defs.push(`$s${i}:String`);fields.push(`c${i}:Character(search:$s${i}){name{full native alternative}image{large medium}media(perPage:10){nodes{title{romaji english native}}}}`)});const q=`query(${defs.join(',')}){${fields.join('\n')}}`;const d=await gql(q,vars);return items.map((x,i)=>({x,c:d['c'+i]}));}
+          async function mediaBatch(items){const vars={},defs=[],fields=[];items.forEach((x,i)=>{vars['s'+i]=x.n;defs.push(`$s${i}:String`);fields.push(`m${i}:Media(search:$s${i},type:ANIME){title{romaji english native}coverImage{extraLarge large medium}}`)});const q=`query(${defs.join(',')}){${fields.join('\n')}}`;const d=await gql(q,vars);return items.map((x,i)=>({x,m:d['m'+i]}));}
+          async function dl(x,url){const out=outFile(x);fs.mkdirSync(path.dirname(out),{recursive:true});for(let a=1;a<=3;a++){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),15000);try{const r=await fetch(url,{redirect:'follow',signal:ac.signal,headers:{'user-agent':'Mozilla/5.0 AnimeGameImageCoverage/3.0','accept':'image/*'}});if(!r.ok)throw new Error('HTTP '+r.status);const b=Buffer.from(await r.arrayBuffer());if(b.length<700)throw new Error('small');const tmp=out+'.tmp';await sharp(b,{animated:false}).rotate().resize({width:420,height:588,fit:'inside',withoutEnlargement:true}).webp({quality:74,effort:4}).toFile(tmp);if(fs.statSync(tmp).size<700)throw new Error('small out');fs.renameSync(tmp,out);return true;}catch(e){if(a===3)return false;await new Promise(q=>setTimeout(q,500*a));}finally{clearTimeout(t);}}return false;}
+          (async()=>{
+            const resolved=[];let batches=0;
+            for(let i=0;i<charItems.length;i+=18){const chunk=charItems.slice(i,i+18);let ans=[];try{ans=await characterBatch(chunk);}catch(e){console.log('CHAR_BATCH_FAIL',i,String(e));continue;}for(const {x,c} of ans){if(!c)continue;const ns=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);const nsc=Math.max(0,...ns.map(n=>nameScore(n,x.n)));const asc=animeScore(c?.media?.nodes,x.anime||x.universeName||x.u||'');if(nsc>=92 || (nsc>=72&&asc>=45))resolved.push({x,url:c?.image?.large||c?.image?.medium||'',kind:'character',nsc,asc});}batches++;if(batches%4===0)await new Promise(q=>setTimeout(q,900));}
+            for(let i=0;i<titleItems.length;i+=18){const chunk=titleItems.slice(i,i+18);let ans=[];try{ans=await mediaBatch(chunk);}catch(e){console.log('MEDIA_BATCH_FAIL',i,String(e));continue;}for(const {x,m} of ans){if(!m)continue;const ts=[m?.title?.romaji,m?.title?.english,m?.title?.native].filter(Boolean);const sc=Math.max(0,...ts.map(t=>nameScore(t,x.n)));if(sc>=65)resolved.push({x,url:m?.coverImage?.extraLarge||m?.coverImage?.large||m?.coverImage?.medium||'',kind:'media',nsc:sc,asc:100});}batches++;if(batches%4===0)await new Promise(q=>setTimeout(q,900));}
+            const dedup=new Map();for(const r of resolved)if(r.url)dedup.set(slug(r.x.u)+'|'+slug(r.x.n),r);const todo=[...dedup.values()];console.log('RESOLVED',todo.length);
+            let idx=0,ok=0,fail=0;async function worker(){while(true){const i=idx++;if(i>=todo.length)return;const r=todo[i];if(await dl(r.x,r.url))ok++;else fail++;if(i%100===0)console.log('DL',i,'/',todo.length,ok,fail);}}await Promise.all(Array.from({length:16},worker));
+            let have=0;const rem=[];for(const x of uniq.values()){if(exists(x))have++;else rem.push({u:x.u,n:x.n,anime:x.anime||'',sources:x.sources||[]});}
+            const report={total:uniq.size,startMissing:missing.length,resolvedCandidates:todo.length,downloaded:ok,downloadFailed:fail,canonical:have,missing:rem.length,coverage:+(have*100/uniq.size).toFixed(2),missingFirst500:rem.slice(0,500)};fs.writeFileSync('PHASE3_IMAGE_REPORT.json',JSON.stringify(report,null,2));console.log(report.total,report.canonical,report.missing,report.coverage+'%');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Commit Phase 3 images
+        run: |
+          set -euo pipefail
+          kill $(cat /tmp/server.pid) 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add music/char-images PHASE3_IMAGE_REPORT.json
+          git commit -m "fix: phase3 batch localize AniList images" || true
+          git push origin HEAD:image-coverage-100-v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase3-image-report
+          path: |
+            PHASE3_IMAGE_REPORT.json
+            /tmp/server.log
