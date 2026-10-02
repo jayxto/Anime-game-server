@@ -1,0 +1,27 @@
+RAW_MISSING=310 NONEMPTY_UNIVERSE=22 UNIVERSES=2
+
+## fate (10)
+Archer
+Fate Route
+Gilgamesh
+Heaven’s Feel
+Illyasviel von Einzbern
+Kirei Kotomine
+Lancer
+Rider
+Sakura Matou
+Unlimited Blade Works
+
+## soul (12)
+Asura
+Black Star
+Crona
+Death the Kid
+Dr. Stein
+Liz Thompson
+Lord Death
+Maka Albarn
+Medusa Gorgon
+Patty Thompson
+Soul Evans
+Tsubaki Nakatsukasa

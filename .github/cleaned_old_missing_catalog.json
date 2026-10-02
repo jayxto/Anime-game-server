@@ -1,0 +1,200 @@
+[
+  {
+    "i": 2099,
+    "u": "fate",
+    "name": "Archer",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2103,
+    "u": "fate",
+    "name": "Fate Route",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2105,
+    "u": "fate",
+    "name": "Gilgamesh",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2106,
+    "u": "fate",
+    "name": "Heaven’s Feel",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2108,
+    "u": "fate",
+    "name": "Illyasviel von Einzbern",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2110,
+    "u": "fate",
+    "name": "Kirei Kotomine",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2112,
+    "u": "fate",
+    "name": "Lancer",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2114,
+    "u": "fate",
+    "name": "Rider",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2120,
+    "u": "fate",
+    "name": "Sakura Matou",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 2124,
+    "u": "fate",
+    "name": "Unlimited Blade Works",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6710,
+    "u": "soul",
+    "name": "Asura",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6712,
+    "u": "soul",
+    "name": "Black Star",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6714,
+    "u": "soul",
+    "name": "Crona",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6716,
+    "u": "soul",
+    "name": "Death the Kid",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6718,
+    "u": "soul",
+    "name": "Dr. Stein",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6723,
+    "u": "soul",
+    "name": "Liz Thompson",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6725,
+    "u": "soul",
+    "name": "Lord Death",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6727,
+    "u": "soul",
+    "name": "Maka Albarn",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6730,
+    "u": "soul",
+    "name": "Medusa Gorgon",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6732,
+    "u": "soul",
+    "name": "Patty Thompson",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6734,
+    "u": "soul",
+    "name": "Soul Evans",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  },
+  {
+    "i": 6737,
+    "u": "soul",
+    "name": "Tsubaki Nakatsukasa",
+    "img": "",
+    "sourceUrl": "",
+    "status": "",
+    "manualOverride": false
+  }
+]
