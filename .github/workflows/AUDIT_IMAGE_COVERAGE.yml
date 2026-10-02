@@ -1,0 +1,85 @@
+name: Audit full character image coverage
+on:
+  push:
+    branches: [image-coverage-100-v1]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Boot server and audit catalog
+        env:
+          PORT: '3099'
+        run: |
+          set -euo pipefail
+          node server.js > server-audit.log 2>&1 &
+          echo $! > server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o catalog.json; then break; fi
+            sleep 1
+          done
+          test -s catalog.json || { cat server-audit.log; exit 1; }
+          node <<'NODE' > IMAGE_COVERAGE_AUDIT.txt
+          const fs = require('fs');
+          const path = require('path');
+          const data = JSON.parse(fs.readFileSync('catalog.json','utf8'));
+          console.log('TOP_LEVEL_TYPE=' + (Array.isArray(data) ? 'array' : typeof data));
+          if (!Array.isArray(data) && data && typeof data === 'object') console.log('TOP_LEVEL_KEYS=' + Object.keys(data).join(','));
+          let chars = Array.isArray(data) ? data : (data.characters || data.items || data.catalog || data.results || []);
+          console.log('RAW_COUNT=' + chars.length);
+          console.log('SAMPLE=' + JSON.stringify(chars.slice(0,5), null, 2));
+          const norm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+          const getU = x => x.universeKey || x.universe || x.u || x.key || x.animeKey || '';
+          const getN = x => x.name || x.character || x.displayName || x.label || '';
+          const uniq = new Map();
+          for (const x of chars) {
+            const u = getU(x), n = getN(x);
+            if (!n) continue;
+            uniq.set(norm(u)+'|'+norm(n), {u,n,raw:x});
+          }
+          console.log('UNIQUE_COUNT=' + uniq.size);
+          let exactLocal = 0;
+          const missing=[];
+          const byU = {};
+          for (const {u,n} of uniq.values()) {
+            const us = norm(u), ns = norm(n);
+            const cands = [
+              path.join('music','char-images',us,ns+'.webp'),
+              path.join('music','char-images',us,ns+'.png'),
+              path.join('music','char-images',us,ns+'.jpg'),
+              path.join('music','char-images',us,ns+'.jpeg')
+            ];
+            const ok = cands.some(fs.existsSync);
+            byU[us] ||= {total:0, exactLocal:0};
+            byU[us].total++;
+            if (ok) { exactLocal++; byU[us].exactLocal++; }
+            else missing.push({u,n});
+          }
+          console.log('EXACT_LOCAL_COUNT=' + exactLocal);
+          console.log('EXACT_LOCAL_COVERAGE=' + (uniq.size ? (exactLocal*100/uniq.size).toFixed(2) : '0') + '%');
+          const files=[];
+          function walk(d){ if(!fs.existsSync(d)) return; for(const ent of fs.readdirSync(d,{withFileTypes:true})){ const p=path.join(d,ent.name); if(ent.isDirectory()) walk(p); else if(/\.(webp|png|jpe?g)$/i.test(ent.name)) files.push(p); } }
+          walk(path.join('music','char-images'));
+          console.log('LOCAL_IMAGE_FILES=' + files.length);
+          console.log('BY_UNIVERSE=' + JSON.stringify(byU,null,2));
+          console.log('MISSING_FIRST_200=' + JSON.stringify(missing.slice(0,200),null,2));
+          NODE
+          cat IMAGE_COVERAGE_AUDIT.txt
+      - name: Upload audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-coverage-audit
+          path: |
+            IMAGE_COVERAGE_AUDIT.txt
+            catalog.json
+            server-audit.log
