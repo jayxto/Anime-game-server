@@ -1,0 +1,37 @@
+name: Audit live image health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_LIVE_IMAGE_HEALTH.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Wait for deployed health endpoint and fetch report
+        run: python3 .github/fetch_live_image_health.py
+      - name: Commit health report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/live_image_health.json .github/live_image_health_summary.txt
+          if git diff --cached --quiet; then
+            echo "No image health changes"
+            exit 0
+          fi
+          git commit -m "chore: record live image health [skip ci]"
+          git push origin HEAD:main
