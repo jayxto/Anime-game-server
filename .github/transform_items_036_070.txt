@@ -1,0 +1,36 @@
+=== ITEMS 36-70 / total 105 ===
+{"char": "Shigeo Kageyama", "i": 36, "imageSearch": "Shigeo Kageyama Mob ???% Mob Psycho 100 anime transformation", "img": null, "name": "Mob ???%", "sub": "Shigeo Kageyama • Mob Psycho 100"}
+{"char": "Kafka Hibino", "i": 37, "imageSearch": "Kafka Hibino Kaiju No. 8 Kaiju No. 8 anime transformation", "img": null, "name": "Kaiju No. 8", "sub": "Kafka Hibino • Kaiju No. 8"}
+{"char": "Akira Fudo", "i": 38, "imageSearch": "Akira Fudo Devilman Devilman Crybaby anime transformation", "img": null, "name": "Devilman", "sub": "Akira Fudo • Devilman Crybaby"}
+{"char": "Guts", "i": 39, "imageSearch": "Guts Berserker Armor Berserk anime transformation", "img": null, "name": "Berserker Armor", "sub": "Guts • Berserk"}
+{"char": "Ken Kaneki", "i": 40, "imageSearch": "Ken Kaneki Black Reaper Tokyo Ghoul anime transformation", "img": null, "name": "Black Reaper", "sub": "Ken Kaneki • Tokyo Ghoul"}
+{"char": "Ken Kaneki", "i": 41, "imageSearch": "Ken Kaneki Dragon Kaneki Tokyo Ghoul anime transformation", "img": null, "name": "Dragon Kaneki", "sub": "Ken Kaneki • Tokyo Ghoul"}
+{"char": "Rimuru Tempest", "i": 42, "imageSearch": "Rimuru Tempest Rimuru Demon Lord Tensura anime transformation", "img": null, "name": "Rimuru Demon Lord", "sub": "Rimuru Tempest • Tensura"}
+{"char": "Sung Jinwoo", "i": 43, "imageSearch": "Sung Jinwoo Shadow Monarch Solo Leveling anime transformation", "img": "/assets/images/external/01a6fdf67de5b299.webp", "name": "Shadow Monarch", "sub": "Sung Jinwoo • Solo Leveling"}
+{"char": "Kirito", "i": 44, "imageSearch": "Kirito Kirito Star King Sword Art Online anime transformation", "img": null, "name": "Kirito Star King", "sub": "Kirito • Sword Art Online"}
+{"char": "Alucard", "i": 45, "imageSearch": "Alucard Alucard Level Zero Hellsing Ultimate anime transformation", "img": null, "name": "Alucard Level Zero", "sub": "Alucard • Hellsing Ultimate"}
+{"char": "Ryuko Matoi", "i": 46, "imageSearch": "Ryuko Matoi Ryuko + Senketsu Kisaragi Kill la Kill anime transformation", "img": null, "name": "Ryuko + Senketsu Kisaragi", "sub": "Ryuko Matoi • Kill la Kill"}
+{"char": "Simon", "i": 47, "imageSearch": "Simon Simon Super Tengen Toppa Gurren Lagann Gurren Lagann anime transformation", "img": "https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg", "name": "Simon Super Tengen Toppa Gurren Lagann", "sub": "Simon • Gurren Lagann"}
+{"char": "Izuku Midoriya", "i": 48, "imageSearch": "Izuku Midoriya Final War Deku My Hero Academia anime transformation", "img": null, "name": "Final War Deku", "sub": "Izuku Midoriya • My Hero Academia"}
+{"char": "All Might", "i": 49, "imageSearch": "All Might Armored All Might My Hero Academia anime transformation", "img": null, "name": "Armored All Might", "sub": "All Might • My Hero Academia"}
+{"char": "Tomura Shigaraki", "i": 50, "imageSearch": "Tomura Shigaraki Shigaraki Awakened My Hero Academia anime transformation", "img": null, "name": "Shigaraki Awakened", "sub": "Tomura Shigaraki • My Hero Academia"}
+{"char": "Ken Takakura", "i": 51, "imageSearch": "Ken Takakura Turbo Granny Form Dandadan anime transformation", "img": "/assets/images/external/3875d45d1d784c0f.webp", "name": "Turbo Granny Form", "sub": "Ken Takakura • Dandadan"}
+{"char": "Jiji Enjoji", "i": 52, "imageSearch": "Jiji Enjoji Evil Eye Possession Dandadan anime transformation", "img": "/assets/images/external/5c3e90418a174ca0.webp", "name": "Evil Eye Possession", "sub": "Jiji Enjoji • Dandadan"}
+{"char": "Momo Ayase", "i": 53, "imageSearch": "Momo Ayase Psychic Awakening Dandadan anime transformation", "img": null, "name": "Psychic Awakening", "sub": "Momo Ayase • Dandadan"}
+{"char": "Frieren", "i": 54, "imageSearch": "Frieren Frieren Mana Unleashed Frieren anime transformation", "img": null, "name": "Frieren Mana Unleashed", "sub": "Frieren • Frieren"}
+{"char": "Aura", "i": 55, "imageSearch": "Aura Aura Scales of Obedience Frieren anime transformation", "img": null, "name": "Aura Scales of Obedience", "sub": "Aura • Frieren"}
+{"char": "Thorfinn", "i": 56, "imageSearch": "Thorfinn Thorfinn Warrior Era Vinland Saga anime transformation", "img": null, "name": "Thorfinn Warrior Era", "sub": "Thorfinn • Vinland Saga"}
+{"char": "Griffith", "i": 57, "imageSearch": "Griffith Femto Berserk anime transformation", "img": null, "name": "Femto", "sub": "Griffith • Berserk"}
+{"char": "Nosferatu Zodd", "i": 58, "imageSearch": "Nosferatu Zodd Apostle Zodd Berserk anime transformation", "img": null, "name": "Apostle Zodd", "sub": "Nosferatu Zodd • Berserk"}
+{"char": "Denji", "i": 59, "imageSearch": "Denji Chainsaw Devil Chainsaw Man anime transformation", "img": null, "name": "Chainsaw Devil", "sub": "Denji • Chainsaw Man"}
+{"char": "Aki Hayakawa", "i": 60, "imageSearch": "Aki Hayakawa Gun Fiend Chainsaw Man anime transformation", "img": null, "name": "Gun Fiend", "sub": "Aki Hayakawa • Chainsaw Man"}
+{"char": "Pochita", "i": 61, "imageSearch": "Pochita Hero of Hell Chainsaw Man anime transformation", "img": null, "name": "Hero of Hell", "sub": "Pochita • Chainsaw Man"}
+{"char": "Rimuru Tempest", "i": 62, "imageSearch": "Rimuru Tempest Dragon Form Tensura anime transformation", "img": null, "name": "Dragon Form", "sub": "Rimuru Tempest • Tensura"}
+{"char": "Milim Nava", "i": 63, "imageSearch": "Milim Nava Demon Lord Milim Tensura anime transformation", "img": null, "name": "Demon Lord Milim", "sub": "Milim Nava • Tensura"}
+{"char": "Diablo", "i": 64, "imageSearch": "Diablo Demon Lord Diablo Tensura anime transformation", "img": null, "name": "Demon Lord Diablo", "sub": "Diablo • Tensura"}
+{"char": "Garou", "i": 65, "imageSearch": "Garou Awakened Garou One Punch Man anime transformation", "img": null, "name": "Awakened Garou", "sub": "Garou • One Punch Man"}
+{"char": "Garou", "i": 66, "imageSearch": "Garou Cosmic Fear Garou One Punch Man anime transformation", "img": null, "name": "Cosmic Fear Garou", "sub": "Garou • One Punch Man"}
+{"char": "Ken Kaneki", "i": 67, "imageSearch": "Ken Kaneki Centipede Mode Tokyo Ghoul anime transformation", "img": null, "name": "Centipede Mode", "sub": "Ken Kaneki • Tokyo Ghoul"}
+{"char": "Ken Kaneki", "i": 68, "imageSearch": "Ken Kaneki Kakuja Tokyo Ghoul anime transformation", "img": null, "name": "Kakuja", "sub": "Ken Kaneki • Tokyo Ghoul"}
+{"char": "Anos Voldigoad", "i": 69, "imageSearch": "Anos Voldigoad Demon King Form The Misfit of Demon King Academy anime transformation", "img": null, "name": "Demon King Form", "sub": "Anos Voldigoad • The Misfit of Demon King Academy"}
+{"char": "Emilia", "i": 70, "imageSearch": "Emilia Spirit Form Re:Zero anime transformation", "img": null, "name": "Spirit Form", "sub": "Emilia • Re:Zero"}

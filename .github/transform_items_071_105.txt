@@ -1,0 +1,36 @@
+=== ITEMS 71-105 / total 105 ===
+{"char": "Fumikage Tokoyami", "i": 71, "imageSearch": "Fumikage Tokoyami Dark Shadow: Ragnarok My Hero Academia anime", "img": null, "name": "Dark Shadow: Ragnarok", "sub": "Fumikage Tokoyami • My Hero Academia"}
+{"char": "Ken Takakura", "i": 72, "imageSearch": "Ken Takakura Okarun Turbo Granny Form Dandadan anime", "img": "/assets/images/external/3875d45d1d784c0f.webp", "name": "Okarun Turbo Granny Form", "sub": "Ken Takakura • Dandadan"}
+{"char": "Guts", "i": 73, "imageSearch": "Guts Black Swordsman Armor Berserk anime", "img": null, "name": "Black Swordsman Armor", "sub": "Guts • Berserk"}
+{"char": "Bondrewd", "i": 74, "imageSearch": "Bondrewd White Whistle Form Made in Abyss anime", "img": null, "name": "White Whistle Form", "sub": "Bondrewd • Made in Abyss"}
+{"char": "Shigeo Kageyama", "i": 75, "imageSearch": "Shigeo Kageyama Mob 100% Courage Mob Psycho 100 anime", "img": null, "name": "Mob 100% Courage", "sub": "Shigeo Kageyama • Mob Psycho 100"}
+{"char": "Lelouch Lamperouge", "i": 76, "imageSearch": "Lelouch Lamperouge Zero Code Geass anime", "img": null, "name": "Zero", "sub": "Lelouch Lamperouge • Code Geass"}
+{"char": "Shinji Ikari", "i": 77, "imageSearch": "Shinji Ikari Eva-01 Awakened Neon Genesis Evangelion anime", "img": null, "name": "Eva-01 Awakened", "sub": "Shinji Ikari • Neon Genesis Evangelion"}
+{"char": "Kafka Hibino", "i": 78, "imageSearch": "Kafka Hibino Kaiju No. 8 Form Kaiju No. 8 anime", "img": null, "name": "Kaiju No. 8 Form", "sub": "Kafka Hibino • Kaiju No. 8"}
+{"char": "Mash Burnedead", "i": 79, "imageSearch": "Mash Burnedead Mash Muscle Form Mashle anime", "img": null, "name": "Mash Muscle Form", "sub": "Mash Burnedead • Mashle"}
+{"char": "Yukine", "i": 80, "imageSearch": "Yukine Yukine Sekki Noragami anime", "img": null, "name": "Yukine Sekki", "sub": "Yukine • Noragami"}
+{"char": "Rin Okumura", "i": 81, "imageSearch": "Rin Okumura Blue Flames Satan Form Blue Exorcist anime", "img": null, "name": "Blue Flames Satan Form", "sub": "Rin Okumura • Blue Exorcist"}
+{"char": "Osamu Dazai & Chuya Nakahara", "i": 82, "imageSearch": "Osamu Dazai & Chuya Nakahara Corruption Bungo Stray Dogs anime", "img": null, "name": "Corruption", "sub": "Osamu Dazai & Chuya Nakahara • Bungo Stray Dogs"}
+{"char": "Asura", "i": 83, "imageSearch": "Asura Kishin Form Soul Eater anime", "img": null, "name": "Kishin Form", "sub": "Asura • Soul Eater"}
+{"char": "Allen Walker", "i": 84, "imageSearch": "Allen Walker Crown Clown D.Gray-man anime", "img": "/assets/images/external/3917dc3b2756fcb5.webp", "name": "Crown Clown", "sub": "Allen Walker • D.Gray-man"}
+{"char": "Kurama", "i": 85, "imageSearch": "Kurama Yoko Kurama Yu Yu Hakusho anime", "img": null, "name": "Yoko Kurama", "sub": "Kurama • Yu Yu Hakusho"}
+{"char": "Inuyasha", "i": 86, "imageSearch": "Inuyasha Full Demon Form Inuyasha anime", "img": null, "name": "Full Demon Form", "sub": "Inuyasha • Inuyasha"}
+{"char": "Vash the Stampede", "i": 87, "imageSearch": "Vash the Stampede Vash Angel Arm Trigun anime", "img": null, "name": "Vash Angel Arm", "sub": "Vash the Stampede • Trigun"}
+{"char": "Simon", "i": 88, "imageSearch": "Simon Tengen Toppa Gurren Lagann Gurren Lagann anime", "img": "https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg", "name": "Tengen Toppa Gurren Lagann", "sub": "Simon • Gurren Lagann"}
+{"char": "Ryuko Matoi", "i": 89, "imageSearch": "Ryuko Matoi Senketsu Kisaragi Kill la Kill anime", "img": null, "name": "Senketsu Kisaragi", "sub": "Ryuko Matoi • Kill la Kill"}
+{"char": "Saber", "i": 90, "imageSearch": "Saber Saber Alter Fate/stay night anime", "img": null, "name": "Saber Alter", "sub": "Saber • Fate/stay night"}
+{"char": "Rider", "i": 91, "imageSearch": "Rider Heaven’s Feel Rider Fate/stay night anime", "img": null, "name": "Heaven’s Feel Rider", "sub": "Rider • Fate/stay night"}
+{"char": "Tatsumi", "i": 92, "imageSearch": "Tatsumi Incursio Evolved Akame ga Kill anime", "img": null, "name": "Incursio Evolved", "sub": "Tatsumi • Akame ga Kill"}
+{"char": "Ainz Ooal Gown", "i": 93, "imageSearch": "Ainz Ooal Gown Ainz Perfect Warrior Overlord anime", "img": null, "name": "Ainz Perfect Warrior", "sub": "Ainz Ooal Gown • Overlord"}
+{"char": "Naofumi Iwatani", "i": 94, "imageSearch": "Naofumi Iwatani Rage Shield The Rising of the Shield Hero anime", "img": "/assets/images/external/6e521a3c43d2d282.webp", "name": "Rage Shield", "sub": "Naofumi Iwatani • The Rising of the Shield Hero"}
+{"char": "Cid Kagenou", "i": 95, "imageSearch": "Cid Kagenou Shadow / John Smith The Eminence in Shadow anime", "img": null, "name": "Shadow / John Smith", "sub": "Cid Kagenou • The Eminence in Shadow"}
+{"char": "Bell Cranel", "i": 96, "imageSearch": "Bell Cranel Level Boost Bell DanMachi anime", "img": null, "name": "Level Boost Bell", "sub": "Bell Cranel • DanMachi"}
+{"char": "Reg", "i": 97, "imageSearch": "Reg Reg Incinerator Mode Made in Abyss anime", "img": null, "name": "Reg Incinerator Mode", "sub": "Reg • Made in Abyss"}
+{"char": "Faputa", "i": 98, "imageSearch": "Faputa Faputa True Form Made in Abyss anime", "img": null, "name": "Faputa True Form", "sub": "Faputa • Made in Abyss"}
+{"char": "Usagi Tsukino", "i": 99, "imageSearch": "Usagi Tsukino Sailor Moon Eternal Sailor Moon anime", "img": null, "name": "Sailor Moon Eternal", "sub": "Usagi Tsukino • Sailor Moon"}
+{"char": "Usagi Tsukino", "i": 100, "imageSearch": "Usagi Tsukino Super Sailor Moon Sailor Moon anime", "img": null, "name": "Super Sailor Moon", "sub": "Usagi Tsukino • Sailor Moon"}
+{"char": "Agumon", "i": 101, "imageSearch": "Agumon WarGreymon Digimon anime", "img": null, "name": "WarGreymon", "sub": "Agumon • Digimon"}
+{"char": "Gabumon", "i": 102, "imageSearch": "Gabumon MetalGarurumon Digimon anime", "img": null, "name": "MetalGarurumon", "sub": "Gabumon • Digimon"}
+{"char": "Agumon & Gabumon", "i": 103, "imageSearch": "Agumon & Gabumon Omnimon Digimon anime", "img": null, "name": "Omnimon", "sub": "Agumon & Gabumon • Digimon"}
+{"char": "Yugi Muto", "i": 104, "imageSearch": "Yugi Muto Yami Yugi Yu-Gi-Oh! anime", "img": null, "name": "Yami Yugi", "sub": "Yugi Muto • Yu-Gi-Oh!"}
+{"char": "Sakura Matou", "i": 105, "imageSearch": "Sakura Matou Dark Sakura Fate/stay night anime", "img": null, "name": "Dark Sakura", "sub": "Sakura Matou • Fate/stay night"}

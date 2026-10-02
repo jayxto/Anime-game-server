@@ -1,0 +1,36 @@
+=== ITEMS 1-35 / total 105 ===
+{"char": "Son Goku", "i": 1, "imageSearch": "Son Goku Super Saiyan Dragon Ball anime transformation", "img": null, "name": "Super Saiyan", "sub": "Son Goku • Dragon Ball"}
+{"char": "Gohan", "i": 2, "imageSearch": "Gohan Super Saiyan 2 Dragon Ball anime transformation", "img": null, "name": "Super Saiyan 2", "sub": "Gohan • Dragon Ball"}
+{"char": "Son Goku", "i": 3, "imageSearch": "Son Goku Super Saiyan Blue Dragon Ball anime transformation", "img": null, "name": "Super Saiyan Blue", "sub": "Son Goku • Dragon Ball"}
+{"char": "Son Goku", "i": 4, "imageSearch": "Son Goku Ultra Instinct Dragon Ball anime transformation", "img": null, "name": "Ultra Instinct", "sub": "Son Goku • Dragon Ball"}
+{"char": "Vegeta", "i": 5, "imageSearch": "Vegeta Ultra Ego Dragon Ball anime transformation", "img": null, "name": "Ultra Ego", "sub": "Vegeta • Dragon Ball"}
+{"char": "Monkey D. Luffy", "i": 6, "imageSearch": "Monkey D. Luffy Gear 2 One Piece anime transformation", "img": null, "name": "Gear 2", "sub": "Monkey D. Luffy • One Piece"}
+{"char": "Monkey D. Luffy", "i": 7, "imageSearch": "Monkey D. Luffy Gear 4: Boundman One Piece anime transformation", "img": null, "name": "Gear 4: Boundman", "sub": "Monkey D. Luffy • One Piece"}
+{"char": "Monkey D. Luffy", "i": 8, "imageSearch": "Monkey D. Luffy Gear 5 One Piece anime transformation", "img": null, "name": "Gear 5", "sub": "Monkey D. Luffy • One Piece"}
+{"char": "Naruto Uzumaki", "i": 9, "imageSearch": "Naruto Uzumaki Sage Mode Naruto anime transformation", "img": null, "name": "Sage Mode", "sub": "Naruto Uzumaki • Naruto"}
+{"char": "Naruto Uzumaki", "i": 10, "imageSearch": "Naruto Uzumaki Kurama Chakra Mode Naruto anime transformation", "img": "https://images-fio.rtlde.bedrock.tech/v2/images/2973451/raw?auto=avif&blur=0&fit=scale_crop&hash=5d9ebcc406f40adbf7532dccd7f711052627ffbc&height=630&interlace=1&optimize=high&width=1200", "name": "Kurama Chakra Mode", "sub": "Naruto Uzumaki • Naruto"}
+{"char": "Naruto Uzumaki", "i": 11, "imageSearch": "Naruto Uzumaki Six Paths Sage Mode Naruto anime transformation", "img": "/assets/images/external/8fe3310db9c1750f.webp", "name": "Six Paths Sage Mode", "sub": "Naruto Uzumaki • Naruto"}
+{"char": "Sasuke Uchiha", "i": 12, "imageSearch": "Sasuke Uchiha Sasuke's Susanoo Naruto anime transformation", "img": "/assets/images/external/b63f513b51910c82.webp", "name": "Sasuke's Susanoo", "sub": "Sasuke Uchiha • Naruto"}
+{"char": "Ichigo Kurosaki", "i": 13, "imageSearch": "Ichigo Kurosaki Bankai: Tensa Zangetsu Bleach anime transformation", "img": null, "name": "Bankai: Tensa Zangetsu", "sub": "Ichigo Kurosaki • Bleach"}
+{"char": "Ichigo Kurosaki", "i": 14, "imageSearch": "Ichigo Kurosaki Vasto Lorde Ichigo Bleach anime transformation", "img": null, "name": "Vasto Lorde Ichigo", "sub": "Ichigo Kurosaki • Bleach"}
+{"char": "Ichigo Kurosaki", "i": 15, "imageSearch": "Ichigo Kurosaki Final Getsuga Tensho Bleach anime transformation", "img": "https://wallpapercrafter.com/th8001/568293-bleach-kurosaki-ichigo-kurosaki-ichigo-final-getsuga.jpg", "name": "Final Getsuga Tensho", "sub": "Ichigo Kurosaki • Bleach"}
+{"char": "Gon Freecss", "i": 16, "imageSearch": "Gon Freecss Adult Gon Hunter x Hunter anime transformation", "img": null, "name": "Adult Gon", "sub": "Gon Freecss • Hunter x Hunter"}
+{"char": "Killua Zoldyck", "i": 17, "imageSearch": "Killua Zoldyck Godspeed Hunter x Hunter anime transformation", "img": null, "name": "Godspeed", "sub": "Killua Zoldyck • Hunter x Hunter"}
+{"char": "Eren Yeager", "i": 18, "imageSearch": "Eren Yeager Founding Titan L'Attaque des Titans anime transformation", "img": null, "name": "Founding Titan", "sub": "Eren Yeager • L'Attaque des Titans"}
+{"char": "Eren Yeager", "i": 19, "imageSearch": "Eren Yeager Attack Titan L'Attaque des Titans anime transformation", "img": null, "name": "Attack Titan", "sub": "Eren Yeager • L'Attaque des Titans"}
+{"char": "Armin Arlert", "i": 20, "imageSearch": "Armin Arlert Colossal Titan L'Attaque des Titans anime transformation", "img": "/assets/images/external/4cbbfea3c64bedce.webp", "name": "Colossal Titan", "sub": "Armin Arlert • L'Attaque des Titans"}
+{"char": "Tanjiro Kamado", "i": 21, "imageSearch": "Tanjiro Kamado Demon Mark Demon Slayer anime transformation", "img": null, "name": "Demon Mark", "sub": "Tanjiro Kamado • Demon Slayer"}
+{"char": "Nezuko Kamado", "i": 22, "imageSearch": "Nezuko Kamado Demon Nezuko Demon Slayer anime transformation", "img": null, "name": "Demon Nezuko", "sub": "Nezuko Kamado • Demon Slayer"}
+{"char": "Ryomen Sukuna", "i": 23, "imageSearch": "Ryomen Sukuna Sukuna True Form Jujutsu Kaisen anime transformation", "img": null, "name": "Sukuna True Form", "sub": "Ryomen Sukuna • Jujutsu Kaisen"}
+{"char": "Mahoraga", "i": 24, "imageSearch": "Mahoraga Mahoraga Adaptation Jujutsu Kaisen anime transformation", "img": null, "name": "Mahoraga Adaptation", "sub": "Mahoraga • Jujutsu Kaisen"}
+{"char": "Asta", "i": 25, "imageSearch": "Asta Black Asta Black Clover anime transformation", "img": "/assets/images/external/10b923e99d118099.webp", "name": "Black Asta", "sub": "Asta • Black Clover"}
+{"char": "Asta", "i": 26, "imageSearch": "Asta Devil Union Black Clover anime transformation", "img": null, "name": "Devil Union", "sub": "Asta • Black Clover"}
+{"char": "Yuno", "i": 27, "imageSearch": "Yuno Spirit Dive Black Clover anime transformation", "img": null, "name": "Spirit Dive", "sub": "Yuno • Black Clover"}
+{"char": "Natsu Dragneel", "i": 28, "imageSearch": "Natsu Dragneel Dragon Force Fairy Tail anime transformation", "img": null, "name": "Dragon Force", "sub": "Natsu Dragneel • Fairy Tail"}
+{"char": "Natsu Dragneel", "i": 29, "imageSearch": "Natsu Dragneel Lightning Flame Dragon Mode Fairy Tail anime transformation", "img": "/assets/images/external/045e0b89a27cbdb3.webp", "name": "Lightning Flame Dragon Mode", "sub": "Natsu Dragneel • Fairy Tail"}
+{"char": "Meliodas", "i": 30, "imageSearch": "Meliodas Demon King Meliodas Seven Deadly Sins anime transformation", "img": null, "name": "Demon King Meliodas", "sub": "Meliodas • Seven Deadly Sins"}
+{"char": "Escanor", "i": 31, "imageSearch": "Escanor The One Ultimate Seven Deadly Sins anime transformation", "img": null, "name": "The One Ultimate", "sub": "Escanor • Seven Deadly Sins"}
+{"char": "Izuku Midoriya", "i": 32, "imageSearch": "Izuku Midoriya One For All Full Cowl My Hero Academia anime transformation", "img": "https://s.yimg.com/ny/api/res/1.2/7ncLbNxnA13ploR5MjRxkw--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyMDA7aD04MDA-/https%3A/media.zenfs.com/en/aol_entertainment_weekly_articles_368/a1f2ab5c54fac06e1a7f52449a8834dd", "name": "One For All Full Cowl", "sub": "Izuku Midoriya • My Hero Academia"}
+{"char": "Izuku Midoriya", "i": 33, "imageSearch": "Izuku Midoriya Dark Deku My Hero Academia anime transformation", "img": null, "name": "Dark Deku", "sub": "Izuku Midoriya • My Hero Academia"}
+{"char": "Katsuki Bakugo", "i": 34, "imageSearch": "Katsuki Bakugo Bakugo Cluster My Hero Academia anime transformation", "img": null, "name": "Bakugo Cluster", "sub": "Katsuki Bakugo • My Hero Academia"}
+{"char": "Shigeo Kageyama", "i": 35, "imageSearch": "Shigeo Kageyama Mob 100% Mob Psycho 100 anime transformation", "img": null, "name": "Mob 100%", "sub": "Shigeo Kageyama • Mob Psycho 100"}
