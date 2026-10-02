@@ -1,0 +1,34 @@
+name: Audit simple image migration section
+
+on:
+  push:
+    branches: [image-audit-work]
+    paths:
+      - '.github/workflows/AUDIT_SIMPLE_MIGRATION_SECTION.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-audit-work
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Extract migration section
+        run: python3 .github/audit_simple_migration_section.py
+      - name: Commit report to audit branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/simple_migration_section.txt
+          git commit -m "audit: record simple image migration section [skip ci]"
+          git push origin HEAD:image-audit-work
