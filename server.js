@@ -110,6 +110,28 @@ app.use('/assets/images/chars', express.static(__agLocalImageCache.root, {
   immutable: true
 }));
 
+
+/* AG_LOCAL_API_IMG_BRIDGE_V3: make avatar redirect-to-/api/img work with same-origin local files. */
+app.get('/api/img', (req, res, next) => {
+  try {
+    const raw = String(req.query.u || req.query.url || '');
+    const prefix = '/assets/images/chars/';
+    if (!raw.startsWith(prefix)) return next();
+    let rel = raw.slice(prefix.length);
+    try { rel = decodeURIComponent(rel); } catch (_) {}
+    const root = require('path').resolve(__agLocalImageCache.root);
+    const fp = require('path').resolve(root, rel);
+    if (fp !== root && !fp.startsWith(root + require('path').sep)) return res.status(400).end();
+    const fs2 = require('fs');
+    if (!fs2.existsSync(fp) || !fs2.statSync(fp).isFile()) return res.status(404).end();
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    res.type(__agLocalImageCache.mime(fp));
+    return res.sendFile(fp);
+  } catch (e) {
+    return next();
+  }
+});
+
 app.get('/api/local-image-cache-status', (_req, res) => res.json({
   ok: true,
   files: __agLocalImageCache.count,
