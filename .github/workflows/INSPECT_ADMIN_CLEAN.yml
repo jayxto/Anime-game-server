@@ -1,0 +1,34 @@
+name: Inspect admin clean
+on:
+  push:
+    branches: [inspect-admin-clean]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            index.html
+            server.js
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print admin character manager
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          for fn,pats in {
+            'index.html':['data-url','saveUrl(x,card)','character-catalog','Gestion des personnages','gestion des personnages'],
+            'server.js':["/api/character-catalog","character-catalog"]
+          }.items():
+            s=Path(fn).read_text(encoding='utf-8',errors='replace')
+            print('\n===== '+fn+' =====')
+            for p in pats:
+              start=0;n=0
+              while n<8:
+                i=s.find(p,start)
+                if i<0: break
+                print('\n###',p,'POS',i)
+                print(s[max(0,i-4000):min(len(s),i+10000)])
+                start=i+len(p);n+=1
+          PY
