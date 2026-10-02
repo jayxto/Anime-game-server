@@ -1,0 +1,42 @@
+name: Character image admin reliability v6
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/patch-character-image-admin-v6.py'
+      - '.github/workflows/character-image-admin-v6.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: character-image-admin-v6
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply v6 reliability patch
+        run: python3 scripts/patch-character-image-admin-v6.py
+      - name: Check JavaScript syntax
+        run: |
+          node --check server.js
+          node --check assets/js/ui-refactor.js
+      - name: Commit application patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js assets/js/ui-refactor.js
+          if git diff --cached --quiet; then
+            echo "No application changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: verify character images for real and keep admin URLs persistent"
+          git pull --rebase origin main
+          git push origin HEAD:main
