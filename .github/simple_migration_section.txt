@@ -1,0 +1,23 @@
+async function startSimpleImageMigration() {
+    if (SIMPLE_IMAGE_STATE.running) return;
+    SIMPLE_IMAGE_STATE.running=true; SIMPLE_IMAGE_STATE.startedAt=new Date().toISOString(); SIMPLE_IMAGE_STATE.lastError=null;
+    try {
+        await initDb();
+        await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS image_bytes BYTEA`);
+        await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS mime_type TEXT`);
+        let missing=[];
+        for (let pass=1; pass<=3; pass++) {
+            missing=await simpleMigrationPass(pass);
+            if (!missing.length) break;
+            if (pass<3) await new Promise(r=>setTimeout(r,12000));
+        }
+        SIMPLE_IMAGE_STATE.done = !missing.length;
+    } catch (e) {
+        SIMPLE_IMAGE_STATE.lastError=String(e?.stack || e?.message || e);
+        console.error('[Simple images] migration failed:',e);
+    } finally {
+        SIMPLE_IMAGE_STATE.running=false; SIMPLE_IMAGE_STATE.finishedAt=new Date().toISOString();
+        console.log('[Simple images] state',SIMPLE_IMAGE_STATE);
+    }
+}
+
