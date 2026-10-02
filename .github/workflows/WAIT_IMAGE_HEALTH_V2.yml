@@ -1,0 +1,74 @@
+name: Wait for live image health v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/WAIT_IMAGE_HEALTH_V2.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Poll deployed catalogue health
+        id: health
+        shell: bash
+        env:
+          URL: https://anime-game-server.onrender.com/api/character-image-health
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            code=$(curl -L -sS -o health.json -w '%{http_code}' --max-time 50 -H 'Accept: application/json' -H 'Cache-Control: no-cache' "$URL" || true)
+            if [ "$code" = "200" ] && python3 - <<'PY'
+          import json,sys
+          try:
+              d=json.load(open('health.json',encoding='utf-8'))
+              ok=d.get('ok') is True and 'catalogueMissingCount' in d and isinstance(d.get('catalogueMissing'),list)
+              sys.exit(0 if ok else 1)
+          except Exception:
+              sys.exit(1)
+          PY
+            then
+              python3 - <<'PY'
+          import json
+          d=json.load(open('health.json',encoding='utf-8'))
+          t=d.get('totals') or {}; s=d.get('state') or {}
+          lines=[
+            '# Live image health V2',
+            '',
+            f"DB rows: {t.get('rows',0)} | bytes: {t.get('with_bytes',0)} | DB missing bytes: {d.get('missingCount',0)} | manual: {t.get('manual',0)}",
+            f"Catalogue: {d.get('catalogueTotal',0)} | stored: {d.get('catalogueStored',0)} | missing: {d.get('catalogueMissingCount',0)}",
+            f"Migration: running={s.get('running')} done={s.get('done')} pass={s.get('pass')} total={s.get('total')} stored={s.get('stored')} missing={s.get('missing')}",
+            '', '## Catalogue missing'
+          ]
+          for x in d.get('catalogueMissing') or []:
+              lines.append(f"- `{x.get('u','')}` — **{x.get('name','')}** — {x.get('anime','')} — sources={','.join(x.get('sources') or [])}")
+          open('health.md','w',encoding='utf-8').write('\n'.join(lines))
+          PY
+              echo "ready=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "attempt $i/60: HTTP $code, V2 not live yet"
+            sleep 30
+          done
+          echo 'V2 health endpoint did not become available in time' >&2
+          exit 1
+      - name: Publish or update health issue
+        if: steps.health.outputs.ready == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='[audit] Live image health V2'
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq '.[] | select(.title=="[audit] Live image health V2") | .number' | head -n1)
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --body-file health.md
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file health.md
+          fi
