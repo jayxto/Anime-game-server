@@ -1,0 +1,95 @@
+name: Fix adminOnly startup order
+
+on:
+  push:
+    paths:
+      - '.github/workflows/FIX_ADMIN_ONLY.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Move character image admin route after adminOnly
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('server.js')
+          s = p.read_text(encoding='utf-8')
+
+          route = """app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
+    const b=req.body||{}; const u=String(b.universe||'').trim();
+    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
+    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
+    if (!/^https:\\/\\/\\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
+    const img=await simpleFetchImage(url,10000);
+    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
+    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    const imageUrl=simpleImageRoute(u,name,Date.now());
+    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
+}));"""
+
+          count = s.count(route)
+          if count != 1:
+              raise SystemExit(f'Expected exactly one admin image route, found {count}')
+
+          # Remove the early route.
+          s = s.replace('\n' + route + '\n', '\n', 1)
+
+          marker = 'const adminOnly = fn => async (req, res) => {'
+          pos = s.find(marker)
+          if pos < 0:
+              raise SystemExit('adminOnly declaration not found')
+          line_end = s.find('\n', pos)
+          if line_end < 0:
+              raise SystemExit('adminOnly declaration line end not found')
+
+          # Reinsert immediately after adminOnly is initialized.
+          s = s[:line_end+1] + '\n' + route + '\n' + s[line_end+1:]
+
+          admin_pos = s.find(marker)
+          route_pos = s.find("app.post('/api/admin/character-image', adminOnly")
+          if route_pos <= admin_pos:
+              raise SystemExit(f'Bad order: route={route_pos}, adminOnly={admin_pos}')
+
+          p.write_text(s, encoding='utf-8')
+          print('adminOnly position:', admin_pos)
+          print('route position:', route_pos)
+          print('Order OK')
+          PY
+
+      - name: Validate server
+        run: |
+          node --check server.js
+          node - <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync('server.js','utf8');
+          const a=s.indexOf('const adminOnly = fn => async');
+          const r=s.indexOf("app.post('/api/admin/character-image', adminOnly");
+          if(a<0||r<0||r<=a) throw new Error(`adminOnly ordering invalid: admin=${a} route=${r}`);
+          console.log('Runtime-order static validation OK');
+          NODE
+
+      - name: Commit fix and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/FIX_ADMIN_ONLY.yml
+          git add server.js
+          git commit -m "fix: initialize adminOnly before character image route"
+          git pull --rebase origin main
+          git push origin HEAD:main
