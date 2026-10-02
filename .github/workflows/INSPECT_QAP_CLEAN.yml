@@ -1,0 +1,30 @@
+name: Inspect QAP clean
+on:
+  push:
+    branches: [inspect-qap-clean]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            index.html
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print QAP functions
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8',errors='replace')
+          pats=['const QAP_CATS','const QAP_BY_CAT','function qapSetup','function qapNextQ','qapSetup =','qapNextQ =','const CATS =','function categoriesFor','categoriesFor =']
+          for p in pats:
+            print('\n###',p)
+            start=0;n=0
+            while n<8:
+              i=s.find(p,start)
+              if i<0: break
+              print('---POS',i,'---')
+              print(s[max(0,i-1800):min(len(s),i+10000)])
+              start=i+len(p); n+=1
+          PY
