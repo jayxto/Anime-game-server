@@ -1,0 +1,52 @@
+name: Inspect fast persistence QAP
+on:
+  push:
+    branches: [fix-persist-qap-fast]
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+            .github/workflows/INSPECT_FAST.yml
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Extract compact context
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          specs={
+            'server.js':['character_images','/api/admin/character-image','resolveCharacterImage','AG_CANONICAL','simpleImageMigration','image-migration'],
+            'index.html':['Qui a le plus','qap','/api/admin/character-image','character-image']
+          }
+          out=[]
+          for fn, pats in specs.items():
+            ls=Path(fn).read_text(encoding='utf-8',errors='replace').splitlines()
+            hits=[]
+            for i,l in enumerate(ls):
+              if any(p.lower() in l.lower() for p in pats): hits.append(i)
+            out.append(f'===== {fn} hits={len(hits)} =====')
+            seen=set()
+            for i in hits:
+              a=max(0,i-22); b=min(len(ls),i+23)
+              key=(a,b)
+              if any(abs(i-j)<35 for j in seen): continue
+              seen.add(i)
+              out.append(f'--- around {i+1} ({a+1}-{b}) ---')
+              out += [f'{j+1:06d}: {ls[j]}' for j in range(a,b)]
+          Path('DEBUG_CONTEXT.txt').write_text('\n'.join(out),encoding='utf-8')
+          print('debug bytes',Path('DEBUG_CONTEXT.txt').stat().st_size)
+          PY
+      - name: Commit debug
+        run: |
+          rm -f .github/workflows/INSPECT_FAST.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m 'debug: compact persistence qap context'
+          git push origin HEAD:fix-persist-qap-fast
