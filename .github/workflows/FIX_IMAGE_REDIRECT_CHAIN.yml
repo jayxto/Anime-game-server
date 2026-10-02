@@ -1,0 +1,115 @@
+name: Fix image redirect chain
+
+on:
+  push:
+    branches: [real-image-fix-v3]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Patch local /api/img bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text(encoding='utf-8')
+          marker='AG_LOCAL_API_IMG_BRIDGE_V3'
+          if marker in s:
+              raise SystemExit('already patched')
+          needle="app.get('/api/local-image-cache-status'"
+          pos=s.find(needle)
+          if pos < 0:
+              raise SystemExit('local image cache status route not found')
+          bridge=r'''
+          /* AG_LOCAL_API_IMG_BRIDGE_V3: make avatar redirect-to-/api/img work with same-origin local files. */
+          app.get('/api/img', (req, res, next) => {
+            try {
+              const raw = String(req.query.u || req.query.url || '');
+              const prefix = '/assets/images/chars/';
+              if (!raw.startsWith(prefix)) return next();
+              let rel = raw.slice(prefix.length);
+              try { rel = decodeURIComponent(rel); } catch (_) {}
+              const root = require('path').resolve(__agLocalImageCache.root);
+              const fp = require('path').resolve(root, rel);
+              if (fp !== root && !fp.startsWith(root + require('path').sep)) return res.status(400).end();
+              const fs2 = require('fs');
+              if (!fs2.existsSync(fp) || !fs2.statSync(fp).isFile()) return res.status(404).end();
+              res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+              res.type(__agLocalImageCache.mime(fp));
+              return res.sendFile(fp);
+            } catch (e) {
+              return next();
+            }
+          });
+
+          '''
+          s=s[:pos]+bridge+s[pos:]
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check server.js
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Runtime test full card image chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          PORT=3210 NODE_ENV=test node server.js >/tmp/server.log 2>&1 &
+          PID=$!
+          trap 'kill $PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 45); do
+            curl -fsS http://127.0.0.1:3210/api/local-image-cache-status >/tmp/status.json 2>/dev/null && break
+            kill -0 $PID 2>/dev/null || { cat /tmp/server.log; exit 1; }
+            sleep 1
+          done
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/status.json'))
+          assert d['files'] >= 1000, d
+          PY
+
+          RESULT=$(curl -sS -L --max-time 20 -o /tmp/avatar.img -w '%{http_code}|%{content_type}|%{size_download}' 'http://127.0.0.1:3210/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki')
+          echo "$RESULT"
+          CODE=$(echo "$RESULT" | cut -d'|' -f1)
+          TYPE=$(echo "$RESULT" | cut -d'|' -f2)
+          SIZE=$(echo "$RESULT" | cut -d'|' -f3 | cut -d'.' -f1)
+          test "$CODE" = '200'
+          echo "$TYPE" | grep -qi '^image/'
+          test "$SIZE" -gt 1000
+          test "$SIZE" -eq 19522
+
+          printf 'FULL CARD IMAGE CHAIN=OK\nhttp=%s\ncontent_type=%s\nbytes=%s\n' "$CODE" "$TYPE" "$SIZE" >/tmp/FULL_IMAGE_CHAIN_TEST.txt
+          cat /tmp/FULL_IMAGE_CHAIN_TEST.txt
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-image-chain-test
+          path: |
+            /tmp/FULL_IMAGE_CHAIN_TEST.txt
+            /tmp/status.json
+            /tmp/server.log
+
+      - name: Commit verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/FIX_IMAGE_REDIRECT_CHAIN.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: serve local images through avatar redirect chain [skip ci]"
+          git push origin HEAD:real-image-fix-v3
