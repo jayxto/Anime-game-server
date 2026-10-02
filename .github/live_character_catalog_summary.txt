@@ -1,0 +1,450 @@
+ENDPOINT=https://anime-game-server.onrender.com/api/character-catalog
+TOTAL=7452 UNIVERSES=128 MISSING=310 MANUAL=0 DUP_IMAGE_GROUPS=4
+
+=== UNIVERSES ===
+(unknown): 425
+akame: 16
+anohana: 8
+another: 9
+apothecary: 14
+assclass: 19
+baccano: 14
+beastars: 14
+berserk: 34
+beyblade: 10
+blackbutler: 15
+blacklagoon: 12
+bleach: 247
+bluebox: 8
+blueexorcist: 16
+bluelock: 57
+bocchi: 9
+bungou: 23
+callnight: 10
+cardcaptor: 12
+chainsaw: 79
+clannad: 13
+clover: 161
+codegeass: 26
+conan: 18
+cote: 82
+cowboybebop: 14
+cyberpunk: 12
+dandadan: 25
+danmachi: 18
+deathnote: 65
+deathparade: 9
+demonslayer: 104
+devilman: 10
+dgrayman: 17
+digimon: 21
+dorohedoro: 12
+dragonball: 330
+dressup: 8
+drstone: 34
+dungeonmeshi: 15
+durarara: 13
+eightysix: 14
+eminence: 17
+erased: 9
+evangelion: 16
+fairy: 257
+fate: 13
+fateapo: 22
+fatestay: 14
+fatezero: 21
+fireforce: 44
+fma: 98
+foodwars: 14
+frieren: 41
+gachiakuta: 30
+gintama: 27
+grandblue: 9
+greatpretender: 9
+gurren: 13
+haikyuu: 114
+hellsing: 12
+hellsparadise: 33
+horimiya: 10
+hxh: 173
+initiald: 12
+inuyasha: 20
+ippo: 9
+jjk: 98
+jojo: 207
+kaguya: 12
+kaiju8: 17
+kakegurui: 12
+killlakill: 13
+konosuba: 17
+kuroko: 10
+lycoris: 10
+madeinabyss: 17
+mashle: 19
+mfghost: 11
+mha: 76
+misfit: 1
+mobpsycho: 19
+monster: 12
+mushoku: 75
+naruto: 535
+nogamenolife: 10
+noragami: 15
+onepiece: 691
+opm: 94
+oshinoko: 17
+overlord: 16
+parasyte: 11
+pokemon: 1111
+promised: 18
+psychopass: 13
+rankingkings: 14
+rascal: 9
+recreators: 11
+rezero: 97
+sailormoon: 14
+sakamoto: 26
+samuraichamploo: 10
+sao: 131
+sds: 136
+shangrila: 11
+shieldhero: 15
+slamdunk: 9
+snk: 121
+solo: 64
+soul: 12
+souleater: 18
+spyfamily: 20
+steinsgate: 19
+tensura: 112
+tokyoghoul: 81
+tokyomewmew: 15
+tokyorevengers: 50
+toradora: 9
+trigun: 11
+vinland: 38
+violet: 10
+wakfu: 52
+windbreaker: 11
+yourlie: 10
+yugioh: 17
+yuyuhakusho: 25
+zom100: 8
+
+=== MISSING ===
+ | Sisters | status=
+ | Omnimon | status=
+ | WarGreymon | status=
+ | Ainz Perfect Warrior | status=
+ | Gun Fiend | status=
+ | Devilman | status=
+ | Armored All Might | status=
+ | Alucard Level Zero | status=
+ | 86 Eighty-Six | status=
+ | Akame ga Kill | status=
+ | Anohana | status=
+ | Another | status=
+ | Assassination Classroom | status=
+ | Baccano! | status=
+ | Beastars | status=
+ | Berserk | status=
+ | Beyblade | status=
+ | Black Butler | status=
+ | Black Clover | status=
+ | Black Lagoon | status=
+ | Bleach | status=
+ | Blue Box | status=
+ | Blue Exorcist | status=
+ | Blue Lock | status=
+ | Bocchi the Rock! | status=
+ | Bungo Stray Dogs | status=
+ | Call of the Night | status=
+ | Cardcaptor Sakura | status=
+ | Chainsaw Man | status=
+ | Clannad | status=
+ | Classroom of the Elite | status=
+ | Code Geass | status=
+ | Cowboy Bebop | status=
+ | Cyberpunk: Edgerunners | status=
+ | D.Gray-man | status=
+ | Dandadan | status=
+ | DanMachi | status=
+ | Death Note | status=
+ | Death Parade | status=
+ | Demon Slayer | status=
+ | Detective Conan | status=
+ | Devilman Crybaby | status=
+ | Digimon | status=
+ | Dorohedoro | status=
+ | Dr. Stone | status=
+ | Dragon Ball | status=
+ | Dungeon Meshi | status=
+ | Durarara!! | status=
+ | Erased | status=
+ | Fairy Tail | status=
+ | Fate/Apocrypha | status=
+ | Fate/stay night | status=
+ | Fate/Zero | status=
+ | Fire Force | status=
+ | Food Wars! | status=
+ | Frieren | status=
+ | Fullmetal Alchemist | status=
+ | Gachiakuta | status=
+ | Gintama | status=
+ | Grand Blue | status=
+ | Great Pretender | status=
+ | Gurren Lagann | status=
+ | Haikyuu | status=
+ | Hajime no Ippo | status=
+ | Hell's Paradise | status=
+ | Hellsing Ultimate | status=
+ | Horimiya | status=
+ | Hunter x Hunter | status=
+ | Initial D | status=
+ | Inuyasha | status=
+ | JoJo's Bizarre Adventure | status=
+ | Jujutsu Kaisen | status=
+ | Kaguya-sama | status=
+ | Kaiju No. 8 | status=
+ | Kakegurui | status=
+ | Kill la Kill | status=
+ | Konosuba | status=
+ | Kuroko no Basket | status=
+ | L'Attaque des Titans | status=
+ | Lycoris Recoil | status=
+ | Made in Abyss | status=
+ | Mashle | status=
+ | MF Ghost | status=
+ | Mob Psycho 100 | status=
+ | Monster | status=
+ | Mushoku Tensei | status=
+ | My Dress-Up Darling | status=
+ | My Hero Academia | status=
+ | Naruto | status=
+ | Neon Genesis Evangelion | status=
+ | No Game No Life | status=
+ | Noragami | status=
+ | One Piece | status=
+ | One Punch Man | status=
+ | Oshi no Ko | status=
+ | Overlord | status=
+ | Parasyte | status=
+ | Pokémon | status=
+ | Psycho-Pass | status=
+ | Ranking of Kings | status=
+ | Rascal Does Not Dream | status=
+ | Re:Creators | status=
+ | Re:Zero | status=
+ | Sailor Moon | status=
+ | Sakamoto Days | status=
+ | Samurai Champloo | status=
+ | Seven Deadly Sins | status=
+ | Shangri-La Frontier | status=
+ | Slam Dunk | status=
+ | Solo Leveling | status=
+ | Soul Eater | status=
+ | Spy x Family | status=
+ | Steins;Gate | status=
+ | Sword Art Online | status=
+ | Tensura | status=
+ | The Apothecary Diaries | status=
+ | The Eminence in Shadow | status=
+ | The Promised Neverland | status=
+ | The Rising of the Shield Hero | status=
+ | Tokyo Ghoul | status=
+ | Tokyo Mew Mew | status=
+ | Tokyo Revengers | status=
+ | Toradora! | status=
+ | Trigun | status=
+ | Vinland Saga | status=
+ | Violet Evergarden | status=
+ | Wakfu | status=
+ | WIND BREAKER | status=
+ | Your Lie in April | status=
+ | Yu Yu Hakusho | status=
+ | Yu-Gi-Oh! | status=
+ | Zom 100 | status=
+ | Demon King Form | status=
+ | Devil Union | status=
+ | Kishin Form | status=
+ | Aura Scales of Obedience | status=
+ | Level Boost Bell | status=
+ | White Whistle Form | status=
+ | Shadow / John Smith | status=
+ | Chainsaw Devil | status=
+ | Demon Lord Diablo | status=
+ | Spirit Form | status=
+ | Attack Titan | status=
+ | Founding Titan | status=
+ | The One Ultimate | status=
+ | Faputa True Form | status=
+fate | Archer | status=
+fate | Fate Route | status=
+fate | Gilgamesh | status=
+fate | Heaven’s Feel | status=
+fate | Illyasviel von Einzbern | status=
+fate | Kirei Kotomine | status=
+fate | Lancer | status=
+fate | Rider | status=
+fate | Sakura Matou | status=
+fate | Unlimited Blade Works | status=
+ | Frieren Mana Unleashed | status=
+ | Dark Shadow: Ragnarok | status=
+ | MetalGarurumon | status=
+ | Awakened Garou | status=
+ | Cosmic Fear Garou | status=
+ | Super Saiyan 2 | status=
+ | Adult Gon | status=
+ | Femto | status=
+ | Berserker Armor | status=
+ | Black Swordsman Armor | status=
+ | Bankai: Tensa Zangetsu | status=
+ | Vasto Lorde Ichigo | status=
+ | Full Demon Form | status=
+ | Arifureta | status=
+ | Ascendance of a Bookworm | status=
+ | Campfire Cooking in Another World | status=
+ | Cautious Hero | status=
+ | Grimgar of Fantasy and Ash | status=
+ | Handyman Saitou in Another World | status=
+ | Konosuba | status=
+ | Log Horizon | status=
+ | Mushoku Tensei | status=
+ | My Next Life as a Villainess | status=
+ | No Game No Life | status=
+ | Overlord | status=
+ | Re:Creators | status=
+ | Re:Zero | status=
+ | Reincarnated as a Sword | status=
+ | Saga of Tanya the Evil | status=
+ | Skeleton Knight in Another World | status=
+ | So I’m a Spider, So What? | status=
+ | Sword Art Online | status=
+ | Tensura | status=
+ | The Eminence in Shadow | status=
+ | The Faraway Paladin | status=
+ | The Rising of the Shield Hero | status=
+ | The Saint’s Magic Power Is Omnipotent | status=
+ | The World’s Finest Assassin Gets Reincarnated in Another World | status=
+ | The Wrong Way to Use Healing Magic | status=
+ | Tsukimichi: Moonlit Fantasy | status=
+ | Uncle from Another World | status=
+ | Dark Deku | status=
+ | Final War Deku | status=
+ | Kaiju No. 8 | status=
+ | Kaiju No. 8 Form | status=
+ | Bakugo Cluster | status=
+ | Black Reaper | status=
+ | Centipede Mode | status=
+ | Dragon Kaneki | status=
+ | Kakuja | status=
+ | Godspeed | status=
+ | Kirito Star King | status=
+ | Yoko Kurama | status=
+ | Zero | status=
+ | Mahoraga Adaptation | status=
+ | Mash Muscle Form | status=
+ | Demon King Meliodas | status=
+ | Demon Lord Milim | status=
+ | Psychic Awakening | status=
+ | Gear 2 | status=
+ | Gear 4: Boundman | status=
+ | Gear 5 | status=
+ | Sage Mode | status=
+ | Dragon Force | status=
+ | Demon Nezuko | status=
+ | Apostle Zodd | status=
+ | Corruption | status=
+ | Hero of Hell | status=
+ | Reg Incinerator Mode | status=
+ | Heaven’s Feel Rider | status=
+ | Dragon Form | status=
+ | Rimuru Demon Lord | status=
+ | Blue Flames Satan Form | status=
+ | Sukuna True Form | status=
+ | Ryuko + Senketsu Kisaragi | status=
+ | Senketsu Kisaragi | status=
+ | Saber Alter | status=
+ | Dark Sakura | status=
+ | Mob ???% | status=
+ | Mob 100% | status=
+ | Mob 100% Courage | status=
+ | Eva-01 Awakened | status=
+ | Assassination Classroom | status=
+ | Beelzebub | status=
+ | Black Clover | status=
+ | Bleach | status=
+ | Blue Box | status=
+ | Blue Exorcist | status=
+ | Blue Lock | status=
+ | Bungo Stray Dogs | status=
+ | Chainsaw Man | status=
+ | D.Gray-man | status=
+ | Dandadan | status=
+ | Demon Slayer | status=
+ | Detective Conan | status=
+ | Dr. Stone | status=
+ | Dragon Ball | status=
+ | Fairy Tail | status=
+ | Fire Force | status=
+ | Food Wars! | status=
+ | Fullmetal Alchemist | status=
+ | Gintama | status=
+ | Haikyuu | status=
+ | Hajime no Ippo | status=
+ | Hunter x Hunter | status=
+ | Inuyasha | status=
+ | Jujutsu Kaisen | status=
+ | Kaiju No. 8 | status=
+ | Kuroko no Basket | status=
+ | Magi | status=
+ | Mashle | status=
+ | Mission: Yozakura Family | status=
+ | My Hero Academia | status=
+ | Naruto | status=
+ | Noragami | status=
+ | One Piece | status=
+ | Rurouni Kenshin | status=
+ | Sakamoto Days | status=
+ | Slam Dunk | status=
+ | Soul Eater | status=
+ | The Elusive Samurai | status=
+ | The Promised Neverland | status=
+ | Toriko | status=
+ | Undead Unluck | status=
+ | WIND BREAKER | status=
+ | World Trigger | status=
+ | Yu Yu Hakusho | status=
+ | Yu-Gi-Oh! | status=
+ | Super Saiyan | status=
+ | Super Saiyan Blue | status=
+ | Ultra Instinct | status=
+soul | Asura | status=
+soul | Black Star | status=
+soul | Crona | status=
+soul | Death the Kid | status=
+soul | Dr. Stein | status=
+soul | Liz Thompson | status=
+soul | Lord Death | status=
+soul | Maka Albarn | status=
+soul | Medusa Gorgon | status=
+soul | Patty Thompson | status=
+soul | Soul Evans | status=
+soul | Tsubaki Nakatsukasa | status=
+ | Demon Mark | status=
+ | Incursio Evolved | status=
+ | Thorfinn Warrior Era | status=
+ | Shigaraki Awakened | status=
+ | Sailor Moon Eternal | status=
+ | Super Sailor Moon | status=
+ | Vash Angel Arm | status=
+ | Ultra Ego | status=
+ | Yami Yugi | status=
+ | Yukine Sekki | status=
+ | Spirit Dive | status=
+
+=== DUPLICATE IMAGE GROUPS (top 100) ===
+2x /assets/images/external/32d32c653acc2aa9.webp :: /Nobita ; /Nobita Nobi
+2x /assets/images/external/3875d45d1d784c0f.webp :: /Okarun Turbo Granny Form ; /Turbo Granny Form
+2x /assets/images/external/ddd207e54dac394a.webp :: /Kuroko Tetsuya ; /Tetsuya Kuroko
+2x https://i.ytimg.com/vi/1Bp68Fg5LJs/maxresdefault.jpg :: /Simon Super Tengen Toppa Gurren Lagann ; /Tengen Toppa Gurren Lagann
