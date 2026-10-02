@@ -822,7 +822,18 @@ const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
     { needs:['milim','demon lord'], url:'https://pbs.twimg.com/media/Ex9rFYjU8AIClSJ.jpg' },
     { needs:['diablo','demon lord'], url:'https://static.zerochan.net/Diablo.%28Tensei.Shitara.Slime.Datta.Ken%29.full.3079251.jpg' },
     { needs:['anos','demon king'], url:'https://s.animeanime.jp/imgs/p/64XVvff3mD9cFhi_PU1_DqGg_6ytrq_oqaqr/499325.jpg?zoom=spacing' },
-    { needs:['emilia','spirit form'], url:'https://static.zerochan.net/Ordinal.Strata.full.2342777.jpg' }
+    { needs:['emilia','spirit form'], url:'https://static.zerochan.net/Ordinal.Strata.full.2342777.jpg' },
+    // QAP_VERIFIED_TRANSFORM_BATCH8_FINAL — final visually reviewed catalogue rows.
+    { needs:['kirito','star king'], url:'https://is.zobj.net/image-server/v1/images?r=xxKOgPEn3MOPoSFzXB0nNMkGaQqsaVMLf_F27Ft79KevQrQKEHzWzPpYVRpxjX8ppW0yZK_bJ4-sUt_cCzbBxrrXyWSzT2pP_d34TrT6tPn7tp2c9gry_-mCXvuI-4L9FCE3uHHpcXKtmdN3GkCUHclnR54xDBvd_4REBCWu8nPAFOJUbpUS4Xdd9P3oKeP0vZBzPvuIi97kMpeeRkttlP5EFAXxLFcDU9y6dEbqbXkZtabEMsHPRfcg7wU' },
+    { needs:['guts','black swordsman'], url:'https://img.goodfon.com/original/1080x960/e/21/berserk-anime-guts-man-armor-manga-japanese-sword-ken-blade.jpg' },
+    { needs:['shigeo','100% courage'], url:'https://mob-psycho-100.fandom.com/wiki/Special:Redirect/file/Mob_100%25_Courage.JPG' },
+    { needs:['mash','muscle'], url:'https://hobiverse.com.vn/cdn/shop/articles/magic-and-muscles_thumbnail_hobi_fb700a9aa7ae457c9091aabdae5f7623.jpg?v=1716180649' },
+    { needs:['yukine','sekki'], url:'https://www.thefandomentals.com/wp-content/uploads/2022/07/Episode_02.webp' },
+    { needs:['rider','heaven'], url:'https://www.fate-sn.com/assets/img/2nd/chara/rider.jpg' },
+    { needs:['tatsumi','incursio evolved'], url:'https://agkofficial.fandom.com/wiki/Special:Redirect/file/Incursio%27s_Evolved_Form_in_Anime.png' },
+    { needs:['cid','john smith'], url:'https://shadow-garden.jp/assets/img/special/special21/chara1.png' },
+    { needs:['bell','level boost'], url:'https://pbs.twimg.com/media/EkdqVeLXgAE8VBF.jpg' },
+    { needs:['faputa','true form'], url:'https://i0.wp.com/otakuorbit.com/wp-content/uploads/2022/09/Screenshot-2022-09-24-230428.png?ssl=1' }
 ];
 
 function qapVerifiedTransformSource(animeName, charName, form) {
