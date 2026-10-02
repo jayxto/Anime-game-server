@@ -1,0 +1,23 @@
+{
+  "stats": {
+    "persistent": true,
+    "cachedInMemory": 2,
+    "total": 6299,
+    "ok": 6182,
+    "missing": 52,
+    "error": 0
+  },
+  "migration": {
+    "ok": true,
+    "running": true,
+    "done": false,
+    "pass": 2,
+    "total": 7084,
+    "stored": 6048,
+    "missing": 1036,
+    "failed": [],
+    "startedAt": "2026-10-02T22:29:56.153Z",
+    "finishedAt": "2026-10-02T22:03:08.796Z",
+    "lastError": null
+  }
+}
