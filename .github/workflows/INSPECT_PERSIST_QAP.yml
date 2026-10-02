@@ -1,0 +1,50 @@
+name: Inspect persistence and QAP
+on:
+  push:
+    branches: [fix-admin-persistence-qap]
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract relevant code context
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          pats = {
+            'server.js': ['character-image','character_images','resolveCharacterImage','simpleCatalogue','adminOnly','image-migration','localImage','canonical'],
+            'index.html': ['Qui a le plus','qui a le plus','qap','character-image','Gestion des personnages','gestion des personnages','admin-character','character manager','saveCharacter','saveImage']
+          }
+          out=[]
+          for fn, words in pats.items():
+              text=Path(fn).read_text(encoding='utf-8',errors='replace')
+              lines=text.splitlines()
+              hits=[]
+              for i,line in enumerate(lines):
+                  low=line.lower()
+                  if any(w.lower() in low for w in words): hits.append(i)
+              # merge windows +/- 35 lines
+              ranges=[]
+              for i in hits:
+                  a=max(0,i-35); b=min(len(lines),i+36)
+                  if ranges and a <= ranges[-1][1]+3: ranges[-1][1]=max(ranges[-1][1],b)
+                  else: ranges.append([a,b])
+              out.append(f'===== {fn} : {len(hits)} hits, {len(ranges)} ranges =====')
+              for a,b in ranges:
+                  out.append(f'--- lines {a+1}-{b} ---')
+                  out.extend(f'{j+1:06d}: {lines[j]}' for j in range(a,b))
+          Path('DEBUG_PERSIST_QAP_CONTEXT.txt').write_text('\n'.join(out),encoding='utf-8')
+          PY
+          wc -c DEBUG_PERSIST_QAP_CONTEXT.txt
+      - name: Commit context and self remove
+        shell: bash
+        run: |
+          rm -f .github/workflows/INSPECT_PERSIST_QAP.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'debug: extract persistence and qap code context'
+          git push origin HEAD:fix-admin-persistence-qap
