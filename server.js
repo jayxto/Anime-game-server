@@ -734,6 +734,16 @@ const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
     {
         needs:['tengen toppa gurren lagann'],
         url:'https://miro.medium.com/v2/resize%3Afit%3A1378/0%2ANmOrgB1FxblwJv0z'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH5 — Shield Hero.
+    // Checked against the anime's red/black Rage Shield silhouette and central gem.
+    {
+        needs:['rage shield'],
+        url:'https://w0.peakpx.com/wallpaper/403/743/HD-wallpaper-naofumi-rage-shield-tate-no-yuusha.jpg'
+    },
+    {
+        needs:['shield of rage'],
+        url:'https://w0.peakpx.com/wallpaper/403/743/HD-wallpaper-naofumi-rage-shield-tate-no-yuusha.jpg'
     }
 ];
 
