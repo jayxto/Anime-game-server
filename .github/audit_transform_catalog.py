@@ -3,52 +3,57 @@ import re
 
 s = Path('server.js').read_text(encoding='utf-8')
 out=[]
-out.append('=== TRANSFORMATION AUDIT V2 ===')
+out.append('=== QAP TRANSFORMATION SOURCE TRACE ===')
 out.append(f'server_chars={len(s)}')
 
-# Focused implementation contexts.
-for needle in [
-    'function arcItemsFor', 'const arcItemsFor', 'arcItemsFor =',
-    "qapThemeId === 'transformation'", 'QAP_VERIFIED_TRANSFORM_SOURCES_V2',
-    'TRANSFORM_PAGE_ALIASES'
-]:
-    pos=s.find(needle)
-    if pos>=0:
-        out.append(f'\n=== CONTEXT {needle} @ {pos} ===')
-        out.append(s[max(0,pos-2500):min(len(s),pos+10000)])
+# Every place qap-themes is referenced/generated.
+for needle in ['qap-themes.json','qap-themes','QT_THEMES','QT_BY_ID']:
+    hits=list(re.finditer(re.escape(needle),s,re.I))
+    out.append(f'\n=== {needle} count={len(hits)} ===')
+    for n,m in enumerate(hits[:40],1):
+        out.append(f'-- occ {n} @{m.start()} --')
+        out.append(s[max(0,m.start()-3500):min(len(s),m.end()+8000)])
 
-# Known forms: report every occurrence count + compact surrounding context. If a form
-# appears outside aliases/verified seeds this usually reveals the actual theme catalog.
-forms=[
-'Gear 4','Gear 5','Bankai','Super Saiyan','Super Saiyan God','Ultra Instinct','Ultra Ego',
-'Six Paths Sage Mode','Sage Mode','Susanoo','Baryon','Kurama Chakra Mode','Devil Union','Black Asta',
-'Crown Clown','Saber Alter','Rage Shield','Shield of Rage','Yoko Kurama','WarGreymon','War Greymon',
-'MetalGarurumon','Omnimon','Omegamon','Tengen Toppa Gurren Lagann','Full Cowl','Beast','Orange Piccolo',
-'Black Frieza','Black Freezer','Broly Full Power','Gogeta'
+# Direct transformation theme declarations/literals.
+patterns=[
+    r'"id"\s*:\s*"transformation"',
+    r"'id'\s*:\s*'transformation'",
+    r"\bid\s*:\s*['\"]transformation['\"]",
+    r'"transformation"\s*:\s*\{',
+    r"['\"]transformation['\"]\s*:\s*\{",
 ]
-out.append('\n=== FORM OCCURRENCES ===')
-for form in forms:
-    matches=list(re.finditer(re.escape(form),s,re.I))
-    out.append(f'\n## {form} count={len(matches)}')
-    for n,m in enumerate(matches[:12],1):
-        ctx=s[max(0,m.start()-650):min(len(s),m.end()+1000)].replace('\r','')
-        out.append(f'-- occ {n} @{m.start()} --\n{ctx}')
-
-# Every direct reference to transformation as a QAP/arcade data source, with smaller contexts.
-out.append('\n=== TRANSFORMATION SOURCE OCCURRENCES ===')
-for rx in [r'qt:transformation',r"['\"]transformation['\"]",r'\btransformation\b']:
+for rx in patterns:
     hits=list(re.finditer(rx,s,re.I))
-    out.append(f'PATTERN {rx} count={len(hits)}')
-    for m in hits[:80]:
-        ctx=s[max(0,m.start()-400):min(len(s),m.end()+900)]
-        if any(k in ctx for k in ['QAP','arcItemsFor','source','theme','items','char','sub','imageSearch','name:']):
-            out.append(f'-- @{m.start()} --\n{ctx}')
+    out.append(f'\n=== PATTERN {rx} count={len(hits)} ===')
+    for n,m in enumerate(hits[:30],1):
+        out.append(f'-- occ {n} @{m.start()} --')
+        out.append(s[max(0,m.start()-5000):min(len(s),m.end()+18000)])
 
-# Verified array raw.
-vm=re.search(r"const\s+QAP_VERIFIED_TRANSFORM_SOURCES_V2\s*=\s*\[(.*?)\n\];",s,re.S)
-if vm:
-    out.append('\n=== VERIFIED ARRAY RAW ===')
-    out.append(vm.group(1))
+# File-generation calls and all JSON writes nearby.
+for rx in [r'writeFileSync\s*\(',r'writeFile\s*\(',r'fs\.write',r'JSON\.stringify']:
+    hits=list(re.finditer(rx,s,re.I))
+    kept=[]
+    for m in hits:
+        ctx=s[max(0,m.start()-5000):min(len(s),m.end()+12000)]
+        if 'qap' in ctx.lower() or 'transformation' in ctx.lower():
+            kept.append((m,ctx))
+    out.append(f'\n=== WRITE TRACE {rx} kept={len(kept)} ===')
+    for n,(m,ctx) in enumerate(kept[:30],1):
+        out.append(f'-- occ {n} @{m.start()} --')
+        out.append(ctx)
+
+# Collect likely form records in source, broader than the previous audit.
+# This catches object/JSON data even when the file is generated dynamically.
+record_rx=re.compile(r"\{[^{}]{0,1500}(?:name|\"name\")\s*:\s*['\"][^'\"]+['\"][^{}]{0,3000}\}",re.S)
+keywords=re.compile(r'(gear|bankai|susanoo|sage mode|baryon|kurama chakra|super saiyan|ultra instinct|ultra ego|beast|orange piccolo|black frieza|black freezer|devil union|black asta|full cowl|crown clown|saber alter|rage shield|shield of rage|yoko kurama|wargreymon|metalgarurumon|omnimon|omegamon|tengen toppa)',re.I)
+records=[]
+for m in record_rx.finditer(s):
+    txt=m.group(0)
+    if keywords.search(txt):
+        records.append((m.start(),txt))
+out.append(f'\n=== LIKELY FORM RECORDS count={len(records)} ===')
+for pos,txt in records[:250]:
+    out.append(f'-- @{pos} --\n{txt}')
 
 Path('.github/transform_audit.txt').write_text('\n'.join(out),encoding='utf-8')
-print('audit v2 written',len(out),'chunks')
+print('trace audit written',len(out),'chunks')
