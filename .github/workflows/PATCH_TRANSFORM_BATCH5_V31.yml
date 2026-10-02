@@ -19,19 +19,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Apply strict fallback order and batch 5
+      - name: Apply and self-validate strict fallback order plus batch 5
         run: python3 .github/patch_transform_batch5_v31.py
       - name: Verify server syntax
         run: node --check server.js
-      - name: Verify anchors
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -q 'QAP_VERIFIED_TRANSFORM_BATCH5' server.js
-          grep -q 'Strict form-specific wiki' server.js
-          grep -q 'Dark-Deku.png' server.js
-          grep -q 'adult gon' server.js
-          grep -q 'the one ultimate' server.js
       - name: Commit patch
         shell: bash
         run: |
