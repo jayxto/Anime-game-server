@@ -38,4 +38,4 @@ jobs:
           git commit -m "chore: refresh remaining transformation audit [skip ci]"
           git push origin HEAD:main
 
-# manual refresh after verified batches 6 and 7
+# manual refresh after forced verified batches 6 and 7
