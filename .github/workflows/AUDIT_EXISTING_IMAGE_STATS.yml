@@ -1,0 +1,36 @@
+name: Audit existing image stats
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_EXISTING_IMAGE_STATS.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Fetch current image stats
+        run: python3 .github/fetch_existing_image_stats.py
+      - name: Commit report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/current_image_stats.json .github/current_image_stats_summary.txt
+          if git diff --cached --quiet; then
+            echo "No image stat changes"
+            exit 0
+          fi
+          git commit -m "chore: record existing image stats [skip ci]"
+          git push origin HEAD:main
