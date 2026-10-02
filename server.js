@@ -1131,6 +1131,9 @@ app.get('/api/character-catalog', (req, res) => {
             name = String(name || '').trim();
             anime = String(anime || '').trim();
             if (!name) return;
+            // CHARACTER_CATALOG_CLEANUP_V2 — normalize legacy universe ids before dedupe/image routing.
+            if (u === 'fate') u = 'fatestay';
+            if (u === 'soul') u = 'souleater';
             let arcAnime = '';
             try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
             if (!anime) anime = arcAnime || u || 'Autre';
@@ -1198,9 +1201,24 @@ app.get('/api/character-catalog', (req, res) => {
                 for (const theme of (parsed.themes || [])) {
                     if (theme.kind !== 'chars') continue;
                     for (const item of (theme.items || [])) {
-                        const anime = String(item.sub || theme.title || '').trim();
-                        const u = resolveImageUniverseKey(anime);
-                        add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                        // Themes also contain anime titles and transformation labels. Only feed real
+                        // character rows to the character catalogue. For transformation themes,
+                        // item.char is the base character and `sub` is usually "Character • Anime".
+                        const rawSub = String(item.sub || item.anime || '').trim();
+                        const bits = rawSub.split('•').map(x => x.trim()).filter(Boolean);
+                        const anime = String(item.anime || (bits.length > 1 ? bits[bits.length - 1] : rawSub) || '').trim();
+                        const explicitChar = String(item.char || item.character || '').trim();
+                        const name = explicitChar || String(item.name || '').trim();
+                        let u = null;
+                        try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                        if (!u && item.u) u = String(item.u).trim();
+                        if (u === 'fate') u = 'fatestay';
+                        if (u === 'soul') u = 'souleater';
+                        // A theme item with no resolvable universe and no explicit character field is
+                        // almost certainly an anime/category item, not a character portrait.
+                        if (!u && !explicitChar) continue;
+                        if (!u || !name) continue;
+                        add(u, anime, name, item.img || null, file.replace('.json',''));
                     }
                 }
             } catch (_) {}
