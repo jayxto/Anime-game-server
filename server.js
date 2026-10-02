@@ -14480,10 +14480,6 @@ app.get('/api/arcade/item-image', async (req, res) => {
                                 }
                             }
 
-                            // Existing theme image is only a fallback now. Critical forms with a
-                            // reviewed source always override it; this fixes stale normal portraits.
-                            if (!url && it.img) url = it.img;
-
                             if (!url && host) {
                                 let candidate = null;
                                 try { candidate = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
@@ -14493,8 +14489,12 @@ app.get('/api/arcade/item-image', async (req, res) => {
                                     // display fallback but do not treat it as durable/verified cache.
                                     if (!url) url = candidate;
                                 }
-                                // Aucun fallback vers le portrait normal du personnage.
                             }
+
+                            // Last resort only: old embedded theme image. Strict form-specific wiki
+                            // lookup now gets a chance first, preventing stale normal portraits.
+                            if (!url && it.img) url = it.img;
+                            // Aucun fallback vers le portrait normal du personnage.
                         }
                         // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
                         // généralement le portrait standard et provoquerait précisément les mauvaises formes.
