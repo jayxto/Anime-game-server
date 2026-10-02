@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'server.js'
+      - '.github/audit_transform_source_health.py'
       - '.github/workflows/AUDIT_TRANSFORM_SOURCE_HEALTH.yml'
 
 permissions:
@@ -36,4 +38,4 @@ jobs:
           git commit -m "chore: audit transformation image source health [skip ci]"
           git push origin HEAD:main
 
-# recheck after replacing eight fragile sources
+# retry slow official image hosts before replacing them
