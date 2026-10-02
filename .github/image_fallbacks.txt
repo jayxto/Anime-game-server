@@ -1,0 +1,111 @@
+
+===== simpleAniListAnime =====
+async function simpleAniListAnime(anime) {
+    const cache = simpleAniListAnime.cache || (simpleAniListAnime.cache = new Map());
+    if (cache.has(anime)) return cache.get(anime);
+    const all = [];
+    for (let page=1; page<=8; page++) {
+        const query = `query($s:String,$p:Int){Media(search:$s,type:ANIME){characters(page:$p,perPage:50,sort:[ROLE,RELEVANCE]){pageInfo{hasNextPage}nodes{name{full native alternative}image{large medium}}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST', headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:anime,p:page}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,3500)); page--; continue; }
+            if (!r.ok) break;
+            const d = await r.json(); const c = d?.data?.Media?.characters;
+            all.push(...(c?.nodes || []));
+            if (!c?.pageInfo?.hasNextPage) break;
+            await new Promise(r=>setTimeout(r,800));
+        } catch (_) { break; }
+    }
+    cache.set(anime,all); return all;
+}
+
+===== simpleAniListCharacterSearch =====
+async function simpleAniListCharacterSearch(u,name) {
+    const wanted = simpleVariants(u,name);
+    for (const q of wanted.slice(0,2)) {
+        const query = `query($s:String){Page(page:1,perPage:10){characters(search:$s){name{full native alternative}image{large medium}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST',
+                headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:q}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,2600)); continue; }
+            if (!r.ok) continue;
+            const arr=(await r.json())?.data?.Page?.characters || [];
+            let best=null;
+            for (const c of arr) {
+                const names=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);
+                const sc=Math.max(0,...names.flatMap(n=>wanted.map(w=>simpleScoreName(n,w))));
+                const url=c?.image?.large || c?.image?.medium || '';
+                if (url && sc>=82 && (!best || sc>best.sc)) best={sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+        await new Promise(r=>setTimeout(r,850));
+    }
+    return '';
+}
+
+===== simpleFandomUrl =====
+async function simpleFandomUrl(u,name) {
+    const host = (typeof FANDOM_WIKIS !== 'undefined' && FANDOM_WIKIS[u]) || null;
+    if (!host) return '';
+    const qs = simpleVariants(u,name);
+    for (const wanted of qs.slice(0,2)) {
+        try {
+            const p = new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:wanted,gsrnamespace:'0',gsrlimit:'8',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'900',redirects:'1'});
+            const r = await fetch(`https://${host}/api.php?${p}`, {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+            if (!r.ok) continue;
+            const pages = Object.values((await r.json())?.query?.pages || {});
+            let best = null;
+            for (const pg of pages) {
+                const sc = Math.max(...qs.map(x=>simpleScoreName(pg?.title,x)));
+                const url = pg?.original?.source || pg?.thumbnail?.source || '';
+                if (url && sc >= 65 && (!best || sc > best.sc)) best = {sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+    }
+    return '';
+}
+
+===== simpleJikanUrl =====
+async function simpleJikanUrl(name,u) {
+    for (const q of simpleVariants(u,name).slice(0,2)) {
+        try {
+            const r = await fetch('https://api.jikan.moe/v4/characters?limit=10&q=' + encodeURIComponent(q), {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,1800)); continue; }
+            if (!r.ok) continue;
+            const arr = (await r.json())?.data || []; let best = null;
+            for (const c of arr) {
+                const sc = Math.max(...simpleVariants(u,name).map(w=>simpleScoreName(c?.name,w)));
+                const url = c?.images?.webp?.image_url || c?.images?.jpg?.image_url || '';
+                if (url && sc >= 82 && (!best || sc > best.sc)) best={sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+        await new Promise(r=>setTimeout(r,420));
+    }
+    return '';
+}
+
+===== simpleWikipediaUrl =====
+async function simpleWikipediaUrl(name,anime,u) {
+    try {
+        const variants = simpleVariants(u,name);
+        const p = new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:`${variants[0]} ${anime || ''}`,gsrnamespace:'0',gsrlimit:'6',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'900'});
+        const r = await fetch('https://en.wikipedia.org/w/api.php?' + p, {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+        if (!r.ok) return '';
+        const pages = Object.values((await r.json())?.query?.pages || {}); let best=null;
+        for (const pg of pages) {
+            const sc = Math.max(...variants.map(x=>simpleScoreName(pg?.title,x)));
+            const url = pg?.original?.source || pg?.thumbnail?.source || '';
+            if (url && sc >= 62 && (!best || sc > best.sc)) best={sc,url};
+        }
+        return best?.url || '';
+    } catch (_) { return ''; }
+}
