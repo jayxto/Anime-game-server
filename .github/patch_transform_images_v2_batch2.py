@@ -13,7 +13,9 @@ if arr < 0 or end < 0:
 
 batch_marker = 'QAP_VERIFIED_TRANSFORM_BATCH2'
 if batch_marker not in s[arr:end]:
-    rows = r'''
+    # Leading comma separates this batch from the final object already present
+    # in the verified seed array.
+    rows = r''',
     // QAP_VERIFIED_TRANSFORM_BATCH2 — visually/context-checked second pass.
     {
         needs:['ultra ego'],
@@ -46,7 +48,7 @@ if batch_marker not in s[arr:end]:
     {
         needs:['black freezer'],
         url:'https://p7.itc.cn/images01/20230602/afea49694e24409dbca3a7924b978389.jpeg'
-    },'''
+    }'''
     s = s[:end] + rows + s[end:]
 
 p.write_text(s, encoding='utf-8')
