@@ -1,0 +1,42 @@
+KNOWN_UNIVERSE_MISSING=22 ALIAS_CANDIDATES=22
+fate/Archer -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Archer SOURCE= STATUS=
+fate/Fate Route -> fatestay :: matches=0
+fate/Gilgamesh -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Gilgamesh SOURCE= STATUS=
+fate/Heaven’s Feel -> fatestay :: matches=0
+fate/Illyasviel von Einzbern -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Illyasviel%20von%20Einzbern SOURCE= STATUS=
+fate/Kirei Kotomine -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Kirei%20Kotomine SOURCE= STATUS=
+fate/Lancer -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Lancer SOURCE= STATUS=
+fate/Rider -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Rider SOURCE= STATUS=
+fate/Sakura Matou -> fatestay :: matches=1
+  IMG=/api/avatar/img?u=fatestay&n=Sakura%20Matou SOURCE= STATUS=
+fate/Unlimited Blade Works -> fatestay :: matches=0
+soul/Asura -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Asura SOURCE= STATUS=
+soul/Black Star -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Black%20Star SOURCE= STATUS=
+soul/Crona -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Crona SOURCE= STATUS=
+soul/Death the Kid -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Death%20the%20Kid SOURCE= STATUS=
+soul/Dr. Stein -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Dr.%20Stein SOURCE= STATUS=
+soul/Liz Thompson -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Liz%20Thompson SOURCE= STATUS=
+soul/Lord Death -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Lord%20Death SOURCE= STATUS=
+soul/Maka Albarn -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Maka%20Albarn SOURCE= STATUS=
+soul/Medusa Gorgon -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Medusa%20Gorgon SOURCE= STATUS=
+soul/Patty Thompson -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Patty%20Thompson SOURCE= STATUS=
+soul/Soul Evans -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Soul%20Evans SOURCE= STATUS=
+soul/Tsubaki Nakatsukasa -> souleater :: matches=1
+  IMG=/api/avatar/img?u=souleater&n=Tsubaki%20Nakatsukasa SOURCE= STATUS=
