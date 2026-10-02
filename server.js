@@ -966,7 +966,7 @@ app.get('/api/character-catalog', (req, res) => {
                     for (const item of (theme.items || [])) {
                         const anime = String(item.sub || theme.title || '').trim();
                         const u = resolveImageUniverseKey(anime);
-                        add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                        add(u, anime, item.name, item.img || null, file === 'qap-themes.json' ? ('qap:' + String(theme.id || theme.title || 'theme')) : file.replace('.json',''));
                     }
                 }
             } catch (_) {}

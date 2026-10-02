@@ -15149,7 +15149,7 @@ async function loadHallOfFame(){
 /* Admin character viewer v5 */
 (() => {
     const PAGE = 120;
-    const state = { all: [], filtered: [], page: 0, status: new Map(), loaded: false };
+    const state = { all: [], filtered: [], page: 0, status: new Map(), loaded: false, qapThemes: new Map() };
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
     const keyOf = x => norm(x.u || x.universe || x.anime) + '|' + norm(x.name);
@@ -15165,6 +15165,8 @@ async function loadHallOfFame(){
     const prettyMode = value => {
         const raw = String(value || '').trim();
         if (!raw) return 'Autre';
+        if (raw === 'qap') return 'Qui a le plus';
+        if (raw.toLowerCase().startsWith('qap:')) return state.qapThemes.get(raw.slice(4)) || 'Qui a le plus';
         const k = raw.toLowerCase().replace(/[\s-]+/g,'_');
         return MODE_LABELS[k] || raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
     };
@@ -15230,11 +15232,12 @@ async function loadHallOfFame(){
         if (!admin) return setTimeout(ensure, 400);
         if (document.getElementById('ag-charadmin')) return;
         const wrap = document.createElement('div'); wrap.id='ag-charadmin'; wrap.className='opt-panel ag-charadmin';
-        wrap.innerHTML = `<div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue unique de tous les personnages du site. Les images locales sont validées instantanément. Tu peux remplacer n'importe quelle image par une URL.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div><div id="ag-charadmin-body" style="display:none"><div class="ag-charadmin-tools"><input id="ag-charadmin-q" type="search" autocomplete="off" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-mode"><option value="">Tous les modes</option></select><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images manquantes</option><option value="external">URLs externes</option><option value="ok">Images locales / stables</option></select></div><div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button></div>`;
+        wrap.innerHTML = `<div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue unique de tous les personnages du site. Les images locales sont validées instantanément. Tu peux remplacer n'importe quelle image par une URL.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div><div id="ag-charadmin-body" style="display:none"><div class="ag-charadmin-tools"><input id="ag-charadmin-q" type="search" autocomplete="off" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-mode"><option value="">Tous les modes</option></select><select id="ag-charadmin-qap-theme" style="display:none"><option value="">Tous les thèmes Qui a le plus</option></select><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images manquantes</option><option value="external">URLs externes</option><option value="ok">Images locales / stables</option></select></div><div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button></div>`;
         admin.appendChild(wrap);
         document.getElementById('ag-charadmin-load').addEventListener('click', load);
         document.getElementById('ag-charadmin-q').addEventListener('input', apply);
-        document.getElementById('ag-charadmin-mode').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-mode').addEventListener('change',()=>{const mode=document.getElementById('ag-charadmin-mode')?.value||'';const sub=document.getElementById('ag-charadmin-qap-theme');if(sub){sub.style.display=mode==='qap'?'':'none';if(mode!=='qap')sub.value='';}apply();});
+        document.getElementById('ag-charadmin-qap-theme').addEventListener('change', apply);
         document.getElementById('ag-charadmin-anime').addEventListener('change', apply);
         document.getElementById('ag-charadmin-status').addEventListener('change', apply);
         document.getElementById('ag-charadmin-more').addEventListener('click',()=>{state.page++;render(false)});
@@ -15251,14 +15254,17 @@ async function loadHallOfFame(){
             const animeSel=document.getElementById('ag-charadmin-anime');
             for(const a of [...new Set(state.all.map(x=>x.anime).filter(Boolean))].sort((a,b)=>a.localeCompare(b))){const o=document.createElement('option');o.value=a;o.textContent=a;animeSel.appendChild(o)}
             const modeSel=document.getElementById('ag-charadmin-mode');
-            for(const m of [...new Set(state.all.flatMap(sourcesOf))].sort((a,b)=>prettyMode(a).localeCompare(prettyMode(b)))){const o=document.createElement('option');o.value=m;o.textContent=prettyMode(m);modeSel.appendChild(o)}
+            const rawModes=[...new Set(state.all.flatMap(sourcesOf))];
+            for(const m of rawModes.filter(m=>!String(m).startsWith('qap:')).sort((a,b)=>prettyMode(a).localeCompare(prettyMode(b)))){const o=document.createElement('option');o.value=m;o.textContent=prettyMode(m);modeSel.appendChild(o)}
+            if(rawModes.some(m=>String(m).startsWith('qap:'))){const o=document.createElement('option');o.value='qap';o.textContent='Qui a le plus';modeSel.appendChild(o)}
+            try{const qr=await fetch('/api/qap/themes',{cache:'no-store'});const qd=await qr.json();if(qr.ok&&qd.ok&&Array.isArray(qd.themes)){const sub=document.getElementById('ag-charadmin-qap-theme');for(const t of qd.themes){const id=String(t.id||'').trim();if(!id)continue;state.qapThemes.set(id,String(t.title||id));const o=document.createElement('option');o.value=id;o.textContent=`${t.emoji||''} ${t.title||id}`.trim();sub.appendChild(o)}}}catch(_){}
             state.loaded=true; document.getElementById('ag-charadmin-body').style.display=''; btn.textContent='Catalogue chargé'; apply();
         } catch(e) { btn.disabled=false;btn.textContent='Réessayer';document.getElementById('ag-charadmin-stats').textContent='❌ '+(e?.message||'Impossible de charger le catalogue'); }
     }
 
     function apply(){
-        if(!state.loaded)return; const q=norm(document.getElementById('ag-charadmin-q')?.value); const anime=document.getElementById('ag-charadmin-anime')?.value||''; const mode=document.getElementById('ag-charadmin-mode')?.value||''; const wanted=document.getElementById('ag-charadmin-status')?.value||'';
-        state.filtered=state.all.filter(x=>{if(anime&&x.anime!==anime)return false;if(mode&&!sourcesOf(x).includes(mode))return false;if(q&&!norm(`${x.name} ${x.anime} ${sourcesOf(x).map(prettyMode).join(' ')}`).includes(q))return false;if(wanted&&state.status.get(keyOf(x))!==wanted)return false;return true}); state.page=0; render(true);
+        if(!state.loaded)return; const q=norm(document.getElementById('ag-charadmin-q')?.value); const anime=document.getElementById('ag-charadmin-anime')?.value||''; const mode=document.getElementById('ag-charadmin-mode')?.value||''; const qapTheme=document.getElementById('ag-charadmin-qap-theme')?.value||''; const wanted=document.getElementById('ag-charadmin-status')?.value||'';
+        state.filtered=state.all.filter(x=>{const src=sourcesOf(x);if(anime&&x.anime!==anime)return false;if(mode==='qap'&&!src.some(s=>String(s).startsWith('qap:')))return false;if(mode&&mode!=='qap'&&!src.includes(mode))return false;if(mode==='qap'&&qapTheme&&!src.includes('qap:'+qapTheme))return false;if(q&&!norm(`${x.name} ${x.anime} ${src.map(prettyMode).join(' ')}`).includes(q))return false;if(wanted&&state.status.get(keyOf(x))!==wanted)return false;return true}); state.page=0; render(true);
     }
 
     function stats(){
