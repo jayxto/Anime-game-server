@@ -14445,7 +14445,9 @@ app.get('/api/arcade/item-image', async (req, res) => {
         else {
             const it = (arcItemsFor(source) || []).find(i => i.name === name);
             if (it) {
-                if (it.img) url = it.img;
+                // Transformation images must go through the strict/persistent resolver below.
+                // Otherwise an old embedded `img` can bypass verified mappings entirely.
+                if (it.img && source !== 'qt:transformation') url = it.img;
                 else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
                     url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
                 } else if (source.startsWith('qt:')) {
@@ -14454,7 +14456,6 @@ app.get('/api/arcade/item-image', async (req, res) => {
                         // STRICT : une transformation ne doit JAMAIS retomber sur le portrait normal du perso.
                         // On cherche la page/image de la FORME elle-même sur le wiki de l'univers.
                         // Si aucune image de forme n'est trouvée, on renvoie null plutôt qu'une mauvaise image.
-                        if (it.img) url = it.img;
                         if (!url) {
                             const parts = String(it.sub || '').split('•').map(s => s.trim()).filter(Boolean);
                             const animeName = parts.length > 1 ? parts[parts.length - 1] : '';
@@ -14462,7 +14463,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
                             const host = universeKey ? FANDOM_WIKIS[universeKey] : null;
                             const form = String(it.name || '').trim();
                             const charName = String(it.char || parts[0] || '').trim();
-                            const persistKey = `v2|${animeName}|${charName}|${form}`;
+                            const persistKey = `v3|${animeName}|${charName}|${form}`;
                             // Une fois une forme trouvée, elle est gardée en PostgreSQL : les prochains chargements
                             // et les prochains redéploiements ne refont plus la recherche lente.
                             try {
@@ -14478,6 +14479,10 @@ app.get('/api/arcade/item-image', async (req, res) => {
                                     url = await persistQapTransformImage(persistKey, verifiedSource, 'transform-verified');
                                 }
                             }
+
+                            // Existing theme image is only a fallback now. Critical forms with a
+                            // reviewed source always override it; this fixes stale normal portraits.
+                            if (!url && it.img) url = it.img;
 
                             if (!url && host) {
                                 let candidate = null;
