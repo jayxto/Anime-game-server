@@ -1,0 +1,8712 @@
+{
+  "total": 7402,
+  "startMissing": 3567,
+  "candidates": 242,
+  "downloaded": 242,
+  "failed": 0,
+  "canonical": 4077,
+  "missing": 3325,
+  "coverage": 55.08,
+  "missingFirst1000": [
+    {
+      "u": "eightysix",
+      "n": "Ernst Zimmerman",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Eugene Rantz",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Federacy",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Grethe Wenzel",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Kiriya Nouzen",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Morpho",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "eightysix",
+      "n": "Spearhead Squadron",
+      "anime": "86 Eighty-Six",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Sisters",
+      "anime": "A Certain Magical Index",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Omnimon",
+      "anime": "Agumon & Gabumon • Digimon",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "WarGreymon",
+      "anime": "Agumon • Digimon",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Ainz Perfect Warrior",
+      "anime": "Ainz Ooal Gown • Overlord",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "akame",
+      "n": "Najenda",
+      "anime": "Akame ga Kill",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "akame",
+      "n": "Run",
+      "anime": "Akame ga Kill",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "akame",
+      "n": "Seryu Ubiquitous",
+      "anime": "Akame ga Kill",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "akame",
+      "n": "Susanoo",
+      "anime": "Akame ga Kill",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "akame",
+      "n": "Wave",
+      "anime": "Akame ga Kill",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Gun Fiend",
+      "anime": "Aki Hayakawa • Chainsaw Man",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Armored All Might",
+      "anime": "All Might • My Hero Academia",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Alucard Level Zero",
+      "anime": "Alucard • Hellsing Ultimate",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "DanMachi",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Demon Slayer",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Digimon",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "L'Attaque des Titans",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Tensura",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Toradora!",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Trigun",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Vinland Saga",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Wakfu",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "WIND BREAKER",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Your Lie in April",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Yu Yu Hakusho",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Yu-Gi-Oh!",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Zom 100",
+      "anime": "Anime",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Atsumu Matsuyuki",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Irene Honma",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Jinta Yadomi",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Naruko Anjo",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Satoshi Honma",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "anohana",
+      "n": "Tetsudo Hisakawa",
+      "anime": "Anohana",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Demon King Form",
+      "anime": "Anos Voldigoad • The Misfit of Demon King Academy",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Koichi Sakakibara",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Naoya Teshigawara",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Reiko Mikami",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Takako Sugiura",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Tomohiko Kazami",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Yukari Sakuragi",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "another",
+      "n": "Yuya Mochizuki",
+      "anime": "Another",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Final Exams",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Gakuho Asano",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Gakushu Asano",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Graduation",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Island",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Manami Okuda",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Ritsu",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Ryoma Terasaka",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Tomohito Sugino",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "assclass",
+      "n": "Yuma Isogai",
+      "anime": "Assassination Classroom",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Devil Union",
+      "anime": "Asta • Black Clover",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Kishin Form",
+      "anime": "Asura • Soul Eater",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Aura Scales of Obedience",
+      "anime": "Aura • Frieren",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "baccano",
+      "n": "Berga Gandor",
+      "anime": "Baccano!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "baccano",
+      "n": "Czeslaw Meyer",
+      "anime": "Baccano!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "baccano",
+      "n": "Keith Gandor",
+      "anime": "Baccano!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "baccano",
+      "n": "Maiza Avaro",
+      "anime": "Baccano!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Bill",
+      "anime": "Beastars",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Gohin",
+      "anime": "Beastars",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Ibuki",
+      "anime": "Beastars",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Interspecies Relations",
+      "anime": "Beastars",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Murder Incident Solution",
+      "anime": "Beastars",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Riz",
+      "anime": "Beastars",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beastars",
+      "n": "Tem",
+      "anime": "Beastars",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Level Boost Bell",
+      "anime": "Bell Cranel • DanMachi",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Black Swordsman",
+      "anime": "Berserk",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Charlotte",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Conrad",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Conviction",
+      "anime": "Berserk",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Corkus",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Erica",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Falcon of the Millennium Empire",
+      "anime": "Berserk",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Farnese",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Ganishka",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Godo",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Golden Age",
+      "anime": "Berserk",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Grunbeld",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Irvine",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Ivalera",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Locus",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Luca",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Mozgus",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Rickert",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Skull Knight",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Slan",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Ubik",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Void",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "berserk",
+      "n": "Zodd",
+      "anime": "Berserk",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Brooklyn",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Daichi Sumeragi",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Hilary Tachibana",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Kenny",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Max Tate",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Ozuma",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Ray Kon",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Tala Valkov",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "beyblade",
+      "n": "Tyson Granger",
+      "anime": "Beyblade",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Baldroy",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Lau",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Ran-Mao",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Snake",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Tanaka",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blackbutler",
+      "n": "Undertaker",
+      "anime": "Black Butler",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Acier Silva",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Adrammelech",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Alecdora Sandler",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Allen Fiarain",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Aruru",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Augustus Kira Clover XIII",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Baro",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Baval",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Beelzebub",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Bell",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Broccos",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Charla",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ciel Grinberryall",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Conrad Leto",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Daizaemon O'oka",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Damnatio Kira",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "David Swallow",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Digit Taliss",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Dominante Code",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Drowa",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Eclat",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ecthel",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Edward Avalache",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Elf Reincarnation",
+      "anime": "Black Clover",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "En Ringard",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Fanzell Kruger",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Father Fuego",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Floga",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Foyal Migusteau",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Fragil Tormenta",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Fujio",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Gaderois Godroc",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Gadjah",
+      "anime": "Black Clover",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Gifso",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Gimodelo",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ginnojomorifuyu Kezoukaku",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Gueldre Poizot",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Halbet Chevour",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Hamon Caseus",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Heath Grice",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Hollo",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ichika Yami",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Jester Garandros",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kabwe Carillon",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kahono",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kaiser Granvorka",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kiato",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kirsch Vermillion",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Kivn",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Komari Imari",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ladros",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Letoile Becquerel",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lilith",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lolopechka",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lotus Whomalt",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Loyce Grinberryall",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lucifero",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lucifugus",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lucius",
+      "anime": "Black Clover",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Lumiere Silvamillion Clover",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Marie Adlai",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Mariella",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Marx Francois",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Megicula",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Milly Maxwell",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Morgen Faust",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Morris",
+      "anime": "Black Clover",
+      "sources": [
+        "power"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Morris Libardirt",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Mushogatake Yosuga",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Naamah",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Nash",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Nathan Agrippa",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Nebra Silva",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Neige",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Noze",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Orsi Orfai",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Owen",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Plumede",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Potrof",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Princia Funnybunny",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Puli Angel",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ragus",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Raia",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ralph Niaflem",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Randall Luftair",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Rebecca Scarlet",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Reine des Sorcières",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Revchi Salik",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Rhya",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Richita",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Robero Ringert",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Roland",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ronne",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Rufel",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Ryudo Ryuya",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Salim of Hapshass",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Sekke Bronzazza",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Siren Tium",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Sister Lily",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Sister Theresa",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Sivoir Snyle",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Slotos",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Sol Marron",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Spade Kingdom Raid",
+      "anime": "Black Clover",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Svenkin Gatard",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Tetia",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Undine",
+      "anime": "Black Clover",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Valtos",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Vetto",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Walgner",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Xerx Lugner",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Yagos",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Zagred",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clover",
+      "n": "Zara Ideale",
+      "anime": "Black Clover",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blacklagoon",
+      "n": "Benny",
+      "anime": "Black Lagoon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blacklagoon",
+      "n": "Chang",
+      "anime": "Black Lagoon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blacklagoon",
+      "n": "Garcia Lovelace",
+      "anime": "Black Lagoon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blacklagoon",
+      "n": "Rokuro Okajima",
+      "anime": "Black Lagoon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blacklagoon",
+      "n": "Sawyer the Cleaner",
+      "anime": "Black Lagoon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Aaroniero Arruruerie",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Abirama Redder",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Acidwire",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Aizen",
+      "anime": "Bleach",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Akon",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Arrancar / Hueco Mundo",
+      "anime": "Bleach",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "As Nodt",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Asguiaro Ebern",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ashido Kano",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Askin",
+      "anime": "Bleach",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Askin Nakk Le Vaar",
+      "anime": "Bleach",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Aura Michibane",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Baishin",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Baura",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Bawabawa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Bazz-B",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Berenice Gabrielli",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "BG9",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Bonnie",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Candice Catnipp",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Cang Du",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Charlotte Chuhlhourne",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Chizuru Honsho",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Choe Neng Poww",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Chojiro Sasakibe",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Cirucci Sanderwicci",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Cyan Sung-Sun",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Danon",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Di Roy Rinker",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Dondochakka Birstanne",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Dordoni Alessandro Del Socaccio",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Driscoll Berci",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Edrad Liones",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Eikichirō Saidō",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Emilou Apacci",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Enryu",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Enzo",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Fērum",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Findorr Calius",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Fishbone D",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Franceska Mila Rose",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ganryu",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Gantenbainne Mosqueda",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Garogai",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Genshiro Okikiba",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Gerard Valkyrie",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ggio Vega",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ginrei Kuchiki",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Giriko Kutsuzawa",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Giselle Gewelle",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Gô Kôga",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Grand Fisher",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Gremmy Thoumeaux",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Guenael Lee",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Gunjo",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hachigen Ushoda",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hanza Nukui",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hexapodus",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hikone Ubuginu",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hisana Kuchiki",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Hiyosu",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Homura",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ichibe Hyosube",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ichika Abarai",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ikumi Unagiya",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Inose",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Isane Kotetsu",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jackie Tristan",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jerome Guizbatt",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jidanbo Ikkanzaka",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jin Kariya",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jinnai Doko",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Jinta Hanakari",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kageroza Inaba",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kanae Katagiri",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Karin Kurosaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kazui Kurosaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kenryu",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kensei Muguruma",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kirio Hikifune",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kiyone Kotetsu",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Koga Kuchiki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Koganehiko",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kokuto",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kugo Ginjo",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Kumoi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Lille Barro",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Liltotto Lamperd",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Lilynette Gingerbuck",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Lisa Yadomaru",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Loly Aivirrne",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Love Aikawa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Loyd Lloyd",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Lumina",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Luppi Antenor",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mabashi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mahana Natsui",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Maki Ichinose",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Makizo Aramaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Makoto Kibune",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Marechiyo Omaeda",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Marenoshin Ōmaeda",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Masaki Kurosaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mashiro Kuna",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mask De Masculine",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Meninas McAllon",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Menis",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Menoly Mallia",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Metastacia",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Michiru Ogawa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mimihagi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Miyako Shiba",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mizuho Asano",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Mizuiro Kojima",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Moe Shishigawara",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Muramasa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nakeem Grindina",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "NaNaNa Najahkoop",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nanao Ise",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nemu Kurotsuchi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nianzol Weizol",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ninny Spangcole",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nirgge Parduoc",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Nozomi Kujo",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Numb Chandelier",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Oetsu Nimaiya",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ouko Yushima",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Pepe Waccabrada",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Pernida Parnkgjas",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Pesche Guatiche",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Quilge Opie",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Rikichi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Rin Tsubokura",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Riyan",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Robert Accutrone",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Roi des Âmes",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Rōjūrō Otoribashi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Royd Lloyd",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Rudbornn Chelute",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Rurichiyo Kasumioji",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ryo Kunieda",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ryô Utagawa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ryuken Ishida",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ryusei Kenzaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sawatari",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Seinosuke Yamada",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Senjumaru Shutara",
+      "anime": "Bleach",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sentaro Kotsubaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shawlong Koufang",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shaz Domino",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shino Madarame",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shiroganehiko",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shrieker",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shuhei Hisagi",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shukuro Tsukishima",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shuren",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Shusuke Amagai",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sode no Shirayuki",
+      "anime": "Bleach",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sojiro Kusaka",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sojun Kuchiki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Soken Ishida",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Sora Inoue",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Soul Society",
+      "anime": "Bleach",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Taikon",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tatsuki Arisawa",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tenjiro Kirinji",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tesla Lindocruz",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tessai Tsukabishi",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tetsuzaemon Iba",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Thousand-Year Blood War",
+      "anime": "Bleach",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Tokinada Tsunayashiro",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ulquiorra",
+      "anime": "Bleach",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Ururu Tsumugiya",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Verona",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Wabisuke",
+      "anime": "Bleach",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Wonderweiss Margela",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yammy Llargo",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yasochika Iemura",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yoshino Sôma",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yûichi Shibata",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yukio Hans Vorarlberna",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yūshirō Shihōin",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yuzu Kurosaki",
+      "anime": "Bleach",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Yylfordt Granz",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Zennosuke Kurumadani",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bleach",
+      "n": "Zommari Rureaux",
+      "anime": "Bleach",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Ayame Moriya",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Chinatsu Kano",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Hina Chono",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Karen Moriya",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Kengo Haryu",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Kyo Kasahara",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluebox",
+      "n": "Nagisa Funami",
+      "anime": "Blue Box",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Arthur A. Angel",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Juzo Shima",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Konekomaru Miwa",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Kyoto Arc",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Lewin Light",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Mamushi Hojo",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Renzo Shima",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Ryuji Suguro",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "blueexorcist",
+      "n": "Satan",
+      "anime": "Blue Exorcist",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Adam Blake",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Hibiki Okawa",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Issei Isagi",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Iyo Isagi",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Okuhito Iemon",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Shoei Baro",
+      "anime": "Blue Lock",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Yukio Ishikari",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bluelock",
+      "n": "Zantetsu Tsurugi",
+      "anime": "Blue Lock",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bocchi",
+      "n": "Futari Gotoh",
+      "anime": "Bocchi the Rock!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "White Whistle Form",
+      "anime": "Bondrewd • Made in Abyss",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Cannibalism",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Cannibalism Arc",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Chuya Nakahara",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Dark Era",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Decay of Angels",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Francis Scott Key Fitzgerald",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Fyodor Dostoevsky",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Guild",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Ichiyo Higuchi",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Junichiro Tanizaki",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Kyoka Izumi",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "bungou",
+      "n": "Ryunosuke Akutagawa",
+      "anime": "Bungo Stray Dogs",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Hatsuka Suzushiro",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Kabura Honda",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Ko Yamori",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Mahiru Seki",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Midori Kohakobe",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Nico Hirata",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "callnight",
+      "n": "Seri Kikyo",
+      "anime": "Call of the Night",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cardcaptor",
+      "n": "Eriol Hiiragizawa",
+      "anime": "Cardcaptor Sakura",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cardcaptor",
+      "n": "Fujitaka Kinomoto",
+      "anime": "Cardcaptor Sakura",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cardcaptor",
+      "n": "Meiling Li",
+      "anime": "Cardcaptor Sakura",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cardcaptor",
+      "n": "Ruby Moon",
+      "anime": "Cardcaptor Sakura",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cardcaptor",
+      "n": "Spinel Sun",
+      "anime": "Cardcaptor Sakura",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Bomb Girl",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon de l'Enfer",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "cards",
+        "char-images",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon de l'Éternité",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "cards",
+        "char-images",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon Pieuvre",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon Poulet",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon Serpent",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Démon Typhon",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Nyako",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Public Safety",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Public Safety Saga",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Taiyo Hayakawa",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "chainsaw",
+      "n": "Yutaro Kurose",
+      "anime": "Chainsaw Man",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Shadow / John Smith",
+      "anime": "Cid Kagenou • The Eminence in Shadow",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "clannad",
+      "n": "Fuko Ibuki",
+      "anime": "Clannad",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "clannad",
+      "n": "Mei Sunohara",
+      "anime": "Clannad",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Ai Morishita",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Anzu Maezono",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Chihiro Shiranami",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Hayato Kito",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Hiroya Tokito",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Ikuto Kiriyama",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Katsunori Shiba",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kaya Ishikura",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kayano Onodera",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kosei Sanada",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kyo Ishigami",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kyogo Komiya",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Kyosuke Okitani",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Mako Amikura",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Miki Yamamura",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Nanami Yabu",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Narumori Sakayanagi",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Nazuna Asahina",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Nene Mori",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Norihito Watanabe",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Reon Kondo",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Rika Morofuji",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Riku Utomiya",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Ruri Ichihashi",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Ryotaro Hondo",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Saki Yamashita",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Sakurako Tsubaki",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Satoru Kaneda",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Satsuki Shinohara",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Shiho Manabe",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "So Shibata",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Soshi Miyamoto",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Takeko Nishino",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Tetsuya Hamaguchi",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Tetsuya Machida",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Tsubasa Nanase",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "cards",
+        "char-images",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Tsukishiro",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Yahiko Totsuka",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Yuki Himeno",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cote",
+      "n": "Yume Kobashi",
+      "anime": "Classroom of the Elite",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Black Rebellion",
+      "anime": "Code Geass",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Chinese Federation",
+      "anime": "Code Geass",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Diethard Ried",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Gino Weinberg",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Kaname Ohgi",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "R2 Final Rebellion",
+      "anime": "Code Geass",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Rakshata Chawla",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Villetta Nu",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Xingke",
+      "anime": "Code Geass",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "codegeass",
+      "n": "Zero Requiem",
+      "anime": "Code Geass",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Edward",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Edward Wong",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Electra Ovilo",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Gren",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Judy",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Julia",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Laughing Bull",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Punch",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cowboybebop",
+      "n": "Vincent Volaju",
+      "anime": "Cowboy Bebop",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Adam Smasher",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Dorio",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Falco",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Faraday",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Gloria Martinez",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Kiwi",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Lucy Kushinada",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "cyberpunk",
+      "n": "Pilar",
+      "anime": "Cyberpunk: Edgerunners",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Arystar Krory III",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Bookman",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Mana D. Campbell",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Nea D. Campbell",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "The Millennium Earl",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Wisely",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dgrayman",
+      "n": "Yu Kanda",
+      "anime": "D.Gray-man",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Acrobatic Silky",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Chiquitita",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Count Saint-Germain",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Cursed House",
+      "anime": "Dandadan",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Dover Demon",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Evil Eye",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Flatwoods Monster",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Hana",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Jiji Enjoji",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Kinta Sakata",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Manjiro",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Naki Kito",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Rin Sawaki",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Serpoians",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Space Globalists",
+      "anime": "Dandadan",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Taro",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Unji Zuma",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dandadan",
+      "n": "Vamola",
+      "anime": "Dandadan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Bete Loga",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Finn Deimne",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Gareth Landrock",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Mikoto Yamato",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Ottarl",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Riveria Ljos Alf",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Syr Flova",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Tiona Hiryute",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Tione Hiryute",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "danmachi",
+      "n": "Welf Crozzo",
+      "anime": "DanMachi",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Daril Ghiroza",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "David Hoope",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Jack Neylon",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Kiichiro Osoreda",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Kinddara Guivelostain",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Kurou Otoharada",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "L arc",
+      "anime": "Death Note",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Light",
+      "anime": "Death Note",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Lind L. Tailor",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Minoru Tanaka",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Steve Mason",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Takuo Shibuimaru",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Taro Kagami",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Yotsuba",
+      "anime": "Death Note",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "deathnote",
+      "n": "Yuri",
+      "anime": "Death Note",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Chiyuki",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Ginti",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Harada",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Mayu Arita",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Oculus",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "deathparade",
+      "n": "Quin",
+      "anime": "Death Parade",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Entertainment District",
+      "anime": "Demon Slayer",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Goto",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Hanako Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Hinaki Ubuyashiki",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Infinity Castle",
+      "anime": "Demon Slayer",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kamanue",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kanata Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kazumi",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Keizo",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kiyo Terauchi",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kiyoshi",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kotetsu",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kotoha Hashibira",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Koyuki",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Kuina Ubuyashiki",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Mukago",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Muzan",
+      "anime": "Demon Slayer",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Naho Takada",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Nichika Ubuyashiki",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Ozaki",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Rokuro",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Rokuta Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Ruka Rengoku",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Saburo",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Shigeru Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Shoichi",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Sumi Nakahara",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Sumihiko Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Sumiyoshi",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Swamp Demon",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Swordsmith Village",
+      "anime": "Demon Slayer",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Takeo Kamado",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Tamayo's cat",
+      "anime": "Demon Slayer",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Tecchin Tecchikawahara",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Teruko",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Toko Agatsuma",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Tsutako Tomioka",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Uta",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Wakuraba",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Yoshiteru Agatsuma",
+      "anime": "Demon Slayer",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "demonslayer",
+      "n": "Zenitsu's sparrow",
+      "anime": "Demon Slayer",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Chainsaw Devil",
+      "anime": "Denji • Chainsaw Man",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Black Organization",
+      "anime": "Detective Conan",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Clash of Red and Black",
+      "anime": "Detective Conan",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Hiroshi Agasa",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Kazuha Toyama",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Kogoro Mouri",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Rei Furuya",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Scarlet Return",
+      "anime": "Detective Conan",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Shinichi Kudo",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Shuichi Akai",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Sonoko Suzuki",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "conan",
+      "n": "Vodka",
+      "anime": "Detective Conan",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Akiko Makimura",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Jinmen",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Kaim",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Miko Kuroda",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Noel Makimura",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Silene",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "devilman",
+      "n": "Xenon",
+      "anime": "Devilman Crybaby",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Demon Lord Diablo",
+      "anime": "Diablo • Tensura",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Biyomon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Gabumon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Gomamon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Izzy Izumi",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Joe Kido",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Kari Kamiya",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Koshiro Izumi",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Matt Ishida",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Palmon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Patamon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Sora Takenouchi",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "T.K. Takaishi",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Tai Kamiya",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "digimon",
+      "n": "Tentomon",
+      "anime": "Digimon",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dorohedoro",
+      "n": "Aikawa",
+      "anime": "Dorohedoro",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dorohedoro",
+      "n": "Chota",
+      "anime": "Dorohedoro",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dorohedoro",
+      "n": "Nikaido",
+      "anime": "Dorohedoro",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Chelsea Childe",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Dr. Xeno",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Francois",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Ginro",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Hyoga",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Ibara",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Joel Gear",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Kinro",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Kirisame",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Luna Wright",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Magma",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Minami Hokutozai",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Moz",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "New America City",
+      "anime": "Dr. Stone",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Nikki Hanada",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Ruri",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Ryusui Nanami",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Soyuz",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Stanley Snyder",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Stone Wars",
+      "anime": "Dr. Stone",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Stone World",
+      "anime": "Dr. Stone",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Suika",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Taiju Oki",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Treasure Island",
+      "anime": "Dr. Stone",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Ukyo Saionji",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Yo Uei",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "drstone",
+      "n": "Yuzuriha Ogawa",
+      "anime": "Dr. Stone",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Amond",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Anato",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Angila",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Anilaza",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Appule",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Arack",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Awamo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Baba",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Bibidi",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Black",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Bora",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Bubbles",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Bujin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Buu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "boss"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "C-14",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "C-15",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "C-8",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cacao",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Campari",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cargo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Carmine",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Caway",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cheelai",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Chi Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cocotte",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cognac",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Colonel Silver",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Colonel Violet",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Commander Red",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cukatail",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cumber",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cus",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Cymbal",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Daiz",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Degesu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Dercori",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Arinsu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Brief",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Hedo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Kochin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Mu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Docteur Willow",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Dore",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Drum",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ea",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ebifurya",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Enma",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Erasa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Fu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Fused Zamasu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Fuwa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gamma 1",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gamma 2",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ganos",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Geene",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "General Blue",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Général Rild",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Général White",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gil",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ginger",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Giran",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Glorio",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gokua",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gowasu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Grand Kaio",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Grand-père Sangohan",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gregory",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Gyumao",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Hasky",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Hatchiyack",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Hearts",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Hildegarn",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Hoi",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Iwne",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kahseral",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kaio de l'Est",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kaio de l'Ouest",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kaio du Sud",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kakunsa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Khai",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kikono",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kishime",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kiwi",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Korn",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Kuru",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Lakasei",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Lavender",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Lemo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Liquiir",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Macki",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Madame Brief",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Magenta",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Majin Duu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Majin Kuu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Majora",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Martinu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Medamatcha",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Minotia",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Misokatsun",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Mojito",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Monaka",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Monite",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Moori",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Mosco",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Murasaki",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Murichim",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Neiz",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Neva",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Nicky",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Obuni",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Oil",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Panbukin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Panzy",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Paparoni",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Pell",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Piano",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Pirina",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Princesse Serpent",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Pui Pui",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Rasin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ribrianne",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Rō Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Roh",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Roi Chappa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Roi Gomah",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Rozie",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Rumsshi",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Ryan Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Saganbo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Salza",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "San Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Sangoku Jr",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Sansho",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Saonel",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Satan Petit-Cœur",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Senbei Norimaki",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Seripa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Seven-Three",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Sharpner",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Shisami",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Shu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Sidra",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Sour",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Spice",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Spopovich",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Su Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Suno",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Tambourine",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Tapion",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Tights",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Toteppo",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Towa",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Tsuno",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Tsuru Sennin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Uu Shenron",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Vegeta Jr",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Vieux Kaioshin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Vinegar",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Yakon",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Yamu",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Yurin",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Zangya",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dragonball",
+      "n": "Zoiray",
+      "anime": "Dragon Ball",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Dungeon Exploration",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Golden Country",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Namari",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Red Dragon",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Shuro Nakamoto",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Thistle",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "dungeonmeshi",
+      "n": "Winged Lion",
+      "anime": "Dungeon Meshi",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "durarara",
+      "n": "Kyohei Kadota",
+      "anime": "Durarara!!",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "durarara",
+      "n": "Mikado Ryugamine",
+      "anime": "Durarara!!",
+      "sources": [
+        "cards",
+        "cards-special",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "durarara",
+      "n": "Namie Yagiri",
+      "anime": "Durarara!!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "durarara",
+      "n": "Seiji Yagiri",
+      "anime": "Durarara!!",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Spirit Form",
+      "anime": "Emilia • Re:Zero",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "erased",
+      "n": "Aya Nakanishi",
+      "anime": "Erased",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "erased",
+      "n": "Hiromi Sugita",
+      "anime": "Erased",
+      "sources": [
+        "cards",
+        "modes",
+        "qap-themes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "erased",
+      "n": "Osamu",
+      "anime": "Erased",
+      "sources": [
+        "cards",
+        "modes",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Attack Titan",
+      "anime": "Eren Yeager • L'Attaque des Titans",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "Founding Titan",
+      "anime": "Eren Yeager • L'Attaque des Titans",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "",
+      "n": "The One Ultimate",
+      "anime": "Escanor • Seven Deadly Sins",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Ajeel Raml",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Aldoron",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Alvarez Empire",
+      "anime": "Fairy Tail",
+      "sources": [
+        "qap-themes"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Alzack Connell",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Angel",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Animus",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Anna Heartfilia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Aquarius",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Arana Webb",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Arcadios",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Aria",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Aries",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Asuka Connell",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Athena",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Atlas Flame",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Azuma",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bacchus Groh",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Belno",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Beth Vanderwood",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bisca Connell",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bloodman",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Blue Note",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bluenote Stinger",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bob",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bobo",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Bora",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Byro Cracy",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Caelum",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Cancer",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Capricorn",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Chapati Lola",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Cosmos",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Crawford Seam",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Crux",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Dan Straight",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Darton",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Deliora",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Deneb",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Dobengal",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Dogramag",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Droy",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Duke Barbaroa",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Duke Everlue",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Éclair",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Elefseria",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Elfman",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Erigor",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Eve Tearm",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Ezel",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Faris",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Faust",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Flare Corona",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Franmalth",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Fukuro",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Gemini",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Georg Reizen",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "God Serena",
+      "anime": "Fairy Tail",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Goldmine",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Gran Doma",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Grandeeney",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Guttman",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Hibiki Lates",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Hisui E. Fiore",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Horologium",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Hoteye",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Hughes",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Hyberion",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Ignia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Ikaruga",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Imitatia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Invel Yura",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Ivan Draer",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jackal",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jackpot",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jacob Lessio",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jäger",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jason",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jenny Realight",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jet",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jiemma",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jose Porla",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Jude Heartfilia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kaby Melon",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kageyama",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kain Hikaru",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kama",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kamika",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Karacka",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Karen Lilica",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kawazu",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Keith",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Keyes",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kinana",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Klodoa",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kurohebi",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Kyoka",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Lahar",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Laki Olietta",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Lamy",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Larcade Dragneel",
+      "anime": "Fairy Tail",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Layla Heartfilia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Leiji",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Libra",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Lullaby",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Lyra",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Macao Conbolt",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Mard Geer",
+      "anime": "Fairy Tail",
+      "sources": [
+        "power",
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Marin Hollow",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Max Alors",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Mercphobia",
+      "anime": "Fairy Tail",
+      "sources": [
+        "roland-garros"
+      ]
+    },
+    {
+      "u": "fairy",
+      "n": "Mest Gryder",
+      "anime": "Fairy Tail",
+      "sources": [
+        "dle",
+        "roland-garros"
+      ]
+    }
+  ]
+}
