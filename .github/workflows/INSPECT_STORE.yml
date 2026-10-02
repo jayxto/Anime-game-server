@@ -1,0 +1,29 @@
+name: Inspect simple image store
+on:
+  push:
+    branches: [fix-persist-qap-fast]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print store/migration windows
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8',errors='replace')
+          for p in ['function simpleStoreImage','async function simpleStoreImage','function simpleMigrationPass','async function simpleMigrationPass','simpleStoreImage(']:
+            print('\n###',p)
+            start=0;n=0
+            while n<10:
+              i=s.find(p,start)
+              if i<0: break
+              print('---POS',i,'---')
+              print(s[max(0,i-1800):min(len(s),i+5000)])
+              start=i+len(p); n+=1
+          PY
