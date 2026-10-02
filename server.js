@@ -11803,6 +11803,9 @@ async function simpleCatalogue() {
         if (!u && anime) {
             try { u = resolveImageUniverseKey(anime) || ''; } catch (_) {}
         }
+        // SIMPLE_CATALOGUE_CANONICAL_UNIVERSES_V2 — merge legacy ids into the live ARC ids.
+        if (u === 'fate') u = 'fatestay';
+        if (u === 'soul') u = 'souleater';
         if (!u || !name) return;
         if (!anime) {
             try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
@@ -17797,6 +17800,48 @@ app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.f
 const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
 
 // ===== IMAGES PERSONNAGES : ADMIN / REMPLISSAGE AUTOMATIQUE =====
+/* CHARACTER_IMAGE_HEALTH_V1
+   Read-only operational health for public game assets. No admin/session/user data is exposed. */
+app.get('/api/character-image-health', async (req, res) => {
+    const state = {
+        running:!!SIMPLE_IMAGE_STATE?.running,
+        done:!!SIMPLE_IMAGE_STATE?.done,
+        total:Number(SIMPLE_IMAGE_STATE?.total || 0),
+        current:Number(SIMPLE_IMAGE_STATE?.current || 0),
+        saved:Number(SIMPLE_IMAGE_STATE?.saved || 0),
+        missing:Number(SIMPLE_IMAGE_STATE?.missing || 0)
+    };
+    if (!HAS_DB) return res.json({ok:true,db:false,state,counts:[],missing:[]});
+    try {
+        const counts=(await pool.query(`
+            SELECT COALESCE(status,'') AS status,
+                   count(*)::int AS n,
+                   sum(CASE WHEN image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 THEN 1 ELSE 0 END)::int AS with_bytes
+            FROM character_images
+            GROUP BY COALESCE(status,'')
+            ORDER BY n DESC
+        `)).rows;
+        const missing=(await pool.query(`
+            SELECT universe_key,display_name,COALESCE(status,'') AS status
+            FROM character_images
+            WHERE image_bytes IS NULL OR octet_length(image_bytes)<700
+            ORDER BY universe_key,display_name
+            LIMIT 500
+        `)).rows.map(x=>({u:x.universe_key,name:x.display_name,status:x.status}));
+        const totals=(await pool.query(`
+            SELECT count(*)::int AS rows,
+                   sum(CASE WHEN image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 THEN 1 ELSE 0 END)::int AS with_bytes,
+                   sum(CASE WHEN status='manual-admin' THEN 1 ELSE 0 END)::int AS manual
+            FROM character_images
+        `)).rows[0] || {};
+        res.setHeader('Cache-Control','no-store');
+        return res.json({ok:true,db:true,state,totals,counts,missingCount:Math.max(0,Number(totals.rows||0)-Number(totals.with_bytes||0)),missing});
+    } catch (e) {
+        console.error('[character image health]',e);
+        return res.status(500).json({ok:false,error:'health query failed'});
+    }
+});
+
 app.get('/api/admin/character-images/status', adminOnly(async (req, res) => {
     res.json({ ok:true, state:SIMPLE_IMAGE_STATE });
 }));
