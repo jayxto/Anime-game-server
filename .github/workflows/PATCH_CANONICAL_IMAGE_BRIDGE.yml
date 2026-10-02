@@ -1,0 +1,121 @@
+name: Patch canonical image bridge
+on:
+  push:
+    branches: [canonical-route-bridge-100]
+    paths: [.github/workflows/PATCH_CANONICAL_IMAGE_BRIDGE.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Patch priority canonical image bridge
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text(encoding='utf-8')
+          marker='AG_CANONICAL_PRIORITY_BRIDGE_V2'
+          if marker not in s:
+              needle='const app = express();'
+              pos=s.find(needle)
+              if pos < 0:
+                  raise SystemExit('const app = express(); not found')
+              bridge=r'''
+
+          /* AG_CANONICAL_PRIORITY_BRIDGE_V2
+             Serve verified local character/card visuals before DB/network resolution. */
+          const __agCanonicalImageRootV2 = require('path').resolve(__dirname, 'music', 'char-images');
+          function __agCanonicalSlugV2(value, fallback='') {
+            const s = String(value == null ? '' : value)
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase().replace(/[’'`]/g, '')
+              .replace(/&/g, ' and ')
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+            return s || fallback;
+          }
+          function __agServeCanonicalImageV2(req, res, next) {
+            try {
+              const fs2 = require('fs');
+              const path2 = require('path');
+              const u = __agCanonicalSlugV2(req.query && (req.query.u || req.query.universe || req.query.key), '_global');
+              const n = __agCanonicalSlugV2(req.query && (req.query.n || req.query.name || req.query.character));
+              if (!n) return next();
+              const dir = path2.resolve(__agCanonicalImageRootV2, u);
+              if (dir !== __agCanonicalImageRootV2 && !dir.startsWith(__agCanonicalImageRootV2 + path2.sep)) return next();
+              for (const ext of ['.webp','.png','.jpg','.jpeg']) {
+                const f = path2.resolve(dir, n + ext);
+                if (!f.startsWith(dir + path2.sep)) continue;
+                if (!fs2.existsSync(f) || !fs2.statSync(f).isFile() || fs2.statSync(f).size < 500) continue;
+                res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+                if (ext === '.webp') res.type('image/webp');
+                else if (ext === '.png') res.type('image/png');
+                else res.type('image/jpeg');
+                return res.sendFile(f);
+              }
+            } catch (_) {}
+            return next();
+          }
+          app.use('/api/avatar/img', __agServeCanonicalImageV2);
+          app.use('/api/character-image', __agServeCanonicalImageV2);
+          app.use('/api/character-image-file', __agServeCanonicalImageV2);
+          /* AG_CANONICAL_PRIORITY_BRIDGE_V2_END */
+          '''
+              s=s[:pos+len(needle)]+bridge+s[pos+len(needle):]
+              p.write_text(s,encoding='utf-8')
+          PY
+          node --check server.js
+      - name: Start server
+        env:
+          PORT: '3099'
+        run: |
+          set -euo pipefail
+          node server.js >/tmp/server.log 2>&1 & echo $! >/tmp/server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o /tmp/catalog.json; then break; fi
+            sleep 1
+          done
+          test -s /tmp/catalog.json || { cat /tmp/server.log; exit 1; }
+      - name: Validate all canonical routes over HTTP
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const data=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
+          const chars=data.characters||data.items||data.catalog||[];
+          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’'`]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+          const uniq=new Map();
+          for(const x of chars){const u=x.universeKey||x.universe||x.u||x.key||x.animeKey||'';const n=x.name||x.character||x.displayName||x.label||'';if(!n)continue;const k=(norm(u)||'_global')+'|'+norm(n);if(!uniq.has(k))uniq.set(k,{u,n});}
+          const items=[...uniq.values()];
+          let cursor=0,ok=0;const bad=[];
+          async function check(x){const qs=new URLSearchParams({u:x.u,n:x.n,name:x.n});const ac=new AbortController(),t=setTimeout(()=>ac.abort(),5000);try{const r=await fetch('http://127.0.0.1:3099/api/avatar/img?'+qs,{redirect:'follow',signal:ac.signal});const ct=(r.headers.get('content-type')||'').toLowerCase();const b=Buffer.from(await r.arrayBuffer());if(!r.ok||!ct.startsWith('image/')||b.length<500)bad.push({u:x.u,n:x.n,status:r.status,ct,bytes:b.length,url:r.url});else ok++;}catch(e){bad.push({u:x.u,n:x.n,error:String(e)});}finally{clearTimeout(t);}}
+          async function worker(){while(true){const i=cursor++;if(i>=items.length)return;await check(items[i]);if(i%1000===0)console.log('PROGRESS',i,'/',items.length,'OK',ok,'BAD',bad.length);}}
+          (async()=>{await Promise.all(Array.from({length:64},worker));const report={total:items.length,ok,bad:bad.length,coverage:+(ok*100/items.length).toFixed(4),failures:bad};fs.writeFileSync('/tmp/canonical-route-report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));if(bad.length)process.exit(1);})().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Commit verified server patch only
+        run: |
+          set -euo pipefail
+          kill $(cat /tmp/server.pid) 2>/dev/null || true
+          rm -rf .github
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js
+          git commit -m "fix: serve all canonical character images before network fallbacks"
+          git push origin HEAD:canonical-route-bridge-100
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: canonical-route-validation
+          path: |
+            /tmp/canonical-route-report.json
+            /tmp/server.log
