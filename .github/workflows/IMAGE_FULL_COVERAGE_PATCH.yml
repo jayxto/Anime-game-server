@@ -3,6 +3,7 @@ name: Image full coverage patch
 on:
   push:
     paths:
+      - 'patch_full_images.py'
       - '.github/workflows/IMAGE_FULL_COVERAGE_PATCH.yml'
   workflow_dispatch:
 
@@ -16,9 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Patch server image coverage
-        run: |
-          echo 'ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCByZQoKcD1QYXRoKCdzZXJ2ZXIuanMnKQpzPXAucmVhZF90ZXh0KGVuY29kaW5nPSd1dGYtOCcpCm9yaWdpbmFsPXMKCiMgUmVwbGFjZSBzaW1wbGVDYXRhbG9ndWUoKSB3aXRoIGEgY29tcGxldGUgY2F0YWxvZ3VlIGJ1aWxkZXIuCnN0YXJ0PXM...TRUNCATED...' | base64 -d > /tmp/patch.py
-          python3 /tmp/patch.py
+        run: python3 patch_full_images.py
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
@@ -35,13 +34,13 @@ jobs:
             'IMAGE FULL COVERAGE V2',
             "typeof cardPool === 'function'",
             'cardAllSpecials(u)',
-            "cards-halloween",
+            'cards-halloween',
             'DLE_MASTER_NAMES',
             'RG_POOLS_V2',
             'PM_POWER_OVERRIDES',
             'image_bytes BYTEA',
-            "/api/character-image-file",
-            "for (let page=1; page<=8; page++)"
+            '/api/character-image-file',
+            'for (let page=1; page<=8; page++)'
           ]
           missing=[x for x in required if x not in s]
           assert not missing, missing
@@ -98,7 +97,7 @@ jobs:
         run: |
           set -e
           rm -rf .github
-          rm -f IMAGE_AUDIT.txt IMAGE_CORE_SNIPPETS.txt IMAGE_TARGET_SNIPPETS.txt IMAGE_COVERAGE_PATCH_REPORT.txt
+          rm -f IMAGE_AUDIT.txt IMAGE_CORE_SNIPPETS.txt IMAGE_TARGET_SNIPPETS.txt IMAGE_COVERAGE_PATCH_REPORT.txt patch_full_images.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
