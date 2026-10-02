@@ -1,0 +1,47 @@
+name: Patch verified transformation images V2 batch 5
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_TRANSFORM_IMAGES_V2_BATCH5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Add Rage Shield verified image
+        run: python3 .github/patch_transform_images_v2_batch5.py
+
+      - name: Verify server syntax
+        run: node --check server.js
+
+      - name: Verify batch anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'QAP_VERIFIED_TRANSFORM_BATCH5' server.js
+          grep -q 'HD-wallpaper-naofumi-rage-shield-tate-no-yuusha.jpg' server.js
+
+      - name: Commit verified batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_transform_images_v2_batch5.py .github/workflows/PATCH_TRANSFORM_IMAGES_V2_BATCH5.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: add Rage Shield verified transformation image [skip ci]"
+          git push origin HEAD:main
