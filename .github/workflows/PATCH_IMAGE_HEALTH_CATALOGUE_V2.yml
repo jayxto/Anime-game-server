@@ -1,0 +1,42 @@
+name: Patch catalogue-aware image health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_IMAGE_HEALTH_CATALOGUE_V2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch catalogue-aware image health
+        run: python3 .github/patch_image_health_catalogue_v2.py
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Verify health v2 anchor
+        run: grep -q 'CHARACTER_IMAGE_HEALTH_CATALOGUE_V2' server.js
+      - name: Commit verified health v2
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_image_health_catalogue_v2.py .github/workflows/PATCH_IMAGE_HEALTH_CATALOGUE_V2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: report catalogue-level missing character images [skip ci]"
+          git push origin HEAD:main
