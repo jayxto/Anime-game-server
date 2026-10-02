@@ -1,5 +1,5 @@
 from pathlib import Path
-import re, json, urllib.request, urllib.error, ssl
+import re, json, urllib.request, urllib.error, ssl, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 s=Path('server.js').read_text(encoding='utf-8')
@@ -29,15 +29,15 @@ def magic_ok(data):
         (len(data)>=12 and data[:4]==b'RIFF' and data[8:12]==b'WEBP')
     )
 
-def check(url):
+def one_check(url, timeout):
     headers={
-        'User-Agent':'Mozilla/5.0 (compatible; AnimeGameImageAudit/1.0)',
+        'User-Agent':'Mozilla/5.0 (compatible; AnimeGameImageAudit/1.1)',
         'Accept':'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
         'Range':'bytes=0-8191',
     }
     req=urllib.request.Request(url,headers=headers,method='GET')
     try:
-        with urllib.request.urlopen(req,timeout=12,context=ctx) as resp:
+        with urllib.request.urlopen(req,timeout=timeout,context=ctx) as resp:
             status=getattr(resp,'status',200)
             ctype=(resp.headers.get('Content-Type') or '').lower()
             final=resp.geturl()
@@ -51,8 +51,26 @@ def check(url):
     except Exception as e:
         return {'url':url,'ok':False,'status':None,'contentType':'','finalUrl':url,'reason':f'{type(e).__name__}: {e}'}
 
+def check(url):
+    last=None
+    # Retry only transient failures. Official image hosts can occasionally be slow from GitHub runners.
+    for attempt, timeout in enumerate((12, 25, 35), 1):
+        last=one_check(url, timeout)
+        if last['ok']:
+            last['attempts']=attempt
+            return last
+        status=last.get('status')
+        transient=(status is None or status in (408, 425, 429, 500, 502, 503, 504))
+        if not transient:
+            last['attempts']=attempt
+            return last
+        if attempt < 3:
+            time.sleep(attempt)
+    last['attempts']=3
+    return last
+
 results=[]
-with ThreadPoolExecutor(max_workers=12) as ex:
+with ThreadPoolExecutor(max_workers=10) as ex:
     futs={ex.submit(check,u):u for u in by_url}
     for fut in as_completed(futs):
         r=fut.result(); r['needs']=by_url[r['url']]; results.append(r)
