@@ -1,5 +1,8 @@
 name: Restore legacy image coverage
 on:
+  push:
+    branches:
+      - image-coverage-100-v1
   workflow_dispatch:
 permissions:
   contents: write
