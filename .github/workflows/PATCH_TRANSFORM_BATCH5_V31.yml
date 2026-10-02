@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Apply and self-validate strict fallback order plus batch 5
+      - name: Apply batch 5 with content validation
         run: python3 .github/patch_transform_batch5_v31.py
       - name: Verify server syntax
         run: node --check server.js
