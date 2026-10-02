@@ -1,0 +1,91 @@
+name: Image full coverage audit
+
+on:
+  push:
+    paths:
+      - '.github/workflows/IMAGE_FULL_AUDIT.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Audit all character and card sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, json
+
+          files = [Path('server.js'), Path('index.html')]
+          keys = [
+              'character-catalog','character-image','character_images','image_bytes','simpleImageRoute','simpleStoreImage',
+              'card','cards','collection','inventory','pack','booster','animeDLE','dle','quote','citation',
+              'undercover','hardcore','roland','garros','tierlist','personnage','character'
+          ]
+          out=[]
+          for p in files:
+              text=p.read_text(encoding='utf-8', errors='replace')
+              lines=text.splitlines()
+              out.append(f'===== {p} =====')
+              out.append(f'bytes={len(text.encode("utf-8"))} lines={len(lines)}')
+              routes=[]
+              for m in re.finditer(r"app\.(get|post|put|patch|delete)\s*\(\s*['\"]([^'\"]+)", text):
+                  routes.append((m.group(1),m.group(2)))
+              out.append('\n-- ROUTES --')
+              for method,path in routes:
+                  if any(k.lower() in path.lower() for k in ['character','card','collection','image','dle','quote','citation','admin']):
+                      out.append(f'{method.upper()} {path}')
+
+              out.append('\n-- IDENTIFIERS / DECLARATIONS CONTAINING KEYWORDS --')
+              seen=set()
+              for i,line in enumerate(lines,1):
+                  low=line.lower()
+                  if any(k.lower() in low for k in keys):
+                      m=re.search(r'\b(?:const|let|var|function)\s+([A-Za-z_$][\w$]*)', line)
+                      if m:
+                          item=(i,m.group(1),line.strip()[:500])
+                          if item not in seen:
+                              seen.add(item); out.append(f'{i}: {m.group(1)} :: {line.strip()[:500]}')
+
+              out.append('\n-- IMPORTANT CONTEXT --')
+              important=['character-catalog','/api/character-image','character_images','image_bytes','cards','collection','animeDLE','UNDERCOVER','HARDCORE','ROLAND','quote','citation']
+              hits=[]
+              for i,line in enumerate(lines,1):
+                  low=line.lower()
+                  if any(x.lower() in low for x in important):
+                      hits.append(i)
+              # Collapse dense runs so report stays readable, max 450 hit anchors/file
+              picked=[]
+              last=-999
+              for i in hits:
+                  if i-last>=3:
+                      picked.append(i); last=i
+                  if len(picked)>=450: break
+              for i in picked:
+                  a=max(1,i-2); b=min(len(lines),i+3)
+                  out.append(f'\n### {p}:{i}')
+                  for j in range(a,b+1):
+                      out.append(f'{j}: {lines[j-1][:1200]}')
+
+              out.append('\n-- COMMON IMAGE FIELD COUNTS --')
+              for token in ['imageUrl','image_url','image','img','portrait','avatar','cardImage','characterImage','source_url']:
+                  out.append(f'{token}={len(re.findall(re.escape(token), text, flags=re.I))}')
+
+          Path('IMAGE_AUDIT_REPORT.txt').write_text('\n'.join(out),encoding='utf-8')
+          print('report bytes', Path('IMAGE_AUDIT_REPORT.txt').stat().st_size)
+          PY
+
+      - name: Commit audit report to work branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add IMAGE_AUDIT_REPORT.txt
+          git commit -m "audit: character and card image coverage report"
+          git push origin HEAD:image-full-coverage-work
