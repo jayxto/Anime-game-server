@@ -1,8 +1,5 @@
 name: Restore legacy image coverage
 on:
-  push:
-    branches:
-      - image-coverage-100-v1
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,7 +23,6 @@ jobs:
           git worktree add --detach /tmp/ag-backup origin/backup-before-image-reset-2026-10-02
           mkdir -p music/legacy-images music/char-images
           rsync -a /tmp/ag-backup/assets/images/ music/legacy-images/
-          echo "Legacy images: $(find music/legacy-images -type f | wc -l)"
       - name: Canonicalize known images
         run: node scripts/phase1-restore-images.mjs
       - name: Verify server syntax
