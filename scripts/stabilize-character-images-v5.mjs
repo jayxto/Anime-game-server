@@ -107,7 +107,7 @@ async function aniRoster(u,anime){
     for(let page=1;page<=6;page++){
       try{
         const r=await aniGate(()=>fetchTimed('https://graphql.anilist.co',{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify({query,variables:{search:anime,page}})},14000));
-        if(r.status===429){await sleep(2500);page--;continue}if(!r.ok)break;const d=await r.json();const block=d?.data?.Media?.characters;for(const c of(block?.nodes||[])){const url=c?.image?.large||c?.image?.medium;if(url)rows.push({names:[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean),url})}if(!block?.pageInfo?.hasNextPage)break;
+        if(r.status===429){await sleep(1800);break}if(!r.ok)break;const d=await r.json();const block=d?.data?.Media?.characters;for(const c of(block?.nodes||[])){const url=c?.image?.large||c?.image?.medium;if(url)rows.push({names:[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean),url})}if(!block?.pageInfo?.hasNextPage)break;
       }catch{break}
     }
     return rows;
@@ -125,13 +125,13 @@ async function pokemonUrl(x){if(compact(x.u)!=='pokemon')return '';const idx=awa
 
 async function fandomUrl(x){
   const host=FANDOM[compact(x.u)];if(!host)return '';const qs=variants(x.u,x.name);const q=new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:qs[0],gsrnamespace:'0',gsrlimit:'6',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'800',redirects:'1'});
-  try{const r=await fetchTimed(`https://${host}/api.php?${q}`,{headers:{accept:'application/json'}},8000);if(!r.ok)return '';const pages=Object.values((await r.json())?.query?.pages||{});let best=null;for(const p of pages){const s=Math.max(...qs.map(v=>scoreName(p?.title,v)));const url=p?.original?.source||p?.thumbnail?.source;if(url&&s>=66&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
+  try{const r=await fetchTimed(`https://${host}/api.php?${q}`,{headers:{accept:'application/json'}},5500);if(!r.ok)return '';const pages=Object.values((await r.json())?.query?.pages||{});let best=null;for(const p of pages){const s=Math.max(...qs.map(v=>scoreName(p?.title,v)));const url=p?.original?.source||p?.thumbnail?.source;if(url&&s>=66&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
 }
 async function jikanUrl(x){
-  const qs=variants(x.u,x.name);try{const r=await jikanGate(()=>fetchTimed('https://api.jikan.moe/v4/characters?limit=10&q='+encodeURIComponent(qs[0]),{headers:{accept:'application/json'}},9000));if(r.status===429)return '';if(!r.ok)return '';let best=null;for(const c of((await r.json())?.data||[])){const s=Math.max(...qs.map(q=>scoreName(c?.name,q)));const url=c?.images?.webp?.image_url||c?.images?.jpg?.image_url;if(url&&s>=82&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
+  const qs=variants(x.u,x.name);try{const r=await jikanGate(()=>fetchTimed('https://api.jikan.moe/v4/characters?limit=10&q='+encodeURIComponent(qs[0]),{headers:{accept:'application/json'}},6000));if(r.status===429)return '';if(!r.ok)return '';let best=null;for(const c of((await r.json())?.data||[])){const s=Math.max(...qs.map(q=>scoreName(c?.name,q)));const url=c?.images?.webp?.image_url||c?.images?.jpg?.image_url;if(url&&s>=82&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
 }
 async function wikipediaUrl(x){
-  const qs=variants(x.u,x.name);try{const p=new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:`${qs[0]} ${animeTitle(x.u,x.anime)}`,gsrnamespace:'0',gsrlimit:'5',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'800'});const r=await fetchTimed('https://en.wikipedia.org/w/api.php?'+p,{headers:{accept:'application/json'}},8000);if(!r.ok)return '';let best=null;for(const row of Object.values((await r.json())?.query?.pages||{})){const s=Math.max(...qs.map(q=>scoreName(row?.title,q)));const url=row?.original?.source||row?.thumbnail?.source;if(url&&s>=62&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
+  const qs=variants(x.u,x.name);try{const p=new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:`${qs[0]} ${animeTitle(x.u,x.anime)}`,gsrnamespace:'0',gsrlimit:'5',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'800'});const r=await fetchTimed('https://en.wikipedia.org/w/api.php?'+p,{headers:{accept:'application/json'}},5500);if(!r.ok)return '';let best=null;for(const row of Object.values((await r.json())?.query?.pages||{})){const s=Math.max(...qs.map(q=>scoreName(row?.title,q)));const url=row?.original?.source||row?.thumbnail?.source;if(url&&s>=62&&(!best||s>best.s))best={s,url}}return best?.url||''}catch{return ''}
 }
 async function makeFallback(out,name,anime){
   const safe=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));const initials=String(name).split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();
