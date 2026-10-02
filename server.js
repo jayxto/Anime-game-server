@@ -24,6 +24,111 @@ fs.readFileSync = function(file, options){
 
 
 const app = express();
+
+/* AG_REAL_LOCAL_IMAGES_V2: verified local image library fallback */
+const __agLocalImageCache = (() => {
+  const agFs = require('fs');
+  const agPath = require('path');
+  const root = agPath.join(__dirname, 'music', 'char-images');
+  const legacyParent = agPath.join(__dirname, 'assets', 'images');
+  const legacyRoot = agPath.join(legacyParent, 'chars');
+  const exact = new Map();
+  const byName = new Map();
+  const ambiguous = new Set();
+  let count = 0;
+
+  const norm = (v) => String(v ?? '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, '-');
+
+  const addName = (k, file) => {
+    if (!k) return;
+    if (byName.has(k) && byName.get(k) !== file) {
+      ambiguous.add(k);
+      byName.delete(k);
+    } else if (!ambiguous.has(k)) byName.set(k, file);
+  };
+
+  const walk = (dir, parts = []) => {
+    if (!agFs.existsSync(dir)) return;
+    for (const ent of agFs.readdirSync(dir, { withFileTypes: true })) {
+      const fp = agPath.join(dir, ent.name);
+      if (ent.isDirectory()) { walk(fp, parts.concat(ent.name)); continue; }
+      if (!/\.(webp|png|jpe?g|gif)$/i.test(ent.name)) continue;
+      const universe = parts[0] || '';
+      const base = ent.name.replace(/\.[^.]+$/, '');
+      const uk = norm(universe), nk = norm(base);
+      if (uk && nk) exact.set(`${uk}::${nk}`, fp);
+      addName(nk, fp);
+      count++;
+    }
+  };
+
+  try {
+    if (agFs.existsSync(root)) {
+      agFs.mkdirSync(legacyParent, { recursive: true });
+      if (!agFs.existsSync(legacyRoot)) {
+        try { agFs.symlinkSync(root, legacyRoot, 'dir'); }
+        catch (_) { /* explicit static route below is enough */ }
+      }
+      walk(root);
+    }
+  } catch (e) {
+    console.warn('[images] local cache init failed:', e?.message || e);
+  }
+
+  const find = (universe, name) => {
+    const uk = norm(universe), nk = norm(name);
+    if (uk && nk) {
+      const hit = exact.get(`${uk}::${nk}`);
+      if (hit) return hit;
+    }
+    if (nk && !ambiguous.has(nk)) {
+      const hit = byName.get(nk);
+      if (hit) return hit;
+    }
+    return null;
+  };
+
+  const mime = (fp) => {
+    const e = agPath.extname(fp).toLowerCase();
+    return e === '.png' ? 'image/png' : (e === '.jpg' || e === '.jpeg') ? 'image/jpeg' : e === '.gif' ? 'image/gif' : 'image/webp';
+  };
+
+  const publicUrl = (fp) => {
+    if (!fp) return '';
+    const rel = agPath.relative(root, fp).split(agPath.sep).map(encodeURIComponent).join('/');
+    return '/assets/images/chars/' + rel;
+  };
+
+  return { root, legacyRoot, exact, byName, ambiguous, count, norm, find, mime, publicUrl };
+})();
+
+app.use('/assets/images/chars', express.static(__agLocalImageCache.root, {
+  fallthrough: true,
+  maxAge: '30d',
+  immutable: true
+}));
+
+app.get('/api/local-image-cache-status', (_req, res) => res.json({
+  ok: true,
+  files: __agLocalImageCache.count,
+  exactKeys: __agLocalImageCache.exact.size,
+  uniqueNames: __agLocalImageCache.byName.size,
+  ambiguousNames: __agLocalImageCache.ambiguous.size
+}));
+
+app.get('/api/local-character-image', (req, res) => {
+  const u = req.query.u || req.query.universe || req.query.anime || '';
+  const n = req.query.n || req.query.name || req.query.character || '';
+  const fp = __agLocalImageCache.find(u, n);
+  if (!fp) return res.status(404).json({ ok: false, error: 'image_not_in_local_cache' });
+  res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  res.type(__agLocalImageCache.mime(fp));
+  return res.sendFile(fp);
+});
+
+
 const server = http.createServer(app);
 const io = new Server(server, {
     // Connexion plus tolérante (téléphone en veille, Wi-Fi/4G qui coupe une seconde) :
@@ -11771,6 +11876,34 @@ resolveCharacterImage = async function(universeKey,displayName){
     return {imageUrl:null,sourceUrl:null,status:'missing'};
 };
 /* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
+
+
+/* AG_REAL_LOCAL_IMAGES_V2 resolver wrapper: keep DB/admin image first, then local proven file, then old remote fallback. */
+try {
+  if (typeof resolveCharacterImage === 'function') {
+    const __agOriginalResolveCharacterImage = resolveCharacterImage;
+    resolveCharacterImage = async function(...args) {
+      let original = '';
+      try { original = await __agOriginalResolveCharacterImage.apply(this, args); } catch (_) {}
+      const originalText = String(original || '');
+      if (originalText.includes('/api/character-image-file') || originalText.includes('/api/local-character-image')) return original;
+
+      let u = '', n = '';
+      const a = args[0], b = args[1];
+      if (a && typeof a === 'object') {
+        u = a.universe || a.anime || a.series || a.franchise || '';
+        n = a.name || a.character || a.characterName || a.title || '';
+      } else { u = a || ''; n = b || ''; }
+
+      let fp = __agLocalImageCache.find(u, n);
+      if (!fp) fp = __agLocalImageCache.find(n, u);
+      if (fp) return __agLocalImageCache.publicUrl(fp);
+      return original;
+    };
+  }
+} catch (e) {
+  console.warn('[images] resolver wrapper failed:', e?.message || e);
+}
 
 server.listen(PORT, () => {
     // Le serveur ouvre le port immédiatement. Les images se remplissent ensuite en arrière-plan.
