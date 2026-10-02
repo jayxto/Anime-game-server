@@ -25,6 +25,46 @@ fs.readFileSync = function(file, options){
 
 const app = express();
 
+/* AG_CANONICAL_PRIORITY_BRIDGE_V2
+   Serve verified local character/card visuals before DB/network resolution. */
+const __agCanonicalImageRootV2 = require('path').resolve(__dirname, 'music', 'char-images');
+function __agCanonicalSlugV2(value, fallback='') {
+  const s = String(value == null ? '' : value)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[’'`]/g, '')
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return s || fallback;
+}
+function __agServeCanonicalImageV2(req, res, next) {
+  try {
+    const fs2 = require('fs');
+    const path2 = require('path');
+    const u = __agCanonicalSlugV2(req.query && (req.query.u || req.query.universe || req.query.key), '_global');
+    const n = __agCanonicalSlugV2(req.query && (req.query.n || req.query.name || req.query.character));
+    if (!n) return next();
+    const dir = path2.resolve(__agCanonicalImageRootV2, u);
+    if (dir !== __agCanonicalImageRootV2 && !dir.startsWith(__agCanonicalImageRootV2 + path2.sep)) return next();
+    for (const ext of ['.webp','.png','.jpg','.jpeg']) {
+      const f = path2.resolve(dir, n + ext);
+      if (!f.startsWith(dir + path2.sep)) continue;
+      if (!fs2.existsSync(f) || !fs2.statSync(f).isFile() || fs2.statSync(f).size < 500) continue;
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      if (ext === '.webp') res.type('image/webp');
+      else if (ext === '.png') res.type('image/png');
+      else res.type('image/jpeg');
+      return res.sendFile(f);
+    }
+  } catch (_) {}
+  return next();
+}
+app.use('/api/avatar/img', __agServeCanonicalImageV2);
+app.use('/api/character-image', __agServeCanonicalImageV2);
+app.use('/api/character-image-file', __agServeCanonicalImageV2);
+/* AG_CANONICAL_PRIORITY_BRIDGE_V2_END */
+
+
 /* AG_REAL_LOCAL_IMAGES_V2: verified local image library fallback */
 const __agLocalImageCache = (() => {
   const agFs = require('fs');
