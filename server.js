@@ -592,12 +592,74 @@ async function fetchFandomTransformationPageFast(host, form) {
 
 // Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
 // l'image principale de la page personnage (qui est précisément la cause de "Sasuke normal").
+/* QAP_VERIFIED_TRANSFORM_IMAGES_V2
+   Small visually-reviewed seed set for the most obvious/high-risk forms.
+   The remote URL is only an import source: persistQapTransformImage copies the
+   bytes into PostgreSQL under universe `_transform`, so game rendering does not
+   depend on the hotlink after the first successful import. */
+const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
+    {
+        needs:['naruto','six paths','sage'],
+        url:'https://img.lemino.docomo.ne.jp/cms/a04cecf/a04cecf_w1.jpg?auto=webp&quality=75&width=3840'
+    },
+    {
+        needs:['naruto','sage mode'], forbids:['six paths','rikudo'],
+        url:'https://static.deltiasgaming.com/2025/01/Naruto-Uzumaki.jpg'
+    },
+    {
+        needs:['sasuke','susanoo'],
+        url:'https://i.ytimg.com/vi/-PVBJ4mf-xo/maxresdefault.jpg'
+    },
+    {
+        needs:['luffy','gear 5'],
+        url:'https://s1.dmcdn.net/v/V9ncC1eoseQFOJQqb/x720'
+    },
+    {
+        needs:['goku','ultra instinct'], forbids:['sign'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2026/01/2785224.jpg?_=1790885400'
+    },
+    {
+        needs:['ichigo','bankai'],
+        url:'https://cdn2.fptshop.com.vn/unsafe/800x0/bankai_5_233785fa0d.png'
+    }
+];
+
+function qapVerifiedTransformSource(animeName, charName, form) {
+    const hay = normalizeImageKey([animeName, charName, form].filter(Boolean).join(' '));
+    for (const row of QAP_VERIFIED_TRANSFORM_SOURCES_V2) {
+        const ok = row.needs.every(x => hay.includes(normalizeImageKey(x)));
+        const blocked = (row.forbids || []).some(x => hay.includes(normalizeImageKey(x)));
+        if (ok && !blocked) return row.url;
+    }
+    return null;
+}
+
+async function persistQapTransformImage(persistKey, sourceUrl, status='transform-auto') {
+    if (!persistKey || !sourceUrl) return null;
+    try {
+        const img = await simpleFetchImage(sourceUrl, 12000);
+        if (!img) return null;
+        const ok = await simpleStoreImage({u:'_transform', name:persistKey}, img, sourceUrl, status);
+        if (!ok) return null;
+        return simpleImageRoute('_transform', persistKey, Date.now());
+    } catch (e) {
+        console.warn('[transform image persist]', persistKey, e?.message || e);
+        return null;
+    }
+}
+
 async function fetchFandomTransformationImage(host, character, form) {
     const direct = await fetchFandomTransformationPageFast(host, form);
-    if (direct) return direct;
     const stop = new Set(['mode','form','forme','anime','transformation','final','true','full','power','awakened','awakening']);
     const toks = x => normalizeImageKey(String(x||'')).split(' ').filter(t => t.length > 2 && !stop.has(t));
     const formTokens = toks(form), charTokens = toks(character);
+    if (direct) {
+        let directName = '';
+        try { directName = normalizeImageKey(decodeURIComponent(String(direct))); }
+        catch (_) { directName = normalizeImageKey(String(direct)); }
+        const distinctive = formTokens.filter(t => t.length >= 4);
+        if (distinctive.length && distinctive.some(t => directName.includes(t))) return direct;
+    }
     // Une image de transformation doit contenir des mots de LA FORME dans son nom de fichier.
     // Le nom du personnage seul n'est plus suffisant (cause d'Armin normal / Ichigo normal).
     const searches = [`${character} ${form}`, form].filter(Boolean);
@@ -14277,17 +14339,31 @@ app.get('/api/arcade/item-image', async (req, res) => {
                             const host = universeKey ? FANDOM_WIKIS[universeKey] : null;
                             const form = String(it.name || '').trim();
                             const charName = String(it.char || parts[0] || '').trim();
-                            const persistKey = `${animeName}|${charName}|${form}`;
+                            const persistKey = `v2|${animeName}|${charName}|${form}`;
                             // Une fois une forme trouvée, elle est gardée en PostgreSQL : les prochains chargements
                             // et les prochains redéploiements ne refont plus la recherche lente.
                             try {
                                 const saved = await getCachedCharacterImage('_transform', persistKey);
                                 if (saved?.imageUrl) url = saved.imageUrl;
                             } catch (_) {}
+
+                            // Hand-checked candidates win for the critical forms. They are copied
+                            // into Postgres immediately; the external URL is only provenance.
+                            if (!url) {
+                                const verifiedSource = qapVerifiedTransformSource(animeName, charName, form);
+                                if (verifiedSource) {
+                                    url = await persistQapTransformImage(persistKey, verifiedSource, 'transform-verified');
+                                }
+                            }
+
                             if (!url && host) {
-                                try { url = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
-                                if (url) {
-                                    try { await saveCachedCharacterImage('_transform', persistKey, { imageUrl:url, sourceUrl:null, status:'ok' }); } catch (_) {}
+                                let candidate = null;
+                                try { candidate = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
+                                if (candidate) {
+                                    url = await persistQapTransformImage(persistKey, candidate, 'transform-auto');
+                                    // If the source rejects server-side copying, keep it as a temporary
+                                    // display fallback but do not treat it as durable/verified cache.
+                                    if (!url) url = candidate;
                                 }
                                 // Aucun fallback vers le portrait normal du personnage.
                             }
