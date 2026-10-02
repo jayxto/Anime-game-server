@@ -1,0 +1,83 @@
+name: Validate all 7402 image routes
+on:
+  push:
+    branches: [validate-image-routes-100]
+    paths: [.github/workflows/VALIDATE_ALL_IMAGE_ROUTES.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Syntax check
+        run: node --check server.js
+      - name: Start actual server
+        env:
+          PORT: '3099'
+        run: |
+          set -euo pipefail
+          node server.js >/tmp/server.log 2>&1 & echo $! >/tmp/server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o /tmp/catalog.json; then break; fi
+            sleep 1
+          done
+          test -s /tmp/catalog.json || { cat /tmp/server.log; exit 1; }
+      - name: Validate every catalog image over HTTP
+        run: |
+          node <<'NODE'
+          const fs=require('fs');
+          const data=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
+          const chars=data.characters||data.items||data.catalog||[];
+          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+          const uniq=new Map();
+          for(const x of chars){
+            const u=x.universeKey||x.universe||x.u||x.key||x.animeKey||'';
+            const n=x.name||x.character||x.displayName||x.label||'';
+            if(!n)continue;
+            const k=(norm(u)||'_global')+'|'+norm(n);
+            if(!uniq.has(k))uniq.set(k,{u,n});
+          }
+          const items=[...uniq.values()];
+          let cursor=0,ok=0; const bad=[];
+          async function check(x){
+            const qs=new URLSearchParams({u:x.u,n:x.n,name:x.n});
+            const url='http://127.0.0.1:3099/api/avatar/img?'+qs;
+            const ac=new AbortController(); const t=setTimeout(()=>ac.abort(),10000);
+            try{
+              const r=await fetch(url,{redirect:'follow',signal:ac.signal});
+              const ct=(r.headers.get('content-type')||'').toLowerCase();
+              const b=Buffer.from(await r.arrayBuffer());
+              if(!r.ok||!ct.startsWith('image/')||b.length<500){
+                bad.push({u:x.u,n:x.n,status:r.status,contentType:ct,bytes:b.length,finalUrl:r.url});
+                return;
+              }
+              ok++;
+            }catch(e){bad.push({u:x.u,n:x.n,error:String(e)});}finally{clearTimeout(t);}
+          }
+          async function worker(){while(true){const i=cursor++;if(i>=items.length)return;await check(items[i]);if(i%500===0)console.log('PROGRESS',i,'/',items.length,'OK',ok,'BAD',bad.length);}}
+          (async()=>{
+            await Promise.all(Array.from({length:32},worker));
+            const report={total:items.length,ok,bad:bad.length,coverage:+(ok*100/items.length).toFixed(4),failures:bad.slice(0,500)};
+            fs.writeFileSync('/tmp/http-image-report.json',JSON.stringify(report,null,2));
+            console.log(JSON.stringify(report,null,2));
+            if(bad.length) process.exit(1);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Show server log if validation failed
+        if: failure()
+        run: tail -n 300 /tmp/server.log || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: all-image-route-validation
+          path: |
+            /tmp/http-image-report.json
+            /tmp/server.log
