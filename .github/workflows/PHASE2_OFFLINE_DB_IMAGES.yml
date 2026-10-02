@@ -1,0 +1,141 @@
+name: Phase 2 offline character image fill
+on:
+  push:
+    branches: [image-coverage-100-v1]
+    paths: [.github/workflows/PHASE2_OFFLINE_DB_IMAGES.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Start app and fetch complete visual catalog
+        env:
+          PORT: '3099'
+        run: |
+          set -euo pipefail
+          node server.js > /tmp/server.log 2>&1 &
+          echo $! >/tmp/server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o /tmp/catalog.json; then break; fi
+            sleep 1
+          done
+          test -s /tmp/catalog.json || { cat /tmp/server.log; exit 1; }
+      - name: Download offline anime-character database
+        run: |
+          set -euo pipefail
+          curl -fL --retry 5 --retry-delay 2 \
+            https://raw.githubusercontent.com/arda-/anime-character-offline-database/prod/latest/characters.min.json.gz \
+            -o /tmp/characters.json.gz
+          gzip -dc /tmp/characters.json.gz > /tmp/characters.json
+          test -s /tmp/characters.json
+          node -e "const d=require('/tmp/characters.json'); console.log('OFFLINE_DB', Array.isArray(d)?d.length:(d.data||[]).length)"
+      - name: Match and localize character images
+        run: |
+          node <<'NODE'
+          const fs=require('fs'), path=require('path'), sharp=require('sharp');
+          const cat=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
+          const dbRaw=JSON.parse(fs.readFileSync('/tmp/characters.json','utf8'));
+          const db=Array.isArray(dbRaw)?dbRaw:(dbRaw.data||[]);
+          const chars=cat.characters||cat.items||cat.catalog||[];
+          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’'`]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+          const slug=s=>norm(s).replace(/ /g,'-')||'_global';
+          const compact=s=>norm(s).replace(/ /g,'');
+          const rev=s=>{const a=norm(s).split(' ').filter(Boolean);return a.length===2?[a[1],a[0]].join(' '):''};
+          const animeTitles=c=>{
+            const out=[];
+            for(const x of (c.animeAppearances||c.anime||[])){
+              const a=x&&x.anime?x.anime:x;
+              for(const k of ['title','title_english','title_japanese']) if(a&&a[k]) out.push(a[k]);
+              if(a&&Array.isArray(a.title_synonyms)) out.push(...a.title_synonyms);
+            }
+            return out.filter(Boolean);
+          };
+          const names=c=>[c.name,c.name_kanji,...(c.nicknames||[]),...(c.aliases||[])].filter(Boolean);
+          const img=c=>c?.images?.webp?.image_url||c?.images?.webp?.large_image_url||c?.images?.jpg?.image_url||c?.images?.jpg?.large_image_url||c?.image_url||c?.image||'';
+          const index=new Map();
+          function add(k,c){k=norm(k);if(!k)return;if(!index.has(k))index.set(k,[]);index.get(k).push(c);}
+          for(const c of db){for(const n of names(c)){add(n,c);const r=rev(n);if(r)add(r,c);}}
+          const uniq=new Map();
+          for(const x of chars){const u=x.universeKey||x.universe||x.u||x.key||x.animeKey||'';const n=x.name||x.character||x.displayName||x.label||'';if(!n)continue;const k=slug(u)+'|'+slug(n);if(!uniq.has(k))uniq.set(k,{...x,u,n});}
+          const exts=['.webp','.png','.jpg','.jpeg'];
+          function outFile(x){return path.join('music','char-images',slug(x.u),slug(x.n)+'.webp');}
+          function exists(x){const d=path.dirname(outFile(x)),b=slug(x.n);return exts.map(e=>path.join(d,b+e)).find(f=>fs.existsSync(f)&&fs.statSync(f).size>700);}
+          function animeScore(c,wanted){
+            const w=norm(wanted); if(!w)return 0;
+            let best=0;
+            for(const t of animeTitles(c)){
+              const a=norm(t); if(!a)continue;
+              if(a===w)best=Math.max(best,100);
+              else if(a.includes(w)||w.includes(a))best=Math.max(best,80);
+              else {const A=new Set(a.split(' ')),B=new Set(w.split(' '));let q=0;for(const z of A)if(B.has(z))q++;best=Math.max(best,Math.round(q/Math.max(1,Math.min(A.size,B.size))*70));}
+            }
+            return best;
+          }
+          function pick(x){
+            const qs=[norm(x.n),rev(x.n)].filter(Boolean);
+            let cand=[]; for(const q of qs) cand.push(...(index.get(q)||[]));
+            cand=[...new Set(cand)]; if(!cand.length)return null;
+            const wantedAnime=x.anime||x.animeTitle||x.series||x.universeName||x.u||'';
+            cand=cand.filter(c=>img(c)); if(!cand.length)return null;
+            cand.sort((a,b)=>animeScore(b,wantedAnime)-animeScore(a,wantedAnime));
+            const top=cand[0], sc=animeScore(top,wantedAnime);
+            if(cand.length>1 && wantedAnime && sc<25) return null;
+            return {c:top,url:img(top),score:sc};
+          }
+          const todo=[];
+          for(const x of uniq.values()){if(exists(x))continue;const p=pick(x);if(p)todo.push({x,...p});}
+          console.log('TOTAL',uniq.size,'MATCHED_MISSING',todo.length);
+          let cursor=0,ok=0,fail=0;const failures=[];
+          async function downloadOne(it){
+            const out=outFile(it.x); fs.mkdirSync(path.dirname(out),{recursive:true});
+            for(let attempt=1;attempt<=3;attempt++){
+              const ac=new AbortController();const timer=setTimeout(()=>ac.abort(),15000);
+              try{
+                const r=await fetch(it.url,{redirect:'follow',signal:ac.signal,headers:{'User-Agent':'Mozilla/5.0 AnimeGameImageCoverage/2.0','Accept':'image/avif,image/webp,image/*,*/*;q=0.8'}});
+                if(!r.ok)throw new Error('HTTP '+r.status);
+                const b=Buffer.from(await r.arrayBuffer()); if(b.length<700)throw new Error('too small');
+                const tmp=out+'.tmp';
+                await sharp(b,{animated:false}).rotate().resize({width:420,height:588,fit:'inside',withoutEnlargement:true}).webp({quality:74,effort:4}).toFile(tmp);
+                if(fs.statSync(tmp).size<700)throw new Error('output too small');
+                fs.renameSync(tmp,out);ok++;return;
+              }catch(e){if(attempt===3){fail++;failures.push({u:it.x.u,n:it.x.n,url:it.url,error:String(e)});}else await new Promise(r=>setTimeout(r,500*attempt));}
+              finally{clearTimeout(timer);}
+            }
+          }
+          async function worker(){while(true){const i=cursor++;if(i>=todo.length)return;await downloadOne(todo[i]);if(i%100===0)console.log('PROGRESS',i,'/',todo.length,'OK',ok,'FAIL',fail);}}
+          (async()=>{
+            await Promise.all(Array.from({length:16},worker));
+            let have=0;const missing=[];
+            for(const x of uniq.values()){if(exists(x))have++;else missing.push({u:x.u,n:x.n,anime:x.anime||'',sources:x.sources||[]});}
+            const report={total:uniq.size,matchedFromOfflineDb:todo.length,downloaded:ok,downloadFailed:fail,canonical:have,missing:missing.length,coverage:+(have*100/uniq.size).toFixed(2),failures:failures.slice(0,100),missingFirst500:missing.slice(0,500)};
+            fs.writeFileSync('PHASE2_IMAGE_REPORT.json',JSON.stringify(report,null,2));console.log(report);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Commit Phase 2 images
+        run: |
+          set -euo pipefail
+          kill $(cat /tmp/server.pid) 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add music/char-images PHASE2_IMAGE_REPORT.json
+          git commit -m "fix: phase2 localize offline database character images" || true
+          git push origin HEAD:image-coverage-100-v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase2-image-report
+          path: |
+            PHASE2_IMAGE_REPORT.json
+            /tmp/server.log
