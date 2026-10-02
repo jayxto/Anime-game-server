@@ -784,7 +784,18 @@ const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
     { needs:['inuyasha','full demon'], url:'https://vignette.wikia.nocookie.net/inuyasha/images/a/ad/The_Demon%27s_True_Nature.png/revision/latest?cb=20190215234638' },
     { needs:['vash','angel arm'], url:'https://m.media-amazon.com/images/M/MV5BNjcwMzM3YzQtNzFiZS00YzVlLWFlOGMtYTllM2VjOTNjYTZmXkEyXkFqcGc%40._V1_.jpg' },
     { needs:['ainz','perfect warrior'], url:'https://i.imgur.com/vsXb2KG.png' },
-    { needs:['sakura','dark sakura'], url:'https://occ-0-8407-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABVN6dDaO-MpX2Qdneytzsxs77uzLmR3Yo-H9d98Xidi3AgAFwmBsOwXyV2-o5sPh9SkQlI-e5y5Sg_KMnDoW7EUqcb4vI14AFWc4.jpg?r=168' }
+    { needs:['sakura','dark sakura'], url:'https://occ-0-8407-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABVN6dDaO-MpX2Qdneytzsxs77uzLmR3Yo-H9d98Xidi3AgAFwmBsOwXyV2-o5sPh9SkQlI-e5y5Sg_KMnDoW7EUqcb4vI14AFWc4.jpg?r=168' },
+    // QAP_VERIFIED_TRANSFORM_BATCH8 — visually reviewed distinctive remaining forms.
+    { needs:['all might','armored all might'], url:'https://movieplayer.net-cdn.it/t/images/2025/10/06/mha_armored_all_might_jpg_1400x0_crop_q85.jpg' },
+    { needs:['aki','gun fiend'], url:'https://image.idntimes.com/post/20221230/untitled-3ccf01ac1753009258072284ab853f9b.png' },
+    { needs:['tokoyami','dark shadow','ragnarok'], url:'https://scrmbl.imgix.net/posts-images/2026/01/my-hero-academia-chapter-265-01.jpg' },
+    { needs:['usagi','sailor moon eternal'], url:'https://corp.toei-anim.co.jp/en/index/firm-slide2/slide1/image/sme_1126.jpg' },
+    { needs:['usagi','super sailor moon'], url:'https://animeanime.jp/imgs/p/JsfylNXtaHqOdo8c8P_mHjahJ65Jrq_oqaqr/711253.jpg' },
+    { needs:['yugi','yami yugi'], url:'https://shopyugioh.com/cdn/shop/files/Yami_Yugi_YGO.png?v=1728459644&width=700' },
+    { needs:['kaneki','dragon kaneki'], url:'https://66.media.tumblr.com/0079638e6e2c7fb1f3d92682d4a167f2/tumblr_inline_ozekdzBmGh1rbthts_540.png' },
+    { needs:['ryuko','senketsu kisaragi'], url:'https://www.navitoworld.com/cdn/shop/products/Ryuko_Matoi_Senketsu_Kisaragi_Ver._GSC_00.jpg?v=1429113293' },
+    { needs:['shigaraki','awakened'], url:'https://thetv.jp/i/nw/1303692/15566033.jpg?w=1284' },
+    { needs:['bondrewd','white whistle'], url:'https://static.zerochan.net/Bondrewd.full.3725399.jpg' }
 ];
 
 function qapVerifiedTransformSource(animeName, charName, form) {
