@@ -11487,6 +11487,7 @@ async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
         DO UPDATE SET display_name=EXCLUDED.display_name,image_url=EXCLUDED.image_url,
           source_url=EXCLUDED.source_url,status=EXCLUDED.status,image_bytes=EXCLUDED.image_bytes,
           mime_type=EXCLUDED.mime_type,updated_at=now()
+          WHERE character_images.status IS DISTINCT FROM 'manual-admin' OR EXCLUDED.status = 'manual-admin'
     `, [x.u,normName,x.name,stable,sourceUrl || null,status,image.bytes,image.mime || 'image/jpeg']);
     try { CHARACTER_IMAGE_CACHE.delete(`${x.u}|${normName}`); } catch (_) {}
     return true;
@@ -11926,6 +11927,61 @@ try {
 } catch (e) {
   console.warn('[images] resolver wrapper failed:', e?.message || e);
 }
+
+
+/* AG_PERSISTENT_ADMIN_CATALOG_V2
+   Admin image overrides are stored in PostgreSQL. This read endpoint overlays
+   those durable rows on the normal catalogue so a refresh/redeploy cannot make
+   the saved URL disappear from the admin UI. */
+app.get('/api/admin/character-catalog-persistent', async (req, res) => {
+    try {
+        const baseResponse = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, {
+            headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
+        });
+        const base = await baseResponse.json().catch(() => null);
+        if (!baseResponse.ok || !base || !base.ok) {
+            return res.status(baseResponse.status || 500).json(base || { ok:false, error:'Catalogue indisponible.' });
+        }
+
+        const q = await pool.query(`
+            SELECT universe_key, norm_name, display_name, source_url, status, updated_at
+            FROM character_images
+            WHERE status = 'manual-admin'
+              AND image_bytes IS NOT NULL
+              AND octet_length(image_bytes) >= 700
+        `);
+        const overrides = new Map();
+        for (const row of q.rows || []) {
+            overrides.set(`${row.universe_key}|${row.norm_name}`, row);
+        }
+
+        const characters = (Array.isArray(base.characters) ? base.characters : []).map(raw => {
+            const u = String(raw?.u || raw?.universe || '').trim();
+            const name = cleanImageCharacterName(String(raw?.name || '').trim());
+            if (!u || !name) return raw;
+            const row = overrides.get(`${u}|${normalizeImageKey(name)}`);
+            if (!row) return raw;
+            const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
+            const stableUrl = (typeof simpleImageRoute === 'function')
+                ? simpleImageRoute(u, name, stamp)
+                : `/api/character-image-file?u=${encodeURIComponent(u)}&n=${encodeURIComponent(name)}&v=${encodeURIComponent(stamp)}`;
+            return {
+                ...raw,
+                img: stableUrl,
+                imageUrl: stableUrl,
+                sourceUrl: String(row.source_url || ''),
+                status: 'manual-admin',
+                manualOverride: true
+            };
+        });
+
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return res.json({ ...base, ok:true, characters, manualOverrides: overrides.size });
+    } catch (e) {
+        console.error('[persistent admin character catalog]', e);
+        return res.status(500).json({ ok:false, error:'Impossible de relire les images admin persistantes.' });
+    }
+});
 
 server.listen(PORT, () => {
     // Le serveur ouvre le port immédiatement. Les images se remplissent ensuite en arrière-plan.
