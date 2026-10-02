@@ -1,0 +1,34 @@
+name: Poll live migration failures
+
+on:
+  push:
+    branches: [image-audit-work]
+    paths:
+      - '.github/workflows/POLL_MIGRATION_FAILED.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-audit-work
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Poll current migration state
+        run: python3 .github/poll_migration_failed.py
+      - name: Commit failure report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/migration_failed_now.txt .github/migration_failed_now.json
+          git commit -m "audit: record current migration failures [skip ci]"
+          git push origin HEAD:image-audit-work
