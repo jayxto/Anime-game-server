@@ -1,0 +1,47 @@
+{
+  "total": 7402,
+  "startMissing": 3567,
+  "created": 3567,
+  "canonical": 7402,
+  "missing": 0,
+  "coverage": 100,
+  "failedPrimaryRecovered": 4,
+  "quality": {
+    "universe-local-fallback": 576,
+    "generated-fallback": 143,
+    "character-exact": 118,
+    "anime-cover-exact": 2409,
+    "character-fuzzy": 93,
+    "character-series": 38,
+    "anime-cover-fuzzy": 186,
+    "source-failed-generated-fallback": 1,
+    "source-failed-universe-fallback": 3
+  },
+  "recovered": [
+    {
+      "u": "",
+      "n": "Re:Zero",
+      "from": "character-fuzzy",
+      "to": "source-failed-generated-fallback"
+    },
+    {
+      "u": "drstone",
+      "n": "Suika",
+      "from": "character-exact",
+      "to": "source-failed-universe-fallback"
+    },
+    {
+      "u": "naruto",
+      "n": "Suika",
+      "from": "character-exact",
+      "to": "source-failed-universe-fallback"
+    },
+    {
+      "u": "sao",
+      "n": "Lind",
+      "from": "character-exact",
+      "to": "source-failed-universe-fallback"
+    }
+  ],
+  "missingEntries": []
+}
