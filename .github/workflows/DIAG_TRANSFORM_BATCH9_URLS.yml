@@ -1,0 +1,50 @@
+name: Diagnose transformation batch 9 URLs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/DIAG_TRANSFORM_BATCH9_URLS.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Check URLs individually
+        shell: bash
+        run: |
+          set -u
+          : > .github/batch9_url_status.txt
+          urls=(
+            'https://gamemag.ru/images/imagemanager/cache/cb/e00e/cbe00e_devilman-crybaby.jpg'
+            'https://abrakadabra.fun/uploads/posts/2022-03/1646914049_27-abrakadabra-fun-p-kaneki-s-kagune-sorokonozhki-43.jpg'
+            'https://ogre.natalie.mu/media/news/comic/2019/0209/02.jpg?imdensity=1&impolicy=lt&imwidth=1000'
+            'https://www.cultture.com/pics/2020/09/perros-callejeros-bungou-las-15-mejores-habilidades-clasificadas-de-mas-debiles-a-mas-fuertes-12.jpg'
+            'https://static.zerochan.net/Reg.%28Made.in.Abyss%29.full.3994517.jpg'
+            'https://imgix.ranker.com/user_node_img/50146/1002916968/original/1002916968-photo-u-1292046586?auto=format&dpr=2&fit=crop&fm=pjpg&q=60&w=500'
+            'https://cdn.oneesports.id/cdn-data/sites/2/2024/03/Tensura-Rimuru-Demon-Lord.jpg'
+            'https://admin.esports.gg/wp-content/uploads/2025/04/anime-of-the-year-968x544.jpg'
+          )
+          for i in "${!urls[@]}"; do
+            url="${urls[$i]}"
+            code=$(curl -L -sS --max-time 20 -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "$url" || true)
+            printf '%02d %s %s\n' "$((i+1))" "$code" "$url" | tee -a .github/batch9_url_status.txt
+          done
+      - name: Commit diagnostic report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/batch9_url_status.txt
+          git commit -m "chore: diagnose batch 9 image URLs [skip ci]"
+          git push origin HEAD:main
