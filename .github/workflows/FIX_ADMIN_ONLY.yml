@@ -21,58 +21,40 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Move character image admin route after adminOnly
+      - name: Move admin image route after adminOnly
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
           p = Path('server.js')
           s = p.read_text(encoding='utf-8')
-
-          route = """app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
-    const b=req.body||{}; const u=String(b.universe||'').trim();
-    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
-    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
-    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
-    if (!/^https:\\/\\/\\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
-    const img=await simpleFetchImage(url,10000);
-    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
-    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
-    const imageUrl=simpleImageRoute(u,name,Date.now());
-    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
-}));"""
-
-          count = s.count(route)
-          if count != 1:
-              raise SystemExit(f'Expected exactly one admin image route, found {count}')
-
-          # Remove the early route.
-          s = s.replace('\n' + route + '\n', '\n', 1)
-
-          marker = 'const adminOnly = fn => async (req, res) => {'
-          pos = s.find(marker)
-          if pos < 0:
+          start_marker = "app.post('/api/admin/character-image', adminOnly(async (req,res)=>{"
+          start = s.find(start_marker)
+          if start < 0:
+              raise SystemExit('admin image route not found')
+          end = s.find('\n}));', start)
+          if end < 0:
+              raise SystemExit('admin image route end not found')
+          end += len('\n}));')
+          block = s[start:end]
+          s = s[:start] + s[end:]
+          admin_marker = 'const adminOnly = fn => async (req, res) => {'
+          admin = s.find(admin_marker)
+          if admin < 0:
               raise SystemExit('adminOnly declaration not found')
-          line_end = s.find('\n', pos)
+          line_end = s.find('\n', admin)
           if line_end < 0:
-              raise SystemExit('adminOnly declaration line end not found')
-
-          # Reinsert immediately after adminOnly is initialized.
-          s = s[:line_end+1] + '\n' + route + '\n' + s[line_end+1:]
-
-          admin_pos = s.find(marker)
-          route_pos = s.find("app.post('/api/admin/character-image', adminOnly")
-          if route_pos <= admin_pos:
-              raise SystemExit(f'Bad order: route={route_pos}, adminOnly={admin_pos}')
-
+              raise SystemExit('adminOnly line end not found')
+          s = s[:line_end + 1] + '\n' + block + '\n' + s[line_end + 1:]
+          admin2 = s.find(admin_marker)
+          route2 = s.find(start_marker)
+          if route2 <= admin2:
+              raise SystemExit(f'bad order admin={admin2} route={route2}')
           p.write_text(s, encoding='utf-8')
-          print('adminOnly position:', admin_pos)
-          print('route position:', route_pos)
-          print('Order OK')
+          print('adminOnly order fixed:', admin2, route2)
           PY
 
-      - name: Validate server
+      - name: Validate server ordering
         run: |
           node --check server.js
           node - <<'NODE'
@@ -80,11 +62,11 @@ jobs:
           const s=fs.readFileSync('server.js','utf8');
           const a=s.indexOf('const adminOnly = fn => async');
           const r=s.indexOf("app.post('/api/admin/character-image', adminOnly");
-          if(a<0||r<0||r<=a) throw new Error(`adminOnly ordering invalid: admin=${a} route=${r}`);
-          console.log('Runtime-order static validation OK');
+          if(a<0||r<0||r<=a) throw new Error(`invalid ordering admin=${a} route=${r}`);
+          console.log('Validation OK:', {admin:a, route:r});
           NODE
 
-      - name: Commit fix and remove one-time workflow
+      - name: Commit fix and remove temporary workflow
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
