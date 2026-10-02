@@ -1,0 +1,24 @@
+name: Inspect store clean
+on:
+  push:
+    branches: [inspect-store-clean]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print relevant functions
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8',errors='replace')
+          for p in ['async function simpleStoreImage','function simpleStoreImage','async function simpleMigrationPass','function simpleMigrationPass']:
+            i=s.find(p)
+            print('\n###',p,'POS',i)
+            if i>=0: print(s[max(0,i-1000):min(len(s),i+7000)])
+          PY
