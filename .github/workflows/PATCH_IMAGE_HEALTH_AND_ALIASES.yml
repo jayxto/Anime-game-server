@@ -1,0 +1,47 @@
+name: Patch image health and migration aliases
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_IMAGE_HEALTH_AND_ALIASES.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch migration aliases and read-only health endpoint
+        run: python3 .github/patch_image_health_and_aliases.py
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Verify anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'SIMPLE_CATALOGUE_CANONICAL_UNIVERSES_V2' server.js
+          grep -q 'CHARACTER_IMAGE_HEALTH_V1' server.js
+          grep -q "app.get('/api/character-image-health'" server.js
+      - name: Commit verified patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_image_health_and_aliases.py .github/workflows/PATCH_IMAGE_HEALTH_AND_ALIASES.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: expose image health and canonicalize migration universes [skip ci]"
+          git push origin HEAD:main
