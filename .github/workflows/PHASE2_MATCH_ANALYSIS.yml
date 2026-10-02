@@ -1,0 +1,33 @@
+name: Analyze phase 2 image matches
+on:
+  push:
+    branches:
+      - image-coverage-100-v1
+permissions:
+  contents: write
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/analyze-phase2-matches.mjs
+      - name: Commit match report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PHASE2_MATCH_REPORT.json
+          git commit -m "audit: report bulk image source matches" || true
+          git push origin HEAD:image-coverage-100-v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase2-match-analysis
+          path: |
+            PHASE2_MATCH_REPORT.json
+            /tmp/phase2-anime-matches.json
+            /tmp/phase2-pokemon-matches.json
