@@ -47,3 +47,5 @@ jobs:
           git diff --cached --check
           git commit -m "feat: add verified transformation image batch 2 [skip ci]"
           git push origin HEAD:main
+
+# rerun: separator fix validated before commit
