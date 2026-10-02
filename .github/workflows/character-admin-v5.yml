@@ -1,0 +1,36 @@
+name: Character admin v5
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/patch-character-admin-v5.py'
+      - '.github/workflows/character-admin-v5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install instant stable character admin
+        run: python3 scripts/patch-character-admin-v5.py
+      - name: Check JavaScript syntax
+        run: node --check assets/js/ui-refactor.js
+      - name: Commit v5 admin
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/js/ui-refactor.js
+          if git diff --cached --quiet; then
+            echo "No admin changes"
+            exit 0
+          fi
+          git commit -m "feat: instant unique character image admin v5"
+          git pull --rebase origin main
+          git push origin HEAD:main
