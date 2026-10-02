@@ -1,0 +1,33 @@
+name: Audit transformation source health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_TRANSFORM_SOURCE_HEALTH.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Test verified image sources
+        run: python3 .github/audit_transform_source_health.py
+      - name: Commit source health report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/transform_source_health.txt
+          git commit -m "chore: audit transformation image source health [skip ci]"
+          git push origin HEAD:main
