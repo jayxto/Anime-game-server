@@ -16,16 +16,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Decode exact transformation catalog
+      - name: Chunk exact transformation catalog
         run: python3 .github/audit_transform_catalog.py
-
-      - name: Commit audit report
+      - name: Commit catalog chunks
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/transform_audit.txt
-          git commit -m "chore: decode exact transformation catalog [skip ci]"
+          git add .github/transform_items_*.txt
+          git commit -m "chore: chunk transformation catalog audit [skip ci]"
           git push origin HEAD:main
