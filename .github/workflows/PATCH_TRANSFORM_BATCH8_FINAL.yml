@@ -1,0 +1,53 @@
+name: Patch final verified transformation images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_TRANSFORM_BATCH8_FINAL.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply final batch
+        run: python3 .github/patch_transform_batch8_final.py
+      - name: Verify syntax and actual rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check server.js
+          grep -Fq 'QAP_VERIFIED_TRANSFORM_BATCH8_FINAL' server.js
+          grep -Fq 'Mob_100%25_Courage.JPG' server.js
+          grep -Fq 'Incursio%27s_Evolved_Form_in_Anime.png' server.js
+          grep -Fq 'shadow-garden.jp/assets/img/special/special21/chara1.png' server.js
+          grep -Fq 'fate-sn.com/assets/img/2nd/chara/rider.jpg' server.js
+          grep -Fq 'Screenshot-2022-09-24-230428.png' server.js
+          if git diff --quiet -- server.js; then
+            echo 'server.js unchanged unexpectedly'
+            exit 1
+          fi
+      - name: Commit final batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_transform_batch8_final.py .github/workflows/PATCH_TRANSFORM_BATCH8_FINAL.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: complete verified transformation image catalog [skip ci]"
+          git push origin HEAD:main
