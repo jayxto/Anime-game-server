@@ -1,0 +1,33 @@
+name: Audit character image API context
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_CHARACTER_IMAGE_API.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Extract image API context
+        run: python3 .github/extract_character_image_api_context.py
+      - name: Commit context
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/character_image_api_context.txt
+          git commit -m "chore: extract character image API context [skip ci]"
+          git push origin HEAD:main
