@@ -1,0 +1,341 @@
+name: Build persistence and QAP replacement files
+on:
+  push:
+    branches: [build-persist-qap-download]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Patch server persistence
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('server.js')
+          s=p.read_text(encoding='utf-8')
+
+          # 1) The 100% local image bridge must NEVER beat a manual admin override.
+          rx=re.compile(r"app\.use\('/api/avatar/img',\s*__agServeCanonicalImageV2\);\s*app\.use\('/api/character-image',\s*__agServeCanonicalImageV2\);\s*app\.use\('/api/character-image-file',\s*__agServeCanonicalImageV2\);",re.M)
+          repl=r'''/* AG_MANUAL_IMAGE_PRIORITY_V3
+             A URL saved by an admin is authoritative. The verified local library is only a fallback.
+             This fixes manual images reverting after a page refresh. */
+          async function __agServeManualThenCanonicalV3(req, res, next) {
+            try {
+              const u = String(req.query.u || req.query.universe || req.query.universeKey || '').trim();
+              const n = String(req.query.n || req.query.name || '').trim();
+              if (u && n) {
+                const cleanName = cleanImageCharacterName(n);
+                const normName = normalizeImageKey(cleanName);
+                const r = await pool.query(`
+                  SELECT image_bytes, mime_type, status
+                  FROM character_images
+                  WHERE universe_key=$1 AND norm_name=$2
+                    AND status='manual-admin'
+                    AND image_bytes IS NOT NULL
+                    AND octet_length(image_bytes)>=700
+                  LIMIT 1`, [u, normName]);
+                const row = r.rows && r.rows[0];
+                if (row && row.image_bytes) {
+                  res.setHeader('Cache-Control', 'no-store, max-age=0, must-revalidate');
+                  res.setHeader('Pragma', 'no-cache');
+                  res.setHeader('Content-Type', row.mime_type || 'image/jpeg');
+                  return res.end(row.image_bytes);
+                }
+              }
+            } catch (_) {}
+            return __agServeCanonicalImageV2(req, res, next);
+          }
+          app.use('/api/avatar/img', __agServeManualThenCanonicalV3);
+          app.use('/api/character-image', __agServeManualThenCanonicalV3);
+          app.use('/api/character-image-file', __agServeManualThenCanonicalV3);'''
+          s,n=rx.subn(repl,s,count=1)
+          assert n==1, f'canonical bridge registrations not patched: {n}'
+
+          # 2) Automatic jobs are forbidden from overwriting a manual-admin row.
+          needle="""    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
+    const stable = simpleImageRoute(x.u, x.name, Date.now());"""
+          inject="""    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
+    /* AG_MANUAL_IMAGE_LOCK_V3: once an admin chose an image, background filling cannot overwrite it. */
+    if (status !== 'manual-admin') {
+        try {
+            const prior = await pool.query(`
+                SELECT status FROM character_images
+                WHERE universe_key=$1 AND norm_name=$2
+                LIMIT 1`, [x.u, normName]);
+            if (prior.rows && prior.rows[0] && prior.rows[0].status === 'manual-admin') return true;
+        } catch (_) {}
+    }
+    const stable = simpleImageRoute(x.u, x.name, Date.now());"""
+          assert needle in s, 'simpleStoreImage normName/stable block not found'
+          s=s.replace(needle,inject,1)
+
+          # 3) Legacy resolver had the manual marker check on sourceUrl instead of status.
+          old="if (manual?.imageUrl && manual?.sourceUrl === 'manual-admin') return manual;"
+          new="if (manual?.imageUrl && (manual?.status === 'manual-admin' || manual?.sourceUrl === 'manual-admin')) return manual;"
+          if old in s:
+              s=s.replace(old,new,1)
+
+          # 4) Make character catalog expose the actual saved manual URL after refresh.
+          route="app.get('/api/character-catalog', (req, res) => {"
+          assert route in s, 'character-catalog route signature not found'
+          s=s.replace(route,"app.get('/api/character-catalog', async (req, res) => {",1)
+          rpos=s.index("app.get('/api/character-catalog', async (req, res) => {")
+          cpos=s.find('const characters = [...rows.values()]',rpos)
+          assert cpos>rpos, 'catalog characters declaration not found'
+          s=s[:cpos]+s[cpos:].replace('const characters = [...rows.values()]','let characters = [...rows.values()]',1)
+          apos=s.find('const animes =',cpos)
+          assert apos>cpos, 'catalog animes declaration not found'
+          merge=r'''/* AG_MANUAL_CATALOG_PRIORITY_V3: keep the exact admin URL visible after reload. */
+    try {
+        const manualRows = await pool.query(`
+            SELECT universe_key, norm_name, source_url, status, updated_at
+            FROM character_images
+            WHERE status='manual-admin'
+              AND source_url IS NOT NULL
+              AND source_url ~ '^https://'
+              AND image_bytes IS NOT NULL
+              AND octet_length(image_bytes)>=700`);
+        const manualByKey = new Map((manualRows.rows || []).map(row => [
+            `${String(row.universe_key || '').trim()}|${String(row.norm_name || '').trim()}`,
+            row
+        ]));
+        characters = characters.map(x => {
+            if (!x || !x.u || !x.name) return x;
+            const key = `${String(x.u).trim()}|${normalizeImageKey(cleanImageCharacterName(x.name))}`;
+            const row = manualByKey.get(key);
+            if (!row || !/^https:\/\/\S+$/i.test(String(row.source_url || ''))) return x;
+            return { ...x, img: row.source_url, originalImg: row.source_url, manualImage: true };
+        });
+    } catch (e) {
+        console.warn('[character-catalog] lecture des images manuelles impossible:', e && e.message ? e.message : e);
+    }
+    '''
+          s=s[:apos]+merge+s[apos:]
+
+          assert 'AG_MANUAL_IMAGE_PRIORITY_V3' in s
+          assert 'AG_MANUAL_IMAGE_LOCK_V3' in s
+          assert 'AG_MANUAL_CATALOG_PRIORITY_V3' in s
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check server.js
+
+      - name: Patch Qui a le plus categories
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # QAP question subcategories. Every one of the 64 questions receives exactly one subcategory.
+          decl='const QAP_QUESTIONS = [], QAP_CAT_OF = [];'
+          assert decl in s, 'QAP declaration not found'
+          subblock=r'''const QAP_SUBS = {
+            power: [
+                ['combat','⚔️ Combat & puissance',[0,1,2,3,4,5,8]],
+                ['mental','🧠 Mental & stratégie',[6,7,9,10,11]]
+            ],
+            aura: [
+                ['presence','🔥 Aura & présence',[0,1,2,3,4]],
+                ['style','✨ Style & charisme',[5,6,7,8]],
+                ['mystique','🌙 Mystère & répliques',[9,10,11]]
+            ],
+            emo: [
+                ['emotion','💔 Souffrance & émotions',[0,1,4,5]],
+                ['evolution','📈 Évolution & comeback',[2,3,6]],
+                ['opinion','👀 Sous-coté / surcoté',[7,8]]
+            ],
+            dark: [
+                ['menace','😈 Danger & noirceur',[0,1,3,4]],
+                ['toxic','☠️ Toxicité & ego',[2,5,6,7,8]]
+            ],
+            fun: [
+                ['quotidien','😂 Drôle & quotidien',[0,1,2,8,11]],
+                ['scenario','🎬 Scénarios improbables',[3,4,5,6,7]],
+                ['absurde','🤪 Absurde & look',[9,10]]
+            ],
+            life: [
+                ['relations','🤝 Amitié & relations',[0,1,6,7]],
+                ['roles','👑 Rôles & responsabilités',[2,3,5,9]],
+                ['confiance','🛡️ Confiance & loyauté',[4,8]]
+            ]
+        };
+        const QAP_QUESTIONS = [], QAP_CAT_OF = [], QAP_SUB_OF = [];
+        '''
+          s=s.replace(decl,subblock,1)
+          flat='QAP_CATS.forEach(([c]) => QAP_BY_CAT[c].forEach(q => { QAP_QUESTIONS.push(q); QAP_CAT_OF.push(c); }));'
+          assert flat in s, 'QAP flatten loop not found'
+          flat2="""QAP_CATS.forEach(([c]) => QAP_BY_CAT[c].forEach((q, localIndex) => {
+            const sub = (QAP_SUBS[c] || []).find(([, , indexes]) => indexes.includes(localIndex));
+            QAP_QUESTIONS.push(q);
+            QAP_CAT_OF.push(c);
+            QAP_SUB_OF.push(sub ? `${c}:${sub[0]}` : `${c}:other`);
+        }));"""
+          s=s.replace(flat,flat2,1)
+
+          qcats="let qapCats = (() => { try { const v = JSON.parse(localStorage.getItem('qap_cats') || 'null'); return Array.isArray(v) && v.length ? v : null; } catch (e) { return null; } })();"
+          assert qcats in s, 'qapCats state not found'
+          s=s.replace(qcats,qcats+"\n        let qapSubs = (() => { try { const v = JSON.parse(localStorage.getItem('qap_subcats') || 'null'); return Array.isArray(v) && v.length ? v : null; } catch (e) { return null; } })();",1)
+
+          qnext="if (!bb.qBag || !bb.qBag.length) bb.qBag = bbShuffle(QAP_QUESTIONS.map((_, i) => i).filter(i => !qapCats || qapCats.includes(QAP_CAT_OF[i])));"
+          assert qnext in s, 'qapNextQ filter not found'
+          qnext2="if (!bb.qBag || !bb.qBag.length) bb.qBag = bbShuffle(QAP_QUESTIONS.map((_, i) => i).filter(i => (!qapCats || qapCats.includes(QAP_CAT_OF[i])) && (!qapSubs || qapSubs.includes(QAP_SUB_OF[i]))));"
+          s=s.replace(qnext,qnext2,1)
+
+          # Replace the first-level chip block with a 2-level category/subcategory selector.
+          start=s.index('            // thèmes des questions (plusieurs possibles)', s.index('function qapSetup(body)'))
+          end_marker='            drawChips(); body.appendChild(chips);'
+          end=s.index(end_marker,start)+len(end_marker)
+          ui=r'''            // thèmes + sous-catégories des questions
+            const chips = document.createElement('div'); chips.className = 'qap-chips';
+            const subTitle = document.createElement('div');
+            subTitle.style.cssText = 'margin:12px 0 6px;color:var(--accent-cyan);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;';
+            subTitle.textContent = 'Sous-catégories';
+            const subChips = document.createElement('div'); subChips.className = 'qap-chips';
+            const saveQapSubs = () => { try { qapSubs ? localStorage.setItem('qap_subcats', JSON.stringify(qapSubs)) : localStorage.removeItem('qap_subcats'); } catch (e) {} };
+            const availableQapSubs = () => {
+                const cats = qapCats || QAP_CATS.map(x => x[0]);
+                return cats.flatMap(c => (QAP_SUBS[c] || []).map(([id,label]) => ({ key:`${c}:${id}`, label, cat:c })));
+            };
+            const drawSubs = () => {
+                const available = availableQapSubs();
+                const allowed = new Set(available.map(x => x.key));
+                if (qapSubs) {
+                    qapSubs = qapSubs.filter(x => allowed.has(x));
+                    if (!qapSubs.length) qapSubs = null;
+                    saveQapSubs();
+                }
+                subChips.innerHTML = '';
+                const allSub = document.createElement('button');
+                allSub.textContent = '✨ Toutes les sous-catégories';
+                allSub.className = !qapSubs ? 'on' : '';
+                allSub.onclick = () => { qapSubs = null; saveQapSubs(); if (bb) bb.qBag = null; drawSubs(); };
+                subChips.appendChild(allSub);
+                available.forEach(({key,label}) => {
+                    const b = document.createElement('button');
+                    b.textContent = label;
+                    b.className = qapSubs && qapSubs.includes(key) ? 'on' : '';
+                    b.onclick = () => {
+                        const set = new Set(qapSubs || []); set.has(key) ? set.delete(key) : set.add(key);
+                        qapSubs = set.size ? [...set] : null;
+                        saveQapSubs(); if (bb) bb.qBag = null; drawSubs();
+                    };
+                    subChips.appendChild(b);
+                });
+            };
+            const drawChips = () => {
+                chips.innerHTML = '';
+                const all = document.createElement('button'); all.textContent = '🌈 Tout mélangé'; all.className = !qapCats ? 'on' : '';
+                all.onclick = () => { qapCats = null; try { localStorage.removeItem('qap_cats'); } catch (e) {} if (bb) bb.qBag = null; drawChips(); drawSubs(); };
+                chips.appendChild(all);
+                QAP_CATS.forEach(([c, label]) => {
+                    const b = document.createElement('button'); b.textContent = label; b.className = qapCats && qapCats.includes(c) ? 'on' : '';
+                    b.onclick = () => {
+                        const set = new Set(qapCats || []); set.has(c) ? set.delete(c) : set.add(c);
+                        qapCats = set.size ? [...set] : null;
+                        try { qapCats ? localStorage.setItem('qap_cats', JSON.stringify(qapCats)) : localStorage.removeItem('qap_cats'); } catch (e) {}
+                        if (bb) bb.qBag = null;
+                        drawChips(); drawSubs();
+                    };
+                    chips.appendChild(b);
+                });
+            };
+            drawChips(); body.appendChild(chips);
+            body.appendChild(subTitle); body.appendChild(subChips); drawSubs();'''
+          s=s[:start]+ui+s[end:]
+
+          # Add a dedicated first-level mode category on the Play page.
+          catline="['fun', '🎨 Dessin & fun'],"
+          assert catline in s, 'active mode category list not found'
+          s=s.replace(catline,catline+"\n            ['qap', '🏆 Qui a le plus'],",1)
+          # There is also a disabled historical category block. Patching every remaining copy is harmless and keeps it coherent.
+          s=s.replace(catline,catline+" ['qap', '🏆 Qui a le plus'],")
+
+          active="if (/tu preferes|qui a le plus|dessine le perso|tier list|jeu de connexion|party mix/.test(t)) add('fun');"
+          assert active in s, 'active categoriesFor QAP rule not found'
+          s=s.replace(active,active+"\n            if (/qui a le plus/.test(t)) add('qap');",1)
+          # Historical disabled RULES, if re-enabled later, also knows the category.
+          s=s.replace("[/qui a le plus/i, ['fun', 'stream']]","[/qui a le plus/i, ['fun', 'stream', 'qap']]")
+
+          assert 'QAP_SUBS' in s and 'QAP_SUB_OF' in s and 'qap_subcats' in s
+          assert "['qap', '🏆 Qui a le plus']" in s
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Validate patched files
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check server.js
+          node <<'NODE'
+          const fs=require('fs'), vm=require('vm');
+          const html=fs.readFileSync('index.html','utf8');
+          const scripts=[...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)];
+          let checked=0;
+          for(const m of scripts){
+            if(/application\/ld\+json/i.test(m[1]||'')) continue;
+            const code=m[2]||'';
+            if(!code.trim()) continue;
+            try{ new vm.Script(code); checked++; }
+            catch(e){ console.error('HTML script syntax error, block',checked+1,e.message); process.exit(1); }
+          }
+          console.log('HTML script blocks syntax OK:',checked);
+          const a=html.indexOf('const QAP_CATS');
+          const b=html.indexOf('let qapCats',a);
+          if(a<0||b<a) throw new Error('QAP definitions missing');
+          const code=html.slice(a,b)+`\nif(QAP_QUESTIONS.length!==64) throw new Error('expected 64 QAP questions, got '+QAP_QUESTIONS.length);\nif(QAP_SUB_OF.length!==QAP_QUESTIONS.length) throw new Error('subcategory count mismatch');\nif(QAP_SUB_OF.some(x=>!x||x.endsWith(':other'))) throw new Error('uncategorized QAP question');\nconsole.log('QAP coverage',QAP_SUB_OF.length+'/'+QAP_QUESTIONS.length);`;
+          new vm.Script(`(()=>{${code}})()`).runInNewContext({console});
+          NODE
+          python3 <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          h=Path('index.html').read_text(encoding='utf-8')
+          for marker in ['AG_MANUAL_IMAGE_PRIORITY_V3','AG_MANUAL_IMAGE_LOCK_V3','AG_MANUAL_CATALOG_PRIORITY_V3']:
+              assert marker in s, marker
+          assert "status='manual-admin'" in s
+          assert "manualImage: true" in s
+          assert 'QAP_SUBS' in h and 'qap_subcats' in h
+          assert "['qap', '🏆 Qui a le plus']" in h
+          print('Persistence/QAP structural checks: OK')
+          PY
+
+      - name: Build replacement ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release/ANIME_GAME_FIX_PERSISTENCE_QAP
+          cp server.js index.html release/ANIME_GAME_FIX_PERSISTENCE_QAP/
+          cat > release/ANIME_GAME_FIX_PERSISTENCE_QAP/README.txt <<'EOF'
+          REMPLACE UNIQUEMENT :
+          - server.js
+          - index.html
+
+          Correctifs inclus :
+          - une image enregistrée manuellement par l'admin reste prioritaire après refresh ;
+          - les remplissages automatiques ne peuvent plus écraser une image manual-admin ;
+          - le catalogue admin recharge l'URL manuelle sauvegardée ;
+          - catégorie principale « Qui a le plus » ;
+          - sous-catégories de questions dans « Qui a le plus ».
+          EOF
+          (cd release && zip -9 -r ANIME_GAME_FIX_PERSISTENCE_QAP.zip ANIME_GAME_FIX_PERSISTENCE_QAP >/dev/null)
+          sha256sum server.js index.html release/ANIME_GAME_FIX_PERSISTENCE_QAP.zip | tee release/SHA256.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ANIME_GAME_FIX_PERSISTENCE_QAP
+          path: |
+            release/ANIME_GAME_FIX_PERSISTENCE_QAP.zip
+            release/SHA256.txt
+          if-no-files-found: error
