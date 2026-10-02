@@ -1,0 +1,41 @@
+name: Fill phase 3 AniList images
+on:
+  push:
+    branches: [image-coverage-100-v1]
+    paths:
+      - 'scripts/fill-phase3-anilist.mjs'
+      - '.github/workflows/FILL_PHASE3_ANILIST.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fill:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Fill media covers and context-matched characters
+        run: node scripts/fill-phase3-anilist.mjs
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Commit AniList images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add music/char-images PHASE3_ANILIST_REPORT.json
+          git commit -m "fix: localize context-matched AniList character images" || true
+          git push origin HEAD:image-coverage-100-v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase3-anilist-report
+          path: |
+            PHASE3_ANILIST_REPORT.json
+            /tmp/phase3-server.log
