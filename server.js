@@ -11403,6 +11403,33 @@ async function simpleAniListAnime(anime) {
     cache.set(anime,all); return all;
 }
 
+async function simpleAniListCharacterSearch(u,name) {
+    const wanted = simpleVariants(u,name);
+    for (const q of wanted.slice(0,2)) {
+        const query = `query($s:String){Page(page:1,perPage:10){characters(search:$s){name{full native alternative}image{large medium}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST',
+                headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:q}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,2600)); continue; }
+            if (!r.ok) continue;
+            const arr=(await r.json())?.data?.Page?.characters || [];
+            let best=null;
+            for (const c of arr) {
+                const names=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);
+                const sc=Math.max(0,...names.flatMap(n=>wanted.map(w=>simpleScoreName(n,w))));
+                const url=c?.image?.large || c?.image?.medium || '';
+                if (url && sc>=82 && (!best || sc>best.sc)) best={sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+        await new Promise(r=>setTimeout(r,850));
+    }
+    return '';
+}
+
 async function simpleFandomUrl(u,name) {
     const host = (typeof FANDOM_WIKIS !== 'undefined' && FANDOM_WIKIS[u]) || null;
     if (!host) return '';
@@ -11542,8 +11569,15 @@ async function simpleMigrationPass(pass) {
         await new Promise(r=>setTimeout(r,700));
     }
 
+    const unresolvedSearch=[];
+    await simplePool(unresolved2,3,async x=>{
+        const url=await simpleAniListCharacterSearch(x.u,x.name);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return; }
+        unresolvedSearch.push(x);
+    });
+
     const unresolved3=[];
-    await simplePool(unresolved2,4,async x=>{
+    await simplePool(unresolvedSearch,4,async x=>{
         const url=await simpleFandomUrl(x.u,x.name);
         if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return; }
         unresolved3.push(x);
@@ -11627,7 +11661,19 @@ resolveCharacterImage = async function(universeKey,displayName){
 /* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
 
 server.listen(PORT, () => {
-    startSimpleImageMigration().catch(err => console.error('[Simple images] startup migration:', err));
+    // Le serveur ouvre le port immédiatement. Les images se remplissent ensuite en arrière-plan.
+    setTimeout(() => {
+        startSimpleImageMigration().catch(err => console.error('[Simple images] startup migration:', err));
+    }, 2500);
+
+    // Tant qu'il reste des images manquantes, une nouvelle passe est retentée périodiquement.
+    const imageRetryTimer = setInterval(() => {
+        if (!SIMPLE_IMAGE_STATE.running && (!SIMPLE_IMAGE_STATE.done || SIMPLE_IMAGE_STATE.missing > 0)) {
+            startSimpleImageMigration().catch(err => console.error('[Simple images] scheduled retry:', err));
+        }
+    }, 6 * 60 * 60 * 1000);
+    if (typeof imageRetryTimer.unref === 'function') imageRetryTimer.unref();
+
     startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
     startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
     console.log(`Serveur démarré sur le port ${PORT}`);
@@ -17116,6 +17162,20 @@ app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.f
 
 const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
 
+// ===== IMAGES PERSONNAGES : ADMIN / REMPLISSAGE AUTOMATIQUE =====
+app.get('/api/admin/character-images/status', adminOnly(async (req, res) => {
+    res.json({ ok:true, state:SIMPLE_IMAGE_STATE });
+}));
+
+app.post('/api/admin/character-images/fill', adminOnly(async (req, res) => {
+    if (!SIMPLE_IMAGE_STATE.running) {
+        setImmediate(() => startSimpleImageMigration().catch(err => {
+            console.error('[Simple images] manual fill:', err);
+        }));
+    }
+    res.json({ ok:true, started:true, state:SIMPLE_IMAGE_STATE });
+}));
+
 app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     const b=req.body||{}; const u=String(b.universe||'').trim();
     const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
@@ -17128,6 +17188,7 @@ app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     const imageUrl=simpleImageRoute(u,name,Date.now());
     return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
 }));
+
 app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
 app.get('/api/admin/stats', adminOnly(async (req, res) => {
     const socketsN = io.sockets && io.sockets.sockets ? io.sockets.sockets.size : 0;
