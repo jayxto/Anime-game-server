@@ -19,6 +19,8 @@ jobs:
           sparse-checkout: |
             .github
           sparse-checkout-cone-mode: false
+      - name: Wait for Render deployment
+        run: sleep 45
       - name: Fetch live Render character catalogue
         run: python3 .github/audit_live_character_catalog.py
       - name: Commit live catalogue audit
@@ -32,5 +34,5 @@ jobs:
             echo "No live catalogue audit changes"
             exit 0
           fi
-          git commit -m "chore: audit live character image catalog [skip ci]"
+          git commit -m "chore: audit live character image catalog after cleanup [skip ci]"
           git push origin HEAD:main
