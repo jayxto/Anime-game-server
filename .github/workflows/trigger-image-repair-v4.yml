@@ -1,0 +1,21 @@
+name: Trigger full character image repair
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/trigger-image-repair-v4.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Launch AniList and wiki image repair
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run auto-fix-character-images-v3.yml --repo "$GITHUB_REPOSITORY"
