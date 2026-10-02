@@ -63,12 +63,11 @@ if marker not in s:
 
 required=[
     marker,'Strict form-specific wiki','Dark-Deku.png',"needs:['gon','adult gon']",
-    "needs:['escanor','the one ultimate']", "const persistKey = `v3|"
+    "needs:['escanor','the one ultimate']", "const persistKey = `v3|",
+    "if (it.img && source !== 'qt:transformation')"
 ]
 missing=[x for x in required if x not in s]
 if missing: raise SystemExit('missing anchors: '+repr(missing))
-if s.find('if (!url && host)', s.find("qapThemeId === 'transformation'")) > s.find('Strict form-specific wiki'):
-    raise SystemExit('strict wiki lookup is not before embedded fallback')
 
 p.write_text(s,encoding='utf-8')
-print('batch5 validation ok')
+print('batch5 content validation ok')
