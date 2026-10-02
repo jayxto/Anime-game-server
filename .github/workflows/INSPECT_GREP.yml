@@ -1,0 +1,27 @@
+name: Grep exact persistence QAP
+on:
+  push:
+    branches: [fix-persist-qap-fast]
+jobs:
+  grep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Exact grep and context
+        shell: bash
+        run: |
+          set -e
+          echo '=== SERVER HITS ==='
+          grep -n -m 30 -E "api/admin/character-image|resolveCharacterImage|CREATE TABLE IF NOT EXISTS character_images|AG_CANONICAL|character_images" server.js || true
+          echo '=== SERVER CONTEXT ==='
+          grep -n -m 12 -E "api/admin/character-image|resolveCharacterImage|CREATE TABLE IF NOT EXISTS character_images|AG_CANONICAL" server.js | cut -d: -f1 | while read n; do a=$((n-18)); [ $a -lt 1 ] && a=1; b=$((n+28)); echo "--- server $a-$b ---"; sed -n "${a},${b}p" server.js; done
+          echo '=== INDEX HITS ==='
+          grep -n -m 80 -Ei "Qui a le plus|api/admin/character-image|qap[-_A-Za-z]*|quiALePlus" index.html || true
+          echo '=== INDEX CONTEXT ==='
+          grep -n -m 20 -Ei "Qui a le plus|api/admin/character-image" index.html | cut -d: -f1 | while read n; do a=$((n-22)); [ $a -lt 1 ] && a=1; b=$((n+35)); echo "--- index $a-$b ---"; sed -n "${a},${b}p" index.html; done
