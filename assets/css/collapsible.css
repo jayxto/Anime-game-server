@@ -1,9 +1,0 @@
-#options .opt-collapse-head,#admin .opt-collapse-head{display:flex;align-items:center;gap:10px;cursor:default;}
-    #options .opt-collapse-head .opt-collapse-btn,#admin .opt-collapse-head .opt-collapse-btn{
-        margin-left:auto;flex:0 0 auto;width:34px;height:30px;border-radius:8px;border:1px solid #41415b;
-        background:#171724;color:var(--accent-cyan);font-size:1rem;font-weight:1000;cursor:pointer;line-height:1;
-    }
-    #options .opt-collapse-head .opt-collapse-btn:hover,#admin .opt-collapse-head .opt-collapse-btn:hover{border-color:var(--accent-cyan);background:#202034;}
-    #options .opt-collapse-body,#admin .opt-collapse-body{display:block;}
-    #options .opt-collapsed>.opt-collapse-body,#admin .opt-collapsed>.opt-collapse-body{display:none!important;}
-    #options .opt-collapsed>.opt-collapse-head,#admin .opt-collapsed>.opt-collapse-head{margin-bottom:0!important;}

@@ -16,13 +16,7 @@
     <meta name="twitter:title" content="Anime Game – Quiz et jeux anime multijoueur gratuits">
     <meta name="twitter:description" content="Blind test, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux anime entre potes. Gratuit.">
     <!--SEO-->
-    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
-    <link rel="icon" href="/favicon.ico" sizes="48x48">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Anime Game","alternateName":["AnimeGame","Anime Game – Quiz anime"],"url":"https://anime-game-server.onrender.com/"}</script>
-    <link rel="apple-touch-icon" href="/icon-192.png">
-    <link rel="manifest" href="/manifest.webmanifest">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Anime Game","inLanguage":"fr","description":"Quiz et jeux anime multijoueur gratuits dans le navigateur : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux.","genre":["Quiz","Party game","Anime"],"playMode":["MultiPlayer","SinglePlayer"],"gamePlatform":"Navigateur web","applicationCategory":"Game","operatingSystem":"Tous","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -1774,7 +1768,1077 @@
         .col-pct{font-family:'Bangers',cursive;font-size:2rem;color:#00ff88;}
         @media (max-width:760px){.col-wrap{grid-template-columns:1fr;}.col-big{grid-template-columns:1fr;}.col-zones{grid-template-columns:repeat(6,1fr);}.col-zone{font-size:.6rem;}}
     </style>
-    <link rel="stylesheet" href="/assets/css/ui-refactor.css?v=20261001c">
+    <style id="ag-ui-refactor-inline">
+/* =====================================================================
+   UI REFACTOR V2 — accueil plus large, cartes unifiées, catalogue compact
+   ===================================================================== */
+
+/* La page Jouer n'est plus enfermée dans une colonne de 600 px sur PC. */
+#mode #menu-selection{
+    width:min(1480px,calc(100vw - 40px));
+    max-width:1480px!important;
+    padding:0 4px 42px;
+}
+
+/* Le bloc de recherche/join reste lisible, même sur grand écran. */
+#mode #menu-selection>.ui-join-card{
+    max-width:980px;
+    margin:0 auto 18px!important;
+}
+
+/* Barre catalogue : recherche + catégories. */
+.mode-library-tools{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:18px 0 8px;
+    position:relative;
+    z-index:7;
+}
+.mode-library-search{
+    flex:1 1 320px;
+    min-width:180px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(16,16,26,.88);
+    border-radius:12px;
+    box-shadow:0 8px 26px rgba(0,0,0,.16);
+}
+.mode-library-search span{opacity:.75}
+.mode-library-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    outline:0;
+    color:var(--text-color);
+    background:transparent;
+    font:600 .9rem Poppins,sans-serif;
+}
+.mode-library-search input::placeholder{color:var(--text-muted)}
+.mode-library-count{
+    flex:0 0 auto;
+    font-size:.78rem;
+    color:var(--text-muted);
+    white-space:nowrap;
+}
+
+/* Les catégories restent accessibles mais prennent moins de place. */
+#mode .mode-cats{
+    position:static;
+    margin:0 0 12px;
+    padding:2px 0 8px;
+    background:none;
+}
+
+/* Grille principale : 3 colonnes desktop, 2 tablette, 1 mobile. */
+#mode .mode-grid-2,
+#mode .game-library-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:12px!important;
+    align-items:stretch;
+}
+
+/* On unifie les différentes générations de cartes du site. */
+#mode .mode-grid-2>.game-mode-card,
+#mode .mode-grid-2>.quote-mode-card,
+#mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+    position:relative;
+    display:flex!important;
+    flex-direction:column;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    min-width:0;
+    min-height:178px;
+    padding:16px!important;
+    margin:0!important;
+    text-align:left!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+    border-radius:14px!important;
+    background:
+        linear-gradient(150deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        var(--panel-color)!important;
+    box-shadow:0 10px 28px rgba(0,0,0,.18);
+    overflow:hidden;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+#mode .mode-grid-2>.game-mode-card:hover,
+#mode .mode-grid-2>.quote-mode-card:hover,
+#mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info):hover{
+    transform:translateY(-2px);
+    border-color:rgba(0,240,255,.42)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.25);
+}
+#mode .mode-grid-2>*>h3,
+#mode .mode-grid-2>*>div>h3{
+    margin:0 0 7px!important;
+    line-height:1.15;
+    color:var(--accent-yellow)!important;
+    font-size:1.02rem;
+}
+#mode .mode-grid-2>*>p,
+#mode .mode-grid-2>*>div>p{
+    line-height:1.42;
+    color:color-mix(in srgb,var(--text-color) 86%,var(--text-muted));
+}
+#mode .mode-grid-2>* .btn-action{
+    margin-top:auto!important;
+    min-height:38px;
+    border-radius:9px;
+}
+#mode .mode-grid-2>* .quote-new{font-size:.58rem}
+
+/* Mini-jeux = une section du catalogue, pas une énorme carte perdue au milieu. */
+#mode .mode-grid-2>.arc-menu{
+    grid-column:1/-1;
+    margin:0!important;
+    padding:16px!important;
+    border:1px solid rgba(0,240,255,.24)!important;
+    border-radius:16px!important;
+    background:linear-gradient(145deg,rgba(0,240,255,.06),rgba(255,42,95,.035)),var(--panel-color)!important;
+    text-align:left;
+}
+.arc-menu-refactor-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+}
+.arc-menu-refactor-head>div{min-width:0}
+.arc-menu-refactor-head h3{margin:0 0 4px!important}
+.arc-menu-refactor-toggle{
+    flex:0 0 auto;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.06);
+    color:var(--text-color);
+    border-radius:9px;
+    padding:7px 10px;
+    cursor:pointer;
+    font-weight:800;
+}
+#mode .arc-menu-grid{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:8px!important;
+    margin-top:10px!important;
+}
+#mode .arc-game-btn{
+    min-height:112px;
+    padding:11px 10px!important;
+    border-radius:11px!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    background:rgba(255,255,255,.035)!important;
+    text-align:left;
+}
+#mode .arc-game-btn:hover{background:rgba(0,240,255,.085)!important;border-color:rgba(0,240,255,.38)!important}
+#mode .arc-game-btn .arc-ico{font-size:1.35rem}
+#mode .arc-game-btn b{font-size:.82rem;line-height:1.15}
+#mode .arc-game-btn span:last-child{font-size:.68rem;line-height:1.3;color:var(--text-muted)}
+#mode .arc-menu.arc-compact .arc-game-btn:nth-child(n+11){display:none!important}
+#mode .arc-menu.arc-compact.arc-stream-view .arc-game-btn.mc-hidden{display:none!important}
+
+/* Le panneau streamer reste pleine largeur. */
+#mode .mode-grid-2>.mc-stream-info{grid-column:1/-1;margin:0!important}
+
+/* Recherche : les éléments non correspondants disparaissent sans casser les filtres existants. */
+.mode-search-hidden{display:none!important}
+
+/* Daily/quest/ranked : un peu plus larges mais pas étirés sur 1400 px. */
+#mode #ranked-card-body,
+#mode #daily-card,
+#mode #quest-card,
+#mode #theme-card{max-width:1100px;margin-left:auto;margin-right:auto}
+
+/* Admin / Options : titres repliables plus faciles à viser. */
+#admin .opt-collapse-head,
+#options .opt-collapse-head{
+    min-height:42px;
+    border-radius:8px;
+}
+#admin .opt-collapse-toggle,
+#options .opt-collapse-toggle{
+    min-width:38px;
+    min-height:34px;
+}
+
+/* Mobile : pas de largeur forcée, boutons confortables. */
+@media (max-width:1180px){
+    #mode .mode-grid-2,#mode .game-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    #mode .arc-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media (max-width:760px){
+    #mode #menu-selection{width:100%;max-width:none!important;padding:0 10px 34px}
+    .mode-library-tools{align-items:stretch;flex-direction:column}
+    .mode-library-search{flex-basis:auto;width:100%}
+    .mode-library-count{align-self:flex-end}
+    #mode .mode-grid-2,#mode .game-library-grid{grid-template-columns:1fr!important;gap:10px!important}
+    #mode .mode-grid-2>.game-mode-card,
+    #mode .mode-grid-2>.quote-mode-card,
+    #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){min-height:0;padding:14px!important}
+    #mode .arc-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    #mode .arc-game-btn{min-height:102px}
+    .arc-menu-refactor-head{align-items:center}
+}
+@media (max-width:390px){
+    #mode .arc-menu-grid{grid-template-columns:1fr 1fr!important}
+    #mode .arc-game-btn span:last-child{display:none}
+    #mode .arc-game-btn{min-height:78px}
+}
+
+/* Réduction des mouvements si l'utilisateur le demande. */
+@media (prefers-reduced-motion:reduce){
+    #mode .mode-grid-2>*{transition:none!important}
+}
+
+/* =====================================================================
+   UI REFACTOR V3 — DASHBOARD PC
+   Inspiration dashboard gaming, tout en gardant les composants ANIME GAME.
+   Mobile volontairement inchangé : ces règles ne s'activent qu'en desktop.
+   ===================================================================== */
+
+/* Éléments V3 injectés par JS : invisibles sur mobile/tablette. */
+.ag-desktop-shell,
+#ag-home-hero,
+#ag-quick-actions,
+#ag-dashboard-right,
+#ag-games-heading { display:none; }
+
+@media (min-width:1181px){
+    :root{
+        --ag-shell-top:74px;
+        --ag-shell-left:196px;
+        --ag-shell-right:292px;
+        --ag-shell-gap:16px;
+        --ag-shell-border:rgba(130,170,255,.17);
+        --ag-shell-panel:rgba(12,18,32,.88);
+        --ag-shell-panel-2:rgba(17,24,42,.86);
+    }
+
+    body.ag-dashboard-on{
+        background:
+            radial-gradient(circle at 45% -10%,rgba(0,126,255,.16),transparent 33%),
+            radial-gradient(circle at 80% 15%,rgba(141,49,255,.09),transparent 28%),
+            #070b13;
+        background-attachment:fixed;
+    }
+
+    /* Ancien header remplacé sur les écrans hors partie. */
+    #app-root.ag-dashboard-shell-on > header{display:none!important}
+
+    .ag-desktop-shell{
+        display:block;
+        position:fixed;
+        inset:0;
+        z-index:9200;
+        pointer-events:none;
+        font-family:'Poppins',sans-serif;
+    }
+    .ag-desktop-shell *{box-sizing:border-box}
+
+    .ag-dash-top{
+        pointer-events:auto;
+        position:absolute;
+        inset:0 0 auto 0;
+        height:var(--ag-shell-top);
+        display:grid;
+        grid-template-columns:var(--ag-shell-left) minmax(280px,560px) 1fr auto;
+        align-items:center;
+        gap:18px;
+        padding:0 22px;
+        background:rgba(7,12,23,.94);
+        border-bottom:1px solid var(--ag-shell-border);
+        box-shadow:0 8px 30px rgba(0,0,0,.28);
+        backdrop-filter:blur(18px);
+    }
+    .ag-dash-brand{
+        display:flex;align-items:center;gap:11px;min-width:0;
+        cursor:pointer;
+        border:0;background:none;color:#fff;text-align:left;
+    }
+    .ag-dash-brand-mark{
+        width:38px;height:38px;border-radius:11px;
+        display:grid;place-items:center;
+        border:1px solid rgba(0,240,255,.58);
+        background:linear-gradient(145deg,rgba(0,240,255,.15),rgba(77,105,255,.08));
+        color:var(--accent-cyan);font-family:'Bangers';font-size:1.05rem;
+        box-shadow:inset 0 0 16px rgba(0,240,255,.08),0 0 18px rgba(0,240,255,.06);
+    }
+    .ag-dash-brand-copy{min-width:0}
+    .ag-dash-brand-copy b{
+        display:block;font-family:'Bangers',cursive;font-size:1.48rem;line-height:1;
+        letter-spacing:1.1px;color:#ddebff;text-shadow:2px 2px 0 rgba(30,109,255,.35);
+        white-space:nowrap;
+    }
+    .ag-dash-brand-copy small{display:block;margin-top:3px;color:#7392c4;font-size:.56rem;letter-spacing:.14em}
+
+    .ag-dash-search{
+        height:42px;display:flex;align-items:center;gap:9px;
+        padding:0 12px;border-radius:12px;
+        background:rgba(14,21,38,.9);border:1px solid rgba(124,163,230,.18);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .ag-dash-search:focus-within{border-color:rgba(0,240,255,.48);box-shadow:0 0 0 3px rgba(0,240,255,.06)}
+    .ag-dash-search span{font-size:.98rem;opacity:.72}
+    .ag-dash-search input{
+        flex:1;min-width:0;border:0;outline:0;background:transparent;color:#f5f8ff;
+        font:600 .8rem Poppins,sans-serif;
+    }
+    .ag-dash-search input::placeholder{color:#71809b}
+    .ag-dash-search button{
+        display:none;border:0;background:transparent;color:#8ea0bf;cursor:pointer;font-weight:900;font-size:1rem;
+    }
+    .ag-dash-search.has-value button{display:block}
+
+    .ag-dash-top-spacer{min-width:10px}
+    .ag-dash-account{display:flex;align-items:center;justify-content:flex-end;gap:9px;pointer-events:auto}
+    .ag-dash-pill,.ag-dash-icon-btn{
+        height:40px;border:1px solid rgba(124,163,230,.16);background:rgba(14,21,38,.92);
+        color:#f3f6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:7px;
+        padding:0 12px;font:800 .76rem Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-dash-pill:hover,.ag-dash-icon-btn:hover{border-color:rgba(0,240,255,.42);background:rgba(20,31,54,.96)}
+    .ag-dash-icon-btn{width:40px;padding:0;font-size:1rem}
+    .ag-dash-coins{color:#ffd451;white-space:nowrap}
+    .ag-dash-profile{
+        min-width:146px;max-width:210px;height:48px;padding:4px 9px 4px 5px;
+        border:1px solid rgba(124,163,230,.16);border-radius:14px;background:rgba(14,21,38,.92);
+        display:flex;align-items:center;gap:8px;cursor:pointer;color:#fff;
+    }
+    .ag-dash-profile:hover{border-color:rgba(0,240,255,.42)}
+    .ag-dash-avatar{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto}
+    .ag-dash-avatar .av{width:36px;height:36px;font-size:.95rem}
+    .ag-dash-avatar .av img{width:100%;height:100%;object-fit:cover}
+    .ag-dash-profile-copy{min-width:0;text-align:left}
+    .ag-dash-profile-copy b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.76rem}
+    .ag-dash-profile-copy small{display:block;color:#7890b7;font-size:.61rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+
+    /* Navigation gauche fixe. */
+    .ag-dash-sidebar{
+        pointer-events:auto;position:absolute;left:0;top:var(--ag-shell-top);bottom:0;width:var(--ag-shell-left);
+        padding:18px 10px 14px;background:rgba(8,13,24,.91);border-right:1px solid var(--ag-shell-border);
+        display:flex;flex-direction:column;overflow:auto;backdrop-filter:blur(16px);
+    }
+    .ag-dash-nav{display:flex;flex-direction:column;gap:4px}
+    .ag-dash-nav-btn{
+        width:100%;height:43px;display:flex;align-items:center;gap:11px;padding:0 12px;
+        border:1px solid transparent;background:transparent;color:#b8c6dc;border-radius:10px;
+        font:700 .76rem Poppins,sans-serif;cursor:pointer;text-align:left;transition:.14s ease;
+    }
+    .ag-dash-nav-btn .ico{width:22px;text-align:center;font-size:1rem;opacity:.92}
+    .ag-dash-nav-btn:hover{background:rgba(255,255,255,.045);color:#fff}
+    .ag-dash-nav-btn.on{
+        color:#cfefff;border-color:rgba(0,160,255,.27);
+        background:linear-gradient(90deg,rgba(0,149,255,.23),rgba(37,91,202,.13));
+        box-shadow:inset 3px 0 0 #4cc9ff,0 8px 24px rgba(0,77,180,.08);
+    }
+    .ag-dash-nav-sep{height:1px;background:rgba(124,163,230,.11);margin:9px 7px}
+    .ag-dash-event{
+        margin-top:auto;padding:12px;border-radius:12px;border:1px solid rgba(255,217,84,.22);
+        background:linear-gradient(145deg,rgba(78,36,8,.62),rgba(22,16,31,.92));cursor:pointer;
+    }
+    .ag-dash-event small{display:block;color:#ffd45b;font-size:.57rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .ag-dash-event b{display:block;color:#fff;font-size:.75rem;margin:5px 0 2px;line-height:1.25}
+    .ag-dash-event span{display:block;color:#9baccc;font-size:.61rem;line-height:1.35}
+
+    /* Décalage de toutes les pages quand le shell est actif. */
+    #app-root.ag-dashboard-shell-on > .tab-content{
+        width:calc(100% - var(--ag-shell-left));
+        margin-left:var(--ag-shell-left);
+        padding:calc(var(--ag-shell-top) + 18px) 22px 44px!important;
+    }
+    #app-root.ag-dashboard-shell-on > #mode{padding-left:16px!important;padding-right:16px!important}
+
+    /* Accueil : 1 colonne centrale + colonne droite. */
+    #app-root.ag-dashboard-shell-on #mode #menu-selection{
+        width:100%;max-width:none!important;margin:0!important;padding:0 0 44px!important;
+        display:grid!important;
+        grid-template-columns:minmax(0,1fr) var(--ag-shell-right);
+        column-gap:var(--ag-shell-gap);row-gap:14px;text-align:left!important;
+        align-items:start;
+    }
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > *{grid-column:1;min-width:0}
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2 + p,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > #h3-news-btn{display:none!important}
+
+    #ag-home-hero{
+        display:flex;order:-20;min-height:188px;position:relative;overflow:hidden;
+        align-items:center;justify-content:space-between;gap:24px;padding:25px 30px!important;
+        border-radius:17px;border:1px solid rgba(73,139,255,.28);
+        background:
+            radial-gradient(circle at 77% 38%,rgba(255,42,95,.29),transparent 22%),
+            radial-gradient(circle at 58% 0%,rgba(129,52,255,.36),transparent 34%),
+            linear-gradient(115deg,#09172e 0%,#122b63 48%,#151032 100%);
+        box-shadow:0 18px 42px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.045);
+    }
+    #ag-home-hero:before,#ag-home-hero:after{content:"";position:absolute;border-radius:50%;filter:blur(1px);pointer-events:none}
+    #ag-home-hero:before{width:280px;height:280px;right:-65px;top:-95px;border:52px solid rgba(0,240,255,.055)}
+    #ag-home-hero:after{width:180px;height:180px;right:140px;bottom:-140px;background:rgba(255,42,95,.1);box-shadow:0 0 65px rgba(255,42,95,.17)}
+    .ag-hero-copy{position:relative;z-index:2;max-width:660px}
+    .ag-hero-kicker{font-size:.63rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#73dfff;margin-bottom:8px}
+    .ag-hero-title{font-family:'Bangers',cursive;font-size:clamp(2.7rem,4.4vw,4.5rem);line-height:.88;letter-spacing:2px;color:#f7fbff;text-shadow:3px 3px 0 #176dff,0 0 25px rgba(46,146,255,.25)}
+    .ag-hero-sub{color:#c5d5ef!important;margin:11px 0 17px!important;font-size:.77rem!important;font-weight:700;letter-spacing:.08em}
+    .ag-hero-btn{
+        width:auto!important;min-width:220px!important;margin:0!important;padding:11px 20px!important;border-radius:999px!important;
+        background:linear-gradient(90deg,#317bff,#8e3dff,#e338c9)!important;border:1px solid rgba(255,255,255,.4)!important;
+        box-shadow:0 0 0 4px rgba(97,66,255,.11),0 8px 28px rgba(83,48,255,.28)!important;
+        font-size:.82rem!important;letter-spacing:.04em;
+    }
+    .ag-hero-side{
+        position:relative;z-index:2;align-self:stretch;width:230px;min-width:190px;
+        display:flex;align-items:center;justify-content:center;
+    }
+    .ag-hero-orb{
+        width:160px;height:160px;border-radius:50%;display:grid;place-items:center;
+        background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(0,240,255,.08) 26%,rgba(50,46,255,.16) 48%,rgba(6,9,20,.25) 70%);
+        border:1px solid rgba(117,190,255,.22);box-shadow:0 0 55px rgba(64,100,255,.2),inset 0 0 30px rgba(0,240,255,.08);
+        font-family:'Bangers';font-size:3rem;color:#bdefff;text-shadow:0 0 20px rgba(0,240,255,.5);
+        transform:rotate(-6deg);
+    }
+
+    #ag-quick-actions{
+        display:grid;order:-19;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+    }
+    .ag-quick-btn{
+        min-height:70px;border-radius:12px;border:1px solid rgba(124,163,230,.17);
+        background:linear-gradient(145deg,rgba(17,27,48,.94),rgba(10,16,30,.94));color:#fff;
+        display:flex;align-items:center;gap:10px;padding:12px 13px;cursor:pointer;text-align:left;
+        box-shadow:0 7px 22px rgba(0,0,0,.14);transition:.14s ease;
+    }
+    .ag-quick-btn:hover{transform:translateY(-1px);border-color:rgba(0,240,255,.35);background:linear-gradient(145deg,rgba(23,37,65,.98),rgba(10,19,37,.98))}
+    .ag-quick-btn .qi{font-size:1.35rem;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,.055)}
+    .ag-quick-btn b{display:block;font-size:.73rem;line-height:1.2}
+    .ag-quick-btn small{display:block;color:#7e91b1;font-size:.58rem;margin-top:3px;line-height:1.25}
+    .ag-quick-btn.purple{border-color:rgba(172,81,255,.33)}
+    .ag-quick-btn.blue{border-color:rgba(55,174,255,.31)}
+    .ag-quick-btn.green{border-color:rgba(0,255,136,.27)}
+    .ag-quick-btn.gold{border-color:rgba(255,194,58,.31)}
+
+    #ag-games-heading{
+        display:flex;order:-8;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;
+    }
+    #ag-games-heading h3{margin:0!important;color:#f3f7ff!important;font-size:1rem!important}
+    #ag-games-heading span{color:#6f86aa;font-size:.65rem}
+
+    /* Ordre du contenu : l'essentiel avant les gros panneaux communautaires. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{order:-18;max-width:none!important;margin:0!important;padding:14px 16px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-library-tools{order:-7;margin:0!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{order:-6;margin:0!important;padding:0 0 4px!important}
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{order:-5}
+    #app-root.ag-dashboard-shell-on #mode #hub-home{order:10}
+    #app-root.ag-dashboard-shell-on #mode .rk-card{order:11}
+    #app-root.ag-dashboard-shell-on #mode #daily-card{order:12}
+    #app-root.ag-dashboard-shell-on #mode #theme-card{order:13}
+    #app-root.ag-dashboard-shell-on #mode #quest-card{order:14}
+
+    /* Le join devient une barre compacte au lieu d'un gros bloc. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{
+        display:grid!important;grid-template-columns:auto minmax(280px,1fr) auto;align-items:center;gap:12px;
+        border:1px solid rgba(124,163,230,.14)!important;border-radius:12px!important;
+        background:rgba(11,18,32,.82)!important;box-shadow:none!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > h3{margin:0!important;font-size:.8rem!important;white-space:nowrap;color:#cce8ff!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box{margin:0!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms{margin:0!important;width:auto!important;white-space:nowrap;padding:10px 13px!important;background:rgba(255,204,69,.12)!important;color:#ffd76d!important;border:1px solid rgba(255,204,69,.26)!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .public-rooms-panel{grid-column:1/-1}
+
+    /* Catalogue plus proche de la maquette : cartes compactes mais toujours celles du site. */
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+        min-height:154px;padding:14px!important;border-radius:12px!important;
+        border:1px solid rgba(108,144,207,.16)!important;
+        background:linear-gradient(145deg,rgba(17,25,44,.96),rgba(10,16,30,.96))!important;
+        box-shadow:0 8px 24px rgba(0,0,0,.14);
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>h3,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>h3{font-size:.88rem!important;color:#f3f7ff!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>p,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>p{font-size:.68rem!important;color:#8295b5!important;line-height:1.38!important;margin-bottom:10px!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .btn-action{min-height:34px!important;padding:8px 10px!important;font-size:.68rem!important;border-radius:8px!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.arc-menu{
+        grid-column:1/-1;padding:15px!important;border-radius:14px!important;
+        background:linear-gradient(145deg,rgba(8,31,54,.86),rgba(22,14,42,.9))!important;
+        border-color:rgba(0,180,255,.22)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .arc-menu-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn{min-height:92px!important;padding:10px!important;border-radius:10px!important;background:rgba(8,14,27,.6)!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn b{font-size:.74rem!important;color:#eef6ff}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn span:last-child{font-size:.59rem!important;color:#7185a7!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn .arc-ico{font-size:1.15rem!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{display:flex!important;gap:7px;overflow:auto;scrollbar-width:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button{
+        flex:0 0 auto;border-radius:9px!important;background:rgba(12,19,34,.86)!important;border:1px solid rgba(124,163,230,.15)!important;
+        color:#91a5c6!important;padding:8px 11px!important;font-size:.66rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button.on{color:#dff7ff!important;background:rgba(0,144,255,.18)!important;border-color:rgba(0,189,255,.35)!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-library-search{background:rgba(11,18,32,.84)!important;border-color:rgba(124,163,230,.14)!important;height:40px}
+
+    /* Colonne droite : vraie donnée des amis + quêtes existantes. */
+    #ag-dashboard-right{
+        display:flex!important;grid-column:2!important;grid-row:1 / span 80;order:-30;
+        position:sticky;top:calc(var(--ag-shell-top) + 18px);align-self:start;
+        flex-direction:column;gap:12px;max-height:calc(100vh - var(--ag-shell-top) - 32px);overflow:auto;padding-right:2px;
+        scrollbar-width:thin;scrollbar-color:#263a5f transparent;
+    }
+    .ag-right-card{
+        border:1px solid rgba(124,163,230,.16);border-radius:13px;background:rgba(10,17,31,.89);
+        padding:12px;box-shadow:0 10px 26px rgba(0,0,0,.15);backdrop-filter:blur(10px);
+    }
+    .ag-right-head{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:9px}
+    .ag-right-head b{font-size:.72rem;color:#f2f6ff}
+    .ag-right-head button{border:0;background:none;color:#4cc9ff;font:800 .6rem Poppins;cursor:pointer;padding:2px}
+    .ag-right-muted{color:#7185a7;font-size:.62rem;line-height:1.4;margin:5px 0}
+    .ag-friend-list{display:flex;flex-direction:column;gap:5px}
+    .ag-friend-row{display:flex;align-items:center;gap:8px;padding:6px;border-radius:9px;background:rgba(255,255,255,.018);cursor:pointer}
+    .ag-friend-row:hover{background:rgba(255,255,255,.045)}
+    .ag-friend-row .av{width:32px;height:32px;font-size:.72rem;flex:0 0 auto}
+    .ag-friend-copy{min-width:0;flex:1}
+    .ag-friend-copy b{display:block;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#eef4ff}
+    .ag-friend-copy small{display:block;font-size:.55rem;color:#7387a9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+    .ag-online-dot{width:7px;height:7px;border-radius:50%;background:#20e783;box-shadow:0 0 8px rgba(32,231,131,.5);flex:0 0 auto}
+    .ag-empty-action{width:100%;margin-top:6px;border:1px solid rgba(0,195,255,.22);background:rgba(0,150,255,.08);color:#7fe2ff;border-radius:8px;padding:7px;font:800 .61rem Poppins;cursor:pointer}
+
+    #ag-dash-quests .quest-row{padding:6px 0!important;margin:0!important;border-bottom:1px solid rgba(124,163,230,.07)}
+    #ag-dash-quests .quest-row:last-child{border-bottom:0}
+    #ag-dash-quests .qt{font-size:.6rem!important}
+    #ag-dash-quests .qx{font-size:.53rem!important;white-space:nowrap}
+    #ag-dash-quests .qbar{height:5px!important;margin-top:4px!important}
+    #ag-dash-quests > .tl-hint{font-size:.56rem!important;margin:5px 0!important;text-align:left!important}
+
+    .ag-daily-mini{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+    .ag-daily-mini button{
+        border:1px solid rgba(124,163,230,.14);background:rgba(255,255,255,.025);color:#dbe6f7;border-radius:9px;
+        padding:8px 4px;font:800 .55rem Poppins;cursor:pointer;line-height:1.25;
+    }
+    .ag-daily-mini button:hover{border-color:rgba(0,240,255,.35);background:rgba(0,240,255,.05)}
+
+    /* Les doublons des quêtes/daily restent plus bas pour conserver leur logique,
+       mais sont cachés sur l'accueil desktop car ils sont reflétés à droite. */
+    #app-root.ag-dashboard-shell-on #mode #quest-card,
+    #app-root.ag-dashboard-shell-on #mode #daily-card{display:none!important}
+
+    /* Hub/boss : conservé, mais plus discret sous les jeux. */
+    #app-root.ag-dashboard-shell-on #mode #hub-home{margin-top:8px}
+    #app-root.ag-dashboard-shell-on #mode #hub-home .hub-card{border-radius:12px!important}
+
+    /* Pages Collection / Amis / Options : le contenu historique reste intact,
+       simplement placé dans le nouveau cadre desktop. */
+    #app-root.ag-dashboard-shell-on #collection,
+    #app-root.ag-dashboard-shell-on #amis,
+    #app-root.ag-dashboard-shell-on #options,
+    #app-root.ag-dashboard-shell-on #admin,
+    #app-root.ag-dashboard-shell-on #beta{max-width:1500px;margin-left:var(--ag-shell-left)!important}
+    #app-root.ag-dashboard-shell-on #collection > div,
+    #app-root.ag-dashboard-shell-on #amis > div{max-width:1200px!important}
+
+    /* Le lecteur reste accessible sans masquer totalement la colonne droite. */
+    body.ag-dashboard-on #music-player{max-width:310px}
+}
+
+
+/* =====================================================================
+   UI REFACTOR V4 — MOBILE DASHBOARD
+   Même langage visuel que le PC, mais pensé pour le pouce : top bar compacte,
+   bottom-nav fixe, menu complet en tiroir et catalogue en 2 colonnes.
+   ===================================================================== */
+.ag-mobile-menu-toggle,.ag-mobile-bottom,.ag-mobile-backdrop{display:none}
+
+@media (max-width:1180px){
+    :root{
+        --ag-mobile-top:62px;
+        --ag-mobile-bottom:72px;
+        --ag-mobile-pad:10px;
+        --ag-mobile-border:rgba(123,165,232,.16);
+        --ag-mobile-panel:rgba(10,17,31,.92);
+    }
+
+    html{scroll-padding-top:calc(var(--ag-mobile-top) + 10px)}
+    body.ag-dashboard-on{
+        background:
+            radial-gradient(circle at 12% 2%,rgba(0,149,255,.15),transparent 27%),
+            radial-gradient(circle at 88% 13%,rgba(148,63,255,.10),transparent 24%),
+            #070b13!important;
+        background-attachment:fixed!important;
+        overflow-x:hidden;
+    }
+    body.ag-mobile-menu-open{overflow:hidden}
+
+    #app-root.ag-dashboard-shell-on > header{display:none!important}
+
+    .ag-desktop-shell{
+        display:block!important;
+        position:fixed;
+        inset:0;
+        z-index:9200;
+        pointer-events:none;
+        font-family:'Poppins',sans-serif;
+    }
+    .ag-desktop-shell *{box-sizing:border-box}
+
+    /* ===== Top bar ===== */
+    .ag-dash-top{
+        pointer-events:auto;
+        position:absolute;
+        top:0;left:0;right:0;
+        height:calc(var(--ag-mobile-top) + env(safe-area-inset-top,0px));
+        padding:env(safe-area-inset-top,0px) 9px 0;
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        align-items:center;
+        gap:8px;
+        background:rgba(6,11,21,.94);
+        border-bottom:1px solid var(--ag-mobile-border);
+        box-shadow:0 8px 28px rgba(0,0,0,.30);
+        backdrop-filter:blur(18px);
+        -webkit-backdrop-filter:blur(18px);
+    }
+    .ag-dash-brand{
+        width:38px;height:38px;padding:0;margin:0;
+        display:grid;place-items:center;border:0;background:none;color:#fff;cursor:pointer;
+    }
+    .ag-dash-brand-mark{
+        width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+        border:1px solid rgba(0,211,255,.48);
+        background:linear-gradient(145deg,rgba(0,183,255,.17),rgba(79,65,255,.10));
+        color:#8beaff;font-family:'Bangers',cursive;font-size:.95rem;
+        box-shadow:inset 0 0 15px rgba(0,240,255,.06),0 0 18px rgba(0,134,255,.08);
+    }
+    .ag-dash-brand-copy,.ag-dash-top-spacer{display:none!important}
+
+    .ag-dash-search{
+        min-width:0;height:38px;padding:0 10px;display:flex;align-items:center;gap:7px;
+        border-radius:11px;background:rgba(14,22,39,.93);border:1px solid rgba(125,165,229,.18);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .ag-dash-search:focus-within{border-color:rgba(0,218,255,.46);box-shadow:0 0 0 3px rgba(0,214,255,.055)}
+    .ag-dash-search span{font-size:.9rem;opacity:.74;flex:0 0 auto}
+    .ag-dash-search input{
+        min-width:0;width:100%;border:0;outline:0;background:transparent;color:#f4f8ff;
+        font:600 .72rem Poppins,sans-serif;
+    }
+    .ag-dash-search input::placeholder{color:#70809c}
+    .ag-dash-search button{border:0;background:transparent;color:#8fa2bf;font-weight:900;padding:0 1px;display:none}
+    .ag-dash-search.has-value button{display:block}
+
+    .ag-dash-account{display:flex;align-items:center;gap:5px;pointer-events:auto}
+    .ag-dash-pill,.ag-dash-icon-btn,.ag-mobile-menu-toggle{
+        height:38px;border:1px solid rgba(125,165,229,.16);background:rgba(14,22,39,.93);
+        color:#eef6ff;border-radius:11px;display:flex;align-items:center;justify-content:center;
+        font:800 .66rem Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-dash-pill{padding:0 8px;gap:4px}
+    .ag-dash-coins{color:#ffd45e;min-width:58px}
+    .ag-dash-icon-btn{display:none!important}
+    .ag-dash-profile{
+        width:38px;min-width:38px;height:38px;padding:0;border:1px solid rgba(125,165,229,.16);
+        border-radius:11px;background:rgba(14,22,39,.93);display:grid;place-items:center;overflow:hidden;
+    }
+    .ag-dash-avatar{width:34px;height:34px;display:grid;place-items:center}
+    .ag-dash-avatar .av{width:32px!important;height:32px!important;font-size:.78rem!important}
+    .ag-dash-profile-copy{display:none!important}
+    .ag-mobile-menu-toggle{display:flex;width:38px;padding:0;font-size:1rem;line-height:1}
+
+    /* ===== Tiroir de navigation ===== */
+    .ag-dash-sidebar{
+        pointer-events:none;
+        position:fixed;
+        left:8px;right:8px;bottom:calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 8px);
+        top:auto;width:auto;max-height:min(74vh,620px);
+        padding:12px 10px 11px;
+        border:1px solid rgba(126,170,238,.20);border-radius:18px;
+        background:linear-gradient(180deg,rgba(13,21,38,.98),rgba(7,13,25,.985));
+        box-shadow:0 -18px 48px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.035);
+        backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+        overflow:auto;
+        transform:translateY(calc(100% + 110px));
+        opacity:0;
+        transition:transform .22s ease,opacity .18s ease;
+        z-index:4;
+        display:flex;flex-direction:column;
+    }
+    body.ag-mobile-menu-open .ag-dash-sidebar{pointer-events:auto;transform:translateY(0);opacity:1}
+    .ag-dash-nav{
+        display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
+    }
+    .ag-dash-nav-btn{
+        min-width:0;height:48px;padding:0 10px;display:flex;align-items:center;gap:8px;
+        border:1px solid rgba(125,165,229,.10);border-radius:11px;background:rgba(255,255,255,.018);
+        color:#b9c8dd;font:700 .70rem Poppins,sans-serif;text-align:left;
+    }
+    .ag-dash-nav-btn .ico{width:22px;text-align:center;font-size:1rem;flex:0 0 auto}
+    .ag-dash-nav-btn.on{
+        color:#dff7ff;border-color:rgba(0,184,255,.32);
+        background:linear-gradient(135deg,rgba(0,143,255,.21),rgba(67,74,210,.12));
+        box-shadow:inset 3px 0 0 #43caff;
+    }
+    .ag-dash-nav-sep{display:none}
+    .ag-dash-event{
+        margin-top:9px;padding:10px 12px;border-radius:11px;border:1px solid rgba(255,211,72,.20);
+        background:linear-gradient(145deg,rgba(75,40,11,.58),rgba(27,18,38,.88));text-align:left;
+    }
+    .ag-dash-event small{display:block;color:#ffd65f;font-size:.52rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    .ag-dash-event b{display:block;color:#fff;font-size:.70rem;margin:4px 0 2px}
+    .ag-dash-event span{display:block;color:#9aaac5;font-size:.57rem;line-height:1.3}
+
+    .ag-mobile-backdrop{
+        display:block;pointer-events:none;position:fixed;inset:0;z-index:3;border:0;padding:0;
+        background:rgba(0,4,12,.58);opacity:0;transition:opacity .18s ease;
+        backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    }
+    body.ag-mobile-menu-open .ag-mobile-backdrop{pointer-events:auto;opacity:1}
+
+    /* ===== Bottom navigation ===== */
+    .ag-mobile-bottom{
+        pointer-events:auto;display:grid;
+        grid-template-columns:repeat(5,1fr);
+        position:fixed;left:7px;right:7px;bottom:calc(6px + env(safe-area-inset-bottom,0px));
+        height:var(--ag-mobile-bottom);padding:6px 5px;
+        border:1px solid rgba(126,170,238,.19);border-radius:18px;
+        background:rgba(8,14,27,.95);box-shadow:0 14px 40px rgba(0,0,0,.48);
+        backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:5;
+    }
+    .ag-mobile-nav-btn{
+        min-width:0;border:0;background:transparent;color:#7588a7;border-radius:12px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+        font-family:Poppins,sans-serif;cursor:pointer;
+    }
+    .ag-mobile-nav-btn span{font-size:1.12rem;line-height:1}
+    .ag-mobile-nav-btn small{font-size:.50rem;font-weight:800;line-height:1.05;white-space:nowrap}
+    .ag-mobile-nav-btn.on{color:#9aeaff;background:linear-gradient(180deg,rgba(0,163,255,.16),rgba(0,118,255,.055))}
+
+    /* ===== Cadre général des pages ===== */
+    #app-root.ag-dashboard-shell-on > .tab-content{
+        width:100%!important;margin-left:0!important;
+        padding:calc(var(--ag-mobile-top) + env(safe-area-inset-top,0px) + 10px) var(--ag-mobile-pad)
+                calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 24px)!important;
+    }
+    #app-root.ag-dashboard-shell-on > #mode{padding-left:0!important;padding-right:0!important}
+    #app-root.ag-dashboard-shell-on #collection,
+    #app-root.ag-dashboard-shell-on #amis,
+    #app-root.ag-dashboard-shell-on #options,
+    #app-root.ag-dashboard-shell-on #admin,
+    #app-root.ag-dashboard-shell-on #beta{max-width:none!important;margin-left:0!important;width:100%!important}
+
+    /* ===== Accueil mobile ===== */
+    #app-root.ag-dashboard-shell-on #mode #menu-selection{
+        width:100%!important;max-width:none!important;margin:0!important;
+        padding:0 var(--ag-mobile-pad) 20px!important;text-align:left!important;
+        display:flex!important;flex-direction:column;gap:11px;align-items:stretch;
+    }
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > h2 + p,
+    #app-root.ag-dashboard-shell-on #mode #menu-selection > #h3-news-btn{display:none!important}
+
+    #ag-home-hero{
+        display:flex!important;order:-50;min-height:158px;position:relative;overflow:hidden;
+        align-items:center;justify-content:space-between;gap:8px;padding:19px 17px!important;
+        border-radius:16px;border:1px solid rgba(65,139,255,.28);
+        background:
+            radial-gradient(circle at 88% 16%,rgba(255,45,147,.24),transparent 24%),
+            radial-gradient(circle at 61% 0%,rgba(117,51,255,.31),transparent 37%),
+            linear-gradient(123deg,#08172d 0%,#113060 54%,#17102e 100%);
+        box-shadow:0 15px 34px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    #ag-home-hero:before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-55px;top:-58px;border:34px solid rgba(0,231,255,.05)}
+    #ag-home-hero:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:52px;bottom:-82px;background:rgba(255,42,95,.11);box-shadow:0 0 42px rgba(255,42,95,.15)}
+    .ag-hero-copy{position:relative;z-index:2;min-width:0;max-width:100%}
+    .ag-hero-kicker{font-size:.48rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:#7ee8ff;margin-bottom:6px}
+    .ag-hero-title{font-family:'Bangers',cursive;font-size:2.45rem;line-height:.9;letter-spacing:1.5px;color:#f8fbff;text-shadow:2px 2px 0 #176dff,0 0 20px rgba(46,146,255,.22)}
+    .ag-hero-sub{
+        color:#b7c9e5!important;margin:8px 0 12px!important;font-size:.63rem!important;font-weight:700;line-height:1.38;
+        max-width:290px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .ag-hero-btn{
+        width:auto!important;min-width:0!important;margin:0!important;padding:9px 14px!important;border-radius:999px!important;
+        background:linear-gradient(90deg,#2d78ff,#7c41ff,#db37c8)!important;border:1px solid rgba(255,255,255,.36)!important;
+        box-shadow:0 0 0 3px rgba(97,66,255,.10),0 7px 20px rgba(83,48,255,.22)!important;
+        font-size:.66rem!important;letter-spacing:.03em;
+    }
+    .ag-hero-side{display:none!important}
+
+    #ag-quick-actions{
+        display:grid!important;order:-49;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+    }
+    .ag-quick-btn{
+        min-height:66px;border-radius:12px;border:1px solid rgba(124,163,230,.17);
+        background:linear-gradient(145deg,rgba(17,27,48,.94),rgba(10,16,30,.94));color:#fff;
+        display:flex;align-items:center;gap:8px;padding:10px 10px;cursor:pointer;text-align:left;
+        box-shadow:0 6px 18px rgba(0,0,0,.13);
+    }
+    .ag-quick-btn .qi{font-size:1.13rem;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:rgba(255,255,255,.05);flex:0 0 auto}
+    .ag-quick-btn b{display:block;font-size:.64rem;line-height:1.15}
+    .ag-quick-btn small{display:block;color:#7f91af;font-size:.50rem;margin-top:3px;line-height:1.22}
+    .ag-quick-btn.purple{border-color:rgba(172,81,255,.32)}
+    .ag-quick-btn.blue{border-color:rgba(55,174,255,.30)}
+    .ag-quick-btn.green{border-color:rgba(0,255,136,.25)}
+    .ag-quick-btn.gold{border-color:rgba(255,194,58,.29)}
+
+    /* Rejoindre : une barre compacte, pas une grosse carte. */
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card{
+        order:-48!important;max-width:none!important;margin:0!important;padding:10px!important;
+        display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;
+        border:1px solid rgba(123,165,232,.14)!important;border-radius:12px!important;
+        background:rgba(10,17,31,.88)!important;box-shadow:none!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > h3{display:none!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box{margin:0!important;display:flex!important;gap:7px}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box input{min-width:0;height:38px!important;font-size:.72rem!important}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .chat-input-box .btn-action{height:38px!important;padding:0 11px!important;font-size:.64rem!important;white-space:nowrap}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms{
+        width:auto!important;margin:0!important;height:38px!important;padding:0 9px!important;font-size:0!important;
+        background:rgba(255,204,69,.10)!important;color:#ffd76d!important;border:1px solid rgba(255,204,69,.22)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > #btn-public-rooms:after{content:"🔎";font-size:.9rem}
+    #app-root.ag-dashboard-shell-on #mode .ui-join-card > .public-rooms-panel{grid-column:1/-1;margin-top:2px!important}
+
+    /* Les widgets sociaux sont un carrousel horizontal sur mobile. */
+    #ag-dashboard-right{
+        display:flex!important;order:-47;flex-direction:row;gap:8px;width:100%;overflow-x:auto;
+        padding:1px 1px 6px;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+    }
+    #ag-dashboard-right::-webkit-scrollbar{display:none}
+    .ag-right-card{
+        flex:0 0 min(86vw,360px);scroll-snap-align:start;
+        border:1px solid rgba(124,163,230,.15);border-radius:13px;background:rgba(10,17,31,.89);
+        padding:10px;box-shadow:0 8px 22px rgba(0,0,0,.13);
+    }
+    .ag-right-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+    .ag-right-head b{font-size:.65rem;color:#f0f5ff}
+    .ag-right-head button{border:0;background:none;color:#59d2ff;font:800 .54rem Poppins;padding:2px}
+    .ag-right-muted{color:#788bab;font-size:.56rem;line-height:1.35;margin:4px 0}
+    .ag-friend-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px!important}
+    .ag-friend-row{display:flex;align-items:center;gap:6px;padding:5px;border-radius:8px;background:rgba(255,255,255,.018)}
+    .ag-friend-row:nth-child(n+5){display:none!important}
+    .ag-friend-row .av{width:27px!important;height:27px!important;font-size:.62rem!important;flex:0 0 auto}
+    .ag-friend-copy{min-width:0;flex:1}
+    .ag-friend-copy b{display:block;font-size:.57rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#edf5ff}
+    .ag-friend-copy small{display:block;font-size:.47rem;color:#7589aa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+    .ag-online-dot{width:6px;height:6px;border-radius:50%;background:#20e783;box-shadow:0 0 7px rgba(32,231,131,.5);flex:0 0 auto}
+    .ag-empty-action{width:100%;margin-top:5px;border:1px solid rgba(0,195,255,.20);background:rgba(0,150,255,.07);color:#7fe2ff;border-radius:8px;padding:7px;font:800 .55rem Poppins}
+    #ag-dash-quests .quest-row{padding:5px 0!important;margin:0!important}
+    #ag-dash-quests .qt{font-size:.55rem!important}
+    #ag-dash-quests .qx{font-size:.48rem!important}
+    #ag-dash-quests .qbar{height:5px!important;margin-top:4px!important}
+    .ag-daily-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+    .ag-daily-mini button{border:1px solid rgba(124,163,230,.13);background:rgba(255,255,255,.024);color:#dbe6f7;border-radius:8px;padding:7px 3px;font:800 .50rem Poppins;line-height:1.2}
+
+    /* Recherche catalogue doublon masquée : la recherche du header pilote déjà la vraie recherche. */
+    #app-root.ag-dashboard-shell-on #mode .mode-library-tools{display:none!important}
+
+    #ag-games-heading{
+        display:flex!important;order:-20;align-items:center;justify-content:space-between;gap:8px;margin:3px 1px 0;
+    }
+    #ag-games-heading h3{margin:0!important;color:#f3f7ff!important;font-size:.88rem!important}
+    #ag-games-heading span{font-size:.52rem;color:#6f86aa;text-align:right}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-cats{
+        order:-19;margin:0!important;padding:0 0 3px!important;display:flex!important;gap:6px;overflow-x:auto;scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button{
+        flex:0 0 auto;min-height:34px;border-radius:9px!important;background:rgba(11,19,34,.88)!important;
+        border:1px solid rgba(124,163,230,.14)!important;color:#91a5c6!important;padding:7px 9px!important;font-size:.58rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-cats button.on{color:#dff7ff!important;background:rgba(0,144,255,.17)!important;border-color:rgba(0,189,255,.32)!important}
+
+    /* Deux colonnes : plus de cartes gigantesques empilées. */
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{
+        order:-18;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){
+        min-width:0;min-height:132px;padding:10px!important;margin:0!important;border-radius:11px!important;
+        border:1px solid rgba(110,146,207,.15)!important;
+        background:linear-gradient(145deg,rgba(17,25,44,.95),rgba(9,16,29,.96))!important;
+        box-shadow:0 6px 18px rgba(0,0,0,.13);overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>h3,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>h3{
+        margin:0 0 5px!important;font-size:.70rem!important;line-height:1.15!important;color:#f1f6ff!important;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>p,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>*>div>p{
+        margin:0 0 7px!important;font-size:.54rem!important;line-height:1.35!important;color:#8093b2!important;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .btn-action{
+        min-height:31px!important;margin-top:auto!important;padding:6px 8px!important;border-radius:7px!important;font-size:.56rem!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>* .quote-new{font-size:.46rem!important}
+
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.arc-menu{
+        grid-column:1/-1;padding:11px!important;border-radius:13px!important;
+        background:linear-gradient(145deg,rgba(8,31,54,.85),rgba(22,14,42,.89))!important;
+        border:1px solid rgba(0,180,255,.20)!important;
+    }
+    .arc-menu-refactor-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+    .arc-menu-refactor-head h3{font-size:.76rem!important;margin:0 0 2px!important}
+    .arc-menu-refactor-head p{font-size:.52rem!important;margin:0!important;color:#8093b2!important}
+    .arc-menu-refactor-toggle{padding:6px 8px!important;border-radius:8px!important;font-size:.54rem!important;white-space:nowrap}
+    #app-root.ag-dashboard-shell-on #mode .arc-menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin-top:7px!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn{
+        min-height:78px!important;padding:8px!important;border-radius:9px!important;background:rgba(7,14,27,.60)!important;
+    }
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn .arc-ico{font-size:1.02rem!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn b{font-size:.60rem!important;line-height:1.15!important}
+    #app-root.ag-dashboard-shell-on #mode .arc-game-btn span:last-child{font-size:.48rem!important;line-height:1.25!important;color:#7387a8!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.mc-stream-info{grid-column:1/-1}
+
+    /* Les cartes daily/quêtes originales sont reflétées dans le carrousel du haut. */
+    #app-root.ag-dashboard-shell-on #mode #quest-card,
+    #app-root.ag-dashboard-shell-on #mode #daily-card{display:none!important}
+    #app-root.ag-dashboard-shell-on #mode #hub-home{order:5;margin-top:1px}
+    #app-root.ag-dashboard-shell-on #mode .rk-card{order:6;margin:0!important;border-radius:12px!important}
+    #app-root.ag-dashboard-shell-on #mode #theme-card{order:7}
+
+    /* Panneaux Collection/Amis/Options : respirent sans manger tout l'écran. */
+    #app-root.ag-dashboard-shell-on #collection > div,
+    #app-root.ag-dashboard-shell-on #amis > div{max-width:none!important;width:100%!important}
+    #app-root.ag-dashboard-shell-on .eco-tabs,
+    #app-root.ag-dashboard-shell-on #collection .eco-tabs{
+        overflow-x:auto!important;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;scrollbar-width:none!important;
+        -webkit-overflow-scrolling:touch;
+    }
+    #app-root.ag-dashboard-shell-on .eco-tabs::-webkit-scrollbar{display:none}
+    #app-root.ag-dashboard-shell-on .eco-tabs button{flex:0 0 auto!important;min-height:38px!important;font-size:.64rem!important}
+
+    /* Le lecteur ne doit pas recouvrir la bottom-nav. */
+    body.ag-dashboard-on #music-player{
+        max-width:calc(100vw - 20px)!important;
+        bottom:calc(var(--ag-mobile-bottom) + env(safe-area-inset-bottom,0px) + 14px)!important;
+    }
+}
+
+@media (max-width:390px){
+    :root{--ag-mobile-pad:8px}
+    .ag-dash-coins{display:none!important}
+    .ag-dash-top{grid-template-columns:auto minmax(0,1fr) auto;padding-left:7px;padding-right:7px;gap:6px}
+    .ag-hero-title{font-size:2.18rem}
+    .ag-hero-sub{font-size:.59rem!important}
+    .ag-quick-btn{padding:9px 8px;gap:6px}
+    .ag-quick-btn .qi{width:28px;height:28px;font-size:1.02rem}
+    .ag-quick-btn b{font-size:.60rem}
+    .ag-quick-btn small{font-size:.47rem}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){padding:9px!important;min-height:126px}
+    .ag-mobile-nav-btn small{font-size:.47rem}
+}
+
+@media (max-width:340px){
+    .ag-dash-profile{display:none!important}
+    .ag-hero-title{font-size:2rem}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2,
+    #app-root.ag-dashboard-shell-on #mode .game-library-grid{grid-template-columns:1fr!important}
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.game-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>.quote-mode-card,
+    #app-root.ag-dashboard-shell-on #mode .mode-grid-2>div:not(.arc-menu):not(.mc-stream-info){min-height:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .ag-dash-sidebar,.ag-mobile-backdrop{transition:none!important}
+}
+
+/* =====================================================================
+   PC GAME PAGE FIX — quand le menu principal est masqué par le jeu,
+   ne pas laisser le dashboard le forcer visible avec display:grid!important.
+   Cela restaure le comportement historique : salon / sélection / jeu = page dédiée.
+   ===================================================================== */
+@media (min-width:1181px){
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display: none"],
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display:none"]{
+        display:none!important;
+    }
+}
+
+/* =====================================================================
+   MOBILE GAME PAGE FIX — le menu dashboard ne doit jamais rester affiché
+   sous un salon / une sélection / un mini-jeu. L'inline display:none posé
+   par le code historique gagne aussi sur mobile, comme sur PC.
+   ===================================================================== */
+@media (max-width:1180px){
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display: none"],
+    #app-root.ag-dashboard-shell-on #mode #menu-selection[style*="display:none"]{
+        display:none!important;
+    }
+}
+
+/* =====================================================================
+   GAME PAGE HARD FIX — salon / sélection / partie en page dédiée.
+   La classe est pilotée par ui-refactor.js et évite tout conflit avec les
+   display:flex/grid !important du dashboard, surtout sur Safari iOS.
+   ===================================================================== */
+body.ag-game-page .ag-desktop-shell,
+#app-root.ag-game-page .ag-desktop-shell{
+    display:none!important;
+}
+body.ag-game-page #app-root #mode #menu-selection,
+#app-root.ag-game-page #mode #menu-selection{
+    display:none!important;
+}
+body.ag-game-page #app-root > #mode,
+#app-root.ag-game-page > #mode{
+    margin-left:0!important;
+    width:100%!important;
+}
+
+@media (max-width:1180px){
+    body.ag-game-page #app-root > #mode,
+    #app-root.ag-game-page > #mode{
+        padding:10px 10px calc(18px + env(safe-area-inset-bottom,0px))!important;
+    }
+    body.ag-game-page .ag-mobile-bottom,
+    body.ag-game-page .ag-mobile-backdrop,
+    body.ag-game-page .ag-dash-top,
+    body.ag-game-page .ag-dash-sidebar{
+        display:none!important;
+    }
+    body.ag-game-page #music-player{
+        bottom:10px!important;
+    }
+}
+
+/* Streamer : ne jamais masquer Plus ou moins / Survie / Chaos à cause de la limite des 10 mini-jeux */
+#mode .arc-menu.arc-stream-view .arc-game-btn:nth-child(n+11){display:grid!important}
+#mode .arc-menu.arc-stream-view .arc-game-btn.mc-hidden{display:none!important}
+
+/* ===== HOTFIX INPUT MOBILE 2026-10-01 =====
+   L'overlay du menu ne doit jamais intercepter les taps quand le tiroir est fermé. */
+@media (max-width: 899px){
+  #mode-cats,[data-mode-cat],.arc-menu-refactor-toggle,.game-mode-card button,.arc-game-btn,
+  .ag-mobile-bottom button,.ag-dash-top button,.ag-dash-top input{
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
+  .ag-mobile-backdrop{
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+  body.ag-mobile-menu-open .ag-mobile-backdrop{
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  body:not(.ag-mobile-menu-open) .ag-dash-sidebar{
+    pointer-events:none!important;
+  }
+}
+
+</style>
 </head>
 <body>
 
@@ -12909,7 +13973,7 @@
                     <p class="tl-hint" style="text-align:left;">Chaque carte que tu gagnes peut sortir avec une <b>finition</b> en plus de sa rareté (la chance x2 / x10 marche aussi). Passe la souris sur une carte, ou clique dessus pour l’inspecter en 3D.</p>
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
-                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/assets/images/external/ac8ee6dd6d539710.webp', '/assets/images/external/bb9ced46bc32e375.webp'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
+                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/api/character-image-file?u=naruto&n=Naruto%20Uzumaki', '/api/character-image-file?u=naruto&n=Sasuke%20Uchiha'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
                     <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
@@ -13223,6 +14287,1064 @@ async function loadHallOfFame(){
 })();
 </script>
 
-    <script src="/assets/js/ui-refactor.js?v=20261001c"></script>
+    <script id="ag-ui-refactor-inline">
+/* =====================================================================
+   UI REFACTOR V2 — amélioration progressive, sans changer les mécaniques.
+   ===================================================================== */
+(() => {
+    const norm = s => String(s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/\s+/g, ' ').trim();
+
+    function findGameGrid() {
+        return [...document.querySelectorAll('#menu-selection > div')]
+            .find(d => d.classList.contains('mode-grid-2') || (d.querySelector('.arc-menu') && d.children.length > 5));
+    }
+
+    function gameText(el) {
+        return norm(el?.textContent || '');
+    }
+
+    function markCards(grid) {
+        [...grid.children].forEach(el => {
+            if (el.classList.contains('arc-menu') || el.classList.contains('mc-stream-info')) return;
+            el.classList.add('game-mode-card');
+        });
+    }
+
+    function setupMiniGames(grid) {
+        const arc = grid.querySelector(':scope > .arc-menu');
+        if (!arc || arc.dataset.refactor === '1') return;
+        arc.dataset.refactor = '1';
+        arc.classList.add('arc-compact');
+
+        const title = arc.querySelector(':scope > h3');
+        const desc = title?.nextElementSibling?.tagName === 'P' ? title.nextElementSibling : null;
+        if (title) {
+            const head = document.createElement('div');
+            head.className = 'arc-menu-refactor-head';
+            const left = document.createElement('div');
+            title.parentNode.insertBefore(head, title);
+            head.appendChild(left);
+            left.appendChild(title);
+            if (desc) left.appendChild(desc);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'arc-menu-refactor-toggle';
+            const refresh = () => {
+                const compact = arc.classList.contains('arc-compact');
+                const count = arc.querySelectorAll('.arc-game-btn:not(.mc-hidden)').length;
+                btn.textContent = compact ? `Voir tous (${count}) ▾` : 'Réduire ▴';
+                btn.setAttribute('aria-expanded', compact ? 'false' : 'true');
+            };
+            btn.onclick = () => {
+                arc.classList.toggle('arc-compact');
+                try { localStorage.setItem('arcMiniExpanded', arc.classList.contains('arc-compact') ? '0' : '1'); } catch (_) {}
+                refresh();
+            };
+            head.appendChild(btn);
+            try { if (localStorage.getItem('arcMiniExpanded') === '1') arc.classList.remove('arc-compact'); } catch (_) {}
+            refresh();
+            new MutationObserver(refresh).observe(arc.querySelector('.arc-menu-grid') || arc, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        }
+    }
+
+    function setupJoinCard(menu) {
+        const direct = [...menu.children].find(el => el.querySelector?.('#join-code-input'));
+        if (direct) direct.classList.add('ui-join-card');
+    }
+
+    function setupSearch(menu, grid) {
+        if (document.getElementById('mode-library-search')) return;
+        const cats = document.getElementById('mode-cats');
+        const tools = document.createElement('div');
+        tools.className = 'mode-library-tools';
+        tools.innerHTML = `<label class="mode-library-search"><span>🔎</span><input id="mode-library-search" type="search" autocomplete="off" placeholder="Chercher un jeu…"><button type="button" class="host-btn" id="mode-library-clear" style="display:none;padding:3px 8px;">✕</button></label><span class="mode-library-count" id="mode-library-count"></span>`;
+        (cats || grid).parentNode.insertBefore(tools, cats || grid);
+
+        const input = tools.querySelector('input');
+        const clear = tools.querySelector('#mode-library-clear');
+        const count = tools.querySelector('#mode-library-count');
+
+        const apply = () => {
+            const q = norm(input.value);
+            let shown = 0;
+            [...grid.children].forEach(el => {
+                if (el.classList.contains('mc-stream-info')) return;
+                if (el.classList.contains('arc-menu')) {
+                    let miniShown = 0;
+                    el.querySelectorAll('.arc-game-btn').forEach(btn => {
+                        const yes = !q || gameText(btn).includes(q);
+                        btn.classList.toggle('mode-search-hidden', !yes);
+                        if (yes && !btn.classList.contains('mc-hidden')) miniShown++;
+                    });
+                    const yes = !q || gameText(el.querySelector(':scope > .arc-menu-refactor-head') || el).includes(q) || miniShown > 0;
+                    el.classList.toggle('mode-search-hidden', !yes);
+                    if (yes) shown++;
+                    return;
+                }
+                const yes = !q || gameText(el).includes(q);
+                el.classList.toggle('mode-search-hidden', !yes);
+                if (yes && !el.classList.contains('mc-hidden')) shown++;
+            });
+            clear.style.display = q ? '' : 'none';
+            count.textContent = q ? `${shown} résultat${shown > 1 ? 's' : ''}` : '';
+        };
+        input.addEventListener('input', apply);
+        clear.onclick = () => { input.value = ''; apply(); input.focus(); };
+        window.addEventListener('mode-category-changed', apply);
+        new MutationObserver(apply).observe(grid, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        apply();
+    }
+
+    /* Catégories robustes : on reprend le contrôle du filtre historique afin
+       qu'il fonctionne aussi avec les modes ajoutés dynamiquement après le chargement. */
+    function setupModeCategories(grid) {
+        let bar = document.getElementById('mode-cats');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'mode-cats';
+            bar.className = 'mode-cats';
+            grid.parentNode.insertBefore(bar, grid);
+        }
+
+        const CATS = [
+            ['all', '⭐ Tout'],
+            ['stream', '🎥 Avec le chat'],
+            ['bluff', '🕵️ Bluff & Undercover'],
+            ['quiz', '🧠 Quiz & mini-jeux'],
+            ['musique', '🎵 Musique'],
+            ['fun', '🎨 Dessin & fun'],
+            ['strat', '💰 Stratégie & tournois']
+        ];
+        const VALID = new Set(CATS.map(x => x[0]));
+        const STREAM_ARC = new Set(['attaque','emoji','quatre','mapguess','scene','link','imposteur','audio','plusmoins','survie','chaos']);
+        let current = 'all';
+        try { current = localStorage.getItem('modeCat') || 'all'; } catch (_) {}
+        if (!VALID.has(current)) current = 'all';
+
+        const directCards = () => [...grid.children].filter(c => !c.classList.contains('mc-stream-info'));
+        const titleOf = c => norm(c.querySelector('h3')?.textContent || c.textContent || '');
+
+        function categoriesFor(card) {
+            if (card.classList.contains('arc-menu')) return ['quiz','stream'];
+            const t = titleOf(card);
+            const cats = new Set();
+            const add = (...xs) => xs.forEach(x => cats.add(x));
+
+            if (/undercover/.test(t)) add('bluff');
+            if (/loup.?garou/.test(t)) add('bluff');
+            if (/devine le perso/.test(t)) add('bluff','quiz');
+            if (/devine la note|citation|chaine de persos|quiz des joueurs|animedle|rolland garos|roland garros/.test(t)) add('quiz');
+            if (/blind test|battle d.openings/.test(t)) add('musique','stream');
+            if (/tu preferes|qui a le plus|dessine le perso|tier list|jeu de connexion|party mix/.test(t)) add('fun');
+            if (/tu preferes|qui a le plus|dessine le perso/.test(t)) add('stream');
+            if (/bingo anime/.test(t)) add('quiz','fun');
+            if (/combat de cartes|tournoi|enchere/.test(t)) add('strat');
+            if (/mini.jeux/.test(t)) add('quiz','stream');
+
+            // Un mode non classé reste accessible dans Quiz plutôt que de disparaître.
+            if (!cats.size) add('quiz');
+            return [...cats];
+        }
+
+        function refreshMeta() {
+            directCards().forEach(card => {
+                card.dataset.cat = categoriesFor(card).join(' ');
+            });
+            grid.querySelectorAll('.arc-game-btn').forEach(btn => {
+                const raw = btn.getAttribute('onclick') || '';
+                const m = raw.match(/openArcadeGame\(['\"]([^'\"]+)['\"]\)/);
+                if (m) btn.dataset.stream = STREAM_ARC.has(m[1]) ? '1' : '0';
+                else if (!btn.dataset.stream) btn.dataset.stream = '0';
+            });
+        }
+
+        function count(cat) {
+            if (cat === 'all') return directCards().length;
+            return directCards().filter(c => (c.dataset.cat || '').split(/\s+/).includes(cat)).length;
+        }
+
+        function rebuildButtons() {
+            bar.innerHTML = CATS.map(([id,label]) =>
+                `<button type="button" data-mode-cat="${id}" class="${id === current ? 'on' : ''}${id === 'stream' ? ' stream' : ''}">${label}${id !== 'all' ? `<b>${count(id)}</b>` : ''}</button>`
+            ).join('');
+        }
+
+        function apply(cat, doScroll = true) {
+            if (!VALID.has(cat)) cat = 'all';
+            current = cat;
+            refreshMeta();
+            try { localStorage.setItem('modeCat', cat); } catch (_) {}
+
+            directCards().forEach(card => {
+                const cats = (card.dataset.cat || '').split(/\s+/);
+                card.classList.toggle('mc-hidden', cat !== 'all' && !cats.includes(cat));
+            });
+
+            const info = grid.querySelector(':scope > .mc-stream-info');
+            if (info) info.classList.toggle('mc-hidden', cat !== 'stream');
+
+            grid.querySelectorAll('.arc-game-btn').forEach(btn => {
+                btn.classList.toggle('mc-hidden', cat === 'stream' && btn.dataset.stream !== '1');
+            });
+
+            const arc = grid.querySelector(':scope > .arc-menu');
+            if (arc) {
+                arc.classList.toggle('arc-stream-view', cat === 'stream');
+                // En vue streamer on affiche TOUS les mini-jeux compatibles, même ceux après la 10e tuile.
+                // C'est ce qui remettait notamment « Plus ou moins » hors de la vue sur mobile.
+                if (cat === 'stream') arc.classList.remove('arc-compact');
+                else {
+                    try { if (localStorage.getItem('arcMiniExpanded') !== '1') arc.classList.add('arc-compact'); } catch (_) {}
+                }
+                const mh = arc.querySelector('h3');
+                if (mh) {
+                    mh.dataset.orig = mh.dataset.orig || mh.textContent;
+                    const wantedTitle = cat === 'stream' ? '🕹️ Mini-jeux jouables avec le chat' : mh.dataset.orig;
+                    // IMPORTANT mobile : ne pas réécrire le même textContent à chaque refresh.
+                    // Sinon le MutationObserver se relance en boucle et finit par bloquer les taps/clics sur iPhone.
+                    if (mh.textContent !== wantedTitle) mh.textContent = wantedTitle;
+                }
+            }
+
+            bar.querySelectorAll('[data-mode-cat]').forEach(b => b.classList.toggle('on', b.dataset.modeCat === cat));
+            window.dispatchEvent(new Event('mode-category-changed'));
+            if (doScroll) bar.scrollIntoView({ block:'nearest', behavior:'smooth' });
+        }
+
+        function refreshAll() {
+            refreshMeta();
+            rebuildButtons();
+            apply(current, false);
+        }
+
+        // Délégation unique PC/mobile. On évite les listeners touchstart globaux en capture :
+        // sur Safari ils peuvent intercepter les gestes de toute la page et rendre l'UI non cliquable.
+        if (bar.dataset.agCatsBound !== '1') {
+            bar.dataset.agCatsBound = '1';
+            let lastPointerAt = 0;
+            const activate = (e) => {
+                const btn = e.target && e.target.closest ? e.target.closest('[data-mode-cat]') : null;
+                if (!btn || !bar.contains(btn)) return;
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+                apply(btn.dataset.modeCat, true);
+            };
+            if (window.PointerEvent) {
+                bar.addEventListener('pointerup', e => {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    lastPointerAt = Date.now();
+                    activate(e);
+                }, {passive:false});
+            }
+            bar.addEventListener('click', e => {
+                // Pointer/touch génère souvent un click synthétique juste après : on ne l'exécute pas deux fois.
+                if (Date.now() - lastPointerAt < 500) return;
+                activate(e);
+            }, {passive:false});
+        }
+
+        const controller = cat => apply(cat, true);
+        controller.__refactorWrapped = true;
+        window.modeCat = controller;
+        refreshAll();
+
+        // Les nouveaux modes / mini-jeux peuvent arriver après le chargement du menu.
+        // Le rafraîchissement est volontairement limité pour ne pas saturer le thread principal sur mobile.
+        let refreshTimer = null;
+        new MutationObserver(muts => {
+            // Ignore nos propres changements de libellé dans l'entête mini-jeux.
+            if (muts.every(m => m.target?.closest?.('.arc-menu-refactor-head'))) return;
+            clearTimeout(refreshTimer);
+            refreshTimer = setTimeout(refreshAll, 120);
+        }).observe(grid, { childList:true, subtree:true });
+    }
+
+    function init() {
+        const menu = document.getElementById('menu-selection');
+        if (!menu) return;
+        menu.classList.add('mode-home-refactor');
+        setupJoinCard(menu);
+
+        const grid = findGameGrid();
+        if (!grid) return setTimeout(init, 120);
+        grid.classList.add('game-library-grid');
+        markCards(grid);
+        setupMiniGames(grid);
+        setupModeCategories(grid);
+        setupSearch(menu, grid);
+
+        // Les nouveaux modes peuvent être injectés après le DOMContentLoaded.
+        new MutationObserver(() => {
+            markCards(grid);
+            setupMiniGames(grid);
+        }).observe(grid, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+    else init();
+})();
+
+/* =====================================================================
+   UI REFACTOR V4 — DASHBOARD RESPONSIVE
+   Shell desktop + mobile. Toutes les fonctions métier existantes restent
+   celles du site (switchTab, ecoTab, startDaily, createRoom, etc.).
+   ===================================================================== */
+(() => {
+    const DASH_BP = 1181;
+    const dashState = { section: 'home', shell: false, friendTimer: null };
+    const q = (s, r = document) => r.querySelector(s);
+    const qa = (s, r = document) => [...r.querySelectorAll(s)];
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+    function isDesktop() { return window.innerWidth >= DASH_BP; }
+    function appVisible() {
+        const app = q('#app-root');
+        return !!app && getComputedStyle(app).display !== 'none';
+    }
+    function menuIsHome() {
+        const active = q('#app-root > .tab-content.active');
+        if (!active) return false;
+        if (active.id !== 'mode') return true;
+        const menu = q('#menu-selection');
+        if (!menu) return false;
+        // Le code historique masque le menu en inline quand un salon / jeu s'ouvre.
+        // On teste d'abord cette valeur car le dashboard mobile utilise des !important
+        // et ne doit jamais ressusciter visuellement un menu que le jeu vient de fermer.
+        if (menu.style.display === 'none') return false;
+        return getComputedStyle(menu).display !== 'none';
+    }
+
+    function buildShell() {
+        const app = q('#app-root');
+        if (!app || q('#ag-desktop-shell')) return;
+
+        const shell = document.createElement('div');
+        shell.id = 'ag-desktop-shell';
+        shell.className = 'ag-desktop-shell';
+        shell.innerHTML = `
+            <div class="ag-dash-top">
+                <button class="ag-dash-brand" type="button" data-dash-nav="home" aria-label="Accueil">
+                    <span class="ag-dash-brand-mark">AG</span>
+                    <span class="ag-dash-brand-copy"><b>ANIME GAME</b><small>アニメゲーム</small></span>
+                </button>
+                <label class="ag-dash-search" id="ag-dash-search-wrap">
+                    <span>⌕</span>
+                    <input id="ag-dash-search" type="search" autocomplete="off" placeholder="Rechercher un jeu…" aria-label="Rechercher un jeu">
+                    <button id="ag-dash-search-clear" type="button" aria-label="Effacer">✕</button>
+                </label>
+                <div class="ag-dash-top-spacer"></div>
+                <div class="ag-dash-account">
+                    <button type="button" class="ag-dash-pill ag-dash-coins" data-dash-nav="collection" title="Collection"><span>🪙</span><b id="ag-dash-coins">0</b></button>
+                    <button type="button" class="ag-dash-icon-btn" id="ag-dash-news" title="Nouveautés">🔔</button>
+                    <button type="button" class="ag-dash-profile" data-dash-nav="settings">
+                        <span class="ag-dash-avatar" id="ag-dash-avatar">AG</span>
+                        <span class="ag-dash-profile-copy"><b id="ag-dash-name">Joueur</b><small id="ag-dash-rank">Anime Game</small></span>
+                    </button>
+                    <button type="button" class="ag-mobile-menu-toggle" id="ag-mobile-menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false">☰</button>
+                </div>
+            </div>
+            <aside class="ag-dash-sidebar">
+                <nav class="ag-dash-nav" aria-label="Navigation principale">
+                    <button class="ag-dash-nav-btn on" type="button" data-dash-nav="home"><span class="ico">⌂</span><span>Accueil</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="play"><span class="ico">🎮</span><span>Jouer</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="collection"><span class="ico">🃏</span><span>Collection</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="shop"><span class="ico">🛒</span><span>Boutique</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="deck"><span class="ico">▱</span><span>Decks</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="trade"><span class="ico">⇄</span><span>Échanges</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="clan"><span class="ico">🛡</span><span>Clans</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="friends"><span class="ico">👥</span><span>Amis</span></button>
+                    <div class="ag-dash-nav-sep"></div>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="leaderboard"><span class="ico">🏆</span><span>Classements</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="quests"><span class="ico">📜</span><span>Quêtes</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="museum"><span class="ico">🏛</span><span>Musée</span></button>
+                    <button class="ag-dash-nav-btn" type="button" data-dash-nav="settings"><span class="ico">⚙</span><span>Paramètres</span></button>
+                    <button class="ag-dash-nav-btn ag-dash-role-btn" id="ag-dash-beta" type="button" data-dash-nav="beta" style="display:none"><span class="ico">🧪</span><span>Bêta</span></button>
+                    <button class="ag-dash-nav-btn ag-dash-role-btn" id="ag-dash-admin" type="button" data-dash-nav="admin" style="display:none"><span class="ico">🛠</span><span>Admin</span></button>
+                </nav>
+                <button class="ag-dash-event" id="ag-dash-event" type="button">
+                    <small>Événement en cours</small>
+                    <b id="ag-dash-event-title">Défis & événements</b>
+                    <span id="ag-dash-event-sub">Boss, anime de la semaine et tournois</span>
+                </button>
+            </aside>
+            <button class="ag-mobile-backdrop" id="ag-mobile-backdrop" type="button" aria-label="Fermer le menu"></button>
+            <nav class="ag-mobile-bottom" aria-label="Navigation mobile">
+                <button class="ag-mobile-nav-btn on" type="button" data-dash-nav="home"><span>⌂</span><small>Accueil</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="play"><span>🎮</span><small>Jouer</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="collection"><span>🃏</span><small>Collection</small></button>
+                <button class="ag-mobile-nav-btn" type="button" data-dash-nav="friends"><span>👥</span><small>Amis</small></button>
+                <button class="ag-mobile-nav-btn" type="button" id="ag-mobile-more"><span>☰</span><small>Menu</small></button>
+            </nav>`;
+        app.appendChild(shell);
+
+        const menu = q('#menu-selection');
+        if (menu) buildHomeBlocks(menu);
+
+        qa('[data-dash-nav]', shell).forEach(b => b.addEventListener('click', () => {
+            navigate(b.dataset.dashNav);
+            closeMobileMenu();
+        }));
+        q('#ag-mobile-menu-toggle', shell)?.addEventListener('click', toggleMobileMenu);
+        q('#ag-mobile-more', shell)?.addEventListener('click', toggleMobileMenu);
+        q('#ag-mobile-backdrop', shell)?.addEventListener('click', closeMobileMenu);
+        q('#ag-dash-news', shell)?.addEventListener('click', () => {
+            if (typeof openChangelog === 'function') openChangelog();
+            else navigate('settings');
+        });
+        q('#ag-dash-event', shell)?.addEventListener('click', () => {
+            navigate('home');
+            setTimeout(() => q('#hub-home')?.scrollIntoView({ behavior:'smooth', block:'start' }), 80);
+        });
+        setupTopSearch();
+        wrapSwitchTab();
+        syncAll();
+    }
+
+    function mobileMenuOpen() { return document.body.classList.contains('ag-mobile-menu-open'); }
+
+    function setMobileMenu(open) {
+        const yes = !!open && !isDesktop();
+        document.body.classList.toggle('ag-mobile-menu-open', yes);
+        const btn = q('#ag-mobile-menu-toggle');
+        if (btn) {
+            btn.setAttribute('aria-expanded', yes ? 'true' : 'false');
+            btn.textContent = yes ? '✕' : '☰';
+        }
+    }
+
+    function toggleMobileMenu() { setMobileMenu(!mobileMenuOpen()); }
+    function closeMobileMenu() { setMobileMenu(false); }
+
+    function buildHomeBlocks(menu) {
+        if (!q('#ag-home-hero')) {
+            const hero = document.createElement('div');
+            hero.id = 'ag-home-hero';
+            hero.innerHTML = `
+                <div class="ag-hero-copy">
+                    <div class="ag-hero-kicker">Quiz • Jeux • Collection • Multijoueur</div>
+                    <div class="ag-hero-title">ANIME GAME</div>
+                    <p class="ag-hero-sub">Tous tes modes anime dans un seul hub, entre amis, en solo ou en live.</p>
+                    <button type="button" class="btn-action ag-hero-btn" id="ag-hero-play">JOUER MAINTENANT →</button>
+                </div>
+                <div class="ag-hero-side" aria-hidden="true"><div class="ag-hero-orb">AG</div></div>`;
+            menu.insertBefore(hero, menu.firstChild);
+            q('#ag-hero-play', hero)?.addEventListener('click', () => navigate('play'));
+        }
+
+        if (!q('#ag-quick-actions')) {
+            const quick = document.createElement('div');
+            quick.id = 'ag-quick-actions';
+            quick.innerHTML = `
+                <button class="ag-quick-btn purple" type="button" data-quick="public"><span class="qi">⚡</span><span><b>Partie rapide</b><small>Trouver un salon public</small></span></button>
+                <button class="ag-quick-btn blue" type="button" data-quick="create"><span class="qi">👥</span><span><b>Créer un salon</b><small>Choisir ton mode</small></span></button>
+                <button class="ag-quick-btn green" type="button" data-quick="bots"><span class="qi">🤖</span><span><b>Jouer avec des bots</b><small>Outil bêta / admin</small></span></button>
+                <button class="ag-quick-btn gold" type="button" data-quick="tournament"><span class="qi">🏆</span><span><b>Tournoi</b><small>Lancer le mode tournoi</small></span></button>`;
+            const hero = q('#ag-home-hero');
+            hero?.insertAdjacentElement('afterend', quick);
+            q('[data-quick="public"]', quick)?.addEventListener('click', quickPublic);
+            q('[data-quick="create"]', quick)?.addEventListener('click', () => navigate('play'));
+            q('[data-quick="bots"]', quick)?.addEventListener('click', quickBots);
+            q('[data-quick="tournament"]', quick)?.addEventListener('click', () => {
+                if (typeof createRoom === 'function') createRoom('arcade','tournoi');
+            });
+        }
+
+        if (!q('#ag-dashboard-right')) {
+            const side = document.createElement('aside');
+            side.id = 'ag-dashboard-right';
+            side.innerHTML = `
+                <div class="ag-right-card">
+                    <div class="ag-right-head"><b>● En ligne <span id="ag-online-count"></span></b><button type="button" data-dash-nav="friends">Voir tous</button></div>
+                    <div class="ag-friend-list" id="ag-dash-friends"><div class="ag-right-muted">Chargement…</div></div>
+                </div>
+                <div class="ag-right-card">
+                    <div class="ag-right-head"><b>📜 Quêtes du jour</b><button type="button" data-dash-nav="quests">Voir</button></div>
+                    <div id="ag-dash-quests"><div class="ag-right-muted">Chargement…</div></div>
+                </div>
+                <div class="ag-right-card">
+                    <div class="ag-right-head"><b>🎯 Défis du jour</b><button type="button" id="ag-daily-board-btn">Classement</button></div>
+                    <div class="ag-daily-mini"><button type="button" data-daily="dle">🎴<br>AnimeDLE</button><button type="button" data-daily="blindtest">🎧<br>Blind Test</button><button type="button" data-daily="pixel">🖼️<br>Pixel</button></div>
+                </div>`;
+            menu.appendChild(side);
+            qa('[data-dash-nav]', side).forEach(b => b.addEventListener('click', () => navigate(b.dataset.dashNav)));
+            qa('[data-daily]', side).forEach(b => b.addEventListener('click', () => {
+                if (typeof startDaily === 'function') startDaily(b.dataset.daily);
+            }));
+            q('#ag-daily-board-btn', side)?.addEventListener('click', () => {
+                navigate('home');
+                setTimeout(() => {
+                    if (typeof toggleDailyBoard === 'function') toggleDailyBoard();
+                    q('#daily-card')?.scrollIntoView({ behavior:'smooth', block:'center' });
+                }, 80);
+            });
+        }
+
+        waitForLibraryHeading();
+    }
+
+    function waitForLibraryHeading() {
+        if (q('#ag-games-heading')) return;
+        const tryAdd = () => {
+            const cats = q('#mode-cats');
+            const grid = q('#menu-selection .game-library-grid, #menu-selection .mode-grid-2');
+            if (!grid) return false;
+            const h = document.createElement('div');
+            h.id = 'ag-games-heading';
+            h.innerHTML = `<h3>🎮 Tous les jeux</h3><span>Choisis un mode ou utilise les catégories</span>`;
+            (cats || grid).parentNode.insertBefore(h, cats || grid);
+            return true;
+        };
+        if (tryAdd()) return;
+        let n = 0;
+        const t = setInterval(() => { if (tryAdd() || ++n > 30) clearInterval(t); }, 100);
+    }
+
+    function setupTopSearch() {
+        const input = q('#ag-dash-search');
+        const wrap = q('#ag-dash-search-wrap');
+        const clear = q('#ag-dash-search-clear');
+        if (!input || !wrap || !clear) return;
+        const apply = () => {
+            wrap.classList.toggle('has-value', !!input.value.trim());
+            if (!input.value.trim()) return syncSearch('');
+            if (q('#app-root > #mode') && !q('#mode')?.classList.contains('active')) {
+                if (typeof switchTab === 'function') switchTab('mode');
+            }
+            dashState.section = 'play';
+            syncNav();
+            if (typeof modeCat === 'function') try { modeCat('all'); } catch (_) {}
+            syncSearch(input.value);
+            setTimeout(() => q('#mode-cats, #ag-games-heading, .game-library-grid')?.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
+        };
+        input.addEventListener('input', apply);
+        input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value=''; apply(); input.blur(); } });
+        clear.addEventListener('click', () => { input.value=''; apply(); input.focus(); });
+    }
+
+    function syncSearch(value) {
+        const target = q('#mode-library-search');
+        if (!target) return;
+        if (target.value !== value) target.value = value;
+        target.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+
+    function quickPublic() {
+        navigate('home');
+        setTimeout(() => {
+            const panel = q('#public-rooms-panel');
+            if (panel && getComputedStyle(panel).display === 'none' && typeof togglePublicRooms === 'function') togglePublicRooms();
+            q('.ui-join-card')?.scrollIntoView({ behavior:'smooth', block:'center' });
+        }, 80);
+    }
+
+    function quickBots() {
+        if (window.IS_ADMIN || window.IS_BETA) {
+            if (typeof createRoom === 'function') createRoom('undercover','normal');
+            return;
+        }
+        if (typeof toast === 'function') toast('🤖 Les bots sont réservés aux admins et bêta testeurs pour le moment.', '#00f0ff');
+        else navigate('play');
+    }
+
+    function navigate(key) {
+        closeMobileMenu();
+        dashState.section = key;
+        const later = (fn, ms = 70) => setTimeout(fn, ms);
+        const tab = t => { if (typeof switchTab === 'function') switchTab(t); };
+        const eco = t => { if (typeof ecoTab === 'function') ecoTab(t); };
+
+        if (key === 'home') { tab('mode'); later(() => window.scrollTo({ top:0, behavior:'smooth' })); }
+        else if (key === 'play') { tab('mode'); later(() => q('#ag-games-heading, #mode-cats, .game-library-grid')?.scrollIntoView({ behavior:'smooth', block:'start' })); }
+        else if (key === 'collection') { tab('collection'); later(() => eco('album')); }
+        else if (key === 'shop') { tab('collection'); later(() => eco('shop')); }
+        else if (key === 'deck') { tab('collection'); later(() => eco('deck')); }
+        else if (key === 'trade') { tab('collection'); later(() => eco('trade')); }
+        else if (key === 'clan') { tab('collection'); later(() => eco('clan')); }
+        else if (key === 'museum') { tab('collection'); later(() => eco('museum')); }
+        else if (key === 'friends') { tab('amis'); later(() => { if (typeof loadFriends === 'function') loadFriends(); }); }
+        else if (key === 'leaderboard') { tab('options'); later(() => scrollOption('Classements par jeu')); }
+        else if (key === 'quests') { tab('mode'); later(() => q('#ag-dashboard-right')?.scrollIntoView({ behavior:'smooth', block:'start' })); }
+        else if (key === 'settings') { tab('options'); later(() => window.scrollTo({ top:0, behavior:'smooth' })); }
+        else if (key === 'beta') {
+            tab('beta');
+            later(() => { if (typeof betaLoad === 'function') betaLoad(); window.scrollTo({ top:0, behavior:'smooth' }); });
+        }
+        else if (key === 'admin') {
+            tab('admin');
+            later(() => { if (typeof loadAdmin === 'function') loadAdmin(); window.scrollTo({ top:0, behavior:'smooth' }); });
+        }
+        syncNav();
+    }
+
+    function scrollOption(title) {
+        const h = qa('#options h2').find(x => x.textContent.includes(title));
+        h?.closest('.opt-panel,div')?.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    function wrapSwitchTab() {
+        if (typeof window.switchTab !== 'function' || window.switchTab.__agDashWrapped) return;
+        const old = window.switchTab;
+        const wrapped = function(t) {
+            const r = old.apply(this, arguments);
+            if (t === 'mode' && !['play','quests','home'].includes(dashState.section)) dashState.section = 'home';
+            if (t === 'amis') dashState.section = 'friends';
+            if (t === 'options' && !['leaderboard','settings'].includes(dashState.section)) dashState.section = 'settings';
+            if (t === 'beta') dashState.section = 'beta';
+            if (t === 'admin') dashState.section = 'admin';
+            if (t === 'collection' && !['collection','shop','deck','trade','clan','museum'].includes(dashState.section)) dashState.section = 'collection';
+            setTimeout(syncAll, 0);
+            return r;
+        };
+        wrapped.__agDashWrapped = true;
+        window.switchTab = wrapped;
+    }
+
+    function syncShell() {
+        const app = q('#app-root');
+        if (!app) return;
+        const on = appVisible() && menuIsHome();
+        const mobile = on && !isDesktop();
+        dashState.shell = on;
+        app.classList.toggle('ag-dashboard-shell-on', on);
+        app.classList.toggle('ag-dashboard-mobile-on', mobile);
+        document.body.classList.toggle('ag-dashboard-on', on);
+        document.body.classList.toggle('ag-dashboard-mobile', mobile);
+        if (!mobile) closeMobileMenu();
+    }
+
+    function syncNav() {
+        let key = dashState.section;
+        const active = q('#app-root > .tab-content.active')?.id;
+        if (active === 'amis') key = 'friends';
+        else if (active === 'beta') key = 'beta';
+        else if (active === 'admin') key = 'admin';
+        else if (active === 'options' && !['leaderboard','settings'].includes(key)) key = 'settings';
+        else if (active === 'collection') {
+            const t = q('#collection .eco-tabs button.on')?.dataset.t;
+            const map = { shop:'shop', album:'collection', deck:'deck', trade:'trade', clan:'clan', museum:'museum' };
+            key = map[t] || key || 'collection';
+        } else if (active === 'mode' && !['home','play','quests'].includes(key)) key = 'home';
+        qa('.ag-dash-nav-btn').forEach(b => b.classList.toggle('on', b.dataset.dashNav === key));
+        qa('.ag-mobile-nav-btn[data-dash-nav]').forEach(b => b.classList.toggle('on', b.dataset.dashNav === key));
+        const more = q('#ag-mobile-more');
+        if (more) more.classList.toggle('on', !['home','play','collection','friends'].includes(key));
+    }
+
+    function syncRoleNav() {
+        const adminBtn = q('#ag-dash-admin');
+        const betaBtn = q('#ag-dash-beta');
+        if (!adminBtn || !betaBtn) return;
+
+        // On reprend exactement les droits déjà calculés par checkAdmin() dans core.js.
+        // Fallback sur les anciens boutons de navigation pour éviter un flash si la
+        // vérification serveur vient juste de se terminer.
+        const oldAdmin = q('#btn-admin')?.parentElement;
+        const oldBeta = q('#btn-beta')?.parentElement;
+        const adminVisibleLegacy = !!oldAdmin && getComputedStyle(oldAdmin).display !== 'none';
+        const betaVisibleLegacy = !!oldBeta && getComputedStyle(oldBeta).display !== 'none';
+        const isAdmin = window.IS_ADMIN === true || adminVisibleLegacy;
+        const isBeta = !isAdmin && (window.IS_BETA === true || betaVisibleLegacy);
+
+        adminBtn.style.display = isAdmin ? '' : 'none';
+        betaBtn.style.display = isBeta ? '' : 'none';
+
+        // Si un rôle vient d'être retiré pendant qu'on est sur son onglet,
+        // on renvoie proprement vers les paramètres.
+        if (dashState.section === 'admin' && !isAdmin) {
+            dashState.section = 'settings';
+            if (q('#app-root > .tab-content.active')?.id === 'admin' && typeof switchTab === 'function') switchTab('options');
+        }
+        if (dashState.section === 'beta' && !isBeta) {
+            dashState.section = 'settings';
+            if (q('#app-root > .tab-content.active')?.id === 'beta' && typeof switchTab === 'function') switchTab('options');
+        }
+    }
+
+    function syncProfile() {
+        const name = (typeof currentUser !== 'undefined' && currentUser && currentUser.pseudo) || q('#profile-pseudo')?.textContent?.trim() || 'Joueur';
+        const rank = q('#profile-rank')?.textContent?.trim();
+        const nameEl = q('#ag-dash-name'); if (nameEl) nameEl.textContent = name || 'Joueur';
+        const rankEl = q('#ag-dash-rank'); if (rankEl) rankEl.textContent = rank && rank !== '---' ? rank : ((typeof currentUser !== 'undefined' && currentUser?.isGuest) ? 'Invité' : 'Anime Game');
+        const av = q('#ag-dash-avatar');
+        if (av) {
+            try {
+                av.innerHTML = typeof avatarHtml === 'function' ? avatarHtml(name, (typeof currentUser !== 'undefined' && currentUser?.cos) || null) : esc(name.charAt(0).toUpperCase());
+            } catch (_) { av.textContent = name.charAt(0).toUpperCase(); }
+        }
+        const coin = q('#coin-badge b')?.textContent?.trim();
+        const out = q('#ag-dash-coins'); if (out && coin) out.textContent = coin;
+    }
+
+    function syncQuests() {
+        const src = q('#quest-list');
+        const dst = q('#ag-dash-quests');
+        if (!src || !dst) return;
+        if (dst.dataset.html !== src.innerHTML) {
+            dst.dataset.html = src.innerHTML;
+            dst.innerHTML = src.innerHTML || '<div class="ag-right-muted">Aucune quête chargée.</div>';
+        }
+    }
+
+    function syncEvent() {
+        const title = q('#ag-dash-event-title');
+        const sub = q('#ag-dash-event-sub');
+        if (!title || !sub) return;
+        try {
+            if (typeof hub !== 'undefined' && hub.home?.weekAnime) {
+                title.textContent = `⭐ ${hub.home.weekAnime.name}`;
+                sub.textContent = 'Anime de la semaine • bonus de collection';
+                return;
+            }
+        } catch (_) {}
+        const week = q('#hub-home .hub-card.week .hb-name')?.textContent?.trim();
+        if (week) { title.textContent = `⭐ ${week}`; sub.textContent = 'Anime de la semaine • bonus de collection'; }
+    }
+
+    async function loadDashFriends() {
+        const box = q('#ag-dash-friends');
+        const count = q('#ag-online-count');
+        if (!box || !dashState.shell) return;
+        let account = false;
+        try { account = typeof isAccount === 'function' ? isAccount() : false; } catch (_) {}
+        if (!account) {
+            if (count) count.textContent = '(0)';
+            box.innerHTML = `<div class="ag-right-muted">Connecte-toi avec un compte pour voir tes amis en ligne.</div><button class="ag-empty-action" type="button" data-open-friends>Ouvrir l'onglet Amis</button>`;
+            q('[data-open-friends]', box)?.addEventListener('click', () => navigate('friends'));
+            return;
+        }
+        let d = null;
+        try { if (typeof v7get === 'function') d = await v7get('/api/friends'); } catch (_) {}
+        if (!d || !d.ok) { box.innerHTML = '<div class="ag-right-muted">Amis indisponibles pour le moment.</div>'; return; }
+        const online = (d.friends || []).filter(f => f.online);
+        if (count) count.textContent = `(${online.length})`;
+        if (!online.length) {
+            box.innerHTML = `<div class="ag-right-muted">Aucun ami en ligne pour le moment.</div><button class="ag-empty-action" type="button" data-open-friends>Voir mes amis</button>`;
+            q('[data-open-friends]', box)?.addEventListener('click', () => navigate('friends'));
+            return;
+        }
+        box.innerHTML = online.slice(0,7).map(f => {
+            let av = `<span class="av">${esc(String(f.pseudo || '?').charAt(0).toUpperCase())}</span>`;
+            try { if (typeof avatarHtml === 'function') av = avatarHtml(f.pseudo, f.cos); } catch (_) {}
+            const state = f.room ? `${f.room.waiting ? 'Salon' : 'En partie'}${f.room.mode ? ' • ' + esc(f.room.mode) : ''}` : `Niveau ${Number(f.level || 1)}`;
+            return `<div class="ag-friend-row" data-friend="${esc(f.pseudo)}">${av}<span class="ag-friend-copy"><b>${esc(f.pseudo)}</b><small>${state}</small></span><span class="ag-online-dot"></span></div>`;
+        }).join('');
+        qa('.ag-friend-row', box).forEach(r => r.addEventListener('click', () => navigate('friends')));
+    }
+
+    function syncAll() {
+        syncShell();
+        syncRoleNav();
+        syncNav();
+        syncProfile();
+        syncQuests();
+        syncEvent();
+    }
+
+    // PC + MOBILE : salon / sélection / partie = vraie page dédiée.
+    // Sur iPhone, un simple scrollTo(0,0) peut être ignoré pendant un changement
+    // de layout : on détecte donc la page de jeu, on masque le shell et on recale
+    // plusieurs fois le panneau actif en haut.
+    const GAME_PAGE_IDS = [
+        'waiting-room','gameplay-room','rg-room','enchere-room','enchereaveugle-room',
+        'connexion-room','dle-room','quote-room','blindtest-room','arcade-room',
+        'draw-room','guess-room','chaine-room','lg-room','uq-room',
+        'quote-universe-selection','theme-selection-container'
+    ];
+
+    function visibleGamePanel() {
+        for (const id of GAME_PAGE_IDS) {
+            const el = q('#' + id);
+            if (!el) continue;
+            const cs = getComputedStyle(el);
+            if (cs.display !== 'none' && cs.visibility !== 'hidden') return el;
+        }
+        return null;
+    }
+
+    function forceGamePageTop() {
+        const panel = visibleGamePanel();
+        try { window.scrollTo({ top:0, left:0, behavior:'auto' }); } catch (_) { window.scrollTo(0,0); }
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        if (panel) {
+            try { panel.scrollIntoView({ block:'start', inline:'nearest', behavior:'auto' }); } catch (_) {}
+        }
+    }
+
+    function setupGamePageTransition() {
+        const menu = q('#menu-selection');
+        const app = q('#app-root');
+        if (!menu || !app || menu.dataset.agGamePageWatch === '1') return;
+        menu.dataset.agGamePageWatch = '1';
+
+        let wasGamePage = false;
+        const refresh = () => {
+            const inlineHidden = menu.style.display === 'none';
+            const panel = visibleGamePanel();
+            const activeTab = q('#app-root > .tab-content.active');
+            // Une partie peut continuer derrière la Collection. On ne masque le shell
+            // que quand l'onglet MODE est réellement affiché.
+            const gamePage = (!activeTab || activeTab.id === 'mode') && (inlineHidden || !!panel);
+
+            document.body.classList.toggle('ag-game-page', gamePage);
+            app.classList.toggle('ag-game-page', gamePage);
+            if (gamePage) closeMobileMenu();
+
+            // syncShell() lit d'abord l'état inline du menu et retire le dashboard.
+            syncAll();
+
+            if (gamePage && !wasGamePage) {
+                forceGamePageTop();
+                requestAnimationFrame(forceGamePageTop);
+                setTimeout(forceGamePageTop, 40);
+                setTimeout(forceGamePageTop, 140);
+                setTimeout(forceGamePageTop, 320);
+            }
+            wasGamePage = gamePage;
+        };
+
+        const observer = new MutationObserver(refresh);
+        observer.observe(menu, { attributes:true, attributeFilter:['style','class'] });
+        GAME_PAGE_IDS.forEach(id => {
+            const el = q('#' + id);
+            if (el) observer.observe(el, { attributes:true, attributeFilter:['style','class'] });
+        });
+        // Collection/Admin changent l'onglet actif sans forcément toucher au style
+        // du menu de jeu : on observe donc également les tabs.
+        qa('#app-root > .tab-content').forEach(el => observer.observe(el, { attributes:true, attributeFilter:['style','class'] }));
+        refresh();
+    }
+
+    function init() {
+        // Sécurité : un état de tiroir laissé ouvert ne doit jamais poser un backdrop invisible au-dessus de la page.
+        document.body.classList.remove('ag-mobile-menu-open');
+        buildShell();
+        setupGamePageTransition();
+        syncAll();
+        window.addEventListener('resize', syncAll, { passive:true });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileMenu(); });
+        setInterval(syncAll, 900);
+        dashState.friendTimer = setInterval(loadDashFriends, 30000);
+        setTimeout(loadDashFriends, 600);
+        try {
+            q('#quest-list') && new MutationObserver(syncQuests).observe(q('#quest-list'), { childList:true, subtree:true, characterData:true });
+            q('#coin-badge') && new MutationObserver(syncProfile).observe(q('#coin-badge'), { childList:true, subtree:true, characterData:true, attributes:true });
+            q('#hub-home') && new MutationObserver(syncEvent).observe(q('#hub-home'), { childList:true, subtree:true });
+        } catch (_) {}
+        if (typeof socket !== 'undefined' && socket?.on) {
+            socket.on('friends_changed', () => setTimeout(loadDashFriends, 150));
+            socket.on('connect', () => setTimeout(loadDashFriends, 900));
+        }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once:true });
+    else init();
+
+    // Hotfix mobile : aucun listener touchstart global en capture.
+})();
+
+
+/* Admin character viewer v5 */
+(() => {
+    const PAGE = 120;
+    const state = { all: [], filtered: [], page: 0, status: new Map(), loaded: false };
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    const keyOf = x => norm(x.u || x.universe || x.anime) + '|' + norm(x.name);
+
+    const MODE_LABELS = {
+        undercover:'Undercover', undercover_normal:'Undercover normal', undercover_hardcore:'Undercover hardcore', hardcore:'Undercover hardcore',
+        rg:'Roland-Garros', rolandgarros:'Roland-Garros', roland_garros:'Roland-Garros', dle:'AnimeDLE', animedle:'AnimeDLE',
+        quote:'Citations', quotes:'Citations', citation:'Citations', citations:'Citations', chaine:'Chaîne de persos', chain:'Chaîne de persos',
+        guess:'Devine le perso', devine:'Devine le perso', tierlist:'Tier List', tier_list:'Tier List', draw:'Dessine le perso', drawing:'Dessine le perso',
+        battle:'Battle de préférence', card:'Combat de cartes', cards:'Combat de cartes', tournoi:'Tournoi', tournament:'Tournoi', arcade:'Mini-jeux',
+        static:'Catalogue images', images:'Catalogue images', character_images:'Catalogue images'
+    };
+    const prettyMode = value => {
+        const raw = String(value || '').trim();
+        if (!raw) return 'Autre';
+        const k = raw.toLowerCase().replace(/[\s-]+/g,'_');
+        return MODE_LABELS[k] || raw.replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    };
+    const sourcesOf = x => {
+        let a = [];
+        if (Array.isArray(x?.sources)) a = x.sources;
+        else if (Array.isArray(x?.modes)) a = x.modes;
+        else if (x?.mode) a = [x.mode];
+        return [...new Set(a.map(v=>String(v||'').trim()).filter(Boolean))];
+    };
+    const imageOf = x => String(x?.img || x?.imageUrl || x?.originalImg || '').trim();
+    const isLocal = u => /^\/assets\/images\/chars\//i.test(String(u||''));
+
+    function mergeCatalogue(items) {
+        const map = new Map();
+        for (const raw of Array.isArray(items) ? items : []) {
+            const name = String(raw?.name || '').trim();
+            const universe = String(raw?.u || raw?.universe || '').trim();
+            const anime = String(raw?.anime || universe || '').trim();
+            if (!name || !universe) continue;
+            const k = norm(universe) + '|' + norm(name);
+            const src = sourcesOf(raw);
+            const candidate = { ...raw, u: universe, anime, name, sources: src };
+            if (!map.has(k)) { map.set(k, candidate); continue; }
+            const old = map.get(k);
+            old.sources = [...new Set([...sourcesOf(old), ...src])];
+            if (!old.anime && anime) old.anime = anime;
+            const a = imageOf(old), b = imageOf(candidate);
+            if ((!a && b) || (!isLocal(a) && isLocal(b))) {
+                old.img = b;
+                old.originalImg = candidate.originalImg || b;
+            }
+        }
+        return [...map.values()].sort((a,b) => String(a.anime).localeCompare(String(b.anime)) || String(a.name).localeCompare(String(b.name)));
+    }
+
+    function instantStatus(x) {
+        const u = imageOf(x);
+        if (!u) return 'bad';
+        // Never trust a URL just because it is local: the browser verifies the
+        // actual file immediately. This catches stale /assets paths after deploys.
+        return 'checking';
+    }
+
+    function css() {
+        if (document.getElementById('ag-charadmin-style')) return;
+        const s = document.createElement('style'); s.id = 'ag-charadmin-style';
+        s.textContent = `
+        .ag-charadmin{margin-top:18px}.ag-charadmin-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.ag-charadmin-head h2{margin:0}
+        .ag-charadmin-tools{display:grid;grid-template-columns:minmax(180px,2fr) repeat(3,minmax(145px,1fr));gap:8px;margin:12px 0}.ag-charadmin-tools input,.ag-charadmin-tools select{width:100%;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#111827;color:#fff}
+        .ag-charadmin-stats{font-size:.82rem;opacity:.9;margin:8px 0 12px}.ag-charadmin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.ag-charcard{position:relative;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,25,.78);border-radius:12px;overflow:hidden;min-width:0}.ag-charcard>img{width:100%;height:190px;object-fit:cover;background:#0b1020;display:block}.ag-charcard.bad{border-color:rgba(255,70,100,.68)}.ag-charcard.bad>img{opacity:.22}.ag-charcard.external{border-color:rgba(246,186,73,.45)}.ag-charcard.checking{border-color:rgba(100,160,255,.35)}
+        .ag-charcard-copy{padding:9px}.ag-charcard-copy>b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ag-charcard-copy>small{display:block;opacity:.67;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.ag-charstate{position:absolute;z-index:2;top:7px;right:7px;font-size:.68rem;font-weight:900;padding:3px 6px;border-radius:999px;background:#5b6475;color:white}.ag-charcard.ok .ag-charstate{background:#118a58}.ag-charcard.bad .ag-charstate{background:#b82d48}.ag-charcard.external .ag-charstate{background:#9a6b12}
+        .ag-modechips{display:flex;gap:4px;overflow:hidden;flex-wrap:wrap;max-height:42px;margin-top:6px}.ag-modechip{font-size:.58rem;padding:2px 5px;border-radius:999px;background:rgba(73,169,255,.12);border:1px solid rgba(73,169,255,.24);white-space:nowrap}.ag-charurl{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09)}.ag-charurl label{display:block;font-size:.63rem;opacity:.7;margin-bottom:4px}.ag-charurl input{width:100%;box-sizing:border-box;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.16);background:#0b1020;color:#fff;font-size:.67rem}
+        .ag-charcard-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:6px}.ag-charcard-actions button,.ag-charcard-actions a{min-width:0;font-size:.65rem;padding:7px 5px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:inherit;text-decoration:none;text-align:center;cursor:pointer}.ag-charcard-actions [data-save]{background:#116b4a;font-weight:800}.ag-charcard-actions button:disabled{opacity:.5;cursor:wait}.ag-charmsg{display:block;min-height:15px;margin-top:5px;font-size:.62rem;line-height:1.2}.ag-charadmin-more{display:block;margin:14px auto 2px;padding:9px 18px}.ag-charadmin-empty{padding:25px;text-align:center;opacity:.7}
+        @media(max-width:900px){.ag-charadmin-tools{grid-template-columns:1fr 1fr}.ag-charadmin-grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}@media(max-width:540px){.ag-charadmin-tools{grid-template-columns:1fr}.ag-charadmin-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.ag-charcard>img{height:155px}.ag-charcard-actions{grid-template-columns:1fr}}
+        `;
+        document.head.appendChild(s);
+    }
+
+    function ensure() {
+        css();
+        const admin = document.getElementById('admin');
+        if (!admin) return setTimeout(ensure, 400);
+        if (document.getElementById('ag-charadmin')) return;
+        const wrap = document.createElement('div'); wrap.id='ag-charadmin'; wrap.className='opt-panel ag-charadmin';
+        wrap.innerHTML = `<div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue unique de tous les personnages du site. Les images locales sont validées instantanément. Tu peux remplacer n'importe quelle image par une URL.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div><div id="ag-charadmin-body" style="display:none"><div class="ag-charadmin-tools"><input id="ag-charadmin-q" type="search" autocomplete="off" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-mode"><option value="">Tous les modes</option></select><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images manquantes</option><option value="external">URLs externes</option><option value="ok">Images locales / stables</option></select></div><div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button></div>`;
+        admin.appendChild(wrap);
+        document.getElementById('ag-charadmin-load').addEventListener('click', load);
+        document.getElementById('ag-charadmin-q').addEventListener('input', apply);
+        document.getElementById('ag-charadmin-mode').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-anime').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-status').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-more').addEventListener('click',()=>{state.page++;render(false)});
+    }
+
+    async function load() {
+        const btn=document.getElementById('ag-charadmin-load');
+        if (state.loaded) { document.getElementById('ag-charadmin-body').style.display=''; apply(); return; }
+        btn.disabled=true; btn.textContent='Chargement…';
+        try {
+            const r=await fetch('/api/character-catalog',{cache:'no-store'}); const d=await r.json(); if(!r.ok||!d.ok) throw new Error(d.error||'catalogue');
+            state.all=mergeCatalogue(d.characters);
+            for (const x of state.all) state.status.set(keyOf(x), instantStatus(x));
+            const animeSel=document.getElementById('ag-charadmin-anime');
+            for(const a of [...new Set(state.all.map(x=>x.anime).filter(Boolean))].sort((a,b)=>a.localeCompare(b))){const o=document.createElement('option');o.value=a;o.textContent=a;animeSel.appendChild(o)}
+            const modeSel=document.getElementById('ag-charadmin-mode');
+            for(const m of [...new Set(state.all.flatMap(sourcesOf))].sort((a,b)=>prettyMode(a).localeCompare(prettyMode(b)))){const o=document.createElement('option');o.value=m;o.textContent=prettyMode(m);modeSel.appendChild(o)}
+            state.loaded=true; document.getElementById('ag-charadmin-body').style.display=''; btn.textContent='Catalogue chargé'; apply();
+        } catch(e) { btn.disabled=false;btn.textContent='Réessayer';document.getElementById('ag-charadmin-stats').textContent='❌ '+(e?.message||'Impossible de charger le catalogue'); }
+    }
+
+    function apply(){
+        if(!state.loaded)return; const q=norm(document.getElementById('ag-charadmin-q')?.value); const anime=document.getElementById('ag-charadmin-anime')?.value||''; const mode=document.getElementById('ag-charadmin-mode')?.value||''; const wanted=document.getElementById('ag-charadmin-status')?.value||'';
+        state.filtered=state.all.filter(x=>{if(anime&&x.anime!==anime)return false;if(mode&&!sourcesOf(x).includes(mode))return false;if(q&&!norm(`${x.name} ${x.anime} ${sourcesOf(x).map(prettyMode).join(' ')}`).includes(q))return false;if(wanted&&state.status.get(keyOf(x))!==wanted)return false;return true}); state.page=0; render(true);
+    }
+
+    function stats(){
+        const vals=[...state.status.values()];
+        const all=state.all.length,
+              ok=vals.filter(v=>v==='ok').length,
+              bad=vals.filter(v=>v==='bad').length,
+              ext=vals.filter(v=>v==='external').length,
+              checking=vals.filter(v=>v==='checking').length;
+        const el=document.getElementById('ag-charadmin-stats');
+        if(el) el.textContent=`⚡ Vérification réelle • ${all} persos uniques • ✅ ${ok} locales testées • 🔗 ${ext} URL testées • ❌ ${bad} cassées • ⏳ ${checking} en cours • ${state.filtered.length} affichés`;
+    }
+
+    function testVisibleImage(imgEl,x,card){
+        const url=imageOf(x), k=keyOf(x), local=isLocal(url);
+        let done=false;
+        const finish=ok=>{
+            if(done)return; done=true;
+            const status=ok?(local?'ok':'external'):'bad';
+            state.status.set(k,status);
+            card.classList.remove('bad','ok','external','checking');
+            card.classList.add(status);
+            const badge=card.querySelector('.ag-charstate');
+            if(badge) badge.textContent=ok?(local?'OK':'URL'):'CASSÉE';
+            stats();
+        };
+        if(!url){finish(false);return}
+        imgEl.addEventListener('load',()=>finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0),{once:true});
+        imgEl.addEventListener('error',()=>finish(false),{once:true});
+        if(imgEl.complete) finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0);
+        else setTimeout(()=>finish(false),6500);
+    }
+
+    function render(reset){
+        const grid=document.getElementById('ag-charadmin-grid');if(!grid)return;if(reset)grid.innerHTML=''; const start=reset?0:Math.max(0,state.page*PAGE), end=Math.min(state.filtered.length,(state.page+1)*PAGE); if(reset&&state.filtered.length===0)grid.innerHTML='<div class="ag-charadmin-empty">Aucun personnage.</div>';
+        for(const x of state.filtered.slice(start,end)){
+            const k=keyOf(x), st=state.status.get(k)||instantStatus(x), url=imageOf(x), modes=sourcesOf(x); const card=document.createElement('div');card.className=`ag-charcard ${st}`; card.dataset.key=k;
+            card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
+            grid.appendChild(card); const img=card.querySelector('img'); testVisibleImage(img,x,card);
+            card.querySelector('[data-copy]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(card.querySelector('[data-url]').value||'')}catch(_){}});
+            card.querySelector('[data-url]').addEventListener('input',e=>{card.querySelector('[data-open]').href=e.target.value||'#'});
+            card.querySelector('[data-save]').addEventListener('click',()=>saveUrl(x,card));
+        }
+        const more=document.getElementById('ag-charadmin-more');more.style.display=end<state.filtered.length?'':'none'; stats();
+    }
+
+    async function validateImageUrl(url){
+        return await new Promise(resolve=>{let settled=false;const im=new Image();const done=v=>{if(settled)return;settled=true;clearTimeout(t);resolve(v)};const t=setTimeout(()=>done(false),6500);im.onload=()=>done(im.naturalWidth>0&&im.naturalHeight>0);im.onerror=()=>done(false);im.referrerPolicy='no-referrer';im.src=url});
+    }
+
+    async function saveUrl(x,card){
+        const input=card.querySelector('[data-url]'), btn=card.querySelector('[data-save]'), msg=card.querySelector('.ag-charmsg'), url=String(input.value||'').trim();
+        if(!/^https:\/\/\S+$/i.test(url)){msg.textContent='❌ URL https:// obligatoire';return}
+        btn.disabled=true;msg.textContent='⚡ Vérification immédiate…';
+        const valid=await validateImageUrl(url);
+        if(!valid){btn.disabled=false;msg.textContent='❌ Cette image ne charge pas';return}
+        msg.textContent='💾 Sauvegarde permanente…';
+        try{
+            let headers={'Content-Type':'application/json'};
+            if(typeof authHeaders==='function'){
+                try{headers=authHeaders(true)||headers}catch(_){ }
+                if(!headers['Content-Type']&&!headers['content-type']) headers['Content-Type']='application/json';
+            }
+            const r=await fetch('/api/admin/character-image',{
+                method:'POST',headers,credentials:'same-origin',
+                body:JSON.stringify({universe:x.u||x.universe,name:x.name,imageUrl:url})
+            });
+            const d=await r.json().catch(()=>({}));
+            if(!r.ok||!d.ok)throw new Error(d.error||`HTTP ${r.status}`);
+            x.img=url;x.originalImg=url;
+            state.status.set(keyOf(x),'checking');
+            card.classList.remove('bad','ok','external');card.classList.add('checking');
+            const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='…';
+            const img=card.querySelector('img');
+            img.src='';
+            requestAnimationFrame(()=>{img.src=url+(url.includes('?')?'&':'?')+'ag_verify='+Date.now();testVisibleImage(img,x,card)});
+            msg.textContent='✅ Sauvegardée définitivement';
+            stats();
+        }catch(e){msg.textContent='❌ '+(e?.message||'Erreur')}
+        finally{btn.disabled=false}
+    }
+
+    /* Character image admin reliability v6 */
+    ensure();
+})();
+
+</script>
 </body>
 </html>
