@@ -1,0 +1,38 @@
+name: Print persistence QAP context
+on:
+  push:
+    branches: [fix-persist-qap-fast]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print targeted context
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          specs={
+            'server.js':["/api/admin/character-image","CREATE TABLE IF NOT EXISTS character_images","resolveCharacterImage","AG_CANONICAL","character_images WHERE","image_bytes"],
+            'index.html':["/api/admin/character-image","Qui a le plus","qui a le plus","qap-","QAP_","qapTheme","qapThemes","quiALePlus"]
+          }
+          for fn,pats in specs.items():
+            ls=Path(fn).read_text(encoding='utf-8',errors='replace').splitlines()
+            print('\n===== '+fn+' =====')
+            centers=[]
+            for i,l in enumerate(ls):
+              if any(p in l for p in pats): centers.append(i)
+            uniq=[]
+            for i in centers:
+              if not any(abs(i-j)<28 for j in uniq): uniq.append(i)
+            print('CENTERS', [i+1 for i in uniq][:80], 'COUNT',len(uniq))
+            for i in uniq[:40]:
+              a=max(0,i-18); b=min(len(ls),i+19)
+              print(f'--- {fn} {a+1}-{b} ---')
+              for j in range(a,b): print(f'{j+1:06d}: {ls[j]}')
+          PY
