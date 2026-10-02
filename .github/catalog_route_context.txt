@@ -1,0 +1,501 @@
+=== OCCURRENCE 1 @ 1169738 ===
+              const alias = typeof DLE_MASTER_ALIASES !== 'undefined' ? DLE_MASTER_ALIASES[universeKey]?.[n] : null;
+                if (alias && typeof DLE_MASTER_NAMES !== 'undefined') {
+                    const found = (DLE_MASTER_NAMES[universeKey] || []).find(x => normalizeImageKey(x) === alias);
+                    if (found) searchName = found;
+                }
+            } catch (_) {}
+
+            let hit = null;
+            if (host) {
+                hit = await fetchFandomPageImageByExactTitle(host, searchName);
+                if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
+                if (!hit && searchName !== cleanName) hit = await fetchFandomPageImageBySearch(host, cleanName);
+            }
+            if (!hit) hit = await fetchAniListCharacterImage(universeKey, searchName);
+            if (!hit && searchName !== cleanName) hit = await fetchAniListCharacterImage(universeKey, cleanName);
+
+            const result = hit
+                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl || null, status:'ok' }
+                : { imageUrl:null, sourceUrl:null, status:'missing' };
+
+            await saveCachedCharacterImage(universeKey, cleanName, result);
+            return result;
+        } catch (e) {
+            console.warn(`[Character image] ${universeKey}/${cleanName}:`, e.message);
+            return { imageUrl:null, sourceUrl:null, status:'error' };
+        } finally {
+            CHARACTER_IMAGE_INFLIGHT.delete(cacheKey);
+        }
+    })();
+
+    CHARACTER_IMAGE_INFLIGHT.set(cacheKey, task);
+    return task;
+}
+
+
+// PATCH CHARACTER ADMIN V1
+// Catalogue unique des personnages réellement présents dans les données du jeu.
+// Les images restent des liens : /api/avatar/img résout local/Fandom/AniList à la demande.
+app.get('/api/character-catalog', (req, res) => {
+    try {
+        const rows = new Map();
+        const add = (u, anime, name, originalImg, source) => {
+            name = String(name || '').trim();
+            anime = String(anime || '').trim();
+            if (!name) return;
+            let arcAnime = '';
+            try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
+            if (!anime) anime = arcAnime || u || 'Autre';
+            if (!u && anime) {
+                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
+            }
+            if (arcAnime) anime = arcAnime;
+            const group = u || normalizeImageKey(anime) || 'autre';
+            const k = group + '|' + normalizeImageKey(name);
+            let img = originalImg || null;
+            try {
+                if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) {
+                    img = '/api/avatar/img?u=' + encodeURIComponent(u) + '&n=' + encodeURIComponent(name);
+                }
+            } catch (_) {}
+            const old = rows.get(k);
+            if (old) {
+                old.sources.add(source || 'jeu');
+                if (!old.originalImg && originalImg) old.originalImg = originalImg;
+                if (old.name === old.name.toLowerCase() && name !== name.toLowerCase()) old.name = name;
+                if ((!old.anime || old.anime === old.u) && anime) old.anime = anime;
+                if (!old.img && img) old.img = img;
+                return;
+            }
+            rows.set(k, { u:u || null, anime, name, img, originalImg:originalImg || null, sources:new Set([source || 'jeu']) });
+        };
+
+        try {
+            for (const [u, byName] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+                for (const [name, img] of Object.entries(byName || {})) add(u, '', name, img, 'char-images');
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+        } catch (_) {}
+
+        for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    for (const item of (theme.items || [])) {
+                        const anime = String(item.sub || theme.title || '').trim();
+                        const u = resolveImageUniverseKey(anime);
+                        add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                    }
+                }
+            } catch (_) {}
+        }
+
+
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+                        }
+                    } catch (_) {}
+                }
+            }
+        } catch (e) { console.warn('[character catalog cards]', e.message); }
+        try {
+            if (typeof hwCards === 'function') {
+                for (const c of (hwCards() || [])) if (c?.u && (c?.display || c?.name)) {
+                    add(c.u, (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[c.u]) || c.anime || c.u, c.display || c.name, c.img || null, 'cards-halloween');
+                }
+            }
+        } catch (_) {}
+        try {
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+        try {
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
+
+        const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
+            .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
+        const animes = [...new Set(characters.map(x => x.anime).filte
+
+=== OCCURRENCE 2 @ 2196280 ===
+p.get(k);
+        if (old) {
+            if (!old.img && cleanImg) old.img = cleanImg;
+            if (!old.anime && anime) old.anime = anime;
+            if (source && !old.sources.includes(source)) old.sources.push(source);
+            return;
+        }
+        map.set(k,{u,name,anime,img:cleanImg,sources:[source]});
+    };
+    const addNames = (u, names, source) => {
+        let anime='';
+        try { anime=String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); } catch (_) { anime=String(u||''); }
+        for (const raw of (Array.isArray(names) ? names : [])) {
+            if (typeof raw === 'string') add(u,raw,anime,'',source);
+            else if (raw && typeof raw === 'object') add(raw.u||u,raw.display||raw.name||raw.character||raw.speaker,raw.anime||anime,raw.img||raw.image||raw.imageUrl||'',source);
+        }
+    };
+    const addCardish = (item, fallbackU='', source='cards') => {
+        if (!item) return;
+        if (typeof item === 'string') { if (fallbackU) add(fallbackU,item,'','',source); return; }
+        if (Array.isArray(item)) { for (const x of item) addCardish(x,fallbackU,source); return; }
+        if (typeof item !== 'object') return;
+        const u=String(item.u||item.universe||item.universeKey||fallbackU||'').trim();
+        const name=item.display||item.name||item.character||item.speaker||'';
+        if (u && name) add(u,name,item.anime||item.sub||'',item.img||item.image||item.imageUrl||'',source);
+        for (const key of ['cards','chars','characters','items','pool','list']) {
+            if (Array.isArray(item[key])) addCardish(item[key],u||fallbackU,source);
+        }
+    };
+
+    // Existing public catalogue (modes, DLE, Roland-Garros, themes, etc.).
+    try {
+        const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d=await r.json();
+            for (const raw of (d?.characters || d?.items || [])) {
+                add(raw?.u, raw?.name || raw?.display, raw?.anime, raw?.originalImg || raw?.img || raw?.imageUrl, 'catalogue-api');
+            }
+        }
+    } catch (_) {}
+
+    // Direct game sources, so migration still works even if the HTTP catalogue is unavailable.
+    try { for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) for (const [name,img] of Object.entries(b||{})) add(u,name,'',img,'char-images'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) addNames(u,names,'modes'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(RG_POOLS_V2 || {})) addNames(u,names,'roland-garros'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_MASTER_NAMES || {})) addNames(u,names,'dle-master'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_TARGET_NAMES || {})) addNames(u,names,'dle-target'); } catch (_) {}
+    try {
+        for (const [u,def] of Object.entries(DLE_UNIVERSES || {})) {
+            for (const c of (def?.characters || [])) add(u,c?.name,'',c?.img||c?.image||'','dle-base');
+        }
+    } catch (_) {}
+
+    // Every card actually obtainable/displayed by the collection.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+            for (const [u,anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                let list=[];
+                try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                for (const c of list) add(u,c?.display||c?.name||c?.raw,anime,c?.img||c?.image||'','cards');
+                try {
+                    if (typeof cardAllSpecials === 'function') {
+                        for (const c of (cardAllSpecials(u)||[])) add(u,c?.display||c?.name,anime,c?.img||'','cards-special');
+                    }
+                } catch (_) {}
+            }
+        }
+    } catch (_) {}
+
+    // Event / seasonal cards that can sit outside the standard card pools.
+    try { if (typeof hwCards === 'function') addCardish(hwCards(),'','cards-halloween'); } catch (_) {}
+    try {
+        if (typeof SEASON_CARDS !== 'undefined') {
+            for (const [id,cfg] of Object.entries(SEASON_CARDS || {})) {
+                addCardish(cfg,'',`cards-season:${id}`);
+                try { if (typeof seasonChars === 'function') addCardish(seasonChars(id),'',`cards-season:${id}`); } catch (_) {}
+            }
+        }
+    } catch (_) {}
+    try { if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS||{})) addNames(u,names,'boss'); } catch (_) {}
+    try { if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES||{})) addNames(u,Object.keys(byName||{}),'power'); } catch (_) {}
+
+    // Bonus card types already carry dedicated imagery, but cache their base character too.
+    try { if (typeof ALT_ART_CARDS === 'function') for (const c of (ALT_ART_CARDS()||[])) if (c?.u && c?.name) add(c.u,c.name,c.anime,'','alt-art-base'); } catch (_) {}
+
+    return [...map.values()].sort((a,b)=>String(a.anime).localeCompare(String(b.anime),'fr') || String(a.name).localeCompare(String(b.name),'fr'));
+}
+async function simplePokeIndex() {
+    if (simplePokeIndex.cache) return simplePokeIndex.cache;
+    const map = new Map();
+    try {
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000', { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d = await r.json();
+            for (const x of d?.results || []) {
+                const id = String(x.url || '').match(/pokemon-species\/(\d+)\/?$/)?.[1];
+                if (id) { map.set(simpleImageNorm(x.name),id); map.set(simpleImageCompact(x.name),id); }
+            }
+        }
+    } catch (_) {}
+    simplePokeIndex.cache = map; return map;
+}
+
+async function simpleAniListAnime(anime) {
+    const cache = simpleAniListAnime.cache || (simpleAniListAnime.cache = new Map());
+    if (cache.has(anime)) return cache.get(anime);
+    const all = [];
+    for (let page=1; page<=8; page++) {
+        const query = `query($s:String,$p:Int){Media(search:$s,type:ANIME){characters(page:$p,perPage:50,sort:[ROLE,RELEVANCE]){pageInfo{hasNextPage}nodes{name{full native alternative}image{large medium}}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST', headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:anime,p:page}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,3500)); page--; continue; }
+            if (!r.ok) break;
+            const d = await r.json(); const c = d?.data?.Media?.characters;
+            all.push(...(c?.nodes || []));
+            if (!c?.pageInfo?.hasNextPage) break;
+            await new Promise(r=>setTimeout(r,800));
+        } catch (_) { break; }
+    }
+    cache.set(anime,all); return all;
+}
+
+async function simpleAniListCharacterSearch(u,name) {
+    const wanted = simpleVariants(u,name);
+    for (const q of wanted.slice(0,2)) {
+        const query = `query($s:String){Page(page:1,perPage:10){characters(search:$s){name{full native alternative}image{large medium}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST',
+                headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:q}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,2600)); continue; }
+            if (!r.ok) continue;
+            const arr=(await r.json())?.data?.Page?.characters || [];
+            let best=null;
+            for (const c of arr) {
+                const names=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);
+                const sc=Math.max(0,...names.flatMap(n=>wanted.map(w=>simpleScoreName(n,w))));
+                const url=c?.image?.large || c?.image?.medium || '';
+                if (url && sc>=82 && (!best || sc>best.sc)) best={sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+        await new 
+
+=== OCCURRENCE 3 @ 2215743 ===
+E_IMAGE_STATE.done) return __legacyCharacterImageResolver(universeKey,displayName);
+    return {imageUrl:null,sourceUrl:null,status:'missing'};
+};
+/* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
+
+
+/* AG_REAL_LOCAL_IMAGES_V2 resolver wrapper: keep DB/admin image first, then local proven file, then old remote fallback. */
+try {
+  if (typeof resolveCharacterImage === 'function') {
+    const __agOriginalResolveCharacterImage = resolveCharacterImage;
+    resolveCharacterImage = async function(...args) {
+      let original = '';
+      try { original = await __agOriginalResolveCharacterImage.apply(this, args); } catch (_) {}
+      const originalText = String(original || '');
+      if (originalText.includes('/api/character-image-file') || originalText.includes('/api/local-character-image')) return original;
+
+      let u = '', n = '';
+      const a = args[0], b = args[1];
+      if (a && typeof a === 'object') {
+        u = a.universe || a.anime || a.series || a.franchise || '';
+        n = a.name || a.character || a.characterName || a.title || '';
+      } else { u = a || ''; n = b || ''; }
+
+      let fp = __agLocalImageCache.find(u, n);
+      if (!fp) fp = __agLocalImageCache.find(n, u);
+      if (fp) return __agLocalImageCache.publicUrl(fp);
+      return original;
+    };
+  }
+} catch (e) {
+  console.warn('[images] resolver wrapper failed:', e?.message || e);
+}
+
+
+/* AG_PERSISTENT_ADMIN_CATALOG_V2
+   Admin image overrides are stored in PostgreSQL. This read endpoint overlays
+   those durable rows on the normal catalogue so a refresh/redeploy cannot make
+   the saved URL disappear from the admin UI. */
+app.get('/api/admin/character-catalog-persistent', async (req, res) => {
+    try {
+        const baseResponse = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, {
+            headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
+        });
+        const base = await baseResponse.json().catch(() => null);
+        if (!baseResponse.ok || !base || !base.ok) {
+            return res.status(baseResponse.status || 500).json(base || { ok:false, error:'Catalogue indisponible.' });
+        }
+
+        const q = await pool.query(`
+            SELECT universe_key, norm_name, display_name, source_url, status, updated_at
+            FROM character_images
+            WHERE status = 'manual-admin'
+              AND image_bytes IS NOT NULL
+              AND octet_length(image_bytes) >= 700
+        `);
+        const overrides = new Map();
+        for (const row of q.rows || []) {
+            overrides.set(`${row.universe_key}|${row.norm_name}`, row);
+        }
+
+        const characters = (Array.isArray(base.characters) ? base.characters : []).map(raw => {
+            const u = String(raw?.u || raw?.universe || '').trim();
+            const name = cleanImageCharacterName(String(raw?.name || '').trim());
+            if (!u || !name) return raw;
+            const row = overrides.get(`${u}|${normalizeImageKey(name)}`);
+            if (!row) return raw;
+            const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
+            const stableUrl = (typeof simpleImageRoute === 'function')
+                ? simpleImageRoute(u, name, stamp)
+                : `/api/character-image-file?u=${encodeURIComponent(u)}&n=${encodeURIComponent(name)}&v=${encodeURIComponent(stamp)}`;
+            return {
+                ...raw,
+                img: stableUrl,
+                imageUrl: stableUrl,
+                sourceUrl: String(row.source_url || ''),
+                status: 'manual-admin',
+                manualOverride: true
+            };
+        });
+
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return res.json({ ...base, ok:true, characters, manualOverrides: overrides.size });
+    } catch (e) {
+        console.error('[persistent admin character catalog]', e);
+        return res.status(500).json({ ok:false, error:'Impossible de relire les images admin persistantes.' });
+    }
+});
+
+server.listen(PORT, () => {
+    // Le serveur ouvre le port immédiatement. Les images se remplissent ensuite en arrière-plan.
+    setTimeout(() => {
+        startSimpleImageMigration().catch(err => console.error('[Simple images] startup migration:', err));
+    }, 2500);
+
+    // Tant qu'il reste des images manquantes, une nouvelle passe est retentée périodiquement.
+    const imageRetryTimer = setInterval(() => {
+        if (!SIMPLE_IMAGE_STATE.running && (!SIMPLE_IMAGE_STATE.done || SIMPLE_IMAGE_STATE.missing > 0)) {
+            startSimpleImageMigration().catch(err => console.error('[Simple images] scheduled retry:', err));
+        }
+    }, 60 * 60 * 1000);
+    if (typeof imageRetryTimer.unref === 'function') imageRetryTimer.unref();
+
+    startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
+    startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
+    console.log(`Serveur démarré sur le port ${PORT}`);
+});
+/* ===== CORRECTIF ANTI-GEL (laisser tout en bas du fichier) ===== */
+// Remplace les versions lentes déclarées plus haut (la dernière déclaration gagne).
+
+var __dleNames, __dleStatic;
+
+function __dleIndex(u) {
+    if (!__dleNames) __dleNames = new Map();
+    const t = DLE_TARGET_NAMES[u] || [], m = DLE_MASTER_NAMES[u] || [];
+    const sig = t.length + '|' + m.length;
+    let idx = __dleNames.get(u);
+    if (idx && idx.sig === sig) return idx;
+    const al = DLE_MASTER_ALIASES[u] || {}, display = new Map();
+    for (const x of [...t, ...m]) {
+        const xn = normalizeDle(x), c = al[xn] || xn;
+        if (c && !display.has(c)) display.set(c, x);
+    }
+    idx = { sig, display };
+    __dleNames.set(u, idx);
+    return idx;
+}
+
+function dleMasterCanonicalNorm(u, rawName) {
+    const n = normalizeDle(rawName);
+    if (!n) return null;
+    const c = (DLE_MASTER_ALIASES[u] || {})[n] || n;
+    return __dleIndex(u).display.has(c) ? c : null;
+}
+
+function dleMasterDisplayName(u, canon) {
+    return __dleIndex(u).display.get(canon) || null;
+}
+
+function dleProfileExists(u, raw) {
+    const c = dleMasterCanonicalNorm(u, raw);
+    if (!c) return false;
+    if (DLE_VERIFIED_PROFILES[u]?.has(c)) return true;
+    if (!__dleStatic) __dleStatic = new Map();
+    let set = __dleStatic.get(u);
+    if (!set) {
+        set = new Set();
+        const base = DLE_UNIVERSES[u];
+        const add = name => { const k = dleMasterCanonicalNorm(u, name); if (k) set.add(k); };
+        (base?.characters || []).forEach(ch => add(ch.name));
+        Object.keys(DLE_STATIC_PROFILES[u] || {}).forEach(name => add(name));
+        for (const [key, attrs] of Object.entries(DLE_MANUAL_OVERRIDES || {})) {
+            const [uk, n] = key.split('|');
+            if (uk === u && isCompleteDleAttrs(attrs, base?.categories)) add(n);
+        }
+        __dleStatic.set(u, set);
+    }
+    return set.has(c);
+}
+
+async function enrichDleUniverse(u, { delayMs = 350 } = {}) {
+    if (u === 'pokemon') return; // Pokédex déjà complet, rien à chercher
+    DLE_ENRICHMENT_STATE.currentUniverse = u;
+    for (const [normName, displayName] of getDleMasterNames(u)) {
+        await new Promise(r => setImmediate(r)); // laisse le serveur répondre entre deux persos
+        if (dleProfileExists(u, normName)) continue;
+        DLE_ENRICHMENT_STATE.checked++;
+        try {
+            if (await enrichOneDleProfile(u, displayName)) DLE_ENRICHMENT_STATE.completed++;
+            else DLE_ENRICHMENT_STATE.skipped++;
+        } catch (e) {
+            DLE_ENRICHMENT_STATE.skipped++;
+            DLE_ENRICHMENT_STATE.lastError = e.message;
+        }
+        if (delayMs > 0) await sleepDle(delayMs);
+    }
+}
+
+// Désactivé : téléchargeait une énorme base de persos jamais utilisée en jeu
+async function startDleLiveExpansion() { return null; }
+
+// Connexion Neon coupée pendant l'inactivité : simple message au lieu d'un gros log
+pool.on('error', err => console.error('[PG] connexion perdue :', err.message));
+
+
+/* =====================================================================
+   MINI-JEUX ARCADE : Pixel Anime, Silhouette, Emoji Anime, 4 images = 1 anime,
+   Map Guess, Fusion Anime, Scene Guessr  +  Tier list  +  Battle de préférence
+   ==============
+
