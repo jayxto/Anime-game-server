@@ -29,5 +29,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/transform_source_health.txt
+          if git diff --cached --quiet; then
+            echo "No source health report changes"
+            exit 0
+          fi
           git commit -m "chore: audit transformation image source health [skip ci]"
           git push origin HEAD:main
+
+# recheck after replacing eight fragile sources
