@@ -614,7 +614,14 @@ async function fetchAniListCharacterImage(universeKey, name) {
 }
 
 async function resolveCharacterImage(universeKey, displayName) {
-    const fixed = staticCharImage(universeKey, displayName);
+        // CHARACTER IMAGE ADMIN V4
+    // A URL selected by an admin is stored in Postgres and must survive Render redeploys.
+    // Manual values deliberately take priority over bundled/static image maps and auto-resolvers.
+    const manualName = cleanImageCharacterName(displayName);
+    const manual = await getCachedCharacterImage(universeKey, manualName);
+    if (manual?.imageUrl && manual?.sourceUrl === 'manual-admin') return manual;
+
+const fixed = staticCharImage(universeKey, displayName);
     if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
 
     const host = FANDOM_WIKIS[universeKey] || null;
@@ -16984,6 +16991,39 @@ app.post('/api/admin/chars/delete', adminOnly(async (req, res) => {
     if (HAS_DB) await pool.query('DELETE FROM custom_chars WHERE id=$1', [id]);
     customCharRemove(id);
     res.json({ ok: true });
+}));
+
+
+// CHARACTER IMAGE ADMIN ROUTE V4
+// Admin-only editor. The chosen URL is persisted in the existing Postgres
+// character_images cache so it is not lost when Render rebuilds the service.
+app.post('/api/admin/character-image', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const universe = String(b.universe || '').trim();
+    const name = cleanImageCharacterName(String(b.name || '').trim()).slice(0, 160);
+    const imageUrl = String(b.imageUrl || b.img || '').trim().slice(0, 1800);
+
+    if (!ARC_UNIVERSE_ANIME[universe]) {
+        return res.status(400).json({ ok:false, error:'Anime invalide.' });
+    }
+    if (!name) {
+        return res.status(400).json({ ok:false, error:'Personnage invalide.' });
+    }
+    if (!/^https:\/\/\S+$/i.test(imageUrl)) {
+        return res.status(400).json({ ok:false, error:'Le lien doit commencer par https://' });
+    }
+
+    await saveCachedCharacterImage(universe, name, {
+        imageUrl,
+        sourceUrl:'manual-admin',
+        status:'ok'
+    });
+
+    try {
+        CHARACTER_IMAGE_RETRY_AT.delete(`${universe}|${normalizeImageKey(name)}`);
+    } catch (_) {}
+
+    return res.json({ ok:true, universe, name, imageUrl, sourceUrl:'manual-admin' });
 }));
 
 /* ---------- API : citations ---------- */
