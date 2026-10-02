@@ -914,8 +914,9 @@
     function instantStatus(x) {
         const u = imageOf(x);
         if (!u) return 'bad';
-        if (isLocal(u)) return 'ok';
-        return 'external';
+        // Never trust a URL just because it is local: the browser verifies the
+        // actual file immediately. This catches stale /assets paths after deploys.
+        return 'checking';
     }
 
     function css() {
@@ -924,7 +925,7 @@
         s.textContent = `
         .ag-charadmin{margin-top:18px}.ag-charadmin-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.ag-charadmin-head h2{margin:0}
         .ag-charadmin-tools{display:grid;grid-template-columns:minmax(180px,2fr) repeat(3,minmax(145px,1fr));gap:8px;margin:12px 0}.ag-charadmin-tools input,.ag-charadmin-tools select{width:100%;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#111827;color:#fff}
-        .ag-charadmin-stats{font-size:.82rem;opacity:.9;margin:8px 0 12px}.ag-charadmin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.ag-charcard{position:relative;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,25,.78);border-radius:12px;overflow:hidden;min-width:0}.ag-charcard>img{width:100%;height:190px;object-fit:cover;background:#0b1020;display:block}.ag-charcard.bad{border-color:rgba(255,70,100,.68)}.ag-charcard.bad>img{opacity:.22}.ag-charcard.external{border-color:rgba(246,186,73,.45)}
+        .ag-charadmin-stats{font-size:.82rem;opacity:.9;margin:8px 0 12px}.ag-charadmin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.ag-charcard{position:relative;border:1px solid rgba(255,255,255,.1);background:rgba(10,14,25,.78);border-radius:12px;overflow:hidden;min-width:0}.ag-charcard>img{width:100%;height:190px;object-fit:cover;background:#0b1020;display:block}.ag-charcard.bad{border-color:rgba(255,70,100,.68)}.ag-charcard.bad>img{opacity:.22}.ag-charcard.external{border-color:rgba(246,186,73,.45)}.ag-charcard.checking{border-color:rgba(100,160,255,.35)}
         .ag-charcard-copy{padding:9px}.ag-charcard-copy>b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ag-charcard-copy>small{display:block;opacity:.67;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.ag-charstate{position:absolute;z-index:2;top:7px;right:7px;font-size:.68rem;font-weight:900;padding:3px 6px;border-radius:999px;background:#5b6475;color:white}.ag-charcard.ok .ag-charstate{background:#118a58}.ag-charcard.bad .ag-charstate{background:#b82d48}.ag-charcard.external .ag-charstate{background:#9a6b12}
         .ag-modechips{display:flex;gap:4px;overflow:hidden;flex-wrap:wrap;max-height:42px;margin-top:6px}.ag-modechip{font-size:.58rem;padding:2px 5px;border-radius:999px;background:rgba(73,169,255,.12);border:1px solid rgba(73,169,255,.24);white-space:nowrap}.ag-charurl{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.09)}.ag-charurl label{display:block;font-size:.63rem;opacity:.7;margin-bottom:4px}.ag-charurl input{width:100%;box-sizing:border-box;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.16);background:#0b1020;color:#fff;font-size:.67rem}
         .ag-charcard-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:6px}.ag-charcard-actions button,.ag-charcard-actions a{min-width:0;font-size:.65rem;padding:7px 5px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:inherit;text-decoration:none;text-align:center;cursor:pointer}.ag-charcard-actions [data-save]{background:#116b4a;font-weight:800}.ag-charcard-actions button:disabled{opacity:.5;cursor:wait}.ag-charmsg{display:block;min-height:15px;margin-top:5px;font-size:.62rem;line-height:1.2}.ag-charadmin-more{display:block;margin:14px auto 2px;padding:9px 18px}.ag-charadmin-empty{padding:25px;text-align:center;opacity:.7}
@@ -971,22 +972,42 @@
     }
 
     function stats(){
-        const all=state.all.length, ok=[...state.status.values()].filter(v=>v==='ok').length, bad=[...state.status.values()].filter(v=>v==='bad').length, ext=[...state.status.values()].filter(v=>v==='external').length;
-        const el=document.getElementById('ag-charadmin-stats'); if(el) el.textContent=`⚡ Vérification instantanée • ${all} persos uniques • ✅ ${ok} locales/stables • 🔗 ${ext} URL externes • ❌ ${bad} manquantes • ${state.filtered.length} affichés`;
+        const vals=[...state.status.values()];
+        const all=state.all.length,
+              ok=vals.filter(v=>v==='ok').length,
+              bad=vals.filter(v=>v==='bad').length,
+              ext=vals.filter(v=>v==='external').length,
+              checking=vals.filter(v=>v==='checking').length;
+        const el=document.getElementById('ag-charadmin-stats');
+        if(el) el.textContent=`⚡ Vérification réelle • ${all} persos uniques • ✅ ${ok} locales testées • 🔗 ${ext} URL testées • ❌ ${bad} cassées • ⏳ ${checking} en cours • ${state.filtered.length} affichés`;
     }
 
-    function testVisibleExternal(imgEl, x, card){
-        if(state.status.get(keyOf(x))!=='external')return;
-        let done=false; const finish=ok=>{if(done)return;done=true;state.status.set(keyOf(x),ok?'external':'bad');card.classList.toggle('bad',!ok);card.classList.toggle('external',ok);card.querySelector('.ag-charstate').textContent=ok?'URL':'CASSÉE';stats()};
-        imgEl.addEventListener('load',()=>finish(true),{once:true}); imgEl.addEventListener('error',()=>finish(false),{once:true}); setTimeout(()=>finish(false),6000);
+    function testVisibleImage(imgEl,x,card){
+        const url=imageOf(x), k=keyOf(x), local=isLocal(url);
+        let done=false;
+        const finish=ok=>{
+            if(done)return; done=true;
+            const status=ok?(local?'ok':'external'):'bad';
+            state.status.set(k,status);
+            card.classList.remove('bad','ok','external','checking');
+            card.classList.add(status);
+            const badge=card.querySelector('.ag-charstate');
+            if(badge) badge.textContent=ok?(local?'OK':'URL'):'CASSÉE';
+            stats();
+        };
+        if(!url){finish(false);return}
+        imgEl.addEventListener('load',()=>finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0),{once:true});
+        imgEl.addEventListener('error',()=>finish(false),{once:true});
+        if(imgEl.complete) finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0);
+        else setTimeout(()=>finish(false),6500);
     }
 
     function render(reset){
         const grid=document.getElementById('ag-charadmin-grid');if(!grid)return;if(reset)grid.innerHTML=''; const start=reset?0:Math.max(0,state.page*PAGE), end=Math.min(state.filtered.length,(state.page+1)*PAGE); if(reset&&state.filtered.length===0)grid.innerHTML='<div class="ag-charadmin-empty">Aucun personnage.</div>';
         for(const x of state.filtered.slice(start,end)){
             const k=keyOf(x), st=state.status.get(k)||instantStatus(x), url=imageOf(x), modes=sourcesOf(x); const card=document.createElement('div');card.className=`ag-charcard ${st}`; card.dataset.key=k;
-            card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
-            grid.appendChild(card); const img=card.querySelector('img'); testVisibleExternal(img,x,card);
+            card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
+            grid.appendChild(card); const img=card.querySelector('img'); testVisibleImage(img,x,card);
             card.querySelector('[data-copy]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(card.querySelector('[data-url]').value||'')}catch(_){}});
             card.querySelector('[data-url]').addEventListener('input',e=>{card.querySelector('[data-open]').href=e.target.value||'#'});
             card.querySelector('[data-save]').addEventListener('click',()=>saveUrl(x,card));
@@ -1001,11 +1022,35 @@
     async function saveUrl(x,card){
         const input=card.querySelector('[data-url]'), btn=card.querySelector('[data-save]'), msg=card.querySelector('.ag-charmsg'), url=String(input.value||'').trim();
         if(!/^https:\/\/\S+$/i.test(url)){msg.textContent='❌ URL https:// obligatoire';return}
-        btn.disabled=true;msg.textContent='⚡ Vérification…';
-        const valid=await validateImageUrl(url); if(!valid){btn.disabled=false;msg.textContent='❌ Cette image ne charge pas';return}
-        msg.textContent='💾 Sauvegarde…';
-        try{const r=await fetch('/api/admin/character-image',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({universe:x.u||x.universe,name:x.name,imageUrl:url})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'sauvegarde');x.img=url;x.originalImg=url;state.status.set(keyOf(x),'external');card.classList.remove('bad','ok');card.classList.add('external');card.querySelector('img').src=url;card.querySelector('.ag-charstate').textContent='URL';msg.textContent='✅ Sauvegardée définitivement';stats()}catch(e){msg.textContent='❌ '+(e?.message||'Erreur')}finally{btn.disabled=false}
+        btn.disabled=true;msg.textContent='⚡ Vérification immédiate…';
+        const valid=await validateImageUrl(url);
+        if(!valid){btn.disabled=false;msg.textContent='❌ Cette image ne charge pas';return}
+        msg.textContent='💾 Sauvegarde permanente…';
+        try{
+            let headers={'Content-Type':'application/json'};
+            if(typeof authHeaders==='function'){
+                try{headers=authHeaders(true)||headers}catch(_){ }
+                if(!headers['Content-Type']&&!headers['content-type']) headers['Content-Type']='application/json';
+            }
+            const r=await fetch('/api/admin/character-image',{
+                method:'POST',headers,credentials:'same-origin',
+                body:JSON.stringify({universe:x.u||x.universe,name:x.name,imageUrl:url})
+            });
+            const d=await r.json().catch(()=>({}));
+            if(!r.ok||!d.ok)throw new Error(d.error||`HTTP ${r.status}`);
+            x.img=url;x.originalImg=url;
+            state.status.set(keyOf(x),'checking');
+            card.classList.remove('bad','ok','external');card.classList.add('checking');
+            const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='…';
+            const img=card.querySelector('img');
+            img.src='';
+            requestAnimationFrame(()=>{img.src=url+(url.includes('?')?'&':'?')+'ag_verify='+Date.now();testVisibleImage(img,x,card)});
+            msg.textContent='✅ Sauvegardée définitivement';
+            stats();
+        }catch(e){msg.textContent='❌ '+(e?.message||'Erreur')}
+        finally{btn.disabled=false}
     }
 
+    /* Character image admin reliability v6 */
     ensure();
 })();

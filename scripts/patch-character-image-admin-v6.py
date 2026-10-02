@@ -117,7 +117,7 @@ if UI_MARK not in ui:
 
     /* Character image admin reliability v6 */
     ensure();'''
-    ui, n = save_rx.subn(save_new, ui, count=1)
+    ui, n = save_rx.subn(lambda _m: save_new, ui, count=1)
     if n != 1:
         raise SystemExit('saveUrl v5 block not found')
 

@@ -613,6 +613,22 @@ async function fetchAniListCharacterImage(universeKey, name) {
     return hit;
 }
 
+
+// CHARACTER IMAGE LOCAL VALIDATION V6
+function characterLocalImageExistsV6(imageUrl) {
+    const value = String(imageUrl || '');
+    if (!/^\/assets\/images\//i.test(value)) return true;
+    try {
+        const fsV6 = require('fs');
+        const pathV6 = require('path');
+        const full = pathV6.join(__dirname, value.replace(/^\/+/, ''));
+        const st = fsV6.statSync(full);
+        return st.isFile() && st.size > 256;
+    } catch (_) {
+        return false;
+    }
+}
+
 async function resolveCharacterImage(universeKey, displayName) {
         // CHARACTER IMAGE ADMIN V4
     // A URL selected by an admin is stored in Postgres and must survive Render redeploys.
@@ -622,7 +638,7 @@ async function resolveCharacterImage(universeKey, displayName) {
     if (manual?.imageUrl && manual?.sourceUrl === 'manual-admin') return manual;
 
 const fixed = staticCharImage(universeKey, displayName);
-    if (fixed) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
+    if (fixed && characterLocalImageExistsV6(fixed)) return { imageUrl:fixed, sourceUrl:null, status:'ok' };
 
     const host = FANDOM_WIKIS[universeKey] || null;
     // Un wiki Fandom n'est plus obligatoire : tous les nouveaux univers peuvent
