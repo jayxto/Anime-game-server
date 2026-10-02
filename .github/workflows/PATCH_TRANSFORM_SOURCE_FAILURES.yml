@@ -1,0 +1,52 @@
+name: Replace fragile transformation image sources
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_TRANSFORM_SOURCE_FAILURES.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Replace failed transformation sources
+        run: python3 .github/patch_transform_source_failures.py
+      - name: Verify syntax and replacements
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check server.js
+          grep -Fq 'Hie7XEj.png' server.js
+          grep -Fq 'DykYFE-UYAASgxi.jpg' server.js
+          grep -Fq 'Best_Anime_Shows_Vinland_Saga.png' server.js
+          grep -Fq '4680235461659675179.jpg' server.js
+          grep -Fq '9e2c90fe64276bea3d46ce086bb62579.jpg' server.js
+          if git diff --quiet -- server.js; then
+            echo 'server.js unchanged unexpectedly'
+            exit 1
+          fi
+      - name: Commit replacements
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_transform_source_failures.py .github/workflows/PATCH_TRANSFORM_SOURCE_FAILURES.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: replace dead transformation image sources [skip ci]"
+          git push origin HEAD:main
