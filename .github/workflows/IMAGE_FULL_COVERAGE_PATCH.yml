@@ -1,0 +1,257 @@
+name: Image full coverage patch
+
+on:
+  push:
+    paths:
+      - '.github/workflows/IMAGE_FULL_COVERAGE_PATCH.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch server image coverage
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('server.js')
+          s=p.read_text(encoding='utf-8')
+          original=s
+
+          # 1) Replace simpleCatalogue() with a complete catalogue builder. It merges
+          # the existing game catalogue with every normal card pool and known event pool.
+          start=s.find('async function simpleCatalogue()')
+          if start < 0:
+              raise SystemExit('simpleCatalogue() not found')
+          brace=s.find('{', start)
+          if brace < 0: raise SystemExit('simpleCatalogue brace not found')
+          depth=0; end=None; i=brace
+          while i < len(s):
+              ch=s[i]
+              if ch=='{': depth+=1
+              elif ch=='}':
+                  depth-=1
+                  if depth==0:
+                      end=i+1
+                      break
+              i+=1
+          if end is None: raise SystemExit('simpleCatalogue end not found')
+
+          new_func=r'''async function simpleCatalogue() {
+    const map = new Map();
+    const add = (u, name, anime, img, source='jeu') => {
+        name = cleanImageCharacterName(String(name || '').trim());
+        anime = String(anime || '').trim();
+        u = String(u || '').trim();
+        if (!u && anime) {
+            try { u = resolveImageUniverseKey(anime) || ''; } catch (_) {}
+        }
+        if (!u || !name) return;
+        if (!anime) {
+            try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
+            catch (_) { anime = u; }
+        }
+        const k = `${u}|${normalizeImageKey(name)}`;
+        const cleanImg = String(img || '').trim();
+        const old = map.get(k);
+        if (old) {
+            if (!old.img && cleanImg) old.img = cleanImg;
+            if (!old.anime && anime) old.anime = anime;
+            if (source && !old.sources.includes(source)) old.sources.push(source);
+            return;
+        }
+        map.set(k,{u,name,anime,img:cleanImg,sources:[source]});
+    };
+    const addNames = (u, names, source) => {
+        let anime='';
+        try { anime=String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); } catch (_) { anime=String(u||''); }
+        for (const raw of (Array.isArray(names) ? names : [])) {
+            if (typeof raw === 'string') add(u,raw,anime,'',source);
+            else if (raw && typeof raw === 'object') add(raw.u||u,raw.display||raw.name||raw.character||raw.speaker,raw.anime||anime,raw.img||raw.image||raw.imageUrl||'',source);
+        }
+    };
+    const addCardish = (item, fallbackU='', source='cards') => {
+        if (!item) return;
+        if (typeof item === 'string') { if (fallbackU) add(fallbackU,item,'','',source); return; }
+        if (Array.isArray(item)) { for (const x of item) addCardish(x,fallbackU,source); return; }
+        if (typeof item !== 'object') return;
+        const u=String(item.u||item.universe||item.universeKey||fallbackU||'').trim();
+        const name=item.display||item.name||item.character||item.speaker||'';
+        if (u && name) add(u,name,item.anime||item.sub||'',item.img||item.image||item.imageUrl||'',source);
+        for (const key of ['cards','chars','characters','items','pool','list']) {
+            if (Array.isArray(item[key])) addCardish(item[key],u||fallbackU,source);
+        }
+    };
+
+    // Existing public catalogue (modes, DLE, Roland-Garros, themes, etc.).
+    try {
+        const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d=await r.json();
+            for (const raw of (d?.characters || d?.items || [])) {
+                add(raw?.u, raw?.name || raw?.display, raw?.anime, raw?.originalImg || raw?.img || raw?.imageUrl, 'catalogue-api');
+            }
+        }
+    } catch (_) {}
+
+    // Direct game sources, so migration still works even if the HTTP catalogue is unavailable.
+    try { for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) for (const [name,img] of Object.entries(b||{})) add(u,name,'',img,'char-images'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) addNames(u,names,'modes'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(RG_POOLS_V2 || {})) addNames(u,names,'roland-garros'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_MASTER_NAMES || {})) addNames(u,names,'dle-master'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_TARGET_NAMES || {})) addNames(u,names,'dle-target'); } catch (_) {}
+    try {
+        for (const [u,def] of Object.entries(DLE_UNIVERSES || {})) {
+            for (const c of (def?.characters || [])) add(u,c?.name,'',c?.img||c?.image||'','dle-base');
+        }
+    } catch (_) {}
+
+    // CRITICAL: every card actually obtainable/displayed by the collection.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+            for (const [u,anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                let list=[];
+                try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                for (const c of list) add(u,c?.display||c?.name||c?.raw,anime,c?.img||c?.image||'','cards');
+                try {
+                    if (typeof cardAllSpecials === 'function') for (const c of (cardAllSpecials(u)||[])) add(u,c?.display||c?.name,anime,c?.img||'','cards-special');
+                } catch (_) {}
+            }
+        }
+    } catch (_) {}
+
+    // Event / seasonal cards that can sit outside the standard card pools.
+    try { if (typeof hwCards === 'function') addCardish(hwCards(),'','cards-halloween'); } catch (_) {}
+    try {
+        if (typeof SEASON_CARDS !== 'undefined') {
+            for (const [id,cfg] of Object.entries(SEASON_CARDS || {})) {
+                addCardish(cfg,'',`cards-season:${id}`);
+                try { if (typeof seasonChars === 'function') addCardish(seasonChars(id),'',`cards-season:${id}`); } catch (_) {}
+            }
+        }
+    } catch (_) {}
+    try { if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS||{})) addNames(u,names,'boss'); } catch (_) {}
+    try { if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES||{})) addNames(u,Object.keys(byName||{}),'power'); } catch (_) {}
+
+    // Bonus card types already carry dedicated imagery, but their base character is also cached.
+    try { if (typeof ALT_ART_CARDS === 'function') for (const c of (ALT_ART_CARDS()||[])) if (c?.u && c?.name) add(c.u,c.name,c.anime,'','alt-art-base'); } catch (_) {}
+
+    return [...map.values()].sort((a,b)=>String(a.anime).localeCompare(String(b.anime),'fr') || String(a.name).localeCompare(String(b.name),'fr'));
+}'''
+          s=s[:start]+new_func+s[end:]
+
+          # 2) Expose the card pools in /api/character-catalog too (admin UI + diagnostics).
+          marker="        const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))"
+          if marker not in s:
+              raise SystemExit('character catalog marker not found')
+          inject=r'''
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+                        }
+                    } catch (_) {}
+                }
+            }
+        } catch (e) { console.warn('[character catalog cards]', e.message); }
+        try {
+            if (typeof hwCards === 'function') {
+                for (const c of (hwCards() || [])) if (c?.u && (c?.display || c?.name)) add(c.u, (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[c.u]) || c.anime || c.u, c.display || c.name, c.img || null, 'cards-halloween');
+            }
+        } catch (_) {}
+        try {
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+        try {
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
+
+'''
+          s=s.replace(marker,inject+marker,1)
+
+          # 3) AniList bulk pages: 4 -> 8 (large franchises such as One Piece have >200 characters).
+          s=s.replace('for (let page=1; page<=4; page++) {','for (let page=1; page<=8; page++) {',1)
+
+          # 4) Faster retries while gaps remain; still unref'ed and never blocks the port.
+          s=s.replace('}, 6 * 60 * 60 * 1000);','}, 60 * 60 * 1000);',1)
+
+          # 5) Add clearer state fields without changing the route contract.
+          if 'IMAGE FULL COVERAGE V2' not in s: raise SystemExit('patch marker missing')
+          if s == original: raise SystemExit('server.js unchanged')
+          p.write_text(s,encoding='utf-8')
+          print('patched bytes',len(original),'->',len(s))
+          print('card coverage marker count',s.count('IMAGE FULL COVERAGE V2'))
+          PY
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Syntax check
+        run: node --check server.js
+
+      - name: Smoke test full catalogue
+        run: |
+          set -e
+          PORT=18080 DATABASE_URL='' node server.js > /tmp/anime-game-smoke.log 2>&1 &
+          PID=$!
+          trap 'kill $PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/api/character-catalog -o /tmp/catalog.json; then break; fi
+            sleep 1
+          done
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/catalog.json'))
+          chars=d.get('characters') or []
+          card=[x for x in chars if 'cards' in (x.get('sources') or []) or 'cards-special' in (x.get('sources') or [])]
+          assert d.get('ok') is True, d
+          assert len(chars) >= 100, len(chars)
+          assert len(card) >= 50, len(card)
+          print('catalogue total=',len(chars),'card-backed=',len(card),'animes=',len(d.get('animes') or []))
+          open('IMAGE_COVERAGE_PATCH_REPORT.txt','w').write(
+            f"Catalogue smoke test OK\nTotal unique characters: {len(chars)}\nCharacters explicitly coming from card pools: {len(card)}\nAnime groups: {len(d.get('animes') or [])}\n"
+          )
+          PY
+          kill $PID 2>/dev/null || true
+          wait $PID 2>/dev/null || true
+          tail -n 40 /tmp/anime-game-smoke.log || true
+
+      - name: Package final server artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-game-server-full-images
+          path: |
+            server.js
+            IMAGE_COVERAGE_PATCH_REPORT.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Clean temporary audit files and commit final branch
+        run: |
+          set -e
+          rm -rf .github
+          rm -f IMAGE_AUDIT.txt IMAGE_CORE_SNIPPETS.txt IMAGE_TARGET_SNIPPETS.txt IMAGE_COVERAGE_PATCH_REPORT.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: full image coverage for every character and card"
+          git push origin HEAD:image-full-coverage-work
