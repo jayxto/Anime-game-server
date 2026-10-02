@@ -1,0 +1,41 @@
+name: Fill phase 2 bulk images
+on:
+  push:
+    branches: [image-coverage-100-v1]
+    paths:
+      - 'scripts/fill-phase2-bulk.mjs'
+      - '.github/workflows/FILL_PHASE2_BULK.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fill:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Localize MAL and Pokemon bulk matches
+        run: node scripts/fill-phase2-bulk.mjs
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Commit localized images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add music/char-images PHASE2_FILL_REPORT.json
+          git commit -m "fix: localize bulk character and Pokemon images" || true
+          git push origin HEAD:image-coverage-100-v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase2-fill-report
+          path: |
+            PHASE2_FILL_REPORT.json
+            /tmp/phase2-fill-server.log
