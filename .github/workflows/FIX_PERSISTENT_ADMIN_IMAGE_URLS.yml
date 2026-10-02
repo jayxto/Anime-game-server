@@ -22,160 +22,19 @@ jobs:
           node-version: '20'
 
       - name: Patch persistent admin image overrides
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 <<'PY'
-          from pathlib import Path
-          import re
+        run: python3 .github/fix_persistent_images.py
 
-          server_path = Path('server.js')
-          index_path = Path('index.html')
-          server = server_path.read_text(encoding='utf-8')
-          html = index_path.read_text(encoding='utf-8')
-
-          # 1) Never let an automatic image refresh overwrite an explicit admin override.
-          fn_start = server.find('async function simpleStoreImage')
-          fn_end = server.find('async function simpleExistingRows', fn_start)
-          if fn_start < 0 or fn_end < 0:
-              raise SystemExit('simpleStoreImage block not found')
-          block = server[fn_start:fn_end]
-          guard = "WHERE character_images.status IS DISTINCT FROM 'manual-admin' OR EXCLUDED.status = 'manual-admin'"
-          if guard not in block:
-              needle = 'mime_type=EXCLUDED.mime_type,updated_at=now()'
-              if needle not in block:
-                  raise SystemExit('simpleStoreImage UPSERT target not found')
-              block = block.replace(
-                  needle,
-                  needle + "\n          " + guard,
-                  1
-              )
-              server = server[:fn_start] + block + server[fn_end:]
-
-          # 2) Read the persistent manual rows back into the admin catalogue after F5.
-          marker = 'AG_PERSISTENT_ADMIN_CATALOG_V2'
-          if marker not in server:
-              listen = server.find('server.listen(PORT, () => {')
-              if listen < 0:
-                  raise SystemExit('server.listen marker not found')
-              route = r'''
-/* AG_PERSISTENT_ADMIN_CATALOG_V2
-   Admin image overrides are stored in PostgreSQL. This read endpoint overlays
-   those durable rows on the normal catalogue so a refresh/redeploy cannot make
-   the saved URL disappear from the admin UI. */
-app.get('/api/admin/character-catalog-persistent', async (req, res) => {
-    try {
-        const baseResponse = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, {
-            headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
-        });
-        const base = await baseResponse.json().catch(() => null);
-        if (!baseResponse.ok || !base || !base.ok) {
-            return res.status(baseResponse.status || 500).json(base || { ok:false, error:'Catalogue indisponible.' });
-        }
-
-        const q = await pool.query(`
-            SELECT universe_key, norm_name, display_name, source_url, status, updated_at
-            FROM character_images
-            WHERE status = 'manual-admin'
-              AND image_bytes IS NOT NULL
-              AND octet_length(image_bytes) >= 700
-        `);
-        const overrides = new Map();
-        for (const row of q.rows || []) {
-            overrides.set(`${row.universe_key}|${row.norm_name}`, row);
-        }
-
-        const characters = (Array.isArray(base.characters) ? base.characters : []).map(raw => {
-            const u = String(raw?.u || raw?.universe || '').trim();
-            const name = cleanImageCharacterName(String(raw?.name || '').trim());
-            if (!u || !name) return raw;
-            const row = overrides.get(`${u}|${normalizeImageKey(name)}`);
-            if (!row) return raw;
-            const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
-            const stableUrl = (typeof simpleImageRoute === 'function')
-                ? simpleImageRoute(u, name, stamp)
-                : `/api/character-image-file?u=${encodeURIComponent(u)}&n=${encodeURIComponent(name)}&v=${encodeURIComponent(stamp)}`;
-            return {
-                ...raw,
-                img: stableUrl,
-                imageUrl: stableUrl,
-                sourceUrl: String(row.source_url || ''),
-                status: 'manual-admin',
-                manualOverride: true
-            };
-        });
-
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-        return res.json({ ...base, ok:true, characters, manualOverrides: overrides.size });
-    } catch (e) {
-        console.error('[persistent admin character catalog]', e);
-        return res.status(500).json({ ok:false, error:'Impossible de relire les images admin persistantes.' });
-    }
-});
-
-'''
-              server = server[:listen] + route + server[listen:]
-
-          # 3) Make only the admin character viewer load the persistent catalogue.
-          anchor = html.find('ag-charadmin-load')
-          if anchor < 0:
-              anchor = html.find('Admin character viewer')
-          if anchor < 0:
-              raise SystemExit('admin character viewer anchor not found in index.html')
-
-          tail = html[anchor:]
-          fetch_re = re.compile(r"fetch\(\s*(['\"])/api/character-catalog\1\s*,\s*\{\s*cache\s*:\s*(['\"])no-store\2\s*\}\s*\)")
-          m = fetch_re.search(tail)
-          if m:
-              old = m.group(0)
-              new = "fetch('/api/admin/character-catalog-persistent', { cache:'no-store' })"
-              pos = anchor + m.start()
-              html = html[:pos] + new + html[pos + len(old):]
-          elif '/api/admin/character-catalog-persistent' not in tail:
-              raise SystemExit('admin catalogue fetch call not found')
-
-          # 4) Preview uses the server-stable image; URL input shows the exact admin URL.
-          anchor = html.find('ag-charadmin-load')
-          tail = html[anchor:]
-          if 'x.sourceUrl || url' not in tail:
-              patterns = [
-                  ('<input data-url value="${esc(url)}"', '<input data-url value="${esc(x.sourceUrl || url)}"'),
-                  ("<input data-url value='${esc(url)}'", "<input data-url value='${esc(x.sourceUrl || url)}'")
-              ]
-              changed = False
-              for old, new in patterns:
-                  p = html.find(old, anchor)
-                  if p >= 0:
-                      html = html[:p] + new + html[p + len(old):]
-                      changed = True
-                      break
-              if not changed:
-                  # More tolerant fallback for formatting differences.
-                  rx = re.compile(r'(<input\s+data-url\s+value=["\'])\$\{esc\(url\)\}(["\'])')
-                  m = rx.search(html, anchor)
-                  if not m:
-                      raise SystemExit('admin URL input binding not found')
-                  html = html[:m.start()] + m.group(1) + '${esc(x.sourceUrl || url)}' + m.group(2) + html[m.end():]
-
-          server_path.write_text(server, encoding='utf-8')
-          index_path.write_text(html, encoding='utf-8')
-
-          print('server marker:', marker in server)
-          print('manual guard:', guard in server)
-          print('persistent catalogue frontend:', '/api/admin/character-catalog-persistent' in html[anchor:])
-          print('source URL binding:', 'x.sourceUrl || url' in html[anchor:])
-          PY
-
-          node --check server.js
+      - name: Verify server syntax
+        run: node --check server.js
 
       - name: Commit verified fix
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .github/workflows/FIX_PERSISTENT_ADMIN_IMAGE_URLS.yml
+          rm -f .github/workflows/FIX_PERSISTENT_ADMIN_IMAGE_URLS.yml .github/fix_persistent_images.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add server.js index.html .github/workflows/FIX_PERSISTENT_ADMIN_IMAGE_URLS.yml
+          git add -A
           git diff --cached --check
           git commit -m "fix: keep admin character image URLs after refresh [skip ci]"
           git push origin HEAD:main
