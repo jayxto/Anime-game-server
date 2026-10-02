@@ -1,0 +1,111 @@
+async function simpleMigrationPass(pass) {
+    SIMPLE_IMAGE_STATE.pass = pass;
+    const chars = await simpleCatalogue();
+    SIMPLE_IMAGE_STATE.total = chars.length;
+    const rows = await simpleExistingRows();
+    const missing = [];
+    for (const x of chars) {
+        const k = `${x.u}|${normalizeImageKey(x.name)}`;
+        if (rows.get(k)?.has_bytes) continue;
+        x._old = rows.get(k) || null;
+        missing.push(x);
+    }
+    SIMPLE_IMAGE_STATE.stored = chars.length - missing.length;
+    SIMPLE_IMAGE_STATE.missing = missing.length;
+    SIMPLE_IMAGE_STATE.failed = [];
+    if (!missing.length) return [];
+
+    const unresolved = [];
+    await simplePool(missing, 12, async x => {
+        const candidates = [];
+        if (x._old?.source_url) candidates.push(x._old.source_url);
+        if (x._old?.image_url) candidates.push(x._old.image_url);
+        if (x.img) candidates.push(x.img);
+        try { const s = staticCharImage(x.u,x.name); if (s) candidates.push(s); } catch (_) {}
+        for (const c of [...new Set(candidates.filter(Boolean))]) {
+            if (/^\//.test(c)) {
+                try {
+                    const file = path.join(__dirname,String(c).replace(/^\/+/,''));
+                    const b = await fs.promises.readFile(file);
+                    if (simpleImageLooksValid(b)) {
+                        if (await simpleStoreImage(x,{bytes:b,mime:simpleMimeFromPath(file)},x._old?.source_url || null,x._old?.status === 'manual-admin' ? 'manual-admin' : 'ok')) return;
+                    }
+                } catch (_) {}
+            } else if (/^https?:\/\//i.test(c) && !c.includes('/api/character-image-file')) {
+                const img = await simpleFetchImage(c);
+                if (img && await simpleStoreImage(x,img,c,x._old?.status === 'manual-admin' ? 'manual-admin' : 'ok')) return;
+            }
+        }
+        if (simpleImageCompact(x.u) === 'pokemon') {
+            const idx = await simplePokeIndex();
+            for (const v of simpleVariants(x.u,x.name)) {
+                const id = idx.get(simpleImageNorm(v)) || idx.get(simpleImageCompact(v));
+                if (!id) continue;
+                const url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+                const img = await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return;
+            }
+        }
+        unresolved.push(x);
+    });
+
+    const byAnime = new Map();
+    for (const x of unresolved) {
+        const anime = String(x.anime || ARC_UNIVERSE_ANIME?.[x.u] || x.u);
+        if (!byAnime.has(anime)) byAnime.set(anime,[]); byAnime.get(anime).push(x);
+    }
+    const unresolved2 = [];
+    for (const [anime,list] of byAnime) {
+        const candidates = await simpleAniListAnime(anime);
+        for (const x of list) {
+            const wanted = simpleVariants(x.u,x.name); let best=null;
+            for (const c of candidates) {
+                const names=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);
+                const sc=Math.max(0,...names.flatMap(n=>wanted.map(w=>simpleScoreName(n,w))));
+                const url=c?.image?.large || c?.image?.medium || '';
+                if (url && sc>=82 && (!best || sc>best.sc)) best={sc,url};
+            }
+            if (best?.url) {
+                const img=await simpleFetchImage(best.url);
+                if (img && await simpleStoreImage(x,img,best.url)) continue;
+            }
+            unresolved2.push(x);
+        }
+        await new Promise(r=>setTimeout(r,700));
+    }
+
+    const unresolvedSearch=[];
+    await simplePool(unresolved2,3,async x=>{
+        const url=await simpleAniListCharacterSearch(x.u,x.name);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return; }
+        unresolvedSearch.push(x);
+    });
+
+    const unresolved3=[];
+    await simplePool(unresolvedSearch,4,async x=>{
+        const url=await simpleFandomUrl(x.u,x.name);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return; }
+        unresolved3.push(x);
+    });
+
+    const unresolved4=[];
+    for (const x of unresolved3) {
+        const url=await simpleJikanUrl(x.name,x.u);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) continue; }
+        unresolved4.push(x);
+    }
+
+    const unresolved5=[];
+    for (const x of unresolved4) {
+        const url=await simpleWikipediaUrl(x.name,x.anime,x.u);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) continue; }
+        unresolved5.push(x);
+    }
+
+    const after = await simpleExistingRows();
+    const finalMissing = chars.filter(x=>!after.get(`${x.u}|${normalizeImageKey(x.name)}`)?.has_bytes);
+    SIMPLE_IMAGE_STATE.stored = chars.length - finalMissing.length;
+    SIMPLE_IMAGE_STATE.missing = finalMissing.length;
+    SIMPLE_IMAGE_STATE.failed = finalMissing.slice(0,80).map(x=>({u:x.u,anime:x.anime,name:x.name}));
+    return finalMissing;
+}
+
