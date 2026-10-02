@@ -1,0 +1,39 @@
+name: Inspect char snippets
+on:
+  push:
+    branches: [fix-persist-qap-fast]
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Print character windows
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          specs={
+           'server.js':["/api/admin/character-image","CREATE TABLE IF NOT EXISTS character_images","resolveCharacterImage","AG_CANONICAL"],
+           'index.html':["/api/admin/character-image","Qui a le plus","qui a le plus","qapTheme","qap-theme","qap_"]
+          }
+          for fn,pats in specs.items():
+            s=Path(fn).read_text(encoding='utf-8',errors='replace')
+            print('\n=====FILE',fn,'LEN',len(s),'=====')
+            for p in pats:
+              print('\n### PATTERN',repr(p))
+              start=0; n=0
+              while n<12:
+                i=s.find(p,start)
+                if i<0: break
+                a=max(0,i-1800); b=min(len(s),i+3000)
+                chunk=s[a:b].replace('\x00','')
+                print(f'--- HIT {n+1} POS {i} ---')
+                print(chunk)
+                start=i+len(p); n+=1
+              print('HITS_PRINTED',n)
+          PY
