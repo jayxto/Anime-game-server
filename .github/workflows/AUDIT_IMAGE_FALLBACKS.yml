@@ -1,0 +1,32 @@
+name: Audit image fallbacks
+
+on:
+  push:
+    branches: [image-audit-work]
+    paths:
+      - '.github/workflows/AUDIT_IMAGE_FALLBACKS.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-audit-work
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - run: python3 .github/audit_image_fallbacks.py
+      - shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/image_fallbacks.txt
+          git commit -m "audit: record image fallback resolvers [skip ci]"
+          git push origin HEAD:image-audit-work
