@@ -1,0 +1,107 @@
+name: Ultra simple repo + persistent character images
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ULTRA_SIMPLE_REPO.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ultra-simple-repo-migration
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build one-time migration script
+        shell: bash
+        run: |
+          mkdir -p scripts
+          python - <<'PY2'
+          import base64,gzip,pathlib
+          data = base64.b64decode("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")
+          pathlib.Path('scripts/ultra-simple-migrate.mjs').write_bytes(gzip.decompress(data))
+          PY2
+          node --check scripts/ultra-simple-migrate.mjs
+
+      - name: Phase 1 - add PostgreSQL image store and migration
+        run: |
+          node scripts/ultra-simple-migrate.mjs phase1
+          node --check server.js
+
+      - name: Commit phase 1
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server.js
+          git commit -m "refactor: migrate all character images into PostgreSQL"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Wait for Render to copy every character image into PostgreSQL
+        run: |
+          node <<'NODE'
+          const url='https://anime-game-server.onrender.com/api/image-migration-status';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          let last=null;
+          for(let i=0;i<150;i++){
+            try{
+              const r=await fetch(url,{cache:'no-store',headers:{accept:'application/json'}});
+              if(r.ok){
+                const d=await r.json(); last=d;
+                console.log(new Date().toISOString(), JSON.stringify(d));
+                if(d.done && Number(d.total)>0 && Number(d.missing)===0){
+                  console.log('All character images are persistent in PostgreSQL.');
+                  process.exit(0);
+                }
+                if(!d.running && d.finishedAt && Number(d.missing)>0){
+                  throw new Error('Migration finished with '+d.missing+' unresolved images: '+JSON.stringify(d.failed||[]));
+                }
+                if(!d.running && d.lastError){
+                  throw new Error('Migration error: '+d.lastError);
+                }
+              } else console.log('Render not updated yet: HTTP',r.status);
+            }catch(e){
+              if(String(e.message||e).startsWith('Migration finished') || String(e.message||e).startsWith('Migration error')) throw e;
+              console.log('Waiting for Render:',e.message||e);
+            }
+            await sleep(24000);
+          }
+          throw new Error('Timed out waiting for image migration. Last status: '+JSON.stringify(last));
+          NODE
+
+      - name: Phase 2 - inline UI/data and delete every obsolete folder
+        run: |
+          node scripts/ultra-simple-migrate.mjs phase2
+          node --check server.js
+          test -s index.html
+          test -s server.js
+          test -s package.json
+          test -s package-lock.json
+          test -d music
+          test ! -e assets
+          test ! -e locales
+          test ! -e char-images.json
+          test ! -e qap-themes.json
+          test ! -e tierlist-themes.json
+          test ! -e node_modules
+
+      - name: Commit final ultra-simple repository
+        run: |
+          git add -A
+          git commit -m "refactor: ultra-simple repo with DB-backed character images"
+          git pull --rebase origin main
+          git push origin HEAD:main
