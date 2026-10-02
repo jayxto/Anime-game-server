@@ -11611,18 +11611,7 @@ app.get('/api/image-migration-status', async (req,res)=>{
     return res.json({ok:true,...SIMPLE_IMAGE_STATE});
 });
 
-app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
-    const b=req.body||{}; const u=String(b.universe||'').trim();
-    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
-    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
-    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
-    if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
-    const img=await simpleFetchImage(url,10000);
-    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
-    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
-    const imageUrl=simpleImageRoute(u,name,Date.now());
-    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
-}));
+
 
 const __legacyCharacterImageResolver = resolveCharacterImage;
 resolveCharacterImage = async function(universeKey,displayName){
@@ -17126,6 +17115,19 @@ app.get('/api/site', (req, res) => res.json({ ok: true, ...SITE }));
 app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.fromEntries(Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).map(([k, v]) => [k, v.quotes.length])) }));
 
 const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
+
+app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
+    const b=req.body||{}; const u=String(b.universe||'').trim();
+    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
+    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
+    if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
+    const img=await simpleFetchImage(url,10000);
+    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
+    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    const imageUrl=simpleImageRoute(u,name,Date.now());
+    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
+}));
 app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
 app.get('/api/admin/stats', adminOnly(async (req, res) => {
     const socketsN = io.sockets && io.sockets.sockets ? io.sockets.sockets.size : 0;
