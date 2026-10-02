@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'server.js'
+      - '.github/audit_transform_remaining_v3.py'
       - '.github/workflows/AUDIT_TRANSFORM_REMAINING_FAST.yml'
 
 permissions:
@@ -22,7 +23,7 @@ jobs:
             .github
           sparse-checkout-cone-mode: false
       - name: Build remaining report
-        run: python3 .github/audit_transform_remaining_v2.py
+        run: python3 .github/audit_transform_remaining_v3.py
       - name: Commit report
         shell: bash
         run: |
