@@ -1,0 +1,1371 @@
+
+=== app.post('/api/admin/character-image' @ 2525005 ===
+ BLINDTEST_TRACKS.splice(i, 1);
+        delete BLINDTEST_VIDEO_IDS[n];
+        if (!BLINDTEST_TRACKS.some(x => x.anime === anime)) { const j = BLINDTEST_ANIMES.indexOf(anime); if (j >= 0) BLINDTEST_ANIMES.splice(j, 1); }
+    }
+}
+if (HAS_DB) {
+    (async () => {
+        try {
+            await pool.query(`CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value JSONB)`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS custom_tracks (id SERIAL PRIMARY KEY, anime TEXT NOT NULL, title TEXT NOT NULL, yt_id TEXT NOT NULL, kind TEXT, added_by TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            await pool.query(`CREATE TABLE IF NOT EXISTS bug_reports (id SERIAL PRIMARY KEY, pseudo TEXT, mode TEXT, info JSONB, note TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+            (await pool.query('SELECT key, value FROM site_settings')).rows.forEach(r => { if (r.key in SITE) SITE[r.key] = r.value; });
+            (await pool.query('SELECT * FROM custom_tracks ORDER BY id')).rows.forEach(customTrackAdd);
+        } catch (e) { console.warn('[Admin] tables :', e.message); }
+    })();
+}
+async function siteSave(key) {
+    io.emit('site_settings', SITE);
+    if (HAS_DB) { try { await pool.query('INSERT INTO site_settings (key, value) VALUES ($1,$2) ON CONFLICT (key) DO UPDATE SET value=$2', [key, JSON.stringify(SITE[key])]); } catch (_) {} }
+}
+io.on('connection', socket => { socket.emit('site_settings', SITE); });
+app.get('/api/site', (req, res) => res.json({ ok: true, ...SITE }));
+app.get('/api/quote-counts', (req, res) => res.json({ ok: true, counts: Object.fromEntries(Object.entries(QUOTE_UNIVERSES).filter(([k]) => !k.includes('+')).map(([k, v]) => [k, v.quotes.length])) }));
+
+const adminOnly = fn => async (req, res) => { if (!(await isAdmin(req))) return res.status(403).json({ ok: false }); try { await fn(req, res); } catch (e) { res.status(500).json({ ok: false, error: e.message }); } };
+
+// ===== IMAGES PERSONNAGES : ADMIN / REMPLISSAGE AUTOMATIQUE =====
+app.get('/api/admin/character-images/status', adminOnly(async (req, res) => {
+    res.json({ ok:true, state:SIMPLE_IMAGE_STATE });
+}));
+
+app.post('/api/admin/character-images/fill', adminOnly(async (req, res) => {
+    if (!SIMPLE_IMAGE_STATE.running) {
+        setImmediate(() => startSimpleImageMigration().catch(err => {
+            console.error('[Simple images] manual fill:', err);
+        }));
+    }
+    res.json({ ok:true, started:true, state:SIMPLE_IMAGE_STATE });
+}));
+
+app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
+    const b=req.body||{}; const u=String(b.universe||'').trim();
+    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
+    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
+    if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
+    const img=await simpleFetchImage(url,10000);
+    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
+    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    const imageUrl=simpleImageRoute(u,name,Date.now());
+    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
+}));
+
+app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
+app.get('/api/admin/stats', adminOnly(async (req, res) => {
+    const socketsN = io.sockets && io.sockets.sockets ? io.sockets.sockets.size : 0;
+    const roomsList = Object.values(rooms);
+    const byMode = {};
+    roomsList.forEach(r => { const k = roomLabel(r); const o = byMode[k] = byMode[k] || { rooms: 0, players: 0, playing: 0 }; o.rooms++; o.players += r.players.length; if (r.status !== 'waiting') o.playing++; });
+    let modes = [], accounts = null, gamesToday = 0, gamesWeek = 0, suggestions = 0, bugs = 0;
+    if (HAS_DB) {
+        modes = (await pool.query(`SELECT mode, count(*)::int AS n FROM game_results WHERE created_at > now() - interval '7 days' GROUP BY mode ORDER BY n DESC LIMIT 20`)).rows;
+        accounts = (await pool.query('SELECT count(*)::int AS n FROM users')).rows[0].n;
+        gamesToday = (await pool.query('SELECT count(*)::int AS n FROM game_results WHERE created_at >= $1', [parisDayStart()])).rows[0].n;
+        gamesWeek = (await pool.query(`SELECT count(*)::int AS n FROM game_results WHERE created_at > now() - interval '7 days'`)).rows[0].n;
+        suggestions = (await pool.query('SELECT count(*)::int AS n FROM suggestions')).rows[0].n;
+        bugs = (await pool.query('SELECT count(*)::int AS n FROM bug_reports')).rows[0].n;
+    } else {
+        const agg = {}; PROG_MEM.results.forEach(r => { agg[r.mode] = (agg[r.mode] || 0) + 1; });
+        modes = Object.entries(agg).map(([mode, n]) => ({ mode, n })).sort((a, b) => b.n - a.n);
+        gamesWeek = PROG_MEM.results.length; suggestions = SUGG_MEM.length; bugs = BUGS_MEM.length;
+    }
+    res.json({ ok: true, online: socketsN, accountsOnline: userSockets.size, rooms: roomsList.length,
+        inGame: roomsList.filter(r => r.status !== 'waiting').reduce((a, r) => a + r.players.length, 0),
+        byMode: Object.entries(byMode).map(([mode, o]) => ({ mode, ...o })).sort((a, b) => b.players - a.players),
+        modes: modes.map(m => ({ ...m, label: MODE_LABELS[m.mode] || m.mode })), accounts, gamesToday, gamesWeek, suggestions, bugs,
+        tracks: BLINDTEST_TRACKS.length, animes: BLINDTEST_ANIMES.length, site: SITE });
+}));
+app.post('/api/admin/settings', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (b.maintenance) {
+        const lock = !!b.maintenance.lock;
+        SITE.maintenance = { on: !!b.maintenance.on || lock, msg: String(b.maintenance.msg || '').slice(0, 300), lock, back: String(b.maintenance.back || '').slice(0, 60), since: lock ? (SITE.maintenance.lock ? SITE.maintenance.since : Date.now()) : null };
+        await siteSave('maintenance');
+    }
+    if (b.luck) { SITE.luck = { admins: !!b.luck.admins, players: !!b.luck.players }; await siteSave('luck'); }
+    if (b.theme !== undefined) { SITE.theme = ['auto', 'none', 'halloween', 'noel', 'valentin', 'hanami', 'tokyo', 'ninja'].includes(b.theme) ? b.theme : 'auto'; await siteSave('theme'); }
+    res.json({ ok: true, site: SITE });
+}));
+function ytIdFrom(s) {
+    s = String(s || '').trim();
+    const m = s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    return /^[A-Za-z0-9_-]{11}$/.test(s) ? s : null;
+}
+app.get('/api/admin/tracks', adminOnly(async (req, res) => {
+    let rows = CUSTOM_TRACKS_MEM.slice();
+    if (HAS_DB) rows = (await pool.query('SELECT * FROM custom_tracks ORDER BY id DESC')).rows;
+    res.json({ ok: true, rows, animes: BLINDTEST_ANIMES.slice().sort((a, b) => a.localeCompare(b, 'fr')) });
+}));
+app.post('/api/admin/tracks', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const anime = String(b.anime || '').trim().slice(0, 80), title = String(b.title || '').trim().slice(0, 120), yt = ytIdFrom(b.link);
+    if (!anime || !title) return res.json({ ok: false, error: "Mets l'anime et le titre." });
+    if (!yt) return res.json({ ok: false, error: 'Lien YouTube invalide.' });
+    if (BLINDTEST_TRACKS.some(t => (t.ytId || BLINDTEST_VIDEO_IDS[t.n]) === yt)) return res.json({ ok: false, error: 'Cette vidéo est déjà dans le blind test.' });
+    const kind = b.kind === 'ending' ? 'ending' : 'opening';
+    let row;
+    if (HAS_DB) row = (await pool.query('INSERT INTO custom_tracks (anime, title, yt_id, kind, added_by) VALUES ($1,$2,$3,$4,$5) RETURNING *', [anime, title, yt, kind, 'admin'])).rows[0];
+    else { row = { id: CUSTOM_TRACKS_MEM.length + 1, anime, title, yt_id: yt, kind, created_at: new Date() }; CUSTOM_TRACKS_MEM.push(row); }
+    customTrackAdd(row);
+    res.json({ ok: true, row });
+}));
+app.post('/api/admin/tracks/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM custom_tracks WHERE id=$1', [id]);
+    else { const i = CUSTOM_TRACKS_MEM.findIndex(t => t.id === id); if (i >= 0) CUSTOM_TRACKS_MEM.splice(i, 1); }
+    customTrackRemove(id);
+    res.json({ ok: true });
+}));
+const bugLast = new Map();
+app.post('/api/bug', async (req, res) => {
+    const b = req.body || {};
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0];
+    const now = Date.now();
+    const hist = (bugLast.get(ip) || []).filter(t => now - t < 3600000);
+    if (hist.length >= 15) return res.json({ ok: false, error: 'Trop de signalements, réessaie plus tard.' });
+    hist.push(now); bugLast.set(ip, hist);
+    let info = b.info && typeof b.info === 'object' ? b.info : {};
+    if (JSON.stringify(info).length > 6000) info = { trop_long: true };
+    const item = { pseudo: String(b.pseudo || 'Invité').slice(0, 20), mode: String(b.mode || '').slice(0, 40), info, note: String(b.note || '').slice(0, 500) };
+    if (HAS_DB) { try { await pool.query('INSERT INTO bug_reports (pseudo, mode, info, note) VALUES ($1,$2,$3,$4)', [item.pseudo, item.mode, item.info, item.note]); } catch (e) { return res.json({ ok: false }); } }
+    else BUGS_MEM.push({ id: BUGS_MEM.length + 1, ...item, created_at: new Date() });
+    res.json({ ok: true });
+});
+app.get('/api/admin/bugs', adminOnly(async (req, res) => {
+    let rows = BUGS_MEM.slice().reverse();
+    if (HAS_DB) rows = (await pool.query('SELECT * FROM bug_reports ORDER BY created_at DESC LIMIT 200')).rows;
+    res.json({ ok: true, rows });
+}));
+app.post('/api/admin/bugs/delete', adminOnly(async (req, res) => {
+    const id = +(req.body || {}).id;
+    if (HAS_DB) await pool.query('DELETE FROM bug_reports WHERE id=$1', [id]);
+    else { const i = BUGS_MEM.findIndex(t => t.id === id); if (i >= 0) BUGS_MEM.splice(i, 1); }
+    res.json({ ok: true });
+}));
+
+/* ---------- Thèmes : Pixel / Silhouette spéciaux avec des persos du thème ---------- */
+const THEME_CHARS = {
+    halloween: [['deathnote', 'Ryuk'], ['deathnote', 'Rem'], ['tokyoghoul', 'Ken Kaneki'], ['tokyoghoul', 'Rize Kamishiro'], ['tokyoghoul', 'Eto Yoshimura'], ['demonslayer', 'Muzan Kibutsuji'],
+        ['demonslayer', 'Akaza'], ['demonslayer', 'Kokushibo'], ['demonslayer', 'Doma'], ['demonslayer', 'Rui'], ['jjk', 'Ryomen Sukuna'], ['jjk', 'Mahito'], ['jjk', 'Jogo'], ['naruto', 'Orochimaru'],
+        ['naruto', 'Kisame Hoshigaki'], ['naruto', 'Hidan'], ['naruto', 'Zetsu'], ['onepiece', 'Brook'], ['onepiece', 'Gecko Moria'], ['onepiece', 'Perona'], ['hxh', 'Hisoka Morow'], ['hxh', 'Illumi Zoldyck'],
+        ['hxh', 'Neferpitou'], ['dragonball', 'Majin Boo'], ['dragonball', 'Cell'], ['chainsaw', 'Pochita'], ['chainsaw', 'Power'], ['chainsaw', 'Makima'], ['fma', 'Envy'], ['fma', 'Gluttony'],
+        ['bleach', 'Ulquiorra Cifer'], ['bleach', 'Mayuri Kurotsuchi'], ['bleach', 'Kenpachi Zaraki'], ['snk', 'Zeke Yeager'], ['fairy', 'Zeref Dragneel'], ['jojo', 'Dio Brando'], ['bluelock', 'Ryusei Shidou']],
+    noel: [['onepiece', 'Tony Tony Chopper'], ['chainsaw', 'Santa Claus'], ['bleach', 'Toshiro Hitsugaya'], ['bleach', 'Rukia Kuchiki'], ['fairy', 'Gray Fullbuster'], ['onepiece', 'Kuzan'],
+        ['naruto', 'Haku'], ['snk', 'Mikasa Ackerman'], ['fairy', 'Juvia Lockser'], ['demonslayer', 'Nezuko Kamado'], ['demonslayer', 'Kyojuro Rengoku'], ['hxh', 'Killua Zoldyck'],
+        ['naruto', 'Hinata Hyūga'], ['jjk', 'Toge Inumaki'], ['jjk', 'Pa
+=== async function simpleStoreImage @ 2192294 ===
+   let parsed;
+    try { parsed = new URL(url); } catch (_) { return null; }
+    if (simpleImageIsPrivateHost(parsed.hostname)) return null;
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+        const r = await fetch(url, {
+            redirect: 'follow', signal: ac.signal,
+            headers: { 'User-Agent':'ANIME-GAME/1.0', 'Accept':'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }
+        });
+        if (!r.ok) return null;
+        const mime = String(r.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+        if (!mime.startsWith('image/')) return null;
+        const bytes = Buffer.from(await r.arrayBuffer());
+        if (!simpleImageLooksValid(bytes)) return null;
+        return { bytes, mime };
+    } catch (_) { return null; }
+    finally { clearTimeout(t); }
+}
+function simpleScoreName(candidate, wanted) {
+    const a = simpleImageNorm(candidate), b = simpleImageNorm(wanted);
+    if (!a || !b) return 0;
+    if (a === b) return 100;
+    if (simpleImageCompact(a) === simpleImageCompact(b)) return 98;
+    if (a.includes(b) || b.includes(a)) {
+        const sm = Math.min(a.length,b.length), lg = Math.max(a.length,b.length);
+        if (sm >= 4) return 83 + Math.round(14 * sm / lg);
+    }
+    const A = new Set(a.split(' ')), B = new Set(b.split(' ')); let common = 0;
+    for (const x of A) if (B.has(x)) common++;
+    return Math.round((common / Math.max(A.size,B.size,1)) * 82);
+}
+const SIMPLE_ALIASES = new Map(Object.entries({
+    'dragonball|sangoku':'Son Goku','dragonball|sangohan':'Son Gohan','dragonball|sangoten':'Son Goten',
+    'dragonball|vegeto':'Vegito','dragonball|roi vegeta':'King Vegeta','dragonball|roi cold':'King Cold',
+    'dragonball|grand pretre':'Grand Priest','dragonball|docteur gero':'Dr. Gero',
+    'chainsaw|demon des tenebres':'Darkness Devil','chainsaw|demon de la chute':'Falling Devil',
+    'chainsaw|demon de la justice':'Justice Devil','chainsaw|demon de l enfer':'Hell Devil',
+    'clover|patolli':'Patry','blackclover|patolli':'Patry','tokyorevengers|draken':'Ken Ryuguji'
+}));
+function simpleVariants(u, name) {
+    const out = [String(name || '').trim()];
+    const a = SIMPLE_ALIASES.get(simpleImageCompact(u) + '|' + simpleImageNorm(name));
+    if (a) out.unshift(a);
+    const p = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (p.length === 2) out.push(p.slice().reverse().join(' '));
+    return [...new Set(out.filter(Boolean))];
+}
+
+async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
+    if (!image || !simpleImageLooksValid(image.bytes)) return false;
+    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
+    const stable = simpleImageRoute(x.u, x.name, Date.now());
+    await pool.query(`
+        INSERT INTO character_images
+            (universe_key,norm_name,display_name,image_url,source_url,status,image_bytes,mime_type,updated_at)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,now())
+        ON CONFLICT (universe_key,norm_name)
+        DO UPDATE SET display_name=EXCLUDED.display_name,image_url=EXCLUDED.image_url,
+          source_url=EXCLUDED.source_url,status=EXCLUDED.status,image_bytes=EXCLUDED.image_bytes,
+          mime_type=EXCLUDED.mime_type,updated_at=now()
+          WHERE character_images.status IS DISTINCT FROM 'manual-admin' OR EXCLUDED.status = 'manual-admin'
+    `, [x.u,normName,x.name,stable,sourceUrl || null,status,image.bytes,image.mime || 'image/jpeg']);
+    try { CHARACTER_IMAGE_CACHE.delete(`${x.u}|${normName}`); } catch (_) {}
+    return true;
+}
+
+async function simpleExistingRows() {
+    const out = new Map();
+    const r = await pool.query(`SELECT universe_key,norm_name,image_url,source_url,status,
+      (image_bytes IS NOT NULL AND octet_length(image_bytes) >= 700) AS has_bytes, updated_at
+      FROM character_images`);
+    for (const row of r.rows) out.set(`${row.universe_key}|${row.norm_name}`, row);
+    return out;
+}
+
+async function simpleCatalogue() {
+    const map = new Map();
+    const add = (u, name, anime, img, source='jeu') => {
+        name = cleanImageCharacterName(String(name || '').trim());
+        anime = String(anime || '').trim();
+        u = String(u || '').trim();
+        if (!u && anime) {
+            try { u = resolveImageUniverseKey(anime) || ''; } catch (_) {}
+        }
+        if (!u || !name) return;
+        if (!anime) {
+            try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
+            catch (_) { anime = u; }
+        }
+        const k = `${u}|${normalizeImageKey(name)}`;
+        const cleanImg = String(img || '').trim();
+        const old = map.get(k);
+        if (old) {
+            if (!old.img && cleanImg) old.img = cleanImg;
+            if (!old.anime && anime) old.anime = anime;
+            if (source && !old.sources.includes(source)) old.sources.push(source);
+            return;
+        }
+        map.set(k,{u,name,anime,img:cleanImg,sources:[source]});
+    };
+    const addNames = (u, names, source) => {
+        let anime='';
+        try { anime=String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); } catch (_) { anime=String(u||''); }
+        for (const raw of (Array.isArray(names) ? names : [])) {
+            if (typeof raw === 'string') add(u,raw,anime,'',source);
+            else if (raw && typeof raw === 'object') add(raw.u||u,raw.display||raw.name||raw.character||raw.speaker,raw.anime||anime,raw.img||raw.image||raw.imageUrl||'',source);
+        }
+    };
+    const addCardish = (item, fallbackU='', source='cards') => {
+        if (!item) return;
+        if (typeof item === 'string') { if (fallbackU) add(fallbackU,item,'','',source); return; }
+        if (Array.isArray(item)) { for (const x of item) addCardish(x,fallbackU,source); return; }
+        if (typeof item !== 'object') return;
+        const u=String(item.u||item.universe||item.universeKey||fallbackU||'').trim();
+        const name=item.display||item.name||item.character||item.speaker||'';
+        if (u && name) add(u,name,item.anime||item.sub||'',item.img||item.image||item.imageUrl||'',source);
+        for (const key of ['cards','chars','characters','items','pool','list']) {
+            if (Array.isArray(item[key])) addCardish(item[key],u||fallbackU,source);
+        }
+    };
+
+    // Existing public catalogue (modes, DLE, Roland-Garros, themes, etc.).
+    try {
+        const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d=await r.json();
+            for (const raw of (d?.characters || d?.items || [])) {
+                add(raw?.u, raw?.name || raw?.display, raw?.anime, raw?.originalImg || raw?.img || raw?.imageUrl, 'catalogue-api');
+            }
+        }
+    } catch (_) {}
+
+    // Direct game sources, so migration still works even if the HTTP catalogue is unavailable.
+    try { for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) for (const [name,img] of Object.entries(b||{})) add(u,name,'',img,'char-images'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) addNames(u,names,'modes'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(RG_POOLS_V2 || {})) addNames(u,names,'roland-garros'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_MASTER_NAMES || {})) addNames(u,names,'dle-master'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_TARGET_NAMES || {})) addNames(u,names,'dle-target'); } catch (_) {}
+    try {
+        for (const [u,def] of Object.entries(DLE_UNIVERSES || {})) {
+            for (const c of (def?.characters || [])) add(u,c?.name,'',c?.img||c?.image||'','dle-base');
+        }
+    } catch (_) {}
+
+    // Every card actually obtainable/displayed by the collection.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+            for (const [u,anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                let list=[];
+                try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                for (const c of list) add(u,c?.display||c?.name||c?.raw,anime,c?.img||c?.image||'','cards');
+                try {
+                    if (typeof cardAllSpecials === 'function') {
+                        for (const c of (cardAllSpecials(u)||[])) add(u,c?.display||c?.name,anime,c?.img||'','cards-special');
+                    }
+                } catch (_) {}
+            }
+        }
+    } catch (_) {}
+
+    // Event / seasonal cards that can sit outside the standard card pools.
+    try { if (typeof hwCards === 'function') addCardish(hwCards(),'','cards-halloween'); } catch (_) {}
+    try {
+        if (typeof SEASON_CARDS !== 'undefined') {
+            for (const [id,cfg] of Object.entries(SEASON_CARDS || {})) {
+                addCardish(cfg,'',`cards-season:${id}`);
+                try { if (typeof seasonChars === 'function') addCardish(seasonChars(id),'',`cards-season:${id}`); } catch (_) {}
+            }
+        }
+    } catch (_) {}
+    try { if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS||{})) addNames(u,names,'boss'); } catch (_) {}
+    try { if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES||{})) addNames(u,Object.keys(byName||{}),'power'); } catch (_) {}
+
+    // Bonus card types already carry dedicated imagery, but cache their base character too.
+    try { if (typeof ALT_ART_CARDS === 'function') for (const c of (ALT_ART_CARDS()||[])) if (c?.u && c?.name) add(c.u,c.name,c.anime,'','alt-art-base'); } catch (_) {}
+
+    return [...map.values()].sort((a,b)=>String(a.anime).localeCompare(String(b.anime),'fr') || String(a.name).localeCompare(String(b.name),'fr'));
+}
+async function simplePokeIndex() {
+    if (simplePokeIndex.cache) return simplePokeIndex.cache;
+    const map = new Map();
+    try {
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000', { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d = await r.json();
+            for (const x of d?.results || []) {
+                const id = String(x.url || '').match(/pokemon-species\/(\d+)\/?$/)?.[1];
+                if (id) { map.set(simpleImageNorm(x.name),id); map.set(simpleImageCompact(x.name),id); }
+            }
+        }
+    } catch (_) {}
+    simplePokeIndex.cache = map; return map;
+}
+
+async function simpleAniListAnime(anime) {
+    const cache = simpleAniListAnime.cache || (simpleAniListAnime.cache = new Map());
+    if (cache.has(anime)) return cache.get(anime);
+    const all = [];
+    for (let page=1; page<=8; page++) {
+        const query = `query($s:String,$p:Int){Media(search:$s,type:ANIME){characters(page:$p,perPage:50,sort:[ROLE,RELEVANCE]){pageInfo{hasNextPage}nodes{name{full native alternative}image{large medium}}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST', headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:anime,p:page}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,3500)); page--; continue; }
+            if (!r.ok) break;
+            const d = await r.json(); const c = d?.data?.Media?.characters;
+            all.push(..
+=== async function getCachedCharacterImage @ 1130886 ===
+bungo stray dogs':'bungou','d gray man':'dgrayman','d.gray-man':'dgrayman','yu yu hakusho':'yuyuhakusho','inuyasha':'inuyasha',
+    'gurren lagann':'gurren','tengen toppa gurren lagann':'gurren','kill la kill':'killlakill','fate stay night':'fate','fate/stay night':'fate',
+    'akame ga kill':'akame','overlord':'overlord','the rising of the shield hero':'shieldhero','the eminence in shadow':'eminence',
+    'danmachi':'danmachi','made in abyss':'madeinabyss','hellsing ultimate':'hellsing','devilman crybaby':'devilman',
+    'neon genesis evangelion':'evangelion','sailor moon':'sailormoon','digimon':'digimon','yu gi oh':'yugioh','yu-gi-oh!':'yugioh',
+    'soul eater':'soul','trigun':'trigun','vinland saga':'vinland','the misfit of demon king academy':'misfit'
+};
+
+const CHARACTER_IMAGE_CACHE = new Map();
+const CHARACTER_IMAGE_INFLIGHT = new Map();
+
+function normalizeImageKey(value) {
+    return String(value || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[’`]/g, "'")
+        .replace(/[^a-z0-9']+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function resolveImageUniverseKey(rawUniverse) {
+    const raw = String(rawUniverse || '').trim();
+    if (!raw) return null;
+    if (FANDOM_WIKIS[raw]) return raw;
+    const alias = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(raw)];
+    if (alias) return alias;
+    // Les nouveaux anime n'ont pas tous un wiki Fandom configuré : on accepte
+    // directement leur clé/nom ARC et resolveCharacterImage utilisera AniList.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined') {
+            if (ARC_UNIVERSE_ANIME[raw]) return raw;
+            const wanted = normalizeImageKey(raw);
+            const hit = Object.entries(ARC_UNIVERSE_ANIME).find(([, label]) => normalizeImageKey(label) === wanted);
+            if (hit) return hit[0];
+        }
+    } catch (_) {}
+    return null;
+}
+
+function cleanImageCharacterName(name) {
+    return String(name || '')
+        .replace(/\s+\((?:adult|young|child|anime|manga|movie|film)\)\s*$/i, '')
+        .trim();
+}
+
+function parseCharacterLabelForImage(label) {
+    const s = String(label || '').trim();
+    if (!s) return { name:'', universe:null };
+
+    if (s.endsWith(')')) {
+        const i = s.lastIndexOf(' (');
+        if (i > 0) {
+            return {
+                name: s.slice(0, i).trim(),
+                universe: s.slice(i + 2, -1).trim()
+            };
+        }
+    }
+    return { name:s, universe:null };
+}
+
+async function getCachedCharacterImage(universeKey, displayName) {
+    const normName = normalizeImageKey(displayName);
+    const cacheKey = `${universeKey}|${normName}`;
+
+    if (CHARACTER_IMAGE_CACHE.has(cacheKey)) {
+        return CHARACTER_IMAGE_CACHE.get(cacheKey);
+    }
+
+    if (!process.env.DATABASE_URL) return null;
+    try {
+        const result = await pool.query(
+            `SELECT image_url, source_url, status
+             FROM character_images
+             WHERE universe_key=$1 AND norm_name=$2
+             LIMIT 1`,
+            [universeKey, normName]
+        );
+        if (!result.rows.length) return null;
+        const row = result.rows[0];
+        const data = {
+            imageUrl: row.image_url || null,
+            sourceUrl: row.source_url || null,
+            status: row.status || 'missing'
+        };
+        CHARACTER_IMAGE_CACHE.set(cacheKey, data);
+        return data;
+    } catch (e) {
+        return null;
+    }
+}
+
+async function saveCachedCharacterImage(universeKey, displayName, data) {
+    const normName = normalizeImageKey(displayName);
+    const cacheKey = `${universeKey}|${normName}`;
+    CHARACTER_IMAGE_CACHE.set(cacheKey, data);
+
+    if (!process.env.DATABASE_URL) return;
+    try {
+        await pool.query(`
+            INSERT INTO character_images
+                (universe_key, norm_name, display_name, image_url, source_url, status, updated_at)
+            VALUES ($1,$2,$3,$4,$5,$6,now())
+            ON CONFLICT (universe_key, norm_name)
+            DO UPDATE SET
+                display_name=EXCLUDED.display_name,
+                image_url=EXCLUDED.image_url,
+                source_url=EXCLUDED.source_url,
+                status=EXCLUDED.status,
+                updated_at=now()
+        `, [
+            universeKey,
+            normName,
+            displayName,
+            data.imageUrl || null,
+            data.sourceUrl || null,
+            data.status || 'missing'
+        ]);
+    } catch (e) {
+        console.warn('[Fandom image] cache DB impossible:', e.message);
+    }
+}
+
+function pageImageFromApiPage(page) {
+    if (!page || page.missing != null) return null;
+    const imageUrl = page.original?.source || page.thumbnail?.source || null;
+    if (!imageUrl) return null;
+    return {
+        imageUrl,
+        sourceUrl: page.fullurl || null,
+        title: page.title || null
+    };
+}
+
+function fandomPageScore(page, wantedName) {
+    const wanted = normalizeImageKey(wantedName);
+    const title = normalizeImageKey(page?.title || '');
+    if (!title) return -999;
+    let score = 0;
+    if (title === wanted) score += 100;
+    if (title.includes(wanted) || wanted.includes(title)) score += 45;
+
+    const wantedTokens = new Set(wanted.split(' ').filter(Boolean));
+    const titleTokens = new Set(title.split(' ').filter(Boolean));
+    let overlap = 0;
+    wantedTokens.forEach(t => { if (titleTokens.has(t)) overlap++; });
+    score += overlap * 8;
+
+    if (/gallery|image gallery|images|list of|category|episode|chapter|volume/i.test(page?.title || '')) score -= 45;
+    return score;
+}
+
+async function fetchFandomPageImageByExactTitle(host, title) {
+    const params = new URLSearchParams({
+        action: 'query',
+        titles: title,
+        prop: 'pageimages|info',
+        piprop: 'original|thumbnail',
+        pithumbsize: '700',
+        inprop: 'url',
+        redirects: '1',
+        format: 'json',
+        origin: '*'
+    });
+    const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 12000);
+    const pages = Object.values(data?.query?.pages || {});
+    for (const page of pages) {
+        const hit = pageImageFromApiPage(page);
+        if (hit) return hit;
+    }
+    return null;
+}
+
+async function fetchFandomPageImageBySearch(host, name) {
+    const params = new URLSearchParams({
+        action: 'query',
+        generator: 'search',
+        gsrsearch: name,
+        gsrnamespace: '0',
+        gsrlimit: '8',
+        prop: 'pageimages|info',
+        piprop: 'original|thumbnail',
+        pithumbsize: '700',
+        inprop: 'url',
+        format: 'json',
+        origin: '*'
+    });
+    const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 12000);
+    const pages = Object.values(data?.query?.pages || {})
+        .filter(p => pageImageFromApiPage(p))
+        .sort((a,b) => fandomPageScore(b, name) - fandomPageScore(a, name));
+
+    return pages.length ? pageImageFromApiPage(pages[0]) : null;
+}
+
+
+// Transformations : chemins de page connus. Une page dédiée à la FORME est plus rapide
+// et plus fiable qu'une recherche de dizaines de fichiers dans une galerie.
+const TRANSFORM_PAGE_ALIASES = {
+    'kurama chakra mode':'Nine-Tails Chakra Mode',
+    'six paths sage mode':'Six Paths Sage Mode',
+    'one for all full cowl':'Full Cowl',
+    'one for all full cowl':'Full Cowl',
+    'black asta':'Black Asta',
+    'devil union':'Devil Union',
+    'crown clown':'Crown Clown',
+    'tengen toppa gurren lagann':'Tengen Toppa Gurren Lagann',
+    'saber alter':'Saber Alter',
+    'rage shield':'Rage Shield',
+    'yoko kurama':'Yoko Kurama',
+    'war greymon':'WarGreymon',
+    'wargreymon':'WarGreymon',
+    'metalgarurumon':'MetalGarurumon',
+    'omnimon':'Omnimon'
+};
+async function fetchFandomTransformationPageFast(host, form) {
+    const raw = String(form || '').trim();
+    if (!raw) return null;
+    const norm = normalizeImageKey(raw);
+    const title = TRANSFORM_PAGE_ALIASES[norm] || raw;
+    const params = new URLSearchParams({ action:'query', titles:title, prop:'pageimages|info', piprop:'original|thumbnail', pithumbsize:'900', inprop:'url', redirects:'1', format:'json', origin:'*' });
+    try {
+        const data = await fetchJsonWithTimeout(`https://${host}/api.php?${params}`, 3200);
+        for (const page of Object.values(data?.query?.pages || {})) {
+            if (page?.missing != null) continue;
+            // La page elle-même doit correspondre à la forme. Jamais au personnage seul.
+            const pt = normalizeImageKey(page.title || '');
+            const wanted = normalizeImageKey(title);
+            if (!(pt === wanted || pt.includes(wanted) || wanted.includes(pt))) continue;
+            const hit = pageImageFromApiPage(page);
+            if (hit?.imageUrl) return hit.imageUrl;
+        }
+    } catch (_) {}
+    return null;
+}
+
+// Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
+// l'image principale de la page personnage (qui est précisément la cause de "Sasuke normal").
+/* QAP_VERIFIED_TRANSFORM_IMAGES_V2
+   Small visually-reviewed seed set for the most obvious/high-risk forms.
+   The remote URL is only an import source: persistQapTransformImage copies the
+   bytes into PostgreSQL under universe `_transform`, so game rendering does not
+   depend on the hotlink after the first successful import. */
+const QAP_VERIFIED_TRANSFORM_SOURCES_V2 = [
+    {
+        needs:['naruto','six paths','sage'],
+        url:'https://img.lemino.docomo.ne.jp/cms/a04cecf/a04cecf_w1.jpg?auto=webp&quality=75&width=3840'
+    },
+    {
+        needs:['naruto','sage mode'], forbids:['six paths','rikudo'],
+        url:'https://static.deltiasgaming.com/2025/01/Naruto-Uzumaki.jpg'
+    },
+    {
+        needs:['sasuke','susanoo'],
+        url:'https://i.ytimg.com/vi/-PVBJ4mf-xo/maxresdefault.jpg'
+    },
+    {
+        needs:['luffy','gear 5'],
+        url:'https://s1.dmcdn.net/v/V9ncC1eoseQFOJQqb/x720'
+    },
+    {
+        needs:['goku','ultra instinct'], forbids:['sign'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2026/01/2785224.jpg?_=1790885400'
+    },
+    {
+        needs:['ichigo','bankai'],
+        url:'https://cdn2.fptshop.com.vn/unsafe/800x0/bankai_5_233785fa0d.png'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH2 — visually/context-checked second pass.
+    {
+        needs:['ultra ego'],
+        url:'https://cdn.alfabetajuega.com/alfabetajuega/2022/03/dragon-ball-super-vegeta-ultra-ego.jpg'
+    },
+    {
+        needs:['gohan','beast'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2023/01/SHF%20SON%20GOHAN%20%20BEAST%2002.jpg?_=1790947320'
+    },
+    {
+        needs:['piccolo','orange'],
+        url:'https://en.dragon-ball-official.com/dragonball/jp/news/2023/03/SHF%20ORANGE%20PICCOLO_01.jpg?_=1790957400'
+    },
+    {
+        needs:['broly','full power'],
+        url:'https://en.dragon-ball-official.com/dragonball/jp/news/2022/03/chara46_7.jpg?_=1790943900'
+    },
+    {
+        needs:['gogeta','super saiyan blue'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2025/12/1040_1040_gogeta2_o.jpg?_=1786515780'
+    },
+    {
+        needs:['gogeta','super saiyan god super saiyan'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2025/12/1040_1040_gogeta2_o.jpg?_=1786515780'
+    },
+    {
+        needs:['black frieza'],
+        url:'https://p7.itc.cn/images01/20230602/afea49694e24409dbca3a7924b978389.jpeg'
+    },
+    {
+        needs:['black freezer'],
+        url:'https://p7.itc.cn/ima
+=== function simpleImageRoute @ 2188586 ===
+).emit('start_voting', room);
+                }
+                return;
+            }
+
+            if (room.status === 'gameplay' || room.status === 'reveal' || room.status === 'end_clues') {
+                if (room.currentTurnIndex >= room.players.length) room.currentTurnIndex = 0;
+                io.to(roomCode).emit('update_gameplay', room);
+                return;
+            }
+
+            if (room.status === 'choosing_theme') {
+                const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+                io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
+                return;
+            }
+
+            // Autres états : on ne renvoie l'écran Undercover que pour les modes Undercover / note
+            if (room.mode === 'undercover' || room.mode === 'note') io.to(roomCode).emit('update_gameplay', room);
+        }
+}
+
+const PORT = process.env.PORT || 3000;
+
+// --- Filet de sécurité global ---
+// Sans ça, la moindre erreur inattendue dans un handler tue le processus Node :
+// Render redémarre, toutes les parties en mémoire sont perdues et TOUS les joueurs
+// sont éjectés en même temps. On journalise et on continue de tourner.
+process.on('uncaughtException', (err) => {
+    console.error('[ERREUR NON RATTRAPÉE] le serveur continue malgré tout :', err);
+});
+
+process.on('unhandledRejection', (raison) => {
+    console.error('[PROMESSE REJETÉE] le serveur continue malgré tout :', raison);
+});
+/* ================= SIMPLE PERSISTENT CHARACTER IMAGES V1 =================
+   Final architecture:
+   - baseline and admin character pictures are copied into PostgreSQL (BYTEA)
+   - the browser only loads /api/character-image-file from this server
+   - admin URL changes are verified immediately, copied, and no longer hotlinked
+   - the old image resolvers are retained only as a temporary migration fallback
+============================================================================ */
+
+const SIMPLE_IMAGE_STATE = {
+    running: false, done: false, pass: 0, total: 0, stored: 0, missing: 0,
+    failed: [], startedAt: null, finishedAt: null, lastError: null
+};
+
+function simpleImageNorm(value) {
+    return String(value || '')
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[’']/g, '')
+        .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+}
+function simpleImageCompact(value) { return simpleImageNorm(value).replace(/\s+/g, ''); }
+function simpleImageRoute(universe, name, version) {
+    const v = version ? '&v=' + encodeURIComponent(String(version)) : '';
+    return '/api/character-image-file?u=' + encodeURIComponent(universe) + '&n=' + encodeURIComponent(name) + v;
+}
+function simpleMimeFromPath(p) {
+    const x = String(p || '').toLowerCase();
+    if (x.endsWith('.png')) return 'image/png';
+    if (x.endsWith('.gif')) return 'image/gif';
+    if (x.endsWith('.avif')) return 'image/avif';
+    if (x.endsWith('.webp')) return 'image/webp';
+    return 'image/jpeg';
+}
+function simpleImageLooksValid(buf) {
+    return Buffer.isBuffer(buf) && buf.length >= 700 && buf.length <= 10 * 1024 * 1024;
+}
+function simpleImageIsPrivateHost(hostname) {
+    const h = String(hostname || '').toLowerCase();
+    if (!h || h === 'localhost' || h === '::1' || h.endsWith('.local')) return true;
+    if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
+    const m = h.match(/^172\.(\d+)\./); if (m && Number(m[1]) >= 16 && Number(m[1]) <= 31) return true;
+    return false;
+}
+async function simpleFetchImage(url, timeoutMs = 14000) {
+    if (!/^https?:\/\//i.test(String(url || ''))) return null;
+    let parsed;
+    try { parsed = new URL(url); } catch (_) { return null; }
+    if (simpleImageIsPrivateHost(parsed.hostname)) return null;
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+        const r = await fetch(url, {
+            redirect: 'follow', signal: ac.signal,
+            headers: { 'User-Agent':'ANIME-GAME/1.0', 'Accept':'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }
+        });
+        if (!r.ok) return null;
+        const mime = String(r.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+        if (!mime.startsWith('image/')) return null;
+        const bytes = Buffer.from(await r.arrayBuffer());
+        if (!simpleImageLooksValid(bytes)) return null;
+        return { bytes, mime };
+    } catch (_) { return null; }
+    finally { clearTimeout(t); }
+}
+function simpleScoreName(candidate, wanted) {
+    const a = simpleImageNorm(candidate), b = simpleImageNorm(wanted);
+    if (!a || !b) return 0;
+    if (a === b) return 100;
+    if (simpleImageCompact(a) === simpleImageCompact(b)) return 98;
+    if (a.includes(b) || b.includes(a)) {
+        const sm = Math.min(a.length,b.length), lg = Math.max(a.length,b.length);
+        if (sm >= 4) return 83 + Math.round(14 * sm / lg);
+    }
+    const A = new Set(a.split(' ')), B = new Set(b.split(' ')); let common = 0;
+    for (const x of A) if (B.has(x)) common++;
+    return Math.round((common / Math.max(A.size,B.size,1)) * 82);
+}
+const SIMPLE_ALIASES = new Map(Object.entries({
+    'dragonball|sangoku':'Son Goku','dragonball|sangohan':'Son Gohan','dragonball|sangoten':'Son Goten',
+    'dragonball|vegeto':'Vegito','dragonball|roi vegeta':'King Vegeta','dragonball|roi cold':'King Cold',
+    'dragonball|grand pretre':'Grand Priest','dragonball|docteur gero':'Dr. Gero',
+    'chainsaw|demon des tenebres':'Darkness Devil','chainsaw|demon de la chute':'Falling Devil',
+    'chainsaw|demon de la justice':'Justice Devil','chainsaw|demon de l enfer':'Hell Devil',
+    'clover|patolli':'Patry','blackclover|patolli':'Patry','tokyorevengers|draken':'Ken Ryuguji'
+}));
+function simpleVariants(u, name) {
+    const out = [String(name || '').trim()];
+    const a = SIMPLE_ALIASES.get(simpleImageCompact(u) + '|' + simpleImageNorm(name));
+    if (a) out.unshift(a);
+    const p = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (p.length === 2) out.push(p.slice().reverse().join(' '));
+    return [...new Set(out.filter(Boolean))];
+}
+
+async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
+    if (!image || !simpleImageLooksValid(image.bytes)) return false;
+    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
+    const stable = simpleImageRoute(x.u, x.name, Date.now());
+    await pool.query(`
+        INSERT INTO character_images
+            (universe_key,norm_name,display_name,image_url,source_url,status,image_bytes,mime_type,updated_at)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,now())
+        ON CONFLICT (universe_key,norm_name)
+        DO UPDATE SET display_name=EXCLUDED.display_name,image_url=EXCLUDED.image_url,
+          source_url=EXCLUDED.source_url,status=EXCLUDED.status,image_bytes=EXCLUDED.image_bytes,
+          mime_type=EXCLUDED.mime_type,updated_at=now()
+          WHERE character_images.status IS DISTINCT FROM 'manual-admin' OR EXCLUDED.status = 'manual-admin'
+    `, [x.u,normName,x.name,stable,sourceUrl || null,status,image.bytes,image.mime || 'image/jpeg']);
+    try { CHARACTER_IMAGE_CACHE.delete(`${x.u}|${normName}`); } catch (_) {}
+    return true;
+}
+
+async function simpleExistingRows() {
+    const out = new Map();
+    const r = await pool.query(`SELECT universe_key,norm_name,image_url,source_url,status,
+      (image_bytes IS NOT NULL AND octet_length(image_bytes) >= 700) AS has_bytes, updated_at
+      FROM character_images`);
+    for (const row of r.rows) out.set(`${row.universe_key}|${row.norm_name}`, row);
+    return out;
+}
+
+async function simpleCatalogue() {
+    const map = new Map();
+    const add = (u, name, anime, img, source='jeu') => {
+        name = cleanImageCharacterName(String(name || '').trim());
+        anime = String(anime || '').trim();
+        u = String(u || '').trim();
+        if (!u && anime) {
+            try { u = resolveImageUniverseKey(anime) || ''; } catch (_) {}
+        }
+        if (!u || !name) return;
+        if (!anime) {
+            try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
+            catch (_) { anime = u; }
+        }
+        const k = `${u}|${normalizeImageKey(name)}`;
+        const cleanImg = String(img || '').trim();
+        const old = map.get(k);
+        if (old) {
+            if (!old.img && cleanImg) old.img = cleanImg;
+            if (!old.anime && anime) old.anime = anime;
+            if (source && !old.sources.includes(source)) old.sources.push(source);
+            return;
+        }
+        map.set(k,{u,name,anime,img:cleanImg,sources:[source]});
+    };
+    const addNames = (u, names, source) => {
+        let anime='';
+        try { anime=String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); } catch (_) { anime=String(u||''); }
+        for (const raw of (Array.isArray(names) ? names : [])) {
+            if (typeof raw === 'string') add(u,raw,anime,'',source);
+            else if (raw && typeof raw === 'object') add(raw.u||u,raw.display||raw.name||raw.character||raw.speaker,raw.anime||anime,raw.img||raw.image||raw.imageUrl||'',source);
+        }
+    };
+    const addCardish = (item, fallbackU='', source='cards') => {
+        if (!item) return;
+        if (typeof item === 'string') { if (fallbackU) add(fallbackU,item,'','',source); return; }
+        if (Array.isArray(item)) { for (const x of item) addCardish(x,fallbackU,source); return; }
+        if (typeof item !== 'object') return;
+        const u=String(item.u||item.universe||item.universeKey||fallbackU||'').trim();
+        const name=item.display||item.name||item.character||item.speaker||'';
+        if (u && name) add(u,name,item.anime||item.sub||'',item.img||item.image||item.imageUrl||'',source);
+        for (const key of ['cards','chars','characters','items','pool','list']) {
+            if (Array.isArray(item[key])) addCardish(item[key],u||fallbackU,source);
+        }
+    };
+
+    // Existing public catalogue (modes, DLE, Roland-Garros, themes, etc.).
+    try {
+        const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d=await r.json();
+            for (const raw of (d?.characters || d?.items || [])) {
+                add(raw?.u, raw?.name || raw?.display, raw?.anime, raw?.originalImg || raw?.img || raw?.imageUrl, 'catalogue-api');
+            }
+        }
+    } catch (_) {}
+
+    // Direct game sources, so migration still works even if the HTTP catalogue is unavailable.
+    try { for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) for (const [name,img] of Object.entries(b||{})) add(u,name,'',img,'char-images'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) addNames(u,names,'modes'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(RG_POOLS_V2 || {})) addNames(u,names,'roland-garros'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_MASTER_NAMES || {})) addNames(u,names,'dle-master'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_TARGET_NAMES || {})) addNames(u,names,'dle-target'); } catch (_) {}
+    try {
+        for (const [u,def] of Object.entries(DLE_UNIVERSES || {})) {
+            for (const c of (def?.characters || [])) add(u,c?.name,'',c?.img||c?.image||'','dle-base');
+        }
+  
+=== app.get('/api/character-catalog' @ 1169729 ===
+rName(displayName);
+    const cacheKey = `${universeKey}|${normalizeImageKey(cleanName)}`;
+
+    const cached = await getCachedCharacterImage(universeKey, cleanName);
+    if (cached?.imageUrl) return cached;
+    if (cached && !cached.imageUrl) {
+        const retryAt = CHARACTER_IMAGE_RETRY_AT.get(cacheKey) || 0;
+        if (Date.now() < retryAt) return cached;
+        CHARACTER_IMAGE_RETRY_AT.set(cacheKey, Date.now() + 6 * 60 * 60 * 1000);
+    }
+
+    if (CHARACTER_IMAGE_INFLIGHT.has(cacheKey)) return CHARACTER_IMAGE_INFLIGHT.get(cacheKey);
+
+    const task = (async () => {
+        try {
+            let searchName = cleanName;
+            try {
+                const n = normalizeImageKey(cleanName);
+                const alias = typeof DLE_MASTER_ALIASES !== 'undefined' ? DLE_MASTER_ALIASES[universeKey]?.[n] : null;
+                if (alias && typeof DLE_MASTER_NAMES !== 'undefined') {
+                    const found = (DLE_MASTER_NAMES[universeKey] || []).find(x => normalizeImageKey(x) === alias);
+                    if (found) searchName = found;
+                }
+            } catch (_) {}
+
+            let hit = null;
+            if (host) {
+                hit = await fetchFandomPageImageByExactTitle(host, searchName);
+                if (!hit) hit = await fetchFandomPageImageBySearch(host, searchName);
+                if (!hit && searchName !== cleanName) hit = await fetchFandomPageImageBySearch(host, cleanName);
+            }
+            if (!hit) hit = await fetchAniListCharacterImage(universeKey, searchName);
+            if (!hit && searchName !== cleanName) hit = await fetchAniListCharacterImage(universeKey, cleanName);
+
+            const result = hit
+                ? { imageUrl:hit.imageUrl, sourceUrl:hit.sourceUrl || null, status:'ok' }
+                : { imageUrl:null, sourceUrl:null, status:'missing' };
+
+            await saveCachedCharacterImage(universeKey, cleanName, result);
+            return result;
+        } catch (e) {
+            console.warn(`[Character image] ${universeKey}/${cleanName}:`, e.message);
+            return { imageUrl:null, sourceUrl:null, status:'error' };
+        } finally {
+            CHARACTER_IMAGE_INFLIGHT.delete(cacheKey);
+        }
+    })();
+
+    CHARACTER_IMAGE_INFLIGHT.set(cacheKey, task);
+    return task;
+}
+
+
+// PATCH CHARACTER ADMIN V1
+// Catalogue unique des personnages réellement présents dans les données du jeu.
+// Les images restent des liens : /api/avatar/img résout local/Fandom/AniList à la demande.
+app.get('/api/character-catalog', (req, res) => {
+    try {
+        const rows = new Map();
+        const add = (u, anime, name, originalImg, source) => {
+            name = String(name || '').trim();
+            anime = String(anime || '').trim();
+            if (!name) return;
+            let arcAnime = '';
+            try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
+            if (!anime) anime = arcAnime || u || 'Autre';
+            if (!u && anime) {
+                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
+            }
+            if (arcAnime) anime = arcAnime;
+            const group = u || normalizeImageKey(anime) || 'autre';
+            const k = group + '|' + normalizeImageKey(name);
+            let img = originalImg || null;
+            try {
+                if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) {
+                    img = '/api/avatar/img?u=' + encodeURIComponent(u) + '&n=' + encodeURIComponent(name);
+                }
+            } catch (_) {}
+            const old = rows.get(k);
+            if (old) {
+                old.sources.add(source || 'jeu');
+                if (!old.originalImg && originalImg) old.originalImg = originalImg;
+                if (old.name === old.name.toLowerCase() && name !== name.toLowerCase()) old.name = name;
+                if ((!old.anime || old.anime === old.u) && anime) old.anime = anime;
+                if (!old.img && img) old.img = img;
+                return;
+            }
+            rows.set(k, { u:u || null, anime, name, img, originalImg:originalImg || null, sources:new Set([source || 'jeu']) });
+        };
+
+        try {
+            for (const [u, byName] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+                for (const [name, img] of Object.entries(byName || {})) add(u, '', name, img, 'char-images');
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+        } catch (_) {}
+
+        for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    for (const item of (theme.items || [])) {
+                        const anime = String(item.sub || theme.title || '').trim();
+                        const u = resolveImageUniverseKey(anime);
+                        add(u, anime, item.name, item.img || null, file.replace('.json',''));
+                    }
+                }
+            } catch (_) {}
+        }
+
+
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+                        }
+                    } catch (_) {}
+                }
+            }
+        } catch (e) { console.warn('[character catalog cards]', e.message); }
+        try {
+            if (typeof hwCards === 'function') {
+                for (const c of (hwCards() || [])) if (c?.u && (c?.display || c?.name)) {
+                    add(c.u, (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[c.u]) || c.anime || c.u, c.display || c.name, c.img || null, 'cards-halloween');
+                }
+            }
+        } catch (_) {}
+        try {
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+        try {
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
+
+        const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
+            .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
+        const animes = [...new Set(characters.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
+        res.json({ ok:true, count:characters.length, animes, characters });
+    } catch (e) {
+        console.error('[character catalog]', e);
+        res.status(500).json({ ok:false, count:0, animes:[], characters:[], error:'catalogue indisponible' });
+    }
+});
+
+app.get('/api/character-image', async (req, res) => {
+    const rawUniverse = String(req.query.universeKey || req.query.universe || '').trim();
+    const name = String(req.query.name || '').trim();
+
+    if (!rawUniverse || !name) {
+        return res.status(400).json({ ok:false, imageUrl:null, message:'universe/name requis' });
+    }
+
+    const universeKey = resolveImageUniverseKey(rawUniverse);
+    if (!universeKey) {
+        return res.json({ ok:false, imageUrl:null, status:'unsupported' });
+    }
+
+    const result = await resolveCharacterImage(universeKey, name);
+    res.json({
+        ok: !!result.imageUrl,
+        universeKey,
+        name,
+        imageUrl: result.imageUrl,
+        sourceUrl: result.sourceUrl,
+        status: result.status
+    });
+});
+
+app.get('/api/character-image-stats', async (req, res) => {
+    if (!process.env.DATABASE_URL) {
+        return res.json({ cachedInMemory:CHARACTER_IMAGE_CACHE.size, persistent:false });
+    }
+    try {
+        const result = await pool.query(`
+            SELECT
+                COUNT(*)::int AS total,
+                COUNT(*) FILTER (WHERE status='ok')::int AS ok,
+                COUNT(*) FILTER (WHERE status='missing')::int AS missing,
+                COUNT(*) FILTER (WHERE status='error')::int AS error
+            FROM character_images
+        `);
+        res.json({ persistent:true, cachedInMemory:CHARACTER_IMAGE_CACHE.size, ...(result.rows[0] || {}) });
+    } catch (e) {
+        res.json({ persistent:true, cachedInMemory:CHARACTER_IMAGE_CACHE.size, error:e.message });
+    }
+});
+
+/* ================= Système de rangs & ELO ================= */
+
+const RANK_TIERS = [
+    { name: 'Bronze',  division: 1, min: -Infinity, max: 1099 },
+    { name: 'Bronze',  division: 2, min: 1100, max: 1199 },
+    { name: 'Bronze',  division: 3, min: 1200, max: 1299 },
+    { name: 'Argent',  division: 1, min: 1300, max: 1399 },
+    { name: 'Argent',  division: 2, min: 1400, max: 1499 },
+    { name: 'Argent',  division: 3, min: 1500, max: 1599 },
+    { name: 'Or',      division: 1, min: 1600, max: 1699 },
+    { name: 'Or',      division: 2, min: 1700, max: 1799 },
+    { name: 'Or',      division: 3, m
+=== app.get('/api/admin/character-catalog-persistent' @ 2215594 ===
+tes);
+    } catch (_) { return res.status(404).end(); }
+});
+
+app.get('/api/image-migration-status', async (req,res)=>{
+    return res.json({ok:true,...SIMPLE_IMAGE_STATE});
+});
+
+
+
+const __legacyCharacterImageResolver = resolveCharacterImage;
+resolveCharacterImage = async function(universeKey,displayName){
+    const name=cleanImageCharacterName(displayName); const normName=normalizeImageKey(name);
+    try {
+        const r=await pool.query(`SELECT source_url,status,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 LIMIT 1`,[universeKey,normName]);
+        const row=r.rows[0];
+        if (row) return {imageUrl:simpleImageRoute(universeKey,name,new Date(row.updated_at).getTime()),sourceUrl:row.source_url||null,status:'ok'};
+    } catch (_) {}
+    if (!SIMPLE_IMAGE_STATE.done) return __legacyCharacterImageResolver(universeKey,displayName);
+    return {imageUrl:null,sourceUrl:null,status:'missing'};
+};
+/* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
+
+
+/* AG_REAL_LOCAL_IMAGES_V2 resolver wrapper: keep DB/admin image first, then local proven file, then old remote fallback. */
+try {
+  if (typeof resolveCharacterImage === 'function') {
+    const __agOriginalResolveCharacterImage = resolveCharacterImage;
+    resolveCharacterImage = async function(...args) {
+      let original = '';
+      try { original = await __agOriginalResolveCharacterImage.apply(this, args); } catch (_) {}
+      const originalText = String(original || '');
+      if (originalText.includes('/api/character-image-file') || originalText.includes('/api/local-character-image')) return original;
+
+      let u = '', n = '';
+      const a = args[0], b = args[1];
+      if (a && typeof a === 'object') {
+        u = a.universe || a.anime || a.series || a.franchise || '';
+        n = a.name || a.character || a.characterName || a.title || '';
+      } else { u = a || ''; n = b || ''; }
+
+      let fp = __agLocalImageCache.find(u, n);
+      if (!fp) fp = __agLocalImageCache.find(n, u);
+      if (fp) return __agLocalImageCache.publicUrl(fp);
+      return original;
+    };
+  }
+} catch (e) {
+  console.warn('[images] resolver wrapper failed:', e?.message || e);
+}
+
+
+/* AG_PERSISTENT_ADMIN_CATALOG_V2
+   Admin image overrides are stored in PostgreSQL. This read endpoint overlays
+   those durable rows on the normal catalogue so a refresh/redeploy cannot make
+   the saved URL disappear from the admin UI. */
+app.get('/api/admin/character-catalog-persistent', async (req, res) => {
+    try {
+        const baseResponse = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, {
+            headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
+        });
+        const base = await baseResponse.json().catch(() => null);
+        if (!baseResponse.ok || !base || !base.ok) {
+            return res.status(baseResponse.status || 500).json(base || { ok:false, error:'Catalogue indisponible.' });
+        }
+
+        const q = await pool.query(`
+            SELECT universe_key, norm_name, display_name, source_url, status, updated_at
+            FROM character_images
+            WHERE status = 'manual-admin'
+              AND image_bytes IS NOT NULL
+              AND octet_length(image_bytes) >= 700
+        `);
+        const overrides = new Map();
+        for (const row of q.rows || []) {
+            overrides.set(`${row.universe_key}|${row.norm_name}`, row);
+        }
+
+        const characters = (Array.isArray(base.characters) ? base.characters : []).map(raw => {
+            const u = String(raw?.u || raw?.universe || '').trim();
+            const name = cleanImageCharacterName(String(raw?.name || '').trim());
+            if (!u || !name) return raw;
+            const row = overrides.get(`${u}|${normalizeImageKey(name)}`);
+            if (!row) return raw;
+            const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
+            const stableUrl = (typeof simpleImageRoute === 'function')
+                ? simpleImageRoute(u, name, stamp)
+                : `/api/character-image-file?u=${encodeURIComponent(u)}&n=${encodeURIComponent(name)}&v=${encodeURIComponent(stamp)}`;
+            return {
+                ...raw,
+                img: stableUrl,
+                imageUrl: stableUrl,
+                sourceUrl: String(row.source_url || ''),
+                status: 'manual-admin',
+                manualOverride: true
+            };
+        });
+
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return res.json({ ...base, ok:true, characters, manualOverrides: overrides.size });
+    } catch (e) {
+        console.error('[persistent admin character catalog]', e);
+        return res.status(500).json({ ok:false, error:'Impossible de relire les images admin persistantes.' });
+    }
+});
+
+server.listen(PORT, () => {
+    // Le serveur ouvre le port immédiatement. Les images se remplissent ensuite en arrière-plan.
+    setTimeout(() => {
+        startSimpleImageMigration().catch(err => console.error('[Simple images] startup migration:', err));
+    }, 2500);
+
+    // Tant qu'il reste des images manquantes, une nouvelle passe est retentée périodiquement.
+    const imageRetryTimer = setInterval(() => {
+        if (!SIMPLE_IMAGE_STATE.running && (!SIMPLE_IMAGE_STATE.done || SIMPLE_IMAGE_STATE.missing > 0)) {
+            startSimpleImageMigration().catch(err => console.error('[Simple images] scheduled retry:', err));
+        }
+    }, 60 * 60 * 1000);
+    if (typeof imageRetryTimer.unref === 'function') imageRetryTimer.unref();
+
+    startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
+    startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
+    console.log(`Serveur démarré sur le port ${PORT}`);
+});
+/* ===== CORRECTIF ANTI-GEL (laisser tout en bas du fichier) ===== */
+// Remplace les versions lentes déclarées plus haut (la dernière déclaration gagne).
+
+var __dleNames, __dleStatic;
+
+function __dleIndex(u) {
+    if (!__dleNames) __dleNames = new Map();
+    const t = DLE_TARGET_NAMES[u] || [], m = DLE_MASTER_NAMES[u] || [];
+    const sig = t.length + '|' + m.length;
+    let idx = __dleNames.get(u);
+    if (idx && idx.sig === sig) return idx;
+    const al = DLE_MASTER_ALIASES[u] || {}, display = new Map();
+    for (const x of [...t, ...m]) {
+        const xn = normalizeDle(x), c = al[xn] || xn;
+        if (c && !display.has(c)) display.set(c, x);
+    }
+    idx = { sig, display };
+    __dleNames.set(u, idx);
+    return idx;
+}
+
+function dleMasterCanonicalNorm(u, rawName) {
+    const n = normalizeDle(rawName);
+    if (!n) return null;
+    const c = (DLE_MASTER_ALIASES[u] || {})[n] || n;
+    return __dleIndex(u).display.has(c) ? c : null;
+}
+
+function dleMasterDisplayName(u, canon) {
+    return __dleIndex(u).display.get(canon) || null;
+}
+
+function dleProfileExists(u, raw) {
+    const c = dleMasterCanonicalNorm(u, raw);
+    if (!c) return false;
+    if (DLE_VERIFIED_PROFILES[u]?.has(c)) return true;
+    if (!__dleStatic) __dleStatic = new Map();
+    let set = __dleStatic.get(u);
+    if (!set) {
+        set = new Set();
+        const base = DLE_UNIVERSES[u];
+        const add = name => { const k = dleMasterCanonicalNorm(u, name); if (k) set.add(k); };
+        (base?.characters || []).forEach(ch => add(ch.name));
+        Object.keys(DLE_STATIC_PROFILES[u] || {}).forEach(name => add(name));
+        for (const [key, attrs] of Object.entries(DLE_MANUAL_OVERRIDES || {})) {
+            const [uk, n] = key.split('|');
+            if (uk === u && isCompleteDleAttrs(attrs, base?.categories)) add(n);
+        }
+        __dleStatic.set(u, set);
+    }
+    return set.has(c);
+}
+
+async function enrichDleUniverse(u, { delayMs = 350 } = {}) {
+    if (u === 'pokemon') return; // Pokédex déjà complet, rien à chercher
+    DLE_ENRICHMENT_STATE.currentUniverse = u;
+    for (const [normName, displayName] of getDleMasterNames(u)) {
+        await new Promise(r => setImmediate(r)); // laisse le serveur répondre entre deux persos
+        if (dleProfileExists(u, normName)) continue;
+        DLE_ENRICHMENT_STATE.checked++;
+        try {
+            if (await enrichOneDleProfile(u, displayName)) DLE_ENRICHMENT_STATE.completed++;
+            else DLE_ENRICHMENT_STATE.skipped++;
+        } catch (e) {
+            DLE_ENRICHMENT_STATE.skipped++;
+            DLE_ENRICHMENT_STATE.lastError = e.message;
+        }
+        if (delayMs > 0) await sleepDle(delayMs);
+    }
+}
+
+// Désactivé : téléchargeait une énorme base de persos jamais utilisée en jeu
+async function startDleLiveExpansion() { return null; }
+
+// Connexion Neon coupée pendant l'inactivité : simple message au lieu d'un gros log
+pool.on('error', err => console.error('[PG] connexion perdue :', err.message));
+
+
+/* =====================================================================
+   MINI-JEUX ARCADE : Pixel Anime, Silhouette, Emoji Anime, 4 images = 1 anime,
+   Map Guess, Fusion Anime, Scene Guessr  +  Tier list  +  Battle de préférence
+   ===================================================================== */
+
+const ARC_GAMES = {
+    pixel:      { label:'Pixel Anime',          icon:'🖼️', universe:true,  rounds:10, roundMs:30000, answer:'text'   },
+    silhouette: { label:'Silhouette',           icon:'👤', universe:true,  rounds:10, roundMs:25000, answer:'text'   },
+    emoji:      { label:'Emoji Anime',          icon:'😀', universe:false, rounds:12, roundMs:20000, answer:'choice' },
+    quatre:     { label:'4 images = 1 anime',   icon:'🧩', universe:false, rounds:10, roundMs:24000, answer:'choice' },
+    mapguess:   { label:'Map Guess',            icon:'🗺️', universe:false, rounds:10, roundMs:20000, answer:'choice' },
+    fusion:     { label:'Fusion Anime',         icon:'🧪', universe:true,  rounds:6,  roundMs:60000, answer:'multi'  },
+    scene:      { label:'Scene Guessr',         icon:'🎬', universe:false, rounds:10, roundMs:22000, answer:'choice' }
+};
+const ARC_REVEAL_MS = 7000;
+
+// Nombre de persos "connus" utilisés par univers (les listes DLE sont triées par popularité)
+const ARC_FAMOUS_LIMIT = { pokemon: 386, onepiece: 60, naruto: 55, dragonball: 45, bleach: 45, jojo: 40, fairy: 40 };
+const ARC_FAMOUS_DEFAULT = 32;
+
+// Animes (tier list, battle, fausses réponses). q = recherche MyAnimeList pour l'affiche.
+const ARC_ANIMES = [
+    ['Naruto','Naruto'],['One Piece','One Piece'],['Bleach','Bleach'],['Hunter x Hunter','Hunter x Hunter (2011)'],
+    ["L'Attaque des Titans",'Shingeki no Kyojin'],['Seven Deadly Sins','Nanatsu no Taizai'],['Death Note','Death Note'],
+    ['Classroom of the Elite','Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e'],['Solo Leveling','Ore dake Level Up na Ken'],
+    ['Black Clover','Black Clover'],['Fire Force','Enen no Shouboutai'],['Mushoku Tensei','Mushoku Tensei: Isekai Ittara Honki Dasu'],
+    ['Re:Zero','Re:Zero kara Hajimeru Isekai Seikatsu'],['Fairy Tail','Fairy Tail'],['Blue Lock','Blue Lock'],
+    ['Fullmetal Alchemist','Fullmetal Alchemist: Brotherhood'],['Chainsaw Man','Chainsaw Man'],['Wakfu','Wakfu'],
+    ['Demon Slayer','Kimetsu no Yaiba'],['Pokémon','Pokemon'],['Dragon Ball','Dragon Ball Z'],["Hell's Paradise",'Jigokuraku'],
+    ['Gachiakuta','Gachiakuta'],['Haikyuu','Haikyuu!!'],['Jujutsu Kaisen','Jujutsu Kaisen'],["JoJo's Bizarre Adventure",'JoJo no Kimyou na Bouken (TV)'],
+    ['Tensura','Tensei shitara Slime Datta 
