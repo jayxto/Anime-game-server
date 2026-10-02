@@ -1,0 +1,647 @@
+=== TRANSFORMATION AUDIT ===
+server_chars=3042725
+
+--- CONTEXT ---
+ver"],
+    "royaume": ["kingdom","origin","residence"],
+    "noble/royal": ["social status","nobility","royal","status"],
+    "esprit/démon": ["spirit","devil","demon","familiar"],
+
+    "génération": ["generation","pyrokinetic generation","classification"],
+    "adolla burst": ["adolla burst","adolla","ability"],
+
+    "style combat": ["fighting style","sword style","combat style","abilities"],
+
+    "pouvoir/autorité": ["authority","divine protection","ability","abilities","magic"],
+    "esprit contracté": ["spirit","contracted spirit","contract"],
+    "candidate royale": ["royal selection","candidate","occupation"],
+
+    "dragon slayer": ["dragon slayer","magic"],
+
+    "poste": ["position","positions","role"],
+    "pied fort": ["dominant foot","foot","preferred foot"],
+    "équipe nel": ["team","neo egoist league","affiliation"],
+    "new gen xi": ["new generation world xi","new gen xi","title"],
+
+    "nature": ["species","race","nature"],
+    "alchimiste d'état": ["state alchemist","occupation","title"],
+    "type d'alchimie": ["alchemy","abilities","specialty"],
+    "pierre philosophale": ["philosopher's stone","stone","abilities"],
+
+    "démon associé": ["devil","contracted devil","contracts","abilities"],
+    "hybride": ["species","nature","hybrid"],
+
+    "souffle/art": ["breathing style","blood demon art","breathing","abilities"],
+    "pilier": ["rank","hashira","occupation"],
+    "démon": ["species","race","nature"],
+
+    "type 1": ["type","type 1","primary type"],
+    "type 2": ["type 2","secondary type"],
+    "génération": ["generation","debut","introduced"],
+    "légendaire": ["legendary","mythical","classification"],
+    "évolution": ["evolution","evolves from","evolves into","evolutionary line"],
+    "couleur dominante": ["color","colour","body color"],
+
+    "transformation": ["transformations","transformation","forms","form"],
+    "univers": ["universe","affiliation","origin"],
+    "fusion": ["fusion","species"],
+
+    "jinki": ["jinki","vital instrument","weapon"],
+    "type de jinki": ["jinki","weapon type","type"],
+
+    "équipe lycée": ["team","school","affiliation"],
+    "numéro": ["number","jersey number","uniform number"],
+    "main dominante": ["dominant hand","handedness"],
+
+    "grade": ["grade","rank"],
+    "technique": ["cursed technique","technique","abilities"],
+    "extension domaine": ["domain expansion","domain"],
+    "énergie maudite": ["cursed energy","energy"],
+
+    "partie": ["part","series","debut"],
+    "stand": ["stand","stands"],
+    "type de stand": ["stand type","type"],
+    "hamon": ["hamon","ripple"],
+    "famille joestar": ["family","relatives","joestar"],
+
+    "compétence ultime": ["ultimate skill","skill","abilities"],
+    "demon lord": ["demon lord","title","rank"],
+
+    "classe héros": ["hero class","class","rank"],
+    "pouvoir/style": ["abilities","powers","fighting style"],
+    "cyborg": ["species","race","cyborg"],
+
+    "jeu principal": ["virtual / augmented realities","virtual reality","game","games","world","vr"],
+
+    "type de kagune": ["kagune type","kagune","rc type"],
+    "kakuja": ["kakuja"],
+    "ccg rang": ["rank","ccg rank"],
+
+    "gang": ["gang","affiliation","organization"],
+    "voyageur temporel": ["time leaper","time leap","ability"]
+};
+
+const DLE_VALUE_DEFAULTS = {
+    "sexe": "Non précisé",
+    "cheveux": "Non précisés",
+    "cheveux avatar": "Non précisés",
+    "cheveux base": "Non précisés",
+    "couleur dominante": "Non précisée",
+    "affiliation": "Non précisée",
+    "guilde": "Non précisée",
+    "groupe": "Non précisé",
+    "camp": "Non précisé",
+    "origine": "Non précisée",
+    "arme": "Aucune / non précisée",
+    "arme/style": "Non précisé",
+    "arme principale": "Non précisée",
+    "race": "Non précisée",
+    "race/avatar": "Non précisée",
+    "rang": "Non classé / non précisé",
+    "statut": "Non précisé",
+    "rôle": "Non précisé",
+    "classe/rôle": "Non précisé",
+    "jinchūriki": "Non révélé",
+    "haki royal": "Non révélé",
+    "bankai": "Non révélé",
+    "adolla burst": "Non révélé",
+    "dragon slayer": "Non révélé",
+    "pilier": "Non révélé",
+    "démon": "Non révélé",
+    "légendaire": "Non révélé",
+    "fusion": "Non révélé",
+    "cyborg": "Non révélé",
+    "kakuja": "Non révélé",
+    "voyageur temporel": "Non révélé",
+    "white room": "Non révélé",
+    "candidate royale": "Non révélé",
+    "new gen xi": "Non révélé",
+    "alchimiste d'état": "Non révélé",
+    "pierre philosophale": "Non révélée",
+    "hybride": "Non révélé",
+    "demon lord": "Non révélé"
+};
+
+function dleFallbackForLabel(label) {
+    return DLE_VALUE_DEFAULTS[normalizeDle(label)] || "Non révélé / non précisé";
+}
+
+function cleanWikiValue(value) {
+    let s = String(value || "");
+    s = s.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, " ")
+         .replace(/<ref[^/>]*\/>/gi, " ")
+         .replace(/<!--[\s\S]*?-->/g, " ")
+         .replace(/\{\{[^{}]*\}\}/g, " ")
+         .replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, "$1")
+         .replace(/\[https?:\/\/[^\s\]]+\s*([^\]]*)\]/g, "$1")
+         .replace(/<br\s*\/?>/gi, " / ")
+         .replace(/<[^>]+>/g, " ")
+         .replace(/'{2,}/g, "")
+         .replace(/&nbsp;/gi, " ")
+         .replace(/&amp;/gi, "&")
+         .replace(/&quot;/gi, '"')
+         .replace(/\s+/g, " ")
+         .trim();
+    if (!s || s.length > 180) return null;
+    return s;
+}
+
+function parseWikiFields(wikitext) {
+    const fields = new Map();
+    const text = String(wikitext || "");
+    const rx = /^\|\s*([^=\n]+?)\s*=\s*([\s\S]*?)(?=^\|\s*[^=\n]+?\s*=|^\}\}|$)/gm;
+    let m;
+    while ((m = rx.exec(text))) {
+        const key = normalizeDle(m[1]);
+        const val = cleanWikiValue(m[2]);
+        if (key && val && !fields.has(key)) fields.set(key, val);
+    }
+    return fields;
+}
+
+function firstMatchingWikiField(fields, aliases) {
+    for (const alias of aliases || []) {
+        const a = normalizeDle(alias);
+        if (fields.has(a)) return fields.get(a);
+    }
+    for (const alias of aliases || []) {
+        const a = normalizeDle(alias);
+        for (const [k, v] of fields) {
+            if (k.includes(a) || a.includes(k)) return v;
+        }
+    }
+    return null;
+}
+
+async function fetchDleWikiWikitext(universeKey, characterName) {
+    const sources = DLE_FANDOM_SOURCES[universeKey] || [];
+    const source = sources[0];
+    if (!source) return null;
+
+    try {
+        const searchParams = new URLSearchParams({
+            action:"query",
+            list:"search",
+            srsearch:String(characterName),
+            srlimit:"5",
+            format:"json",
+            origin:"*"
+        });
+        const search = await fetchJsonWithTimeout(`https://${source.host}/api.php?${searchParams.toString()}`, 10000);
+        const results = search?.query?.search || [];
+        if (!results.length) return null;
+
+        const wanted = normalizeDle(characterName);
+        const exact = results.find(x => normalizeDle(x.title) === wanted);
+        const title = (exact || results[0]).title;
+
+        const parseParams = new URLSearchParams({
+            action:"parse",
+            page:title,
+            prop:"wikitext",
+            format:"json",
+            origin:"*"
+        });
+        const parsed = await fetchJsonWithTimeout(`https://${source.host}/api.php?${parseParams.toString()}`, 12000);
+        return parsed?.parse?.wikitext?.["*"] || null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function inferProfileValues(fields, categories) {
+    const attrs = {};
+    for (const cat of categories) {
+        const labelNorm = normalizeDle(cat.label);
+        const aliases = DLE_CATEGORY_ALIASES[labelNorm] || [cat.label];
+        const val = firstMatchingWikiField(fields, aliases);
+        attrs[cat.key] = val || dleFallbackForLabel(cat.label);
+    }
+    return attrs;
+}
+
+async function ensureDleCharacterProfile(universeKey, character, categories) {
+    if (!character) return character;
+
+    const cacheKey = `${universeKey}|${normalizeDle(character.name)}`;
+
+    if (DLE_PROFILE_CACHE.has(cacheKey)) {
+        const cached = DLE_PROFILE_CACHE.get(cacheKey);
+        character.attrs = { ...(character.attrs || {}), ...(cached.attrs || {}) };
+        character.attrKnown = { ...(character.attrKnown || {}), ...(cached.attrKnown || {}) };
+        character.profiled = Object.values(character.attrKnown || {}).every(Boolean);
+        return character;
+    }
+
+    const attrs = { ...(character.attrs || {}) };
+    const attrKnown = {};
+
+    // Toute donnée présente dans les fiches V2 est considérée comme réelle.
+    for (const cat of categories) {
+        const v = attrs[cat.key];
+        attrKnown[cat.key] = !(v === undefined || v === null || String(v).trim() === "" || String(v).trim() === "?");
+    }
+
+    // Overrides vérifiés manuellement.
+    const override = DLE_MANUAL_OVERRIDES[cacheKey];
+    if (override) {
+        Object.assign(attrs, override);
+        for (const cat of categories) {
+            if (Object.prototype.hasOwnProperty.call(override, cat.key)) attrKnown[cat.key] = true;
+        }
+    }
+
+    const stillMissing = categories.some(cat => !attrKnown[cat.key]);
+
+    if (stillMissing) {
+        const wikitext = await fetchDleWikiWikitext(universeKey, character.name);
+        if (wikitext) {
+            const fields = parseWikiFields(wikitext);
+
+            for (const cat of categories) {
+                if (attrKnown[cat.key]) continue;
+
+                const labelNorm = normalizeDle(cat.label);
+                const aliases = DLE_CATEGORY_ALIASES[labelNorm] || [cat.label];
+                const found = firstMatchingWikiField(fields, aliases);
+
+                if (found) {
+                    attrs[cat.key] = found;
+                    attrKnown[cat.key] = true;
+                }
+            }
+        }
+    }
+
+    // IMPORTANT : on ne transforme plus une absence de do
+
+--- CONTEXT ---
+ing){ Character(search:$s){ image{ large medium } } }`, { s: clean });
+        return d?.Character?.image?.large || d?.Character?.image?.medium || null;
+    } catch (_) { return null; }
+}
+async function qapAniListAnimeCover(name) {
+    if (!name) return null;
+    try {
+        const d = await arcAniList(`query($s:String){ Media(search:$s,type:ANIME,sort:SEARCH_MATCH){ coverImage{ extraLarge large medium } } }`, { s: String(name) });
+        return d?.Media?.coverImage?.extraLarge || d?.Media?.coverImage?.large || d?.Media?.coverImage?.medium || null;
+    } catch (_) { return null; }
+}
+const QAP_ITEM_IMAGE_CACHE = new Map();
+app.get('/api/arcade/item-image', async (req, res) => {
+    const cacheKey = String(req.query.source||'') + '|' + String(req.query.name||'');
+    const cached = QAP_ITEM_IMAGE_CACHE.get(cacheKey);
+    if (cached && Date.now() - cached.at < (cached.url ? 86400000 : 300000)) {
+        res.set('Cache-Control', cached.url ? 'public, max-age=86400' : 'no-store');
+        return res.json({ok:!!cached.url,imageUrl:cached.url});
+    }
+    const source = String(req.query.source || '');
+    const name = String(req.query.name || '');
+    let url = null;
+    try {
+        if (source === 'animes') url = await arcAnimeCover(name);
+        else {
+            const it = (arcItemsFor(source) || []).find(i => i.name === name);
+            if (it) {
+                if (it.img) url = it.img;
+                else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
+                    url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
+                } else if (source.startsWith('qt:')) {
+                    const qapThemeId = source.slice(3);
+                    if (qapThemeId === 'transformation') {
+                        // STRICT : une transformation ne doit JAMAIS retomber sur le portrait normal du perso.
+                        // On cherche la page/image de la FORME elle-même sur le wiki de l'univers.
+                        // Si aucune image de forme n'est trouvée, on renvoie null plutôt qu'une mauvaise image.
+                        if (it.img) url = it.img;
+                        if (!url) {
+                            const parts = String(it.sub || '').split('•').map(s => s.trim()).filter(Boolean);
+                            const animeName = parts.length > 1 ? parts[parts.length - 1] : '';
+                            const universeKey = FANDOM_UNIVERSE_ALIASES[normalizeImageKey(animeName)] || null;
+                            const host = universeKey ? FANDOM_WIKIS[universeKey] : null;
+                            const form = String(it.name || '').trim();
+                            const charName = String(it.char || parts[0] || '').trim();
+                            const persistKey = `v2|${animeName}|${charName}|${form}`;
+                            // Une fois une forme trouvée, elle est gardée en PostgreSQL : les prochains chargements
+                            // et les prochains redéploiements ne refont plus la recherche lente.
+                            try {
+                                const saved = await getCachedCharacterImage('_transform', persistKey);
+                                if (saved?.imageUrl) url = saved.imageUrl;
+                            } catch (_) {}
+
+                            // Hand-checked candidates win for the critical forms. They are copied
+                            // into Postgres immediately; the external URL is only provenance.
+                            if (!url) {
+                                const verifiedSource = qapVerifiedTransformSource(animeName, charName, form);
+                                if (verifiedSource) {
+                                    url = await persistQapTransformImage(persistKey, verifiedSource, 'transform-verified');
+                                }
+                            }
+
+                            if (!url && host) {
+                                let candidate = null;
+                                try { candidate = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
+                                if (candidate) {
+                                    url = await persistQapTransformImage(persistKey, candidate, 'transform-auto');
+                                    // If the source rejects server-side copying, keep it as a temporary
+                                    // display fallback but do not treat it as durable/verified cache.
+                                    if (!url) url = candidate;
+                                }
+                                // Aucun fallback vers le portrait normal du personnage.
+                            }
+                        }
+                        // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
+                        // généralement le portrait standard et provoquerait précisément les mauvaises formes.
+                    } else {
+                        if (it.imageSearch) {
+                            try {
+                                const q = String(it.imageSearch).replace(/\s+anime(?:\s+transformation)?$/i, '').trim();
+                                url = await qapAniListCharacterImage(q);
+                            } catch (_) {}
+                        }
+                        const charName = it.char || (String(it.sub || '').split('•')[0].trim()) || it.name;
+                        if (!url) url = await qapAniListCharacterImage(charName);
+                    }
+                } else url = await arcCharImage(source, it.raw || it.name);
+            }
+        }
+    } catch (_) {}
+    QAP_ITEM_IMAGE_CACHE.set(cacheKey, {url:url||null, at:Date.now()});
+    res.set('Cache-Control', url ? 'public, max-age=86400' : 'no-store');
+    res.json({ ok: !!url, imageUrl: url });
+});
+
+// Classement mondial des battles (comme uwufufu : % de victoires en duel + nombre de sacres)
+const ARC_BATTLE_MEM = new Map(); // theme -> Map(name -> {wins, matches, champions})
+const ARC_BATTLE_IP = new Map();
+if (process.env.DATABASE_URL) {
+    pool.query(`CREATE TABLE IF NOT EXISTS battle_stats (
+        theme TEXT NOT NULL, name TEXT NOT NULL,
+        wins INTEGER NOT NULL DEFAULT 0, matches INTEGER NOT NULL DEFAULT 0, champions INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (theme, name))`).catch(e => console.warn('[Battle] table :', e.message));
+}
+
+app.post('/api/battle/result', express.json({ limit: '1mb' }), async (req, res) => {
+    const theme = String(req.body?.theme || '');
+    const items = arcItemsFor(theme);
+    if (!items) return res.status(400).json({ ok: false });
+    const ip = String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
+    const last = ARC_BATTLE_IP.get(ip) || 0;
+    if (Date.now() - last < 8000) return res.json({ ok: false, message: 'Trop rapide' });
+    ARC_BATTLE_IP.set(ip, Date.now());
+
+    const valid = new Set(items.map(i => i.name));
+    const duels = Array.isArray(req.body?.duels) ? req.body.duels.slice(0, 4095) : [];
+    const champion = String(req.body?.champion || '');
+    const agg = new Map();
+    const bump = (n, k) => { const o = agg.get(n) || { wins: 0, matches: 0, champions: 0 }; o[k]++; agg.set(n, o); };
+    for (const d of duels) {
+        if (!Array.isArray(d)) continue;
+        const [w, l] = d.map(String);
+        if (!valid.has(w) || !valid.has(l) || w === l) continue;
+        bump(w, 'wins'); bump(w, 'matches'); bump(l, 'matches');
+    }
+    if (!valid.has(champion) || duels.length < 7) return res.json({ ok: false });
+    bump(champion, 'champions');
+
+    const mem = ARC_BATTLE_MEM.get(theme) || new Map();
+    ARC_BATTLE_MEM.set(theme, mem);
+    for (const [n, o] of agg) {
+        const m = mem.get(n) || { wins: 0, matches: 0, champions: 0 };
+        m.wins += o.wins; m.matches += o.matches; m.champions += o.champions;
+        mem.set(n, m);
+    }
+    if (process.env.DATABASE_URL) {
+        try {
+            for (const [n, o] of agg) {
+                await pool.query(`INSERT INTO battle_stats (theme, name, wins, matches, champions) VALUES ($1,$2,$3,$4,$5)
+                    ON CONFLICT (theme, name) DO UPDATE SET wins = battle_stats.wins + EXCLUDED.wins,
+                    matches = battle_stats.matches + EXCLUDED.matches, champions = battle_stats.champions + EXCLUDED.champions`,
+                    [theme, n, o.wins, o.matches, o.champions]);
+            }
+        } catch (e) { console.warn('[Battle] enregistrement :', e.message); }
+    }
+    res.json({ ok: true });
+});
+
+app.get('/api/battle/ranking', async (req, res) => {
+    const theme = String(req.query.theme || '');
+    if (!arcItemsFor(theme)) return res.status(400).json({ ok: false });
+    let rows = [];
+    if (process.env.DATABASE_URL) {
+        try {
+            const r = await pool.query('SELECT name, wins, matches, champions FROM battle_stats WHERE theme=$1', [theme]);
+            rows = r.rows;
+        } catch (_) {}
+    }
+    if (!rows.length) rows = [...(ARC_BATTLE_MEM.get(theme) || new Map())].map(([name, o]) => ({ name, ...o }));
+    rows = rows.map(r => ({ name: r.name, wins: +r.wins, matches: +r.matches, champions: +r.champions, rate: r.matches ? Math.round(1000 * r.wins / r.matches) / 10 : 0 }))
+        .sort((a, b) => b.champions - a.champions || b.rate - a.rate || b.matches - a.matches)
+        .slice(0, 100);
+    res.json({ ok: true, theme, rows });
+});
+
+// Common Link : [point commun, [[univers, nom], ...]] (au moins 4 persos par lien)
+const ARC_LINKS = [
+    ['Ils maîtrisent la glace', [['onepiece','Kuzan'],['bleach','Toshiro Hitsugaya'],['fairy','Gray Fullbuster'],['fairy','Lyon Vastia'],['naruto','Haku'],['rezero','Emilia'],['bleach','Rukia Kuchiki'],['demonslayer','Doma']]],
+    ['Ils maîtrise
+
+=== VERIFIED ARRAY RAW ===
+
+    {
+        needs:['naruto','six paths','sage'],
+        url:'https://img.lemino.docomo.ne.jp/cms/a04cecf/a04cecf_w1.jpg?auto=webp&quality=75&width=3840'
+    },
+    {
+        needs:['naruto','sage mode'], forbids:['six paths','rikudo'],
+        url:'https://static.deltiasgaming.com/2025/01/Naruto-Uzumaki.jpg'
+    },
+    {
+        needs:['sasuke','susanoo'],
+        url:'https://i.ytimg.com/vi/-PVBJ4mf-xo/maxresdefault.jpg'
+    },
+    {
+        needs:['luffy','gear 5'],
+        url:'https://s1.dmcdn.net/v/V9ncC1eoseQFOJQqb/x720'
+    },
+    {
+        needs:['goku','ultra instinct'], forbids:['sign'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2026/01/2785224.jpg?_=1790885400'
+    },
+    {
+        needs:['ichigo','bankai'],
+        url:'https://cdn2.fptshop.com.vn/unsafe/800x0/bankai_5_233785fa0d.png'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH2 — visually/context-checked second pass.
+    {
+        needs:['ultra ego'],
+        url:'https://cdn.alfabetajuega.com/alfabetajuega/2022/03/dragon-ball-super-vegeta-ultra-ego.jpg'
+    },
+    {
+        needs:['gohan','beast'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2023/01/SHF%20SON%20GOHAN%20%20BEAST%2002.jpg?_=1790947320'
+    },
+    {
+        needs:['piccolo','orange'],
+        url:'https://en.dragon-ball-official.com/dragonball/jp/news/2023/03/SHF%20ORANGE%20PICCOLO_01.jpg?_=1790957400'
+    },
+    {
+        needs:['broly','full power'],
+        url:'https://en.dragon-ball-official.com/dragonball/jp/news/2022/03/chara46_7.jpg?_=1790943900'
+    },
+    {
+        needs:['gogeta','super saiyan blue'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2025/12/1040_1040_gogeta2_o.jpg?_=1786515780'
+    },
+    {
+        needs:['gogeta','super saiyan god super saiyan'],
+        url:'https://fr.dragon-ball-official.com/dragonball/jp/news/2025/12/1040_1040_gogeta2_o.jpg?_=1786515780'
+    },
+    {
+        needs:['black frieza'],
+        url:'https://p7.itc.cn/images01/20230602/afea49694e24409dbca3a7924b978389.jpeg'
+    },
+    {
+        needs:['black freezer'],
+        url:'https://p7.itc.cn/images01/20230602/afea49694e24409dbca3a7924b978389.jpeg'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH3 — Naruto / One Piece / Black Clover.
+    // Candidates were visually checked for the requested form before being added.
+    {
+        needs:['baryon'],
+        url:'https://cmsapi-frontend.naruto-official.com/site/api/naruto/Image/get?path=%2Fnaruto%2Fjp%2Fnews%2F2023%2F10%2F18%2F8wzhJiyppt1phCJs%2F003.jpg'
+    },
+    {
+        needs:['kurama chakra mode'],
+        url:'https://www.cultture.com/pics/2021/04/naruto-10-cosas-confusas-sobre-el-chakra-explicadas-6.jpg'
+    },
+    {
+        needs:['nine tails chakra mode'],
+        url:'https://www.cultture.com/pics/2021/04/naruto-10-cosas-confusas-sobre-el-chakra-explicadas-6.jpg'
+    },
+    {
+        needs:['gear 4'],
+        url:'https://cdn.shopify.com/s/files/1/0770/3425/8763/files/luffy_gear_4_fourth_boundman.jpg?v=1704383505'
+    },
+    {
+        needs:['gear fourth'],
+        url:'https://cdn.shopify.com/s/files/1/0770/3425/8763/files/luffy_gear_4_fourth_boundman.jpg?v=1704383505'
+    },
+    {
+        needs:['devil union'],
+        url:'https://i.pinimg.com/736x/9f/bc/6f/9fbc6f2e56efa93c3a23cb7b54b5c62d.jpg'
+    },
+    {
+        needs:['black asta'],
+        url:'https://m.media-amazon.com/images/M/MV5BOTE2YjU0NTAtZTY5Mi00M2UzLWIyNDEtZGVmMjc2YWNhMzlmXkEyXkFqcGc%40._V1_.jpg'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH4 — Digimon + visually distinctive forms.
+    // Digimon entries use the official Digimon encyclopedia artwork endpoints.
+    {
+        needs:['wargreymon'],
+        url:'https://digimon.net/cimages/digimon/wargreymon.jpg'
+    },
+    {
+        needs:['war greymon'],
+        url:'https://digimon.net/cimages/digimon/wargreymon.jpg'
+    },
+    {
+        needs:['metalgarurumon'],
+        url:'https://digimon.net/cimages/digimon/metalgarurumon.jpg'
+    },
+    {
+        needs:['metal garurumon'],
+        url:'https://digimon.net/cimages/digimon/metalgarurumon.jpg'
+    },
+    {
+        needs:['omnimon'],
+        url:'https://digimon.net/cimages/digimon/omegamon.jpg'
+    },
+    {
+        needs:['omegamon'],
+        url:'https://digimon.net/cimages/digimon/omegamon.jpg'
+    },
+    {
+        needs:['yoko kurama'],
+        url:'https://i.pinimg.com/originals/d6/11/82/d61182f292445425a90ab2d954a08b0d.jpg'
+    },
+    {
+        needs:['youko kurama'],
+        url:'https://i.pinimg.com/originals/d6/11/82/d61182f292445425a90ab2d954a08b0d.jpg'
+    },
+    {
+        needs:['crown clown'],
+        url:'https://static.zerochan.net/Allen.Walker.full.278757.jpg'
+    },
+    {
+        needs:['saber alter'],
+        url:'https://static.wikia.nocookie.net/villains/images/c/c8/Alter2.png/revision/latest?cb=20171115204936'
+    },
+    {
+        needs:['full cowl'],
+        url:'https://www.gamersdecide.com/sites/default/files/2020-02/full_cowl_midoriya.jpg'
+    },
+    {
+        needs:['tengen toppa gurren lagann'],
+        url:'https://miro.medium.com/v2/resize%3Afit%3A1378/0%2ANmOrgB1FxblwJv0z'
+    },
+    // QAP_VERIFIED_TRANSFORM_BATCH5 — Shield Hero.
+    // Checked against the anime's red/black Rage Shield silhouette and central gem.
+    {
+        needs:['rage shield'],
+        url:'https://w0.peakpx.com/wallpaper/403/743/HD-wallpaper-naofumi-rage-shield-tate-no-yuusha.jpg'
+    },
+    {
+        needs:['shield of rage'],
+        url:'https://w0.peakpx.com/wallpaper/403/743/HD-wallpaper-naofumi-rage-shield-tate-no-yuusha.jpg'
+    }
+
+=== CANDIDATE LINES ===
+556:     'kurama chakra mode':'Nine-Tails Chakra Mode',
+557:     'six paths sage mode':'Six Paths Sage Mode',
+560:     'black asta':'Black Asta',
+562:     'crown clown':'Crown Clown',
+564:     'saber alter':'Saber Alter',
+565:     'rage shield':'Rage Shield',
+566:     'yoko kurama':'Yoko Kurama',
+570:     'omnimon':'Omnimon'
+593: // Cherche une IMAGE de transformation dans les fichiers des pages Fandom, pas seulement
+739:     // Checked against the anime's red/black Rage Shield silhouette and central gem.
+774: async function fetchFandomTransformationImage(host, character, form) {
+776:     const stop = new Set(['mode','form','forme','anime','transformation','final','true','full','power','awakened','awakening']);
+786:     // Une image de transformation doit contenir des mots de LA FORME dans son nom de fichier.
+1636:         "Gear 4 (One Piece)",
+1637:         "Gear 5 (One Piece)"
+1700:         "Bankai (Bleach)",
+2512:         "Super Saiyan (Dragon Ball)",
+2513:         "Super Saiyan God (Dragon Ball)"
+2516:         "Ultra Instinct (Dragon Ball)",
+2517:         "Ultra Ego (Dragon Ball)"
+3531:         /\btransformed\b/g, /\btransformation\b/g,
+7328: const RG_POOLS_V2 = {"naruto": ["Naruto Uzumaki", "Sasuke Uchiwa", "Sakura Haruno", "Kakashi Hatake", "Itachi Uchiwa", "Hinata Hyūga", "Gaara", "Minato Namikaze", "Madara Uchiwa", "Hashirama Senju", "Neji Hyūga", "Jiraiya", "Agara", "Ageha", "Akahoshi", "Akamaru", "Akatsuchi", "Akino", "Anko Mitarashi", "Ao", "Aoi Rokushô", "Arashi Fûma", "Ashina Uzumaki", "Asura Ōtsutsuki", "Asuma Sarutobi", "Ayame", "Zetsu Noir", "Boruto Uzumaki", "Chino", "Chiriku", "Chiyo", "Chôchô Akimichi", "Chôji Akimichi", "Chôza Akimichi", "Daemon", "Danzô Shimura", "Darui", "Deidara", "Denki Kaminarimon", "Ebisu", "Fû", "Fū Yamanaka", "Fubuki Kakuyoku", "Fugaku Uchiwa", "Gaï Maito", "Gama", "Gamabunta", "Gamakichi", "Hagoromo Ôtsutsuki", "Haku", "Hamura Ôtsutsuki", "Hanabi Hyûga", "Hanzô", "Hayate Gekkô", "Hiashi Hyûga", "Hidan", "Himawari Uzumaki", "Hiruzen Sarutobi", "Ibiki Morino", "Indra Ôtsutsuki", "Ino Yamanaka", "Inoichi Yamanaka", "Inojin Yamanaka", "Iruka Umino", "Izumi Uchiwa", "Jigen", "Jinpachi Munashi", "Jirôbô", "Jirocho", "Jōseki", "Jûbi", "Jûgo", "Jūjin", "Jūzō Biwa", "Kabuto Yakushi", "Kagami Uchiwa", "Kagari", "Kaguya Ôtsutsuki", "Kakuzu", "Kankurô", "Karin Uzumaki", "Karui", "Katsuyu", 
+7333: const RG_ALIASES_V3 = {"naruto": {"might guy": "Gaï Maito", "might duy": "Daï Maito", "black zetsu": "Zetsu Noir", "white zetsu": "Zetsu Blanc", "sasuke uchiha": "Sasuke Uchiwa", "itachi uchiha": "Itachi Uchiwa", "madara uchiha": "Madara Uchiwa", "fugaku uchiha": "Fugaku Uchiwa", "izumi uchiha": "Izumi Uchiwa", "kagami uchiha": "Kagami Uchiwa", "obito uchiha": "Obito Uchiwa", "sarada uchiha": "Sarada Uchiwa", "shisui uchiha": "Shisui Uchiwa", "izuna uchiha": "Izuna Uchiwa", "hikaku uchiha": "Hikaku Uchiwa", "inabi uchiha": "Inabi Uchiwa", "mikoto uchiha": "Mikoto Uchiwa", "naori uchiha": "Naori Uchiwa", "shin uchiha": "Shin Uchiwa", "tajima uchiha": "Tajima Uchiwa", "teyaki uchiha": "Teyaki Uchiwa", "uruchi uchiha": "Uruchi Uchiwa", "yashiro uchiha": "Yashiro Uchiwa", "tekka uchiha": "Tekka Uchiwa", "maito gai": "Gaï Maito", "might gai": "Gaï Maito", "gai sensei": "Gaï Maito", "guy": "Gaï Maito", "maito dai": "Daï Maito", "might dai": "Daï Maito", "kuro zetsu": "Zetsu Noir", "shiro zetsu": "Zetsu Blanc", "sakura uchiwa": "Sakura Haruno", "sakura uchiha": "Sakura Haruno", "hinata uzumaki": "Hinata Hyūga", "temari nara": "Temari", "karui akimichi": "Karui", "killer b": "Killer Bee", 
+7479:     { name: 'Naruto — Mode Baryon', value: 108 },
+7538:     { name: 'Luffy Gear 5', value: 103 },
+8408: const DLE_UNIVERSES = {"naruto":{"name":"Naruto","categories":[{"key":"c0","label":"Village","type":"text"},{"key":"c1","label":"Rang","type":"text"},{"key":"c2","label":"Clan","type":"text"},{"key":"c3","label":"Nature chakra","type":"text"},{"key":"c4","label":"Dōjutsu","type":"text"},{"key":"c5","label":"Jinchūriki","type":"text"}],"characters":[{"name":"Naruto Uzumaki","attrs":{"c0":"Konoha","c1":"Hokage","c2":"Uzumaki","c3":"Vent","c4":"Aucun","c5":"Oui"}},{"name":"Sasuke Uchiha","attrs":{"c0":"Konoha","c1":"Nukenin","c2":"Uchiha","c3":"Foudre","c4":"Sharingan/Rinnegan","c5":"Non"}},{"name":"Sakura Haruno","attrs":{"c0":"Konoha","c1":"Jōnin","c2":"Aucun","c3":"Terre/Eau","c4":"Aucun","c5":"Non"}},{"name":"Kakashi Hatake","attrs":{"c0":"Konoha","c1":"Hokage","c2":"Hatake","c3":"Foudre","c4":"Sharingan","c5":"Non"}},{"name":"Itachi Uchiha","attrs":{"c0":"Konoha","c1":"Nukenin","c2":"Uchiha","c3":"Feu","c4":"Sharingan","c5":"Non"}},{"name":"Hinata Hyūga","attrs":{"c0":"Konoha","c1":"Chūnin","c2":"Hyūga","c3":"Feu/Foudre","c4":"Byakugan","c5":"Non"}},{"name":"Gaara","attrs":{"c0":"Suna","c1":"Kazekage","c2":"Kazekage","c3":"Vent","c4":"Aucun","c5":"Ancien"}},{"name":"Minato Namika
+8750: const DLE_MASTER_NAMES = {"naruto":["Naruto Uzumaki","Sasuke Uchiha","Sakura Haruno","Kakashi Hatake","Itachi Uchiha","Hinata Hyūga","Gaara","Minato Namikaze","Madara Uchiha","Hashirama Senju","Neji Hyūga","Jiraiya","Agara","Ageha","Akahoshi","Akamaru","Akatsuchi","Akino","Anko Mitarashi","Ao","Aoi Rokushô","Arashi Fûma","Ashina Uzumaki","Asura Ōtsutsuki","Asuma Sarutobi","Ayame","Black Zetsu","Boruto Uzumaki","Chino","Chiriku","Chiyo","Chôchô Akimichi","Chôji Akimichi","Chôza Akimichi","Daemon","Danzô Shimura","Darui","Deidara","Denki Kaminarimon","Ebisu","Fû","Fū Yamanaka","Fubuki Kakuyoku","Fugaku Uchiha","Might Guy","Gakidô","Gama","Gamabunta","Gamakichi","Hagoromo Ôtsutsuki","Haku","Hamura Ôtsutsuki","Hanabi Hyûga","Hanzô","Hayate Gekkô","Hiashi Hyûga","Hidan","Himawari Uzumaki","Hiruzen Sarutobi","Ibiki Morino","Indra Ôtsutsuki","Ino Yamanaka","Inoichi Yamanaka","Inojin Yamanaka","Iruka Umino","Izumi Uchiha","Jigen","Akebino","Jinpachi Munashi","Jirôbô","Jirocho","Jōseki","Jûbi","Jûgo","Jūjin","Jūzō Biwa","Kabuto Yakushi","Kagami Uchiha","Kagari","Kaguya Ôtsutsuki","Kakuzu","Kankurô","Karin Uzumaki","Karui","Katsuyu","Kawaki","Kiba","Killer Bee","Kimimaro","Kisame Hoshigaki",
+8757: const DLE_TARGET_NAMES = {"naruto":["Naruto Uzumaki","Sasuke Uchiha","Sakura Haruno","Kakashi Hatake","Itachi Uchiha","Hinata Hyūga","Gaara","Minato Namikaze","Madara Uchiha","Hashirama Senju","Neji Hyūga","Jiraiya","Agara","Ageha","Akahoshi","Akamaru","Akatsuchi","Akino","Anko Mitarashi","Ao","Aoi Rokushô","Arashi Fûma","Ashina Uzumaki","Asura Ōtsutsuki","Asuma Sarutobi","Ayame","Black Zetsu","Boruto Uzumaki","Chino","Chiriku","Chiyo","Chôchô Akimichi","Chôji Akimichi","Chôza Akimichi","Daemon","Danzô Shimura","Darui","Deidara","Denki Kaminarimon","Ebisu","Fû","Fū Yamanaka","Fubuki Kakuyoku","Fugaku Uchiha","Might Guy","Gakidô","Gama","Gamabunta","Gamakichi","Hagoromo Ôtsutsuki","Haku","Hamura Ôtsutsuki","Hanabi Hyûga","Hanzô","Hayate Gekkô","Hiashi Hyûga","Hidan","Himawari Uzumaki","Hiruzen Sarutobi","Ibiki Morino","Indra Ôtsutsuki","Ino Yamanaka","Inoichi Yamanaka","Inojin Yamanaka","Iruka Umino","Izumi Uchiha","Jigen","Akebino","Jinpachi Munashi","Jirôbô","Jirocho","Jōseki","Jûbi","Jûgo","Jūjin","Jūzō Biwa","Kabuto Yakushi","Kagami Uchiha","Kagari","Kaguya Ôtsutsuki","Kakuzu","Kankurô","Karin Uzumaki","Karui","Katsuyu","Kawaki","Kiba","Killer Bee","Kimimaro","Kisame Hoshigaki",
+8771: const DLE_STATIC_PROFILES_EXT = {"onepiece":{"Usopp":{"c0":"Chapeau de paille","c1":"Tireur","c2":"Aucun","c3":"Aucun","c4":"Non","c5":"East Blue"},"Tony Tony Chopper":{"c0":"Chapeau de paille","c1":"Médecin","c2":"Hito Hito no Mi","c3":"Zoan","c4":"Non","c5":"Grand Line"},"Franky":{"c0":"Chapeau de paille","c1":"Charpentier","c2":"Aucun","c3":"Aucun","c4":"Non","c5":"South Blue"},"Brook":{"c0":"Chapeau de paille","c1":"Musicien","c2":"Yomi Yomi no Mi","c3":"Paramecia","c4":"Non","c5":"West Blue"},"Jinbe":{"c0":"Chapeau de paille","c1":"Timonier","c2":"Aucun","c3":"Aucun","c4":"Non","c5":"Île des Hommes-Poissons"},"Donquixote Doflamingo":{"c0":"Donquixote Pirates","c1":"Capitaine","c2":"Ito Ito no Mi","c3":"Paramecia","c4":"Oui","c5":"Mary Geoise"},"Charlotte Linlin":{"c0":"Big Mom Pirates","c1":"Capitaine","c2":"Soru Soru no Mi","c3":"Paramecia","c4":"Oui","c5":"Grand Line"},"Charlotte Katakuri":{"c0":"Big Mom Pirates","c1":"Sweet Commander","c2":"Mochi Mochi no Mi","c3":"Paramecia spécial","c4":"Oui","c5":"Grand Line"},"Edward Newgate":{"c0":"Barbe Blanche","c1":"Capitaine","c2":"Gura Gura no Mi","c3":"Paramecia","c4":"Oui","c5":"Grand Line"},"Gol D. Roger":{"c0":"Roger Pirates",
+8792: const DLE_STATIC_PROFILES_MORE = {"onepiece":{"Jewelry Bonney":{"c0":"Bonney Pirates","c1":"Capitaine","c2":"Toshi Toshi no Mi","c3":"Paramecia","c4":"Non","c5":"South Blue"},"Eustass Kid":{"c0":"Kid Pirates","c1":"Capitaine","c2":"Jiki Jiki no Mi","c3":"Paramecia","c4":"Oui","c5":"South Blue"},"Killer":{"c0":"Kid Pirates","c1":"Combattant","c2":"Aucun","c3":"Aucun","c4":"Non","c5":"South Blue"},"Marco":{"c0":"Barbe Blanche","c1":"Commandant 1re division / médecin","c2":"Tori Tori no Mi, modèle Phénix","c3":"Zoan mythique","c4":"Non","c5":"Grand Line"},"Buggy":{"c0":"Cross Guild / Buggy Pirates","c1":"Empereur / capitaine","c2":"Bara Bara no Mi","c3":"Paramecia","c4":"Non","c5":"Grand Line"},"Enel":{"c0":"Armée d'Enel","c1":"Dieu de Skypiea","c2":"Goro Goro no Mi","c3":"Logia","c4":"Non","c5":"Birka"},"Rob Lucci":{"c0":"CP0","c1":"Agent","c2":"Neko Neko no Mi, modèle Léopard","c3":"Zoan","c4":"Non","c5":"Grand Line"},"Smoker":{"c0":"Marine","c1":"Vice-amiral","c2":"Moku Moku no Mi","c3":"Logia","c4":"Non","c5":"Grand Line"},"Nefertari Vivi":{"c0":"Royaume d'Alabasta","c1":"Princesse","c2":"Aucun","c3":"Aucun","c4":"Non","c5":"Alabasta"},"Gecko Moria":{"c0":"Thriller Bark","c1":"Cap
+8812: const DLE_STATIC_PROFILES_V18 = {"naruto": {"Kimimaro": {"c0": "Oto", "c1": "Garde d'Orochimaru", "c2": "Kaguya", "c3": "Non élémentaire — Shikotsumyaku", "c4": "Aucun", "c5": "Non"}, "Yugito Nii": {"c0": "Kumo", "c1": "Jinchūriki / kunoichi", "c2": "Aucun", "c3": "Feu", "c4": "Aucun", "c5": "Ancienne — Matatabi"}, "Rōshi": {"c0": "Iwa", "c1": "Jinchūriki", "c2": "Aucun", "c3": "Feu, Terre, Yōton", "c4": "Aucun", "c5": "Ancien — Son Gokū"}, "Han": {"c0": "Iwa", "c1": "Jinchūriki", "c2": "Aucun", "c3": "Feu, Eau, Futton", "c4": "Aucun", "c5": "Ancien — Kokuō"}, "Utakata": {"c0": "Kiri", "c1": "Nukenin / Jinchūriki", "c2": "Aucun", "c3": "Eau", "c4": "Aucun", "c5": "Ancien — Saiken"}, "Kokuō": {"c0": "Iwa", "c1": "Bijū", "c2": "Bijū", "c3": "Feu, Eau, Futton", "c4": "Aucun", "c5": "Non — c'est un Bijū"}, "Saiken": {"c0": "Kiri", "c1": "Bijū", "c2": "Bijū", "c3": "Eau", "c4": "Aucun", "c5": "Non — c'est un Bijū"}, "Chōmei": {"c0": "Taki", "c1": "Bijū", "c2": "Bijū", "c3": "Vent", "c4": "Aucun", "c5": "Non — c'est un Bijū"}}, "onepiece": {"Trafalgar D. Water Law": {"c0": "Heart Pirates", "c1": "Capitaine", "c2": "Ope Ope no Mi", "c3": "Paramecia", "c4": "Non", "c5": "North Blue"}, "Cro
+8830: const DLE_STATIC_PROFILES_V20 = {"bleach": {"Ganju Shiba": {"c0": "Âme", "c1": "Clan Shiba", "c2": "Aucune", "c3": "Kidō / feux d'artifice", "c4": "Non", "c5": "Rukongai"}, "Kukaku Shiba": {"c0": "Âme", "c1": "Clan Shiba", "c2": "Aucune", "c3": "Feux d'artifice", "c4": "Non", "c5": "Rukongai"}, "Hanataro Yamada": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "4e", "c3": "Hisagomaru", "c4": "Non", "c5": "Soul Society"}, "Marechiyo Omaeda": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "2e", "c3": "Gegetsuburi", "c4": "Non", "c5": "Soul Society"}, "Nemu Kurotsuchi": {"c0": "Âme artificielle", "c1": "Gotei 13", "c2": "12e", "c3": "Corps artificiel", "c4": "Non", "c5": "Soul Society"}, "Chojiro Sasakibe": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "1re", "c3": "Gonryomaru", "c4": "Oui", "c5": "Soul Society"}, "Isane Kotetsu": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "4e", "c3": "Itegumo", "c4": "Non", "c5": "Soul Society"}, "Love Aikawa": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "7e", "c3": "Tengumaru", "c4": "Inconnu", "c5": "Soul Society"}, "Rōjūrō Otoribashi": {"c0": "Shinigami", "c1": "Gotei 13", "c2": "3e", "c3": "Kinshara", "c4": "Oui", "c5": "Soul Society"}, "Lisa Yadomaru": 
+9026:     "nature chakra": ["nature type","chakra nature","nature transformation","chakra affinity","nature"],
+9106:     "transformation": ["transformations","transformation","forms","form"],
+9427: const DLE_PROFILE_FIXES = {"naruto": {"Naruto Uzumaki": {"c3": "Vent, Feu, Foudre, Terre, Eau, Yin, Yang", "c5": "Oui — Kurama"}, "Sasuke Uchiha": {"c3": "Feu, Foudre, Vent, Terre, Eau, Yin, Yang", "c4": "Sharingan, Rinnegan", "c1": "Shinobi indépendant"}, "Sakura Haruno": {"c3": "Terre, Eau, Yin, Yang"}, "Kakashi Hatake": {"c3": "Foudre, Terre, Eau, Feu, Vent, Yin, Yang", "c4": "Sharingan"}, "Itachi Uchiha": {"c3": "Feu, Eau, Vent, Yin, Yang", "c4": "Mangekyō Sharingan"}, "Gaara": {"c3": "Vent, Terre, Magnétisme", "c5": "Ancien — Shukaku"}, "Minato Namikaze": {"c3": "Vent, Foudre, Feu, Yang"}, "Madara Uchiha": {"c3": "Feu, Vent, Foudre, Terre, Eau, Bois, Yin, Yang", "c4": "Sharingan, Rinnegan", "c5": "Ancien — Jūbi"}, "Hashirama Senju": {"c3": "Terre, Eau, Bois, Yang"}, "Jiraiya": {"c3": "Feu, Vent, Terre, Eau, Yang"}, "Orochimaru": {"c3": "Vent, Feu, Foudre, Terre, Eau, Yin, Yang"}, "Tsunade": {"c3": "Foudre, Terre, Eau, Feu, Yin, Yang"}, "Rock Lee": {"c3": "Aucune"}, "Metal Lee": {"c3": "Aucune"}, "Mifune": {"c3": "Aucune"}, "Hidan": {"c3": "Aucune"}, "Kimimaro": {"c3": "Aucune"}, "Hiruzen Sarutobi": {"c3": "Feu, Vent, Foudre, Terre, Eau, Yin, Yang"}, "Yamato": {"c3": "Eau, Terr
+9905: const QUOTE_UNIVERSES = {"naruto":{"name":"Naruto","quotes":[{"text":"Je deviendrai Hokage, peu importe combien de fois je tombe.","speaker":"Naruto Uzumaki","recipient":"à Iruka et au village","aliases":["Naruto"]},{"text":"Mon seul but est de tuer un certain homme.","speaker":"Sasuke Uchiha","recipient":"à l'équipe 7","aliases":["Sasuke"]},{"text":"Ceux qui abandonnent leurs amis sont pires que des déchets.","speaker":"Kakashi Hatake","recipient":"à l'équipe 7","aliases":["Kakashi"]},{"text":"Même le plus puissant a une faiblesse.","speaker":"Itachi Uchiha","recipient":"à Sasuke","aliases":["Itachi"]},{"text":"Quand on connaît la douleur, on peut comprendre les autres.","speaker":"Pain","recipient":"à Naruto","aliases":["Nagato","Pain Nagato"]},{"text":"Je protégerai Naruto, même si je dois risquer ma vie.","speaker":"Hinata Hyūga","recipient":"à Pain","aliases":["Hinata","Hinata Hyuga"]},{"text":"La jeunesse est une flamme qui ne s'éteint jamais !","speaker":"Might Guy","recipient":"à Rock Lee","aliases":["Guy","Gai","Gaï Maito"]},{"text":"Les règles sont importantes, mais les camarades le sont encore plus.","speaker":"Obito Uchiha","recipient":"à Kakashi","aliases":["Obito"]},{
+10157: const BLINDTEST_YT_TRACKS = [{"anime": "One Piece", "title": "Hiroshi Kitadani - We Are!", "id": "gcjdXMfYIe4", "footage": true}, {"anime": "One Piece", "title": "Folder5 - Believe", "id": "QwSkErUIF9k", "footage": true}, {"anime": "One Piece", "title": "D-51 - Brand New World", "id": "0uh9U5CXgso", "footage": true}, {"anime": "One Piece", "title": "The Babystars - Hikari e", "id": "GXkN2Du52j4", "footage": true}, {"anime": "One Piece", "title": "BOYSTYLE - Kokoro no Chizu", "id": "lj6tjz5VkQM", "footage": true}, {"anime": "One Piece", "title": "TVXQ - Share the World", "id": "6y5mvWkI7TE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Over the Top", "id": "pAI961THYkE", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Us!", "id": "NYryrD9lpsw", "footage": true}, {"anime": "One Piece", "title": "SEKAI NO OWARI - Saikou Toutatsuten", "id": "kXNwlScpt_c", "footage": true}, {"anime": "One Piece", "title": "Hiroshi Kitadani - Aaaassu!", "id": "r7zV2RtNlw0", "footage": true}, {"anime": "One Piece", "title": "Maki Otsuki - Memories", "id": "T1_gMAN4TjA", "footage": false}, {"anime": "One Piece", "title": "Ado - New Genesis", "id": "6lnnPnr_0SU
+11021:         // Alias + formes/transformation => toujours ramenés au personnage unique.
+12490: const ARC_SCENES = [{"anime": "Naruto", "id": "CmMa8dXn71I", "desc": "Naruto vs Pain, combat complet (VOSTA)"}, {"anime": "Naruto", "id": "DRDTCbMoBBc", "desc": "Naruto vs Pain, combat complet (VF anglaise)"}, {"anime": "Naruto", "id": "OGFNX4aPCe0", "desc": "Naruto vs Pain, combat complet 60FPS (VOSTA)"}, {"anime": "One Piece", "id": "bauIj1SMbwk", "desc": "Luffy Gear 5 vs Kaido, combat complet (VF anglaise)"}, {"anime": "One Piece", "id": "iYbDA-m1u-c", "desc": "Luffy Gear 5 vs Kaido, clip officiel IGN Fan Fest 2024"}, {"anime": "One Piece", "id": "6DGwf4c9qxE", "desc": "Luffy vs Kaido, combat complet HD"}, {"anime": "Bleach", "id": "zJn-hyLSdbU", "desc": "Ichigo vs Aizen, bataille finale (VF anglaise)"}, {"anime": "Bleach", "id": "9CCXlnUn3z0", "desc": "Ichigo vs Aizen, combat complet"}, {"anime": "Bleach", "id": "9QGf6UYs6fI", "desc": "Ichigo vs Aizen, combat complet (VOSTA)"}, {"anime": "Hunter x Hunter", "id": "Oc78yF8Wr58", "desc": "Gon vs Pitou, combat complet HD (VF anglaise)"}, {"anime": "Hunter x Hunter", "id": "NMMvLQu1xMQ", "desc": "Gon vs Pitou, combat complet"}, {"anime": "Hunter x Hunter", "id": "eSd5wuj-dE4", "desc": "Gon vs Pitou, combat complet"}, {"anime": "L'At
+13583: for (const [u, names] of Object.entries({"berserk": ["Farnese", "Serpico", "Schierke", "Isidro", "Ivalera", "Luca", "Godo", "Erica", "Charlotte", "Ganishka", "Slan", "Void", "Ubik", "Conrad", "Mozgus", "Grunbeld", "Locus", "Irvine"], "spyfamily": ["Emile Elman", "Ewen Egeburg", "Donovan Desmond", "Melinda Desmond", "Bill Watkins", "Daybreak", "Matthew McMahon", "Shopkeeper"], "oshinoko": ["Pieyon", "Minami Kotobuki", "Frill Shiranui", "Melt Narushima", "Yuki Sumi", "Nobuyuki Kumano", "Memcho", "Gotanda Taishi"], "drstone": ["Kinro", "Ginro", "Ruri", "Magma", "Nikki Hanada", "Yo Uei", "Minami Hokutozai", "Moz", "Kirisame", "Ibara", "Soyuz", "Luna Wright", "Chelsea Childe", "Joel Gear"], "mobpsycho": ["Ritsu Kageyama", "Teruki Hanazawa", "Arataka Reigen", "Dimple", "Tome Kurata", "Musashi Goda", "Tenga Onigawara", "Shigeo Kageyama", "Sho Suzuki", "Toichiro Suzuki", "Katsuya Serizawa", "Ryo Shimazaki", "Ishiguro", "Minegishi", "Matsuo", "Mezato Ichi"], "codegeass": ["Lelouch Lamperouge", "Suzaku Kururugi", "C.C.", "Kallen Stadtfeld", "Nunnally Lamperouge", "Shirley Fenette", "Rolo Lamperouge", "Cornelia li Britannia", "Euphemia li Britannia", "Schneizel el Britannia", "Charles zi Brit
+14453:                     if (qapThemeId === 'transformation') {
+14454:                         // STRICT : une transformation ne doit JAMAIS retomber sur le portrait normal du perso.
+14484:                                 try { candidate = await fetchFandomTransformationImage(host, charName, form); } catch (_) {}
+14499:                                 const q = String(it.imageSearch).replace(/\s+anime(?:\s+transformation)?$/i, '').trim();
+19063:     'og.png': Buffer.from('iVBORw0KGgoAAAANSUhEUgAABLAAAAJ2CAIAAADAIuwLAACKFUlEQVR42u3ddXhT1//A8ROvG4VCobi7M9xdNvS7sQ3mGxPm7vabuzAXJrCxjcFwd2e4Oy1FSl3iye+PdiFN0jZykybl/Xr6PNA0cnPOuZ97Pveee44sOa69AAAAAABcfZRWYaUUAAAAAOAqJKcIAAAAAICEEAAAAABAQggAAAAAICEEAAAAAJAQAgAAAABICAEAAAAAJIQAAAAAABJCAAAAAAAJIQAAAACAhBAAAAAAQEIIAAAAACAhBAAAAACQEAIAAAAASAgBAAAAACSEAAAAAAASQgAAAAAACSEAAAAAgIQQAAAAAEBCCAAAAAAgIQQAAAAAkBACAAAAAEgIAQAAAAAOlFK90fnTuylNAAAAAAiMWvXb+/4mXCEEAAAAgKsUCSEAAAAAkBACAAAAAEgIAQAAAAAkhAAAAACAqknpv7eWZNIbAAAAAICflnXgCiEAAAAAXKVICAEAAACAhBAAAAAAQEIIAAAAACAhBAAAAACQEAIAAAAASAgBAAAAACSEAAAAAAASQgAAAAAACSEAAAAAgIQQAAAAAEBCCAAAAAAIGkqr397aSukCAAAAQBAnXFwhBAAAAICrFAkhAAAAAJAQAgAAAABICAEAAAAAJIQAAAAAABJCAAAAAAAJIQAAAACAhBAAAAAAQEIIAAAAACAhBAAAAACQEAIAAAAASAgBAAAAACSEAAAAAAASQgAAAAAACSEAAAAAgIQQAAAAAEBCCAAAAAAgIQQAAAAAkBACAAAAAHyhFDK/vbeM4gUAAACA4E24uEIIAAAAAFcpEkIAAAAAICEEAAAAAJAQAgAAAABICAEAAAAAJIQAAAAAABJCAAAAAAAJIQAAAACAhBAAAAAAQEIIAAAAACAhBAAAAACQEAIAAAAASAgBAAAAACSEAAAAAAASQgAAAAAACSEAAAAAgIQQAAAAAEBCCAAAAAAgIQQAAAAAkBACAAAAAEgIAQAAAADuUVr99tZWShcAAAAAgjjh4gohAAAAAFylSAgBAAAAgIQQAAAAAEBCCAAAAAAgIQQAAAAAkBACAAAAAEgIAQAAAAAkhAAAAAAAEkIAAAAAAAkhAAAAAICEEAAAAABAQggAAAAAICEEAAAAAJAQAgAAA
+21587:     ['Bleach', 'Bankai', 'La libération ultime d’un sabre d’âme, qui décuple la puissance.'],
+23657:     const power = bingoFields(data, c, /element|type|nature chakra|chakra|pouvoir|capacite|technique|magie|magic|souffle|art|arme|style|fruit|zanpakuto|stand|alter|quirk|competence|dragon slayer|adolla|nen|ki|forme|transformation|mode/);
+23659:     const form = bingoFields(data, c, /(^| )(forme|transformation|mode)( |$)/);
+23698:     if (bingoIsMeaningful(form) || bingoHasStem(power, ['transformation','transform','gear','saiyan','bankai','resurreccion','titan','jinchuriki','hybride','zoan','kakuja']) || bingoHasPhrase(power, 'mode', 'forme')) tags.add('transform');
