@@ -1,0 +1,53 @@
+name: Export final index and server
+
+on:
+  push:
+    paths:
+      - '.github/workflows/EXPORT_TWO_FILES.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Recover existing migration script
+        run: |
+          mkdir -p scripts
+          python - <<'PY'
+          import re,base64,gzip,pathlib
+          src=pathlib.Path('.github/workflows/ULTRA_SIMPLE_REPO.yml').read_text()
+          m=re.search(r'base64\.b64decode\("([A-Za-z0-9+/=]+)"\)',src)
+          if not m:
+              raise SystemExit('embedded migration script not found')
+          pathlib.Path('scripts/ultra-simple-migrate.mjs').write_bytes(gzip.decompress(base64.b64decode(m.group(1))))
+          PY
+          node --check scripts/ultra-simple-migrate.mjs
+
+      - name: Build the two-file version
+        run: |
+          node scripts/ultra-simple-migrate.mjs phase2
+          node --check server.js
+          test -s index.html
+          test -s server.js
+          echo "INDEX_BYTES=$(wc -c < index.html)"
+          echo "SERVER_BYTES=$(wc -c < server.js)"
+
+      - name: Commit export branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "build: final two-file ANIME GAME export"
+          git push origin HEAD:two-file-export
