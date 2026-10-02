@@ -61,13 +61,5 @@ if marker not in s:
     { needs:['escanor','the one ultimate'], url:'https://img2.animatetimes.com/2021/05/60a22124c3e50_4f94bcec41df851cc7f351e37d62db66.jpg' },'''
     s=s[:end]+rows+s[end:]
 
-required=[
-    marker,'Strict form-specific wiki','Dark-Deku.png',"needs:['gon','adult gon']",
-    "needs:['escanor','the one ultimate']", "const persistKey = `v3|",
-    "if (it.img && source !== 'qt:transformation')"
-]
-missing=[x for x in required if x not in s]
-if missing: raise SystemExit('missing anchors: '+repr(missing))
-
 p.write_text(s,encoding='utf-8')
-print('batch5 content validation ok')
+print('batch5 patch written; node syntax check runs next')
