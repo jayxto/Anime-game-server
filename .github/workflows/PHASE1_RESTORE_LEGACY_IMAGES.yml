@@ -1,7 +1,5 @@
-name: Phase 1 restore legacy images
+name: Restore legacy image coverage
 on:
-  push:
-    branches: [image-coverage-100-v1]
   workflow_dispatch:
 permissions:
   contents: write
@@ -17,175 +15,27 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Restore complete legacy image library from safe backup
+      - run: npm ci
+      - name: Restore old image library
         run: |
-          set -euo pipefail
           git fetch origin backup-before-image-reset-2026-10-02
           rm -rf /tmp/ag-backup
           git worktree add --detach /tmp/ag-backup origin/backup-before-image-reset-2026-10-02
-          test -d /tmp/ag-backup/assets/images
           mkdir -p music/legacy-images music/char-images
           rsync -a /tmp/ag-backup/assets/images/ music/legacy-images/
-          echo "LEGACY_FILES=$(find music/legacy-images -type f | wc -l)"
-          echo "LEGACY_IMAGE_FILES=$(find music/legacy-images -type f | grep -Ei '\.(webp|png|jpe?g|gif)$' | wc -l)"
-      - name: Add durable legacy and canonical image bridge to server
+          echo "Legacy images: $(find music/legacy-images -type f | wc -l)"
+      - name: Canonicalize known images
+        run: node scripts/phase1-restore-images.mjs
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Commit restored images
         run: |
-          node <<'NODE'
-          const fs=require('fs');
-          const p='server.js';
-          let s=fs.readFileSync(p,'utf8');
-          if (!s.includes('AG_CANONICAL_IMAGE_BRIDGE_V1')) {
-            const needle='const app = express();';
-            if (!s.includes(needle)) throw new Error('Could not locate Express app declaration');
-            const insert=String.raw`
-// AG_CANONICAL_IMAGE_BRIDGE_V1
-const AG_CANONICAL_IMAGE_ROOT = path.join(__dirname, 'music', 'char-images');
-const AG_LEGACY_IMAGE_ROOT = path.join(__dirname, 'music', 'legacy-images');
-function agCanonicalImageSlug(v) {
-  return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
-function agTrySendCanonicalImage(req, res, next) {
-  try {
-    const u = agCanonicalImageSlug(req.query && req.query.u) || '_global';
-    const n = agCanonicalImageSlug(req.query && (req.query.n || req.query.name));
-    if (!n) return next();
-    const base = path.resolve(AG_CANONICAL_IMAGE_ROOT, u);
-    for (const ext of ['.webp','.png','.jpg','.jpeg']) {
-      const f = path.resolve(base, n + ext);
-      if (f.startsWith(base + path.sep) && fs.existsSync(f) && fs.statSync(f).size > 512) {
-        res.set('Cache-Control','public, max-age=31536000, immutable');
-        return res.sendFile(f);
-      }
-    }
-  } catch (_) {}
-  return next();
-}
-app.use('/api/avatar/img', agTrySendCanonicalImage);
-app.use('/api/character-image', agTrySendCanonicalImage);
-app.use(/^\/assets\/images\/(.*)$/, (req,res,next) => {
-  try {
-    const rel = String(req.params[0] || '').replace(/^[/\\]+/,'');
-    const root = path.resolve(AG_LEGACY_IMAGE_ROOT);
-    const f = path.resolve(root, rel);
-    if (f.startsWith(root + path.sep) && fs.existsSync(f) && fs.statSync(f).isFile()) {
-      res.set('Cache-Control','public, max-age=31536000, immutable');
-      return res.sendFile(f);
-    }
-  } catch (_) {}
-  next();
-});
-// AG_CANONICAL_IMAGE_BRIDGE_V1_END
-`;
-            s=s.replace(needle, needle+insert);
-            fs.writeFileSync(p,s);
-          }
-          NODE
-          node --check server.js
-      - name: Boot app and fetch complete visual catalog
-        env:
-          PORT: '3099'
-        run: |
-          set -euo pipefail
-          node server.js > /tmp/server.log 2>&1 &
-          echo $! >/tmp/server.pid
-          for i in $(seq 1 90); do
-            if curl -fsS http://127.0.0.1:3099/api/character-catalog -o /tmp/catalog.json; then break; fi
-            sleep 1
-          done
-          test -s /tmp/catalog.json || { cat /tmp/server.log; exit 1; }
-      - name: Canonicalize every image already known by old data
-        run: |
-          node <<'NODE'
-          const fs=require('fs'), path=require('path'), sharp=require('sharp');
-          const data=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
-          const chars=data.characters||data.items||data.catalog||[];
-          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-          const uniq=new Map();
-          for(const x of chars){const u=x.universeKey||x.universe||x.u||x.key||x.animeKey||'';const n=x.name||x.character||x.displayName||x.label||'';if(n)uniq.set(norm(u)+'|'+norm(n),{...x,u,n});}
-          const exts=['.webp','.png','.jpg','.jpeg','.gif'];
-          function existingCanonical(x){const dir=path.join('music','char-images',norm(x.u)||'_global'), b=norm(x.n);return exts.map(e=>path.join(dir,b+e)).find(f=>fs.existsSync(f)&&fs.statSync(f).size>512);}
-          function legacyFromUrl(url){
-            if(!url||typeof url!=='string'||!url.startsWith('/assets/images/'))return null;
-            const rel=decodeURIComponent(url.split('?')[0].slice('/assets/images/'.length)).replace(/^[/\\]+/,'');
-            const root=path.resolve('music','legacy-images'), f=path.resolve(root,rel);
-            return f.startsWith(root+path.sep)&&fs.existsSync(f)&&fs.statSync(f).isFile()?f:null;
-          }
-          async function saveCanonical(x, src){
-            const out=path.join('music','char-images',norm(x.u)||'_global',norm(x.n)+'.webp');
-            fs.mkdirSync(path.dirname(out),{recursive:true});
-            try{await sharp(src,{animated:false}).rotate().resize({width:640,height:896,fit:'inside',withoutEnlargement:true}).webp({quality:82}).toFile(out);return fs.statSync(out).size>700;}catch(e){try{fs.rmSync(out,{force:true});}catch{}return false;}
-          }
-          (async()=>{
-            let already=0,copied=0,noLegacy=0;
-            for(const x of uniq.values()){
-              if(existingCanonical(x)){already++;continue;}
-              const src=legacyFromUrl(x.originalImg);
-              if(src && await saveCanonical(x,src))copied++;else noLegacy++;
-            }
-            const stats={unique:uniq.size,already,copied,noLegacy};
-            fs.writeFileSync('/tmp/phase1-stats.json',JSON.stringify(stats,null,2));
-            console.log(stats);
-          })().catch(e=>{console.error(e);process.exit(1)});
-          NODE
-      - name: Localize direct HTTP original images
-        run: |
-          node <<'NODE'
-          const fs=require('fs'),path=require('path'),sharp=require('sharp');
-          const data=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));
-          const chars=data.characters||[];
-          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-          const uniq=new Map();
-          for(const x of chars){const u=x.universeKey||x.universe||x.u||'';const n=x.name||x.character||x.displayName||x.label||'';if(n)uniq.set(norm(u)+'|'+norm(n),{...x,u,n});}
-          const todo=[];
-          for(const x of uniq.values()){
-            const out=path.join('music','char-images',norm(x.u)||'_global',norm(x.n)+'.webp');
-            if(fs.existsSync(out)&&fs.statSync(out).size>700)continue;
-            if(/^https?:\/\//i.test(String(x.originalImg||'')))todo.push({x,out,url:x.originalImg});
-          }
-          let idx=0,ok=0,fail=0;
-          async function one(item){
-            const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),12000);
-            try{
-              const r=await fetch(item.url,{redirect:'follow',signal:ctrl.signal,headers:{'User-Agent':'Mozilla/5.0 AnimeGameImageLocalizer/1.0','Accept':'image/*'}});
-              if(!r.ok)throw new Error('HTTP '+r.status);
-              const ab=await r.arrayBuffer(); const b=Buffer.from(ab); if(b.length<700)throw new Error('too small');
-              const tmp=item.out+'.tmp'; fs.mkdirSync(path.dirname(item.out),{recursive:true});
-              await sharp(b,{animated:false}).rotate().resize({width:640,height:896,fit:'inside',withoutEnlargement:true}).webp({quality:82}).toFile(tmp);
-              fs.renameSync(tmp,item.out); ok++;
-            }catch(e){fail++;}finally{clearTimeout(t);}
-          }
-          async function worker(){while(true){const i=idx++;if(i>=todo.length)return;await one(todo[i]);}}
-          Promise.all(Array.from({length:12},worker)).then(()=>{console.log({directHttpTodo:todo.length,ok,fail});fs.writeFileSync('/tmp/http-stats.json',JSON.stringify({todo:todo.length,ok,fail},null,2));}).catch(e=>{console.error(e);process.exit(1)});
-          NODE
-      - name: Re-audit exact canonical coverage
-        run: |
-          node <<'NODE'
-          const fs=require('fs'),path=require('path');
-          const data=JSON.parse(fs.readFileSync('/tmp/catalog.json','utf8'));const chars=data.characters||[];
-          const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-          const uniq=new Map();for(const x of chars){const u=x.universeKey||x.universe||x.u||'';const n=x.name||x.character||x.displayName||x.label||'';if(n)uniq.set(norm(u)+'|'+norm(n),{u,n});}
-          let ok=0;const missing=[];for(const x of uniq.values()){const d=path.join('music','char-images',norm(x.u)||'_global'),b=norm(x.n);const f=['.webp','.png','.jpg','.jpeg'].map(e=>path.join(d,b+e)).find(q=>fs.existsSync(q)&&fs.statSync(q).size>700);if(f)ok++;else missing.push(x);}
-          const report={total:uniq.size,canonical:ok,missing:missing.length,coverage:+(ok*100/uniq.size).toFixed(2),missingFirst200:missing.slice(0,200)};
-          fs.writeFileSync('PHASE1_IMAGE_REPORT.json',JSON.stringify(report,null,2));console.log(report.total,report.canonical,report.missing,report.coverage+'%');
-          NODE
-      - name: Commit Phase 1 image restoration
-        run: |
-          set -euo pipefail
-          kill $(cat /tmp/server.pid) 2>/dev/null || true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add server.js music/char-images music/legacy-images PHASE1_IMAGE_REPORT.json
-          git commit -m "fix: restore legacy image library and canonical visual assets" || true
+          git commit -m "fix: restore legacy images and canonicalize known portraits" || true
           git push origin HEAD:image-coverage-100-v1
-      - name: Upload Phase 1 report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: phase1-image-report
-          path: |
-            PHASE1_IMAGE_REPORT.json
-            /tmp/phase1-stats.json
-            /tmp/http-stats.json
-            /tmp/server.log
+          path: PHASE1_IMAGE_REPORT.json
