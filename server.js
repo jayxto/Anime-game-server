@@ -103,6 +103,10 @@ async function initDb() {
             PRIMARY KEY (universe_key, norm_name)
         );
     `);
+
+    // SIMPLE IMAGE STORE COLUMNS V1
+    await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS image_bytes BYTEA`);
+    await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS mime_type TEXT`);
 }
 
 initDb()
@@ -11198,7 +11202,427 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (raison) => {
     console.error('[PROMESSE REJETÉE] le serveur continue malgré tout :', raison);
 });
+/* ================= SIMPLE PERSISTENT CHARACTER IMAGES V1 =================
+   Final architecture:
+   - baseline and admin character pictures are copied into PostgreSQL (BYTEA)
+   - the browser only loads /api/character-image-file from this server
+   - admin URL changes are verified immediately, copied, and no longer hotlinked
+   - the old image resolvers are retained only as a temporary migration fallback
+============================================================================ */
+
+const SIMPLE_IMAGE_STATE = {
+    running: false, done: false, pass: 0, total: 0, stored: 0, missing: 0,
+    failed: [], startedAt: null, finishedAt: null, lastError: null
+};
+
+function simpleImageNorm(value) {
+    return String(value || '')
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase().replace(/[’']/g, '')
+        .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+}
+function simpleImageCompact(value) { return simpleImageNorm(value).replace(/\s+/g, ''); }
+function simpleImageRoute(universe, name, version) {
+    const v = version ? '&v=' + encodeURIComponent(String(version)) : '';
+    return '/api/character-image-file?u=' + encodeURIComponent(universe) + '&n=' + encodeURIComponent(name) + v;
+}
+function simpleMimeFromPath(p) {
+    const x = String(p || '').toLowerCase();
+    if (x.endsWith('.png')) return 'image/png';
+    if (x.endsWith('.gif')) return 'image/gif';
+    if (x.endsWith('.avif')) return 'image/avif';
+    if (x.endsWith('.webp')) return 'image/webp';
+    return 'image/jpeg';
+}
+function simpleImageLooksValid(buf) {
+    return Buffer.isBuffer(buf) && buf.length >= 700 && buf.length <= 10 * 1024 * 1024;
+}
+function simpleImageIsPrivateHost(hostname) {
+    const h = String(hostname || '').toLowerCase();
+    if (!h || h === 'localhost' || h === '::1' || h.endsWith('.local')) return true;
+    if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
+    const m = h.match(/^172\.(\d+)\./); if (m && Number(m[1]) >= 16 && Number(m[1]) <= 31) return true;
+    return false;
+}
+async function simpleFetchImage(url, timeoutMs = 14000) {
+    if (!/^https?:\/\//i.test(String(url || ''))) return null;
+    let parsed;
+    try { parsed = new URL(url); } catch (_) { return null; }
+    if (simpleImageIsPrivateHost(parsed.hostname)) return null;
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+        const r = await fetch(url, {
+            redirect: 'follow', signal: ac.signal,
+            headers: { 'User-Agent':'ANIME-GAME/1.0', 'Accept':'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }
+        });
+        if (!r.ok) return null;
+        const mime = String(r.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+        if (!mime.startsWith('image/')) return null;
+        const bytes = Buffer.from(await r.arrayBuffer());
+        if (!simpleImageLooksValid(bytes)) return null;
+        return { bytes, mime };
+    } catch (_) { return null; }
+    finally { clearTimeout(t); }
+}
+function simpleScoreName(candidate, wanted) {
+    const a = simpleImageNorm(candidate), b = simpleImageNorm(wanted);
+    if (!a || !b) return 0;
+    if (a === b) return 100;
+    if (simpleImageCompact(a) === simpleImageCompact(b)) return 98;
+    if (a.includes(b) || b.includes(a)) {
+        const sm = Math.min(a.length,b.length), lg = Math.max(a.length,b.length);
+        if (sm >= 4) return 83 + Math.round(14 * sm / lg);
+    }
+    const A = new Set(a.split(' ')), B = new Set(b.split(' ')); let common = 0;
+    for (const x of A) if (B.has(x)) common++;
+    return Math.round((common / Math.max(A.size,B.size,1)) * 82);
+}
+const SIMPLE_ALIASES = new Map(Object.entries({
+    'dragonball|sangoku':'Son Goku','dragonball|sangohan':'Son Gohan','dragonball|sangoten':'Son Goten',
+    'dragonball|vegeto':'Vegito','dragonball|roi vegeta':'King Vegeta','dragonball|roi cold':'King Cold',
+    'dragonball|grand pretre':'Grand Priest','dragonball|docteur gero':'Dr. Gero',
+    'chainsaw|demon des tenebres':'Darkness Devil','chainsaw|demon de la chute':'Falling Devil',
+    'chainsaw|demon de la justice':'Justice Devil','chainsaw|demon de l enfer':'Hell Devil',
+    'clover|patolli':'Patry','blackclover|patolli':'Patry','tokyorevengers|draken':'Ken Ryuguji'
+}));
+function simpleVariants(u, name) {
+    const out = [String(name || '').trim()];
+    const a = SIMPLE_ALIASES.get(simpleImageCompact(u) + '|' + simpleImageNorm(name));
+    if (a) out.unshift(a);
+    const p = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (p.length === 2) out.push(p.slice().reverse().join(' '));
+    return [...new Set(out.filter(Boolean))];
+}
+
+async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
+    if (!image || !simpleImageLooksValid(image.bytes)) return false;
+    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
+    const stable = simpleImageRoute(x.u, x.name, Date.now());
+    await pool.query(`
+        INSERT INTO character_images
+            (universe_key,norm_name,display_name,image_url,source_url,status,image_bytes,mime_type,updated_at)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,now())
+        ON CONFLICT (universe_key,norm_name)
+        DO UPDATE SET display_name=EXCLUDED.display_name,image_url=EXCLUDED.image_url,
+          source_url=EXCLUDED.source_url,status=EXCLUDED.status,image_bytes=EXCLUDED.image_bytes,
+          mime_type=EXCLUDED.mime_type,updated_at=now()
+    `, [x.u,normName,x.name,stable,sourceUrl || null,status,image.bytes,image.mime || 'image/jpeg']);
+    try { CHARACTER_IMAGE_CACHE.delete(`${x.u}|${normName}`); } catch (_) {}
+    return true;
+}
+
+async function simpleExistingRows() {
+    const out = new Map();
+    const r = await pool.query(`SELECT universe_key,norm_name,image_url,source_url,status,
+      (image_bytes IS NOT NULL AND octet_length(image_bytes) >= 700) AS has_bytes, updated_at
+      FROM character_images`);
+    for (const row of r.rows) out.set(`${row.universe_key}|${row.norm_name}`, row);
+    return out;
+}
+
+async function simpleCatalogue() {
+    try {
+        const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
+        const d = await r.json();
+        if (r.ok && d?.ok && Array.isArray(d.characters) && d.characters.length) {
+            const map = new Map();
+            for (const raw of d.characters) {
+                const u = String(raw?.u || raw?.universe || '').trim();
+                const name = cleanImageCharacterName(String(raw?.name || '').trim());
+                if (!u || !name) continue;
+                const k = `${u}|${normalizeImageKey(name)}`;
+                if (!map.has(k)) map.set(k,{u,name,anime:String(raw?.anime || ARC_UNIVERSE_ANIME?.[u] || u),img:String(raw?.img || raw?.imageUrl || raw?.originalImg || '')});
+                else if (!map.get(k).img && (raw?.img || raw?.imageUrl || raw?.originalImg)) map.get(k).img = String(raw.img || raw.imageUrl || raw.originalImg);
+            }
+            return [...map.values()];
+        }
+    } catch (_) {}
+    const out = [];
+    try {
+        for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+            if (!b || typeof b !== 'object') continue;
+            for (const [name,img] of Object.entries(b)) out.push({u,name,anime:ARC_UNIVERSE_ANIME?.[u] || u,img:String(img || '')});
+        }
+    } catch (_) {}
+    return out;
+}
+
+async function simplePokeIndex() {
+    if (simplePokeIndex.cache) return simplePokeIndex.cache;
+    const map = new Map();
+    try {
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon-species?limit=2000', { headers:{Accept:'application/json'} });
+        if (r.ok) {
+            const d = await r.json();
+            for (const x of d?.results || []) {
+                const id = String(x.url || '').match(/pokemon-species\/(\d+)\/?$/)?.[1];
+                if (id) { map.set(simpleImageNorm(x.name),id); map.set(simpleImageCompact(x.name),id); }
+            }
+        }
+    } catch (_) {}
+    simplePokeIndex.cache = map; return map;
+}
+
+async function simpleAniListAnime(anime) {
+    const cache = simpleAniListAnime.cache || (simpleAniListAnime.cache = new Map());
+    if (cache.has(anime)) return cache.get(anime);
+    const all = [];
+    for (let page=1; page<=4; page++) {
+        const query = `query($s:String,$p:Int){Media(search:$s,type:ANIME){characters(page:$p,perPage:50,sort:[ROLE,RELEVANCE]){pageInfo{hasNextPage}nodes{name{full native alternative}image{large medium}}}}}`;
+        try {
+            const r = await fetch('https://graphql.anilist.co', {
+                method:'POST', headers:{'content-type':'application/json','accept':'application/json','User-Agent':'ANIME-GAME/1.0'},
+                body:JSON.stringify({query,variables:{s:anime,p:page}})
+            });
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,3500)); page--; continue; }
+            if (!r.ok) break;
+            const d = await r.json(); const c = d?.data?.Media?.characters;
+            all.push(...(c?.nodes || []));
+            if (!c?.pageInfo?.hasNextPage) break;
+            await new Promise(r=>setTimeout(r,800));
+        } catch (_) { break; }
+    }
+    cache.set(anime,all); return all;
+}
+
+async function simpleFandomUrl(u,name) {
+    const host = (typeof FANDOM_WIKIS !== 'undefined' && FANDOM_WIKIS[u]) || null;
+    if (!host) return '';
+    const qs = simpleVariants(u,name);
+    for (const wanted of qs.slice(0,2)) {
+        try {
+            const p = new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:wanted,gsrnamespace:'0',gsrlimit:'8',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'900',redirects:'1'});
+            const r = await fetch(`https://${host}/api.php?${p}`, {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+            if (!r.ok) continue;
+            const pages = Object.values((await r.json())?.query?.pages || {});
+            let best = null;
+            for (const pg of pages) {
+                const sc = Math.max(...qs.map(x=>simpleScoreName(pg?.title,x)));
+                const url = pg?.original?.source || pg?.thumbnail?.source || '';
+                if (url && sc >= 65 && (!best || sc > best.sc)) best = {sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+    }
+    return '';
+}
+
+async function simpleJikanUrl(name,u) {
+    for (const q of simpleVariants(u,name).slice(0,2)) {
+        try {
+            const r = await fetch('https://api.jikan.moe/v4/characters?limit=10&q=' + encodeURIComponent(q), {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+            if (r.status === 429) { await new Promise(r=>setTimeout(r,1800)); continue; }
+            if (!r.ok) continue;
+            const arr = (await r.json())?.data || []; let best = null;
+            for (const c of arr) {
+                const sc = Math.max(...simpleVariants(u,name).map(w=>simpleScoreName(c?.name,w)));
+                const url = c?.images?.webp?.image_url || c?.images?.jpg?.image_url || '';
+                if (url && sc >= 82 && (!best || sc > best.sc)) best={sc,url};
+            }
+            if (best?.url) return best.url;
+        } catch (_) {}
+        await new Promise(r=>setTimeout(r,420));
+    }
+    return '';
+}
+
+async function simpleWikipediaUrl(name,anime,u) {
+    try {
+        const variants = simpleVariants(u,name);
+        const p = new URLSearchParams({action:'query',format:'json',origin:'*',generator:'search',gsrsearch:`${variants[0]} ${anime || ''}`,gsrnamespace:'0',gsrlimit:'6',prop:'pageimages',piprop:'original|thumbnail',pithumbsize:'900'});
+        const r = await fetch('https://en.wikipedia.org/w/api.php?' + p, {headers:{Accept:'application/json','User-Agent':'ANIME-GAME/1.0'}});
+        if (!r.ok) return '';
+        const pages = Object.values((await r.json())?.query?.pages || {}); let best=null;
+        for (const pg of pages) {
+            const sc = Math.max(...variants.map(x=>simpleScoreName(pg?.title,x)));
+            const url = pg?.original?.source || pg?.thumbnail?.source || '';
+            if (url && sc >= 62 && (!best || sc > best.sc)) best={sc,url};
+        }
+        return best?.url || '';
+    } catch (_) { return ''; }
+}
+
+async function simplePool(items, n, fn) {
+    let cursor=0;
+    await Promise.all(Array.from({length:Math.min(n,Math.max(1,items.length))}, async()=>{
+        while (true) { const i=cursor++; if (i>=items.length) return; await fn(items[i],i); }
+    }));
+}
+
+async function simpleMigrationPass(pass) {
+    SIMPLE_IMAGE_STATE.pass = pass;
+    const chars = await simpleCatalogue();
+    SIMPLE_IMAGE_STATE.total = chars.length;
+    const rows = await simpleExistingRows();
+    const missing = [];
+    for (const x of chars) {
+        const k = `${x.u}|${normalizeImageKey(x.name)}`;
+        if (rows.get(k)?.has_bytes) continue;
+        x._old = rows.get(k) || null;
+        missing.push(x);
+    }
+    SIMPLE_IMAGE_STATE.stored = chars.length - missing.length;
+    SIMPLE_IMAGE_STATE.missing = missing.length;
+    SIMPLE_IMAGE_STATE.failed = [];
+    if (!missing.length) return [];
+
+    const unresolved = [];
+    await simplePool(missing, 12, async x => {
+        const candidates = [];
+        if (x._old?.source_url) candidates.push(x._old.source_url);
+        if (x._old?.image_url) candidates.push(x._old.image_url);
+        if (x.img) candidates.push(x.img);
+        try { const s = staticCharImage(x.u,x.name); if (s) candidates.push(s); } catch (_) {}
+        for (const c of [...new Set(candidates.filter(Boolean))]) {
+            if (/^\//.test(c)) {
+                try {
+                    const file = path.join(__dirname,String(c).replace(/^\/+/,''));
+                    const b = await fs.promises.readFile(file);
+                    if (simpleImageLooksValid(b)) {
+                        if (await simpleStoreImage(x,{bytes:b,mime:simpleMimeFromPath(file)},x._old?.source_url || null,x._old?.status === 'manual-admin' ? 'manual-admin' : 'ok')) return;
+                    }
+                } catch (_) {}
+            } else if (/^https?:\/\//i.test(c) && !c.includes('/api/character-image-file')) {
+                const img = await simpleFetchImage(c);
+                if (img && await simpleStoreImage(x,img,c,x._old?.status === 'manual-admin' ? 'manual-admin' : 'ok')) return;
+            }
+        }
+        if (simpleImageCompact(x.u) === 'pokemon') {
+            const idx = await simplePokeIndex();
+            for (const v of simpleVariants(x.u,x.name)) {
+                const id = idx.get(simpleImageNorm(v)) || idx.get(simpleImageCompact(v));
+                if (!id) continue;
+                const url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+                const img = await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return;
+            }
+        }
+        unresolved.push(x);
+    });
+
+    const byAnime = new Map();
+    for (const x of unresolved) {
+        const anime = String(x.anime || ARC_UNIVERSE_ANIME?.[x.u] || x.u);
+        if (!byAnime.has(anime)) byAnime.set(anime,[]); byAnime.get(anime).push(x);
+    }
+    const unresolved2 = [];
+    for (const [anime,list] of byAnime) {
+        const candidates = await simpleAniListAnime(anime);
+        for (const x of list) {
+            const wanted = simpleVariants(x.u,x.name); let best=null;
+            for (const c of candidates) {
+                const names=[c?.name?.full,c?.name?.native,...(c?.name?.alternative||[])].filter(Boolean);
+                const sc=Math.max(0,...names.flatMap(n=>wanted.map(w=>simpleScoreName(n,w))));
+                const url=c?.image?.large || c?.image?.medium || '';
+                if (url && sc>=82 && (!best || sc>best.sc)) best={sc,url};
+            }
+            if (best?.url) {
+                const img=await simpleFetchImage(best.url);
+                if (img && await simpleStoreImage(x,img,best.url)) continue;
+            }
+            unresolved2.push(x);
+        }
+        await new Promise(r=>setTimeout(r,700));
+    }
+
+    const unresolved3=[];
+    await simplePool(unresolved2,4,async x=>{
+        const url=await simpleFandomUrl(x.u,x.name);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) return; }
+        unresolved3.push(x);
+    });
+
+    const unresolved4=[];
+    for (const x of unresolved3) {
+        const url=await simpleJikanUrl(x.name,x.u);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) continue; }
+        unresolved4.push(x);
+    }
+
+    const unresolved5=[];
+    for (const x of unresolved4) {
+        const url=await simpleWikipediaUrl(x.name,x.anime,x.u);
+        if (url) { const img=await simpleFetchImage(url); if (img && await simpleStoreImage(x,img,url)) continue; }
+        unresolved5.push(x);
+    }
+
+    const after = await simpleExistingRows();
+    const finalMissing = chars.filter(x=>!after.get(`${x.u}|${normalizeImageKey(x.name)}`)?.has_bytes);
+    SIMPLE_IMAGE_STATE.stored = chars.length - finalMissing.length;
+    SIMPLE_IMAGE_STATE.missing = finalMissing.length;
+    SIMPLE_IMAGE_STATE.failed = finalMissing.slice(0,80).map(x=>({u:x.u,anime:x.anime,name:x.name}));
+    return finalMissing;
+}
+
+async function startSimpleImageMigration() {
+    if (SIMPLE_IMAGE_STATE.running) return;
+    SIMPLE_IMAGE_STATE.running=true; SIMPLE_IMAGE_STATE.startedAt=new Date().toISOString(); SIMPLE_IMAGE_STATE.lastError=null;
+    try {
+        await initDb();
+        await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS image_bytes BYTEA`);
+        await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS mime_type TEXT`);
+        let missing=[];
+        for (let pass=1; pass<=3; pass++) {
+            missing=await simpleMigrationPass(pass);
+            if (!missing.length) break;
+            if (pass<3) await new Promise(r=>setTimeout(r,12000));
+        }
+        SIMPLE_IMAGE_STATE.done = !missing.length;
+    } catch (e) {
+        SIMPLE_IMAGE_STATE.lastError=String(e?.stack || e?.message || e);
+        console.error('[Simple images] migration failed:',e);
+    } finally {
+        SIMPLE_IMAGE_STATE.running=false; SIMPLE_IMAGE_STATE.finishedAt=new Date().toISOString();
+        console.log('[Simple images] state',SIMPLE_IMAGE_STATE);
+    }
+}
+
+app.get('/api/character-image-file', async (req,res)=>{
+    try {
+        const u=String(req.query.u||'').trim(), name=cleanImageCharacterName(String(req.query.n||'').trim());
+        if (!u || !name) return res.status(404).end();
+        const r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[u,normalizeImageKey(name)]);
+        const row=r.rows[0]; if (!row?.image_bytes) return res.status(404).end();
+        res.set('Content-Type',row.mime_type || 'image/jpeg');
+        res.set('Cache-Control','public,max-age=31536000,immutable');
+        res.set('ETag',`W/"${Buffer.byteLength(row.image_bytes)}-${new Date(row.updated_at).getTime()}"`);
+        return res.send(row.image_bytes);
+    } catch (_) { return res.status(404).end(); }
+});
+
+app.get('/api/image-migration-status', async (req,res)=>{
+    return res.json({ok:true,...SIMPLE_IMAGE_STATE});
+});
+
+app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
+    const b=req.body||{}; const u=String(b.universe||'').trim();
+    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
+    if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
+    if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
+    const img=await simpleFetchImage(url,10000);
+    if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
+    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    const imageUrl=simpleImageRoute(u,name,Date.now());
+    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
+}));
+
+const __legacyCharacterImageResolver = resolveCharacterImage;
+resolveCharacterImage = async function(universeKey,displayName){
+    const name=cleanImageCharacterName(displayName); const normName=normalizeImageKey(name);
+    try {
+        const r=await pool.query(`SELECT source_url,status,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 LIMIT 1`,[universeKey,normName]);
+        const row=r.rows[0];
+        if (row) return {imageUrl:simpleImageRoute(universeKey,name,new Date(row.updated_at).getTime()),sourceUrl:row.source_url||null,status:'ok'};
+    } catch (_) {}
+    if (!SIMPLE_IMAGE_STATE.done) return __legacyCharacterImageResolver(universeKey,displayName);
+    return {imageUrl:null,sourceUrl:null,status:'missing'};
+};
+/* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
+
 server.listen(PORT, () => {
+    startSimpleImageMigration().catch(err => console.error('[Simple images] startup migration:', err));
     startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
     startDleLiveExpansion().catch(err => console.warn('[AnimeDLE] Expansion massive échouée :', err.message));
     console.log(`Serveur démarré sur le port ${PORT}`);
@@ -17013,7 +17437,7 @@ app.post('/api/admin/chars/delete', adminOnly(async (req, res) => {
 // CHARACTER IMAGE ADMIN ROUTE V4
 // Admin-only editor. The chosen URL is persisted in the existing Postgres
 // character_images cache so it is not lost when Render rebuilds the service.
-app.post('/api/admin/character-image', adminOnly(async (req, res) => {
+app.post('/api/admin/character-image-legacy-disabled', adminOnly(async (req, res) => {
     const b = req.body || {};
     const universe = String(b.universe || '').trim();
     const name = cleanImageCharacterName(String(b.name || '').trim()).slice(0, 160);
