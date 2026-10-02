@@ -805,6 +805,42 @@ app.get('/api/character-catalog', (req, res) => {
             } catch (_) {}
         }
 
+
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+                        }
+                    } catch (_) {}
+                }
+            }
+        } catch (e) { console.warn('[character catalog cards]', e.message); }
+        try {
+            if (typeof hwCards === 'function') {
+                for (const c of (hwCards() || [])) if (c?.u && (c?.display || c?.name)) {
+                    add(c.u, (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[c.u]) || c.anime || c.u, c.display || c.name, c.img || null, 'cards-halloween');
+                }
+            }
+        } catch (_) {}
+        try {
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+        try {
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
+
         const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
             .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
         const animes = [...new Set(characters.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
@@ -11339,32 +11375,108 @@ async function simpleExistingRows() {
 }
 
 async function simpleCatalogue() {
+    const map = new Map();
+    const add = (u, name, anime, img, source='jeu') => {
+        name = cleanImageCharacterName(String(name || '').trim());
+        anime = String(anime || '').trim();
+        u = String(u || '').trim();
+        if (!u && anime) {
+            try { u = resolveImageUniverseKey(anime) || ''; } catch (_) {}
+        }
+        if (!u || !name) return;
+        if (!anime) {
+            try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
+            catch (_) { anime = u; }
+        }
+        const k = `${u}|${normalizeImageKey(name)}`;
+        const cleanImg = String(img || '').trim();
+        const old = map.get(k);
+        if (old) {
+            if (!old.img && cleanImg) old.img = cleanImg;
+            if (!old.anime && anime) old.anime = anime;
+            if (source && !old.sources.includes(source)) old.sources.push(source);
+            return;
+        }
+        map.set(k,{u,name,anime,img:cleanImg,sources:[source]});
+    };
+    const addNames = (u, names, source) => {
+        let anime='';
+        try { anime=String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); } catch (_) { anime=String(u||''); }
+        for (const raw of (Array.isArray(names) ? names : [])) {
+            if (typeof raw === 'string') add(u,raw,anime,'',source);
+            else if (raw && typeof raw === 'object') add(raw.u||u,raw.display||raw.name||raw.character||raw.speaker,raw.anime||anime,raw.img||raw.image||raw.imageUrl||'',source);
+        }
+    };
+    const addCardish = (item, fallbackU='', source='cards') => {
+        if (!item) return;
+        if (typeof item === 'string') { if (fallbackU) add(fallbackU,item,'','',source); return; }
+        if (Array.isArray(item)) { for (const x of item) addCardish(x,fallbackU,source); return; }
+        if (typeof item !== 'object') return;
+        const u=String(item.u||item.universe||item.universeKey||fallbackU||'').trim();
+        const name=item.display||item.name||item.character||item.speaker||'';
+        if (u && name) add(u,name,item.anime||item.sub||'',item.img||item.image||item.imageUrl||'',source);
+        for (const key of ['cards','chars','characters','items','pool','list']) {
+            if (Array.isArray(item[key])) addCardish(item[key],u||fallbackU,source);
+        }
+    };
+
+    // Existing public catalogue (modes, DLE, Roland-Garros, themes, etc.).
     try {
         const r = await fetch(`http://127.0.0.1:${PORT}/api/character-catalog`, { headers:{Accept:'application/json'} });
-        const d = await r.json();
-        if (r.ok && d?.ok && Array.isArray(d.characters) && d.characters.length) {
-            const map = new Map();
-            for (const raw of d.characters) {
-                const u = String(raw?.u || raw?.universe || '').trim();
-                const name = cleanImageCharacterName(String(raw?.name || '').trim());
-                if (!u || !name) continue;
-                const k = `${u}|${normalizeImageKey(name)}`;
-                if (!map.has(k)) map.set(k,{u,name,anime:String(raw?.anime || ARC_UNIVERSE_ANIME?.[u] || u),img:String(raw?.img || raw?.imageUrl || raw?.originalImg || '')});
-                else if (!map.get(k).img && (raw?.img || raw?.imageUrl || raw?.originalImg)) map.get(k).img = String(raw.img || raw.imageUrl || raw.originalImg);
+        if (r.ok) {
+            const d=await r.json();
+            for (const raw of (d?.characters || d?.items || [])) {
+                add(raw?.u, raw?.name || raw?.display, raw?.anime, raw?.originalImg || raw?.img || raw?.imageUrl, 'catalogue-api');
             }
-            return [...map.values()];
         }
     } catch (_) {}
-    const out = [];
-    try {
-        for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) {
-            if (!b || typeof b !== 'object') continue;
-            for (const [name,img] of Object.entries(b)) out.push({u,name,anime:ARC_UNIVERSE_ANIME?.[u] || u,img:String(img || '')});
-        }
-    } catch (_) {}
-    return out;
-}
 
+    // Direct game sources, so migration still works even if the HTTP catalogue is unavailable.
+    try { for (const [u,b] of Object.entries(STATIC_CHAR_IMAGES || {})) for (const [name,img] of Object.entries(b||{})) add(u,name,'',img,'char-images'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) addNames(u,names,'modes'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(RG_POOLS_V2 || {})) addNames(u,names,'roland-garros'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_MASTER_NAMES || {})) addNames(u,names,'dle-master'); } catch (_) {}
+    try { for (const [u,names] of Object.entries(DLE_TARGET_NAMES || {})) addNames(u,names,'dle-target'); } catch (_) {}
+    try {
+        for (const [u,def] of Object.entries(DLE_UNIVERSES || {})) {
+            for (const c of (def?.characters || [])) add(u,c?.name,'',c?.img||c?.image||'','dle-base');
+        }
+    } catch (_) {}
+
+    // Every card actually obtainable/displayed by the collection.
+    try {
+        if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+            for (const [u,anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                let list=[];
+                try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                for (const c of list) add(u,c?.display||c?.name||c?.raw,anime,c?.img||c?.image||'','cards');
+                try {
+                    if (typeof cardAllSpecials === 'function') {
+                        for (const c of (cardAllSpecials(u)||[])) add(u,c?.display||c?.name,anime,c?.img||'','cards-special');
+                    }
+                } catch (_) {}
+            }
+        }
+    } catch (_) {}
+
+    // Event / seasonal cards that can sit outside the standard card pools.
+    try { if (typeof hwCards === 'function') addCardish(hwCards(),'','cards-halloween'); } catch (_) {}
+    try {
+        if (typeof SEASON_CARDS !== 'undefined') {
+            for (const [id,cfg] of Object.entries(SEASON_CARDS || {})) {
+                addCardish(cfg,'',`cards-season:${id}`);
+                try { if (typeof seasonChars === 'function') addCardish(seasonChars(id),'',`cards-season:${id}`); } catch (_) {}
+            }
+        }
+    } catch (_) {}
+    try { if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS||{})) addNames(u,names,'boss'); } catch (_) {}
+    try { if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES||{})) addNames(u,Object.keys(byName||{}),'power'); } catch (_) {}
+
+    // Bonus card types already carry dedicated imagery, but cache their base character too.
+    try { if (typeof ALT_ART_CARDS === 'function') for (const c of (ALT_ART_CARDS()||[])) if (c?.u && c?.name) add(c.u,c.name,c.anime,'','alt-art-base'); } catch (_) {}
+
+    return [...map.values()].sort((a,b)=>String(a.anime).localeCompare(String(b.anime),'fr') || String(a.name).localeCompare(String(b.name),'fr'));
+}
 async function simplePokeIndex() {
     if (simplePokeIndex.cache) return simplePokeIndex.cache;
     const map = new Map();
@@ -11385,7 +11497,7 @@ async function simpleAniListAnime(anime) {
     const cache = simpleAniListAnime.cache || (simpleAniListAnime.cache = new Map());
     if (cache.has(anime)) return cache.get(anime);
     const all = [];
-    for (let page=1; page<=4; page++) {
+    for (let page=1; page<=8; page++) {
         const query = `query($s:String,$p:Int){Media(search:$s,type:ANIME){characters(page:$p,perPage:50,sort:[ROLE,RELEVANCE]){pageInfo{hasNextPage}nodes{name{full native alternative}image{large medium}}}}}`;
         try {
             const r = await fetch('https://graphql.anilist.co', {
@@ -11671,7 +11783,7 @@ server.listen(PORT, () => {
         if (!SIMPLE_IMAGE_STATE.running && (!SIMPLE_IMAGE_STATE.done || SIMPLE_IMAGE_STATE.missing > 0)) {
             startSimpleImageMigration().catch(err => console.error('[Simple images] scheduled retry:', err));
         }
-    }, 6 * 60 * 60 * 1000);
+    }, 60 * 60 * 1000);
     if (typeof imageRetryTimer.unref === 'function') imageRetryTimer.unref();
 
     startDleProfileEnrichment().catch(err => console.warn('[AnimeDLE] Enrichissement auto impossible :', err.message));
