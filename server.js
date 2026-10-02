@@ -24,6 +24,16 @@ fs.readFileSync = function(file, options){
 
 
 const app = express();
+// AG_CANONICAL_IMAGE_BRIDGE_V1
+const AG_CANONICAL_IMAGE_ROOT = path.join(__dirname, 'music', 'char-images');
+const AG_LEGACY_IMAGE_ROOT = path.join(__dirname, 'music', 'legacy-images');
+function agCanonicalImageSlug(v){ return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+function agTrySendCanonicalImage(req,res,next){ try { const u=agCanonicalImageSlug(req.query&&req.query.u)||'_global'; const n=agCanonicalImageSlug(req.query&&(req.query.n||req.query.name)); if(!n)return next(); const base=path.resolve(AG_CANONICAL_IMAGE_ROOT,u); for(const ext of ['.webp','.png','.jpg','.jpeg']){ const f=path.resolve(base,n+ext); if(f.startsWith(base+path.sep)&&fs.existsSync(f)&&fs.statSync(f).size>512){ res.set('Cache-Control','public, max-age=31536000, immutable'); return res.sendFile(f); } } }catch(_){} return next(); }
+app.use('/api/avatar/img',agTrySendCanonicalImage);
+app.use('/api/character-image',agTrySendCanonicalImage);
+app.use(/^\/assets\/images\/(.*)$/,(req,res,next)=>{ try { const rel=String(req.params[0]||'').replace(/^[/\\]+/,''); const root=path.resolve(AG_LEGACY_IMAGE_ROOT); const f=path.resolve(root,rel); if(f.startsWith(root+path.sep)&&fs.existsSync(f)&&fs.statSync(f).isFile()){ res.set('Cache-Control','public, max-age=31536000, immutable'); return res.sendFile(f); } }catch(_){} next(); });
+// AG_CANONICAL_IMAGE_BRIDGE_V1_END
+
 
 /* AG_REAL_LOCAL_IMAGES_V2: verified local image library fallback */
 const __agLocalImageCache = (() => {
