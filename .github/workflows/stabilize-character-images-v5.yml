@@ -12,12 +12,12 @@ permissions:
 
 concurrency:
   group: stabilize-character-images-v5
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   stabilize:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
     env:
       SITE_URL: https://anime-game-server.onrender.com
     steps:
@@ -29,11 +29,11 @@ jobs:
           node-version: '22'
       - name: Install image encoder
         run: npm install --no-save --package-lock=false sharp@0.33.5
-      - name: Download and localize every catalogue image
+      - name: Download, repair and localize every catalogue image
         run: node scripts/stabilize-character-images-v5.mjs
       - name: Validate outputs
         run: |
-          node -e "JSON.parse(require('fs').readFileSync('char-images.json','utf8')); JSON.parse(require('fs').readFileSync('character-image-manifest.json','utf8')); console.log('JSON OK')"
+          node -e "const fs=require('fs'); const m=JSON.parse(fs.readFileSync('character-image-manifest.json','utf8')); if(!m.total||m.missingFiles) throw new Error('image validation failed'); JSON.parse(fs.readFileSync('char-images.json','utf8')); console.log('JSON/images OK',m.total)"
           test -s CHARACTER_IMAGE_STABLE_REPORT.md
       - name: Commit permanent local images
         run: |
@@ -45,6 +45,6 @@ jobs:
             echo "Nothing to commit"
             exit 0
           fi
-          git commit -m "feat: persist every character image locally"
+          git commit -m "feat: persist and verify every character image locally"
           git pull --rebase origin main
           git push origin HEAD:main
