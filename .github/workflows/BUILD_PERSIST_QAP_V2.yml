@@ -1,0 +1,37 @@
+name: Build tested persistence QAP files
+'on':
+  push:
+    branches:
+      - build-persist-qap-download
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            server.js
+            index.html
+            .build
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch files
+        run: python3 .build/patch_persist_qap.py
+      - name: Check server syntax
+        run: node --check server.js
+      - name: Validate persistence and QAP
+        run: node .build/validate_persist_qap.js
+      - name: Package files
+        run: python3 .build/package_release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ANIME_GAME_FIX_PERSISTENCE_QAP
+          path: |
+            release/ANIME_GAME_FIX_PERSISTENCE_QAP.zip
+            release/SHA256.txt
+          if-no-files-found: error
