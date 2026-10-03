@@ -5,6 +5,7 @@ on:
     branches: [image-fix-v7]
     paths:
       - '.github/workflows/PATCH_CHARACTER_CATALOG_V7.yml'
+      - '.github/patch_character_catalog_v7.py'
 
 permissions:
   contents: write
@@ -47,3 +48,5 @@ jobs:
           git diff --cached --check
           git commit -m "fix: remove non-character image catalogue entries v7 [skip ci]"
           git push origin HEAD:image-fix-v7
+
+# rerun after separator fix
