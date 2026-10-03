@@ -135,18 +135,18 @@ if "QAP_ITEM_IMAGE_CACHE.clear()" in middle:
 replacement = m.group(1) + """    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
     // AG_MANUAL_IMAGE_LOCK_V9 — report success only after the durable BYTEA row is confirmed.
     const persisted = await pool.query(
-        \`SELECT source_url,status,updated_at
+        `SELECT source_url,status,updated_at
            FROM character_images
           WHERE universe_key=$1 AND norm_name=$2
             AND status='manual-admin'
             AND image_bytes IS NOT NULL
             AND octet_length(image_bytes)>=700
-          LIMIT 1\`,
+          LIMIT 1`,
         [u, normalizeImageKey(name)]
     );
     const saved = persisted.rows[0];
     if (!saved) return res.status(500).json({ok:false,error:'La copie permanente de l’image a échoué.'});
-""" + cache_clear + """    try { CHARACTER_IMAGE_CACHE.delete(\`${u}|${normalizeImageKey(name)}\`); } catch (_) {}
+""" + cache_clear + """    try { CHARACTER_IMAGE_CACHE.delete(`${u}|${normalizeImageKey(name)}`); } catch (_) {}
     const stamp = saved.updated_at ? new Date(saved.updated_at).getTime() : Date.now();
     const imageUrl=simpleImageRoute(u,name,stamp);
     return res.json({
