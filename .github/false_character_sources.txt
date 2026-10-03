@@ -1,0 +1,168 @@
+{"file": "qap-themes.json", "hits": ["Stone Wars"], "item": {"media": "anime", "name": "Stone Wars", "sub": "Dr. Stone"}, "itemIndex": 23, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Treasure Island"], "item": {"media": "anime", "name": "Treasure Island", "sub": "Dr. Stone"}, "itemIndex": 24, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["R2 Final Rebellion"], "item": {"media": "anime", "name": "R2 Final Rebellion", "sub": "Code Geass"}, "itemIndex": 34, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Stone World"], "item": {"media": "anime", "name": "Stone World", "sub": "Dr. Stone"}, "itemIndex": 77, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["New America City"], "item": {"media": "anime", "name": "New America City", "sub": "Dr. Stone"}, "itemIndex": 78, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Final Exams"], "item": {"media": "anime", "name": "Final Exams", "sub": "Assassination Classroom"}, "itemIndex": 97, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Graduation"], "item": {"media": "anime", "name": "Graduation", "sub": "Assassination Classroom"}, "itemIndex": 99, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Federacy"], "item": {"media": "anime", "name": "Federacy", "sub": "86 Eighty-Six"}, "itemIndex": 118, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Murder Incident Solution"], "item": {"media": "anime", "name": "Murder Incident Solution", "sub": "Beastars"}, "itemIndex": 123, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Interspecies Relations"], "item": {"media": "anime", "name": "Interspecies Relations", "sub": "Beastars"}, "itemIndex": 124, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Black Organization"], "item": {"media": "anime", "name": "Black Organization", "sub": "Detective Conan"}, "itemIndex": 125, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Clash of Red and Black"], "item": {"media": "anime", "name": "Clash of Red and Black", "sub": "Detective Conan"}, "itemIndex": 126, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+{"file": "qap-themes.json", "hits": ["Scarlet Return"], "item": {"media": "anime", "name": "Scarlet Return", "sub": "Detective Conan"}, "itemIndex": 127, "themeId": "arc", "themeIndex": 22, "themeKind": "chars", "themeTitle": "Meilleur arc"}
+
+SERVER_LITERAL Charlotte's squad @ 1295456
+Sequen
+222. Weisslogia
+223. Wendy Marvell
+224. Wolfheim
+225. Yajima
+226. Yomazu
+227. Yuka Suzuki
+228. Yukino Agria
+229. Yuri Dreyar
+230. Yury
+231. Zancrow
+232. Zentopia
+233. Zera
+234. Zeref Dragneel
+235. Zero
+236. Zirconis
+237. Zoldeo`;
+
+const CLOVER_RAW = `1. Acier Silva
+2. Adrammelech
+3. Alecdora Sandler
+4. Allen Fiarain
+5. Aruru
+6. Asta
+7. Asta's parents
+8. Augustus Kira Clover XIII
+9. Baro
+10. Baro's gang
+11. Baval
+12. Beelzebub
+13. Broccos
+14. Catherine
+15. Charla
+16. Charlotte Roselei
+17. Charlotte's squad
+18. Charmy Pappitson
+19. Ciel Grinberryall
+20. Clover Kingdom Magic Knights
+21. Conrad Leto
+22. Daizaemon O'oka
+23. Damnatio Kira
+24. Dante Zogratis
+25. David Swallow
+26. Devil Adrammelech
+27. Devil Beelzebub
+28. Devil Lilith
+29. Devil Lucifero
+30. Devil Megicula
+31. Devil Naamah
+32. Diamond Kingdom Shining Generals
+33. Digit Taliss
+34. Dominante Code
+35. Dorothy Unsworth
+36. Drowa
+37. Dryad
+38. Eclat
+39. Ecthel
+40. Edward Avalache
+41. Elf Charla
+42. Elf Drowa
+43. Elf Eclat
+44. Elf Fana
+45. Elf Kivn
+46. Elf Licht
+47. Elf Patolli
+48. Elf Rhya
+49. Elf Ronne
+50. Elf Vetto
+51. En Ringard
+52. Fana
+53. Fanzell Kruger
+54. Father Fuego
+55. Father Orsi Orfai
+56. Finral Roulacase
+57.
+
+SERVER_LITERAL Fuegoleon's squad @ 1296232
+icula
+31. Devil Naamah
+32. Diamond Kingdom Shining Generals
+33. Digit Taliss
+34. Dominante Code
+35. Dorothy Unsworth
+36. Drowa
+37. Dryad
+38. Eclat
+39. Ecthel
+40. Edward Avalache
+41. Elf Charla
+42. Elf Drowa
+43. Elf Eclat
+44. Elf Fana
+45. Elf Kivn
+46. Elf Licht
+47. Elf Patolli
+48. Elf Rhya
+49. Elf Ronne
+50. Elf Vetto
+51. En Ringard
+52. Fana
+53. Fanzell Kruger
+54. Father Fuego
+55. Father Orsi Orfai
+56. Finral Roulacase
+57. Floga
+58. Foyal Migusteau
+59. Fragil Tormenta
+60. Fuegoleon Vermillion
+61. Fuegoleon's squad
+62. Fujio
+63. Gaderois Godroc
+64. Gadjah
+65. Gaja
+66. Gauche Adlai
+67. Gifso
+68. Gimodelo
+69. Ginnojomorifuyu Kezoukaku
+70. Gordon Agrippa
+71. Grey
+72. Gueldre Poizot
+73. Halbet Chevour
+74. Hamon Caseus
+75. Heart Kingdom Spirit Guardians
+76. Heath Grice
+77. Henry Legolant
+78. Hollo
+79. Ichika Yami
+80. Jack the Ripper
+81. Jester Garandros
+82. Julius Novachrono
+83. Kabwe Carillon
+84. Kahono
+85. Kaiser Granvorka
+86. Kiato
+87. Kirsch Vermillion
+88. Kivn
+89. Klaus Lunettes
+90. Komari Imari
+91. Ladros
+92. Langris Vaude
+93. Lemiel Silvamillion Clover
+94. Leopold Vermillion
+95. Letoile Becquerel
+96. Licht
+97. Liebe
+98. Liebe's mother
+99. Lilith
+100. Lolopechka
+101. Lotus Whomalt
+10
+
+SERVER_LITERAL Stone World @ 2251879
+": "Neon Genesis Evangelion", "id": "n91KFykoglk", "desc": "Clip officiel Netflix - Get in the Robot, Shinji"}, {"anime": "Neon Genesis Evangelion", "id": "j_0aBLn-FUI", "desc": "Clip officiel Netflix - Combat en parfaite synchronisation"}, {"anime": "Neon Genesis Evangelion", "id": "BYqWmWIatRI", "desc": "Clip officiel Netflix - L'Unit 01 se réveille"}, {"anime": "Dr. Stone", "id": "fuMDO4uTlJk", "desc": "Kohaku (SimulDub Clip officiel)"}, {"anime": "Dr. Stone", "id": "9oTIuknrMB4", "desc": "A Stone World! (SimulDub Clip officiel)"}, {"anime": "Dr. Stone", "id": "jqTUqmoaO1k", "desc": "Senku vs Tsukasa (SimulDub Clip officiel)"}, {"anime": "The Promised Neverland", "id": "RWMoMBQ4kl8", "desc": "Clip officiel #06"}, {"anime": "The Promised Neverland", "id": "UUyRNIPv6Lo", "desc": "Clip officiel #08"}, {"anime": "Violet Evergarden", "id": "qMSr5EwUpOs", "desc": "Clip officiel - I Want to be a Postman"}, {"anime": "Violet Evergarden", "id": "ZIQiMxCkxAg", "desc": "Clip officiel Netflix - Le souhait d'Olivia"}, {"anime": "Violet Evergarden", "id": "lK3iXcbnSK0", "desc": "Clip officiel Netflix - Une lettre pour Spencer"}, {"anime": "Your Lie in April", "id": "t-eusIvlTzU", "desc": "Scè
