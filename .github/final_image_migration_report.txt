@@ -1,0 +1,4 @@
+running=True done=False pass=3 total=7084 stored=6050 missing=1034 failed_count=0
+db_total=6301 db_ok=6184 db_missing=52 db_error=0
+
+=== FINAL FAILED / UNRESOLVED ===
