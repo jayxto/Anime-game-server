@@ -1,0 +1,288 @@
+ROUTE_START=1171153 ROUTE_END=1181444 CHARS=10291 LINES=171
+
+--- line 22 ---
+            if (u === 'soul') u = 'souleater';
+            let arcAnime = '';
+            try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || ''; } catch (_) {}
+            if (!anime) anime = arcAnime || u || 'Autre';
+            if (!u && anime) {
+                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+
+--- line 26 ---
+            if (!u && anime) {
+                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
+            }
+            // CHARACTER_CATALOG_ROUTE_CANONICAL_V3 — canonicalize after anime resolution too.
+            if (u === 'fate') u = 'fatestay';
+
+--- line 37 ---
+            const compactName = normalizeImageKey(name).replace(/[^a-z0-9]+/g, '');
+            if (u === 'fatestay' && ['fateroute','heavensfeel','unlimitedbladeworks'].includes(compactName)) return;
+            if ((source === 'tierlist-themes' || source === 'qap-themes') && normalizeImageKey(name) === normalizeImageKey(anime)) return;
+            const group = u || normalizeImageKey(anime) || 'autre';
+            const k = group + '|' + normalizeImageKey(name);
+            let img = originalImg || null;
+
+--- line 42 ---
+            let img = originalImg || null;
+            try {
+                if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) {
+                    img = '/api/avatar/img?u=' + encodeURIComponent(u) + '&n=' + encodeURIComponent(name);
+                }
+            } catch (_) {}
+
+--- line 48 ---
+            const old = rows.get(k);
+            if (old) {
+                old.sources.add(source || 'jeu');
+                if (!old.originalImg && originalImg) old.originalImg = originalImg;
+                if (old.name === old.name.toLowerCase() && name !== name.toLowerCase()) old.name = name;
+                if ((!old.anime || old.anime === old.u) && anime) old.anime = anime;
+
+--- line 60 ---
+        try {
+            for (const [u, byName] of Object.entries(STATIC_CHAR_IMAGES || {})) {
+                for (const [name, img] of Object.entries(byName || {})) add(u, '', name, img, 'char-images');
+            }
+        } catch (_) {}
+
+
+--- line 65 ---
+
+        try {
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+
+--- line 66 ---
+        try {
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+
+--- line 67 ---
+            if (typeof ARC_FAMOUS_OVERRIDE !== 'undefined') {
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+            }
+
+--- line 68 ---
+                for (const [u, names] of Object.entries(ARC_FAMOUS_OVERRIDE || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'modes');
+                }
+            }
+        } catch (_) {}
+
+--- line 74 ---
+
+        try {
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+
+--- line 75 ---
+        try {
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+
+--- line 76 ---
+            if (typeof RG_POOLS_V2 !== 'undefined') {
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+
+--- line 77 ---
+                for (const [u, names] of Object.entries(RG_POOLS_V2 || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof RG_UNIVERSES !== 'undefined' && RG_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+        } catch (_) {}
+
+--- line 83 ---
+
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+
+--- line 84 ---
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+
+--- line 85 ---
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+
+--- line 86 ---
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+        } catch (_) {}
+
+--- line 91 ---
+        } catch (_) {}
+
+        for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+
+--- line 94 ---
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
+
+--- line 95 ---
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
+                    // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
+
+--- line 96 ---
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
+                    // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
+                    // Some ranking themes are typed `chars` for UI reuse although their items are
+
+--- line 97 ---
+                    if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
+                    // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
+                    // Some ranking themes are typed `chars` for UI reuse although their items are
+                    // arcs/anime/categories, not character portraits. Never feed them to the image catalogue.
+
+--- line 104 ---
+                    if (nonCharacterThemeIds.has(String(theme.id || '').trim().toLowerCase())) continue;
+                    for (const item of (theme.items || [])) {
+                        // Themes also contain anime titles and transformation labels. Only feed real
+                        // character rows to the character catalogue. For transformation themes,
+                        // item.char is the base character and `sub` is usually "Character • Anime".
+                        const rawSub = String(item.sub || item.anime || '').trim();
+
+--- line 105 ---
+                    for (const item of (theme.items || [])) {
+                        // Themes also contain anime titles and transformation labels. Only feed real
+                        // character rows to the character catalogue. For transformation themes,
+                        // item.char is the base character and `sub` is usually "Character • Anime".
+                        const rawSub = String(item.sub || item.anime || '').trim();
+                        const bits = rawSub.split('•').map(x => x.trim()).filter(Boolean);
+
+--- line 121 ---
+                        if (!u && !explicitChar) continue;
+                        if (!u || !name) continue;
+                        add(u, anime, name, item.img || null, file.replace('.json',''));
+                    }
+                }
+            } catch (_) {}
+
+--- line 130 ---
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+
+--- line 131 ---
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+
+--- line 133 ---
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+
+--- line 134 ---
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+                    for (const c of list) add(u, anime, c?.display || c?.name || c?.raw, c?.img || c?.image || null, 'cards');
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+
+--- line 137 ---
+                    try {
+                        if (typeof cardAllSpecials === 'function') {
+                            for (const c of (cardAllSpecials(u) || [])) add(u, anime, c?.display || c?.name, c?.img || null, 'cards-special');
+                        }
+                    } catch (_) {}
+                }
+
+--- line 146 ---
+            if (typeof hwCards === 'function') {
+                for (const c of (hwCards() || [])) if (c?.u && (c?.display || c?.name)) {
+                    add(c.u, (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[c.u]) || c.anime || c.u, c.display || c.name, c.img || null, 'cards-halloween');
+                }
+            }
+        } catch (_) {}
+
+--- line 152 ---
+        try {
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+
+--- line 153 ---
+            if (typeof BOSS_VILLAINS !== 'undefined') for (const [u,names] of Object.entries(BOSS_VILLAINS || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of (names || [])) add(u, anime, name, null, 'boss');
+            }
+        } catch (_) {}
+        try {
+
+--- line 158 ---
+        try {
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
+
+--- line 159 ---
+            if (typeof PM_POWER_OVERRIDES !== 'undefined') for (const [u,byName] of Object.entries(PM_POWER_OVERRIDES || {})) {
+                const anime=(typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u;
+                for (const name of Object.keys(byName || {})) add(u, anime, name, null, 'power');
+            }
+        } catch (_) {}
