@@ -1,0 +1,82 @@
+running=False done=False pass=3 total=7084 stored=6048 missing=1036 failed=80
+
+0001 | eightysix | 86 Eighty-Six | Federacy
+0002 | another | Another | Yuya Mochizuki
+0003 | assclass | Assassination Classroom | Final Exams
+0004 | assclass | Assassination Classroom | Gakuho Asano
+0005 | assclass | Assassination Classroom | Gakushu Asano
+0006 | assclass | Assassination Classroom | Graduation
+0007 | assclass | Assassination Classroom | Ryoma Terasaka
+0008 | beastars | Beastars | Gohin
+0009 | beastars | Beastars | Interspecies Relations
+0010 | beastars | Beastars | Murder Incident Solution
+0011 | beyblade | Beyblade | Hilary Tachibana
+0012 | blackbutler | Black Butler | Baldroy
+0013 | clover | Black Clover | Charlotte's squad
+0014 | clover | Black Clover | Ecthel
+0015 | clover | Black Clover | Fuegoleon's squad
+0016 | blacklagoon | Black Lagoon | Sawyer the Cleaner
+0017 | bleach | Bleach | Fērum
+0018 | bleach | Bleach | Genryusai Yamamoto
+0019 | bleach | Bleach | Ichigo (papa)
+0020 | bleach | Bleach | Sosuke Aizen (scellé)
+0021 | bluebox | Blue Box | Hina Chono
+0022 | bluebox | Blue Box | Kyo Kasahara
+0023 | bocchi | Bocchi the Rock! | Futari Gotoh
+0024 | bocchi | Bocchi the Rock! | Ryo Yamada
+0025 | callnight | Call of the Night | Ko Yamori
+0026 | callnight | Call of the Night | Nico Hirata
+0027 | chainsaw | Chainsaw Man | Bomb Girl
+0028 | chainsaw | Chainsaw Man | Démon Pieuvre
+0029 | chainsaw | Chainsaw Man | Démon Poulet
+0030 | chainsaw | Chainsaw Man | Démon Serpent
+0031 | chainsaw | Chainsaw Man | Démon Typhon
+0032 | chainsaw | Chainsaw Man | Taiyo Hayakawa
+0033 | clannad | Clannad | Tomoya (début)
+0034 | cote | Classroom of the Elite | Anzu Maezono
+0035 | cote | Classroom of the Elite | Kaya Ishikura
+0036 | cote | Classroom of the Elite | Reon Kondo
+0037 | cote | Classroom of the Elite | Ruri Ichihashi
+0038 | cote | Classroom of the Elite | Tetsuya Machida
+0039 | codegeass | Code Geass | R2 Final Rebellion
+0040 | cowboybebop | Cowboy Bebop | Vincent Volaju
+0041 | dgrayman | D.Gray-man | Mana D. Campbell
+0042 | dgrayman | D.Gray-man | The Millennium Earl
+0043 | danmachi | DanMachi | Aiz Wallenstein
+0044 | deathnote | Death Note | Taro Kagami
+0045 | demonslayer | Demon Slayer | Kasugai Matsuemon
+0046 | demonslayer | Demon Slayer | Muzan (Rui)
+0047 | demonslayer | Demon Slayer | Nezuko (bébé)
+0048 | demonslayer | Demon Slayer | Tanjiro (Rengoku)
+0049 | demonslayer | Demon Slayer | Zenitsu's sparrow
+0050 | conan | Detective Conan | Black Organization
+0051 | conan | Detective Conan | Clash of Red and Black
+0052 | conan | Detective Conan | Kaito Kid
+0053 | conan | Detective Conan | Kazuha Toyama
+0054 | conan | Detective Conan | Kogoro Mouri
+0055 | conan | Detective Conan | Rei Furuya
+0056 | conan | Detective Conan | Scarlet Return
+0057 | digimon | Digimon | Koshiro Izumi
+0058 | drstone | Dr. Stone | Minami Hokutozai
+0059 | drstone | Dr. Stone | New America City
+0060 | drstone | Dr. Stone | Senku Ishigami
+0061 | drstone | Dr. Stone | Stone Wars
+0062 | drstone | Dr. Stone | Stone World
+0063 | drstone | Dr. Stone | Taiju Oki
+0064 | drstone | Dr. Stone | Treasure Island
+0065 | drstone | Dr. Stone | Ukyo Saionji
+0066 | drstone | Dr. Stone | Yo Uei
+0067 | dragonball | Dragon Ball | C-14
+0068 | dragonball | Dragon Ball | C-15
+0069 | dragonball | Dragon Ball | C-8
+0070 | dragonball | Dragon Ball | Docteur Arinsu
+0071 | dragonball | Dragon Ball | Docteur Brief
+0072 | dragonball | Dragon Ball | Docteur Hedo
+0073 | dragonball | Dragon Ball | Docteur Kochin
+0074 | dragonball | Dragon Ball | Docteur Mu
+0075 | dragonball | Dragon Ball | Docteur Willow
+0076 | dragonball | Dragon Ball | Ea
+0077 | dragonball | Dragon Ball | Geene
+0078 | dragonball | Dragon Ball | Général Rild
+0079 | dragonball | Dragon Ball | Gyumao
+0080 | dragonball | Dragon Ball | Kaio de l'Est

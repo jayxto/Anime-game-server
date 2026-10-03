@@ -1,0 +1,414 @@
+{
+  "ok": true,
+  "running": false,
+  "done": false,
+  "pass": 3,
+  "total": 7084,
+  "stored": 6048,
+  "missing": 1036,
+  "failed": [
+    {
+      "u": "eightysix",
+      "anime": "86 Eighty-Six",
+      "name": "Federacy"
+    },
+    {
+      "u": "another",
+      "anime": "Another",
+      "name": "Yuya Mochizuki"
+    },
+    {
+      "u": "assclass",
+      "anime": "Assassination Classroom",
+      "name": "Final Exams"
+    },
+    {
+      "u": "assclass",
+      "anime": "Assassination Classroom",
+      "name": "Gakuho Asano"
+    },
+    {
+      "u": "assclass",
+      "anime": "Assassination Classroom",
+      "name": "Gakushu Asano"
+    },
+    {
+      "u": "assclass",
+      "anime": "Assassination Classroom",
+      "name": "Graduation"
+    },
+    {
+      "u": "assclass",
+      "anime": "Assassination Classroom",
+      "name": "Ryoma Terasaka"
+    },
+    {
+      "u": "beastars",
+      "anime": "Beastars",
+      "name": "Gohin"
+    },
+    {
+      "u": "beastars",
+      "anime": "Beastars",
+      "name": "Interspecies Relations"
+    },
+    {
+      "u": "beastars",
+      "anime": "Beastars",
+      "name": "Murder Incident Solution"
+    },
+    {
+      "u": "beyblade",
+      "anime": "Beyblade",
+      "name": "Hilary Tachibana"
+    },
+    {
+      "u": "blackbutler",
+      "anime": "Black Butler",
+      "name": "Baldroy"
+    },
+    {
+      "u": "clover",
+      "anime": "Black Clover",
+      "name": "Charlotte's squad"
+    },
+    {
+      "u": "clover",
+      "anime": "Black Clover",
+      "name": "Ecthel"
+    },
+    {
+      "u": "clover",
+      "anime": "Black Clover",
+      "name": "Fuegoleon's squad"
+    },
+    {
+      "u": "blacklagoon",
+      "anime": "Black Lagoon",
+      "name": "Sawyer the Cleaner"
+    },
+    {
+      "u": "bleach",
+      "anime": "Bleach",
+      "name": "Fērum"
+    },
+    {
+      "u": "bleach",
+      "anime": "Bleach",
+      "name": "Genryusai Yamamoto"
+    },
+    {
+      "u": "bleach",
+      "anime": "Bleach",
+      "name": "Ichigo (papa)"
+    },
+    {
+      "u": "bleach",
+      "anime": "Bleach",
+      "name": "Sosuke Aizen (scellé)"
+    },
+    {
+      "u": "bluebox",
+      "anime": "Blue Box",
+      "name": "Hina Chono"
+    },
+    {
+      "u": "bluebox",
+      "anime": "Blue Box",
+      "name": "Kyo Kasahara"
+    },
+    {
+      "u": "bocchi",
+      "anime": "Bocchi the Rock!",
+      "name": "Futari Gotoh"
+    },
+    {
+      "u": "bocchi",
+      "anime": "Bocchi the Rock!",
+      "name": "Ryo Yamada"
+    },
+    {
+      "u": "callnight",
+      "anime": "Call of the Night",
+      "name": "Ko Yamori"
+    },
+    {
+      "u": "callnight",
+      "anime": "Call of the Night",
+      "name": "Nico Hirata"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Bomb Girl"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Démon Pieuvre"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Démon Poulet"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Démon Serpent"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Démon Typhon"
+    },
+    {
+      "u": "chainsaw",
+      "anime": "Chainsaw Man",
+      "name": "Taiyo Hayakawa"
+    },
+    {
+      "u": "clannad",
+      "anime": "Clannad",
+      "name": "Tomoya (début)"
+    },
+    {
+      "u": "cote",
+      "anime": "Classroom of the Elite",
+      "name": "Anzu Maezono"
+    },
+    {
+      "u": "cote",
+      "anime": "Classroom of the Elite",
+      "name": "Kaya Ishikura"
+    },
+    {
+      "u": "cote",
+      "anime": "Classroom of the Elite",
+      "name": "Reon Kondo"
+    },
+    {
+      "u": "cote",
+      "anime": "Classroom of the Elite",
+      "name": "Ruri Ichihashi"
+    },
+    {
+      "u": "cote",
+      "anime": "Classroom of the Elite",
+      "name": "Tetsuya Machida"
+    },
+    {
+      "u": "codegeass",
+      "anime": "Code Geass",
+      "name": "R2 Final Rebellion"
+    },
+    {
+      "u": "cowboybebop",
+      "anime": "Cowboy Bebop",
+      "name": "Vincent Volaju"
+    },
+    {
+      "u": "dgrayman",
+      "anime": "D.Gray-man",
+      "name": "Mana D. Campbell"
+    },
+    {
+      "u": "dgrayman",
+      "anime": "D.Gray-man",
+      "name": "The Millennium Earl"
+    },
+    {
+      "u": "danmachi",
+      "anime": "DanMachi",
+      "name": "Aiz Wallenstein"
+    },
+    {
+      "u": "deathnote",
+      "anime": "Death Note",
+      "name": "Taro Kagami"
+    },
+    {
+      "u": "demonslayer",
+      "anime": "Demon Slayer",
+      "name": "Kasugai Matsuemon"
+    },
+    {
+      "u": "demonslayer",
+      "anime": "Demon Slayer",
+      "name": "Muzan (Rui)"
+    },
+    {
+      "u": "demonslayer",
+      "anime": "Demon Slayer",
+      "name": "Nezuko (bébé)"
+    },
+    {
+      "u": "demonslayer",
+      "anime": "Demon Slayer",
+      "name": "Tanjiro (Rengoku)"
+    },
+    {
+      "u": "demonslayer",
+      "anime": "Demon Slayer",
+      "name": "Zenitsu's sparrow"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Black Organization"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Clash of Red and Black"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Kaito Kid"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Kazuha Toyama"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Kogoro Mouri"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Rei Furuya"
+    },
+    {
+      "u": "conan",
+      "anime": "Detective Conan",
+      "name": "Scarlet Return"
+    },
+    {
+      "u": "digimon",
+      "anime": "Digimon",
+      "name": "Koshiro Izumi"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Minami Hokutozai"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "New America City"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Senku Ishigami"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Stone Wars"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Stone World"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Taiju Oki"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Treasure Island"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Ukyo Saionji"
+    },
+    {
+      "u": "drstone",
+      "anime": "Dr. Stone",
+      "name": "Yo Uei"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "C-14"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "C-15"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "C-8"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Arinsu"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Brief"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Hedo"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Kochin"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Mu"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Docteur Willow"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Ea"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Geene"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Général Rild"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Gyumao"
+    },
+    {
+      "u": "dragonball",
+      "anime": "Dragon Ball",
+      "name": "Kaio de l'Est"
+    }
+  ],
+  "startedAt": "2026-10-02T22:29:56.153Z",
+  "finishedAt": "2026-10-03T00:02:59.124Z",
+  "lastError": null
+}
