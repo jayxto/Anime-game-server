@@ -1,0 +1,45 @@
+name: Patch character catalog final sanity v10
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_CHARACTER_CATALOG_FINAL_SANITY_V10.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply final character-only sanity filter
+        run: python3 .github/patch_character_catalog_final_sanity_v10.py
+      - name: Verify syntax and marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check server.js
+          grep -q 'CHARACTER_CATALOG_FINAL_SANITY_V10' server.js
+          grep -q ".filter(x => String(x?.u || '').trim())" server.js
+      - name: Commit tested patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_character_catalog_final_sanity_v10.py .github/workflows/PATCH_CHARACTER_CATALOG_FINAL_SANITY_V10.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: reject unresolved rows from character catalog [skip ci]"
+          git push origin HEAD:main
