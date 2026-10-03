@@ -10,7 +10,8 @@ if alias_marker not in s:
     if astart<0: raise SystemExit('SIMPLE_ALIASES map not found')
     aend=s.find('\n}));',astart)
     if aend<0: raise SystemExit('SIMPLE_ALIASES end not found')
-    rows=r''',
+    rows=r'''
+    ,
     // SIMPLE_CHARACTER_ALIASES_V5 — checked canonical/search names.
     'dgrayman|mana d campbell':'Mana Walker',
     'demonslayer|kasugai matsuemon':'Matsuemon Tennouji',
@@ -35,7 +36,8 @@ if image_marker not in s:
     if vstart<0: raise SystemExit('verified image map start not found')
     vend=s.rfind('\n}));',vstart,helper)
     if vend<0: raise SystemExit('verified image map end not found')
-    rows=r''',
+    rows=r'''
+    ,
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V5 — visually reviewed 2026-10-03.
     'dgrayman|mana d campbell':'https://static.wikia.nocookie.net/dgrayman/images/8/84/Mana_Walker_Clown_Hallow.png/revision/latest/scale-to-width-down/1200?cb=20191004082854',
     'demonslayer|zenitsu s sparrow':'https://neoapo.com/images/character/45725/8b882a75e080f929509d70555d465a4b.jpg',
