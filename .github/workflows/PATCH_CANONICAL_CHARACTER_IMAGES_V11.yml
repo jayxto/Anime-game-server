@@ -48,7 +48,7 @@ jobs:
             'identity helper':'function simpleCanonicalCharacterIdentity' in s,
             'manual helper':'async function simpleManualCharacterImage' in s,
             'transform exact only':"if (id.transformation)" in s and "overrideSource === 'qt:transformation'" in s,
-            'qap normal canonical':'canonicalManual = await simpleManualCharacterImage' in s,
+            'qap normal canonical':"canonicalManual = typeof simpleManualCharacterImage === 'function'" in s,
             'qap old early override restricted':"if (overrideSource === 'qt:transformation' && overrideName)" in s,
             'avatar local bypass':"character-image-file|local-character-image" in s and "return res.redirect(url)" in s,
             'canonical persistent catalog':"simpleCanonicalCharacterIdentity(u,name,raw?.anime || '')" in s,
