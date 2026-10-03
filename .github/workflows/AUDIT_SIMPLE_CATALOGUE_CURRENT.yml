@@ -1,0 +1,33 @@
+name: Audit current simple catalogue
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_SIMPLE_CATALOGUE_CURRENT.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Extract current simpleCatalogue
+        run: python3 .github/extract_simple_catalogue_current.py
+      - name: Commit extract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/simple_catalogue_current.txt
+          git commit -m 'audit: record current simple catalogue [skip ci]'
+          git push origin HEAD:main
