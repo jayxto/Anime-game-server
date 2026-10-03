@@ -1305,7 +1305,12 @@ app.get('/api/character-catalog', (req, res) => {
             }
         } catch (_) {}
 
-        const characters = [...rows.values()].map(x => ({ ...x, sources:[...x.sources].sort() }))
+        // CHARACTER_CATALOG_FINAL_SANITY_V10 — a portrait row without a resolved universe
+        // is not a usable character row. This blocks anime titles, arcs and transformation labels
+        // from leaking into the public character catalogue even if an upstream theme changes later.
+        const characters = [...rows.values()]
+            .filter(x => String(x?.u || '').trim())
+            .map(x => ({ ...x, sources:[...x.sources].sort() }))
             .sort((a,b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
         const animes = [...new Set(characters.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'fr'));
         res.json({ ok:true, count:characters.length, animes, characters });
