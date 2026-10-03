@@ -13,9 +13,9 @@ replacements={
     # Bomb Girl = Reze — MAPPA promotional character art, normal Reze portrait rather than an opaque pin.
     'https://i.pinimg.com/736x/6e/67/1f/6e671f272ef9a1ebdaa2f15ffb6577ab.jpg':
         'https://static.zerochan.net/Reze.1024.4599201.webp',
-    # Sealed Aizen — TYBW/Muken restraint close-up, visually checked anime frame.
+    # Sealed Aizen — Muken restraints/chair, visually checked image; source accepts server-side fetching.
     'https://i.pinimg.com/736x/6e/12/d9/6e12d9a35cd1b461225b72aaf1e485e5.jpg':
-        'https://images.everyeye.it/img-notizie/bleach-thousand-year-blood-war-ruolo-avrA-sosuke-aizen-nell-arco-finale-v4-620477-1200x1200.webp',
+        'https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg',
     # Geene/Giin — Universe 12 God of Destruction; blue fish-like deity in purple Destroyer attire.
     'https://i.pinimg.com/736x/dc/1b/62/dc1b6223ee06ee57f62f6425c9bf6500.jpg':
         'https://i.pinimg.com/736x/28/35/f0/2835f07d35ae947b3f3204690346f32f.jpg',
