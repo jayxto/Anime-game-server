@@ -1,0 +1,37 @@
+name: Fetch full missing image list
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/FETCH_FULL_MISSING_IMAGE_LIST.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Wait for Render endpoint and fetch full list
+        run: python3 .github/fetch_full_missing_image_list.py
+      - name: Commit full missing report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/full_missing_image_list.json .github/full_missing_image_list.txt
+          if git diff --cached --quiet; then
+            echo "No missing list changes"
+            exit 0
+          fi
+          git commit -m "chore: capture full missing image list [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
