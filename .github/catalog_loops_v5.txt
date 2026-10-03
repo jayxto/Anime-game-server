@@ -1,0 +1,220 @@
+=== const THEME_CHAR_IMAGES #1 @ 1160021 ===
+(`https://${host}/api.php?${qp}`, 3000);
+        const pages = Object.values(d?.query?.pages||{}).sort((a,b)=>score(b.title)-score(a.title));
+        for (const pg of pages) {
+            const ii=pg.imageinfo?.[0]; const u=ii?.thumburl||ii?.url;
+            if (u && /^https:/i.test(u) && /^image\//i.test(ii?.mime||'image/unknown')) return u;
+        }
+    } catch (_) {}
+    return null;
+}
+
+// Images personnages : statiques vérifiées + thèmes + Fandom + secours AniList.
+// Les anciens "missing" en base ne bloquent plus définitivement une image : ils sont retentés
+// au redémarrage puis avec un délai, ce qui permet de réparer les photos sans vider la DB.
+const STATIC_CHAR_IMAGES = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'char-images.json'), 'utf8')); }
+    catch (e) { console.warn('[Images] char-images.json introuvable :', e.message); return {}; }
+})();
+
+const THEME_CHAR_IMAGES = (() => {
+    const out = {};
+    const add = (universeKey, name, img) => {
+        if (!universeKey || !name || !img) return;
+        const key = normalizeImageKey(cleanImageCharacterName(name));
+        if (!key) return;
+        out[universeKey] = out[universeKey] || {};
+        if (!out[universeKey][key]) out[universeKey][key] = img;
+    };
+    for (const file of ['qap-themes.json', 'tierlist-themes.json']) {
+        try {
+            const themes = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8')).themes || [];
+            for (const theme of themes) {
+                if (theme.kind !== 'chars') continue;
+                for (const item of (theme.items || [])) {
+                    const u = resolveImageUniverseKey(item.sub);
+                    add(u, item.name, item.img);
+                }
+            }
+        } catch (_) {}
+    }
+    return out;
+})();
+
+function staticCharImage(universeKey, name) {
+    if (!name) return null;
+    const key = normalizeImageKey(cleanImageCharacterName(name));
+    return STATIC_CHAR_IMAGES[universeKey]?.[key]
+        || THEME_CHAR_IMAGES[universeKey]?.[key]
+        || null;
+}
+
+const IMAGE_ANILIST_MEDIA_HINTS = {
+    naruto:[/naruto/i,/boruto/i], onepiece:[/one piece/i], bleach:[/bleach/i],
+    hxh:[/hunter x hunter/i,/hunter × hunter/i], snk:[/shingeki no kyojin/i,/attack on titan/i],
+    sds:[/nanatsu no taizai/i,/seven deadly sins/i], deathnote:[/death note/i],
+    cote:[/youkoso jitsuryoku/i,/classroom of the elite/i], solo:[/solo leveling/i,/ore dake level up/i],
+    clover:[/black clover/i], fireforce:[/enen no shouboutai/i,/fire force/i],
+    mushoku:[/mushoku tensei/i], rezero:[/re:?zero/i], fairy:[/fairy tail/i],
+    bluelock:[/blue lock/i], fma:[/fullmetal alchemist/i,/hagane no renkinjutsushi/i],
+    chainsaw:[/chainsaw man/i], wakfu:[/wakfu/i], demonslayer:[/kimetsu no yaiba/i,/demon slayer/i],
+    pokemon:[/pok[eé]mon/i,/pokemon/i], dragonball:[/dragon ball/i],
+    hellsparadise:[/jigokuraku/i,/hell'?s paradise/i], gachiakuta:[/gachiakuta/i],
+    haikyuu:[/haikyuu/i], jjk:[/jujutsu kaisen/i], jojo:[/jojo/i,/jojo'?s bizarre adventure/i],
+    tensura:[/tensei shitara slime/i,/tensura/i,/that time i got reincarnated as a slime/i],
+    opm:[/one punch man/i], sao:[/sword art online/i], tokyoghoul:[/tokyo ghoul/i],
+    tokyorevengers:[/tokyo revengers/i]
+};
+const CHARACTER_ANILIST_CACHE = new Map();
+const CHARACTER_IMAGE_RETRY_AT = new Map();
+
+function imageNameScore(wantedName, candidateNames) {
+    const wanted = normalizeImageKey(wantedName);
+    if (!wanted) return 0;
+    let best = 0;
+    const wt = new Set(wanted.split(' ').filter(Boolean));
+    for (const raw of candidateNames.filter(Boolean)) {
+        const n = normalizeImageKey(raw);
+        if (!n) continue
+
+=== if (theme.kind !== 'chars') continue; #1 @ 1160639 ===
+met de réparer les photos sans vider la DB.
+const STATIC_CHAR_IMAGES = (() => {
+    try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'char-images.json'), 'utf8')); }
+    catch (e) { console.warn('[Images] char-images.json introuvable :', e.message); return {}; }
+})();
+
+const THEME_CHAR_IMAGES = (() => {
+    const out = {};
+    const add = (universeKey, name, img) => {
+        if (!universeKey || !name || !img) return;
+        const key = normalizeImageKey(cleanImageCharacterName(name));
+        if (!key) return;
+        out[universeKey] = out[universeKey] || {};
+        if (!out[universeKey][key]) out[universeKey][key] = img;
+    };
+    for (const file of ['qap-themes.json', 'tierlist-themes.json']) {
+        try {
+            const themes = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8')).themes || [];
+            for (const theme of themes) {
+                if (theme.kind !== 'chars') continue;
+                for (const item of (theme.items || [])) {
+                    const u = resolveImageUniverseKey(item.sub);
+                    add(u, item.name, item.img);
+                }
+            }
+        } catch (_) {}
+    }
+    return out;
+})();
+
+function staticCharImage(universeKey, name) {
+    if (!name) return null;
+    const key = normalizeImageKey(cleanImageCharacterName(name));
+    return STATIC_CHAR_IMAGES[universeKey]?.[key]
+        || THEME_CHAR_IMAGES[universeKey]?.[key]
+        || null;
+}
+
+const IMAGE_ANILIST_MEDIA_HINTS = {
+    naruto:[/naruto/i,/boruto/i], onepiece:[/one piece/i], bleach:[/bleach/i],
+    hxh:[/hunter x hunter/i,/hunter × hunter/i], snk:[/shingeki no kyojin/i,/attack on titan/i],
+    sds:[/nanatsu no taizai/i,/seven deadly sins/i], deathnote:[/death note/i],
+    cote:[/youkoso jitsuryoku/i,/classroom of the elite/i], solo:[/solo leveling/i,/ore dake level up/i],
+    clover:[/black clover/i], fireforce:[/enen no shouboutai/i,/fire force/i],
+    mushoku:[/mushoku tensei/i], rezero:[/re:?zero/i], fairy:[/fairy tail/i],
+    bluelock:[/blue lock/i], fma:[/fullmetal alchemist/i,/hagane no renkinjutsushi/i],
+    chainsaw:[/chainsaw man/i], wakfu:[/wakfu/i], demonslayer:[/kimetsu no yaiba/i,/demon slayer/i],
+    pokemon:[/pok[eé]mon/i,/pokemon/i], dragonball:[/dragon ball/i],
+    hellsparadise:[/jigokuraku/i,/hell'?s paradise/i], gachiakuta:[/gachiakuta/i],
+    haikyuu:[/haikyuu/i], jjk:[/jujutsu kaisen/i], jojo:[/jojo/i,/jojo'?s bizarre adventure/i],
+    tensura:[/tensei shitara slime/i,/tensura/i,/that time i got reincarnated as a slime/i],
+    opm:[/one punch man/i], sao:[/sword art online/i], tokyoghoul:[/tokyo ghoul/i],
+    tokyorevengers:[/tokyo revengers/i]
+};
+const CHARACTER_ANILIST_CACHE = new Map();
+const CHARACTER_IMAGE_RETRY_AT = new Map();
+
+function imageNameScore(wantedName, candidateNames) {
+    const wanted = normalizeImageKey(wantedName);
+    if (!wanted) return 0;
+    let best = 0;
+    const wt = new Set(wanted.split(' ').filter(Boolean));
+    for (const raw of candidateNames.filter(Boolean)) {
+        const n = normalizeImageKey(raw);
+        if (!n) continue;
+        if (n === wanted) best = Math.max(best, 100);
+        else if (n.includes(wanted) || wanted.includes(n)) best = Math.max(best, 55);
+        const nt = new Set(n.split(' ').filter(Boolean));
+        let overlap = 0;
+        wt.forEach(t => { if (nt.has(t)) overlap++; });
+        best = Math.max(best, overlap * 18);
+    }
+    return best;
+}
+
+async function fetchAniListCharacterImage(universeKey, name) {
+    const cacheKey = `${universeKey}|${normalizeImageKey(name)}`;
+    if (CHARACTER_ANILIST_CACHE.has(cacheKey)) return CHARACTER_ANILIST_CACHE.get(cacheKey);
+
+    const query = `query($s:String){Page(pe
+
+=== if (theme.kind !== 'chars') continue; #2 @ 1174942 ===
+                    for (const name of (names || [])) add(u, anime, name, null, 'roland-garros');
+                }
+            }
+        } catch (_) {}
+
+        try {
+            if (typeof DLE_MASTER_NAMES !== 'undefined') {
+                for (const [u, names] of Object.entries(DLE_MASTER_NAMES || {})) {
+                    const anime = (typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || (typeof DLE_UNIVERSES !== 'undefined' && DLE_UNIVERSES[u]?.name) || u;
+                    for (const name of (names || [])) add(u, anime, name, null, 'dle');
+                }
+            }
+        } catch (_) {}
+
+        for (const file of ['tierlist-themes.json', 'qap-themes.json']) {
+            try {
+                const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
+                for (const theme of (parsed.themes || [])) {
+                    if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
+                    // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
+                    // Some ranking themes are typed `chars` for UI reuse although their items are
+                    // arcs/anime/categories, not character portraits. Never feed them to the image catalogue.
+                    const nonCharacterThemeIds = new Set(['arc','anime','shonen','isekai']);
+                    if (nonCharacterThemeIds.has(String(theme.id || '').trim().toLowerCase())) continue;
+                    for (const item of (theme.items || [])) {
+                        // Themes also contain anime titles and transformation labels. Only feed real
+                        // character rows to the character catalogue. For transformation themes,
+                        // item.char is the base character and `sub` is usually "Character • Anime".
+                        const rawSub = String(item.sub || item.anime || '').trim();
+                        const bits = rawSub.split('•').map(x => x.trim()).filter(Boolean);
+                        const anime = String(item.anime || (bits.length > 1 ? bits[bits.length - 1] : rawSub) || '').trim();
+                        const explicitChar = String(item.char || item.character || '').trim();
+                        const name = explicitChar || String(item.name || '').trim();
+                        let u = null;
+                        try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
+                        if (!u && item.u) u = String(item.u).trim();
+                        if (u === 'fate') u = 'fatestay';
+                        if (u === 'soul') u = 'souleater';
+                        // A theme item with no resolvable universe and no explicit character field is
+                        // almost certainly an anime/category item, not a character portrait.
+                        if (!u && !explicitChar) continue;
+                        if (!u || !name) continue;
+                        add(u, anime, name, item.img || null, file.replace('.json',''));
+                    }
+                }
+            } catch (_) {}
+        }
+
+
+        // IMAGE FULL COVERAGE V2 — collection/card pools are part of the master catalogue.
+        try {
+            if (typeof ARC_UNIVERSE_ANIME !== 'undefined' && typeof cardPool === 'function') {
+                for (const [u, anime] of Object.entries(ARC_UNIVERSE_ANIME || {})) {
+                    let list=[];
+                    try { list=cardPool(u) || []; } catch (_) { list=[]; }
+
