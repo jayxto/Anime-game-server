@@ -1,0 +1,33 @@
+name: Audit full missing images long
+
+on:
+  push:
+    branches: [image-audit-work]
+    paths:
+      - '.github/workflows/FETCH_FULL_MISSING_LONG.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-audit-work
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Wait for Render and fetch complete missing list
+        run: python3 .github/fetch_full_missing_image_list_long.py
+      - name: Commit audit report to audit branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/full_missing_image_list_latest.json .github/full_missing_image_list_latest.txt
+          git commit -m "audit: capture current full missing image list [skip ci]"
+          git push origin HEAD:image-audit-work
