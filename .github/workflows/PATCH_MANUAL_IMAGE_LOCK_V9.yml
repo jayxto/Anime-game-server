@@ -2,6 +2,7 @@ name: Patch manual image lock v9
 on:
   push:
     paths:
+      - '.github/patch_manual_image_lock_v9.py'
       - '.github/workflows/PATCH_MANUAL_IMAGE_LOCK_V9.yml'
 permissions:
   contents: write
@@ -15,180 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Apply permanent manual image lock
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          def replace_once(text, old, new, label):
-              if old not in text:
-                  raise SystemExit(f'MISSING PATCH TARGET: {label}')
-              count=text.count(old)
-              if count != 1:
-                  raise SystemExit(f'AMBIGUOUS PATCH TARGET {label}: {count}')
-              return text.replace(old,new,1)
-
-          # ---------- index.html ----------
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-
-          old="""                // Transformations must use the game's strict resolver, never an old portrait.
-                  img: id === 'transformation' ? '' : (item.img || item.imgs?.[0] || ''),
-                  imagePending: id === 'transformation' || !(item.img || item.imgs?.[0])
-              }));"""
-          new="""                // AG_MANUAL_IMAGE_LOCK_V9 — every QAP card resolves through the server after refresh.
-                  // This guarantees a manual-admin override always wins over embedded/fallback art.
-                  fallbackImg: item.img || item.imgs?.[0] || '',
-                  img: '',
-                  imagePending: true
-              }));"""
-          s=replace_once(s,old,new,'QAP loadTheme always resolves server override')
-
-          old="""                    item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
-                  } catch (_) { item.img = ''; }
-                  item.imagePending = false;
-                  if (!card.isConnected) return;
-                  const img = card.querySelector('img');
-                  if (item.img) img.src = item.img;
-                  card.querySelector('[data-url]').value = item.img;
-                  card.querySelector('[data-open]').href = item.img || '#';
-                  testVisibleImage(img, item, card);"""
-          new="""                    item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
-                      if (response.ok && data.ok && data.manualOverride) {
-                          // AG_MANUAL_IMAGE_LOCK_V9 — restore manual metadata too, not only the preview.
-                          item.manualOverride = true;
-                          item.status = 'manual-admin';
-                          item.sourceUrl = String(data.sourceUrl || '');
-                          item.imgs = [];
-                      }
-                  } catch (_) { item.img = ''; }
-                  item.imagePending = false;
-                  if (!card.isConnected) return;
-                  const img = card.querySelector('img');
-                  if (item.img) img.src = item.img;
-                  const input = card.querySelector('[data-url]');
-                  if (input) input.value = item.manualOverride ? (item.sourceUrl || item.img) : item.img;
-                  card.querySelector('[data-open]').href = item.img || '#';
-                  testVisibleImage(img, item, card);"""
-          s=replace_once(s,old,new,'QAP drain restores manual source metadata')
-
-          old="""    function testVisibleImage(imgEl,x,card){
-          const url=imageOf(x), k=keyOf(x), local=isLocal(url);
-          let done=false;
-          const finish=ok=>{
-              if(done)return; done=true;
-              const status=ok?(local?'ok':'external'):'bad';
-              state.status.set(k,status);
-              card.classList.remove('bad','ok','external','checking');
-              card.classList.add(status);
-              const badge=card.querySelector('.ag-charstate');
-              if(badge) badge.textContent=ok?(local?'OK':'URL'):'CASSÉE';
-              stats();
-          };
-          if(!url){finish(false);return}
-          imgEl.addEventListener('load',()=>finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0),{once:true});
-          imgEl.addEventListener('error',()=>finish(false),{once:true});
-          if(imgEl.complete) finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0);
-          else setTimeout(()=>finish(false),6500);
-      }"""
-          new="""    function testVisibleImage(imgEl,x,card){
-          // AG_MANUAL_IMAGE_LOCK_V9 — a DB-backed manual image is authoritative.
-          // Do not let lazy-loading timeouts turn a persisted override into a false "CASSÉE".
-          const url=imageOf(x), k=keyOf(x), local=isLocal(url);
-          const manual=!!x.manualOverride || x.status==='manual-admin';
-          let done=false;
-          const finish=ok=>{
-              if(done)return; done=true;
-              const status=manual ? 'ok' : (ok?(local?'ok':'external'):'bad');
-              state.status.set(k,status);
-              card.classList.remove('bad','ok','external','checking');
-              card.classList.add(status);
-              const badge=card.querySelector('.ag-charstate');
-              if(badge) badge.textContent=manual?'SAUVÉE':(ok?(local?'OK':'URL'):'CASSÉE');
-              stats();
-          };
-          if(!url){finish(false);return}
-          if(manual && local){finish(true);return}
-          imgEl.addEventListener('load',()=>finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0),{once:true});
-          imgEl.addEventListener('error',()=>finish(false),{once:true});
-          if(imgEl.complete) finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0);
-          else setTimeout(()=>finish(false),6500);
-      }"""
-          s=replace_once(s,old,new,'manual images never false broken from lazy timeout')
-
-          old="""card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}">"""
-          new="""card.innerHTML=`<span class="ag-charstate">${x.manualOverride||x.status==='manual-admin'?'SAUVÉE':st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}">"""
-          s=replace_once(s,old,new,'saved badge on initial render')
-
-          old="""            state.status.set(k,'checking');
-              card.classList.remove('bad','ok','external');card.classList.add('checking');
-              const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='…';
-              const img=card.querySelector('img');"""
-          new="""            // AG_MANUAL_IMAGE_LOCK_V9 — save success means the server already copied bytes to PostgreSQL.
-              state.status.set(k,'ok');
-              card.classList.remove('bad','external','checking');card.classList.add('ok');
-              const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='SAUVÉE';
-              const img=card.querySelector('img');"""
-          s=replace_once(s,old,new,'save success status is authoritative')
-
-          p.write_text(s,encoding='utf-8')
-
-          # ---------- server.js ----------
-          p=Path('server.js')
-          s=p.read_text(encoding='utf-8')
-
-          old="""        if (manualOverride?.imageUrl) {
-              QAP_ITEM_IMAGE_CACHE.delete(overrideSource + '|' + overrideName);
-              res.set('Cache-Control', 'no-store');
-              return res.json({ ok:true, imageUrl:manualOverride.imageUrl });
-          }"""
-          new="""        if (manualOverride?.status === 'manual-admin' && manualOverride?.imageUrl) {
-              // AG_MANUAL_IMAGE_LOCK_V9 — return enough metadata for the admin UI
-              // to restore the original source URL and the permanent-saved state after F5.
-              QAP_ITEM_IMAGE_CACHE.delete(overrideSource + '|' + overrideName);
-              res.set('Cache-Control', 'no-store');
-              return res.json({
-                  ok:true,
-                  imageUrl:manualOverride.imageUrl,
-                  sourceUrl:manualOverride.sourceUrl || '',
-                  status:'manual-admin',
-                  manualOverride:true
-              });
-          }"""
-          s=replace_once(s,old,new,'QAP manual override metadata response')
-
-          old="""    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
-      if (u.startsWith('qt:') && typeof QAP_ITEM_IMAGE_CACHE !== 'undefined') QAP_ITEM_IMAGE_CACHE.clear();
-      const imageUrl=simpleImageRoute(u,name,Date.now());
-      return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});"""
-          new="""    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
-      // AG_MANUAL_IMAGE_LOCK_V9 — acknowledge success only after durable bytes are confirmed.
-      const persisted = await pool.query(
-          `SELECT source_url,status,updated_at
-             FROM character_images
-            WHERE universe_key=$1 AND norm_name=$2
-              AND status='manual-admin'
-              AND image_bytes IS NOT NULL
-              AND octet_length(image_bytes)>=700
-            LIMIT 1`,
-          [u, normalizeImageKey(name)]
-      );
-      const saved = persisted.rows[0];
-      if (!saved) return res.status(500).json({ok:false,error:'La copie permanente de l’image a échoué.'});
-      if (u.startsWith('qt:') && typeof QAP_ITEM_IMAGE_CACHE !== 'undefined') QAP_ITEM_IMAGE_CACHE.clear();
-      try { CHARACTER_IMAGE_CACHE.delete(`${u}|${normalizeImageKey(name)}`); } catch (_) {}
-      const stamp = saved.updated_at ? new Date(saved.updated_at).getTime() : Date.now();
-      const imageUrl=simpleImageRoute(u,name,stamp);
-      return res.json({
-          ok:true,universe:u,name,imageUrl,
-          sourceUrl:String(saved.source_url || url),
-          status:'manual-admin',manualOverride:true,persistent:true
-      });"""
-          s=replace_once(s,old,new,'verify durable DB bytes after admin save')
-
-          p.write_text(s,encoding='utf-8')
-          PY
-      - name: Verify syntax and lock markers
+      - name: Apply patch
+        run: python .github/patch_manual_image_lock_v9.py
+      - name: Verify syntax and behavior markers
         run: |
           node --check server.js
           python - <<'PY'
@@ -198,25 +28,29 @@ jobs:
           checks={
             'index marker':'AG_MANUAL_IMAGE_LOCK_V9' in i,
             'server marker':'AG_MANUAL_IMAGE_LOCK_V9' in s,
-            'QAP always resolves':'imagePending: true' in i and "fallbackImg: item.img || item.imgs?.[0] || ''" in i,
+            'QAP always resolves':"imagePending: true" in i and "fallbackImg: item.img || item.imgs?.[0] || ''" in i,
             'saved badge':"'SAUVÉE'" in i,
             'manual lazy lock':"if(manual && local){finish(true);return}" in i,
-            'QAP metadata':'manualOverride:true' in s and "sourceUrl:manualOverride.sourceUrl || ''" in s,
-            'durable verify':"octet_length(image_bytes)>=700" in s and "persistent:true" in s,
+            'QAP source metadata':"sourceUrl:manualOverride.sourceUrl || ''" in s and "manualOverride:true" in s,
+            'durable save confirmation':"persistent:true" in s and "octet_length(image_bytes)>=700" in s,
           }
-          for k,v in checks.items():
-              print(k, v)
-              if not v: raise SystemExit('FAILED: '+k)
+          for name,ok in checks.items():
+              print(name, ok)
+              if not ok:
+                  raise SystemExit('FAILED: '+name)
           PY
       - name: Run transformation regression tests
         run: |
-          if [ -f .github/transform-audit.test.cjs ]; then node .github/transform-audit.test.cjs; fi
+          if [ -f .github/transform-audit.test.cjs ]; then
+            node .github/transform-audit.test.cjs
+          fi
       - name: Commit tested fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -f .github/workflows/AUDIT_MANUAL_IMAGE_REFRESH.yml
           rm -f .github/workflows/PATCH_MANUAL_IMAGE_LOCK_V9.yml
-          git add index.html server.js .github/workflows
+          rm -f .github/patch_manual_image_lock_v9.py
+          git add index.html server.js .github
           git commit -m "fix: permanently lock manual character images after refresh [skip ci]"
           git push origin HEAD:main
