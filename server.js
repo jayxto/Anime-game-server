@@ -1127,10 +1127,20 @@ const fixed = staticCharImage(universeKey, displayName);
 app.get('/api/character-catalog', (req, res) => {
     try {
         const rows = new Map();
+        // CHARACTER_CATALOG_CANONICAL_V9 — keep the public image catalogue character-only.
+        const isClearlyNonCharacterCatalogName = (value) => {
+            const raw = String(value || '').trim();
+            if (!raw) return true;
+            return /(?:\bsquad|\bparents|\bmagic knights|\bspirit guardians|\bshining generals)$/i.test(raw)
+                || /['’]s\s+gang$/i.test(raw);
+        };
         const add = (u, anime, name, originalImg, source) => {
             name = String(name || '').trim();
             anime = String(anime || '').trim();
-            if (!name) return;
+            u = String(u || '').trim();
+            if (u === 'fate') u = 'fatestay';
+            if (u === 'soul') u = 'souleater';
+            if (!name || isClearlyNonCharacterCatalogName(name)) return;
             // CHARACTER_CATALOG_CLEANUP_V2 — normalize legacy universe ids before dedupe/image routing.
             if (u === 'fate') u = 'fatestay';
             if (u === 'soul') u = 'souleater';
@@ -1142,6 +1152,9 @@ app.get('/api/character-catalog', (req, res) => {
                 try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
             }
             // CHARACTER_CATALOG_ROUTE_CANONICAL_V3 — canonicalize after anime resolution too.
+            if (u === 'fate') u = 'fatestay';
+            if (u === 'soul') u = 'souleater';
+            // Canonicalize aliases returned by older datasets/resolvers too.
             if (u === 'fate') u = 'fatestay';
             if (u === 'soul') u = 'souleater';
             if (arcAnime) anime = arcAnime;
