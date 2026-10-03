@@ -14845,9 +14845,8 @@ app.get('/api/arcade/item-image', async (req, res) => {
                                 }
                             }
 
-                            // Last resort only: old embedded theme image. Strict form-specific wiki
-                            // lookup now gets a chance first, preventing stale normal portraits.
-                            if (!url && it.img) url = it.img;
+                            // An old embedded image has no verified form provenance and can be
+                            // a normal portrait. Leave the result empty if form lookup fails.
                             // Aucun fallback vers le portrait normal du personnage.
                         }
                         // Important : pas de qapAniListCharacterImage(charName) ici. AniList renvoie
