@@ -1,0 +1,51 @@
+name: Audit manual image refresh
+on:
+  push:
+    paths:
+      - '.github/workflows/AUDIT_MANUAL_IMAGE_REFRESH.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract relevant image UI/server code
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def show(path, needles, radius=2600):
+              text=Path(path).read_text(encoding='utf-8')
+              print("\n===== FILE", path, "SIZE", len(text), "=====")
+              for needle in needles:
+                  print("\n--- NEEDLE:", needle, "---")
+                  start=0
+                  found=0
+                  while True:
+                      i=text.find(needle,start)
+                      if i<0: break
+                      found+=1
+                      print("\n[occurrence",found,"byte",i,"]")
+                      print(text[max(0,i-radius):min(len(text),i+radius)])
+                      start=i+len(needle)
+                      if found>=4: break
+                  if not found: print("NOT FOUND")
+
+          show('index.html',[
+              'character-catalog-persistent',
+              '/api/character-catalog',
+              'async function saveUrl',
+              'data-url',
+              'manualOverride',
+              'imagePending',
+              'testVisibleImage'
+          ],3200)
+          show('server.js',[
+              "app.post('/api/admin/character-image'",
+              "app.get('/api/character-image-file'",
+              "app.get('/api/admin/character-catalog-persistent'",
+              'async function getCachedCharacterImage',
+              'async function simpleStoreImage'
+          ],3000)
+          PY
