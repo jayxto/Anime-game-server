@@ -1,0 +1,39 @@
+name: Audit canonical character image paths
+on:
+  push:
+    paths:
+      - '.github/workflows/AUDIT_CANONICAL_CHARACTER_IMAGES.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract image resolution paths
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          needles=[
+            "app.get('/api/character-image-file'",
+            "resolveCharacterImage = async function",
+            "getCachedCharacterImage(",
+            "simpleImageRoute(",
+            "STATIC_CHAR_IMAGES",
+            "originalImg",
+            "imageUrl:",
+            "character-image-file"
+          ]
+          for needle in needles:
+              print('\n===== '+needle+' =====')
+              pos=0; n=0
+              while True:
+                  i=s.find(needle,pos)
+                  if i<0: break
+                  n+=1
+                  print('\n--- occurrence %d byte %d ---' % (n,i))
+                  print(s[max(0,i-1800):min(len(s),i+4200)])
+                  pos=i+len(needle)
+                  if n>=12: break
+          PY
