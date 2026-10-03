@@ -11870,10 +11870,155 @@ function simpleVariants(u, name) {
     return [...new Set(out.filter(Boolean))];
 }
 
+/* AG_CANONICAL_CHARACTER_IMAGE_V11
+   One admin portrait belongs to the NORMAL character identity everywhere.
+   Transformation namespaces stay isolated and never inherit the base portrait. */
+function simpleIsTransformationImageNamespace(value) {
+    const u = String(value || '').trim().toLowerCase();
+    return u === '_transform'
+        || u === 'qt:transformation'
+        || u.startsWith('_transform:')
+        || u.startsWith('transform:');
+}
+function simpleCanonicalCharacterUniverse(rawUniverse, anime='') {
+    let u = String(rawUniverse || '').trim();
+    if (simpleIsTransformationImageNamespace(u)) return u;
+
+    if (u.startsWith('qt:')) {
+        const fromAnime = String(anime || '').trim();
+        if (fromAnime) {
+            try { u = resolveImageUniverseKey(fromAnime) || u; } catch (_) {}
+        }
+        if (u.startsWith('qt:')) return u;
+    }
+
+    if (u === 'fate') u = 'fatestay';
+    if (u === 'soul') u = 'souleater';
+    try { u = resolveImageUniverseKey(u) || u; } catch (_) {}
+    if (u === 'fate') u = 'fatestay';
+    if (u === 'soul') u = 'souleater';
+    return u;
+}
+function simpleCanonicalCharacterName(universeKey, displayName) {
+    let name = cleanImageCharacterName(String(displayName || '').trim());
+    if (!name || simpleIsTransformationImageNamespace(universeKey)) return name;
+
+    const u = String(universeKey || '').trim();
+    try {
+        const alias = SIMPLE_ALIASES.get(simpleImageCompact(u) + '|' + simpleImageNorm(name));
+        if (alias) name = alias;
+    } catch (_) {}
+
+    try {
+        const wanted = normalizeImageKey(name);
+        const aliasKey = (typeof DLE_MASTER_ALIASES !== 'undefined') ? DLE_MASTER_ALIASES?.[u]?.[wanted] : null;
+        if (aliasKey && typeof DLE_MASTER_NAMES !== 'undefined' && Array.isArray(DLE_MASTER_NAMES?.[u])) {
+            const hit = DLE_MASTER_NAMES[u].find(x => normalizeImageKey(x) === aliasKey);
+            if (hit) name = hit;
+        }
+
+        const names = (typeof DLE_MASTER_NAMES !== 'undefined' && Array.isArray(DLE_MASTER_NAMES?.[u])) ? DLE_MASTER_NAMES[u] : [];
+        if (names.length) {
+            const now = normalizeImageKey(name);
+            const matches = names.filter(x => {
+                const nx = normalizeImageKey(x);
+                return nx === now || nx.startsWith(now + ' ') || now.startsWith(nx + ' ');
+            });
+            if (matches.length === 1) name = matches[0];
+        }
+    } catch (_) {}
+    return name;
+}
+function simpleCanonicalCharacterIdentity(rawUniverse, displayName, anime='') {
+    const u = simpleCanonicalCharacterUniverse(rawUniverse, anime);
+    const name = simpleCanonicalCharacterName(u, displayName);
+    return {
+        u,
+        name,
+        normName: normalizeImageKey(name),
+        transformation: simpleIsTransformationImageNamespace(u)
+    };
+}
+async function simpleManualCharacterImage(rawUniverse, displayName, anime='') {
+    if (!process.env.DATABASE_URL) return null;
+    const id = simpleCanonicalCharacterIdentity(rawUniverse, displayName, anime);
+    if (!id.name) return null;
+
+    const rowToResult = row => {
+        if (!row?.image_bytes) return null;
+        const display = String(row.display_name || id.name);
+        const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
+        return {
+            imageUrl: simpleImageRoute(row.universe_key, display, stamp),
+            sourceUrl: row.source_url || null,
+            status: 'manual-admin',
+            manualOverride: true,
+            universe: row.universe_key,
+            name: display
+        };
+    };
+
+    // Transformations are always exact-only.
+    if (id.transformation) {
+        try {
+            const q = await pool.query(
+                `SELECT universe_key,display_name,source_url,status,image_bytes,updated_at
+                   FROM character_images
+                  WHERE universe_key=$1 AND norm_name=$2
+                    AND status='manual-admin'
+                    AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700
+                  LIMIT 1`,
+                [id.u,id.normName]
+            );
+            return rowToResult(q.rows[0]);
+        } catch (_) { return null; }
+    }
+
+    if (id.u && !id.u.startsWith('qt:')) {
+        try {
+            const q = await pool.query(
+                `SELECT universe_key,display_name,source_url,status,image_bytes,updated_at
+                   FROM character_images
+                  WHERE universe_key=$1 AND norm_name=$2
+                    AND status='manual-admin'
+                    AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700
+                  LIMIT 1`,
+                [id.u,id.normName]
+            );
+            const exact = rowToResult(q.rows[0]);
+            if (exact) return exact;
+        } catch (_) {}
+    }
+
+    // Backward compatibility for old QAP saves: reuse a normal portrait globally
+    // only when the name identifies exactly one normal manual row.
+    try {
+        const q = await pool.query(
+            `SELECT universe_key,display_name,source_url,status,image_bytes,updated_at
+               FROM character_images
+              WHERE norm_name=$1
+                AND status='manual-admin'
+                AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700
+                AND universe_key NOT LIKE 'qt:%'
+                AND universe_key <> '_transform'
+              ORDER BY updated_at DESC
+              LIMIT 3`,
+            [id.normName]
+        );
+        if (q.rows.length === 1) return rowToResult(q.rows[0]);
+    } catch (_) {}
+    return null;
+}
+
 async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
     if (!image || !simpleImageLooksValid(image.bytes)) return false;
-    const normName = normalizeImageKey(cleanImageCharacterName(x.name));
-    const stable = simpleImageRoute(x.u, x.name, Date.now());
+    const identity = simpleCanonicalCharacterIdentity(x.u, x.name, x.anime || '');
+    const storeU = identity.u || String(x.u || '').trim();
+    const storeName = identity.name || cleanImageCharacterName(x.name);
+    const normName = identity.normName || normalizeImageKey(storeName);
+    x.u = storeU;
+    x.name = storeName;
+    const stable = simpleImageRoute(storeU, storeName, Date.now());
     await pool.query(`
         INSERT INTO character_images
             (universe_key,norm_name,display_name,image_url,source_url,status,image_bytes,mime_type,updated_at)
@@ -12381,9 +12526,13 @@ async function startSimpleImageMigration() {
 
 app.get('/api/character-image-file', async (req,res)=>{
     try {
-        const u=String(req.query.u||'').trim(), name=cleanImageCharacterName(String(req.query.n||'').trim());
-        if (!u || !name) return res.status(404).end();
-        const r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[u,normalizeImageKey(name)]);
+        const rawU=String(req.query.u||'').trim(), rawName=cleanImageCharacterName(String(req.query.n||'').trim());
+        if (!rawU || !rawName) return res.status(404).end();
+        const identity=simpleCanonicalCharacterIdentity(rawU,rawName,String(req.query.anime||''));
+        let r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[identity.u,identity.normName]);
+        if (!r.rows[0] && (identity.u!==rawU || identity.normName!==normalizeImageKey(rawName))) {
+            r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[rawU,normalizeImageKey(rawName)]);
+        }
         const row=r.rows[0]; if (!row?.image_bytes) return res.status(404).end();
         res.set('Content-Type',row.mime_type || 'image/jpeg');
         res.set('Cache-Control','public,max-age=31536000,immutable');
@@ -12428,13 +12577,18 @@ app.get('/api/character-image-missing-list', async (req,res)=>{
 
 const __legacyCharacterImageResolver = resolveCharacterImage;
 resolveCharacterImage = async function(universeKey,displayName){
-    const name=cleanImageCharacterName(displayName); const normName=normalizeImageKey(name);
+    const identity=simpleCanonicalCharacterIdentity(universeKey,displayName);
+    const canonicalU=identity.u || universeKey;
+    const name=identity.name || cleanImageCharacterName(displayName);
+    const normName=identity.normName || normalizeImageKey(name);
     try {
-        const r=await pool.query(`SELECT source_url,status,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 LIMIT 1`,[universeKey,normName]);
+        const manual=await simpleManualCharacterImage(canonicalU,name);
+        if (manual?.imageUrl) return manual;
+        const r=await pool.query(`SELECT source_url,status,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 LIMIT 1`,[canonicalU,normName]);
         const row=r.rows[0];
-        if (row) return {imageUrl:simpleImageRoute(universeKey,name,new Date(row.updated_at).getTime()),sourceUrl:row.source_url||null,status:'ok'};
+        if (row) return {imageUrl:simpleImageRoute(canonicalU,name,new Date(row.updated_at).getTime()),sourceUrl:row.source_url||null,status:row.status||'ok'};
     } catch (_) {}
-    if (!SIMPLE_IMAGE_STATE.done) return __legacyCharacterImageResolver(universeKey,displayName);
+    if (!SIMPLE_IMAGE_STATE.done) return __legacyCharacterImageResolver(canonicalU,name);
     return {imageUrl:null,sourceUrl:null,status:'missing'};
 };
 /* ================= END SIMPLE PERSISTENT CHARACTER IMAGES V1 ============== */
@@ -12498,12 +12652,15 @@ app.get('/api/admin/character-catalog-persistent', async (req, res) => {
             const u = String(raw?.u || raw?.universe || '').trim();
             const name = cleanImageCharacterName(String(raw?.name || '').trim());
             if (!u || !name) return raw;
-            const row = overrides.get(`${u}|${normalizeImageKey(name)}`);
+            const identity = simpleCanonicalCharacterIdentity(u,name,raw?.anime || '');
+            const row = overrides.get(`${identity.u}|${identity.normName}`) || overrides.get(`${u}|${normalizeImageKey(name)}`);
             if (!row) return raw;
             const stamp = row.updated_at ? new Date(row.updated_at).getTime() : Date.now();
+            const stableName = String(row.display_name || identity.name || name);
+            const stableU = String(row.universe_key || identity.u || u);
             const stableUrl = (typeof simpleImageRoute === 'function')
-                ? simpleImageRoute(u, name, stamp)
-                : `/api/character-image-file?u=${encodeURIComponent(u)}&n=${encodeURIComponent(name)}&v=${encodeURIComponent(stamp)}`;
+                ? simpleImageRoute(stableU, stableName, stamp)
+                : `/api/character-image-file?u=${encodeURIComponent(stableU)}&n=${encodeURIComponent(stableName)}&v=${encodeURIComponent(stamp)}`;
             return {
                 ...raw,
                 img: stableUrl,
@@ -14789,7 +14946,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
     // It uses the same durable character_images table, keyed by qt:<theme> + item name.
     const overrideSource = String(req.query.source || '');
     const overrideName = String(req.query.name || '');
-    if (overrideSource.startsWith('qt:') && overrideName) {
+    if (overrideSource === 'qt:transformation' && overrideName) {
         try {
             const manualOverride = await getCachedCharacterImage(overrideSource, overrideName);
             if (manualOverride?.status === 'manual-admin' && manualOverride?.imageUrl) {
@@ -14820,6 +14977,47 @@ app.get('/api/arcade/item-image', async (req, res) => {
         else {
             const it = (arcItemsFor(source) || []).find(i => i.name === name);
             if (it) {
+                // AG_CANONICAL_CHARACTER_IMAGE_V11 — normal QAP occurrences share the
+                // canonical character portrait. Transformations stay isolated.
+                if (source.startsWith('qt:') && source !== 'qt:transformation') {
+                    const themeId = source.slice(3);
+                    const nonCharacterTheme = ['anime','shonen','isekai','arc'].includes(themeId) || it.media === 'anime';
+                    if (!nonCharacterTheme) {
+                        const parts = String(it.sub || '').split('•').map(x => x.trim()).filter(Boolean);
+                        const animeName = String(req.query.anime || (parts.length > 1 ? parts[parts.length - 1] : '') || '').trim();
+                        const charName = String(it.char || it.character || parts[0] || it.name || '').trim();
+                        let baseU = '';
+                        try { baseU = resolveImageUniverseKey(animeName) || ''; } catch (_) {}
+                        const canonicalManual = typeof simpleManualCharacterImage === 'function' ? await simpleManualCharacterImage(baseU, charName, animeName) : null;
+                        if (canonicalManual?.imageUrl) {
+                            QAP_ITEM_IMAGE_CACHE.delete(cacheKey);
+                            res.set('Cache-Control','no-store');
+                            return res.json({
+                                ok:true,
+                                imageUrl:canonicalManual.imageUrl,
+                                sourceUrl:canonicalManual.sourceUrl || '',
+                                status:'manual-admin',
+                                manualOverride:true,
+                                canonical:true
+                            });
+                        }
+                        // Compatibility for per-theme manual rows saved before v11.
+                        try {
+                            const legacyManual = await getCachedCharacterImage(source, name);
+                            if (legacyManual?.status === 'manual-admin' && legacyManual?.imageUrl) {
+                                res.set('Cache-Control','no-store');
+                                return res.json({
+                                    ok:true,
+                                    imageUrl:legacyManual.imageUrl,
+                                    sourceUrl:legacyManual.sourceUrl || '',
+                                    status:'manual-admin',
+                                    manualOverride:true,
+                                    legacyThemeOverride:true
+                                });
+                            }
+                        } catch (_) {}
+                    }
+                }
                 // Transformation images must go through the strict/persistent resolver below.
                 // Otherwise an old embedded `img` can bypass verified mappings entirely.
                 if (it.img && source !== 'qt:transformation') url = it.img;
@@ -17716,6 +17914,8 @@ app.get('/api/avatar/img', async (req, res) => {
     const c = avatarFind(u, requested);
     const url = await arcCharImage(u, c ? c.raw : requested);
     if (!url) return res.status(404).end();
+    // AG_CANONICAL_CHARACTER_IMAGE_V11 — DB-backed portraits are already same-origin.
+    if (/^\/api\/(?:character-image-file|local-character-image)(?:\?|$)/i.test(url)) return res.redirect(url);
     res.redirect('/api/img?u=' + encodeURIComponent(url));
 });
 app.post('/api/avatar', async (req, res) => {
@@ -18151,14 +18351,23 @@ app.post('/api/admin/character-images/fill', adminOnly(async (req, res) => {
 }));
 
 app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
-    const b=req.body||{}; const u=String(b.universe||'').trim();
-    const name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const b=req.body||{};
+    let u=String(b.universe||'').trim();
+    let name=cleanImageCharacterName(String(b.name||'').trim()).slice(0,160);
+    const anime=String(b.anime||'').trim().slice(0,160);
+    const themeSource=String(b.themeSource||'').trim();
+    const isTransformation=!!b.isTransformation || themeSource==='qt:transformation' || u==='qt:transformation';
+    if (!isTransformation) {
+        const identity=simpleCanonicalCharacterIdentity(u,name,anime);
+        u=identity.u || u;
+        name=identity.name || name;
+    }
     const url=String(b.imageUrl||b.img||'').trim().slice(0,2200);
     if (!u || !name) return res.status(400).json({ok:false,error:'Personnage invalide.'});
     if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
     const img=await simpleFetchImage(url,10000);
     if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
-    const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    const x={u,name,anime}; await simpleStoreImage(x,img,url,'manual-admin');
     // AG_MANUAL_IMAGE_LOCK_V9 — report success only after the durable BYTEA row is confirmed.
     const persisted = await pool.query(
         `SELECT source_url,status,updated_at

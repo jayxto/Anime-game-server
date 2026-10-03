@@ -15427,7 +15427,7 @@ async function loadHallOfFame(){
             themeImagesActive++;
             (async () => {
                 try {
-                    const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name), { cache:'no-store', signal: AbortSignal.timeout(60000) });
+                    const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name) + '&anime=' + encodeURIComponent(item.anime || ''), { cache:'no-store', signal: AbortSignal.timeout(60000) });
                     const data = await response.json();
                     item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
                     if (response.ok && data.ok && data.manualOverride) {
@@ -15472,7 +15472,14 @@ async function loadHallOfFame(){
             }
             const r=await fetch('/api/admin/character-image',{
                 method:'POST',headers,credentials:'same-origin',
-                body:JSON.stringify({universe:x.u||x.universe,name:x.name,imageUrl:url})
+                body:JSON.stringify({
+                    universe:x.u||x.universe,
+                    name:x.name,
+                    imageUrl:url,
+                    anime:x.anime||'',
+                    themeSource:x.themeSource||'',
+                    isTransformation:x.themeSource==='qt:transformation'
+                })
             });
             const d=await r.json().catch(()=>({}));
             if(!r.ok||!d.ok)throw new Error(d.error||`HTTP ${r.status}`);
