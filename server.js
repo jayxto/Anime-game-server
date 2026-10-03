@@ -11816,6 +11816,11 @@ const SIMPLE_ALIASES = new Map(Object.entries({
     'dragonball|geene':'Giin',
     'dragonball|kaio de l est':'East Kai'
     // END SIMPLE_CHARACTER_ALIASES_V5
+    ,
+    // SIMPLE_CHARACTER_ALIASES_V6 — verified name corrections.
+    'cote|kaya ishikura':'Kayoko Ishikura',
+    'digimon|koshiro izumi':'Koushiro Izumi'
+    // END SIMPLE_CHARACTER_ALIASES_V6
 }));
 function simpleVariants(u, name) {
     const out = [String(name || '').trim()];
@@ -11871,7 +11876,8 @@ const SIMPLE_NON_CHARACTER_EXACT_V1 = new Set([
     'drstone|new america city',
     'drstone|stone wars',
     'drstone|stone world',
-    'drstone|treasure island'
+    'drstone|treasure island',
+    'cote|tetsuya machida' // malformed composite, not a canonical character
 ]);
 
 async function simpleCatalogue() {
@@ -12171,6 +12177,13 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'dragonball|geene':'https://i.pinimg.com/736x/dc/1b/62/dc1b6223ee06ee57f62f6425c9bf6500.jpg',
     'dragonball|kaio de l est':'https://i.pinimg.com/736x/2c/79/2b/2c792b55f5bcbabedd9dfb2da3598bdf.jpg'
     // END SIMPLE_VERIFIED_CHARACTER_IMAGES_V5
+    ,
+    // SIMPLE_VERIFIED_CHARACTER_IMAGES_V6 — visually reviewed 2026-10-03.
+    'cote|reon kondo':'https://cdn.anime-planet.com/characters/primary/reo-kondou-1.webp?t=1661325903',
+    'digimon|koshiro izumi':'https://i.pinimg.com/originals/bc/4c/6a/bc4c6a1670248f88e6831b5da741f16f.png',
+    'dragonball|ea':'https://www.toei-anim.co.jp/tv/dragon_s/assets/img/chara/chapter4/no03/u03_ea.png',
+    'dragonball|gyumao':'https://thumbs.coleka.com/media/item/201807/03/dragon-ball-z-serie-1-gyumao-36-77.webp'
+    // END SIMPLE_VERIFIED_CHARACTER_IMAGES_V6
 }));
 function simpleVerifiedCharacterImage(u,name) {
     return SIMPLE_VERIFIED_CHARACTER_IMAGES.get(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`) || null;
