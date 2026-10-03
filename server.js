@@ -1206,6 +1206,8 @@ app.get('/api/character-catalog', (req, res) => {
                 const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
                 for (const theme of (parsed.themes || [])) {
                     if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;
                     // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
                     // Some ranking themes are typed `chars` for UI reuse although their items are
                     // arcs/anime/categories, not character portraits. Never feed them to the image catalogue.
@@ -12167,7 +12169,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'drstone|minami hokutozai':'https://i.pinimg.com/originals/d4/52/9c/d4529c2309a21d55ea30eef7bb2176be.jpg',
     'drstone|senku ishigami':'https://a.storyblok.com/f/178900/712x1362/b844774350/ds1_senku.png/m/filters%3Aquality%2895%29format%28webp%29',
     'drstone|taiju oki':'https://static.wikia.nocookie.net/dr-stone/images/6/69/Taiju_Oki_%28Anime%29.png/revision/latest?cb=20190705185117',
-    'drstone|ukyo saionji':'https://anibase.net/files/d3a35b167052ef0e059174f5717c2519',
+    'drstone|ukyo saionji':'https://times-abema.ismcdn.jp/mwimgs/3/3/724w/img_33316d797bfecc3a90883fc92118ffc473569.jpg',
     'drstone|yo uei':'https://i.pinimg.com/736x/f2/6f/b3/f26fb3d927a271c05a9bb770f4939ea8.jpg',
     'dragonball|docteur arinsu':'https://static.zerochan.net/Dr..Arinsu.1024.4317613.webp',
     'dragonball|docteur mu':'https://vignette.wikia.nocookie.net/dragon-ball-gt-and-af/images/9/92/Myuu.png/revision/latest?cb=20200114102110',
