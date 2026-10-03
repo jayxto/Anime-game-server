@@ -1,0 +1,26 @@
+{"i": 1, "id": "souffert", "title": "Qui a le plus souffert ?", "kind": "chars", "items": 153, "withChar": 0, "medias": [""]}
+{"i": 2, "id": "smart", "title": "Qui est le plus smart ?", "kind": "chars", "items": 127, "withChar": 0, "medias": [""]}
+{"i": 3, "id": "entree", "title": "Qui a la meilleure entrée ?", "kind": "chars", "items": 133, "withChar": 0, "medias": [""]}
+{"i": 4, "id": "waifu", "title": "Qui est la meilleure waifu ?", "kind": "chars", "items": 177, "withChar": 0, "medias": [""]}
+{"i": 5, "id": "aura", "title": "Qui a le plus d'aura ?", "kind": "chars", "items": 168, "withChar": 0, "medias": [""]}
+{"i": 6, "id": "moinsaura", "title": "Qui a le moins d'aura ?", "kind": "chars", "items": 126, "withChar": 0, "medias": [""]}
+{"i": 7, "id": "pleurnichard", "title": "Qui est le plus pleurnichard ?", "kind": "chars", "items": 124, "withChar": 0, "medias": [""]}
+{"i": 8, "id": "bonpere", "title": "Qui est le meilleur père ?", "kind": "chars", "items": 86, "withChar": 0, "medias": [""]}
+{"i": 9, "id": "pirepere", "title": "Qui est le pire père ?", "kind": "chars", "items": 58, "withChar": 0, "medias": [""]}
+{"i": 10, "id": "ost", "title": "Qui a le meilleur OST ?", "kind": "ost", "items": 109, "withChar": 0, "medias": [""]}
+{"i": 11, "id": "loyal", "title": "Qui est le plus loyal ?", "kind": "chars", "items": 165, "withChar": 0, "medias": [""]}
+{"i": 12, "id": "duo", "title": "Qui est le meilleur duo ?", "kind": "duos", "items": 172, "withChar": 0, "medias": [""]}
+{"i": 13, "id": "animal", "title": "Qui est le meilleur animal de compagnie ?", "kind": "chars", "items": 83, "withChar": 0, "medias": [""]}
+{"i": 14, "id": "grandfrere", "title": "Qui est le meilleur grand frère ?", "kind": "chars", "items": 79, "withChar": 0, "medias": [""]}
+{"i": 15, "id": "rival", "title": "Meilleur rival", "kind": "chars", "items": 136, "withChar": 0, "medias": [""]}
+{"i": 16, "id": "antagoniste", "title": "Meilleur antagoniste", "kind": "chars", "items": 99, "withChar": 0, "medias": [""]}
+{"i": 17, "id": "protagoniste", "title": "Meilleur protagoniste", "kind": "chars", "items": 133, "withChar": 0, "medias": [""]}
+{"i": 18, "id": "deuteragoniste", "title": "Meilleur deutéragoniste", "kind": "chars", "items": 141, "withChar": 0, "medias": [""]}
+{"i": 19, "id": "secondaire", "title": "Meilleur personnage secondaire", "kind": "chars", "items": 734, "withChar": 0, "medias": [""]}
+{"i": 20, "id": "transformation", "title": "Meilleure transformation", "kind": "chars", "items": 105, "withChar": 105, "medias": [""]}
+{"i": 21, "id": "design", "title": "Meilleur design", "kind": "chars", "items": 887, "withChar": 0, "medias": [""]}
+{"i": 22, "id": "combat", "title": "Meilleur combat", "kind": "ost", "items": 79, "withChar": 0, "medias": [""]}
+{"i": 23, "id": "arc", "title": "Meilleur arc", "kind": "chars", "items": 128, "withChar": 0, "medias": ["anime"]}
+{"i": 24, "id": "isekai", "title": "Quel est le meilleur isekai ?", "kind": "chars", "items": 28, "withChar": 0, "medias": ["anime"]}
+{"i": 25, "id": "shonen", "title": "Quel est le meilleur shonen ?", "kind": "chars", "items": 46, "withChar": 0, "medias": ["anime"]}
+{"i": 26, "id": "anime", "title": "Quel est le meilleur anime ?", "kind": "chars", "items": 124, "withChar": 0, "medias": ["anime"]}
