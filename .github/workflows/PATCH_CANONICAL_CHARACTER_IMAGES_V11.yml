@@ -1,0 +1,62 @@
+name: Patch canonical character images v11
+on:
+  push:
+    paths:
+      - '.github/workflows/PATCH_CANONICAL_CHARACTER_IMAGES_V11.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Decode patch
+        run: |
+          cat > /tmp/patch.gz.b64 <<'B64'
+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
+B64
+          base64 -d /tmp/patch.gz.b64 | gzip -d > /tmp/patch.py
+      - name: Apply canonical image patch
+        run: python /tmp/patch.py
+      - name: Verify syntax and invariants
+        run: |
+          node --check server.js
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          i=Path('index.html').read_text(encoding='utf-8')
+          checks={
+            'canonical marker':'AG_CANONICAL_CHARACTER_IMAGE_V11' in s,
+            'identity helper':'function simpleCanonicalCharacterIdentity' in s,
+            'manual helper':'async function simpleManualCharacterImage' in s,
+            'transform exact only':"if (id.transformation)" in s and "source === 'qt:transformation'" in s,
+            'qap normal canonical':'canonicalManual = await simpleManualCharacterImage' in s,
+            'qap old early override restricted':"if (overrideSource === 'qt:transformation' && overrideName)" in s,
+            'avatar local bypass':"character-image-file|local-character-image" in s and "return res.redirect(url)" in s,
+            'canonical persistent catalog':"simpleCanonicalCharacterIdentity(u,name,raw?.anime || '')" in s,
+            'admin context':"isTransformation:x.themeSource==='qt:transformation'" in i,
+            'qap anime context':"'&anime=' + encodeURIComponent(item.anime || '')" in i,
+          }
+          for name,ok in checks.items():
+              print(name,ok)
+              if not ok: raise SystemExit('FAILED: '+name)
+          PY
+      - name: Run transformation regression tests
+        run: |
+          if [ -f .github/transform-audit.test.cjs ]; then
+            node .github/transform-audit.test.cjs
+          fi
+      - name: Commit tested canonical fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/AUDIT_CANONICAL_CHARACTER_IMAGES.yml
+          rm -f .github/workflows/PATCH_CANONICAL_CHARACTER_IMAGES_V11.yml
+          git add server.js index.html .github/workflows
+          git commit -m "fix: make manual normal character images canonical everywhere [skip ci]"
+          git push origin HEAD:main
