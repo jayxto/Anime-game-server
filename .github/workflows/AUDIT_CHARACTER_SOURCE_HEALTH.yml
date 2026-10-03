@@ -40,4 +40,4 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
-# rerun: 2026-10-03 after visually verified character batch 6
+# rerun: 2026-10-03 after visually verified character batches 7 and 8
