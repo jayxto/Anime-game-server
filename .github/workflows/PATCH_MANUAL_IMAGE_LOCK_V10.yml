@@ -1,0 +1,53 @@
+name: Patch manual image lock v10
+on:
+  push:
+    paths:
+      - '.github/patch_manual_image_lock_v10.py'
+      - '.github/workflows/PATCH_MANUAL_IMAGE_LOCK_V10.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply duplicate-safe lock
+        run: python .github/patch_manual_image_lock_v10.py
+      - name: Verify syntax and persistence invariants
+        run: |
+          node --check server.js
+          python - <<'PY'
+          from pathlib import Path
+          i=Path('index.html').read_text(encoding='utf-8')
+          checks={
+            'v9 still present':'AG_MANUAL_IMAGE_LOCK_V9' in i,
+            'v10 marker':'AG_MANUAL_IMAGE_LOCK_V10' in i,
+            'DB route is local':"character-image-file|local-character-image" in i,
+            'manual merge lock':"if (candidateManual)" in i and "old.manualOverride = true" in i,
+            'manual instant status':"if (x.manualOverride || x.status === 'manual-admin') return 'ok';" in i,
+            'no stale QAP extras':"if (!x.imagePending && !x.manualOverride && x.imgs?.length > 1)" in i,
+          }
+          for name,ok in checks.items():
+              print(name,ok)
+              if not ok: raise SystemExit('FAILED: '+name)
+          PY
+      - name: Run transformation regression tests
+        run: |
+          if [ -f .github/transform-audit.test.cjs ]; then
+            node .github/transform-audit.test.cjs
+          fi
+      - name: Commit final persistence fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/AUDIT_IMAGE_MERGE_V10.yml
+          rm -f .github/workflows/PATCH_MANUAL_IMAGE_LOCK_V10.yml
+          rm -f .github/patch_manual_image_lock_v10.py
+          git add index.html server.js .github
+          git commit -m "fix: keep manual character images authoritative across refresh [skip ci]"
+          git push origin HEAD:main
