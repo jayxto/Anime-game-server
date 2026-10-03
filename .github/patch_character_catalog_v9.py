@@ -18,10 +18,10 @@ if marker not in block:
         raise SystemExit('catalog add anchor not found')
     block=block.replace(anchor,repl,1)
 
-    anchor2="""            if (!u && anime) {\n                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}\n                try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}\n            }\n            if (arcAnime) anime = arcAnime;"""
-    repl2="""            if (!u && anime) {\n                try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}\n            }\n            // Canonicalize aliases returned by older datasets/resolvers too.\n            if (u === 'fate') u = 'fatestay';\n            if (u === 'soul') u = 'souleater';\n            try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}\n            if (arcAnime) anime = arcAnime;"""
+    anchor2="            if (arcAnime) anime = arcAnime;"
+    repl2="""            // Canonicalize aliases returned by older datasets/resolvers too.\n            if (u === 'fate') u = 'fatestay';\n            if (u === 'soul') u = 'souleater';\n            if (arcAnime) anime = arcAnime;"""
     if anchor2 not in block:
-        raise SystemExit('catalog resolver anchor not found')
+        raise SystemExit('catalog arcAnime anchor not found')
     block=block.replace(anchor2,repl2,1)
     s=s[:route]+block+s[end:]
 
