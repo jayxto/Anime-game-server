@@ -1141,7 +1141,13 @@ app.get('/api/character-catalog', (req, res) => {
                 try { u = resolveImageUniverseKey(anime) || null; } catch (_) {}
                 try { if (u && typeof ARC_UNIVERSE_ANIME !== 'undefined') arcAnime = ARC_UNIVERSE_ANIME[u] || arcAnime; } catch (_) {}
             }
+            // CHARACTER_CATALOG_ROUTE_CANONICAL_V3 — canonicalize after anime resolution too.
+            if (u === 'fate') u = 'fatestay';
+            if (u === 'soul') u = 'souleater';
             if (arcAnime) anime = arcAnime;
+            const compactName = normalizeImageKey(name).replace(/[^a-z0-9]+/g, '');
+            if (u === 'fatestay' && ['fateroute','heavensfeel','unlimitedbladeworks'].includes(compactName)) return;
+            if ((source === 'tierlist-themes' || source === 'qap-themes') && normalizeImageKey(name) === normalizeImageKey(anime)) return;
             const group = u || normalizeImageKey(anime) || 'autre';
             const k = group + '|' + normalizeImageKey(name);
             let img = originalImg || null;
