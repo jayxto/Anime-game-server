@@ -37,7 +37,7 @@ jobs:
             'https://cdn.anime-planet.com/characters/primary/niko-hirata-1.webp?t=1660955578',
             'https://i.pinimg.com/736x/55/a7/ca/55a7ca3cce0a606d39510bec1e982ad3.jpg',
             'https://static.zerochan.net/Reze.1024.4599201.webp',
-            'https://images.everyeye.it/img-notizie/bleach-thousand-year-blood-war-ruolo-avrA-sosuke-aizen-nell-arco-finale-v4-620477-1200x1200.webp',
+            'https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg',
             'https://i.pinimg.com/736x/28/35/f0/2835f07d35ae947b3f3204690346f32f.jpg',
           ]
           for url in urls:
@@ -55,6 +55,7 @@ jobs:
           grep -q 'SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH6' server.js
           grep -q 'niko-hirata-1.webp' server.js
           grep -q 'Reze.1024.4599201.webp' server.js
+          grep -q 'artworks-kzBn7kymKFnU1jEz-ho78oQ' server.js
           grep -q '2835f07d35ae947b3f3204690346f32f.jpg' server.js
       - name: Commit verified image batch
         shell: bash
@@ -68,3 +69,5 @@ jobs:
           git commit -m "fix: visually verify ambiguous character portraits v6 [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
+
+# rerun: fetchable Muken Aizen source
