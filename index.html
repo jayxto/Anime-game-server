@@ -15415,6 +15415,9 @@ async function loadHallOfFame(){
     }
 
     async function saveUrl(x,card){
+        // AG_CHARACTER_ADMIN_PERSISTENT_URL_V7
+        // The URL typed in the admin catalogue is the durable source URL.
+        // The preview/game image is the stable server route backed by PostgreSQL.
         const input=card.querySelector('[data-url]'), btn=card.querySelector('[data-save]'), msg=card.querySelector('.ag-charmsg'), url=String(input.value||'').trim();
         if(!/^https:\/\/\S+$/i.test(url)){msg.textContent='❌ URL https:// obligatoire';return}
         btn.disabled=true;msg.textContent='⚡ Vérification immédiate…';
@@ -15433,14 +15436,39 @@ async function loadHallOfFame(){
             });
             const d=await r.json().catch(()=>({}));
             if(!r.ok||!d.ok)throw new Error(d.error||`HTTP ${r.status}`);
-            x.img=url;x.originalImg=url;
-            state.status.set(keyOf(x),'checking');
+
+            const savedSource=String(d.sourceUrl||url).trim();
+            const savedImage=String(d.imageUrl||url).trim();
+            const k=keyOf(x);
+            const applySaved=row=>{
+                if(!row)return;
+                row.sourceUrl=savedSource;
+                row.img=savedImage;
+                row.imageUrl=savedImage;
+                row.originalImg=savedImage;
+                row.status='manual-admin';
+                row.manualOverride=true;
+            };
+            applySaved(x);
+            for(const row of state.all){if(keyOf(row)===k)applySaved(row)}
+            for(const row of state.filtered){if(keyOf(row)===k)applySaved(row)}
+
+            input.value=savedSource;
+            const open=card.querySelector('[data-open]');
+            if(open)open.href=savedImage||savedSource||'#';
+            state.status.set(k,'checking');
             card.classList.remove('bad','ok','external');card.classList.add('checking');
             const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='…';
             const img=card.querySelector('img');
-            img.src='';
-            requestAnimationFrame(()=>{img.src=url+(url.includes('?')?'&':'?')+'ag_verify='+Date.now();testVisibleImage(img,x,card)});
-            msg.textContent='✅ Sauvegardée définitivement';
+            if(img){
+                img.src='';
+                requestAnimationFrame(()=>{
+                    const sep=savedImage.includes('?')?'&':'?';
+                    img.src=savedImage+sep+'ag_verify='+Date.now();
+                    testVisibleImage(img,x,card);
+                });
+            }
+            msg.textContent='✅ URL enregistrée définitivement';
             stats();
         }catch(e){msg.textContent='❌ '+(e?.message||'Erreur')}
         finally{btn.disabled=false}
