@@ -1,0 +1,35 @@
+name: Audit QAP theme kinds
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_QAP_THEME_KINDS.yml'
+      - '.github/audit_qap_theme_kinds.py'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Decode theme metadata
+        run: python3 .github/audit_qap_theme_kinds.py
+      - name: Commit report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/qap_theme_kinds.txt
+          git commit -m "chore: audit qap theme kinds [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
