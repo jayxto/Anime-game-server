@@ -11767,7 +11767,26 @@ const SIMPLE_ALIASES = new Map(Object.entries({
     'dragonball|grand pretre':'Grand Priest','dragonball|docteur gero':'Dr. Gero',
     'chainsaw|demon des tenebres':'Darkness Devil','chainsaw|demon de la chute':'Falling Devil',
     'chainsaw|demon de la justice':'Justice Devil','chainsaw|demon de l enfer':'Hell Devil',
-    'clover|patolli':'Patry','blackclover|patolli':'Patry','tokyorevengers|draken':'Ken Ryuguji'
+    'clover|patolli':'Patry','blackclover|patolli':'Patry','tokyorevengers|draken':'Ken Ryuguji',
+    // SIMPLE_ALIAS_BATCH_IMAGE_V2 — conservative provider/display-name aliases.
+    'another|yuya mochizuki':'Yuuya Mochizuki',
+    'bleach|genryusai yamamoto':'Shigekuni Genryusai Yamamoto',
+    'bleach|ichigo papa':'Isshin Kurosaki',
+    'callnight|nico hirata':'Niko Hirata',
+    'chainsaw|bomb girl':'Reze',
+    'chainsaw|demon pieuvre':'Octopus Devil',
+    'chainsaw|demon poulet':'Bucky',
+    'chainsaw|demon serpent':'Snake Devil',
+    'chainsaw|demon typhon':'Typhoon Devil',
+    'digimon|koshiro izumi':'Koushiro Izumi',
+    'dragonball|c 14':'Android 14',
+    'dragonball|c 15':'Android 15',
+    'dragonball|c 8':'Android 8',
+    'dragonball|docteur brief':'Dr. Brief',
+    'dragonball|docteur hedo':'Dr. Hedo',
+    'dragonball|docteur kochin':'Dr. Kochin',
+    'dragonball|gyumao':'Ox-King'
+
 }));
 function simpleVariants(u, name) {
     const out = [String(name || '').trim()];
@@ -12051,7 +12070,17 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'beastars|gohin':'https://wallpapers.com/images/hd/beastars-gohin-panda-character-06vhvwcc8q0xiova.jpg',
     'beyblade|hilary tachibana':'https://vignette1.wikia.nocookie.net/beyblade/images/5/53/HILARY_TACHIBANA_%28V-FORCE%29.png/revision/latest/scale-to-width-down/2000?cb=20161104115145',
     'blackbutler|baldroy':'https://www.kuroshitsuji.tv/emeraldwitch/assets/img/character/sub/character_sub1_main.jpg',
-    'blacklagoon|sawyer the cleaner':'https://www.blacklagoon.jp/imgs/character/sawyer/04.jpg'
+    'blacklagoon|sawyer the cleaner':'https://www.blacklagoon.jp/imgs/character/sawyer/04.jpg',
+    // SIMPLE_VERIFIED_CHARACTER_IMAGES_V2 — visually reviewed batch 2.
+    'bleach|genryusai yamamoto':'https://i.pinimg.com/736x/64/c4/f6/64c4f690cd53f841d21568ad75225db4.jpg',
+    'bleach|ichigo papa':'https://static.zerochan.net/Kurosaki.Isshin.1024.3983714.webp',
+    'bleach|sosuke aizen scelle':'https://i.pinimg.com/736x/6e/12/d9/6e12d9a35cd1b461225b72aaf1e485e5.jpg',
+    'bluebox|hina chono':'https://i.pinimg.com/736x/18/20/db/1820dbe627174dd549dc87a8f8f8d9f2.jpg',
+    'bluebox|kyo kasahara':'https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg',
+    'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
+    'callnight|ko yamori':'https://i.pinimg.com/originals/91/ea/c6/91eac632a88586c250575bbcaebe243c.jpg',
+    'callnight|nico hirata':'https://i.pinimg.com/736x/16/95/43/169543da51737af1bdd422ce8c640284.jpg'
+
 }));
 function simpleVerifiedCharacterImage(u,name) {
     return SIMPLE_VERIFIED_CHARACTER_IMAGES.get(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`) || null;
