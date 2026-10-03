@@ -12146,6 +12146,7 @@ async function simplePool(items, n, fn) {
 /* SIMPLE_VERIFIED_CHARACTER_IMAGES_V1
    Visually-reviewed sources for stubborn characters that automatic providers miss.
    These URLs are import sources only: simpleStoreImage copies bytes into PostgreSQL. */
+// SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH6 — five visually rechecked ambiguous portraits.
 const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'another|yuya mochizuki':'https://neoapo.com/images/character/3687/9925542d006864dd6dd922f6de1668cf.jpg',
     'assclass|gakuho asano':'https://image.kingsoft.jp/starthome/nijimen/2023-08-02/4c42b618a8cabc21bf73323a88e57b30_lg.jpg',
@@ -12158,15 +12159,15 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V2 — visually reviewed batch 2.
     'bleach|genryusai yamamoto':'https://i.pinimg.com/736x/64/c4/f6/64c4f690cd53f841d21568ad75225db4.jpg',
     'bleach|ichigo papa':'https://static.zerochan.net/Kurosaki.Isshin.1024.3983714.webp',
-    'bleach|sosuke aizen scelle':'https://i.pinimg.com/736x/6e/12/d9/6e12d9a35cd1b461225b72aaf1e485e5.jpg',
+    'bleach|sosuke aizen scelle':'https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg',
     'bluebox|hina chono':'https://i.pinimg.com/736x/18/20/db/1820dbe627174dd549dc87a8f8f8d9f2.jpg',
     'bluebox|kyo kasahara':'https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg',
     'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
     'callnight|ko yamori':'https://i.pinimg.com/originals/91/ea/c6/91eac632a88586c250575bbcaebe243c.jpg',
-    'callnight|nico hirata':'https://i.pinimg.com/736x/16/95/43/169543da51737af1bdd422ce8c640284.jpg'
+    'callnight|nico hirata':'https://cdn.anime-planet.com/characters/primary/niko-hirata-1.webp?t=1660955578'
 ,
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V3 — visually reviewed batch 3.
-    'chainsaw|bomb girl':'https://i.pinimg.com/736x/6e/67/1f/6e671f272ef9a1ebdaa2f15ffb6577ab.jpg',
+    'chainsaw|bomb girl':'https://static.zerochan.net/Reze.1024.4599201.webp',
     'chainsaw|demon poulet':'https://i0.wp.com/www.comicbookrevolution.com/wp-content/uploads/2022/07/Chainsaw-Man-Chapter-98-1.png?ssl=1',
     'chainsaw|demon typhon':'https://static.wikia.nocookie.net/chainsaw-man/images/8/89/Typhoon_Devil_Reze_Arc_anime_design.png/revision/latest?cb=20250704001946',
     'chainsaw|taiyo hayakawa':'https://manga-imperial.fr/cdn/shop/articles/taiyo_hayakawa_1920x.jpg?v=1682332072',
@@ -12201,8 +12202,8 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'dragonball|docteur brief':'https://neoapo.com/images/character/46073/b088427e8b4f59c6fc52853b73332451.webp',
     'dragonball|docteur hedo':'https://neoapo.com/images/character/35960/27d98c3d8ddf79eb8e6012718daa9ca4.png',
     'dragonball|docteur kochin':'https://vignette.wikia.nocookie.net/dragonball/images/e/ea/Dr._Kochin_Dokkan.png/revision/latest?cb=20181208185112&path-prefix=es',
-    'dragonball|geene':'https://i.pinimg.com/736x/dc/1b/62/dc1b6223ee06ee57f62f6425c9bf6500.jpg',
-    'dragonball|kaio de l est':'https://i.pinimg.com/736x/2c/79/2b/2c792b55f5bcbabedd9dfb2da3598bdf.jpg'
+    'dragonball|geene':'https://i.pinimg.com/736x/28/35/f0/2835f07d35ae947b3f3204690346f32f.jpg',
+    'dragonball|kaio de l est':'https://i.pinimg.com/736x/55/a7/ca/55a7ca3cce0a606d39510bec1e982ad3.jpg'
     // END SIMPLE_VERIFIED_CHARACTER_IMAGES_V5
     ,
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V6 — visually reviewed 2026-10-03.
