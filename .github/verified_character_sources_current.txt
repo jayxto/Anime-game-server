@@ -1,0 +1,53 @@
+ROWS=52
+another|yuya mochizuki	neoapo.com	https://neoapo.com/images/character/3687/9925542d006864dd6dd922f6de1668cf.jpg
+assclass|gakuho asano	image.kingsoft.jp	https://image.kingsoft.jp/starthome/nijimen/2023-08-02/4c42b618a8cabc21bf73323a88e57b30_lg.jpg
+assclass|gakushu asano	img.animatetimes.com	https://img.animatetimes.com/news/visual/2015/1428310229_1_1_00696cc58f478d7fb7a8d03a164eed3f.jpg
+assclass|ryoma terasaka	cdn.gamerch.com	https://cdn.gamerch.com/contents/wiki/4008/entry/idyh0sw9.jpg
+beastars|gohin	wallpapers.com	https://wallpapers.com/images/hd/beastars-gohin-panda-character-06vhvwcc8q0xiova.jpg
+beyblade|hilary tachibana	vignette1.wikia.nocookie.net	https://vignette1.wikia.nocookie.net/beyblade/images/5/53/HILARY_TACHIBANA_%28V-FORCE%29.png/revision/latest/scale-to-width-down/2000?cb=20161104115145
+blackbutler|baldroy	www.kuroshitsuji.tv	https://www.kuroshitsuji.tv/emeraldwitch/assets/img/character/sub/character_sub1_main.jpg
+blacklagoon|sawyer the cleaner	www.blacklagoon.jp	https://www.blacklagoon.jp/imgs/character/sawyer/04.jpg
+bleach|genryusai yamamoto	i.pinimg.com	https://i.pinimg.com/736x/64/c4/f6/64c4f690cd53f841d21568ad75225db4.jpg
+bleach|ichigo papa	bleach-anime.com	https://bleach-anime.com/assets/img/character/face_58.png
+bleach|sosuke aizen scelle	i1.sndcdn.com	https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg
+bluebox|hina chono	i.pinimg.com	https://i.pinimg.com/736x/18/20/db/1820dbe627174dd549dc87a8f8f8d9f2.jpg
+bluebox|kyo kasahara	i.pinimg.com	https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg
+bocchi|futari gotoh	cdn.myanimelist.net	https://cdn.myanimelist.net/images/characters/10/493791.webp?s=bdd6daf4624618470817611b5e4c8577
+bocchi|ryo yamada	cdn.rafled.com	https://cdn.rafled.com/anime-icons/images/7z9SrV28Eit8hSVVG4isKIgt0OvUE8fT.jpg
+callnight|ko yamori	cdn.rafled.com	https://cdn.rafled.com/anime-icons/images/b23f2b0117002d3e968e41fb65b936dd5221edf3db3279309f3664dad09726a6.jpg
+callnight|nico hirata	cdn.anime-planet.com	https://cdn.anime-planet.com/characters/primary/niko-hirata-1.webp?t=1660955578
+chainsaw|bomb girl	static.zerochan.net	https://static.zerochan.net/Reze.1024.4599201.webp
+chainsaw|demon poulet	i0.wp.com	https://i0.wp.com/www.comicbookrevolution.com/wp-content/uploads/2022/07/Chainsaw-Man-Chapter-98-1.png?ssl=1
+chainsaw|demon typhon	static.wikia.nocookie.net	https://static.wikia.nocookie.net/chainsaw-man/images/8/89/Typhoon_Devil_Reze_Arc_anime_design.png/revision/latest?cb=20250704001946
+chainsaw|taiyo hayakawa	manga-imperial.fr	https://manga-imperial.fr/cdn/shop/articles/taiyo_hayakawa_1920x.jpg?v=1682332072
+clannad|tomoya debut	cdn.rafled.com	https://cdn.rafled.com/anime-icons/images/9wPrequXz045.jpg
+conan|kaito kid	imgs.laipeitu.com	https://imgs.laipeitu.com/upload/2022/2022031311/58976.jpg
+conan|kazuha toyama	i.pinimg.com	https://i.pinimg.com/736x/fd/f5/5f/fdf55f513dc40101f7c1e6605dd11f6f.jpg
+conan|kogoro mouri	f.media-amazon.com	https://f.media-amazon.com/images/S/pv-target-images/121d81556c59ce7b502db217ae96f706316fb258fb6ab34d06300c5ad8451dc9._CR350%2C0%2C1080%2C1080_.jpg
+conan|rei furuya	vignette.wikia.nocookie.net	https://vignette.wikia.nocookie.net/detektifconan/images/8/86/Rei_Furuya_Profile.jpg/revision/latest?cb=20180501041722&path-prefix=id
+cote|reon kondo	cdn.anime-planet.com	https://cdn.anime-planet.com/characters/primary/reo-kondou-1.webp?t=1661325903
+cowboybebop|vincent volaju	img2.wikia.nocookie.net	https://img2.wikia.nocookie.net/__cb20140401054309/cowboybebop/images/2/25/CL_Vincent.png
+danmachi|aiz wallenstein	i.pinimg.com	https://i.pinimg.com/originals/64/77/af/6477af3868ca84fa25b5e36de4b77217.jpg
+demonslayer|zenitsu s sparrow	neoapo.com	https://neoapo.com/images/character/45725/8b882a75e080f929509d70555d465a4b.jpg
+dgrayman|mana d campbell	static.wikia.nocookie.net	https://static.wikia.nocookie.net/dgrayman/images/8/84/Mana_Walker_Clown_Hallow.png/revision/latest/scale-to-width-down/1200?cb=20191004082854
+dgrayman|the millennium earl	dgrayman-anime.com	https://dgrayman-anime.com/images/chara4.png
+digimon|koshiro izumi	i.pinimg.com	https://i.pinimg.com/originals/bc/4c/6a/bc4c6a1670248f88e6831b5da741f16f.png
+dragonball|c 14	neoapo.com	https://neoapo.com/images/character/41877/7659046d79639f9f430922abd7e996bd.webp
+dragonball|c 15	vignette.wikia.nocookie.net	https://vignette.wikia.nocookie.net/vsbattles/images/0/01/Android_15_Legends.png/revision/latest?cb=20200227102541
+dragonball|c 8	cdn.shopify.com	https://cdn.shopify.com/s/files/1/0252/1736/8154/files/Android_8_480x480.png?v=1607955461
+dragonball|docteur arinsu	static.zerochan.net	https://static.zerochan.net/Dr..Arinsu.1024.4317613.webp
+dragonball|docteur brief	neoapo.com	https://neoapo.com/images/character/46073/b088427e8b4f59c6fc52853b73332451.webp
+dragonball|docteur hedo	neoapo.com	https://neoapo.com/images/character/35960/27d98c3d8ddf79eb8e6012718daa9ca4.png
+dragonball|docteur kochin	vignette.wikia.nocookie.net	https://vignette.wikia.nocookie.net/dragonball/images/e/ea/Dr._Kochin_Dokkan.png/revision/latest?cb=20181208185112&path-prefix=es
+dragonball|docteur mu	vignette.wikia.nocookie.net	https://vignette.wikia.nocookie.net/dragon-ball-gt-and-af/images/9/92/Myuu.png/revision/latest?cb=20200114102110
+dragonball|docteur willow	www.looper.com	https://www.looper.com/img/gallery/every-dragon-ball-movie-ranked-according-to-imdb/dragon-ball-z-the-worlds-strongest-1663016461.jpg
+dragonball|ea	www.toei-anim.co.jp	https://www.toei-anim.co.jp/tv/dragon_s/assets/img/chara/chapter4/no03/u03_ea.png
+dragonball|geene	i.pinimg.com	https://i.pinimg.com/736x/28/35/f0/2835f07d35ae947b3f3204690346f32f.jpg
+dragonball|general rild	m.media-amazon.com	https://m.media-amazon.com/images/M/MV5BYTE5ZjBmYjEtZDE1Yy00MTJmLTkxOTYtNTY2ZTgzNTA3NDZjXkEyXkFqcGc%40._V1_.jpg
+dragonball|gyumao	fr.dragon-ball-official.com	https://fr.dragon-ball-official.com/dragonball/jp/news/2023/11/chara136_2.jpg?_=1773153000
+dragonball|kaio de l est	i.pinimg.com	https://i.pinimg.com/736x/55/a7/ca/55a7ca3cce0a606d39510bec1e982ad3.jpg
+drstone|minami hokutozai	i.pinimg.com	https://i.pinimg.com/736x/bf/ef/b6/bfefb69ca7516bb5e42f7e3f80626f11.jpg
+drstone|senku ishigami	a.storyblok.com	https://a.storyblok.com/f/178900/712x1362/b844774350/ds1_senku.png/m/filters%3Aquality%2895%29format%28webp%29
+drstone|taiju oki	static.wikia.nocookie.net	https://static.wikia.nocookie.net/dr-stone/images/6/69/Taiju_Oki_%28Anime%29.png/revision/latest?cb=20190705185117
+drstone|ukyo saionji	times-abema.ismcdn.jp	https://times-abema.ismcdn.jp/mwimgs/3/3/724w/img_33316d797bfecc3a90883fc92118ffc473569.jpg
+drstone|yo uei	i.pinimg.com	https://i.pinimg.com/736x/f2/6f/b3/f26fb3d927a271c05a9bb770f4939ea8.jpg
