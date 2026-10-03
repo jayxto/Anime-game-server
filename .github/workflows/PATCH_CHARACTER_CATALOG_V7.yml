@@ -1,0 +1,49 @@
+name: Patch character catalogue cleanup V7
+
+on:
+  push:
+    branches: [image-fix-v7]
+    paths:
+      - '.github/workflows/PATCH_CHARACTER_CATALOG_V7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-fix-v7
+          fetch-depth: 0
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply catalogue cleanup
+        run: python3 .github/patch_character_catalog_v7.py
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Verify cleanup anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'SIMPLE_NON_CHARACTER_EXACT_V7' server.js
+          grep -q "fatestay|fate route" server.js
+          grep -q "clover|charlotte s squad" server.js
+          grep -q "clover|heart kingdom spirit guardians" server.js
+      - name: Commit tested cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_character_catalog_v7.py .github/workflows/PATCH_CHARACTER_CATALOG_V7.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: remove non-character image catalogue entries v7 [skip ci]"
+          git push origin HEAD:image-fix-v7
