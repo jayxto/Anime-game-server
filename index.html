@@ -15311,8 +15311,11 @@ async function loadHallOfFame(){
                 catalogKey: `${source}|${i}|${item.name}`, themeSource: source, u: source,
                 anime: String(item.sub || '').split('•').pop().trim(), sources: [data.label || source],
                 // Transformations must use the game's strict resolver, never an old portrait.
-                img: id === 'transformation' ? '' : (item.img || item.imgs?.[0] || ''),
-                imagePending: id === 'transformation' || !(item.img || item.imgs?.[0])
+                // AG_MANUAL_IMAGE_LOCK_V9 — always resolve through the server after refresh.
+                // This makes a saved admin override authoritative over every embedded/fallback image.
+                fallbackImg: item.img || item.imgs?.[0] || '',
+                img: '',
+                imagePending: true
             }));
             for (const item of state.themeItems) state.status.set(keyOf(item), item.imagePending ? 'checking' : instantStatus(item));
             updateAnimeOptions(state.themeItems);
@@ -15339,19 +15342,23 @@ async function loadHallOfFame(){
     }
 
     function testVisibleImage(imgEl,x,card){
+        // AG_MANUAL_IMAGE_LOCK_V9 — a DB-backed manual image is authoritative.
+        // Never turn it into a false "CASSÉE" because a lazy image did not load within 6.5s.
         const url=imageOf(x), k=keyOf(x), local=isLocal(url);
+        const manual=!!x.manualOverride || x.status==='manual-admin';
         let done=false;
         const finish=ok=>{
             if(done)return; done=true;
-            const status=ok?(local?'ok':'external'):'bad';
+            const status=manual?'ok':(ok?(local?'ok':'external'):'bad');
             state.status.set(k,status);
             card.classList.remove('bad','ok','external','checking');
             card.classList.add(status);
             const badge=card.querySelector('.ag-charstate');
-            if(badge) badge.textContent=ok?(local?'OK':'URL'):'CASSÉE';
+            if(badge) badge.textContent=manual?'SAUVÉE':(ok?(local?'OK':'URL'):'CASSÉE');
             stats();
         };
         if(!url){finish(false);return}
+        if(manual && local){finish(true);return}
         imgEl.addEventListener('load',()=>finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0),{once:true});
         imgEl.addEventListener('error',()=>finish(false),{once:true});
         if(imgEl.complete) finish(imgEl.naturalWidth>0&&imgEl.naturalHeight>0);
@@ -15362,7 +15369,7 @@ async function loadHallOfFame(){
         const grid=document.getElementById('ag-charadmin-grid');if(!grid)return;if(reset)grid.innerHTML=''; const start=reset?0:Math.max(0,state.page*PAGE), end=Math.min(state.filtered.length,(state.page+1)*PAGE); if(reset&&state.filtered.length===0)grid.innerHTML='<div class="ag-charadmin-empty">Aucun personnage.</div>';
         for(const x of state.filtered.slice(start,end)){
             const k=keyOf(x), st=state.status.get(k)||instantStatus(x), url=imageOf(x), modes=sourcesOf(x); const card=document.createElement('div');card.className=`ag-charcard ${st}`; card.dataset.key=k;
-            card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(x.sourceUrl || url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
+            card.innerHTML=`<span class="ag-charstate">${x.manualOverride||x.status==='manual-admin'?'SAUVÉE':st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(x.sourceUrl || url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
             grid.appendChild(card); const img=card.querySelector('img');
             if (x.themeSource) {
                 // AG_QAP_ADMIN_URL_EDIT_V8 — QAP cards are real editable admin entries.
@@ -15404,12 +15411,20 @@ async function loadHallOfFame(){
                     const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name), { cache:'no-store', signal: AbortSignal.timeout(60000) });
                     const data = await response.json();
                     item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
+                    if (response.ok && data.ok && data.manualOverride) {
+                        // AG_MANUAL_IMAGE_LOCK_V9 — restore the permanent source URL/state after F5.
+                        item.manualOverride = true;
+                        item.status = 'manual-admin';
+                        item.sourceUrl = String(data.sourceUrl || '');
+                        item.imgs = [];
+                    }
                 } catch (_) { item.img = ''; }
                 item.imagePending = false;
                 if (!card.isConnected) return;
                 const img = card.querySelector('img');
                 if (item.img) img.src = item.img;
-                card.querySelector('[data-url]').value = item.img;
+                const input = card.querySelector('[data-url]');
+                if (input) input.value = item.manualOverride ? (item.sourceUrl || item.img) : item.img;
                 card.querySelector('[data-open]').href = item.img || '#';
                 testVisibleImage(img, item, card);
             })().finally(() => { themeImagesActive--; drainThemeImages(); });
@@ -15463,9 +15478,10 @@ async function loadHallOfFame(){
             input.value=savedSource;
             const open=card.querySelector('[data-open]');
             if(open)open.href=savedImage||savedSource||'#';
-            state.status.set(k,'checking');
-            card.classList.remove('bad','ok','external');card.classList.add('checking');
-            const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='…';
+            // AG_MANUAL_IMAGE_LOCK_V9 — POST success already means the image was copied durably.
+            state.status.set(k,'ok');
+            card.classList.remove('bad','external','checking');card.classList.add('ok');
+            const badge=card.querySelector('.ag-charstate');if(badge)badge.textContent='SAUVÉE';
             const img=card.querySelector('img');
             if(img){
                 img.src='';

@@ -14792,10 +14792,17 @@ app.get('/api/arcade/item-image', async (req, res) => {
     if (overrideSource.startsWith('qt:') && overrideName) {
         try {
             const manualOverride = await getCachedCharacterImage(overrideSource, overrideName);
-            if (manualOverride?.imageUrl) {
+            if (manualOverride?.status === 'manual-admin' && manualOverride?.imageUrl) {
+                // AG_MANUAL_IMAGE_LOCK_V9 — return the permanent metadata, not only the preview.
                 QAP_ITEM_IMAGE_CACHE.delete(overrideSource + '|' + overrideName);
                 res.set('Cache-Control', 'no-store');
-                return res.json({ ok:true, imageUrl:manualOverride.imageUrl });
+                return res.json({
+                    ok:true,
+                    imageUrl:manualOverride.imageUrl,
+                    sourceUrl:manualOverride.sourceUrl || '',
+                    status:'manual-admin',
+                    manualOverride:true
+                });
             }
         } catch (_) {}
     }
@@ -18152,11 +18159,28 @@ app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     const img=await simpleFetchImage(url,10000);
     if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
     const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
-    // A QAP image may already be held in the runtime resolver cache. Drop it immediately
-    // so the newly saved admin image is visible without waiting for cache expiry/redeploy.
+    // AG_MANUAL_IMAGE_LOCK_V9 — report success only after the durable BYTEA row is confirmed.
+    const persisted = await pool.query(
+        `SELECT source_url,status,updated_at
+           FROM character_images
+          WHERE universe_key=$1 AND norm_name=$2
+            AND status='manual-admin'
+            AND image_bytes IS NOT NULL
+            AND octet_length(image_bytes)>=700
+          LIMIT 1`,
+        [u, normalizeImageKey(name)]
+    );
+    const saved = persisted.rows[0];
+    if (!saved) return res.status(500).json({ok:false,error:'La copie permanente de l’image a échoué.'});
     if (u.startsWith('qt:') && typeof QAP_ITEM_IMAGE_CACHE !== 'undefined') QAP_ITEM_IMAGE_CACHE.clear();
-    const imageUrl=simpleImageRoute(u,name,Date.now());
-    return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
+    try { CHARACTER_IMAGE_CACHE.delete(`${u}|${normalizeImageKey(name)}`); } catch (_) {}
+    const stamp = saved.updated_at ? new Date(saved.updated_at).getTime() : Date.now();
+    const imageUrl=simpleImageRoute(u,name,stamp);
+    return res.json({
+        ok:true,universe:u,name,imageUrl,
+        sourceUrl:String(saved.source_url || url),
+        status:'manual-admin',manualOverride:true,persistent:true
+    });
 }));
 
 app.get('/api/admin/me', adminOnly((req, res) => res.json({ ok: true })));
