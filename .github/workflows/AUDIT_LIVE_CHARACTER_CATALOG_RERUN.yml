@@ -20,7 +20,7 @@ jobs:
             .github
           sparse-checkout-cone-mode: false
       - name: Wait briefly for Render
-        run: sleep 20
+        run: sleep 35
       - name: Fetch current live character catalogue
         run: python3 .github/audit_live_character_catalog.py
       - name: Commit current audit
@@ -38,4 +38,4 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
-# rerun: 2026-10-03 after catalogue v8 canonical universe/filter fixes
+# rerun: 2026-10-03 after THEME_CHAR_IMAGES_QAP_FILTER_V9
