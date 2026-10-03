@@ -12147,6 +12147,7 @@ async function simplePool(items, n, fn) {
    Visually-reviewed sources for stubborn characters that automatic providers miss.
    These URLs are import sources only: simpleStoreImage copies bytes into PostgreSQL. */
 // SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH6 — five visually rechecked ambiguous portraits.
+// SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH7 — six visually rechecked portrait upgrades.
 const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'another|yuya mochizuki':'https://neoapo.com/images/character/3687/9925542d006864dd6dd922f6de1668cf.jpg',
     'assclass|gakuho asano':'https://image.kingsoft.jp/starthome/nijimen/2023-08-02/4c42b618a8cabc21bf73323a88e57b30_lg.jpg',
@@ -12158,12 +12159,12 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'blacklagoon|sawyer the cleaner':'https://www.blacklagoon.jp/imgs/character/sawyer/04.jpg',
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V2 — visually reviewed batch 2.
     'bleach|genryusai yamamoto':'https://i.pinimg.com/736x/64/c4/f6/64c4f690cd53f841d21568ad75225db4.jpg',
-    'bleach|ichigo papa':'https://static.zerochan.net/Kurosaki.Isshin.1024.3983714.webp',
+    'bleach|ichigo papa':'https://bleach-anime.com/assets/img/character/face_58.png',
     'bleach|sosuke aizen scelle':'https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg',
     'bluebox|hina chono':'https://i.pinimg.com/736x/18/20/db/1820dbe627174dd549dc87a8f8f8d9f2.jpg',
     'bluebox|kyo kasahara':'https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg',
     'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
-    'callnight|ko yamori':'https://i.pinimg.com/originals/91/ea/c6/91eac632a88586c250575bbcaebe243c.jpg',
+    'callnight|ko yamori':'https://cdn.rafled.com/anime-icons/images/b23f2b0117002d3e968e41fb65b936dd5221edf3db3279309f3664dad09726a6.jpg',
     'callnight|nico hirata':'https://cdn.anime-planet.com/characters/primary/niko-hirata-1.webp?t=1660955578'
 ,
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V3 — visually reviewed batch 3.
@@ -12172,7 +12173,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'chainsaw|demon typhon':'https://static.wikia.nocookie.net/chainsaw-man/images/8/89/Typhoon_Devil_Reze_Arc_anime_design.png/revision/latest?cb=20250704001946',
     'chainsaw|taiyo hayakawa':'https://manga-imperial.fr/cdn/shop/articles/taiyo_hayakawa_1920x.jpg?v=1682332072',
     'clannad|tomoya debut':'https://cdn.rafled.com/anime-icons/images/9wPrequXz045.jpg',
-    'cowboybebop|vincent volaju':'https://static.wixstatic.com/media/ed35c2_3fe6cc9f83c54970814ba7f682783bbe~mv2.jpg/v1/fit/w_500%2Ch_500%2Cq_90/file.jpg',
+    'cowboybebop|vincent volaju':'https://img2.wikia.nocookie.net/__cb20140401054309/cowboybebop/images/2/25/CL_Vincent.png',
     'dgrayman|the millennium earl':'https://dgrayman-anime.com/images/chara4.png',
     'danmachi|aiz wallenstein':'https://i.pinimg.com/originals/64/77/af/6477af3868ca84fa25b5e36de4b77217.jpg'
 ,
@@ -12180,7 +12181,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'bocchi|futari gotoh':'https://cdn.myanimelist.net/images/characters/10/493791.webp?s=bdd6daf4624618470817611b5e4c8577',
     'conan|kaito kid':'https://i.pinimg.com/736x/99/aa/40/99aa407765073c87bb06544ffe81ecae.jpg',
     'conan|kogoro mouri':'https://f.media-amazon.com/images/S/pv-target-images/121d81556c59ce7b502db217ae96f706316fb258fb6ab34d06300c5ad8451dc9._CR350%2C0%2C1080%2C1080_.jpg',
-    'drstone|minami hokutozai':'https://i.pinimg.com/originals/d4/52/9c/d4529c2309a21d55ea30eef7bb2176be.jpg',
+    'drstone|minami hokutozai':'https://i.pinimg.com/736x/bf/ef/b6/bfefb69ca7516bb5e42f7e3f80626f11.jpg',
     'drstone|senku ishigami':'https://a.storyblok.com/f/178900/712x1362/b844774350/ds1_senku.png/m/filters%3Aquality%2895%29format%28webp%29',
     'drstone|taiju oki':'https://static.wikia.nocookie.net/dr-stone/images/6/69/Taiju_Oki_%28Anime%29.png/revision/latest?cb=20190705185117',
     'drstone|ukyo saionji':'https://times-abema.ismcdn.jp/mwimgs/3/3/724w/img_33316d797bfecc3a90883fc92118ffc473569.jpg',
@@ -12194,7 +12195,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V5 — visually reviewed 2026-10-03.
     'dgrayman|mana d campbell':'https://static.wikia.nocookie.net/dgrayman/images/8/84/Mana_Walker_Clown_Hallow.png/revision/latest/scale-to-width-down/1200?cb=20191004082854',
     'demonslayer|zenitsu s sparrow':'https://neoapo.com/images/character/45725/8b882a75e080f929509d70555d465a4b.jpg',
-    'conan|kazuha toyama':'https://i.pinimg.com/736x/c5/84/af/c584af6694b35d52546c9885162cd6c8.jpg',
+    'conan|kazuha toyama':'https://i.pinimg.com/736x/fd/f5/5f/fdf55f513dc40101f7c1e6605dd11f6f.jpg',
     'conan|rei furuya':'https://vignette.wikia.nocookie.net/detektifconan/images/8/86/Rei_Furuya_Profile.jpg/revision/latest?cb=20180501041722&path-prefix=id',
     'dragonball|c 14':'https://thecodex.wiki/images/thumb/d/df/Dcbyuoj-fe6e02b1-3729-482d-9e3e-f379badde7ac.png/640px-Dcbyuoj-fe6e02b1-3729-482d-9e3e-f379badde7ac.png',
     'dragonball|c 15':'https://vignette.wikia.nocookie.net/vsbattles/images/0/01/Android_15_Legends.png/revision/latest?cb=20200227102541',
@@ -12210,7 +12211,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'cote|reon kondo':'https://cdn.anime-planet.com/characters/primary/reo-kondou-1.webp?t=1661325903',
     'digimon|koshiro izumi':'https://i.pinimg.com/originals/bc/4c/6a/bc4c6a1670248f88e6831b5da741f16f.png',
     'dragonball|ea':'https://www.toei-anim.co.jp/tv/dragon_s/assets/img/chara/chapter4/no03/u03_ea.png',
-    'dragonball|gyumao':'https://thumbs.coleka.com/media/item/201807/03/dragon-ball-z-serie-1-gyumao-36-77.webp'
+    'dragonball|gyumao':'https://fr.dragon-ball-official.com/dragonball/jp/news/2023/11/chara136_2.jpg?_=1773153000'
     // END SIMPLE_VERIFIED_CHARACTER_IMAGES_V6
 }));
 function simpleVerifiedCharacterImage(u,name) {
