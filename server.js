@@ -11877,7 +11877,19 @@ const SIMPLE_NON_CHARACTER_EXACT_V1 = new Set([
     'drstone|stone wars',
     'drstone|stone world',
     'drstone|treasure island',
-    'cote|tetsuya machida' // malformed composite, not a canonical character
+    'cote|tetsuya machida', // malformed composite, not a canonical character
+    // SIMPLE_NON_CHARACTER_EXACT_V7 — verified non-character catalogue entries.
+    'fatestay|fate route',
+    'fatestay|heaven s feel',
+    'fatestay|unlimited blade works',
+    'clover|asta s parents',
+    'clover|baro s gang',
+    'clover|charlotte s squad',
+    'clover|clover kingdom magic knights',
+    'clover|diamond kingdom shining generals',
+    'clover|fuegoleon s squad',
+    'clover|heart kingdom spirit guardians'
+    // END SIMPLE_NON_CHARACTER_EXACT_V7
 ]);
 
 async function simpleCatalogue() {
