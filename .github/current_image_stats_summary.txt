@@ -1,2 +1,2 @@
-DB persistent=True total=6299 ok=6182 missing=52 error=0 memory=2
-MIGRATION running=True done=False pass=2 total=7084 stored=6048 missing=1036 failed_count=0
+DB persistent=True total=6301 ok=6184 missing=52 error=0 memory=2
+MIGRATION running=True done=False pass=3 total=7084 stored=6050 missing=1034 failed_count=0
