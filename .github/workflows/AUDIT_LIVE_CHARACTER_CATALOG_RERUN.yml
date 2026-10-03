@@ -37,3 +37,5 @@ jobs:
           git commit -m "chore: refresh live character image audit [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
+
+# rerun: 2026-10-03 after verified character batch 5 and transform health pass
