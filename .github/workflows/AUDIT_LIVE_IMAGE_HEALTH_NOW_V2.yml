@@ -1,0 +1,32 @@
+name: Audit live image health now V2
+
+on:
+  push:
+    branches: [image-audit-work]
+    paths:
+      - '.github/workflows/AUDIT_LIVE_IMAGE_HEALTH_NOW_V2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Fetch live health
+        run: python3 .github/fetch_live_health_now.py
+      - name: Commit report
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/live_image_health_now.json .github/live_image_health_now.txt
+          git commit -m 'audit: record current live image health v2 [skip ci]'
+          git push origin HEAD:image-audit-work
