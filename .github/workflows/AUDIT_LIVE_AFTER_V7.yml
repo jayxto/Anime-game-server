@@ -1,0 +1,88 @@
+name: Audit live images after V7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_LIVE_AFTER_V7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+
+      - name: Wait until Render serves V7 catalogue
+        shell: bash
+        run: |
+          set -euo pipefail
+          CAT='https://anime-game-server.onrender.com/api/character-catalog'
+          for i in $(seq 1 40); do
+            code=$(curl -L -sS --max-time 60 -o catalog.json -w '%{http_code}' -H 'Accept: application/json' -H 'Cache-Control: no-cache' "$CAT" || true)
+            if [ "$code" = "200" ] && python3 - <<'PY'
+          import json,sys
+          try:
+              d=json.load(open('catalog.json',encoding='utf-8'))
+              rows=d.get('characters') or []
+              bad={'fate route','heaven’s feel','heaven\'s feel','unlimited blade works','charlotte\'s squad','heart kingdom spirit guardians'}
+              names={str(x.get('name') or '').strip().lower() for x in rows}
+              # V7 is live when these non-character entries are no longer in the character catalogue.
+              sys.exit(0 if not (bad & names) else 1)
+          except Exception:
+              sys.exit(1)
+          PY
+            then
+              echo "V7 catalogue is live on attempt $i"
+              break
+            fi
+            if [ "$i" = "40" ]; then
+              echo 'Timed out waiting for V7 catalogue' >&2
+              exit 1
+            fi
+            echo "attempt $i/40: waiting for Render V7 (HTTP $code)"
+            sleep 20
+          done
+
+      - name: Fetch exact live image health
+        shell: bash
+        run: |
+          set -euo pipefail
+          HEALTH='https://anime-game-server.onrender.com/api/character-image-health'
+          curl -L -sS --fail --max-time 90 -H 'Accept: application/json' -H 'Cache-Control: no-cache' "$HEALTH" -o .github/live_image_health_after_v7.json
+          python3 - <<'PY'
+          import json
+          p='.github/live_image_health_after_v7.json'
+          d=json.load(open(p,encoding='utf-8'))
+          t=d.get('totals') or {}; s=d.get('state') or {}
+          miss=d.get('catalogueMissing') or []
+          lines=[
+            f"CATALOGUE_TOTAL={d.get('catalogueTotal',0)} STORED={d.get('catalogueStored',0)} MISSING={d.get('catalogueMissingCount',len(miss))}",
+            f"DB_ROWS={t.get('rows',0)} DB_BYTES={t.get('with_bytes',0)} DB_MISSING={d.get('missingCount',0)} MANUAL={t.get('manual',0)}",
+            f"MIGRATION running={s.get('running')} done={s.get('done')} pass={s.get('pass')} total={s.get('total')} stored={s.get('stored')} missing={s.get('missing')}",
+            '', '=== LIVE CATALOGUE MISSING ==='
+          ]
+          for x in miss:
+              lines.append(f"{x.get('u','')} | {x.get('name','')} | {x.get('anime','')} | sources={','.join(x.get('sources') or [])}")
+          open('.github/live_image_health_after_v7.txt','w',encoding='utf-8').write('\n'.join(lines))
+          print(lines[0])
+          PY
+
+      - name: Commit live snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/live_image_health_after_v7.json .github/live_image_health_after_v7.txt
+          git commit -m "chore: snapshot live image health after v7 [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
