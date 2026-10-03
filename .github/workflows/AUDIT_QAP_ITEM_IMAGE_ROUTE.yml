@@ -1,0 +1,32 @@
+name: Inspect QAP item image route
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/AUDIT_QAP_ITEM_IMAGE_ROUTE.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+          sparse-checkout-cone-mode: false
+      - name: Print route
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs');
+          const s=fs.readFileSync('server.js','utf8');
+          const start=s.indexOf("app.get('/api/arcade/item-image',");
+          const end=s.indexOf('\n});',start)+4;
+          if(start<0||end<=start) process.exit(1);
+          console.log(s.slice(start,end));
+          NODE
