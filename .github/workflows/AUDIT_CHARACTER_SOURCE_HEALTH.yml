@@ -39,3 +39,5 @@ jobs:
           git commit -m "chore: audit verified character image sources [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
+
+# rerun: 2026-10-03 after visually verified character batch 6
