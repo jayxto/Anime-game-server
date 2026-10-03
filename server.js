@@ -11791,7 +11791,17 @@ const SIMPLE_ALIASES = new Map(Object.entries({
     'clannad|tomoya debut':'Tomoya Okazaki',
     'danmachi|aiz wallenstein':'Ais Wallenstein',
     'dgrayman|the millennium earl':'Millennium Earl'
-
+,
+    // SIMPLE_CHARACTER_ALIASES_V4 — checked canonical/search names.
+    'bocchi|futari gotoh':'Futari Gotou',
+    'demonslayer|zenitsu s sparrow':'Chuntaro',
+    'conan|kaito kid':'Kaito Kuroba',
+    'conan|kogoro mouri':'Kogoro Mori',
+    'dragonball|docteur arinsu':'Dr. Arinsu',
+    'dragonball|docteur mu':'Dr. Myuu',
+    'dragonball|docteur willow':'Dr. Wheelo',
+    'dragonball|general rild':'General Rilldo'
+    // END SIMPLE_CHARACTER_ALIASES_V4
 }));
 function simpleVariants(u, name) {
     const out = [String(name || '').trim()];
@@ -11829,6 +11839,27 @@ async function simpleExistingRows() {
     return out;
 }
 
+// SIMPLE_NON_CHARACTER_EXACT_V1 — exact labels that are arcs, groups, places or concepts,
+// not character portraits. They stay available to their game/theme data; they are only excluded
+// from the persistent CHARACTER image migration.
+const SIMPLE_NON_CHARACTER_EXACT_V1 = new Set([
+    'eightysix|federacy',
+    'assclass|final exams',
+    'assclass|graduation',
+    'beastars|interspecies relations',
+    'beastars|murder incident solution',
+    'clover|charlotte s squad',
+    'clover|fuegoleon s squad',
+    'codegeass|r2 final rebellion',
+    'conan|black organization',
+    'conan|clash of red and black',
+    'conan|scarlet return',
+    'drstone|new america city',
+    'drstone|stone wars',
+    'drstone|stone world',
+    'drstone|treasure island'
+]);
+
 async function simpleCatalogue() {
     const map = new Map();
     const add = (u, name, anime, img, source='jeu') => {
@@ -11842,6 +11873,7 @@ async function simpleCatalogue() {
         if (u === 'fate') u = 'fatestay';
         if (u === 'soul') u = 'souleater';
         if (!u || !name) return;
+        if (SIMPLE_NON_CHARACTER_EXACT_V1.has(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`)) return;
         if (!anime) {
             try { anime = String((typeof ARC_UNIVERSE_ANIME !== 'undefined' && ARC_UNIVERSE_ANIME[u]) || u); }
             catch (_) { anime = u; }
@@ -12095,7 +12127,21 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'cowboybebop|vincent volaju':'https://static.wixstatic.com/media/ed35c2_3fe6cc9f83c54970814ba7f682783bbe~mv2.jpg/v1/fit/w_500%2Ch_500%2Cq_90/file.jpg',
     'dgrayman|the millennium earl':'https://dgrayman-anime.com/images/chara4.png',
     'danmachi|aiz wallenstein':'https://i.pinimg.com/originals/64/77/af/6477af3868ca84fa25b5e36de4b77217.jpg'
-
+,
+    // SIMPLE_VERIFIED_CHARACTER_IMAGES_V4 — visually reviewed 2026-10-03.
+    'bocchi|futari gotoh':'https://cdn.myanimelist.net/images/characters/10/493791.webp?s=bdd6daf4624618470817611b5e4c8577',
+    'conan|kaito kid':'https://i.pinimg.com/736x/99/aa/40/99aa407765073c87bb06544ffe81ecae.jpg',
+    'conan|kogoro mouri':'https://f.media-amazon.com/images/S/pv-target-images/121d81556c59ce7b502db217ae96f706316fb258fb6ab34d06300c5ad8451dc9._CR350%2C0%2C1080%2C1080_.jpg',
+    'drstone|minami hokutozai':'https://i.pinimg.com/originals/d4/52/9c/d4529c2309a21d55ea30eef7bb2176be.jpg',
+    'drstone|senku ishigami':'https://a.storyblok.com/f/178900/712x1362/b844774350/ds1_senku.png/m/filters%3Aquality%2895%29format%28webp%29',
+    'drstone|taiju oki':'https://static.wikia.nocookie.net/dr-stone/images/6/69/Taiju_Oki_%28Anime%29.png/revision/latest?cb=20190705185117',
+    'drstone|ukyo saionji':'https://anibase.net/files/d3a35b167052ef0e059174f5717c2519',
+    'drstone|yo uei':'https://i.pinimg.com/736x/f2/6f/b3/f26fb3d927a271c05a9bb770f4939ea8.jpg',
+    'dragonball|docteur arinsu':'https://static.zerochan.net/Dr..Arinsu.1024.4317613.webp',
+    'dragonball|docteur mu':'https://vignette.wikia.nocookie.net/dragon-ball-gt-and-af/images/9/92/Myuu.png/revision/latest?cb=20200114102110',
+    'dragonball|docteur willow':'https://www.looper.com/img/gallery/every-dragon-ball-movie-ranked-according-to-imdb/dragon-ball-z-the-worlds-strongest-1663016461.jpg',
+    'dragonball|general rild':'https://m.media-amazon.com/images/M/MV5BYTE5ZjBmYjEtZDE1Yy00MTJmLTkxOTYtNTY2ZTgzNTA3NDZjXkEyXkFqcGc%40._V1_.jpg'
+    // END SIMPLE_VERIFIED_CHARACTER_IMAGES_V4
 }));
 function simpleVerifiedCharacterImage(u,name) {
     return SIMPLE_VERIFIED_CHARACTER_IMAGES.get(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`) || null;
