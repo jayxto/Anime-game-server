@@ -1,0 +1,35 @@
+name: Extract current verified character sources
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/EXTRACT_VERIFIED_CHARACTER_SOURCES_CURRENT.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Build source inventory
+        run: python3 .github/extract_verified_character_sources_current.py
+      - name: Commit inventory and remove temporary runner files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/extract_verified_character_sources_current.py .github/workflows/EXTRACT_VERIFIED_CHARACTER_SOURCES_CURRENT.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: refresh verified character source inventory [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
