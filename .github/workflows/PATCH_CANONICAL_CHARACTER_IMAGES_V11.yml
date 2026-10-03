@@ -23,6 +23,19 @@ jobs:
           base64 -d /tmp/patch.gz.b64 | gzip -d > /tmp/patch.py
       - name: Apply canonical image patch
         run: python /tmp/patch.py
+      - name: Keep QAP route standalone-safe
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('server.js')
+          s=p.read_text(encoding='utf-8')
+          old="const canonicalManual = await simpleManualCharacterImage(baseU, charName, animeName);"
+          new="const canonicalManual = typeof simpleManualCharacterImage === 'function' ? await simpleManualCharacterImage(baseU, charName, animeName) : null;"
+          if old not in s:
+              raise SystemExit('canonical QAP helper call not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
       - name: Verify syntax and invariants
         run: |
           node --check server.js
