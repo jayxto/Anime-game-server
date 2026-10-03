@@ -47,3 +47,5 @@ jobs:
           git commit -m "fix: canonicalize public character catalog v9 [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
+
+# rerun: robust arcAnime anchor
