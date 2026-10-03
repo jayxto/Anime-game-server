@@ -1,0 +1,93 @@
+name: Live audit V8 branch
+
+on:
+  push:
+    branches: [live-audit-v8]
+    paths:
+      - '.github/workflows/LIVE_AUDIT_V8_BRANCH.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: live-audit-v8
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+          sparse-checkout-cone-mode: false
+
+      - name: Wait for V8 public catalogue marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://anime-game-server.onrender.com/api/character-catalog'
+          for i in $(seq 1 70); do
+            code=$(curl -L -sS --max-time 60 -o /tmp/catalog.json -w '%{http_code}' -H 'Accept: application/json' -H 'Cache-Control: no-cache' "$URL" || true)
+            if [ "$code" = "200" ] && python3 - <<'PY'
+          import json,sys
+          try:
+              d=json.load(open('/tmp/catalog.json',encoding='utf-8'))
+              rows=d.get('characters') or []
+              # V8 filters the qap transformation/arc/isekai/shonen/anime themes from portrait catalogue.
+              # Gear 5, Adult Gon and Vasto Lorde were transformation-theme-only catalogue pollution.
+              names={str(x.get('name') or '').strip().lower() for x in rows}
+              markers={'gear 5','adult gon','vasto lorde ichigo','ultra ego'}
+              sys.exit(0 if not (names & markers) else 1)
+          except Exception:
+              sys.exit(1)
+          PY
+            then
+              cp /tmp/catalog.json .github/live_v8_catalog.json
+              echo "V8 live on attempt $i"
+              break
+            fi
+            if [ "$i" = "70" ]; then
+              cp /tmp/catalog.json .github/live_v8_catalog_timeout.json 2>/dev/null || true
+              echo 'V8 marker did not become live in time' >&2
+              exit 1
+            fi
+            echo "attempt $i/70: live still pre-V8 (HTTP $code)"
+            sleep 20
+          done
+
+      - name: Fetch live image health and summarize
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L -sS --fail --max-time 90 -H 'Accept: application/json' -H 'Cache-Control: no-cache' \
+            'https://anime-game-server.onrender.com/api/character-image-health' \
+            -o .github/live_v8_image_health.json
+          python3 - <<'PY'
+          import json
+          cat=json.load(open('.github/live_v8_catalog.json',encoding='utf-8'))
+          h=json.load(open('.github/live_v8_image_health.json',encoding='utf-8'))
+          chars=cat.get('characters') or []
+          miss=h.get('catalogueMissing') or []
+          t=h.get('totals') or {}; st=h.get('state') or {}
+          lines=[
+              f"CATALOGUE_ROWS={len(chars)} HEALTH_TOTAL={h.get('catalogueTotal',0)} STORED={h.get('catalogueStored',0)} MISSING={h.get('catalogueMissingCount',len(miss))}",
+              f"DB_ROWS={t.get('rows',0)} DB_BYTES={t.get('with_bytes',0)} DB_MISSING={h.get('missingCount',0)} MANUAL={t.get('manual',0)}",
+              f"MIGRATION running={st.get('running')} done={st.get('done')} pass={st.get('pass')} total={st.get('total')} stored={st.get('stored')} missing={st.get('missing')}",
+              '', '=== LIVE V8 MISSING ==='
+          ]
+          for x in miss:
+              lines.append(f"{x.get('u','')} | {x.get('name','')} | {x.get('anime','')} | sources={','.join(x.get('sources') or [])}")
+          open('.github/live_v8_image_health.txt','w',encoding='utf-8').write('\n'.join(lines))
+          print(lines[0])
+          PY
+
+      - name: Commit branch-only snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/live_v8_catalog.json .github/live_v8_image_health.json .github/live_v8_image_health.txt
+          git commit -m "audit: capture live V8 image state [skip ci]"
+          git push origin HEAD:live-audit-v8
