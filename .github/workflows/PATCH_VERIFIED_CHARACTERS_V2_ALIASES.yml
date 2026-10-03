@@ -1,0 +1,50 @@
+name: Patch verified characters V2 aliases
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_VERIFIED_CHARACTERS_V2_ALIASES.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply reviewed batch and aliases
+        run: python3 .github/patch_verified_characters_v2_aliases.py
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Verify anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'SIMPLE_ALIAS_BATCH_IMAGE_V2' server.js
+          grep -q 'SIMPLE_VERIFIED_CHARACTER_IMAGES_V2' server.js
+          grep -q "'bleach|ichigo papa':'Isshin Kurosaki'" server.js
+          grep -q "'callnight|nico hirata':'Niko Hirata'" server.js
+          grep -q 'Kurosaki.Isshin.1024.3983714.webp' server.js
+          grep -q '1820dbe627174dd549dc87a8f8f8d9f2.jpg' server.js
+      - name: Commit verified batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_verified_characters_v2_aliases.py .github/workflows/PATCH_VERIFIED_CHARACTERS_V2_ALIASES.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: add verified character image batch 2 and aliases [skip ci]'
+          git push origin HEAD:main
