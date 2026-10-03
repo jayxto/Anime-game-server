@@ -1,0 +1,49 @@
+name: Patch official character images batch 9
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_VERIFIED_CHARACTER_OFFICIAL_BATCH9.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply official-source character upgrades
+        run: python3 .github/patch_verified_character_official_batch9.py
+      - name: Verify syntax and official anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check server.js
+          grep -q 'SIMPLE_VERIFIED_CHARACTER_OFFICIAL_BATCH9' server.js
+          grep -q 'bleach-anime.com/assets/img/character/thumb_06.jpg' server.js
+          grep -q 'aonohako-anime.com/assets/img/top/chara/chara3_img.png' server.js
+          grep -q 'aonohako-anime.com/assets/img/top/chara/chara4_img.png' server.js
+          grep -q 'ytv.co.jp/conan/character/kazuha/images/main_sz5h9bmc7s033d819d9maj54rwnrj7.png' server.js
+          grep -q 'danmachi.com/danmachi2/character/images/ais_kao.png' server.js
+      - name: Commit tested batch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_verified_character_official_batch9.py .github/workflows/PATCH_VERIFIED_CHARACTER_OFFICIAL_BATCH9.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "chore: upgrade verified portraits to official sources [skip ci]"
+          git push origin HEAD:main
