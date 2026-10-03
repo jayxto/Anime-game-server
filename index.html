@@ -15149,10 +15149,10 @@ async function loadHallOfFame(){
 /* Admin character viewer v5 */
 (() => {
     const PAGE = 120;
-    const state = { all: [], filtered: [], page: 0, status: new Map(), loaded: false };
+    const state = { all: [], filtered: [], page: 0, status: new Map(), loaded: false, themes: [], themeItems: [], themeRequest: 0, themeLoading: false, themeError: '' };
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-    const keyOf = x => norm(x.u || x.universe || x.anime) + '|' + norm(x.name);
+    const keyOf = x => x.catalogKey || norm(x.u || x.universe || x.anime) + '|' + norm(x.name);
 
     const MODE_LABELS = {
         undercover:'Undercover', undercover_normal:'Undercover normal', undercover_hardcore:'Undercover hardcore', hardcore:'Undercover hardcore',
@@ -15160,7 +15160,7 @@ async function loadHallOfFame(){
         quote:'Citations', quotes:'Citations', citation:'Citations', citations:'Citations', chaine:'Chaîne de persos', chain:'Chaîne de persos',
         guess:'Devine le perso', devine:'Devine le perso', tierlist:'Tier List', tier_list:'Tier List', draw:'Dessine le perso', drawing:'Dessine le perso',
         battle:'Battle de préférence', card:'Combat de cartes', cards:'Combat de cartes', tournoi:'Tournoi', tournament:'Tournoi', arcade:'Mini-jeux',
-        static:'Catalogue images', images:'Catalogue images', character_images:'Catalogue images'
+        static:'Catalogue images', images:'Catalogue images', character_images:'Catalogue images', qap_themes:'Qui a le plus…'
     };
     const prettyMode = value => {
         const raw = String(value || '').trim();
@@ -15232,9 +15232,14 @@ async function loadHallOfFame(){
         const wrap = document.createElement('div'); wrap.id='ag-charadmin'; wrap.className='opt-panel ag-charadmin';
         wrap.innerHTML = `<div class="ag-charadmin-head"><div><h2>🖼️ Tous les personnages & images</h2><p class="tl-hint" style="text-align:left;margin:3px 0">Catalogue unique de tous les personnages du site. Les images locales sont validées instantanément. Tu peux remplacer n'importe quelle image par une URL.</p></div><button id="ag-charadmin-load" class="btn-action">Afficher les personnages</button></div><div id="ag-charadmin-body" style="display:none"><div class="ag-charadmin-tools"><input id="ag-charadmin-q" type="search" autocomplete="off" placeholder="🔎 Perso ou anime…"><select id="ag-charadmin-mode"><option value="">Tous les modes</option></select><select id="ag-charadmin-anime"><option value="">Tous les anime</option></select><select id="ag-charadmin-status"><option value="">Toutes les images</option><option value="bad">Images manquantes</option><option value="external">URLs externes</option><option value="ok">Images locales / stables</option></select></div><div id="ag-charadmin-stats" class="ag-charadmin-stats"></div><div id="ag-charadmin-grid" class="ag-charadmin-grid"></div><button id="ag-charadmin-more" class="ag-charadmin-more" style="display:none">Afficher plus</button></div>`;
         admin.appendChild(wrap);
+        const themeSel = document.createElement('select');
+        themeSel.id = 'ag-charadmin-theme'; themeSel.hidden = true;
+        themeSel.setAttribute('aria-label', 'Sous-mode de Qui a le plus');
+        document.getElementById('ag-charadmin-mode').insertAdjacentElement('afterend', themeSel);
         document.getElementById('ag-charadmin-load').addEventListener('click', load);
         document.getElementById('ag-charadmin-q').addEventListener('input', apply);
-        document.getElementById('ag-charadmin-mode').addEventListener('change', apply);
+        document.getElementById('ag-charadmin-mode').addEventListener('change', changeMode);
+        themeSel.addEventListener('change', loadTheme);
         document.getElementById('ag-charadmin-anime').addEventListener('change', apply);
         document.getElementById('ag-charadmin-status').addEventListener('change', apply);
         document.getElementById('ag-charadmin-more').addEventListener('click',()=>{state.page++;render(false)});
@@ -15251,25 +15256,86 @@ async function loadHallOfFame(){
             const animeSel=document.getElementById('ag-charadmin-anime');
             for(const a of [...new Set(state.all.map(x=>x.anime).filter(Boolean))].sort((a,b)=>a.localeCompare(b))){const o=document.createElement('option');o.value=a;o.textContent=a;animeSel.appendChild(o)}
             const modeSel=document.getElementById('ag-charadmin-mode');
-            for(const m of [...new Set(state.all.flatMap(sourcesOf))].sort((a,b)=>prettyMode(a).localeCompare(prettyMode(b)))){const o=document.createElement('option');o.value=m;o.textContent=prettyMode(m);modeSel.appendChild(o)}
+            for(const m of [...new Set([...state.all.flatMap(sourcesOf), 'qap-themes'])].sort((a,b)=>prettyMode(a).localeCompare(prettyMode(b)))){const o=document.createElement('option');o.value=m;o.textContent=prettyMode(m);modeSel.appendChild(o)}
             state.loaded=true; document.getElementById('ag-charadmin-body').style.display=''; btn.textContent='Catalogue chargé'; apply();
         } catch(e) { btn.disabled=false;btn.textContent='Réessayer';document.getElementById('ag-charadmin-stats').textContent='❌ '+(e?.message||'Impossible de charger le catalogue'); }
     }
 
+    const themeMode = () => document.getElementById('ag-charadmin-mode')?.value === 'qap-themes';
+    function updateAnimeOptions(items) {
+        const sel = document.getElementById('ag-charadmin-anime');
+        sel.innerHTML = '<option value="">Tous les anime</option>';
+        for (const anime of [...new Set(items.map(x => x.anime).filter(Boolean))].sort((a,b) => a.localeCompare(b))) {
+            const option = document.createElement('option'); option.value = anime; option.textContent = anime; sel.appendChild(option);
+        }
+    }
+    async function changeMode() {
+        const select = document.getElementById('ag-charadmin-theme');
+        select.hidden = !themeMode();
+        state.themeRequest++; state.themeLoading = false; state.themeError = '';
+        if (!themeMode()) { updateAnimeOptions(state.all); apply(); return; }
+        select.disabled = true;
+        state.themeItems = []; updateAnimeOptions([]);
+        state.themeLoading = true; apply();
+        const request = state.themeRequest;
+        try {
+            if (!state.themes.length) {
+                const response = await fetch('/api/qap/themes', { cache: 'no-store' });
+                const data = await response.json();
+                if (!response.ok || !data.ok || !Array.isArray(data.themes)) throw new Error('Sous-modes indisponibles. Sélectionne à nouveau le mode pour réessayer.');
+                if (request !== state.themeRequest) return;
+                state.themes = data.themes;
+            }
+            if (request !== state.themeRequest) return;
+            select.innerHTML = '<option value="">Choisir un sous-mode…</option>';
+            for (const theme of state.themes) {
+                const option = document.createElement('option'); option.value = theme.id;
+                option.textContent = `${theme.title} (${theme.n})`; select.appendChild(option);
+            }
+        } catch (error) { if (request === state.themeRequest) state.themeError = error.message; }
+        finally { if (request === state.themeRequest) { state.themeLoading = false; select.disabled = false; apply(); } }
+    }
+    async function loadTheme() {
+        const id = document.getElementById('ag-charadmin-theme').value;
+        const request = ++state.themeRequest;
+        state.themeItems = []; state.themeError = ''; state.themeLoading = !!id;
+        updateAnimeOptions([]); apply();
+        if (!id) return;
+        try {
+            const source = 'qt:' + id;
+            const response = await fetch('/api/arcade/items?source=' + encodeURIComponent(source), { cache: 'no-store' });
+            const data = await response.json();
+            if (!response.ok || !data.ok || !Array.isArray(data.items)) throw new Error('Impossible de charger ce sous-mode. Sélectionne-le à nouveau pour réessayer.');
+            if (request !== state.themeRequest || !themeMode()) return;
+            state.themeItems = data.items.map((item, i) => ({ ...item,
+                catalogKey: `${source}|${i}|${item.name}`, themeSource: source, u: source,
+                anime: String(item.sub || '').split('•').pop().trim(), sources: [data.label || source],
+                // Transformations must use the game's strict resolver, never an old portrait.
+                img: id === 'transformation' ? '' : (item.img || item.imgs?.[0] || ''),
+                imagePending: id === 'transformation' || !(item.img || item.imgs?.[0])
+            }));
+            for (const item of state.themeItems) state.status.set(keyOf(item), item.imagePending ? 'checking' : instantStatus(item));
+            updateAnimeOptions(state.themeItems);
+        } catch (error) { if (request === state.themeRequest) state.themeError = error.message; }
+        finally { if (request === state.themeRequest) { state.themeLoading = false; apply(); } }
+    }
+
     function apply(){
         if(!state.loaded)return; const q=norm(document.getElementById('ag-charadmin-q')?.value); const anime=document.getElementById('ag-charadmin-anime')?.value||''; const mode=document.getElementById('ag-charadmin-mode')?.value||''; const wanted=document.getElementById('ag-charadmin-status')?.value||'';
-        state.filtered=state.all.filter(x=>{if(anime&&x.anime!==anime)return false;if(mode&&!sourcesOf(x).includes(mode))return false;if(q&&!norm(`${x.name} ${x.anime} ${sourcesOf(x).map(prettyMode).join(' ')}`).includes(q))return false;if(wanted&&state.status.get(keyOf(x))!==wanted)return false;return true}); state.page=0; render(true);
+        const items = themeMode() ? state.themeItems : state.all;
+        state.filtered=items.filter(x=>{if(anime&&x.anime!==anime)return false;if(mode&&!themeMode()&&!sourcesOf(x).includes(mode))return false;if(q&&!norm(`${x.name} ${x.anime} ${sourcesOf(x).map(prettyMode).join(' ')}`).includes(q))return false;if(wanted&&state.status.get(keyOf(x))!==wanted)return false;return true}); state.page=0; render(true);
     }
 
     function stats(){
-        const vals=[...state.status.values()];
-        const all=state.all.length,
+        const items = themeMode() ? state.themeItems : state.all;
+        const vals=items.map(x => state.status.get(keyOf(x)));
+        const all=items.length,
               ok=vals.filter(v=>v==='ok').length,
               bad=vals.filter(v=>v==='bad').length,
               ext=vals.filter(v=>v==='external').length,
               checking=vals.filter(v=>v==='checking').length;
         const el=document.getElementById('ag-charadmin-stats');
-        if(el) el.textContent=`⚡ Vérification réelle • ${all} persos uniques • ✅ ${ok} locales testées • 🔗 ${ext} URL testées • ❌ ${bad} cassées • ⏳ ${checking} en cours • ${state.filtered.length} affichés`;
+        if(el) el.textContent=`⚡ Vérification réelle • ${all} ${themeMode() ? 'entrées du sous-mode' : 'persos uniques'} • ✅ ${ok} locales testées • 🔗 ${ext} URL testées • ❌ ${bad} cassées • ⏳ ${checking} en cours • ${state.filtered.length} affichés`;
     }
 
     function testVisibleImage(imgEl,x,card){
@@ -15297,12 +15363,51 @@ async function loadHallOfFame(){
         for(const x of state.filtered.slice(start,end)){
             const k=keyOf(x), st=state.status.get(k)||instantStatus(x), url=imageOf(x), modes=sourcesOf(x); const card=document.createElement('div');card.className=`ag-charcard ${st}`; card.dataset.key=k;
             card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(x.sourceUrl || url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
-            grid.appendChild(card); const img=card.querySelector('img'); testVisibleImage(img,x,card);
+            grid.appendChild(card); const img=card.querySelector('img');
+            if (x.themeSource) {
+                card.querySelector('[data-save]').remove();
+                card.querySelector('.ag-charcard-copy>small').textContent = x.sub || x.anime;
+                card.querySelector('.ag-charmsg').textContent = 'Aperçu du sous-mode';
+                card.querySelector('[data-url]').readOnly = true;
+                if (x.imgs?.length > 1) {
+                    for (const url of x.imgs.slice(1)) { const extra = document.createElement('img'); extra.loading = 'lazy'; extra.src = url; extra.alt = x.name; card.insertBefore(extra, card.querySelector('.ag-charcard-copy')); }
+                }
+            }
+            if (x.imagePending) queueThemeImage(x, card);
+            else testVisibleImage(img,x,card);
             card.querySelector('[data-copy]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(card.querySelector('[data-url]').value||'')}catch(_){}});
             card.querySelector('[data-url]').addEventListener('input',e=>{card.querySelector('[data-open]').href=e.target.value||'#'});
-            card.querySelector('[data-save]').addEventListener('click',()=>saveUrl(x,card));
+            card.querySelector('[data-save]')?.addEventListener('click',()=>saveUrl(x,card));
         }
+        if (themeMode() && !state.filtered.length) grid.textContent = state.themeLoading ? 'Chargement du sous-mode…' : state.themeError || (!document.getElementById('ag-charadmin-theme').value ? 'Choisis un sous-mode pour afficher ses images.' : 'Aucune entrée pour ces filtres.');
         const more=document.getElementById('ag-charadmin-more');more.style.display=end<state.filtered.length?'':'none'; stats();
+    }
+
+    const themeImageQueue = []; let themeImagesActive = 0;
+    function queueThemeImage(item, card) {
+        card.querySelector('img').removeAttribute('src');
+        themeImageQueue.push({ item, card }); drainThemeImages();
+    }
+    function drainThemeImages() {
+        while (themeImagesActive < 6 && themeImageQueue.length) {
+            const { item, card } = themeImageQueue.shift();
+            if (!card.isConnected) continue;
+            themeImagesActive++;
+            (async () => {
+                try {
+                    const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name), { signal: AbortSignal.timeout(60000) });
+                    const data = await response.json();
+                    item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
+                } catch (_) { item.img = ''; }
+                item.imagePending = false;
+                if (!card.isConnected) return;
+                const img = card.querySelector('img');
+                if (item.img) img.src = item.img;
+                card.querySelector('[data-url]').value = item.img;
+                card.querySelector('[data-open]').href = item.img || '#';
+                testVisibleImage(img, item, card);
+            })().finally(() => { themeImagesActive--; drainThemeImages(); });
+        }
     }
 
     async function validateImageUrl(url){
