@@ -1,0 +1,47 @@
+name: Patch simple catalogue cleanup V3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/PATCH_SIMPLE_CATALOGUE_CLEANUP_V3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Patch migration catalogue
+        run: python3 .github/patch_simple_catalogue_cleanup_v3.py
+      - name: Verify server syntax
+        run: node --check server.js
+      - name: Verify cleanup anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'SIMPLE_CATALOGUE_THEME_FILTER_V3' server.js
+          grep -q 'const explicitChar = String(item.char || item.character ||' server.js
+          grep -q "if (!u && !explicitChar) continue;" server.js
+      - name: Commit verified cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch_simple_catalogue_cleanup_v3.py .github/workflows/PATCH_SIMPLE_CATALOGUE_CLEANUP_V3.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: clean migration character catalogue v3 [skip ci]'
+          git push origin HEAD:main
