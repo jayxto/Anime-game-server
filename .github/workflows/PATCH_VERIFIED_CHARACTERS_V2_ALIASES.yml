@@ -49,3 +49,5 @@ jobs:
           git commit -m 'feat: add verified character image batch 2 and aliases [skip ci]'
           git pull --rebase origin main
           git push origin HEAD:main
+
+# rerun after whitespace cleanup
