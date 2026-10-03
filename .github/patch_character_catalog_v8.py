@@ -7,20 +7,21 @@ s=p.read_text(encoding='utf-8')
 # 1) QAP contains non-character themes that were polluting /api/character-catalog.
 marker='CHARACTER_CATALOG_QAP_FILTER_V8'
 if marker not in s:
-    route_start=s.find("app.get('/api/character-catalog'")
-    if route_start < 0:
-        raise SystemExit('character-catalog route not found')
-    route_end=s.find("app.get('/api/admin/character-catalog-persistent'", route_start)
-    if route_end < 0:
-        route_end=min(len(s), route_start+60000)
-    segment=s[route_start:route_end]
-    rx=re.compile(r"(if\s*\(\s*theme\.kind\s*!==\s*['\"]chars['\"]\s*\)\s*continue;\s*)(for\s*\(\s*const\s+item\s+of\s*\(\s*theme\.items\s*\|\|\s*\[\]\s*\)\s*\)\s*\{)")
-    m=rx.search(segment)
-    if not m:
-        raise SystemExit('QAP character-catalog loop anchor not found inside route')
-    insert="""// CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.\n                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;\n                    """
-    patched=segment[:m.start()] + m.group(1) + insert + m.group(2) + segment[m.end():]
-    s=s[:route_start]+patched+s[route_end:]
+    route_marker=s.find('// PATCH CHARACTER ADMIN V1')
+    if route_marker < 0:
+        raise SystemExit('real character admin route marker not found')
+    loop=s.find("for (const file of ['tierlist-themes.json', 'qap-themes.json'])", route_marker)
+    if loop < 0:
+        raise SystemExit('QAP catalogue file loop not found after real route marker')
+    anchor="if (theme.kind !== 'chars') continue;"
+    pos=s.find(anchor, loop)
+    if pos < 0 or pos > loop+12000:
+        raise SystemExit('theme chars filter not found in QAP catalogue loop')
+    insert_at=pos+len(anchor)
+    insert="""
+                    // CHARACTER_CATALOG_QAP_FILTER_V8 — forms/arcs/anime titles are not normal character portraits.
+                    if (file === 'qap-themes.json' && ['transformation','arc','isekai','shonen','anime'].includes(String(theme.id || ''))) continue;"""
+    s=s[:insert_at]+insert+s[insert_at:]
 
 # 2) Replace the dead 403 Ukyo source with a visually checked anime frame.
 ukyo_new='https://times-abema.ismcdn.jp/mwimgs/3/3/724w/img_33316d797bfecc3a90883fc92118ffc473569.jpg'
