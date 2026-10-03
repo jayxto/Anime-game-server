@@ -14785,10 +14785,24 @@ async function qapAniListAnimeCover(name) {
 }
 const QAP_ITEM_IMAGE_CACHE = new Map();
 app.get('/api/arcade/item-image', async (req, res) => {
+    // AG_QAP_MANUAL_OVERRIDE_V8 — an admin URL saved for a QAP item always wins.
+    // It uses the same durable character_images table, keyed by qt:<theme> + item name.
+    const overrideSource = String(req.query.source || '');
+    const overrideName = String(req.query.name || '');
+    if (overrideSource.startsWith('qt:') && overrideName) {
+        try {
+            const manualOverride = await getCachedCharacterImage(overrideSource, overrideName);
+            if (manualOverride?.imageUrl) {
+                QAP_ITEM_IMAGE_CACHE.delete(overrideSource + '|' + overrideName);
+                res.set('Cache-Control', 'no-store');
+                return res.json({ ok:true, imageUrl:manualOverride.imageUrl });
+            }
+        } catch (_) {}
+    }
     const cacheKey = String(req.query.source||'') + '|' + String(req.query.name||'');
     const cached = QAP_ITEM_IMAGE_CACHE.get(cacheKey);
     if (cached && Date.now() - cached.at < (cached.url ? 86400000 : 300000)) {
-        res.set('Cache-Control', cached.url ? 'public, max-age=86400' : 'no-store');
+        res.set('Cache-Control', overrideSource.startsWith('qt:') ? 'no-store' : (cached.url ? 'public, max-age=86400' : 'no-store'));
         return res.json({ok:!!cached.url,imageUrl:cached.url});
     }
     const source = String(req.query.source || '');
@@ -14866,7 +14880,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
         }
     } catch (_) {}
     QAP_ITEM_IMAGE_CACHE.set(cacheKey, {url:url||null, at:Date.now()});
-    res.set('Cache-Control', url ? 'public, max-age=86400' : 'no-store');
+    res.set('Cache-Control', overrideSource.startsWith('qt:') ? 'no-store' : (url ? 'public, max-age=86400' : 'no-store'));
     res.json({ ok: !!url, imageUrl: url });
 });
 
@@ -18138,6 +18152,9 @@ app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     const img=await simpleFetchImage(url,10000);
     if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
     const x={u,name}; await simpleStoreImage(x,img,url,'manual-admin');
+    // A QAP image may already be held in the runtime resolver cache. Drop it immediately
+    // so the newly saved admin image is visible without waiting for cache expiry/redeploy.
+    if (u.startsWith('qt:') && typeof QAP_ITEM_IMAGE_CACHE !== 'undefined') QAP_ITEM_IMAGE_CACHE.clear();
     const imageUrl=simpleImageRoute(u,name,Date.now());
     return res.json({ok:true,universe:u,name,imageUrl,sourceUrl:url});
 }));

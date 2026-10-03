@@ -15365,10 +15365,16 @@ async function loadHallOfFame(){
             card.innerHTML=`<span class="ag-charstate">${st==='ok'?'OK':st==='external'?'URL':st==='checking'?'…':'CASSÉE'}</span><img loading="lazy" referrerpolicy="no-referrer" src="${esc(url)}" alt="${esc(x.name)}"><div class="ag-charcard-copy"><b title="${esc(x.name)}">${esc(x.name)}</b><small>${esc(x.anime||x.u||'')}</small><div class="ag-modechips">${modes.slice(0,5).map(m=>`<span class="ag-modechip">${esc(prettyMode(m))}</span>`).join('')}</div><div class="ag-charurl"><label>URL de l'image</label><input data-url value="${esc(x.sourceUrl || url)}" placeholder="https://…"></div><div class="ag-charcard-actions"><button data-save>Enregistrer</button><button data-copy>Copier</button><a data-open href="${esc(url||'#')}" target="_blank" rel="noopener noreferrer">Ouvrir</a></div><span class="ag-charmsg"></span></div>`;
             grid.appendChild(card); const img=card.querySelector('img');
             if (x.themeSource) {
-                card.querySelector('[data-save]').remove();
+                // AG_QAP_ADMIN_URL_EDIT_V8 — QAP cards are real editable admin entries.
                 card.querySelector('.ag-charcard-copy>small').textContent = x.sub || x.anime;
-                card.querySelector('.ag-charmsg').textContent = 'Aperçu du sous-mode';
-                card.querySelector('[data-url]').readOnly = true;
+                card.querySelector('.ag-charmsg').textContent = 'URL modifiable • sauvegarde persistante';
+                const qapUrlInput = card.querySelector('[data-url]');
+                if (qapUrlInput) qapUrlInput.readOnly = false;
+                const qapSaveButton = card.querySelector('[data-save]');
+                if (qapSaveButton) {
+                    qapSaveButton.textContent = 'Enregistrer';
+                    qapSaveButton.title = 'Enregistrer définitivement cette image pour ce sous-mode';
+                }
                 if (x.imgs?.length > 1) {
                     for (const url of x.imgs.slice(1)) { const extra = document.createElement('img'); extra.loading = 'lazy'; extra.src = url; extra.alt = x.name; card.insertBefore(extra, card.querySelector('.ag-charcard-copy')); }
                 }
@@ -15395,7 +15401,7 @@ async function loadHallOfFame(){
             themeImagesActive++;
             (async () => {
                 try {
-                    const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name), { signal: AbortSignal.timeout(60000) });
+                    const response = await fetch('/api/arcade/item-image?source=' + encodeURIComponent(item.themeSource) + '&name=' + encodeURIComponent(item.name), { cache:'no-store', signal: AbortSignal.timeout(60000) });
                     const data = await response.json();
                     item.img = response.ok && data.ok ? String(data.imageUrl || '') : '';
                 } catch (_) { item.img = ''; }
@@ -15448,6 +15454,7 @@ async function loadHallOfFame(){
                 row.originalImg=savedImage;
                 row.status='manual-admin';
                 row.manualOverride=true;
+                if(row.themeSource) row.imagePending=false;
             };
             applySaved(x);
             for(const row of state.all){if(keyOf(row)===k)applySaved(row)}
