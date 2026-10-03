@@ -1206,6 +1206,11 @@ app.get('/api/character-catalog', (req, res) => {
                 const parsed = JSON.parse(fs.readFileSync(path.join(__dirname, file), 'utf8'));
                 for (const theme of (parsed.themes || [])) {
                     if (theme.kind !== 'chars') continue;
+                    // CHARACTER_CATALOG_NONCHAR_THEME_FILTER_V4
+                    // Some ranking themes are typed `chars` for UI reuse although their items are
+                    // arcs/anime/categories, not character portraits. Never feed them to the image catalogue.
+                    const nonCharacterThemeIds = new Set(['arc','anime','shonen','isekai']);
+                    if (nonCharacterThemeIds.has(String(theme.id || '').trim().toLowerCase())) continue;
                     for (const item of (theme.items || [])) {
                         // Themes also contain anime titles and transformation labels. Only feed real
                         // character rows to the character catalogue. For transformation themes,
