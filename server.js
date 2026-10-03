@@ -12040,6 +12040,23 @@ async function simplePool(items, n, fn) {
     }));
 }
 
+/* SIMPLE_VERIFIED_CHARACTER_IMAGES_V1
+   Visually-reviewed sources for stubborn characters that automatic providers miss.
+   These URLs are import sources only: simpleStoreImage copies bytes into PostgreSQL. */
+const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
+    'another|yuya mochizuki':'https://neoapo.com/images/character/3687/9925542d006864dd6dd922f6de1668cf.jpg',
+    'assclass|gakuho asano':'https://image.kingsoft.jp/starthome/nijimen/2023-08-02/4c42b618a8cabc21bf73323a88e57b30_lg.jpg',
+    'assclass|gakushu asano':'https://img.animatetimes.com/news/visual/2015/1428310229_1_1_00696cc58f478d7fb7a8d03a164eed3f.jpg',
+    'assclass|ryoma terasaka':'https://pbs.twimg.com/media/B2zAY0cCEAAexwm.jpg',
+    'beastars|gohin':'https://wallpapers.com/images/hd/beastars-gohin-panda-character-06vhvwcc8q0xiova.jpg',
+    'beyblade|hilary tachibana':'https://vignette1.wikia.nocookie.net/beyblade/images/5/53/HILARY_TACHIBANA_%28V-FORCE%29.png/revision/latest/scale-to-width-down/2000?cb=20161104115145',
+    'blackbutler|baldroy':'https://www.kuroshitsuji.tv/emeraldwitch/assets/img/character/sub/character_sub1_main.jpg',
+    'blacklagoon|sawyer the cleaner':'https://www.blacklagoon.jp/imgs/character/sawyer/04.jpg'
+}));
+function simpleVerifiedCharacterImage(u,name) {
+    return SIMPLE_VERIFIED_CHARACTER_IMAGES.get(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`) || null;
+}
+
 async function simpleMigrationPass(pass) {
     SIMPLE_IMAGE_STATE.pass = pass;
     const chars = await simpleCatalogue();
@@ -12060,6 +12077,8 @@ async function simpleMigrationPass(pass) {
     const unresolved = [];
     await simplePool(missing, 12, async x => {
         const candidates = [];
+        const reviewed = simpleVerifiedCharacterImage(x.u,x.name);
+        if (reviewed) candidates.push(reviewed);
         if (x._old?.source_url) candidates.push(x._old.source_url);
         if (x._old?.image_url) candidates.push(x._old.image_url);
         if (x.img) candidates.push(x.img);
