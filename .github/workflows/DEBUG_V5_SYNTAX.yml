@@ -1,0 +1,51 @@
+name: Debug V5 syntax
+
+on:
+  push:
+    branches: [image-fix-v5]
+    paths:
+      - '.github/workflows/DEBUG_V5_SYNTAX.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: image-fix-v5
+          fetch-depth: 1
+          sparse-checkout: |
+            server.js
+            .github
+          sparse-checkout-cone-mode: false
+      - name: Apply patch in workspace
+        run: python3 .github/patch_character_images_v5.py
+      - name: Capture syntax error and nearby V5 blocks
+        shell: bash
+        run: |
+          set +e
+          node --check server.js > .github/v5_syntax_report.txt 2>&1
+          code=$?
+          echo "EXIT_CODE=$code" >> .github/v5_syntax_report.txt
+          python3 - <<'PY' >> .github/v5_syntax_report.txt
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          for marker in ['SIMPLE_CHARACTER_ALIASES_V5','SIMPLE_VERIFIED_CHARACTER_IMAGES_V5']:
+              p=s.find(marker)
+              print('\n===',marker,'@',p,'===')
+              print(s[max(0,p-600):p+3500] if p>=0 else 'NOT FOUND')
+          PY
+          exit 0
+      - name: Commit debug report only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git restore server.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/v5_syntax_report.txt
+          git commit -m "debug: capture V5 syntax failure [skip ci]"
+          git push origin HEAD:image-fix-v5
