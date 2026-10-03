@@ -12148,11 +12148,12 @@ async function simplePool(items, n, fn) {
    These URLs are import sources only: simpleStoreImage copies bytes into PostgreSQL. */
 // SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH6 — five visually rechecked ambiguous portraits.
 // SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH7 — six visually rechecked portrait upgrades.
+// SIMPLE_VERIFIED_CHARACTER_VISUAL_BATCH8 — four visually rechecked ambiguous portraits.
 const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'another|yuya mochizuki':'https://neoapo.com/images/character/3687/9925542d006864dd6dd922f6de1668cf.jpg',
     'assclass|gakuho asano':'https://image.kingsoft.jp/starthome/nijimen/2023-08-02/4c42b618a8cabc21bf73323a88e57b30_lg.jpg',
     'assclass|gakushu asano':'https://img.animatetimes.com/news/visual/2015/1428310229_1_1_00696cc58f478d7fb7a8d03a164eed3f.jpg',
-    'assclass|ryoma terasaka':'https://pbs.twimg.com/media/B2zAY0cCEAAexwm.jpg',
+    'assclass|ryoma terasaka':'https://cdn.gamerch.com/contents/wiki/4008/entry/idyh0sw9.jpg',
     'beastars|gohin':'https://wallpapers.com/images/hd/beastars-gohin-panda-character-06vhvwcc8q0xiova.jpg',
     'beyblade|hilary tachibana':'https://vignette1.wikia.nocookie.net/beyblade/images/5/53/HILARY_TACHIBANA_%28V-FORCE%29.png/revision/latest/scale-to-width-down/2000?cb=20161104115145',
     'blackbutler|baldroy':'https://www.kuroshitsuji.tv/emeraldwitch/assets/img/character/sub/character_sub1_main.jpg',
@@ -12163,7 +12164,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'bleach|sosuke aizen scelle':'https://i1.sndcdn.com/artworks-kzBn7kymKFnU1jEz-ho78oQ-t1080x1080.jpg',
     'bluebox|hina chono':'https://i.pinimg.com/736x/18/20/db/1820dbe627174dd549dc87a8f8f8d9f2.jpg',
     'bluebox|kyo kasahara':'https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg',
-    'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
+    'bocchi|ryo yamada':'https://cdn.rafled.com/anime-icons/images/7z9SrV28Eit8hSVVG4isKIgt0OvUE8fT.jpg',
     'callnight|ko yamori':'https://cdn.rafled.com/anime-icons/images/b23f2b0117002d3e968e41fb65b936dd5221edf3db3279309f3664dad09726a6.jpg',
     'callnight|nico hirata':'https://cdn.anime-planet.com/characters/primary/niko-hirata-1.webp?t=1660955578'
 ,
@@ -12179,7 +12180,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
 ,
     // SIMPLE_VERIFIED_CHARACTER_IMAGES_V4 — visually reviewed 2026-10-03.
     'bocchi|futari gotoh':'https://cdn.myanimelist.net/images/characters/10/493791.webp?s=bdd6daf4624618470817611b5e4c8577',
-    'conan|kaito kid':'https://i.pinimg.com/736x/99/aa/40/99aa407765073c87bb06544ffe81ecae.jpg',
+    'conan|kaito kid':'https://imgs.laipeitu.com/upload/2022/2022031311/58976.jpg',
     'conan|kogoro mouri':'https://f.media-amazon.com/images/S/pv-target-images/121d81556c59ce7b502db217ae96f706316fb258fb6ab34d06300c5ad8451dc9._CR350%2C0%2C1080%2C1080_.jpg',
     'drstone|minami hokutozai':'https://i.pinimg.com/736x/bf/ef/b6/bfefb69ca7516bb5e42f7e3f80626f11.jpg',
     'drstone|senku ishigami':'https://a.storyblok.com/f/178900/712x1362/b844774350/ds1_senku.png/m/filters%3Aquality%2895%29format%28webp%29',
@@ -12197,7 +12198,7 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'demonslayer|zenitsu s sparrow':'https://neoapo.com/images/character/45725/8b882a75e080f929509d70555d465a4b.jpg',
     'conan|kazuha toyama':'https://i.pinimg.com/736x/fd/f5/5f/fdf55f513dc40101f7c1e6605dd11f6f.jpg',
     'conan|rei furuya':'https://vignette.wikia.nocookie.net/detektifconan/images/8/86/Rei_Furuya_Profile.jpg/revision/latest?cb=20180501041722&path-prefix=id',
-    'dragonball|c 14':'https://thecodex.wiki/images/thumb/d/df/Dcbyuoj-fe6e02b1-3729-482d-9e3e-f379badde7ac.png/640px-Dcbyuoj-fe6e02b1-3729-482d-9e3e-f379badde7ac.png',
+    'dragonball|c 14':'https://neoapo.com/images/character/41877/7659046d79639f9f430922abd7e996bd.webp',
     'dragonball|c 15':'https://vignette.wikia.nocookie.net/vsbattles/images/0/01/Android_15_Legends.png/revision/latest?cb=20200227102541',
     'dragonball|c 8':'https://cdn.shopify.com/s/files/1/0252/1736/8154/files/Android_8_480x480.png?v=1607955461',
     'dragonball|docteur brief':'https://neoapo.com/images/character/46073/b088427e8b4f59c6fc52853b73332451.webp',
