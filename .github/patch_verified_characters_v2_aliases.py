@@ -29,7 +29,8 @@ if alias_marker not in s[a0:a1]:
     'dragonball|docteur brief':'Dr. Brief',
     'dragonball|docteur hedo':'Dr. Hedo',
     'dragonball|docteur kochin':'Dr. Kochin',
-    'dragonball|gyumao':'Ox-King' '''
+    'dragonball|gyumao':'Ox-King'
+'''
     s=s[:a1]+rows+s[a1:]
 
 # Add visually-reviewed sources to the persistent import seed map.
@@ -49,7 +50,8 @@ if img_marker not in s[i0:i1]:
     'bluebox|kyo kasahara':'https://i.pinimg.com/736x/12/ad/36/12ad365529c60630eaa70595f672431d.jpg',
     'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
     'callnight|ko yamori':'https://i.pinimg.com/originals/91/ea/c6/91eac632a88586c250575bbcaebe243c.jpg',
-    'callnight|nico hirata':'https://i.pinimg.com/736x/16/95/43/169543da51737af1bdd422ce8c640284.jpg' '''
+    'callnight|nico hirata':'https://i.pinimg.com/736x/16/95/43/169543da51737af1bdd422ce8c640284.jpg'
+'''
     s=s[:i1]+rows+s[i1:]
 
 p.write_text(s,encoding='utf-8')
