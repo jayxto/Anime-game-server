@@ -15176,7 +15176,8 @@ async function loadHallOfFame(){
         return [...new Set(a.map(v=>String(v||'').trim()).filter(Boolean))];
     };
     const imageOf = x => String(x?.img || x?.imageUrl || x?.originalImg || '').trim();
-    const isLocal = u => /^\/assets\/images\/chars\//i.test(String(u||''));
+    // AG_MANUAL_IMAGE_LOCK_V10 — DB-backed images are local/stable too.
+    const isLocal = u => /^(?:\/assets\/images\/chars\/|\/api\/(?:character-image-file|local-character-image))/i.test(String(u||''));
 
     function mergeCatalogue(items) {
         const map = new Map();
@@ -15193,9 +15194,23 @@ async function loadHallOfFame(){
             old.sources = [...new Set([...sourcesOf(old), ...src])];
             if (!old.anime && anime) old.anime = anime;
             const a = imageOf(old), b = imageOf(candidate);
-            if ((!a && b) || (!isLocal(a) && isLocal(b))) {
+            const oldManual = !!old.manualOverride || old.status === 'manual-admin';
+            const candidateManual = !!candidate.manualOverride || candidate.status === 'manual-admin';
+
+            // AG_MANUAL_IMAGE_LOCK_V10 — duplicate merging can NEVER discard an admin override.
+            if (candidateManual) {
+                const manualImage = b || candidate.imageUrl || candidate.originalImg || a;
+                old.img = manualImage;
+                old.imageUrl = candidate.imageUrl || manualImage;
+                old.originalImg = candidate.originalImg || manualImage;
+                old.sourceUrl = candidate.sourceUrl || old.sourceUrl || '';
+                old.status = 'manual-admin';
+                old.manualOverride = true;
+            } else if (!oldManual && ((!a && b) || (!isLocal(a) && isLocal(b)))) {
                 old.img = b;
+                old.imageUrl = candidate.imageUrl || b;
                 old.originalImg = candidate.originalImg || b;
+                if (candidate.sourceUrl) old.sourceUrl = candidate.sourceUrl;
             }
         }
         return [...map.values()].sort((a,b) => String(a.anime).localeCompare(String(b.anime)) || String(a.name).localeCompare(String(b.name)));
@@ -15204,8 +15219,10 @@ async function loadHallOfFame(){
     function instantStatus(x) {
         const u = imageOf(x);
         if (!u) return 'bad';
-        // Never trust a URL just because it is local: the browser verifies the
-        // actual file immediately. This catches stale /assets paths after deploys.
+        // AG_MANUAL_IMAGE_LOCK_V10 — persistent admin rows are returned only when
+        // PostgreSQL has real image bytes, so they are authoritative after refresh.
+        if (x.manualOverride || x.status === 'manual-admin') return 'ok';
+        // Auto/local legacy images are still verified by the browser.
         return 'checking';
     }
 
@@ -15382,7 +15399,9 @@ async function loadHallOfFame(){
                     qapSaveButton.textContent = 'Enregistrer';
                     qapSaveButton.title = 'Enregistrer définitivement cette image pour ce sous-mode';
                 }
-                if (x.imgs?.length > 1) {
+                // AG_MANUAL_IMAGE_LOCK_V10 — while the server is resolving the authoritative
+                // image, never draw stale secondary artwork behind the selected/admin image.
+                if (!x.imagePending && !x.manualOverride && x.imgs?.length > 1) {
                     for (const url of x.imgs.slice(1)) { const extra = document.createElement('img'); extra.loading = 'lazy'; extra.src = url; extra.alt = x.name; card.insertBefore(extra, card.querySelector('.ag-charcard-copy')); }
                 }
             }
