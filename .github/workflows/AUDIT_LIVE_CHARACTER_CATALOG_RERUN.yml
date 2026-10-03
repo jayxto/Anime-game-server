@@ -38,4 +38,4 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
 
-# rerun: 2026-10-03 after verified character batch 5 and transform health pass
+# rerun: 2026-10-03 after catalogue v8 canonical universe/filter fixes
