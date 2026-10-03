@@ -11786,6 +11786,11 @@ const SIMPLE_ALIASES = new Map(Object.entries({
     'dragonball|docteur hedo':'Dr. Hedo',
     'dragonball|docteur kochin':'Dr. Kochin',
     'dragonball|gyumao':'Ox-King'
+,
+    // SIMPLE_ALIAS_BATCH_IMAGE_V3
+    'clannad|tomoya debut':'Tomoya Okazaki',
+    'danmachi|aiz wallenstein':'Ais Wallenstein',
+    'dgrayman|the millennium earl':'Millennium Earl'
 
 }));
 function simpleVariants(u, name) {
@@ -12080,6 +12085,16 @@ const SIMPLE_VERIFIED_CHARACTER_IMAGES = new Map(Object.entries({
     'bocchi|ryo yamada':'https://prcdn.freetls.fastly.net/release_image/16356/3474/16356-3474-b03735e642b25479cce130514dcaf5f2-1587x2245.jpg?auto=webp&fit=bounds&format=jpeg&height=1350&quality=85%2C65&width=1950',
     'callnight|ko yamori':'https://i.pinimg.com/originals/91/ea/c6/91eac632a88586c250575bbcaebe243c.jpg',
     'callnight|nico hirata':'https://i.pinimg.com/736x/16/95/43/169543da51737af1bdd422ce8c640284.jpg'
+,
+    // SIMPLE_VERIFIED_CHARACTER_IMAGES_V3 — visually reviewed batch 3.
+    'chainsaw|bomb girl':'https://i.pinimg.com/736x/6e/67/1f/6e671f272ef9a1ebdaa2f15ffb6577ab.jpg',
+    'chainsaw|demon poulet':'https://i0.wp.com/www.comicbookrevolution.com/wp-content/uploads/2022/07/Chainsaw-Man-Chapter-98-1.png?ssl=1',
+    'chainsaw|demon typhon':'https://static.wikia.nocookie.net/chainsaw-man/images/8/89/Typhoon_Devil_Reze_Arc_anime_design.png/revision/latest?cb=20250704001946',
+    'chainsaw|taiyo hayakawa':'https://manga-imperial.fr/cdn/shop/articles/taiyo_hayakawa_1920x.jpg?v=1682332072',
+    'clannad|tomoya debut':'https://cdn.rafled.com/anime-icons/images/9wPrequXz045.jpg',
+    'cowboybebop|vincent volaju':'https://static.wixstatic.com/media/ed35c2_3fe6cc9f83c54970814ba7f682783bbe~mv2.jpg/v1/fit/w_500%2Ch_500%2Cq_90/file.jpg',
+    'dgrayman|the millennium earl':'https://dgrayman-anime.com/images/chara4.png',
+    'danmachi|aiz wallenstein':'https://i.pinimg.com/originals/64/77/af/6477af3868ca84fa25b5e36de4b77217.jpg'
 
 }));
 function simpleVerifiedCharacterImage(u,name) {
