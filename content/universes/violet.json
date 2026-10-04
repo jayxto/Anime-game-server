@@ -1,0 +1,25 @@
+{
+  "key": "violet",
+  "name": "Violet Evergarden",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Organisation","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Violet Evergarden","attrs":["Poupée de souvenirs automatiques","Compagnie postale CH","Femme","Blonds"]},
+      {"name":"Cattleya Baudelaire","attrs":["Poupée de souvenirs automatiques","Compagnie postale CH","Femme","Noirs"]},
+      {"name":"Erica Brown","attrs":["Poupée de souvenirs automatiques","Compagnie postale CH","Femme","Bruns"]},
+      {"name":"Claudia Hodgins","attrs":["Directeur","Compagnie postale CH","Homme","Rouges"]},
+      {"name":"Benedict Blue","attrs":["Facteur","Compagnie postale CH","Homme","Blonds"]},
+      {"name":"Gilbert Bougainvillea","attrs":["Militaire","Armée de Leidenschaftlich","Homme","Bruns"]},
+      {"name":"Dietfried Bougainvillea","attrs":["Militaire","Marine de Leidenschaftlich","Homme","Noirs"]},
+      {"name":"Luculia Marlborough","attrs":["Poupée de souvenirs automatiques","Aucune","Femme","Roux"]},
+      {"name":"Leon Stephanotis","attrs":["Astronome","Observatoire de Shaher","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Violet Evergarden",95], ["Dietfried Bougainvillea",80], ["Gilbert Bougainvillea",75], ["Claudia Hodgins",60], ["Benedict Blue",40], ["Cattleya Baudelaire",30],
+    ["Erica Brown",20], ["Iris Cannary",20], ["Luculia Marlborough",20], ["Leon Stephanotis",15]
+  ]
+}

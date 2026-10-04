@@ -1,0 +1,38 @@
+{
+  "key": "shieldhero",
+  "name": "The Rising of the Shield Hero",
+  "quotes": [
+    {"text":"Je ne fais plus confiance à personne.","speaker":"Naofumi Iwatani","recipient":"après la trahison de Malty","aliases":["Naofumi"]},
+    {"text":"Raphtalia, tu es mon épée.","speaker":"Naofumi Iwatani","recipient":"à Raphtalia","aliases":["Naofumi"]},
+    {"text":"Bouclier de la colère !","speaker":"Naofumi Iwatani","recipient":"à ses ennemis","aliases":["Naofumi"]},
+    {"text":"Je suis l'épée de Naofumi-sama !","speaker":"Raphtalia","recipient":"à ses ennemis","aliases":[]},
+    {"text":"Maître, j'ai faim !","speaker":"Filo","recipient":"à Naofumi","aliases":[]},
+    {"text":"Les filoliaux sont des anges !","speaker":"Motoyasu Kitamura","recipient":"à Filo","aliases":["Motoyasu"]},
+    {"text":"Le héros du bouclier a tenté de m'agresser !","speaker":"Malty S Melromarc","recipient":"au roi","aliases":["Malty","Myne"]},
+    {"text":"Je suis Melty, deuxième princesse de Melromarc.","speaker":"Melty Q Melromarc","recipient":"à Naofumi","aliases":["Melty"]},
+    {"text":"Je présente mes excuses au héros du bouclier au nom de mon royaume.","speaker":"Mirellia Q Melromarc","recipient":"à Naofumi","aliases":["Mirellia"]},
+    {"text":"Je défendrai mon monde, même si je dois vous tuer.","speaker":"Glass","recipient":"à Naofumi","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Arme","Race","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Naofumi Iwatani","attrs":["Héros cardinal","Bouclier","Humain","Homme","Noirs"]},
+      {"name":"Motoyasu Kitamura","attrs":["Héros cardinal","Lance","Humain","Homme","Blonds"]},
+      {"name":"Ren Amaki","attrs":["Héros cardinal","Épée","Humain","Homme","Noirs"]},
+      {"name":"Raphtalia","attrs":["Compagnon","Épée","Semi-humain","Femme","Bruns"]},
+      {"name":"Filo","attrs":["Compagnon","Griffes","Filolial","Femme","Blonds"]},
+      {"name":"Melty Q Melromarc","attrs":["Princesse","Magie","Humain","Femme","Bleus"]},
+      {"name":"Malty S Melromarc","attrs":["Princesse","Magie","Humain","Femme","Rouges"]},
+      {"name":"Mirellia Q Melromarc","attrs":["Reine","Magie","Humain","Femme","Violets"]},
+      {"name":"Glass","attrs":["Héros d'un autre monde","Éventails","Esprit","Femme","Noirs"]},
+      {"name":"L Arc Berg","attrs":["Héros d'un autre monde","Faux","Humain","Homme","Rouges"]},
+      {"name":"Kizuna Kazayama","attrs":["Héros d'un autre monde","Outil de chasse","Humain","Femme","Bruns"]},
+      {"name":"Therese Alexanderite","attrs":["Compagnon","Magie","Gemme","Femme","Bleus"]}
+    ]
+  },
+  "power": [
+    ["Glass",92], ["Naofumi Iwatani",90], ["L Arc Berg",88], ["Ost Horai",88], ["Raphtalia",86], ["Filo",85],
+    ["Mirellia Q Melromarc",82], ["Kizuna Kazayama",80], ["Therese Alexanderite",78], ["Motoyasu Kitamura",75], ["Ren Amaki",75], ["Itsuki Kawasumi",72],
+    ["Rishia Ivyred",70], ["Melty Q Melromarc",60], ["Malty S Melromarc",50]
+  ]
+}

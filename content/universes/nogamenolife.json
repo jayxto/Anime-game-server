@@ -1,0 +1,25 @@
+{
+  "key": "nogamenolife",
+  "name": "No Game No Life",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Race","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Sora","attrs":["Imanity","Elkia","Homme","Noirs"]},
+      {"name":"Shiro","attrs":["Imanity","Elkia","Femme","Blancs"]},
+      {"name":"Stephanie Dola","attrs":["Imanity","Elkia","Femme","Rouges"]},
+      {"name":"Jibril","attrs":["Flügel","Elkia","Femme","Roses"]},
+      {"name":"Izuna Hatsuse","attrs":["Werebeast","Fédération orientale","Femme","Noirs"]},
+      {"name":"Ino Hatsuse","attrs":["Werebeast","Fédération orientale","Homme","Blancs"]},
+      {"name":"Kurami Zell","attrs":["Imanity","Aucun","Femme","Rouges"]},
+      {"name":"Fiel Nirvalen","attrs":["Elfe","Elven Gard","Femme","Blonds"]},
+      {"name":"Tet","attrs":["Old Deus","Aucun","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Tet",100], ["Shiro",97], ["Sora",97], ["Jibril",90], ["Izuna Hatsuse",80], ["Fiel Nirvalen",75],
+    ["Kurami Zell",72], ["Chlammy Zell",72], ["Ino Hatsuse",70], ["Stephanie Dola",40]
+  ]
+}

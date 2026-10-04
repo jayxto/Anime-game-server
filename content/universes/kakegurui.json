@@ -1,0 +1,27 @@
+{
+  "key": "kakegurui",
+  "name": "Kakegurui",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Statut","Poste","Famille","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Yumeko Jabami","attrs":["Élève","Aucun","Jabami","Femme","Noirs"]},
+      {"name":"Mary Saotome","attrs":["Élève","Aucun","Saotome","Femme","Blonds"]},
+      {"name":"Ryota Suzui","attrs":["Élève","Aucun","Suzui","Homme","Bruns"]},
+      {"name":"Kirari Momobami","attrs":["Conseil des élèves","Présidente","Momobami","Femme","Blancs"]},
+      {"name":"Ririka Momobami","attrs":["Conseil des élèves","Vice-présidente","Momobami","Femme","Blancs"]},
+      {"name":"Sayaka Igarashi","attrs":["Conseil des élèves","Secrétaire","Igarashi","Femme","Noirs"]},
+      {"name":"Midari Ikishima","attrs":["Conseil des élèves","Membre","Ikishima","Femme","Violets"]},
+      {"name":"Itsuki Sumeragi","attrs":["Conseil des élèves","Membre","Sumeragi","Femme","Blonds"]},
+      {"name":"Kaede Manyuda","attrs":["Conseil des élèves","Membre","Manyuda","Homme","Noirs"]},
+      {"name":"Yumemi Yumemite","attrs":["Conseil des élèves","Membre","Yumemite","Femme","Roses"]},
+      {"name":"Rei Batsubami","attrs":["Conseil des élèves","Membre","Batsubami","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Kirari Momobami",100], ["Yumeko Jabami",98], ["Ririka Momobami",85], ["Kaede Manyuda",85], ["Rei Batsubami",85], ["Sayaka Igarashi",82],
+    ["Mary Saotome",80], ["Midari Ikishima",78], ["Yumemi Yumemite",75], ["Itsuki Sumeragi",70], ["Terano Totobami",70], ["Ryota Suzui",50]
+  ]
+}

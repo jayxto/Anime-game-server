@@ -1,0 +1,25 @@
+{
+  "key": "devilman",
+  "name": "Devilman Crybaby",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Nature","Rôle","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Akira Fudo","attrs":["Devilman","Héros","Mort","Homme","Noirs"]},
+      {"name":"Ryo Asuka","attrs":["Démon","Antagoniste","Vivant","Homme","Blonds"]},
+      {"name":"Miki Makimura","attrs":["Humain","Lycéenne","Mort","Femme","Bruns"]},
+      {"name":"Miko Kuroda","attrs":["Devilman","Athlète","Mort","Femme","Bruns"]},
+      {"name":"Akiko Makimura","attrs":["Humain","Mère","Mort","Femme","Noirs"]},
+      {"name":"Noel Makimura","attrs":["Humain","Père","Mort","Homme","Bruns"]},
+      {"name":"Silene","attrs":["Démon","Démon","Mort","Femme","Blancs"]},
+      {"name":"Kaim","attrs":["Démon","Démon","Mort","Homme","Aucun"]},
+      {"name":"Jinmen","attrs":["Démon","Démon","Mort","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Ryo Asuka",100], ["Akira Fudo",95], ["Xenon",90], ["Silene",85], ["Kaim",80], ["Jinmen",75],
+    ["Miko Kuroda",75], ["Miki Makimura",10], ["Noel Makimura",5], ["Akiko Makimura",5]
+  ]
+}

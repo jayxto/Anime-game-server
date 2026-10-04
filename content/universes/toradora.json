@@ -1,0 +1,33 @@
+{
+  "key": "toradora",
+  "name": "Toradora!",
+  "quotes": [
+    {"text":"Je suis le Tigre de poche !","speaker":"Taiga Aisaka","recipient":"aux élèves du lycée","aliases":["Taiga","Palmtop Tiger"]},
+    {"text":"Ryuuji, tu es mon chien !","speaker":"Taiga Aisaka","recipient":"à Ryuuji","aliases":["Taiga"]},
+    {"text":"Je t'aime, Ryuuji !","speaker":"Taiga Aisaka","recipient":"à Ryuuji","aliases":["Taiga"]},
+    {"text":"Le tigre et le dragon sont faits pour se tenir côte à côte.","speaker":"Ryuuji Takasu","recipient":"à Taiga","aliases":["Ryuuji"]},
+    {"text":"Laisse-moi faire le ménage ici !","speaker":"Ryuuji Takasu","recipient":"à Taiga","aliases":["Ryuuji"]},
+    {"text":"Je suis amoureux de la présidente !","speaker":"Yusaku Kitamura","recipient":"à Sumire, devant tout le lycée","aliases":["Kitamura"]},
+    {"text":"Ryu-chan !","speaker":"Yasuko Takasu","recipient":"à Ryuuji","aliases":["Yasuko"]},
+    {"text":"Je suis toujours célibataire…","speaker":"Yuri Koigakubo","recipient":"à sa classe","aliases":["Koigakubo-sensei"]},
+    {"text":"Je ne peux pas voir les fantômes, mais je crois aux OVNI !","speaker":"Minori Kushieda","recipient":"à Ryuuji","aliases":["Minori"]},
+    {"text":"Je fais semblant d'être une gentille fille, et alors ?","speaker":"Ami Kawashima","recipient":"à Ryuuji","aliases":["Ami"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Conseil des élèves","Famille","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Taiga Aisaka","attrs":["Élève","Aucun","Aisaka","Femme","Bruns"]},
+      {"name":"Ryuuji Takasu","attrs":["Élève","Aucun","Takasu","Homme","Bleus"]},
+      {"name":"Minori Kushieda","attrs":["Élève","Aucun","Kushieda","Femme","Rouges"]},
+      {"name":"Yusaku Kitamura","attrs":["Élève","Vice-président","Kitamura","Homme","Bleus"]},
+      {"name":"Ami Kawashima","attrs":["Élève","Aucun","Kawashima","Femme","Bleus"]},
+      {"name":"Sumire Kano","attrs":["Élève","Présidente","Kano","Femme","Bleus"]},
+      {"name":"Yasuko Takasu","attrs":["Mère","Aucun","Takasu","Femme","Blonds"]},
+      {"name":"Yuri Koigakubo","attrs":["Professeur","Aucun","Koigakubo","Femme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Taiga Aisaka",90], ["Minori Kushieda",80], ["Sumire Kano",80], ["Ami Kawashima",75], ["Ryuuji Takasu",70], ["Yusaku Kitamura",65],
+    ["Yasuko Takasu",40], ["Yuri Koigakubo",35]
+  ]
+}

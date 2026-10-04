@@ -1,0 +1,24 @@
+{
+  "key": "erased",
+  "name": "Erased",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Âge","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Satoru Fujinuma","attrs":["Mangaka","Adulte","Homme","Noirs"]},
+      {"name":"Kayo Hinazuki","attrs":["Élève","Enfant","Femme","Bruns"]},
+      {"name":"Airi Katagiri","attrs":["Employée","Adolescent","Femme","Bruns"]},
+      {"name":"Sachiko Fujinuma","attrs":["Mère","Adulte","Femme","Noirs"]},
+      {"name":"Gaku Yashiro","attrs":["Professeur","Adulte","Homme","Noirs"]},
+      {"name":"Kenya Kobayashi","attrs":["Élève","Enfant","Homme","Blonds"]},
+      {"name":"Hiromi Sugita","attrs":["Élève","Enfant","Homme","Noirs"]},
+      {"name":"Aya Nakanishi","attrs":["Élève","Enfant","Femme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Gaku Yashiro",90], ["Satoru Fujinuma",80], ["Kenya Kobayashi",75], ["Sachiko Fujinuma",60], ["Airi Katagiri",50], ["Kayo Hinazuki",40],
+    ["Hiromi Sugita",30], ["Osamu",25], ["Aya Nakanishi",20]
+  ]
+}

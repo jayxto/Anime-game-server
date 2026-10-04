@@ -1,0 +1,24 @@
+{
+  "key": "madeinabyss",
+  "name": "Made in Abyss",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Espèce","Sifflet","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Riko","attrs":["Humain","Sifflet rouge","Groupe de Riko","Femme","Blonds"]},
+      {"name":"Reg","attrs":["Robot","Aucun","Groupe de Riko","Homme","Noirs"]},
+      {"name":"Bondrewd","attrs":["Humain","Sifflet blanc","Prière de l'aube","Homme","Aucun"]},
+      {"name":"Prushka","attrs":["Humain","Aucun","Prière de l'aube","Femme","Blancs"]},
+      {"name":"Ozen","attrs":["Humain","Sifflet blanc","Aucun","Femme","Noirs et blancs"]},
+      {"name":"Faputa","attrs":["Hollow","Aucun","Village des Hollows","Femme","Blancs"]},
+      {"name":"Wazukyan","attrs":["Humain","Aucun","Ganja","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Faputa",98], ["Ozen",96], ["Bondrewd",95], ["Lyza",92], ["Reg",90], ["Wazukyan",80],
+    ["Gaburoon",75], ["Nanachi",75], ["Belaf",70], ["Vueko",50], ["Riko",40], ["Prushka",35],
+    ["Mitty",20], ["Marulk",20]
+  ]
+}

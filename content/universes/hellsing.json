@@ -1,0 +1,37 @@
+{
+  "key": "hellsing",
+  "name": "Hellsing",
+  "quotes": [
+    {"text":"Seul un humain peut vaincre un monstre.","speaker":"Alucard","recipient":"à Anderson","aliases":[]},
+    {"text":"Vos ordres, ma maîtresse ?","speaker":"Alucard","recipient":"à Integra","aliases":[]},
+    {"text":"Recherchez et détruisez ! Search and Destroy !","speaker":"Integra Hellsing","recipient":"aux soldats d'Hellsing","aliases":["Integra","Sir Integra"]},
+    {"text":"Nous sommes les instruments de Dieu sur cette Terre. Amen !","speaker":"Alexander Anderson","recipient":"à Alucard","aliases":["Anderson","Paladin Anderson"]},
+    {"text":"J'aime la guerre.","speaker":"The Major","recipient":"aux soldats de Millennium","aliases":["Le Major","Montana Max"]},
+    {"text":"Maître !","speaker":"Seras Victoria","recipient":"à Alucard","aliases":["Seras","Police Girl"]},
+    {"text":"Je suis devenu ce que je suis pour enfin te battre, Alucard.","speaker":"Walter C. Dornez","recipient":"à Alucard","aliases":["Walter"]},
+    {"text":"Mignonette !","speaker":"Pip Bernadotte","recipient":"à Seras","aliases":["Pip"]},
+    {"text":"Je suis partout et nulle part à la fois.","speaker":"Schrodinger","recipient":"à Integra","aliases":["Schrödinger"]},
+    {"text":"Les protestants ne sont que des hérétiques à exterminer.","speaker":"Enrico Maxwell","recipient":"à Integra","aliases":["Maxwell"]}
+  ],
+  "dle": {
+    "categories": ["Espèce","Organisation","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Alucard","attrs":["Vampire","Hellsing","Pistolets","Homme","Noirs"]},
+      {"name":"Integra Hellsing","attrs":["Humain","Hellsing","Sabre","Femme","Blonds"]},
+      {"name":"Seras Victoria","attrs":["Vampire","Hellsing","Canon","Femme","Blonds"]},
+      {"name":"Walter C. Dornez","attrs":["Humain","Hellsing","Fils","Homme","Noirs"]},
+      {"name":"Pip Bernadotte","attrs":["Humain","Wild Geese","Fusil","Homme","Bruns"]},
+      {"name":"Alexander Anderson","attrs":["Humain","Iscariote","Baïonnettes","Homme","Blonds"]},
+      {"name":"Enrico Maxwell","attrs":["Humain","Iscariote","Aucune","Homme","Blancs"]},
+      {"name":"The Major","attrs":["Humain","Millennium","Pistolet","Homme","Blonds"]},
+      {"name":"The Captain","attrs":["Loup-garou","Millennium","Combat","Homme","Blancs"]},
+      {"name":"Rip Van Winkle","attrs":["Vampire","Millennium","Mousquet","Femme","Noirs"]},
+      {"name":"Zorin Blitz","attrs":["Vampire","Millennium","Faux","Femme","Rouges"]},
+      {"name":"Schrodinger","attrs":["Chimère","Millennium","Aucune","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Alucard",100], ["Alexander Anderson",93], ["The Captain",92], ["Walter C. Dornez",92], ["Seras Victoria",90], ["Schrodinger",85],
+    ["Rip Van Winkle",80], ["Zorin Blitz",78], ["The Major",60], ["Integra Hellsing",55], ["Pip Bernadotte",50], ["Enrico Maxwell",40]
+  ]
+}
