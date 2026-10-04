@@ -1,0 +1,34 @@
+{
+  "key": "slamdunk",
+  "name": "Slam Dunk",
+  "quotes": [
+    {"text":"Je suis un génie !","speaker":"Hanamichi Sakuragi","recipient":"à toute l'équipe de Shohoku","aliases":["Sakuragi","Hanamichi"]},
+    {"text":"J'aime le basket. Cette fois, je le dis du fond du cœur.","speaker":"Hanamichi Sakuragi","recipient":"à Haruko","aliases":["Sakuragi","Hanamichi"]},
+    {"text":"Le roi des rebonds, c'est moi !","speaker":"Hanamichi Sakuragi","recipient":"à Akagi","aliases":["Sakuragi","Hanamichi"]},
+    {"text":"Coach… je veux jouer au basket…","speaker":"Hisashi Mitsui","recipient":"au coach Anzai","aliases":["Mitsui"]},
+    {"text":"Je suis Mitsui, l'ancien MVP du collège.","speaker":"Hisashi Mitsui","recipient":"à ses adversaires","aliases":["Mitsui"]},
+    {"text":"Nous deviendrons champions du Japon !","speaker":"Takenori Akagi","recipient":"à l'équipe de Shohoku","aliases":["Akagi","Gori"]},
+    {"text":"Imbécile.","speaker":"Kaede Rukawa","recipient":"à Sakuragi","aliases":["Rukawa"]},
+    {"text":"Tu aimes le basket ?","speaker":"Haruko Akagi","recipient":"à Sakuragi, lors de leur rencontre","aliases":["Haruko"]},
+    {"text":"Le dribble, c'est l'arme des petits.","speaker":"Ryota Miyagi","recipient":"à Sakuragi","aliases":["Miyagi"]},
+    {"text":"Le match ne fait que commencer. Amusons-nous.","speaker":"Akira Sendoh","recipient":"à Rukawa","aliases":["Sendoh"]}
+  ],
+  "dle": {
+    "categories": ["Lycée","Poste","Numéro","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Hanamichi Sakuragi","attrs":["Shohoku","Ailier fort","10","Homme","Rouges"]},
+      {"name":"Kaede Rukawa","attrs":["Shohoku","Ailier","11","Homme","Noirs"]},
+      {"name":"Takenori Akagi","attrs":["Shohoku","Pivot","4","Homme","Noirs"]},
+      {"name":"Hisashi Mitsui","attrs":["Shohoku","Arrière","14","Homme","Bruns"]},
+      {"name":"Ryota Miyagi","attrs":["Shohoku","Meneur","7","Homme","Noirs"]},
+      {"name":"Haruko Akagi","attrs":["Shohoku","Manager","Aucun","Femme","Noirs"]},
+      {"name":"Akira Sendoh","attrs":["Ryonan","Ailier","7","Homme","Noirs"]},
+      {"name":"Kicchou Fukuda","attrs":["Ryonan","Ailier fort","13","Homme","Noirs"]},
+      {"name":"Shinichi Maki","attrs":["Kainan","Meneur","4","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Akira Sendoh",95],["Shinichi Maki",95],["Kaede Rukawa",93],["Takenori Akagi",90],["Hisashi Mitsui",88],["Hanamichi Sakuragi",85],
+    ["Ryota Miyagi",84],["Kicchou Fukuda",80],["Haruko Akagi",5]
+  ]
+}

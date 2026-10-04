@@ -1,0 +1,42 @@
+{
+  "key": "souleater",
+  "name": "Soul Eater",
+  "quotes": [
+    {"text":"Pas cool.","speaker":"Soul Evans","recipient":"à Maka","aliases":["Soul","Soul Eater"]},
+    {"text":"Je suis l'homme qui surpassera Dieu !","speaker":"Black Star","recipient":"à tout Shibusen","aliases":[]},
+    {"text":"Ce n'est pas symétrique !","speaker":"Death the Kid","recipient":"à Liz et Patty","aliases":["Kid"]},
+    {"text":"Maka Chop !","speaker":"Maka Albarn","recipient":"à Soul","aliases":["Maka"]},
+    {"text":"Imbécile !","speaker":"Excalibur","recipient":"à Kid","aliases":[]},
+    {"text":"Salut, salut, ça boume ?","speaker":"Lord Death","recipient":"aux élèves de Shibusen","aliases":["Shinigami-sama"]},
+    {"text":"J'ai très envie de te disséquer…","speaker":"Franken Stein","recipient":"à Maka et Soul","aliases":["Stein","Dr. Stein"]},
+    {"text":"Je ne sais pas comment gérer ça…","speaker":"Crona","recipient":"à Maka","aliases":[]},
+    {"text":"La peur est la seule chose qui gouverne ce monde.","speaker":"Asura","recipient":"à Lord Death","aliases":["Le Kishin"]},
+    {"text":"Maka, papa t'aime !","speaker":"Spirit Albarn","recipient":"à Maka","aliases":["Spirit","Death Scythe"]}
+  ],
+  "dle": {
+    "categories": ["Camp","Rôle","Partenaire","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Maka Albarn","attrs":["Shibusen","Meister","Soul Evans","Femme","Blonds"]},
+      {"name":"Soul Evans","attrs":["Shibusen","Arme","Maka Albarn","Homme","Blancs"]},
+      {"name":"Black Star","attrs":["Shibusen","Meister","Tsubaki","Homme","Bleus"]},
+      {"name":"Tsubaki Nakatsukasa","attrs":["Shibusen","Arme","Black Star","Femme","Noirs"]},
+      {"name":"Death the Kid","attrs":["Shibusen","Meister","Liz et Patty","Homme","Noirs"]},
+      {"name":"Liz Thompson","attrs":["Shibusen","Arme","Death the Kid","Femme","Blonds"]},
+      {"name":"Patty Thompson","attrs":["Shibusen","Arme","Death the Kid","Femme","Blonds"]},
+      {"name":"Franken Stein","attrs":["Shibusen","Professeur","Marie Mjolnir","Homme","Gris"]},
+      {"name":"Marie Mjolnir","attrs":["Shibusen","Arme","Franken Stein","Femme","Blonds"]},
+      {"name":"Spirit Albarn","attrs":["Shibusen","Arme","Lord Death","Homme","Rouges"]},
+      {"name":"Lord Death","attrs":["Shibusen","Dieu de la Mort","Spirit Albarn","Homme","Aucun"]},
+      {"name":"Justin Law","attrs":["Traître","Arme","Aucun","Homme","Blonds"]},
+      {"name":"Medusa Gorgon","attrs":["Sorcières","Sorcière","Aucun","Femme","Blonds"]},
+      {"name":"Arachne Gorgon","attrs":["Arachnophobia","Sorcière","Aucun","Femme","Noirs"]},
+      {"name":"Asura","attrs":["Kishin","Kishin","Aucun","Homme","Aucun"]},
+      {"name":"Excalibur","attrs":["Aucun","Arme légendaire","Aucun","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Asura",100],["Lord Death",99],["Franken Stein",92],["Dr. Stein",92],["Death the Kid",90],["Excalibur",90],
+    ["Medusa Gorgon",88],["Black Star",88],["Justin Law",88],["Maka Albarn",87],["Crona",86],["Arachne Gorgon",85],
+    ["Soul Evans",80],["Spirit Albarn",75],["Marie Mjolnir",75],["Tsubaki Nakatsukasa",70],["Liz Thompson",60],["Patty Thompson",60]
+  ]
+}

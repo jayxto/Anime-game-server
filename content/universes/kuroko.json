@@ -1,0 +1,35 @@
+{
+  "key": "kuroko",
+  "name": "Kuroko's Basket",
+  "quotes": [
+    {"text":"Je suis une ombre.","speaker":"Tetsuya Kuroko","recipient":"à Kagami","aliases":["Kuroko","Tetsu"]},
+    {"text":"Je serai ton ombre, et toi, tu seras la lumière.","speaker":"Tetsuya Kuroko","recipient":"à Kagami","aliases":["Kuroko","Tetsu"]},
+    {"text":"Je suis absolu.","speaker":"Seijuro Akashi","recipient":"à ses adversaires","aliases":["Akashi"]},
+    {"text":"Le seul qui peut me battre, c'est moi.","speaker":"Daiki Aomine","recipient":"à Kuroko","aliases":["Aomine"]},
+    {"text":"Je fais tout ce qui est humainement possible, puis j'attends la décision du destin.","speaker":"Shintaro Midorima","recipient":"à Takao","aliases":["Midorima"]},
+    {"text":"Le basket, je trouve ça nul.","speaker":"Atsushi Murasakibara","recipient":"à Kiyoshi","aliases":["Murasakibara"]},
+    {"text":"Tout ce que je vois, je peux le copier.","speaker":"Ryota Kise","recipient":"à Kagami","aliases":["Kise"]},
+    {"text":"Je vais battre la Génération des Miracles !","speaker":"Taiga Kagami","recipient":"à Kuroko","aliases":["Kagami"]},
+    {"text":"Tetsu-kun !","speaker":"Satsuki Momoi","recipient":"à Kuroko","aliases":["Momoi"]},
+    {"text":"Amusons-nous !","speaker":"Teppei Kiyoshi","recipient":"à l'équipe de Seirin","aliases":["Kiyoshi"]}
+  ],
+  "dle": {
+    "categories": ["Lycée","Génération des Miracles","Numéro","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Tetsuya Kuroko","attrs":["Seirin","Oui","11","Homme","Bleus"]},
+      {"name":"Taiga Kagami","attrs":["Seirin","Non","10","Homme","Rouges"]},
+      {"name":"Junpei Hyuga","attrs":["Seirin","Non","4","Homme","Noirs"]},
+      {"name":"Teppei Kiyoshi","attrs":["Seirin","Non","7","Homme","Bruns"]},
+      {"name":"Seijuro Akashi","attrs":["Rakuzan","Oui","4","Homme","Rouges"]},
+      {"name":"Daiki Aomine","attrs":["Tōō","Oui","5","Homme","Bleus"]},
+      {"name":"Satsuki Momoi","attrs":["Tōō","Non","Aucun","Femme","Roses"]},
+      {"name":"Ryota Kise","attrs":["Kaijō","Oui","7","Homme","Blonds"]},
+      {"name":"Shintaro Midorima","attrs":["Shūtoku","Oui","6","Homme","Verts"]},
+      {"name":"Atsushi Murasakibara","attrs":["Yōsen","Oui","9","Homme","Violets"]}
+    ]
+  },
+  "power": [
+    ["Seijuro Akashi",100],["Daiki Aomine",98],["Taiga Kagami",96],["Atsushi Murasakibara",95],["Ryota Kise",95],["Shintaro Midorima",94],
+    ["Tetsuya Kuroko",85],["Teppei Kiyoshi",80],["Junpei Hyuga",75],["Satsuki Momoi",40]
+  ]
+}

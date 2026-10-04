@@ -1,0 +1,37 @@
+{
+  "key": "promised",
+  "name": "The Promised Neverland",
+  "quotes": [
+    {"text":"On s'enfuira tous ensemble. Je ne laisserai personne derrière !","speaker":"Emma","recipient":"à Norman et Ray","aliases":[]},
+    {"text":"Je ne veux pas que quelqu'un d'autre meure. Je trouverai un autre moyen.","speaker":"Emma","recipient":"à Ray","aliases":[]},
+    {"text":"Vis, Emma.","speaker":"Norman","recipient":"à Emma, avant son expédition","aliases":[]},
+    {"text":"Je sais tout depuis le début. J'ai toujours travaillé pour Mama.","speaker":"Ray","recipient":"à Norman","aliases":[]},
+    {"text":"Je comptais m'immoler en mettant le feu à la maison.","speaker":"Ray","recipient":"à Emma, la nuit de l'évasion","aliases":[]},
+    {"text":"Je vous aime, mes enfants.","speaker":"Isabella","recipient":"aux enfants de Grace Field","aliases":["Mama"]},
+    {"text":"Un jour, c'est moi qui deviendrai Mama !","speaker":"Krone","recipient":"à Isabella","aliases":["Sœur Krone"]},
+    {"text":"Nous, les démons, pouvons vivre sans manger d'humains.","speaker":"Mujika","recipient":"à Emma","aliases":[]},
+    {"text":"Je ne mange que les humains nés à l'état sauvage. C'est la loi de mon dieu.","speaker":"Sonju","recipient":"à Emma","aliases":[]},
+    {"text":"Vous n'êtes que du bétail. Rentrez à la ferme.","speaker":"Peter Ratri","recipient":"à Emma","aliases":["Peter"]}
+  ],
+  "dle": {
+    "categories": ["Espèce","Camp","Rôle","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Emma","attrs":["Humain","Grace Field","Enfant","Vivant","Femme","Roux"]},
+      {"name":"Norman","attrs":["Humain","Grace Field","Enfant","Vivant","Homme","Blancs"]},
+      {"name":"Ray","attrs":["Humain","Grace Field","Enfant","Vivant","Homme","Noirs"]},
+      {"name":"Phil","attrs":["Humain","Grace Field","Enfant","Vivant","Homme","Bruns"]},
+      {"name":"Don","attrs":["Humain","Grace Field","Enfant","Vivant","Homme","Noirs"]},
+      {"name":"Gilda","attrs":["Humain","Grace Field","Enfant","Vivant","Femme","Verts"]},
+      {"name":"Isabella","attrs":["Humain","Grace Field","Mama","Mort","Femme","Bruns"]},
+      {"name":"Krone","attrs":["Humain","Grace Field","Sœur","Mort","Femme","Noirs"]},
+      {"name":"Peter Ratri","attrs":["Humain","Clan Ratri","Chef","Mort","Homme","Blonds"]},
+      {"name":"Mujika","attrs":["Démon","Démons","Démon","Vivant","Femme","Violets"]},
+      {"name":"Sonju","attrs":["Démon","Démons","Démon","Vivant","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Leuvis",92],["Norman",90],["Sonju",90],["Ray",88],["Emma",86],["Isabella",85],
+    ["Yuugo",82],["Mujika",80],["Peter Ratri",75],["Andrew",72],["Lucas",70],["Barbara",70],
+    ["Zazie",68],["Krone",60],["Vincent",60],["Don",52],["Gilda",50],["Phil",40]
+  ]
+}

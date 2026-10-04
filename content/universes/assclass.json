@@ -1,0 +1,41 @@
+{
+  "key": "assclass",
+  "name": "Assassination Classroom",
+  "quotes": [
+    {"text":"Nurufufufu…","speaker":"Koro-sensei","recipient":"à la classe 3-E","aliases":["Koro"]},
+    {"text":"Je détruirai la Terre en mars prochain. D'ici là, je serai votre professeur.","speaker":"Koro-sensei","recipient":"à la classe 3-E","aliases":["Koro"]},
+    {"text":"Tuez-moi avant la remise des diplômes, si vous en êtes capables.","speaker":"Koro-sensei","recipient":"à ses élèves","aliases":["Koro"]},
+    {"text":"Merci de nous avoir tout appris, Koro-sensei.","speaker":"Nagisa Shiota","recipient":"à Koro-sensei","aliases":["Nagisa"]},
+    {"text":"Je ne perds jamais deux fois contre le même adversaire.","speaker":"Karma Akabane","recipient":"à Gakushu","aliases":["Karma"]},
+    {"text":"Arrêtez de m'appeler Bitch-sensei !","speaker":"Irina Jelavic","recipient":"à la classe 3-E","aliases":["Irina","Bitch-sensei"]},
+    {"text":"Je serai toujours le premier.","speaker":"Gakushu Asano","recipient":"à Karma","aliases":["Gakushu"]},
+    {"text":"Les forts dominent les faibles. C'est ça, l'éducation.","speaker":"Gakuho Asano","recipient":"aux élèves de Kunugigaoka","aliases":["Le directeur Asano"]},
+    {"text":"Je suis la petite sœur d'Aguri Yukimura.","speaker":"Kaede Kayano","recipient":"à Koro-sensei","aliases":["Kayano","Akari Yukimura"]},
+    {"text":"Bonjour ! Je suis Ritsu, votre nouvelle camarade de classe !","speaker":"Ritsu","recipient":"à la classe 3-E","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Classe","Rôle","Spécialité","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Koro-sensei","attrs":["3-E","Professeur","Vitesse","Homme","Aucun"]},
+      {"name":"Tadaomi Karasuma","attrs":["3-E","Professeur","Combat","Homme","Noirs"]},
+      {"name":"Irina Jelavic","attrs":["3-E","Professeur","Séduction","Femme","Blonds"]},
+      {"name":"Nagisa Shiota","attrs":["3-E","Élève","Assassinat","Homme","Bleus"]},
+      {"name":"Karma Akabane","attrs":["3-E","Élève","Combat","Homme","Rouges"]},
+      {"name":"Kaede Kayano","attrs":["3-E","Élève","Comédie","Femme","Verts"]},
+      {"name":"Rio Nakamura","attrs":["3-E","Élève","Langues","Femme","Blonds"]},
+      {"name":"Itona Horibe","attrs":["3-E","Élève","Mécanique","Homme","Blancs"]},
+      {"name":"Ritsu","attrs":["3-E","Élève","Tir","Femme","Violets"]},
+      {"name":"Ryoma Terasaka","attrs":["3-E","Élève","Force","Homme","Bruns"]},
+      {"name":"Yuma Isogai","attrs":["3-E","Élève","Leadership","Homme","Noirs"]},
+      {"name":"Tomohito Sugino","attrs":["3-E","Élève","Lancer","Homme","Bleus"]},
+      {"name":"Manami Okuda","attrs":["3-E","Élève","Chimie","Femme","Violets"]},
+      {"name":"Gakushu Asano","attrs":["3-A","Élève","Études","Homme","Roux"]},
+      {"name":"Gakuho Asano","attrs":["Direction","Directeur","Éducation","Homme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Koro-sensei",100],["Tadaomi Karasuma",85],["Gakuho Asano",80],["Karma Akabane",75],["Nagisa Shiota",72],["Irina Jelavic",70],
+    ["Itona Horibe",70],["Kaede Kayano",65],["Gakushu Asano",60],["Ritsu",55],["Ryoma Terasaka",50],["Yuma Isogai",45],
+    ["Tomohito Sugino",45],["Rio Nakamura",40],["Manami Okuda",35]
+  ]
+}
