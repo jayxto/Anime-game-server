@@ -1,0 +1,25 @@
+{
+  "key": "kaguya",
+  "name": "Kaguya-sama: Love is War",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Conseil des élèves","Famille","Année","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kaguya Shinomiya","attrs":["Vice-présidente","Shinomiya","2e année","Femme","Noirs"]},
+      {"name":"Miyuki Shirogane","attrs":["Président","Shirogane","2e année","Homme","Blonds"]},
+      {"name":"Chika Fujiwara","attrs":["Secrétaire","Fujiwara","2e année","Femme","Roses"]},
+      {"name":"Yu Ishigami","attrs":["Trésorier","Ishigami","1re année","Homme","Noirs"]},
+      {"name":"Miko Iino","attrs":["Contrôleuse","Iino","1re année","Femme","Bruns"]},
+      {"name":"Ai Hayasaka","attrs":["Aucun","Hayasaka","2e année","Femme","Blonds"]},
+      {"name":"Kei Shirogane","attrs":["Aucun","Shirogane","Collège","Femme","Blancs"]},
+      {"name":"Nagisa Kashiwagi","attrs":["Aucun","Kashiwagi","2e année","Femme","Noirs"]},
+      {"name":"Tsubasa Tanuma","attrs":["Aucun","Tanuma","2e année","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Kaguya Shinomiya",95], ["Miyuki Shirogane",92], ["Ai Hayasaka",85], ["Chika Fujiwara",80], ["Maki Shijo",75], ["Yu Ishigami",72],
+    ["Miko Iino",70], ["Papa Shirogane",65], ["Nagisa Kashiwagi",60], ["Kei Shirogane",58], ["Tsubasa Tanuma",50], ["Moeha Fujiwara",50]
+  ]
+}

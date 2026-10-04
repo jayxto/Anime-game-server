@@ -1,0 +1,38 @@
+{
+  "key": "konosuba",
+  "name": "Konosuba",
+  "quotes": [
+    {"text":"Explosion !","speaker":"Megumin","recipient":"à un crapaud géant","aliases":[]},
+    {"text":"Je suis Megumin, archimage du clan des démons cramoisis, maîtresse de la magie d'explosion !","speaker":"Megumin","recipient":"à Kazuma","aliases":[]},
+    {"text":"Vol !","speaker":"Kazuma Satou","recipient":"à Chris","aliases":["Kazuma"]},
+    {"text":"Rends-moi mon argent, déesse inutile !","speaker":"Kazuma Satou","recipient":"à Aqua","aliases":["Kazuma"]},
+    {"text":"Je suis la déesse Aqua, vénérée par l'Ordre axis !","speaker":"Aqua","recipient":"aux habitants d'Axel","aliases":[]},
+    {"text":"Turn Undead sacré !","speaker":"Aqua","recipient":"aux morts-vivants","aliases":[]},
+    {"text":"Frappe-moi encore, plus fort !","speaker":"Darkness","recipient":"à ses ennemis","aliases":["Lalatina"]},
+    {"text":"Un jour, je deviendrai la cheffe du clan des démons cramoisis !","speaker":"Yunyun","recipient":"à Megumin","aliases":[]},
+    {"text":"Fuhahahaha !","speaker":"Vanir","recipient":"à Kazuma","aliases":[]},
+    {"text":"Je suis une liche… mais je tiens une boutique de magie.","speaker":"Wiz","recipient":"à Kazuma","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Classe","Race","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kazuma Satou","attrs":["Aventurier","Humain","Groupe de Kazuma","Homme","Bruns"]},
+      {"name":"Aqua","attrs":["Archiprêtresse","Déesse","Groupe de Kazuma","Femme","Bleus"]},
+      {"name":"Megumin","attrs":["Archimage","Démon cramoisi","Groupe de Kazuma","Femme","Noirs"]},
+      {"name":"Darkness","attrs":["Croisée","Humain","Groupe de Kazuma","Femme","Blonds"]},
+      {"name":"Yunyun","attrs":["Archimage","Démon cramoisi","Aucun","Femme","Noirs"]},
+      {"name":"Komekko","attrs":["Enfant","Démon cramoisi","Aucun","Femme","Noirs"]},
+      {"name":"Wiz","attrs":["Liche","Liche","Armée du Roi démon","Femme","Bruns"]},
+      {"name":"Vanir","attrs":["Démon","Démon","Armée du Roi démon","Homme","Noirs"]},
+      {"name":"Eris","attrs":["Déesse","Déesse","Aucun","Femme","Blancs"]},
+      {"name":"Chris","attrs":["Voleuse","Humain","Aucun","Femme","Blancs"]},
+      {"name":"Luna","attrs":["Réceptionniste","Humain","Guilde des aventuriers","Femme","Blonds"]},
+      {"name":"Mitsurugi Kyouya","attrs":["Épéiste","Humain","Aucun","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Wolbach",95], ["Vanir",94], ["Wiz",92], ["Eris",90], ["Sylvia",85], ["Aqua",80],
+    ["Megumin",80], ["Yunyun",75], ["Mitsurugi Kyouya",72], ["Darkness",70], ["Chris",62], ["Kazuma Satou",55],
+    ["Luna",10], ["Komekko",15]
+  ]
+}

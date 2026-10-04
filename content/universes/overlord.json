@@ -1,0 +1,42 @@
+{
+  "key": "overlord",
+  "name": "Overlord",
+  "quotes": [
+    {"text":"Je suis Ainz Ooal Gown !","speaker":"Ainz Ooal Gown","recipient":"au monde entier","aliases":["Ainz","Momonga"]},
+    {"text":"Tout se déroule exactement comme prévu.","speaker":"Ainz Ooal Gown","recipient":"à ses gardiens, sans rien comprendre","aliases":["Ainz","Momonga"]},
+    {"text":"Ainz-sama, je vous aime !","speaker":"Albedo","recipient":"à Ainz","aliases":[]},
+    {"text":"La seule épouse digne d'Ainz-sama, c'est moi, arinsu !","speaker":"Shalltear Bloodfallen","recipient":"à Albedo","aliases":["Shalltear"]},
+    {"text":"Comme on pouvait s'y attendre de la part d'Ainz-sama !","speaker":"Demiurge","recipient":"aux autres gardiens","aliases":[]},
+    {"text":"Je suis Gazef Stronoff, capitaine guerrier du Royaume !","speaker":"Gazef Stronoff","recipient":"à Ainz","aliases":["Gazef"]},
+    {"text":"Wenn es meines Gottes Wille ist !","speaker":"Pandoras Actor","recipient":"à Ainz","aliases":["Pandora's Actor"]},
+    {"text":"Il est naturel d'aider ceux qui sont dans le besoin.","speaker":"Sebas Tian","recipient":"à Tuare","aliases":["Sebas"]},
+    {"text":"Ces insectes humains ne méritent pas votre attention, Momon-san.","speaker":"Narberal Gamma","recipient":"à Ainz, sous le nom de Momon","aliases":["Nabe"]},
+    {"text":"Ainz-sama est le seul être suprême.","speaker":"Cocytus","recipient":"aux gardiens","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Race","Faction","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ainz Ooal Gown","attrs":["Liche","Grand Tombeau de Nazarick","Seigneur","Homme","Aucun"]},
+      {"name":"Albedo","attrs":["Succube","Grand Tombeau de Nazarick","Superviseure des gardiens","Femme","Noirs"]},
+      {"name":"Shalltear Bloodfallen","attrs":["Vampire","Grand Tombeau de Nazarick","Gardien d'étage","Femme","Blancs"]},
+      {"name":"Demiurge","attrs":["Démon","Grand Tombeau de Nazarick","Gardien d'étage","Homme","Noirs"]},
+      {"name":"Cocytus","attrs":["Insecte","Grand Tombeau de Nazarick","Gardien d'étage","Homme","Aucun"]},
+      {"name":"Aura Bella Fiora","attrs":["Elfe noire","Grand Tombeau de Nazarick","Gardien d'étage","Femme","Blonds"]},
+      {"name":"Mare Bello Fiore","attrs":["Elfe noire","Grand Tombeau de Nazarick","Gardien d'étage","Homme","Blonds"]},
+      {"name":"Sebas Tian","attrs":["Dragonoïde","Grand Tombeau de Nazarick","Majordome","Homme","Gris"]},
+      {"name":"Narberal Gamma","attrs":["Doppelgänger","Grand Tombeau de Nazarick","Servante","Femme","Noirs"]},
+      {"name":"Pandoras Actor","attrs":["Doppelgänger","Grand Tombeau de Nazarick","Gardien du trésor","Homme","Aucun"]},
+      {"name":"Gazef Stronoff","attrs":["Humain","Royaume de Re-Estize","Capitaine guerrier","Homme","Noirs"]},
+      {"name":"Brain Unglaus","attrs":["Humain","Royaume de Re-Estize","Épéiste","Homme","Bleus"]},
+      {"name":"Climb","attrs":["Humain","Royaume de Re-Estize","Chevalier","Homme","Blonds"]},
+      {"name":"Renner Theiere Chardelon Ryle Vaiself","attrs":["Humain","Royaume de Re-Estize","Princesse","Femme","Blonds"]},
+      {"name":"Evileye","attrs":["Vampire","Rose bleue","Mage","Femme","Blonds"]},
+      {"name":"Jircniv Rune Farlord El Nix","attrs":["Humain","Empire de Baharuth","Empereur","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Ainz Ooal Gown",100], ["Shalltear Bloodfallen",95], ["Albedo",92], ["Cocytus",90], ["Sebas Tian",90], ["Demiurge",88],
+    ["Pandoras Actor",86], ["Aura Bella Fiora",85], ["Mare Bello Fiore",86], ["Evileye",78], ["Narberal Gamma",76], ["Gazef Stronoff",72],
+    ["Brain Unglaus",70], ["Climb",45], ["Jircniv Rune Farlord El Nix",40], ["Renner Theiere Chardelon Ryle Vaiself",30]
+  ]
+}

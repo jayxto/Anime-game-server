@@ -1,0 +1,32 @@
+{
+  "key": "danmachi",
+  "name": "DanMachi",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Famille","Race","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Bell Cranel","attrs":["Famille Hestia","Humain","Dague","Homme","Blancs"]},
+      {"name":"Hestia","attrs":["Famille Hestia","Déesse","Aucune","Femme","Noirs"]},
+      {"name":"Liliruca Arde","attrs":["Famille Hestia","Pallum","Arbalète","Femme","Bruns"]},
+      {"name":"Welf Crozzo","attrs":["Famille Hestia","Humain","Grande épée","Homme","Rouges"]},
+      {"name":"Mikoto Yamato","attrs":["Famille Hestia","Humain","Katana","Femme","Noirs"]},
+      {"name":"Haruhime Sanjouno","attrs":["Famille Hestia","Homme-bête","Magie","Femme","Blonds"]},
+      {"name":"Ais Wallenstein","attrs":["Famille Loki","Humain","Épée","Femme","Blonds"]},
+      {"name":"Finn Deimne","attrs":["Famille Loki","Pallum","Lance","Homme","Blonds"]},
+      {"name":"Riveria Ljos Alf","attrs":["Famille Loki","Elfe","Bâton","Femme","Verts"]},
+      {"name":"Gareth Landrock","attrs":["Famille Loki","Nain","Hache","Homme","Bruns"]},
+      {"name":"Bete Loga","attrs":["Famille Loki","Homme-bête","Poings","Homme","Gris"]},
+      {"name":"Tiona Hiryute","attrs":["Famille Loki","Amazone","Grande épée","Femme","Noirs"]},
+      {"name":"Tione Hiryute","attrs":["Famille Loki","Amazone","Couteaux","Femme","Noirs"]},
+      {"name":"Ryuu Lion","attrs":["Famille Astrée","Elfe","Épée de bois","Femme","Blonds"]},
+      {"name":"Freya","attrs":["Famille Freya","Déesse","Aucune","Femme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Ottarl",100], ["Freya",90], ["Ais Wallenstein",95], ["Finn Deimne",92], ["Riveria Ljos Alf",92], ["Gareth Landrock",90],
+    ["Bell Cranel",90], ["Ryuu Lion",88], ["Bete Loga",85], ["Tiona Hiryute",84], ["Tione Hiryute",84], ["Welf Crozzo",70],
+    ["Mikoto Yamato",68], ["Hestia",50], ["Haruhime Sanjouno",60], ["Liliruca Arde",50], ["Syr Flova",45]
+  ]
+}

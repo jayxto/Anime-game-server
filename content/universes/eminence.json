@@ -1,0 +1,32 @@
+{
+  "key": "eminence",
+  "name": "The Eminence in Shadow",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Organisation","Rang","Race","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Cid Kagenou","attrs":["Shadow Garden","Chef","Humain","Homme","Noirs"]},
+      {"name":"Alpha","attrs":["Shadow Garden","Sept Ombres","Elfe","Femme","Blonds"]},
+      {"name":"Beta","attrs":["Shadow Garden","Sept Ombres","Elfe","Femme","Blancs"]},
+      {"name":"Gamma","attrs":["Shadow Garden","Sept Ombres","Elfe","Femme","Noirs"]},
+      {"name":"Delta","attrs":["Shadow Garden","Sept Ombres","Homme-bête","Femme","Noirs"]},
+      {"name":"Epsilon","attrs":["Shadow Garden","Sept Ombres","Elfe","Femme","Bleus"]},
+      {"name":"Zeta","attrs":["Shadow Garden","Sept Ombres","Homme-bête","Femme","Blancs"]},
+      {"name":"Eta","attrs":["Shadow Garden","Sept Ombres","Elfe","Femme","Bruns"]},
+      {"name":"Alexia Midgar","attrs":["Royaume de Midgar","Princesse","Humain","Femme","Blancs"]},
+      {"name":"Iris Midgar","attrs":["Royaume de Midgar","Princesse","Humain","Femme","Rouges"]},
+      {"name":"Rose Oriana","attrs":["Royaume d'Oriana","Princesse","Humain","Femme","Blonds"]},
+      {"name":"Claire Kagenou","attrs":["Aucune","Aucun","Humain","Femme","Noirs"]},
+      {"name":"Sherry Barnett","attrs":["Aucune","Chercheuse","Humain","Femme","Roses"]},
+      {"name":"Beatrix","attrs":["Aucune","Guerrière","Elfe","Femme","Blonds"]},
+      {"name":"Aurora","attrs":["Aucune","Sorcière","Humain","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Cid Kagenou",100], ["Aurora",95], ["Beatrix",90], ["Alpha",88], ["Delta",86], ["Beta",84],
+    ["Epsilon",84], ["Zeta",84], ["Gamma",80], ["Eta",80], ["Iris Midgar",78], ["Claire Kagenou",72],
+    ["Alexia Midgar",72], ["Rose Oriana",70], ["Sherry Barnett",30]
+  ]
+}
