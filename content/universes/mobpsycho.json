@@ -1,0 +1,39 @@
+{
+  "key": "mobpsycho",
+  "name": "Mob Psycho 100",
+  "quotes": [
+    {"text":"Avoir des pouvoirs psychiques ne fait pas de toi quelqu'un de spécial.","speaker":"Arataka Reigen","recipient":"à Mob","aliases":["Reigen"]},
+    {"text":"Éclaboussure de sel !","speaker":"Arataka Reigen","recipient":"à un esprit maléfique","aliases":["Reigen"]},
+    {"text":"Tu es quelqu'un de bien, Mob.","speaker":"Arataka Reigen","recipient":"à Mob","aliases":["Reigen"]},
+    {"text":"Mes pouvoirs ne sont qu'une partie de moi.","speaker":"Shigeo Kageyama","recipient":"à Teru","aliases":["Mob","Shigeo"]},
+    {"text":"Je veux plaire à Tsubomi-chan.","speaker":"Shigeo Kageyama","recipient":"à Reigen","aliases":["Mob","Shigeo"]},
+    {"text":"Je vais devenir un dieu !","speaker":"Dimple","recipient":"aux habitants de Seasoning City","aliases":["Ekubo"]},
+    {"text":"Je croyais être le héros de ce monde.","speaker":"Teruki Hanazawa","recipient":"après sa défaite contre Mob","aliases":["Teru"]},
+    {"text":"Pourquoi est-ce que moi, je n'ai aucun pouvoir ?","speaker":"Ritsu Kageyama","recipient":"en pensant à son frère","aliases":["Ritsu"]},
+    {"text":"Je vais conquérir le monde entier.","speaker":"Toichiro Suzuki","recipient":"à Mob","aliases":["Le patron des Griffes"]},
+    {"text":"Les muscles ne trahissent jamais.","speaker":"Musashi Goda","recipient":"à Mob, au club d'amélioration corporelle","aliases":["Goda"]}
+  ],
+  "dle": {
+    "categories": ["Pouvoir","Groupe","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Shigeo Kageyama","attrs":["Esper","Esprits et Cie","Élève","Homme","Noirs"]},
+      {"name":"Arataka Reigen","attrs":["Aucun","Esprits et Cie","Patron","Homme","Blonds"]},
+      {"name":"Katsuya Serizawa","attrs":["Esper","Esprits et Cie","Employé","Homme","Noirs"]},
+      {"name":"Dimple","attrs":["Esprit","Esprits et Cie","Esprit","Homme","Aucun"]},
+      {"name":"Ritsu Kageyama","attrs":["Esper","Conseil des élèves","Élève","Homme","Noirs"]},
+      {"name":"Teruki Hanazawa","attrs":["Esper","Aucun","Élève","Homme","Blonds"]},
+      {"name":"Toichiro Suzuki","attrs":["Esper","Griffes","Chef","Homme","Bruns"]},
+      {"name":"Sho Suzuki","attrs":["Esper","Aucun","Élève","Homme","Roux"]},
+      {"name":"Ryo Shimazaki","attrs":["Esper","Griffes","Membre","Homme","Noirs"]},
+      {"name":"Tome Kurata","attrs":["Aucun","Club de télépathie","Élève","Femme","Noirs"]},
+      {"name":"Musashi Goda","attrs":["Aucun","Club d'amélioration corporelle","Élève","Homme","Noirs"]},
+      {"name":"Tenga Onigawara","attrs":["Aucun","Aucun","Élève","Homme","Noirs"]},
+      {"name":"Mezato Ichi","attrs":["Aucun","Club de journalisme","Élève","Femme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Shigeo Kageyama",100], ["Toichiro Suzuki",96], ["Katsuya Serizawa",88], ["Teruki Hanazawa",85], ["Ryo Shimazaki",82], ["Dimple",80],
+    ["Ritsu Kageyama",80], ["Sho Suzuki",78], ["Minegishi",72], ["Ishiguro",70], ["Matsuo",70], ["Arataka Reigen",30],
+    ["Musashi Goda",25], ["Tenga Onigawara",20], ["Tome Kurata",15], ["Mezato Ichi",10]
+  ]
+}

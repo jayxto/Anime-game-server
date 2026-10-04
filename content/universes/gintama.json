@@ -1,0 +1,40 @@
+{
+  "key": "gintama",
+  "name": "Gintama",
+  "quotes": [
+    {"text":"Je ne me bats pas pour le pays. Je protège ce qui se trouve à portée de mon sabre.","speaker":"Gintoki Sakata","recipient":"à Shinpachi","aliases":["Gintoki","Gin-chan","Gin-san","Shiroyasha"]},
+    {"text":"Ce n'est pas Zura, c'est Katsura !","speaker":"Kotaro Katsura","recipient":"à Gintoki","aliases":["Katsura","Zura"]},
+    {"text":"Gin-chan, j'ai faim, aru !","speaker":"Kagura","recipient":"à Gintoki","aliases":[]},
+    {"text":"Je ne suis pas qu'une paire de lunettes !","speaker":"Shinpachi Shimura","recipient":"aux autres membres de la Yorozuya","aliases":["Shinpachi","Patsuan"]},
+    {"text":"Sans mayonnaise, la vie n'a aucun goût.","speaker":"Toshiro Hijikata","recipient":"aux membres du Shinsengumi","aliases":["Hijikata","Démon vice-commandant"]},
+    {"text":"Meurs, Hijikata.","speaker":"Sogo Okita","recipient":"à Hijikata","aliases":["Sogo","Okita"]},
+    {"text":"Otae-san, épousez-moi !","speaker":"Isao Kondo","recipient":"à Tae Shimura","aliases":["Kondo","Gorille"]},
+    {"text":"Je ne fais que détruire ce monde pourri.","speaker":"Shinsuke Takasugi","recipient":"à Katsura","aliases":["Takasugi"]},
+    {"text":"Je ne tue pas les faibles. Ils pourraient devenir forts un jour.","speaker":"Kamui","recipient":"à Gintoki","aliases":[]},
+    {"text":"Je ne suis pas un MADAO !","speaker":"Hasegawa Taizo","recipient":"à Gintoki","aliases":["Hasegawa","Madao"]}
+  ],
+  "dle": {
+    "categories": ["Groupe","Race","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Gintoki Sakata","attrs":["Yorozuya","Humain","Sabre de bois","Homme","Blancs"]},
+      {"name":"Shinpachi Shimura","attrs":["Yorozuya","Humain","Sabre de bois","Homme","Noirs"]},
+      {"name":"Kagura","attrs":["Yorozuya","Yato","Parapluie","Femme","Roux"]},
+      {"name":"Toshiro Hijikata","attrs":["Shinsengumi","Humain","Katana","Homme","Noirs"]},
+      {"name":"Sogo Okita","attrs":["Shinsengumi","Humain","Katana","Homme","Bruns"]},
+      {"name":"Isao Kondo","attrs":["Shinsengumi","Humain","Katana","Homme","Bruns"]},
+      {"name":"Kotaro Katsura","attrs":["Joui","Humain","Katana","Homme","Noirs"]},
+      {"name":"Shinsuke Takasugi","attrs":["Kiheitai","Humain","Katana","Homme","Violets"]},
+      {"name":"Kamui","attrs":["Harusame","Yato","Parapluie","Homme","Roux"]},
+      {"name":"Tsukuyo","attrs":["Yoshiwara","Humain","Kunai","Femme","Blonds"]},
+      {"name":"Tae Shimura","attrs":["Aucun","Humain","Naginata","Femme","Bruns"]},
+      {"name":"Kyubei Yagyu","attrs":["Clan Yagyu","Humain","Katana","Femme","Noirs"]},
+      {"name":"Hasegawa Taizo","attrs":["Aucun","Humain","Aucune","Homme","Bruns"]},
+      {"name":"Oboro","attrs":["Tenshouin Naraku","Humain","Aiguilles","Homme","Gris"]}
+    ]
+  },
+  "power": [
+    ["Utsuro",100], ["Umibozu",95], ["Kamui",94], ["Gintoki Sakata",93], ["Shinsuke Takasugi",88], ["Oboro",86],
+    ["Kotaro Katsura",85], ["Sogo Okita",84], ["Toshiro Hijikata",82], ["Kagura",82], ["Tsukuyo",78], ["Isao Kondo",75],
+    ["Kyubei Yagyu",72], ["Shinpachi Shimura",55], ["Tae Shimura",50], ["Elizabeth",45], ["Hasegawa Taizo",20]
+  ]
+}

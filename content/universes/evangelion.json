@@ -1,0 +1,43 @@
+{
+  "key": "evangelion",
+  "name": "Neon Genesis Evangelion",
+  "quotes": [
+    {"text":"Je ne dois pas fuir. Je ne dois pas fuir. Je ne dois pas fuir.","speaker":"Shinji Ikari","recipient":"avant de monter dans l'Eva","aliases":["Shinji"]},
+    {"text":"T'es idiot ou quoi ?!","speaker":"Asuka Langley Soryu","recipient":"à Shinji","aliases":["Asuka"]},
+    {"text":"C'est dégoûtant…","speaker":"Asuka Langley Soryu","recipient":"à Shinji, à la fin d'End of Evangelion","aliases":["Asuka"]},
+    {"text":"Je ne sais pas quoi faire dans ces moments-là… peut-être sourire ?","speaker":"Rei Ayanami","recipient":"à Shinji","aliases":["Rei"]},
+    {"text":"Monte dans l'Eva, ou rentre chez toi.","speaker":"Gendo Ikari","recipient":"à Shinji","aliases":["Gendo","Commandant Ikari"]},
+    {"text":"Tout se déroule selon le scénario.","speaker":"Gendo Ikari","recipient":"à Fuyutsuki","aliases":["Gendo","Commandant Ikari"]},
+    {"text":"Je crois que je suis né pour te rencontrer.","speaker":"Kaworu Nagisa","recipient":"à Shinji","aliases":["Kaworu"]},
+    {"text":"Le chant est l'apogée de la culture des Lilims.","speaker":"Kaworu Nagisa","recipient":"à Shinji","aliases":["Kaworu"]},
+    {"text":"C'était un baiser d'adulte. On fera le reste quand tu reviendras.","speaker":"Misato Katsuragi","recipient":"à Shinji","aliases":["Misato"]},
+    {"text":"Je t'ai frappé, alors frappe-moi aussi.","speaker":"Toji Suzuhara","recipient":"à Shinji","aliases":["Toji"]},
+    {"text":"Prends soin de mes pastèques.","speaker":"Ryoji Kaji","recipient":"à Shinji","aliases":["Kaji"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Organisation","Eva","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Shinji Ikari","attrs":["Pilote","NERV","Unité-01","Homme","Bruns"]},
+      {"name":"Rei Ayanami","attrs":["Pilote","NERV","Unité-00","Femme","Bleus"]},
+      {"name":"Asuka Langley Soryu","attrs":["Pilote","NERV","Unité-02","Femme","Roux"]},
+      {"name":"Toji Suzuhara","attrs":["Pilote","NERV","Unité-03","Homme","Noirs"]},
+      {"name":"Mari Illustrious Makinami","attrs":["Pilote","WILLE","Unité-08","Femme","Bruns"]},
+      {"name":"Kaworu Nagisa","attrs":["Ange","SEELE","Unité-02","Homme","Blancs"]},
+      {"name":"Misato Katsuragi","attrs":["Officier","NERV","Aucune","Femme","Violets"]},
+      {"name":"Gendo Ikari","attrs":["Commandant","NERV","Aucune","Homme","Bruns"]},
+      {"name":"Kozo Fuyutsuki","attrs":["Commandant adjoint","NERV","Aucune","Homme","Gris"]},
+      {"name":"Ritsuko Akagi","attrs":["Scientifique","NERV","Aucune","Femme","Blonds"]},
+      {"name":"Ryoji Kaji","attrs":["Agent","NERV","Aucune","Homme","Noirs"]},
+      {"name":"Maya Ibuki","attrs":["Technicien","NERV","Aucune","Femme","Bruns"]},
+      {"name":"Makoto Hyuga","attrs":["Technicien","NERV","Aucune","Homme","Noirs"]},
+      {"name":"Shigeru Aoba","attrs":["Technicien","NERV","Aucune","Homme","Bruns"]},
+      {"name":"Kensuke Aida","attrs":["Élève","Collège de Tokyo-3","Aucune","Homme","Bruns"]},
+      {"name":"Hikari Horaki","attrs":["Élève","Collège de Tokyo-3","Aucune","Femme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Kaworu Nagisa",98], ["Shinji Ikari",95], ["Rei Ayanami",92], ["Asuka Langley Soryu",90], ["Mari Illustrious Makinami",88], ["Toji Suzuhara",70],
+    ["Gendo Ikari",60], ["Misato Katsuragi",55], ["Ryoji Kaji",55], ["Ritsuko Akagi",40], ["Kozo Fuyutsuki",35], ["Maya Ibuki",25],
+    ["Makoto Hyuga",25], ["Shigeru Aoba",25], ["Kensuke Aida",15], ["Hikari Horaki",10]
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "key": "drstone",
+  "name": "Dr. Stone",
+  "quotes": [
+    {"text":"Dix milliards de pour cent !","speaker":"Senku Ishigami","recipient":"à Chrome","aliases":["Senku"]},
+    {"text":"Ça m'excite à mort, ça !","speaker":"Senku Ishigami","recipient":"devant une nouvelle invention","aliases":["Senku"]},
+    {"text":"La science n'a rien de magique. On avance un pas après l'autre.","speaker":"Senku Ishigami","recipient":"à Chrome","aliases":["Senku"]},
+    {"text":"Yuzuriha, je t'aime depuis toujours !","speaker":"Taiju Oki","recipient":"à Yuzuriha","aliases":["Taiju"]},
+    {"text":"Je veux un monde où seuls les jeunes au cœur pur survivront.","speaker":"Tsukasa Shishio","recipient":"à Senku","aliases":["Tsukasa"]},
+    {"text":"Je suis mentaliste. Manipuler les cœurs, c'est mon métier.","speaker":"Gen Asagiri","recipient":"à Senku","aliases":["Gen"]},
+    {"text":"Je suis le sorcier du village !","speaker":"Chrome","recipient":"à Senku","aliases":[]},
+    {"text":"Je veux tout. Le monde entier m'appartiendra !","speaker":"Ryusui Nanami","recipient":"à Senku","aliases":["Ryusui"]},
+    {"text":"Mon âme d'artisan s'enflamme !","speaker":"Kaseki","recipient":"en arrachant sa chemise","aliases":[]},
+    {"text":"Élégant.","speaker":"Dr. Xeno","recipient":"à Stanley","aliases":["Xeno"]}
+  ],
+  "dle": {
+    "categories": ["Origine","Camp","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Senku Ishigami","attrs":["Ère moderne","Royaume de la Science","Scientifique","Homme","Blancs"]},
+      {"name":"Taiju Oki","attrs":["Ère moderne","Royaume de la Science","Force de la nature","Homme","Bruns"]},
+      {"name":"Yuzuriha Ogawa","attrs":["Ère moderne","Royaume de la Science","Artisan","Femme","Bruns"]},
+      {"name":"Tsukasa Shishio","attrs":["Ère moderne","Empire de Tsukasa","Combattant","Homme","Bruns"]},
+      {"name":"Gen Asagiri","attrs":["Ère moderne","Royaume de la Science","Mentaliste","Homme","Noirs et blancs"]},
+      {"name":"Ryusui Nanami","attrs":["Ère moderne","Royaume de la Science","Capitaine","Homme","Blonds"]},
+      {"name":"Nikki Hanada","attrs":["Ère moderne","Royaume de la Science","Combattant","Femme","Blonds"]},
+      {"name":"Kohaku","attrs":["Village Ishigami","Royaume de la Science","Combattant","Femme","Blonds"]},
+      {"name":"Chrome","attrs":["Village Ishigami","Royaume de la Science","Scientifique","Homme","Bruns"]},
+      {"name":"Suika","attrs":["Village Ishigami","Royaume de la Science","Espion","Femme","Blonds"]},
+      {"name":"Kaseki","attrs":["Village Ishigami","Royaume de la Science","Artisan","Homme","Blancs"]},
+      {"name":"Kinro","attrs":["Village Ishigami","Royaume de la Science","Garde","Homme","Bruns"]},
+      {"name":"Ginro","attrs":["Village Ishigami","Royaume de la Science","Garde","Homme","Blonds"]},
+      {"name":"Ruri","attrs":["Village Ishigami","Royaume de la Science","Prêtresse","Femme","Blonds"]},
+      {"name":"Magma","attrs":["Village Ishigami","Royaume de la Science","Combattant","Homme","Blonds"]},
+      {"name":"Dr. Xeno","attrs":["Ère moderne","Équipe de Xeno","Scientifique","Homme","Blancs"]},
+      {"name":"Stanley Snyder","attrs":["Ère moderne","Équipe de Xeno","Soldat","Homme","Blancs"]},
+      {"name":"Moz","attrs":["Île de Takarajima","Habitants de Takarajima","Combattant","Homme","Bruns"]},
+      {"name":"Kirisame","attrs":["Île de Takarajima","Habitants de Takarajima","Combattant","Femme","Verts"]}
+    ]
+  },
+  "power": [
+    ["Tsukasa Shishio",100], ["Stanley Snyder",96], ["Hyoga",94], ["Kohaku",90], ["Moz",88], ["Taiju Oki",85],
+    ["Kirisame",82], ["Magma",75], ["Ukyo Saionji",74], ["Nikki Hanada",72], ["Kinro",70], ["Ibara",70],
+    ["Soyuz",60], ["Ginro",60], ["Yo Uei",55], ["Ryusui Nanami",55], ["Dr. Xeno",50], ["Francois",50],
+    ["Senku Ishigami",45], ["Chrome",45], ["Kaseki",40], ["Gen Asagiri",35], ["Yuzuriha Ogawa",30], ["Suika",30],
+    ["Joel Gear",30], ["Minami Hokutozai",25], ["Ruri",20], ["Luna Wright",20], ["Chelsea Childe",20]
+  ]
+}

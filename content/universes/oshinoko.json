@@ -1,0 +1,41 @@
+{
+  "key": "oshinoko",
+  "name": "Oshi no Ko",
+  "quotes": [
+    {"text":"Le mensonge, c'est la plus belle forme d'amour.","speaker":"Ai Hoshino","recipient":"à propos de son métier d'idole","aliases":["Ai"]},
+    {"text":"Aqua, Ruby… je vous aime. Ça y est, j'ai enfin pu le dire.","speaker":"Ai Hoshino","recipient":"à ses enfants, avant de mourir","aliases":["Ai"]},
+    {"text":"Je retrouverai l'homme qui a tué ma mère. Et je le tuerai.","speaker":"Aqua Hoshino","recipient":"en pensant à Ai","aliases":["Aqua","Aquamarine"]},
+    {"text":"Je deviendrai une idole, comme maman.","speaker":"Ruby Hoshino","recipient":"à Aqua","aliases":["Ruby"]},
+    {"text":"Je suis l'enfant star qui pleure en dix secondes !","speaker":"Kana Arima","recipient":"à Aqua","aliases":["Kana"]},
+    {"text":"Je ferai de toi mon fan, Aqua. Tu ne regarderas que moi.","speaker":"Kana Arima","recipient":"à Aqua","aliases":["Kana"]},
+    {"text":"Pour jouer quelqu'un, il suffit de l'étudier jusqu'à devenir lui.","speaker":"Akane Kurokawa","recipient":"à Aqua","aliases":["Akane"]},
+    {"text":"J'ai dix-huit ans ! Enfin… à peu près.","speaker":"MEM-cho","recipient":"à Aqua et Kana","aliases":["Memcho","MEM"]},
+    {"text":"Je ne suis pas leur mère… mais c'est moi qui les élèverai.","speaker":"Miyako Saito","recipient":"à Ichigo","aliases":["Miyako"]},
+    {"text":"Je ne sais pas ce qu'est l'amour. Alors je dis « je t'aime » en espérant qu'un jour ce mensonge devienne vrai.","speaker":"Ai Hoshino","recipient":"à propos de ses fans","aliases":["Ai"]}
+  ],
+  "dle": {
+    "categories": ["Profession","Groupe","Famille","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ai Hoshino","attrs":["Idole","B-Komachi","Hoshino","Femme","Violets"]},
+      {"name":"Aqua Hoshino","attrs":["Acteur","Strawberry Productions","Hoshino","Homme","Blonds"]},
+      {"name":"Ruby Hoshino","attrs":["Idole","B-Komachi","Hoshino","Femme","Blonds"]},
+      {"name":"Kana Arima","attrs":["Actrice","B-Komachi","Aucune","Femme","Rouges"]},
+      {"name":"MEM-cho","attrs":["Influenceuse","B-Komachi","Aucune","Femme","Blonds"]},
+      {"name":"Akane Kurokawa","attrs":["Actrice","Lalalai","Aucune","Femme","Bleus"]},
+      {"name":"Taiki Himekawa","attrs":["Acteur","Lalalai","Kamiki","Homme","Noirs"]},
+      {"name":"Miyako Saito","attrs":["Présidente d'agence","Strawberry Productions","Saito","Femme","Roses"]},
+      {"name":"Ichigo Saito","attrs":["Producteur","Strawberry Productions","Saito","Homme","Blonds"]},
+      {"name":"Melt Narushima","attrs":["Acteur","Aucun","Aucune","Homme","Violets"]},
+      {"name":"Frill Shiranui","attrs":["Actrice","Aucun","Aucune","Femme","Noirs"]},
+      {"name":"Minami Kotobuki","attrs":["Mannequin","Aucun","Aucune","Femme","Roses"]},
+      {"name":"Yuki Sumi","attrs":["Mannequin","Aucun","Aucune","Femme","Noirs"]},
+      {"name":"Gotanda Taishi","attrs":["Réalisateur","Aucun","Aucune","Homme","Bruns"]},
+      {"name":"Pieyon","attrs":["Influenceur","Aucun","Aucune","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Ai Hoshino",100], ["Aqua Hoshino",88], ["Akane Kurokawa",86], ["Kana Arima",85], ["Ruby Hoshino",84], ["Hikaru Kamiki",80],
+    ["Frill Shiranui",78], ["Taiki Himekawa",75], ["MEM-cho",70], ["Gotanda Taishi",65], ["Melt Narushima",60], ["Pieyon",60],
+    ["Minami Kotobuki",55], ["Yuki Sumi",55], ["Ichigo Saito",50], ["Miyako Saito",50], ["Nobuyuki Kumano",40]
+  ]
+}
