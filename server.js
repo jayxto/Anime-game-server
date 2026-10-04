@@ -16030,6 +16030,42 @@ arcItemsFor = function (source) {
     if (source === 'openings') return arcOpeningItems();
     return arcItemsForV1(source);
 };
+
+// AG_DEAD_THEME_VIDEOS_V1 — « Qui a le plus… » (Meilleur combat, Meilleure entrée, OST) et la tier list OST
+// jouent des vidéos YouTube : une vidéo supprimée/privée n'est plus jamais proposée. Quand le même combat
+// existe dans un autre upload vivant, l'item le reprend. Vérifié le 2026-10-04 (oEmbed + miniature),
+// puis re-sondé au démarrage et chaque jour.
+const THEME_VIDEO_REPLACEMENTS = {
+    'CmMa8dXn71I': 'DRDTCbMoBBc', // Naruto vs Pain, combat complet
+    'zJn-hyLSdbU': '9QGf6UYs6fI', // Ichigo vs Aizen, bataille finale
+    'LrYGhu2jzA0': 'WgKs_gtZW-4'  // Goku vs Freezer, combat complet
+};
+for (const id of ['9p3uVC9mexQ', 'OGFNX4aPCe0', 'ldbpfouF60Q', 'kD6XWRVpcYA', 'AGEuQ3Q6Tm4', 'ksXLy4gezZo', 'In5qd9-J7Rc', '-EZjAeR9jDg', 'hjh23tn0jtg', ...Object.keys(THEME_VIDEO_REPLACEMENTS)]) BT_BAD_IDS.add(id);
+const arcItemsForLiveVideos = arcItemsFor;
+arcItemsFor = function (source) {
+    const items = arcItemsForLiveVideos(source);
+    if (!Array.isArray(items) || !items.some(i => i && i.video && BT_BAD_IDS.has(i.video))) return items;
+    return items
+        .map(i => i && i.video && BT_BAD_IDS.has(i.video) && THEME_VIDEO_REPLACEMENTS[i.video] && !BT_BAD_IDS.has(THEME_VIDEO_REPLACEMENTS[i.video])
+            ? { ...i, video: THEME_VIDEO_REPLACEMENTS[i.video], start: 0 } : i)
+        .filter(i => !(i && i.video && BT_BAD_IDS.has(i.video)));
+};
+async function themeVideoDeadProbe() {
+    const ids = new Set();
+    for (const t of [...QT_THEMES, ...TLT_THEMES]) for (const i of (t.items || [])) if (i && i.video) ids.add(i.video);
+    for (const id of Object.values(THEME_VIDEO_REPLACEMENTS)) ids.add(id);
+    let found = 0;
+    for (const id of ids) {
+        if (BT_BAD_IDS.has(id)) continue;
+        try {
+            const r = await fetch(`https://i.ytimg.com/vi/${id}/mqdefault.jpg`, { signal: AbortSignal.timeout(8000) });
+            const len = r.ok ? (await r.arrayBuffer()).byteLength : 0;
+            if (r.status === 404 || (r.ok && len < 2000)) { BT_BAD_IDS.add(id); found++; }
+        } catch (_) { /* coupure réseau : on garde la vidéo */ }
+    }
+    if (found) console.log(`[thèmes] ${found} vidéo(s) YouTube supprimée(s) écartée(s)`);
+}
+setTimeout(() => { themeVideoDeadProbe(); setInterval(themeVideoDeadProbe, 24 * 3600 * 1000).unref(); }, 90 * 1000).unref();
 app.get('/api/arcade/openings', (req, res) => {
     const items = arcOpeningItems();
     res.json({ ok: true, source: 'openings', label: 'Openings & endings', items });

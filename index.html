@@ -791,6 +791,7 @@
         .uni-multi-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px;}
         .uni-multi-bar button{background:#1a1a2e;color:var(--accent-cyan);border:2px solid var(--accent-cyan);border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;}
         .uni-multi-bar button.on{background:var(--accent-cyan);color:#111;}
+        .uni-search-wrap{max-width:520px;margin:0 0 6px;} .uni-search-wrap .v7-input{margin:0 0 8px;font-size:1rem;}
         .quote-universe-btn.uni-sel{border-color:#00ff88;background:#0f2a1c;box-shadow:0 0 0 2px #00ff88 inset;}
         .quote-universe-btn.uni-sel::before{content:'✔ ';color:#00ff88;}
         .quote-universe-btn.uni-dim{opacity:.35;pointer-events:none;}
@@ -3160,6 +3161,7 @@ body.ag-game-page #app-root > #mode,
                 <button onclick="goToMenuSelection()" style="background:none;border:1px solid var(--text-muted);color:var(--text-muted);border-radius:4px;padding:7px 10px;cursor:pointer;">🔙 Retour</button>
             </div>
             <div id="uni-multi-bar" class="uni-multi-bar" style="display:none;"><button id="uni-multi-toggle" onclick="uniMultiToggle()">☑️ Choisir plusieurs animes</button><span id="uni-multi-info" class="tl-hint"></span></div>
+            <div class="uni-search-wrap"><input id="uni-search" class="v7-input" type="search" placeholder="🔎 Chercher un anime… (ex. frieren, attack on titan, jjk)" autocomplete="off" enterkeyhint="search" oninput="uniSearchApply()" onkeydown="if (event.key === 'Enter') uniSearchEnter()"><p id="uni-search-empty" class="tl-hint" style="display:none;margin:0 0 8px;">Aucun anime ne correspond à ta recherche.</p></div>
             <div class="quote-universe-grid" id="universe-select-grid"><button class="quote-universe-btn" onclick="createQuoteRoom('naruto')">Naruto<br><span style="font-size:.65rem;color:var(--text-muted);">38 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('onepiece')">One Piece<br><span style="font-size:.65rem;color:var(--text-muted);">42 citations</span></button>
 <button class="quote-universe-btn" onclick="createQuoteRoom('bleach')">Bleach<br><span style="font-size:.65rem;color:var(--text-muted);">39 citations</span></button>
@@ -4518,14 +4520,52 @@ body.ag-game-page #app-root > #mode,
                     t.textContent = mode === 'quote' && QUOTE_COUNTS[key] ? QUOTE_COUNTS[key] + ' citations' : cfg.tag;
                     b.appendChild(t);
                 }
-                b.dataset.k = key;
+                b.dataset.k = key; b.dataset.sk = key; b.dataset.sl = label;
                 b.onclick = () => { if (uniMulti.on) { uniMulti.sel.has(key) ? uniMulti.sel.delete(key) : uniMulti.sel.add(key); uniMultiUi(); } else pick(key); };
                 grid.appendChild(b);
             });
+            uniSearchReset();
             const p = document.getElementById('quote-universe-selection');
             if (p) p.style.display = 'block';
             window.scrollTo(0, 0);
         }
+
+        // Recherche d'univers : filtre la grille (nom affiché, clé, titres alternatifs ; accents/ponctuation ignorés).
+        const UNI_SEARCH_ALIASES = {
+            snk:'attack on titan shingeki no kyojin aot', sds:'nanatsu no taizai', cote:'youkoso jitsuryoku', solo:'ore dake level up',
+            fma:'hagane no renkinjutsushi', demonslayer:'kimetsu no yaiba', dragonball:'dbz dbs dragon ball z super', jjk:'jujutsu',
+            tensura:'slime tensei shitara', opm:'onepunchman', hxh:'hunterxhunter', mha:'boku no hero academia bnha', fairy:'fairytail',
+            promised:'yakusoku no neverland', shieldhero:'tate no yuusha', assclass:'ansatsu kyoushitsu assassination', kaguya:'love is war',
+            eightysix:'86', rascal:'bunny girl senpai seishun buta yarou', dressup:'sono bisque doll', callnight:'yofukashi no uta',
+            bluebox:'ao no hako', apothecary:'kusuriya no hitorigoto', rankingkings:'ousama ranking', dungeonmeshi:'delicious in dungeon',
+            foodwars:'shokugeki no soma', yourlie:'shigatsu wa kimi no uso', blueexorcist:'ao no exorcist', bungou:'bungo stray dogs',
+            blackbutler:'kuroshitsuji', nogamenolife:'ngnl', eminence:'kage no jitsuryokusha', erased:'boku dake ga inai machi',
+            cardcaptor:'sakura', parasyte:'kiseijuu parasite', conan:'meitantei detective', evangelion:'eva nge', fatestay:'fate',
+            fatezero:'fate', fateapo:'fate', mobpsycho:'mob psycho', oshinoko:'oshi no ko', drstone:'dr stone', yugioh:'yu gi oh',
+            hellsparadise:'jigokuraku', sao:'sword art online', ippo:'hajime no ippo', kuroko:'kuroko no basuke', haikyuu:'haikyu',
+            chainsaw:'chainsawman csm', rezero:'re zero', pokemon:'pokemon', akame:'akame ga kill', gurren:'tengen toppa'
+        };
+        const uniSearchNorm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        function uniSearchApply() {
+            const input = document.getElementById('uni-search');
+            const tokens = uniSearchNorm(input ? input.value : '').split(/\s+/).map(t => t.replace(/[^a-z0-9]/g, '')).filter(Boolean);
+            let shown = 0;
+            document.querySelectorAll('#universe-select-grid .quote-universe-btn').forEach(b => {
+                const k = b.dataset.sk;
+                if (!k) { b.style.display = tokens.length ? 'none' : ''; return; }
+                const hay = uniSearchNorm((b.dataset.sl || b.textContent) + ' ' + k + ' ' + (UNI_SEARCH_ALIASES[k] || '')).replace(/[^a-z0-9]/g, '');
+                const ok = tokens.every(t => hay.includes(t));
+                b.style.display = ok ? '' : 'none';
+                if (ok) shown++;
+            });
+            const empty = document.getElementById('uni-search-empty');
+            if (empty) empty.style.display = tokens.length && !shown ? 'block' : 'none';
+        }
+        function uniSearchEnter() {
+            const vis = [...document.querySelectorAll('#universe-select-grid .quote-universe-btn')].filter(b => b.dataset.sk && b.style.display !== 'none');
+            if (vis.length === 1) vis[0].click();
+        }
+        function uniSearchReset() { const i = document.getElementById('uni-search'); if (i) i.value = ''; uniSearchApply(); }
 
         const uniMulti = { on: false, sel: new Set(), pick: null };
         function uniMultiToggle() { uniMulti.on = !uniMulti.on; if (!uniMulti.on) uniMulti.sel.clear(); uniMultiUi(); }
@@ -7715,9 +7755,11 @@ body.ag-game-page #app-root > #mode,
                 const b = document.createElement('button');
                 b.className = 'quote-universe-btn';
                 b.textContent = 'Persos · ' + label;
+                b.dataset.sk = key; b.dataset.sl = label;
                 b.onclick = () => onPick(key);
                 grid.appendChild(b);
             });
+            uniSearchReset();
             document.getElementById('quote-universe-selection').style.display = 'block';
             window.scrollTo(0, 0);
         }
