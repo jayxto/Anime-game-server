@@ -45,7 +45,7 @@ jobs:
       - name: Test real decode and fake-byte rejection
         run: |
           node - <<'NODE'
-          const fs=require('fs'), vm=require('vm'), assert=require('assert'), sharp=require('sharp');
+          const fs=require('fs'), vm=require('vm'), assert=require('assert'), sharp=require('sharp'), crypto=require('crypto');
           const s=fs.readFileSync('server.js','utf8');
           const a=s.indexOf('function simpleImageLooksValid');
           const b=s.indexOf('function simpleImageIsPrivateHost',a);
@@ -54,11 +54,11 @@ jobs:
           vm.createContext(ctx);
           vm.runInContext(s.slice(a,b),ctx);
           (async()=>{
-            const png=await sharp({create:{width:64,height:64,channels:4,background:{r:255,g:0,b:0,alpha:1}}}).png().toBuffer();
+            const raw=crypto.randomBytes(256*256*3); const png=await sharp(raw,{raw:{width:256,height:256,channels:3}}).png().toBuffer();
             const normalized=await ctx.simpleNormalizeImage({bytes:png,mime:'image/png'});
             assert(normalized && normalized.mime==='image/webp');
             const meta=await sharp(normalized.bytes).metadata();
-            assert(meta.format==='webp' && meta.width===64 && meta.height===64);
+            assert(meta.format==='webp' && meta.width===256 && meta.height===256);
             const fake=Buffer.alloc(1200,65);
             assert.strictEqual(await ctx.simpleNormalizeImage({bytes:fake,mime:'image/jpeg'}),null);
             console.log('manual image integrity decode tests OK');
