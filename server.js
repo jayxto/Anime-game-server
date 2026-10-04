@@ -25933,3 +25933,114 @@ app.get('/api/cards/rates', (req, res) => {
         'Booster de la semaine : raretés x2 • chance x2 / x10 pendant les événements « chance » du site'
     ] });
 });
+
+/* =====================================================================
+   AG_MORE_FINISHES_V1 — 8 finitions de plus + finitions désactivables par joueur
+   (clic sur une finition dans « Chances d'obtention » : elle ne sortira plus pour lui).
+   ===================================================================== */
+const MORE_FINISHES_V1 = [
+    { id: 'crystal', label: 'Cristal', rate: 1 / 900, deck: 9 },
+    { id: 'prism', label: 'Prismatique', rate: 1 / 700, deck: 8 },
+    { id: 'aurora', label: 'Aurore boréale', rate: 1 / 600, deck: 8 },
+    { id: 'pixel', label: '8-bit', rate: 1 / 450, deck: 6 },
+    { id: 'neon', label: 'Néon', rate: 1 / 350, deck: 6 },
+    { id: 'retro', label: 'Rétro VHS', rate: 1 / 180, deck: 4 },
+    { id: 'sketch', label: 'Croquis', rate: 1 / 120, deck: 3 },
+    { id: 'sakura', label: 'Sakura', rate: 1 / 100, deck: 3 }
+];
+for (const f of MORE_FINISHES_V1) { FINISHES.push({ id: f.id, label: f.label, rate: f.rate }); FIN_DECK[f.id] = f.deck; }
+FINISHES.sort((a, b) => a.rate - b.rate); // de la plus rare à la plus courante, comme avant
+FIN_IDS.splice(0, FIN_IDS.length, ...FINISHES.map(f => f.id));
+CARD_RATES_CACHE = null;
+
+async function finOff(uid) { const v = await kvGet('finoff', String(uid), []); return new Set(Array.isArray(v) ? v.filter(f => FIN_IDS.includes(f)) : []); }
+cardDecorate = async function (uid, card, luck) {
+    if (!card || !card.u || !card.name) return card;
+    const off = await finOff(uid);
+    let fid = null;
+    for (const f of FINISHES) { if (Math.random() < Math.min(0.5, f.rate * (luck || 1))) { fid = f.id; break; } }
+    if (fid && off.has(fid)) fid = null; // finition refusée par le joueur : la carte sort sans finition
+    if (fid) Object.assign(card, await finAdd(uid, cardKeyOf(card), fid));
+    const r = RAR_RANK[card.rarity] || 0;
+    if (r >= 3 || card.finish === 'signed' || card.finish === 'numbered') { const q = cardQuote(card.u, card.name); if (q) card.quote = q; }
+    return card;
+};
+app.get('/api/cards/finish-prefs', async (req, res) => {
+    const uid = authUserId(req);
+    res.json({ ok: true, account: !!uid, off: uid ? [...(await finOff(uid))] : [] });
+});
+app.post('/api/cards/finish-prefs', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || '');
+    if (!FIN_IDS.includes(id)) return res.json({ ok: false, error: 'Finition inconnue.' });
+    const off = await finOff(uid);
+    if ((req.body || {}).off) off.add(id); else off.delete(id);
+    await kvSet('finoff', String(uid), [...off]);
+    res.json({ ok: true, off: [...off] });
+});
+
+/* =====================================================================
+   AG_AUTO_DELETE_V1 — suppression automatique par rareté : le joueur voit quand même ces cartes
+   à l'ouverture, puis elles sont retirées de sa collection à la fin du booster.
+   ===================================================================== */
+const AUTO_DEL_OK = () => new Set(['commune', 'rare', 'epique', 'legendaire', 'mythique', ...SPECIAL_TIERS.map(t => t.id)]);
+async function autoDelSet(uid) { const v = await kvGet('autodel', String(uid), []); const ok = AUTO_DEL_OK(); return new Set(Array.isArray(v) ? v.filter(r => ok.has(r)) : []); }
+async function autoDelApply(uid, cards) {
+    if (!uid || !Array.isArray(cards) || !cards.length) return cards;
+    const set = await autoDelSet(uid);
+    for (const c of cards) {
+        if (!c || c._adChecked) continue;
+        c._adChecked = true;
+        if (!set.has(c.rarity) || c.duo || !c.u || !c.name) continue;
+        try { if (await cardTake(uid, cardKeyOf(c), 1)) c.autoDel = true; } catch (_) {}
+    }
+    return cards;
+}
+const _openBoosterAutoDel = openBooster;
+openBooster = async function (uid, n, type = '') { return autoDelApply(uid, await _openBoosterAutoDel(uid, n, type)); };
+const _tbOpenAutoDel = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return autoDelApply(uid, await _tbOpenAutoDel(uid, b, chosenU)); };
+app.get('/api/cards/autodel-prefs', async (req, res) => {
+    const uid = authUserId(req);
+    res.json({ ok: true, account: !!uid, on: uid ? [...(await autoDelSet(uid))] : [] });
+});
+app.post('/api/cards/autodel-prefs', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || '');
+    if (!AUTO_DEL_OK().has(id)) return res.json({ ok: false, error: 'Rareté inconnue.' });
+    const set = await autoDelSet(uid);
+    if ((req.body || {}).on) set.add(id); else set.delete(id);
+    await kvSet('autodel', String(uid), [...set]);
+    res.json({ ok: true, on: [...set] });
+});
+
+/* =====================================================================
+   AG_MORE_CARDS_V1 — ~2 400 persos de plus ont une carte : tous les persos connus du jeu
+   (listes Roland-Garros et AnimeDLE) qui n'en avaient pas. Ajoutés APRÈS les cartes existantes :
+   la rareté des cartes déjà possédées ne change pas (calculée sur l'ancienne liste) ; les
+   nouvelles, moins connues, vont de Rare à Mythique.
+   ===================================================================== */
+const _cardPoolMore = cardPool;
+cardPool = function (u) {
+    const list = _cardPoolMore(u);
+    if (list._more || u === 'pokemon' || !list.length) return list;
+    list._more = true;
+    list.baseLen = list.length;
+    const have = new Set(list.map(c => normalizeRG(c.display)));
+    const cand = [...(RG_POOLS_V2[u] || []), ...((typeof DLE_MASTER_NAMES !== 'undefined' && DLE_MASTER_NAMES[u]) || [])];
+    for (const raw of cand) {
+        const display = arcDisplayName(u, raw), k = normalizeRG(display);
+        if (!k || have.has(k)) continue;
+        have.add(k);
+        list.push({ raw, display, extra: true, more: true });
+    }
+    return list;
+};
+cardRarityAt = function (u, idx) {
+    const list = cardPool(u), f = list.famous || list.length, base = list.baseLen || list.length;
+    if (idx < f) return cardRarity(idx, f);
+    if (idx < base) { const e = (idx - f) / Math.max(1, base - f); return e < 0.4 ? 'rare' : e < 0.75 ? 'epique' : e < 0.93 ? 'legendaire' : 'mythique'; }
+    const e = (idx - base) / Math.max(1, list.length - base);
+    return e < 0.45 ? 'rare' : e < 0.78 ? 'epique' : e < 0.95 ? 'legendaire' : 'mythique';
+};
+CARD_RATES_CACHE = null;

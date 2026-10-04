@@ -10932,12 +10932,33 @@ body.ag-game-page #app-root > #mode,
             const d = await v7get('/api/cards/rates');
             const body = m.querySelector('.rates-body');
             if (!d || !d.ok) { body.textContent = 'Impossible de charger les chances.'; return; }
+            const pr = await v7get('/api/cards/finish-prefs');
+            const off = new Set((pr && pr.off) || []);
+            const ad = await v7get('/api/cards/autodel-prefs');
+            const adel = new Set((ad && ad.on) || []);
             const label = r => (!r.extra && typeof RAR_LABEL !== 'undefined' && RAR_LABEL[r.id]) || r.label;
             const row = r => `<div class="rates-row"><span class="rates-dot" style="background:${RATE_COL[r.id] || '#888'}"></span><span class="rates-l">${v7esc(label(r))}</span><span class="rates-p">${ratesFmt(r.p)}</span></div>`;
-            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Par carte d’un booster normal, de la plus courante à la plus rare.</p>${d.rows.map(row).join('')}
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Par carte d’un booster normal, de la plus courante à la plus rare.<br>🗑️ Clique sur une rareté pour <b>supprimer automatiquement</b> ces cartes à la fin de chaque booster (tu les vois quand même à l’ouverture). Re-clique pour annuler.</p><div id="rates-rars">${d.rows.map(r => `<div class="rates-rar${adel.has(r.id) ? ' del' : ''}" data-r="${v7esc(r.id)}">${row(r)}</div>`).join('')}</div>
                 <h4>✨ Bonus</h4>${d.extras.map(r => row({ ...r, extra: true })).join('')}
-                <h4>💎 Finitions (par carte)</h4>${d.finishes.map(r => row({ ...r, id: '', extra: true })).join('')}
+                <h4>💎 Finitions (par carte)</h4><p class="tl-hint" style="margin:0 0 6px;">👆 Clique sur une finition pour ne plus jamais l’avoir (re-clique pour la réactiver).</p><div id="rates-fins">${d.finishes.map(r => `<div class="rates-fin${off.has(r.id) ? ' off' : ''}" data-f="${v7esc(r.id)}">${row({ ...r, id: '', extra: true })}</div>`).join('')}</div>
                 <p class="tl-hint" style="margin-top:10px;">${(d.boosts || []).map(v7esc).join('<br>')}</p>`;
+            body.querySelectorAll('.rates-rar').forEach(el => el.onclick = async () => {
+                if (!isAccount()) return toast('Connecte-toi pour utiliser la suppression automatique.', 'var(--accent-yellow)');
+                const want = !el.classList.contains('del');
+                const r = await v7post('/api/cards/autodel-prefs', { id: el.dataset.r, on: want });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                el.classList.toggle('del', want);
+                const lab = el.querySelector('.rates-l') ? el.querySelector('.rates-l').textContent : '';
+                toast(want ? `🗑️ Les cartes ${lab} seront supprimées à la fin de chaque booster` : `✅ Les cartes ${lab} sont gardées à nouveau`, want ? 'var(--accent-pink)' : '#00ff88');
+            });
+            body.querySelectorAll('.rates-fin').forEach(el => el.onclick = async () => {
+                if (!isAccount()) return toast('Connecte-toi pour choisir tes finitions.', 'var(--accent-yellow)');
+                const want = !el.classList.contains('off');
+                const r = await v7post('/api/cards/finish-prefs', { id: el.dataset.f, off: want });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                el.classList.toggle('off', want);
+                toast(want ? '🚫 Finition désactivée : tu ne l’auras plus' : '✅ Finition réactivée', want ? 'var(--accent-pink)' : '#00ff88');
+            });
         }
         async function tbBuy(bi) {
             if (tbBuy.busy) return;
@@ -13191,7 +13212,8 @@ body.ag-game-page #app-root > #mode,
                 const o = document.getElementById('summon'); if (!o || o.classList.contains('done')) return;
                 o.classList.add('done');
                 const cards = o._cards, news = cards.filter(c => c.isNew).length, coins = cards.reduce((a, c) => a + (c.coins || 0), 0);
-                o.querySelector('.sm-sum').innerHTML = `${news} nouvelle${news > 1 ? 's' : ''} carte${news > 1 ? 's' : ''}${coins ? ` • doublons : +${coins} 🪙` : ''}`;
+                const dels = cards.filter(c => c.autoDel).length; // AG_AUTO_DELETE_V1
+                o.querySelector('.sm-sum').innerHTML = `${news} nouvelle${news > 1 ? 's' : ''} carte${news > 1 ? 's' : ''}${coins ? ` • doublons : +${coins} 🪙` : ''}${dels ? ` • 🗑️ ${dels} supprimée${dels > 1 ? 's' : ''} automatiquement` : ''}`;
                 const b = o.querySelector('.sm-skip'); b.textContent = '✔ Fermer'; b.onclick = () => o.remove();
             }
         })();
@@ -13836,6 +13858,32 @@ body.ag-game-page #app-root > #mode,
         .tcard .tc-duo img{width:50%;height:100%;object-fit:cover;object-position:top;}
         .tcard .tc-duo img+img{border-left:2px solid #00e5a0;}
         /* --- finitions --- */
+        /* AG_MORE_FINISHES_V1 */
+        .tcard.f-crystal{border-color:#9be7ff;box-shadow:0 0 14px rgba(155,231,255,.7);}
+        .tcard.f-crystal .tc-fx{background:conic-gradient(from 30deg at 30% 30%,rgba(255,255,255,.45),rgba(155,231,255,.15) 25%,rgba(255,255,255,.4) 40%,rgba(155,231,255,.1) 60%,rgba(255,255,255,.45));mix-blend-mode:screen;clip-path:polygon(0 0,60% 0,100% 40%,100% 100%,40% 100%,0 60%);opacity:.75;}
+        .tcard.f-prism{border:2px solid transparent;background:linear-gradient(#111,#111) padding-box,linear-gradient(90deg,#ff5e5e,#ffd93d,#6bff6b,#5ec8ff,#c55eff,#ff5e5e) border-box;}
+        .tcard.f-prism .tc-fx{background:repeating-linear-gradient(120deg,rgba(255,94,94,.3) 0 10px,rgba(255,217,61,.3) 10px 20px,rgba(107,255,107,.3) 20px 30px,rgba(94,200,255,.3) 30px 40px,rgba(197,94,255,.3) 40px 50px);mix-blend-mode:color-dodge;animation:finHolo 6s linear infinite;background-size:200% 200%;}
+        .tcard.f-aurora{border-color:#5effc3;box-shadow:0 0 14px rgba(94,255,195,.6);}
+        .tcard.f-aurora .tc-fx{background:linear-gradient(170deg,rgba(94,255,195,.55),rgba(80,140,255,.4) 35%,rgba(200,90,255,.35) 60%,transparent 80%);background-size:100% 220%;mix-blend-mode:screen;animation:finAurora 6s ease-in-out infinite alternate;}
+        @keyframes finAurora{from{background-position:0 0;}to{background-position:0 100%;}}
+        .tcard.f-pixel{border:3px solid #7cff4f;border-radius:0;box-shadow:4px 4px 0 #1f7a00;image-rendering:pixelated;}
+        .tcard.f-pixel .tc-img img{image-rendering:pixelated;filter:contrast(1.25) saturate(1.3);}
+        .tcard.f-pixel .tc-fx{background-image:linear-gradient(rgba(0,0,0,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.25) 1px,transparent 1px);background-size:6px 6px;}
+        .tcard.f-pixel .tc-name{font-family:monospace;color:#7cff4f;}
+        .tcard.f-neon{border:2px solid #ff2bd6;box-shadow:0 0 8px #ff2bd6,0 0 22px #ff2bd6,inset 0 0 10px rgba(255,43,214,.5);background:#0a0010;animation:finNeon 1.6s ease-in-out infinite;}
+        .tcard.f-neon .tc-name{color:#fff;text-shadow:0 0 6px #ff2bd6,0 0 14px #00e5ff;}
+        @keyframes finNeon{0%,100%{box-shadow:0 0 8px #ff2bd6,0 0 22px #ff2bd6,inset 0 0 10px rgba(255,43,214,.5);}50%{box-shadow:0 0 8px #00e5ff,0 0 26px #00e5ff,inset 0 0 10px rgba(0,229,255,.5);}}
+        .tcard.f-retro{border-color:#ffb347;}
+        .tcard.f-retro .tc-img img{filter:sepia(.35) saturate(1.4) contrast(1.1) hue-rotate(-8deg);}
+        .tcard.f-retro .tc-fx{background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 1px,transparent 1px 3px),linear-gradient(90deg,rgba(255,0,0,.12),transparent 30%,transparent 70%,rgba(0,140,255,.12));animation:finVhs 3s steps(2) infinite;}
+        @keyframes finVhs{50%{transform:translateY(1px);}}
+        .tcard.f-sketch{background:#f4f1e8;border-color:#555;}
+        .tcard.f-sketch .tc-img img{filter:grayscale(1) contrast(2.2) brightness(1.25);mix-blend-mode:multiply;}
+        .tcard.f-sketch .tc-fx{background:repeating-linear-gradient(-35deg,rgba(0,0,0,.08) 0 1px,transparent 1px 5px);}
+        .tcard.f-sketch .tc-name,.tcard.f-sketch .tc-rar{color:#222;}
+        .tcard.f-sakura{border-color:#ffb7d5;box-shadow:0 0 12px rgba(255,183,213,.6);}
+        .tcard.f-sakura .tc-fx{background-image:radial-gradient(ellipse 5px 3px at 15% 20%,#ffb7d5 60%,transparent 70%),radial-gradient(ellipse 4px 3px at 70% 35%,#ffd1e3 60%,transparent 70%),radial-gradient(ellipse 5px 3px at 40% 65%,#ff9ec4 60%,transparent 70%),radial-gradient(ellipse 4px 3px at 85% 80%,#ffb7d5 60%,transparent 70%),linear-gradient(0deg,rgba(255,183,213,.3),transparent 50%);animation:finPetals 5s linear infinite;}
+        @keyframes finPetals{from{background-position:0 -40px,0 -60px,0 -30px,0 -50px,0 0;}to{background-position:20px 260px,-15px 240px,10px 270px,-20px 250px,0 0;}}
         .tcard.f-holo{border-color:#d7a8ff;box-shadow:0 0 12px rgba(215,168,255,.55);}
         .tcard.f-holo .tc-fx{background:linear-gradient(115deg,transparent 12%,rgba(255,0,170,.5) 28%,rgba(255,230,0,.45) 40%,rgba(0,255,170,.45) 52%,rgba(0,170,255,.5) 64%,rgba(180,77,255,.45) 74%,transparent 88%);background-size:260% 260%;mix-blend-mode:color-dodge;opacity:.7;animation:finHolo 5s linear infinite;}
         .tcard.f-holo.tilting .tc-fx,.tcard.f-reverse.tilting .tc-bgfx,.tcard.f-numbered.tilting .tc-fx{animation:none;background-position:var(--mx) var(--my);}
@@ -13912,6 +13960,12 @@ body.ag-game-page #app-root > #mode,
         #rates-modal h4{margin:12px 0 6px;color:var(--accent-cyan);}
         #rates-modal .rates-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #1d1d2b;font-size:.9rem;}
         #rates-modal .rates-dot{width:12px;height:12px;border-radius:50%;flex:0 0 12px;box-shadow:0 0 6px rgba(255,255,255,.25);}
+        #rates-modal .rates-rar{cursor:pointer;border-radius:6px;} #rates-modal .rates-rar:hover{background:#1b1b28;}
+        #rates-modal .rates-rar.del{background:rgba(255,42,95,.12);}
+        #rates-modal .rates-rar.del .rates-l::after{content:' — 🗑️ supprimées auto';color:var(--accent-pink);font-size:.8rem;}
+        #rates-modal .rates-fin{cursor:pointer;border-radius:6px;} #rates-modal .rates-fin:hover{background:#1b1b28;}
+        #rates-modal .rates-fin.off .rates-l,#rates-modal .rates-fin.off .rates-p{text-decoration:line-through;opacity:.45;}
+        #rates-modal .rates-fin.off .rates-l::after{content:' — désactivée 🚫';text-decoration:none;display:inline-block;margin-left:4px;color:var(--accent-pink);opacity:1;font-size:.8rem;}
         #rates-modal .rates-l{flex:1;} #rates-modal .rates-p{text-align:right;white-space:nowrap;} #rates-modal .rates-p small{color:var(--text-muted);}
         .tb-item small{line-height:1.25;} .tb-item.tb-event{border-color:var(--accent-yellow);box-shadow:0 0 14px rgba(255,230,0,.25);}
         /* AG_MORE_RARITIES_V1 — 8 styles de carte */
@@ -14061,10 +14115,10 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const FIN_LABEL = { holo: 'Holo', reverse: 'Reverse Holo', glitter: 'Pailletée', gold: 'Gold', dark: 'Dark', fullart: 'Full Art', manga: 'Manga', galaxy: 'Galaxie', glitch: 'Glitch', signed: 'Signée', numbered: 'Numérotée' };
-            const FIN_ICON = { holo: '🌈', reverse: '🪩', glitter: '✨', gold: '🥇', dark: '🌑', fullart: '🖼️', manga: '🖋️', galaxy: '🔮', glitch: '📺', signed: '✍️', numbered: '🔢' };
-            const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff' };
-            const FIN_ORDER = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
+            const FIN_LABEL = { holo: 'Holo', reverse: 'Reverse Holo', glitter: 'Pailletée', gold: 'Gold', dark: 'Dark', fullart: 'Full Art', manga: 'Manga', galaxy: 'Galaxie', glitch: 'Glitch', signed: 'Signée', numbered: 'Numérotée', crystal: 'Cristal', prism: 'Prismatique', aurora: 'Aurore boréale', pixel: '8-bit', neon: 'Néon', retro: 'Rétro VHS', sketch: 'Croquis', sakura: 'Sakura' };
+            const FIN_ICON = { holo: '🌈', reverse: '🪩', glitter: '✨', gold: '🥇', dark: '🌑', fullart: '🖼️', manga: '🖋️', galaxy: '🔮', glitch: '📺', signed: '✍️', numbered: '🔢', crystal: '🔷', prism: '💎', aurora: '🌌', pixel: '👾', neon: '💡', retro: '📼', sketch: '✏️', sakura: '🌸' };
+            const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff', crystal: '#9be7ff', prism: '#ff9ff3', aurora: '#5effc3', pixel: '#7cff4f', neon: '#ff2bd6', retro: '#ffb347', sketch: '#d9d9d9', sakura: '#ffb7d5' };
+            const FIN_ORDER = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'celeste', 'abyssale', 'primordiale', 'stellaire', 'spectrale', 'infernale', 'glaciale', 'imperiale', 'dimensionnelle', 'chaos', 'absolue', 'noel', 'valentin', 'ete'];
             Object.assign(RAR_LABEL, { stellaire: 'Stellaire ⭐', spectrale: 'Spectrale 👻', infernale: 'Infernale 🔥', glaciale: 'Glaciale ❄️', imperiale: 'Impériale 🏯', dimensionnelle: 'Dimensionnelle 🌀', chaos: 'Chaos ☄️', absolue: 'Absolue ✴️', celeste: 'Céleste 🌠', abyssale: 'Abyssale 🌑', primordiale: 'Primordiale 🔱', eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
             if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { stellaire: 'Stellaire', spectrale: 'Spectrale', infernale: 'Infernale', glaciale: 'Glaciale', imperiale: 'Impériale', dimensionnelle: 'Dimensionnelle', chaos: 'Chaos', absolue: 'Absolue', celeste: 'Céleste', abyssale: 'Abyssale', primordiale: 'Primordiale', eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
@@ -14292,7 +14346,7 @@ body.ag-game-page #app-root > #mode,
         (function () {
             const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
             const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
-            const FORD = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
+            const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
             const SORTS = {
