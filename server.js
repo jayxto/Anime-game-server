@@ -12613,6 +12613,70 @@ function simpleVerifiedCharacterImage(u,name) {
     return SIMPLE_VERIFIED_CHARACTER_IMAGES.get(`${simpleImageCompact(u)}|${simpleImageNorm(name)}`) || null;
 }
 
+/* AG_SIMPLE_IMAGE_CORRECTIONS_V1 — rows that already had bytes but showed ANOTHER character
+   (name-only searches: Lucy of Cyberpunk came back as Luffy, Rock of Black Lagoon as Rock Lee…).
+   Reviewed 2026-10-04 against the anime's own AniList cast or its official wiki. Applied once at
+   boot; an admin URL (manual-admin) is never touched. */
+const SIMPLE_IMAGE_CORRECTIONS_V1 = new Map(Object.entries({
+    'apothecary|Xiaolan':'https://s4.anilist.co/file/anilistcdn/character/large/b274186-lzElg0bbpo1O.jpg',
+    'beastars|Ibuki':'https://s4.anilist.co/file/anilistcdn/character/large/b132985-hb60Fj8P43er.png',
+    'beastars|Riz':'https://s4.anilist.co/file/anilistcdn/character/large/b132983-hOgSO3VJ9Bmx.png',
+    'beastars|Tem':'https://s4.anilist.co/file/anilistcdn/character/large/b132986-zSlKOw5a8UOI.png',
+    'berserk|Slan':'https://s4.anilist.co/file/anilistcdn/character/large/b605-ZsoC0t5dH12S.png',
+    'berserk|Void':'https://s4.anilist.co/file/anilistcdn/character/large/b604-vQdHCxkTarh5.png',
+    'blackbutler|Agni':'https://s4.anilist.co/file/anilistcdn/character/large/b16735-chd0v1o0IBky.jpg',
+    'blackbutler|Lau':'https://s4.anilist.co/file/anilistcdn/character/large/14958.jpg',
+    'blackbutler|Snake':'https://s4.anilist.co/file/anilistcdn/character/large/b35348-A1ABcSwEkA65.png',
+    'blacklagoon|Chang':'https://s4.anilist.co/file/anilistcdn/character/large/3450.jpg',
+    'blacklagoon|Rock':'https://s4.anilist.co/file/anilistcdn/character/large/b459-QsGmozEvK0jM.png',
+    'bocchi|PA-san':'https://s4.anilist.co/file/anilistcdn/character/large/b289055-khOP70WdXl2V.jpg',
+    'cowboybebop|Punch':'https://s4.anilist.co/file/anilistcdn/character/large/b6693-g9dxF2QkMkUZ.png',
+    'cyberpunk|Dorio':'https://static.wikia.nocookie.net/cyberpunk/images/b/bd/Dorio_Infobox_CPEDGE.png/revision/latest?cb=20260622125733',
+    'cyberpunk|Falco':'https://s4.anilist.co/file/anilistcdn/character/large/b287420-AzHYB6Sjt2Vj.jpg',
+    'cyberpunk|Kiwi':'https://s4.anilist.co/file/anilistcdn/character/large/b284161-QlVuoXKKONLM.jpg',
+    'cyberpunk|Lucy':'https://s4.anilist.co/file/anilistcdn/character/large/b284157-cqYawN7XCNJx.jpg',
+    'cyberpunk|Maine':'https://s4.anilist.co/file/anilistcdn/character/large/b284159-RvuKShSpDOS5.png',
+    'devilman|Xenon':'https://static.wikia.nocookie.net/devilman/images/9/97/D9466f392c416ce1933065c86c06061f1512129474_full.jpg/revision/latest?cb=20171202185300',
+    'drstone|Hyoga':'https://s4.anilist.co/file/anilistcdn/character/large/b145062-eCEE4J0RRGvt.jpg',
+    'drstone|Ibara':'https://static.wikia.nocookie.net/dr-stone/images/b/ba/Ibara_Full_Body_%28Anime%29.png/revision/latest?cb=20231026082815',
+    'drstone|Minami Hokutozai':'https://static.wikia.nocookie.net/dr-stone/images/0/0a/Minami_Full_Body_%28Anime%29.png/revision/latest?cb=20250128175753',
+    'gintama|Umibozu':'https://s4.anilist.co/file/anilistcdn/character/large/b9876-mV0noYgRqmBc.png',
+    'grandblue|Shiori Kitahara':'https://s4.anilist.co/file/anilistcdn/character/large/b125928-c9RlL22xjsJL.png',
+    'greatpretender|Dorothy':'https://s4.anilist.co/file/anilistcdn/character/large/b190121-nyEBFyRXMFpr.png',
+    'greatpretender|Kudo':'https://static.wikia.nocookie.net/greatpretender/images/f/fc/Kudo_-_Transparent_1.png/revision/latest?cb=20200915205824',
+    'konosuba|Chris':'https://static.wikia.nocookie.net/konosuba/images/d/dd/Chris_Anime.png/revision/latest?cb=20240404150137',
+    'mha|Endeavor':'https://s4.anilist.co/file/anilistcdn/character/large/b126158-Wix9rh7unTDQ.png',
+    'mha|Hawks':'https://s4.anilist.co/file/anilistcdn/character/large/b128299-eMEsWazNXE56.png',
+    'mha|Stain':'https://s4.anilist.co/file/anilistcdn/character/large/b126067-ZL6sRFyaqX9c.png',
+    'promised|Andrew':'https://static.wikia.nocookie.net/yakusokunoneverland/images/e/ed/Andrew_debut.png/revision/latest?cb=20230421120036',
+    'promised|Lucas':'https://s4.anilist.co/file/anilistcdn/character/large/126502-vAOZ7lG12F9v.png',
+    'promised|Yuugo':'https://static.wikia.nocookie.net/yakusokunoneverland/images/d/d7/Yugo_2047_3.png/revision/latest?cb=20220909052442',
+    'rankingkings|Miranjo':'https://static.wikia.nocookie.net/ousamaranking/images/2/26/New_miranjo.png/revision/latest?cb=20211224202110',
+    'tokyomewmew|Taruto':'https://s4.anilist.co/file/anilistcdn/character/large/b13398-msGQ8raCuWRz.png',
+    'vinland|Askeladd':'https://s4.anilist.co/file/anilistcdn/character/large/b13020-ZdiYlNmpRUNS.png'
+}));
+for (const [k, url] of SIMPLE_IMAGE_CORRECTIONS_V1) {
+    const [u, n] = k.split('|');
+    SIMPLE_VERIFIED_CHARACTER_IMAGES.set(`${simpleImageCompact(u)}|${simpleImageNorm(n)}`, url);
+}
+async function simpleApplyImageCorrections() {
+    const out = {fixed:0, kept:0, failed:0};
+    if (!process.env.DATABASE_URL) return out;
+    for (const [k, url] of SIMPLE_IMAGE_CORRECTIONS_V1) {
+        const [u, name] = k.split('|');
+        try {
+            const id = simpleCanonicalCharacterIdentity(u, name, '');
+            const r = await pool.query(`SELECT status,source_url FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`, [id.u, id.normName]);
+            const row = r.rows[0];
+            if (row && (row.status === 'manual-admin' || row.source_url === url)) { out.kept++; continue; }
+            const img = await simpleFetchImage(url);
+            if (img && await simpleStoreImage({u, name, anime:''}, img, url, 'ok')) out.fixed++; else out.failed++;
+        } catch (_) { out.failed++; }
+    }
+    console.log('[Simple images] corrections', out);
+    return out;
+}
+
 async function simpleMigrationPass(pass) {
     SIMPLE_IMAGE_STATE.pass = pass;
     const chars = await simpleCatalogue();
@@ -12734,6 +12798,7 @@ async function startSimpleImageMigration() {
         await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS image_bytes BYTEA`);
         await simpleRepairManualImageRows();
         await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS mime_type TEXT`);
+        await simpleApplyImageCorrections();
         let missing=[];
         for (let pass=1; pass<=3; pass++) {
             missing=await simpleMigrationPass(pass);
@@ -14478,6 +14543,51 @@ async function arcFetchImage(url) {
     return task;
 }
 
+/* AG_ARC_SAME_ORIGIN_IMAGES_V1 — les portraits vérifiés locaux (/assets/images/…) et ceux de Postgres
+   (/api/character-image-file) sont lus directement : le fetch https ci-dessus les refusait, donc les
+   persos les plus connus ne sortaient jamais dans Pixel / Zoom / Silhouette / Devine le perso. */
+const _arcFetchImageRemote = arcFetchImage;
+arcFetchImage = async function (url) {
+    const s = String(url || '');
+    if (!s.startsWith('/')) return _arcFetchImageRemote(url);
+    if (ARC_IMG_CACHE.has(s)) return ARC_IMG_CACHE.get(s);
+    let item = null;
+    try {
+        if (s.startsWith('/api/character-image-file?')) {
+            const q = new URLSearchParams(s.slice(s.indexOf('?') + 1));
+            const rawU = String(q.get('u') || '').trim(), rawName = cleanImageCharacterName(String(q.get('n') || '').trim());
+            if (HAS_DB && rawU && rawName) {
+                const id = simpleCanonicalCharacterIdentity(rawU, rawName, String(q.get('anime') || ''));
+                const r = await pool.query(
+                    `SELECT image_bytes,mime_type FROM character_images
+                      WHERE ((universe_key=$1 AND norm_name=$2) OR (universe_key=$3 AND norm_name=$4)) AND image_bytes IS NOT NULL
+                      ORDER BY (universe_key=$1 AND norm_name=$2) DESC LIMIT 1`,
+                    [id.u, id.normName, rawU, normalizeImageKey(rawName)]);
+                const row = r.rows[0];
+                if (row && await simpleImageDecodes(row.image_bytes)) item = { buf: row.image_bytes, type: row.mime_type || 'image/webp' };
+            }
+        } else {
+            const roots = [['/assets/images/chars/', __agLocalImageCache.root], ['/assets/images/external/', path.join(__dirname, 'assets', 'images', 'external')]];
+            const hit = roots.find(([p]) => s.startsWith(p));
+            if (hit) {
+                let rel = s.slice(hit[0].length).split('?')[0];
+                try { rel = decodeURIComponent(rel); } catch (_) {}
+                const root = path.resolve(hit[1]), fp = path.resolve(root, rel);
+                if (fp.startsWith(root + path.sep)) item = { buf: await fs.promises.readFile(fp), type: __agLocalImageCache.mime(fp) };
+            }
+        }
+    } catch (_) { item = null; }
+    if (!item || item.buf.length < 800 || item.buf.length > 10 * 1024 * 1024) return null;
+    ARC_IMG_CACHE.set(s, item);
+    ARC_IMG_CACHE_BYTES += item.buf.length;
+    while (ARC_IMG_CACHE_BYTES > 90 * 1024 * 1024 && ARC_IMG_CACHE.size) {
+        const [k, v] = ARC_IMG_CACHE.entries().next().value;
+        ARC_IMG_CACHE.delete(k);
+        ARC_IMG_CACHE_BYTES -= v.buf.length;
+    }
+    return item;
+};
+
 app.get('/api/arc-img/:token', async (req, res) => {
     const entry = ARC_IMG_TOKENS.get(String(req.params.token || ''));
     if (!entry || entry.exp < Date.now()) return res.status(404).end();
@@ -16025,8 +16135,21 @@ async function arcAniImage(u, name) {
 }
 const resolveCharacterImageFandom = resolveCharacterImage;
 resolveCharacterImage = async function (universeKey, displayName) {
+    // AG_DB_IMAGE_FIRST_V1 — l'URL admin puis le portrait vérifié en base passent avant la recherche
+    // AniList par nom seul (« Lucy » de Cyberpunk renvoyait Luffy, « Rock » de Black Lagoon Rock Lee).
+    const dbFirst = universeKey && universeKey !== 'pokemon' && displayName;
+    if (dbFirst) {
+        try {
+            const manual = await simpleManualCharacterImage(universeKey, displayName);
+            if (manual?.imageUrl) return manual;
+        } catch (_) {}
+    }
     const fixed = staticCharImage(universeKey, displayName); // image vérifiée : instantané
     if (fixed) return { imageUrl: fixed, sourceUrl: null, status: 'ok' };
+    if (dbFirst) {
+        const stored = await avatarStoredImageRoute(universeKey, displayName);
+        if (stored) return { imageUrl: stored, sourceUrl: null, status: 'ok' };
+    }
     if (universeKey && universeKey !== 'pokemon' && displayName) {
         try {
             const clean = cleanImageCharacterName(displayName);
