@@ -1,0 +1,22 @@
+{
+  "key": "ippo",
+  "name": "Hajime no Ippo",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Club","Catégorie","Style","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ippo Makunouchi","attrs":["Kamogawa","Poids plume","Infighter","Homme","Noirs"]},
+      {"name":"Mamoru Takamura","attrs":["Kamogawa","Poids moyen","Polyvalent","Homme","Noirs"]},
+      {"name":"Masaru Aoki","attrs":["Kamogawa","Poids léger","Boxeur fantaisiste","Homme","Noirs"]},
+      {"name":"Tatsuya Kimura","attrs":["Kamogawa","Poids super-plume","Outboxer","Homme","Blonds"]},
+      {"name":"Ichiro Miyata","attrs":["Kawahara","Poids plume","Outboxer","Homme","Noirs"]},
+      {"name":"Takeshi Sendo","attrs":["Naniwa","Poids plume","Puncheur","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Mamoru Takamura",100], ["Eiji Date",92], ["Ippo Makunouchi",92], ["Ichiro Miyata",90], ["Takeshi Sendo",90], ["Ryo Mashiba",88],
+    ["Tatsuya Kimura",75], ["Masaru Aoki",72], ["Genji Kamogawa",60]
+  ]
+}

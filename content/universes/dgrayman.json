@@ -1,0 +1,27 @@
+{
+  "key": "dgrayman",
+  "name": "D.Gray-man",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Camp","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Allen Walker","attrs":["Ordre noir","Crown Clown","Homme","Blancs"]},
+      {"name":"Yu Kanda","attrs":["Ordre noir","Mugen","Homme","Noirs"]},
+      {"name":"Lavi","attrs":["Ordre noir","Marteau","Homme","Roux"]},
+      {"name":"Komui Lee","attrs":["Ordre noir","Aucune","Homme","Noirs"]},
+      {"name":"Miranda Lotto","attrs":["Ordre noir","Time Record","Femme","Bruns"]},
+      {"name":"Arystar Krory","attrs":["Ordre noir","Crocs","Homme","Noirs et blancs"]},
+      {"name":"Cross Marian","attrs":["Ordre noir","Judgment","Homme","Rouges"]},
+      {"name":"The Millennium Earl","attrs":["Noé","Aucune","Homme","Aucun"]},
+      {"name":"Tyki Mikk","attrs":["Noé","Tease","Homme","Noirs"]},
+      {"name":"Wisely","attrs":["Noé","Télépathie","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["The Millennium Earl",98], ["Nea D. Campbell",97], ["Cross Marian",95], ["Allen Walker",94], ["Tyki Mikk",92], ["Road Kamelot",92],
+    ["Yu Kanda",90], ["Wisely",88], ["Lavi",85], ["Lenalee Lee",85], ["Arystar Krory",82], ["Bookman",80],
+    ["Mana D. Campbell",70], ["Miranda Lotto",60], ["Komui Lee",40]
+  ]
+}

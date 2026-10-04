@@ -1,0 +1,23 @@
+{
+  "key": "samuraichamploo",
+  "name": "Samurai Champloo",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Mugen","attrs":["Vagabond","Sabre","Homme","Noirs"]},
+      {"name":"Jin","attrs":["Rōnin","Katana","Homme","Noirs"]},
+      {"name":"Fuu Kasumi","attrs":["Serveuse","Aucune","Femme","Bruns"]},
+      {"name":"Sara","attrs":["Musicienne","Shamisen","Femme","Bruns"]},
+      {"name":"Mukuro","attrs":["Bandit","Couteau","Homme","Noirs"]},
+      {"name":"Koza","attrs":["Voleuse","Aucune","Femme","Bruns"]},
+      {"name":"Okuru","attrs":["Guerrier aïnou","Épée","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Mugen",92], ["Jin",92], ["Kariya Kagetoki",90], ["Okuru",88], ["Sara",85], ["Shoryu",80],
+    ["Mukuro",70], ["Shinsuke",40], ["Koza",30], ["Fuu Kasumi",20]
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "key": "noragami",
+  "name": "Noragami",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Nature","Lien","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Yato","attrs":["Dieu","Yukine","Homme","Noirs"]},
+      {"name":"Hiyori Iki","attrs":["Humain","Yato","Femme","Bruns"]},
+      {"name":"Yukine","attrs":["Shinki","Yato","Homme","Blonds"]},
+      {"name":"Bishamon","attrs":["Dieu","Kazuma","Femme","Blonds"]},
+      {"name":"Kazuma","attrs":["Shinki","Bishamon","Homme","Roux"]},
+      {"name":"Kofuku","attrs":["Dieu","Daikoku","Femme","Roses"]},
+      {"name":"Daikoku","attrs":["Shinki","Kofuku","Homme","Bruns"]},
+      {"name":"Nora","attrs":["Nora","Fujisaki","Femme","Noirs"]},
+      {"name":"Ebisu","attrs":["Dieu","Kugaha","Homme","Noirs"]},
+      {"name":"Takemikazuchi","attrs":["Dieu","Kiun","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Bishamon",95], ["Takemikazuchi",95], ["Yato",93], ["Fujisaki",90], ["Nora",85], ["Kofuku",80],
+    ["Tenjin",75], ["Kazuma",75], ["Yukine",75], ["Ebisu",70], ["Daikoku",70], ["Kiun",70],
+    ["Tsuyu",60], ["Hiyori Iki",50], ["Mayu",50]
+  ]
+}

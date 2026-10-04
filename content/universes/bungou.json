@@ -1,0 +1,42 @@
+{
+  "key": "bungou",
+  "name": "Bungo Stray Dogs",
+  "quotes": [
+    {"text":"Mon rêve ? Un suicide propre, sans douleur, et avec une jolie femme.","speaker":"Osamu Dazai","recipient":"à Atsushi","aliases":["Dazai"]},
+    {"text":"Je veux simplement qu'on me dise que j'ai le droit de vivre.","speaker":"Atsushi Nakajima","recipient":"à Akutagawa","aliases":["Atsushi"]},
+    {"text":"Ce n'est pas écrit dans mon carnet d'idéaux !","speaker":"Doppo Kunikida","recipient":"à Dazai","aliases":["Kunikida"]},
+    {"text":"Rashōmon !","speaker":"Ryunosuke Akutagawa","recipient":"à Atsushi","aliases":["Akutagawa"]},
+    {"text":"Je déteste ce maudit Dazai plus que tout au monde !","speaker":"Chuya Nakahara","recipient":"à Dazai","aliases":["Chuya"]},
+    {"text":"Super déduction !","speaker":"Ranpo Edogawa","recipient":"aux policiers","aliases":["Ranpo"]},
+    {"text":"Je ne veux plus jamais tuer personne.","speaker":"Kyoka Izumi","recipient":"à Atsushi","aliases":["Kyoka"]},
+    {"text":"Ne t'inquiète pas, je vais te soigner… d'abord, je vais te découper.","speaker":"Akiko Yosano","recipient":"à Atsushi","aliases":["Yosano"]},
+    {"text":"L'humanité est pécheresse. Seul un monde sans pouvoir pourra être purifié.","speaker":"Fyodor Dostoevsky","recipient":"à Dazai","aliases":["Fyodor","Dostoïevski"]},
+    {"text":"Je veux être libre ! Libre comme un oiseau !","speaker":"Nikolai Gogol","recipient":"à Fyodor","aliases":["Gogol"]}
+  ],
+  "dle": {
+    "categories": ["Organisation","Pouvoir","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Atsushi Nakajima","attrs":["Agence des détectives armés","Bête sous la lune","Homme","Blancs"]},
+      {"name":"Osamu Dazai","attrs":["Agence des détectives armés","Indigne d'être humain","Homme","Bruns"]},
+      {"name":"Doppo Kunikida","attrs":["Agence des détectives armés","Poète idéaliste","Homme","Blonds"]},
+      {"name":"Ranpo Edogawa","attrs":["Agence des détectives armés","Super déduction","Homme","Noirs"]},
+      {"name":"Kyoka Izumi","attrs":["Agence des détectives armés","Démon des neiges","Femme","Noirs"]},
+      {"name":"Akiko Yosano","attrs":["Agence des détectives armés","Tu ne mourras point","Femme","Noirs"]},
+      {"name":"Junichiro Tanizaki","attrs":["Agence des détectives armés","Neige légère","Homme","Roux"]},
+      {"name":"Kenji Miyazawa","attrs":["Agence des détectives armés","Invaincu par la pluie","Homme","Blonds"]},
+      {"name":"Ryunosuke Akutagawa","attrs":["Port Mafia","Rashōmon","Homme","Noirs"]},
+      {"name":"Chuya Nakahara","attrs":["Port Mafia","Souillure de la tristesse","Homme","Roux"]},
+      {"name":"Ougai Mori","attrs":["Port Mafia","Vita Sexualis","Homme","Noirs"]},
+      {"name":"Francis Scott Key Fitzgerald","attrs":["Guilde","The Great Fitzgerald","Homme","Blonds"]},
+      {"name":"Lucy Maud Montgomery","attrs":["Guilde","Anne des abysses","Femme","Rouges"]},
+      {"name":"Edgar Allan Poe","attrs":["Guilde","Le Chat noir de la rue Morgue","Homme","Bruns"]},
+      {"name":"Fyodor Dostoevsky","attrs":["Rats dans la maison des morts","Crime et Châtiment","Homme","Noirs"]},
+      {"name":"Nikolai Gogol","attrs":["Décadence de l'Ange","Le Manteau","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Fyodor Dostoevsky",96], ["Chuya Nakahara",96], ["Osamu Dazai",95], ["Ougai Mori",92], ["Ryunosuke Akutagawa",92], ["Atsushi Nakajima",90],
+    ["Nikolai Gogol",90], ["Francis Scott Key Fitzgerald",90], ["Ranpo Edogawa",85], ["Doppo Kunikida",82], ["Kyoka Izumi",82], ["Akiko Yosano",80],
+    ["Kenji Miyazawa",80], ["Edgar Allan Poe",78], ["Lucy Maud Montgomery",75], ["Junichiro Tanizaki",72], ["Sigma",70], ["Ichiyo Higuchi",60]
+  ]
+}

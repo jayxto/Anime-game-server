@@ -1,0 +1,41 @@
+{
+  "key": "blackbutler",
+  "name": "Black Butler",
+  "quotes": [
+    {"text":"Je ne suis qu'un diable de majordome.","speaker":"Sebastian Michaelis","recipient":"à ses ennemis","aliases":["Sebastian"]},
+    {"text":"Yes, my lord.","speaker":"Sebastian Michaelis","recipient":"à Ciel","aliases":["Sebastian"]},
+    {"text":"Un majordome de la famille Phantomhive qui ne serait pas capable de ça ne vaudrait rien.","speaker":"Sebastian Michaelis","recipient":"à Ciel","aliases":["Sebastian"]},
+    {"text":"C'est un ordre, Sebastian !","speaker":"Ciel Phantomhive","recipient":"à Sebastian","aliases":["Ciel"]},
+    {"text":"Je suis le chien de garde de la Reine.","speaker":"Ciel Phantomhive","recipient":"à ses ennemis","aliases":["Ciel"]},
+    {"text":"Sebas-chan !","speaker":"Grell Sutcliff","recipient":"à Sebastian","aliases":["Grell"]},
+    {"text":"Fais-moi rire, et je te dirai tout ce que tu veux savoir.","speaker":"Undertaker","recipient":"à Ciel","aliases":[]},
+    {"text":"Les heures supplémentaires sont inacceptables.","speaker":"William T. Spears","recipient":"à Grell","aliases":["William"]},
+    {"text":"Ciel, tout doit être mignon !","speaker":"Elizabeth Midford","recipient":"à Ciel","aliases":["Lizzy","Elizabeth"]},
+    {"text":"Je ne sais pas vraiment ce que je fais ici, mais c'est amusant.","speaker":"Lau","recipient":"à Ciel","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Nature","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ciel Phantomhive","attrs":["Humain","Comte","Homme","Noirs"]},
+      {"name":"Sebastian Michaelis","attrs":["Démon","Majordome","Homme","Noirs"]},
+      {"name":"Undertaker","attrs":["Dieu de la mort","Croque-mort","Homme","Blancs"]},
+      {"name":"Grell Sutcliff","attrs":["Dieu de la mort","Faucheur","Homme","Rouges"]},
+      {"name":"William T. Spears","attrs":["Dieu de la mort","Faucheur","Homme","Noirs"]},
+      {"name":"Elizabeth Midford","attrs":["Humain","Fiancée","Femme","Blonds"]},
+      {"name":"Finnian","attrs":["Humain","Jardinier","Homme","Blonds"]},
+      {"name":"Mey-Rin","attrs":["Humain","Servante","Femme","Rouges"]},
+      {"name":"Baldroy","attrs":["Humain","Cuisinier","Homme","Blonds"]},
+      {"name":"Tanaka","attrs":["Humain","Intendant","Homme","Gris"]},
+      {"name":"Lau","attrs":["Humain","Mafieux","Homme","Noirs"]},
+      {"name":"Ran-Mao","attrs":["Humain","Garde du corps","Femme","Noirs"]},
+      {"name":"Soma Asman Kadar","attrs":["Humain","Prince","Homme","Violets"]},
+      {"name":"Agni","attrs":["Humain","Majordome","Homme","Blancs"]},
+      {"name":"Snake","attrs":["Humain","Artiste de cirque","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Sebastian Michaelis",98], ["Undertaker",97], ["Grell Sutcliff",85], ["William T. Spears",85], ["Agni",75], ["Elizabeth Midford",75],
+    ["Ran-Mao",72], ["Lau",70], ["Finnian",70], ["Mey-Rin",70], ["Baldroy",68], ["Tanaka",65],
+    ["Snake",50], ["Ciel Phantomhive",40], ["Soma Asman Kadar",30]
+  ]
+}

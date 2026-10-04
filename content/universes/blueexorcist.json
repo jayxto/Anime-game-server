@@ -1,0 +1,28 @@
+{
+  "key": "blueexorcist",
+  "name": "Blue Exorcist",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Nature","Meister","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Rin Okumura","attrs":["Demi-démon","Chevalier","Élève","Homme","Noirs"]},
+      {"name":"Yukio Okumura","attrs":["Demi-démon","Dragon","Professeur","Homme","Noirs"]},
+      {"name":"Shiemi Moriyama","attrs":["Humain","Tamer","Élève","Femme","Blonds"]},
+      {"name":"Ryuji Suguro","attrs":["Humain","Aria","Élève","Homme","Noirs et blonds"]},
+      {"name":"Izumo Kamiki","attrs":["Humain","Tamer","Élève","Femme","Violets"]},
+      {"name":"Konekomaru Miwa","attrs":["Humain","Aria","Élève","Homme","Aucun"]},
+      {"name":"Renzo Shima","attrs":["Humain","Aria","Élève","Homme","Roses"]},
+      {"name":"Shura Kirigakure","attrs":["Humain","Chevalier","Exorciste","Femme","Rouges"]},
+      {"name":"Arthur A. Angel","attrs":["Humain","Chevalier","Paladin","Homme","Blonds"]},
+      {"name":"Mephisto Pheles","attrs":["Démon","Aucun","Directeur","Homme","Violets"]},
+      {"name":"Amaimon","attrs":["Démon","Aucun","Roi démon","Homme","Verts"]}
+    ]
+  },
+  "power": [
+    ["Satan",100], ["Mephisto Pheles",98], ["Amaimon",92], ["Arthur A. Angel",92], ["Rin Okumura",90], ["Lewin Light",90],
+    ["Shura Kirigakure",88], ["Yukio Okumura",85], ["Juzo Shima",75], ["Ryuji Suguro",70], ["Renzo Shima",70], ["Mamushi Hojo",70],
+    ["Izumo Kamiki",65], ["Shiemi Moriyama",50], ["Konekomaru Miwa",40]
+  ]
+}
