@@ -1,0 +1,41 @@
+{
+  "key": "yuyuhakusho",
+  "name": "Yu Yu Hakusho",
+  "quotes": [
+    {"text":"Rei Gan !","speaker":"Yusuke Urameshi","recipient":"à ses adversaires","aliases":["Yusuke","Urameshi"]},
+    {"text":"Épée spirituelle !","speaker":"Kazuma Kuwabara","recipient":"à ses adversaires","aliases":["Kuwabara"]},
+    {"text":"Yukina-san, mon amour !","speaker":"Kazuma Kuwabara","recipient":"à Yukina","aliases":["Kuwabara"]},
+    {"text":"Dragon de la flamme noire !","speaker":"Hiei","recipient":"à ses adversaires","aliases":[]},
+    {"text":"Fouet de roses !","speaker":"Kurama","recipient":"à ses adversaires","aliases":["Shuichi Minamino","Yoko Kurama"]},
+    {"text":"J'ai abandonné mon humanité pour obtenir la force.","speaker":"Toguro Younger","recipient":"à Genkai","aliases":["Toguro","Toguro le cadet"]},
+    {"text":"Cent pour cent !","speaker":"Toguro Younger","recipient":"à Yusuke, au Tournoi des Ténèbres","aliases":["Toguro","Toguro le cadet"]},
+    {"text":"Je ne suis pas un bébé !","speaker":"Koenma","recipient":"à Yusuke","aliases":[]},
+    {"text":"Je suis Botan, ton guide vers l'au-delà !","speaker":"Botan","recipient":"à Yusuke, après sa mort","aliases":[]},
+    {"text":"Les humains ne méritent pas de vivre. Je vais ouvrir le tunnel vers le Makai.","speaker":"Shinobu Sensui","recipient":"à Yusuke","aliases":["Sensui"]}
+  ],
+  "dle": {
+    "categories": ["Espèce","Équipe","Technique","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Yusuke Urameshi","attrs":["Mazoku","Équipe Urameshi","Rei Gan","Homme","Noirs"]},
+      {"name":"Kazuma Kuwabara","attrs":["Humain","Équipe Urameshi","Épée spirituelle","Homme","Roux"]},
+      {"name":"Hiei","attrs":["Démon","Équipe Urameshi","Flamme noire","Homme","Noirs"]},
+      {"name":"Kurama","attrs":["Démon","Équipe Urameshi","Fouet de roses","Homme","Rouges"]},
+      {"name":"Genkai","attrs":["Humain","Équipe Urameshi","Onde spirituelle","Femme","Roses"]},
+      {"name":"Koenma","attrs":["Divinité","Monde des esprits","Mafuken","Homme","Bruns"]},
+      {"name":"Botan","attrs":["Guide des âmes","Monde des esprits","Aucune","Femme","Bleus"]},
+      {"name":"Keiko Yukimura","attrs":["Humain","Aucune","Aucune","Femme","Bruns"]},
+      {"name":"Toguro Younger","attrs":["Démon","Équipe Toguro","Force musculaire","Homme","Noirs"]},
+      {"name":"Shinobu Sensui","attrs":["Humain","Groupe de Sensui","Énergie sacrée","Homme","Noirs"]},
+      {"name":"Itsuki","attrs":["Démon","Groupe de Sensui","Ombre","Homme","Verts"]},
+      {"name":"Jin","attrs":["Démon","Rokuyukai","Vent","Homme","Rouges"]},
+      {"name":"Chu","attrs":["Démon","Rokuyukai","Combat ivre","Homme","Bleus"]},
+      {"name":"Mukuro","attrs":["Démon","Trois Rois du Makai","Combat","Femme","Roux"]},
+      {"name":"Raizen","attrs":["Démon","Trois Rois du Makai","Combat","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Raizen",100],["Mukuro",98],["Yomi",98],["Yusuke Urameshi",96],["Shinobu Sensui",95],["Hiei",90],
+    ["Toguro Younger",90],["Toguro",90],["Kurama",89],["Itsuki",82],["Genkai",80],["Kazuma Kuwabara",80],
+    ["Jin",75],["Chu",74],["Koenma",70],["Toguro Elder",70],["Rinku",65],["Botan",30],["Keiko Yukimura",5]
+  ]
+}

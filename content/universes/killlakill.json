@@ -1,0 +1,36 @@
+{
+  "key": "killlakill",
+  "name": "Kill la Kill",
+  "quotes": [
+    {"text":"Je cherche la personne qui a tué mon père.","speaker":"Ryuko Matoi","recipient":"à Satsuki","aliases":["Ryuko"]},
+    {"text":"Senketsu, on y va !","speaker":"Ryuko Matoi","recipient":"à Senketsu","aliases":["Ryuko"]},
+    {"text":"Je ne suis ni humaine ni vêtement. Je suis Ryuko Matoi !","speaker":"Ryuko Matoi","recipient":"à Ragyo","aliases":["Ryuko"]},
+    {"text":"La peur, c'est la liberté ! La soumission, c'est la libération !","speaker":"Satsuki Kiryuin","recipient":"aux élèves de l'Académie Honnōji","aliases":["Satsuki"]},
+    {"text":"Les gens ne sont que des porcs habillés en humains.","speaker":"Satsuki Kiryuin","recipient":"à Ryuko","aliases":["Satsuki"]},
+    {"text":"Alléluia !","speaker":"Mako Mankanshoku","recipient":"à Ryuko","aliases":["Mako"]},
+    {"text":"Je suis le bouclier de Lady Satsuki !","speaker":"Ira Gamagoori","recipient":"à Ryuko","aliases":["Gamagoori"]},
+    {"text":"Les vêtements sont les vrais maîtres de l'humanité.","speaker":"Ragyo Kiryuin","recipient":"à Satsuki","aliases":["Ragyo"]},
+    {"text":"C'est moi qui ai tué ton papa ~ !","speaker":"Nui Harime","recipient":"à Ryuko","aliases":["Nui"]},
+    {"text":"Il est temps que tu connaisses la vérité, Matoi.","speaker":"Aikuro Mikisugi","recipient":"à Ryuko","aliases":["Mikisugi"]}
+  ],
+  "dle": {
+    "categories": ["Camp","Rôle","Uniforme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ryuko Matoi","attrs":["Académie Honnōji","Élève","Senketsu","Femme","Noirs"]},
+      {"name":"Satsuki Kiryuin","attrs":["Académie Honnōji","Présidente du conseil","Junketsu","Femme","Noirs"]},
+      {"name":"Mako Mankanshoku","attrs":["Académie Honnōji","Élève","Aucun","Femme","Bruns"]},
+      {"name":"Ira Gamagoori","attrs":["Académie Honnōji","Élite des Quatre","Uniforme 3 étoiles","Homme","Blonds"]},
+      {"name":"Uzu Sanageyama","attrs":["Académie Honnōji","Élite des Quatre","Uniforme 3 étoiles","Homme","Verts"]},
+      {"name":"Nonon Jakuzure","attrs":["Académie Honnōji","Élite des Quatre","Uniforme 3 étoiles","Femme","Roses"]},
+      {"name":"Hoka Inumuta","attrs":["Académie Honnōji","Élite des Quatre","Uniforme 3 étoiles","Homme","Gris"]},
+      {"name":"Ragyo Kiryuin","attrs":["REVOCS","PDG","Shinra-Kōketsu","Femme","Blancs"]},
+      {"name":"Nui Harime","attrs":["REVOCS","Grande couturière","Aucun","Femme","Blonds"]},
+      {"name":"Aikuro Mikisugi","attrs":["Nudist Beach","Agent","Aucun","Homme","Bleus"]},
+      {"name":"Tsumugu Kinagase","attrs":["Nudist Beach","Agent","Aucun","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Ragyo Kiryuin",100],["Ryuko Matoi",97],["Satsuki Kiryuin",95],["Nui Harime",94],["Senketsu",90],["Ira Gamagoori",80],
+    ["Ira Gamagori",80],["Uzu Sanageyama",80],["Nonon Jakuzure",78],["Hoka Inumuta",76],["Aikuro Mikisugi",72],["Tsumugu Kinagase",70],["Mako Mankanshoku",50]
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "key": "inuyasha",
+  "name": "Inuyasha",
+  "quotes": [
+    {"text":"Assis !","speaker":"Kagome Higurashi","recipient":"à Inuyasha","aliases":["Kagome"]},
+    {"text":"Je ne suis pas Kikyo ! Je m'appelle Kagome !","speaker":"Kagome Higurashi","recipient":"à Inuyasha","aliases":["Kagome"]},
+    {"text":"Keh !","speaker":"Inuyasha","recipient":"à Kagome","aliases":[]},
+    {"text":"La Blessure du vent !","speaker":"Inuyasha","recipient":"à ses ennemis, avec Tessaiga","aliases":[]},
+    {"text":"Avec le Shikon no Tama, je deviendrai un vrai démon !","speaker":"Inuyasha","recipient":"à Kagome","aliases":[]},
+    {"text":"Accepteriez-vous de porter mon enfant ?","speaker":"Miroku","recipient":"aux jeunes femmes qu'il rencontre","aliases":["Le moine"]},
+    {"text":"Hiraikotsu !","speaker":"Sango","recipient":"en lançant son boomerang","aliases":[]},
+    {"text":"Inuyasha… viens avec moi en enfer.","speaker":"Kikyo","recipient":"à Inuyasha","aliases":[]},
+    {"text":"Kagome est ma femme !","speaker":"Koga","recipient":"à Inuyasha","aliases":["Kôga"]},
+    {"text":"Seigneur Sesshomaru !","speaker":"Jaken","recipient":"à Sesshomaru","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Espèce","Groupe","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Inuyasha","attrs":["Hanyō","Groupe d'Inuyasha","Tessaiga","Homme","Blancs"]},
+      {"name":"Kagome Higurashi","attrs":["Humain","Groupe d'Inuyasha","Arc","Femme","Noirs"]},
+      {"name":"Miroku","attrs":["Humain","Groupe d'Inuyasha","Bâton","Homme","Noirs"]},
+      {"name":"Sango","attrs":["Humain","Groupe d'Inuyasha","Boomerang","Femme","Noirs"]},
+      {"name":"Shippo","attrs":["Yōkai","Groupe d'Inuyasha","Magie de renard","Homme","Roux"]},
+      {"name":"Sesshomaru","attrs":["Yōkai","Groupe de Sesshomaru","Épée","Homme","Blancs"]},
+      {"name":"Rin","attrs":["Humain","Groupe de Sesshomaru","Aucune","Femme","Noirs"]},
+      {"name":"Jaken","attrs":["Yōkai","Groupe de Sesshomaru","Bâton à deux têtes","Homme","Aucun"]},
+      {"name":"Kikyo","attrs":["Humain","Aucun","Arc","Femme","Noirs"]},
+      {"name":"Naraku","attrs":["Hanyō","Naraku","Miasme","Homme","Noirs"]},
+      {"name":"Kagura","attrs":["Incarnation de Naraku","Naraku","Éventail","Femme","Noirs"]},
+      {"name":"Kanna","attrs":["Incarnation de Naraku","Naraku","Miroir","Femme","Blancs"]},
+      {"name":"Kohaku","attrs":["Humain","Exterminateurs de démons","Faucille","Homme","Bruns"]},
+      {"name":"Koga","attrs":["Yōkai","Clan des loups","Griffes","Homme","Noirs"]},
+      {"name":"Totosai","attrs":["Yōkai","Aucun","Marteau","Homme","Gris"]}
+    ]
+  },
+  "power": [
+    ["Sesshomaru",99],["Naraku",98],["Inuyasha",95],["Kikyo",85],["Koga",82],["Kagome Higurashi",80],
+    ["Miroku",80],["Sango",78],["Kagura",78],["Kanna",70],["Kohaku",65],["Totosai",60],
+    ["Kirara",55],["Shippo",40],["Jaken",35],["Myoga",5],["Rin",5]
+  ]
+}

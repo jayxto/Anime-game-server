@@ -1,0 +1,36 @@
+{
+  "key": "gurren",
+  "name": "Gurren Lagann",
+  "quotes": [
+    {"text":"Mais qui diable crois-tu que je suis ?!","speaker":"Kamina","recipient":"à ses ennemis","aliases":[]},
+    {"text":"Crois en toi. Pas en moi qui crois en toi, ni en toi qui crois en moi. Crois en toi qui crois en toi !","speaker":"Kamina","recipient":"à Simon","aliases":[]},
+    {"text":"Va au-delà de l'impossible et envoie promener la logique !","speaker":"Kamina","recipient":"à la Brigade Gurren","aliases":[]},
+    {"text":"Ma foreuse est celle qui percera les cieux !","speaker":"Simon","recipient":"à Lordgenome","aliases":[]},
+    {"text":"Giga Drill Break !","speaker":"Simon","recipient":"à ses ennemis","aliases":[]},
+    {"text":"King Kittan Giga Drill Break !","speaker":"Kittan Bachika","recipient":"à l'Anti-Spirale","aliases":["Kittan"]},
+    {"text":"Je ferai ce qui doit être fait, même si je dois devenir le méchant.","speaker":"Rossiu Adai","recipient":"à Simon","aliases":["Rossiu"]},
+    {"text":"Je suis la fille de Lordgenome… mais je veux rester avec Simon.","speaker":"Nia Teppelin","recipient":"à Simon","aliases":["Nia"]},
+    {"text":"Les humains sont trop faibles pour vivre à la surface.","speaker":"Lordgenome","recipient":"à Simon","aliases":["Le Roi spirale"]},
+    {"text":"La spirale mènera l'univers à sa perte.","speaker":"Anti-Spiral","recipient":"à Simon","aliases":["Anti-Spirale"]}
+  ],
+  "dle": {
+    "categories": ["Groupe","Rôle","Mecha","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Simon","attrs":["Brigade Gurren","Pilote","Lagann","Homme","Bleus"]},
+      {"name":"Kamina","attrs":["Brigade Gurren","Chef","Gurren","Homme","Bleus"]},
+      {"name":"Yoko Littner","attrs":["Brigade Gurren","Tireuse d'élite","Aucun","Femme","Rouges"]},
+      {"name":"Nia Teppelin","attrs":["Brigade Gurren","Princesse","Aucun","Femme","Bleus"]},
+      {"name":"Kittan Bachika","attrs":["Brigade Gurren","Pilote","King Kittan","Homme","Blonds"]},
+      {"name":"Rossiu Adai","attrs":["Brigade Gurren","Stratège","Aucun","Homme","Noirs"]},
+      {"name":"Leeron Littner","attrs":["Brigade Gurren","Mécanicien","Aucun","Homme","Verts"]},
+      {"name":"Gimmy Adai","attrs":["Brigade Gurren","Pilote","Gurren","Homme","Roux"]},
+      {"name":"Darry Adai","attrs":["Brigade Gurren","Pilote","Gurren","Femme","Roses"]},
+      {"name":"Viral","attrs":["Hommes-bêtes","Pilote","Enki","Homme","Blonds"]},
+      {"name":"Lordgenome","attrs":["Hommes-bêtes","Roi spirale","Lazengann","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Anti-Spiral",100],["Simon",99],["Lordgenome",95],["Kamina",88],["Viral",85],["Kittan Bachika",82],
+    ["Nia Teppelin",80],["Yoko Littner",75],["Rossiu Adai",60],["Gimmy Adai",55],["Darry Adai",55],["Leeron Littner",40],["Boota",30]
+  ]
+}

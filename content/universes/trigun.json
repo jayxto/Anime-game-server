@@ -1,0 +1,21 @@
+{
+  "key": "trigun",
+  "name": "Trigun",
+  "quotes": [],
+  "dle": {
+    "categories": ["Espèce","Camp","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Vash the Stampede","attrs":["Plant","Groupe de Vash","Revolver","Homme","Blonds"]},
+      {"name":"Nicholas D. Wolfwood","attrs":["Humain","Œil de Michael","Croix Punisher","Homme","Noirs"]},
+      {"name":"Meryl Stryfe","attrs":["Humain","Assurances Bernardelli","Derringers","Femme","Noirs"]},
+      {"name":"Milly Thompson","attrs":["Humain","Assurances Bernardelli","Fusil paralysant","Femme","Bruns"]},
+      {"name":"Millions Knives","attrs":["Plant","Gung-Ho Guns","Pouvoir des Plants","Homme","Blonds"]},
+      {"name":"Legato Bluesummers","attrs":["Humain","Gung-Ho Guns","Contrôle mental","Homme","Bleus"]},
+      {"name":"Rem Saverem","attrs":["Humain","Équipage des SEEDS","Aucune","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Millions Knives",100],["Vash the Stampede",99],["Nicholas D. Wolfwood",88],["Livio the Double Fang",86],["Legato Bluesummers",85],["Elendira the Crimsonnail",84],
+    ["Zazie the Beast",80],["Milly Thompson",50],["Meryl Stryfe",40],["Roberto De Niro",30],["Rem Saverem",20]
+  ]
+}
