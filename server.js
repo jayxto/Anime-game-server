@@ -116,11 +116,18 @@ app.use('/assets/images/chars', express.static(__agLocalImageCache.root, {
 app.get('/api/img', (req, res, next) => {
   try {
     const raw = String(req.query.u || req.query.url || '');
-    const prefix = '/assets/images/chars/';
-    if (!raw.startsWith(prefix)) return next();
-    let rel = raw.slice(prefix.length);
+    // Same-origin image routes (DB portraits, avatars): the https-only proxy below would reject them.
+    if (/^\/api\/(?:character-image-file|local-character-image|avatar\/img)\?/.test(raw)) return res.redirect(raw);
+    // Duo cards and themed tier lists store /assets/images/external/<hash>.webp.
+    const roots = [
+      ['/assets/images/chars/', __agLocalImageCache.root],
+      ['/assets/images/external/', require('path').join(__dirname, 'assets', 'images', 'external')]
+    ];
+    const hit = roots.find(([p]) => raw.startsWith(p));
+    if (!hit) return next();
+    let rel = raw.slice(hit[0].length);
     try { rel = decodeURIComponent(rel); } catch (_) {}
-    const root = require('path').resolve(__agLocalImageCache.root);
+    const root = require('path').resolve(hit[1]);
     const fp = require('path').resolve(root, rel);
     if (fp !== root && !fp.startsWith(root + require('path').sep)) return res.status(400).end();
     const fs2 = require('fs');
@@ -13104,6 +13111,10 @@ const ARC_EMOJI = [
 
 // Scene Guessr : clips YouTube de vraies scènes (anime, id vidéo, description)
 const ARC_SCENES = [{"anime": "Naruto", "id": "CmMa8dXn71I", "desc": "Naruto vs Pain, combat complet (VOSTA)"}, {"anime": "Naruto", "id": "DRDTCbMoBBc", "desc": "Naruto vs Pain, combat complet (VF anglaise)"}, {"anime": "Naruto", "id": "OGFNX4aPCe0", "desc": "Naruto vs Pain, combat complet 60FPS (VOSTA)"}, {"anime": "One Piece", "id": "bauIj1SMbwk", "desc": "Luffy Gear 5 vs Kaido, combat complet (VF anglaise)"}, {"anime": "One Piece", "id": "iYbDA-m1u-c", "desc": "Luffy Gear 5 vs Kaido, clip officiel IGN Fan Fest 2024"}, {"anime": "One Piece", "id": "6DGwf4c9qxE", "desc": "Luffy vs Kaido, combat complet HD"}, {"anime": "Bleach", "id": "zJn-hyLSdbU", "desc": "Ichigo vs Aizen, bataille finale (VF anglaise)"}, {"anime": "Bleach", "id": "9CCXlnUn3z0", "desc": "Ichigo vs Aizen, combat complet"}, {"anime": "Bleach", "id": "9QGf6UYs6fI", "desc": "Ichigo vs Aizen, combat complet (VOSTA)"}, {"anime": "Hunter x Hunter", "id": "Oc78yF8Wr58", "desc": "Gon vs Pitou, combat complet HD (VF anglaise)"}, {"anime": "Hunter x Hunter", "id": "NMMvLQu1xMQ", "desc": "Gon vs Pitou, combat complet"}, {"anime": "Hunter x Hunter", "id": "eSd5wuj-dE4", "desc": "Gon vs Pitou, combat complet"}, {"anime": "L'Attaque des Titans", "id": "b6fB4gIkqqk", "desc": "Eren vs Reiner, combat complet saison 4 partie 2"}, {"anime": "L'Attaque des Titans", "id": "zK8jsOExJqs", "desc": "Eren vs Reiner, combat complet Full HD 60fps"}, {"anime": "L'Attaque des Titans", "id": "v983LqcNQS0", "desc": "Eren vs Reiner, combat complet (VOSTA)"}, {"anime": "Seven Deadly Sins", "id": "JgiMhAw_bc4", "desc": "Meliodas vs Zeldris et Estarossa, combat complet"}, {"anime": "Seven Deadly Sins", "id": "hbsQDrKqcwU", "desc": "Meliodas vs Zeldris et Estarossa, combat complet (VOSTA)"}, {"anime": "Seven Deadly Sins", "id": "VNfztmILGyQ", "desc": "Meliodas vs Zeldris (VF anglaise)"}, {"anime": "Death Note", "id": "JeDNxOO2xTY", "desc": "L vs Light, scène de confrontation"}, {"anime": "Death Note", "id": "Z1mcQ6CzXo8", "desc": "L confronte Light, clip officiel Netflix"}, {"anime": "Death Note", "id": "PgYa9UcSkpo", "desc": "L vs Light, combat complet 4K"}, {"anime": "Classroom of the Elite", "id": "r4gvAl5ukS0", "desc": "Ayanokoji remet les élèves à leur place, clip officiel SimulDub"}, {"anime": "Classroom of the Elite", "id": "Z89UPHYsHq4", "desc": "Ayanokoji face à quatre agresseurs, clip officiel"}, {"anime": "Classroom of the Elite", "id": "P0SfxgQNdo0", "desc": "Scène de combat d'Ayanokoji, saison 2 épisode 12"}, {"anime": "Solo Leveling", "id": "IrHTT2IEKpE", "desc": "Sung Jinwoo vs le Roi des Fourmis, saison 2"}, {"anime": "Solo Leveling", "id": "WnrfPSVtNaY", "desc": "Premier combat en solo de Jinwoo"}, {"anime": "Solo Leveling", "id": "vicLm2WoMJw", "desc": "Jinwoo affronte une armée entière"}, {"anime": "Black Clover", "id": "qB43JovpxYk", "desc": "Asta et Yuno vs Licht, combat complet HD"}, {"anime": "Black Clover", "id": "QFfir-ApRsg", "desc": "Asta et Yuno vs Licht, combat complet 4K (VF anglaise)"}, {"anime": "Black Clover", "id": "nwvMwrClHQw", "desc": "Asta et Yuno vs Licht, combat complet"}, {"anime": "Fire Force", "id": "ldbpfouF60Q", "desc": "Shinra vs Sho, combat complet partie 1"}, {"anime": "Fire Force", "id": "edDj1gT6c9w", "desc": "Shinra vs Rekka, clip officiel SimulDub"}, {"anime": "Fire Force", "id": "qm1JcoWxVrU", "desc": "Shinra vs Sho, combat complet 4K 60FPS"}, {"anime": "Mushoku Tensei", "id": "uN44fV9dNfQ", "desc": "Compilation de meilleures scènes de combat"}, {"anime": "Mushoku Tensei", "id": "X2RqwFuGiFc", "desc": "Meilleures scènes de combat"}, {"anime": "Mushoku Tensei", "id": "mv90lUOoP8w", "desc": "Toutes les scènes de combat"}, {"anime": "Re:Zero", "id": "irOiG61fu9w", "desc": "Meilleurs moments de Rem"}, {"anime": "Re:Zero", "id": "4PDuZQtv6EM", "desc": "Scène du baiser, saison 2"}, {"anime": "Re:Zero", "id": "CChjxX-RNaE", "desc": "Scène de combat, saison 3"}, {"anime": "Fairy Tail", "id": "SEzT7yTVKx0", "desc": "Natsu vs Jellal, arc Tower of Heaven"}, {"anime": "Fairy Tail", "id": "OqZE9rd17FQ", "desc": "Natsu et les Dragon Slayers vs Acnologia"}, {"anime": "Fairy Tail", "id": "YFJnXLzLsQE", "desc": "Natsu vs Erigor"}, {"anime": "Blue Lock", "id": "eL-NUQIdG9A", "desc": "But de Shidou, Big Bang Drive"}, {"anime": "Blue Lock", "id": "qTsjNWglgNk", "desc": "But surhumain de Nagi"}, {"anime": "Blue Lock", "id": "R-VeQxsRb_o", "desc": "Isagi vs Rin, match complet"}, {"anime": "Fullmetal Alchemist", "id": "Lp1mbWaBs70", "desc": "Colonel Mustang vs Envy, combat complet"}, {"anime": "Fullmetal Alchemist", "id": "VEkFTs21ONU", "desc": "Edward vs Envy"}, {"anime": "Fullmetal Alchemist", "id": "s6hxs16-ImE", "desc": "Edward vs Father"}, {"anime": "Chainsaw Man", "id": "4MTnx4_34gI", "desc": "Denji vs Katana Man, combat complet"}, {"anime": "Chainsaw Man", "id": "kD6XWRVpcYA", "desc": "Reze vs Denji, combat complet"}, {"anime": "Chainsaw Man", "id": "P_NSd5AMcY0", "desc": "Denji et Power vs Kishibe, épisode 10"}, {"anime": "Demon Slayer", "id": "AGEuQ3Q6Tm4", "desc": "Tanjiro vs Rui, combat complet"}, {"anime": "Demon Slayer", "id": "oe8w45y4SL0", "desc": "Tanjiro vs Rui en 4K"}, {"anime": "Demon Slayer", "id": "x14T9mE0gSM", "desc": "Tanjiro vs Rui, scène complète"}, {"anime": "Pokémon", "id": "NIVKlYJp52c", "desc": "Ash rencontre Pikachu (clip officiel)"}, {"anime": "Pokémon", "id": "TNCqlnt2GX8", "desc": "Ash vs Paul (clip officiel)"}, {"anime": "Pokémon", "id": "AG4GSlMhGHs", "desc": "Ash vs Gary (clip officiel)"}, {"anime": "Dragon Ball", "id": "LrYGhu2jzA0", "desc": "Goku vs Freezer, combat complet"}, {"anime": "Dragon Ball", "id": "WgKs_gtZW-4", "desc": "Goku vs Freezer, combat complet"}, {"anime": "Dragon Ball", "id": "ksXLy4gezZo", "desc": "Goku vs Freezer, saga Namek (VO anglaise)"}, {"anime": "Hell's Paradise", "id": "AaaURRKGZys", "desc": "Scènes de combat de Gabimaru"}, {"anime": "Hell's Paradise", "id": "pY_E5e28bAE", "desc": "Gabimaru vs un Tensen"}, {"anime": "Hell's Paradise", "id": "7GzVWgrremg", "desc": "Gabimaru vs Chobei"}, {"anime": "Haikyuu", "id": "In5qd9-J7Rc", "desc": "Karasuno vs Nekoma, dernier set"}, {"anime": "Haikyuu", "id": "oho1_yFzE5E", "desc": "Karasuno vs Nekoma, moments du dernier set"}, {"anime": "Haikyuu", "id": "rAOwZFLVkXo", "desc": "Karasuno vs Nekoma, épisodes 11 et 12"}, {"anime": "Jujutsu Kaisen", "id": "Vd3-13xAuL0", "desc": "Gojo vs Toji, combat complet saison 2"}, {"anime": "Jujutsu Kaisen", "id": "G7JP4Ui0wpg", "desc": "Yuji vs Mahito (clip officiel VIZ)"}, {"anime": "Jujutsu Kaisen", "id": "CbRVrLZKn0o", "desc": "Yuji et Todo vs Mahito, Black Flash"}, {"anime": "JoJo's Bizarre Adventure", "id": "-909shKMi2k", "desc": "Jotaro vs Dio, combat complet"}, {"anime": "JoJo's Bizarre Adventure", "id": "yKGcngfS3YY", "desc": "Jotaro vs Dio, partie 1"}, {"anime": "JoJo's Bizarre Adventure", "id": "Oc2Sclb99qw", "desc": "Jotaro vs Dio, Stardust Crusaders"}, {"anime": "Tensura", "id": "t5JcYsFGwbw", "desc": "Rimuru vs Clayman"}, {"anime": "Tensura", "id": "7H196dcWAbc", "desc": "Le méchant utilise le pouvoir de l'amitié (combat)"}, {"anime": "Tensura", "id": "_Kq_0J01Rog", "desc": "Rimuru Tempest - combats et meilleurs moments"}, {"anime": "One Punch Man", "id": "WUfF1RV8fAo", "desc": "Saitama vs Boros, combat complet"}, {"anime": "One Punch Man", "id": "4AQdwNRNCRI", "desc": "Saitama vs Boros, combat complet HD"}, {"anime": "One Punch Man", "id": "ghgK77Y2hBQ", "desc": "Boros vs Saitama, combat complet saison 1"}, {"anime": "Sword Art Online", "id": "VlwqQuPydHs", "desc": "Kirito vs Heathcliff, combat complet"}, {"anime": "Sword Art Online", "id": "QCrhmaDjx6o", "desc": "Kirito vs Heathcliff dans l'arène"}, {"anime": "Sword Art Online", "id": "WaYWO1rZXuU", "desc": "Meilleures scènes de combat d'Asuna"}, {"anime": "Tokyo Ghoul", "id": "Z6-dA9x4nDc", "desc": "Kaneki vs Arima (clip officiel)"}, {"anime": "Tokyo Ghoul", "id": "yagJWVIHfG8", "desc": "Le combat sanglant (clip officiel)"}, {"anime": "Tokyo Ghoul", "id": "aC9Hm3AY70A", "desc": "Ferocious Biter (clip officiel)"}, {"anime": "Tokyo Revengers", "id": "3MDO2WE5IAo", "desc": "Mikey vs Kazutora"}, {"anime": "Tokyo Revengers", "id": "UNhm2mBi-hE", "desc": "Baji contre tout le monde"}, {"anime": "Tokyo Revengers", "id": "mipqV9yB0sU", "desc": "Mikey vs Osanai"}, {"anime": "My Hero Academia", "id": "OEIimCuqZJ4", "desc": "Midoriya vs Todoroki, combat complet"}, {"anime": "My Hero Academia", "id": "CDW2ReQZOQU", "desc": "United States of Smash - All Might vs All For One"}, {"anime": "My Hero Academia", "id": "KPNIU5Nq36g", "desc": "All Might vs All For One"}, {"anime": "Spy x Family", "id": "NFvoXfxX0bg", "desc": "Yor bat une vache (scène comique)"}, {"anime": "Spy x Family", "id": "L6yAQI_Zhyk", "desc": "La gifle (scène culte)"}, {"anime": "Spy x Family", "id": "P-W6Yb2LL2g", "desc": "Anya rencontre le dieu caca (clip officiel Netflix Anime)"}, {"anime": "Frieren", "id": "5ZVND5zGZCU", "desc": "L'aura de Frieren (clip officiel)"}, {"anime": "Frieren", "id": "quedt2IB9_Q", "desc": "Frieren vs Frieren, combat"}, {"anime": "Frieren", "id": "jKKm-BHJWRA", "desc": "Stark vs le dragon"}, {"anime": "Dandadan", "id": "cPgYAE0qRlU", "desc": "L'entrée chaotique de Turbo Granny (clip officiel)"}, {"anime": "Dandadan", "id": "5YuhNhLgnak", "desc": "Okarun mord le point faible de Turbo Granny"}, {"anime": "Dandadan", "id": "XfNggNeHQlo", "desc": "Mamie contre Mamie (Granny vs Granny)"}, {"anime": "Mob Psycho 100", "id": "QsKaiMyVaQg", "desc": "Mob à 100% de puissance (clip officiel)"}, {"anime": "Mob Psycho 100", "id": "aT_P7R2ebsQ", "desc": "Mob passe à ???% (clip officiel)"}, {"anime": "Mob Psycho 100", "id": "NYQEjOMNmgw", "desc": "Mob vs Dimple"}, {"anime": "Vinland Saga", "id": "H7ZRZgVeRmk", "desc": "Meilleurs combats de Thorfinn (compilation)"}, {"anime": "Vinland Saga", "id": "LTTOBjZafEQ", "desc": "Thorfinn vs Thorkell"}, {"anime": "Vinland Saga", "id": "l3zQNgXdmj0", "desc": "Thorfinn vs Snake (Saison 2)"}, {"anime": "Kaiju No. 8", "id": "77wbFrtg5e4", "desc": "Punch as Hard as You Can!! (clip officiel)"}, {"anime": "Kaiju No. 8", "id": "3g_7TViNhrk", "desc": "Kikoru rencontre le mauvais Kikoru"}, {"anime": "Kaiju No. 8", "id": "aX5T9R62BKs", "desc": "Compilation des meilleures scènes de combat"}, {"anime": "Code Geass", "id": "5_JItH4pOy0", "desc": "Lelouch obtient le Geass et l'utilise pour la première fois"}, {"anime": "Code Geass", "id": "0UTys1ZxnTg", "desc": "Clip officiel - Suzaku"}, {"anime": "Code Geass", "id": "wG639kr8Pkg", "desc": "Clip officiel - Le Geass"}, {"anime": "Code Geass", "id": "a1R5sZb4v8s", "desc": "Clip officiel - Les ordres d'Euphemia"}, {"anime": "Steins;Gate", "id": "NAXT7BEUpIk", "desc": "La scène la plus marquante (VF)"}, {"anime": "Steins;Gate", "id": "aYwpsVloYdU", "desc": "Clip officiel - Les choses ont changé"}, {"anime": "Steins;Gate", "id": "RjZicrGd0RI", "desc": "Clip officiel - Hello, is it me you're looking for?"}, {"anime": "Neon Genesis Evangelion", "id": "n91KFykoglk", "desc": "Clip officiel Netflix - Get in the Robot, Shinji"}, {"anime": "Neon Genesis Evangelion", "id": "j_0aBLn-FUI", "desc": "Clip officiel Netflix - Combat en parfaite synchronisation"}, {"anime": "Neon Genesis Evangelion", "id": "BYqWmWIatRI", "desc": "Clip officiel Netflix - L'Unit 01 se réveille"}, {"anime": "Dr. Stone", "id": "fuMDO4uTlJk", "desc": "Kohaku (SimulDub Clip officiel)"}, {"anime": "Dr. Stone", "id": "9oTIuknrMB4", "desc": "A Stone World! (SimulDub Clip officiel)"}, {"anime": "Dr. Stone", "id": "jqTUqmoaO1k", "desc": "Senku vs Tsukasa (SimulDub Clip officiel)"}, {"anime": "The Promised Neverland", "id": "RWMoMBQ4kl8", "desc": "Clip officiel #06"}, {"anime": "The Promised Neverland", "id": "UUyRNIPv6Lo", "desc": "Clip officiel #08"}, {"anime": "Violet Evergarden", "id": "qMSr5EwUpOs", "desc": "Clip officiel - I Want to be a Postman"}, {"anime": "Violet Evergarden", "id": "ZIQiMxCkxAg", "desc": "Clip officiel Netflix - Le souhait d'Olivia"}, {"anime": "Violet Evergarden", "id": "lK3iXcbnSK0", "desc": "Clip officiel Netflix - Une lettre pour Spencer"}, {"anime": "Your Lie in April", "id": "t-eusIvlTzU", "desc": "Scène de la performance finale (VF)"}, {"anime": "Your Lie in April", "id": "qYaKWx-z6iM", "desc": "Scène finale"}, {"anime": "Your Lie in April", "id": "p_nMSwl0A5I", "desc": "Performance de Kaori et Kousei - Introduction et Rondo Capriccioso"}, {"anime": "Kaguya-sama", "id": "x3Ibc8zUgHU", "desc": "Marriage?! (SimulDub Clip officiel, Saison 2)"}, {"anime": "Kaguya-sama", "id": "tXTx4kpgMlo", "desc": "Outwitted (clip officiel)"}, {"anime": "Kaguya-sama", "id": "XGL33uMVnZM", "desc": "Top 5 des meilleures scènes (compilation)"}, {"anime": "Oshi no Ko", "id": "8rMFVVv-UVk", "desc": "Mort d'Ai Hoshino (épisode 1)"}, {"anime": "Oshi no Ko", "id": "WGO48upjurM", "desc": "Ai Hoshino's Death, épisode 1"}, {"anime": "Oshi no Ko", "id": "u7Yp0bUldFU", "desc": "Ai Hoshino, scènes en 4K plein écran"}, {"anime": "Cyberpunk: Edgerunners", "id": "SLHlMRjh0_Y", "desc": "David Norris vs MaxTac, combat complet"}, {"anime": "Cyberpunk: Edgerunners", "id": "wYf2FilBUOE", "desc": "Adam Smasher vs David Martinez, bataille finale"}, {"anime": "Cyberpunk: Edgerunners", "id": "YRL74JmhVgk", "desc": "Cyberpsycho vs la NCPD (clip officiel Netflix Anime)"}, {"anime": "Berserk", "id": "_Nyt3IY7iHE", "desc": "Guts vs Griffith, combat complet sous-titré"}, {"anime": "Berserk", "id": "jrqVo555ggY", "desc": "Premier combat complet Griffith vs Guts"}, {"anime": "Berserk", "id": "-pUw12Bj-Hc", "desc": "Tous les combats Guts vs Griffith (série 1997)"}, {"anime": "Assassination Classroom", "id": "i3nmm7hRGjE", "desc": "Mort de Koro-sensei (VF)"}, {"anime": "Assassination Classroom", "id": "v8v57NyXaEk", "desc": "Mort de Koro-sensei, saison 2 épisode 24"}, {"anime": "Assassination Classroom", "id": "hh3FDTRSnOo", "desc": "Meilleurs moments de Koro-sensei"}, {"anime": "Gintama", "id": "Cx76Ln1ezGA", "desc": "Compilation des meilleurs moments comiques"}, {"anime": "Gintama", "id": "3zB3P_l6TPQ", "desc": "Scène comique de la tortue assassine"}, {"anime": "Gintama", "id": "rU-EgcWaUPk", "desc": "Scène comique des funérailles"}, {"anime": "Boruto", "id": "gX61m0gVx7Q", "desc": "Momoshiki/Boruto vs Kawaki, combat complet (Boruto épisode 292)"}, {"anime": "Boruto", "id": "VXgm75IqAfU", "desc": "Boruto vs Kawaki, mort de Boruto, combat complet"}, {"anime": "Boruto", "id": "rtYEFM6SaL8", "desc": "Boruto vs Kawaki partie 2, combat complet 4K"}, {"anime": "Détective Conan", "id": "ximWD6XEEYw", "desc": "Shinichi coince Kid (clip officiel Netflix Anime)"}, {"anime": "Détective Conan", "id": "sIV_bvRv--k", "desc": "Akai en action (clip officiel Netflix Anime)"}, {"anime": "Détective Conan", "id": "KAKkwvZ96eU", "desc": "Ran contre l'Organisation (clip officiel Netflix Anime)"}, {"anime": "Kuroko no Basket", "id": "vEH3n938wg8", "desc": "Kagami vs Aomine dans la Zone"}, {"anime": "Kuroko no Basket", "id": "x3whtAlq2V8", "desc": "Bataille des Zones, Kagami vs Aomine"}, {"anime": "Kuroko no Basket", "id": "tn3ty8OOZ54", "desc": "Tous les moments de la Zone"}, {"anime": "Slam Dunk", "id": "-EZjAeR9jDg", "desc": "Hanamichi vs Rukawa, épisode 2 (VOSTA)"}, {"anime": "Slam Dunk", "id": "hjh23tn0jtg", "desc": "Confrontation Gorille vs Hanamichi, épisode 3 (VOSTA)"}, {"anime": "Slam Dunk", "id": "9ZNLJq2Geb4", "desc": "Glorious Slam Dunk, épisode 101 (VOSTA)"}, {"anime": "Sakamoto Days", "id": "05EIB6kOu6Y", "desc": "Slur affronte Sakamoto (clip officiel Netflix Anime)"}, {"anime": "Sakamoto Days", "id": "KVqTyHA-r0Y", "desc": "Face-à-face au convenience store (clip officiel Netflix Anime)"}, {"anime": "Sakamoto Days", "id": "SjjXPSs9wNI", "desc": "The Strongest Dad (clip officiel Netflix Anime)"}, {"anime": "Wakfu", "id": "lLj4MaBGA_0", "desc": "Yugo vs Qilby, combat final (VOSTA)"}, {"anime": "Wakfu", "id": "EaidSaU3zkE", "desc": "Yugo vs Qilby, premier combat (VOSTA)"}, {"anime": "Wakfu", "id": "MflFho1n2nc", "desc": "Yugo et Goultard vs Toross, combat complet (saison 4)"}];
+// AG_DEAD_SCENES_V1 — videos removed from YouTube (thumbnail 404, checked 2026-10-04).
+// Kept in ARC_SCENES so owned Moment cards keep their id; never shown or played.
+const ARC_SCENES_DEAD = new Set(["CmMa8dXn71I","OGFNX4aPCe0","6DGwf4c9qxE","zJn-hyLSdbU","ldbpfouF60Q","qm1JcoWxVrU","mv90lUOoP8w","kD6XWRVpcYA","AGEuQ3Q6Tm4","x14T9mE0gSM","LrYGhu2jzA0","ksXLy4gezZo","In5qd9-J7Rc","_Kq_0J01Rog","5YuhNhLgnak","aX5T9R62BKs","5_JItH4pOy0","RWMoMBQ4kl8","UUyRNIPv6Lo","3zB3P_l6TPQ","-EZjAeR9jDg","hjh23tn0jtg","9ZNLJq2Geb4"]);
+for (const id of ARC_SCENES_DEAD) BT_BAD_IDS.add(id);
 
 // Map Guess : lieux emblématiques [titre de page Fandom, nom affiché]
 const ARC_PLACES = {
@@ -18012,11 +18023,35 @@ app.get('/api/avatar/search', (req, res) => {
         .forEach(u => arcFamous(u).slice(0, 2).forEach(c => out.push({ u, name: c.display, anime: ARC_UNIVERSE_ANIME[u] })));
     res.json({ ok: true, results: out.slice(0, 24) });
 });
+// AG_AVATAR_DB_IMAGE_V1 — portraits already stored in PostgreSQL win over the legacy resolver,
+// which returns nothing for many catalogue characters (Berserk: Irvine, Isidro, Locus…).
+async function avatarStoredImageRoute(u, name) {
+    if (!HAS_DB) return null;
+    try {
+        const clean = cleanImageCharacterName(String(name || '').trim());
+        if (!clean) return null;
+        const id = simpleCanonicalCharacterIdentity(u, clean, '');
+        if (id.transformation) return null;
+        const r = await pool.query(
+            `SELECT updated_at FROM character_images
+              WHERE ((universe_key=$1 AND norm_name=$2) OR (universe_key=$3 AND norm_name=$4))
+                AND image_bytes IS NOT NULL AND octet_length(image_bytes)>=700
+              ORDER BY (universe_key=$1 AND norm_name=$2) DESC LIMIT 1`,
+            [id.u, id.normName, u, normalizeImageKey(clean)]
+        );
+        const row = r.rows[0];
+        if (!row) return null;
+        // Same (u, n) pair the file route resolves with, so it finds this exact row.
+        return simpleImageRoute(u, clean, row.updated_at ? new Date(row.updated_at).getTime() : 0);
+    } catch (_) { return null; }
+}
 app.get('/api/avatar/img', async (req, res) => {
     const u = String(req.query.u || '');
     const requested = String(req.query.n || '').trim();
     if (!ARC_UNIVERSE_ANIME[u] || !requested) return res.status(404).end();
     const c = avatarFind(u, requested);
+    const stored = await avatarStoredImageRoute(u, c ? c.display : requested) || (c && c.raw !== c.display ? await avatarStoredImageRoute(u, c.raw) : null);
+    if (stored) return res.redirect(stored);
     const url = await arcCharImage(u, c ? c.raw : requested);
     if (!url) return res.status(404).end();
     // AG_CANONICAL_CHARACTER_IMAGE_V11 — DB-backed portraits are already same-origin.
@@ -25144,6 +25179,17 @@ function sceneUniverseKey(anime) {
     return Object.keys(ARC_UNIVERSE_ANIME).find(u => normalizeRG(ARC_UNIVERSE_ANIME[u]) === n) || null;
 }
 function sceneThumb(id) { return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`; }
+// Live scene of the same anime for a removed video (same fight first); null when the anime has none left.
+function sceneLiveFor(sc, u) {
+    if (!ARC_SCENES_DEAD.has(sc.id)) return sc;
+    const live = ARC_SCENES.filter(s => !ARC_SCENES_DEAD.has(s.id) && sceneUniverseKey(s.anime) === u);
+    const fight = cleanMomentName(sc.desc).split(",")[0];
+    return live.find(s => cleanMomentName(s.desc).startsWith(fight)) || live[0] || null;
+}
+function sceneHeroPortrait(u) {
+    const hero = arcFamous(u)[0] || cardPool(u)[0];
+    return hero ? "/api/avatar/img?u=" + encodeURIComponent(u) + "&n=" + encodeURIComponent(hero.display) : null;
+}
 function cleanMomentName(s) {
     return String(s || '').replace(/\s*\((?:VOSTA|VF[^)]*|VO[^)]*|HD|60FPS)[^)]*\)\s*/gi, ' ')
         .replace(/\s+/g, ' ').trim().slice(0, 72);
@@ -25152,10 +25198,12 @@ function ALT_ART_CARDS() {
     if (_ALT_ART_CACHE) return _ALT_ART_CACHE;
     const out = [];
     for (const u of arcUniverses()) {
-        const label = ARC_UNIVERSE_ANIME[u], scene = ARC_SCENES.find(s => sceneUniverseKey(s.anime) === u);
+        const label = ARC_UNIVERSE_ANIME[u], first = ARC_SCENES.find(s => sceneUniverseKey(s.anime) === u);
+        const scene = first && sceneLiveFor(first, u);
         const hero = arcFamous(u)[0] || cardPool(u)[0];
-        if (!label || !scene || !hero) continue;
-        out.push({ id: u, u, name: hero.display, anime: label, img: sceneThumb(scene.id), source: cleanMomentName(scene.desc), baseKey: u + '|' + hero.display });
+        if (!label || !first || !hero) continue;
+        const img = scene ? sceneThumb(scene.id) : sceneHeroPortrait(u);
+        out.push({ id: u, u, name: hero.display, anime: label, img, source: cleanMomentName((scene || first).desc), baseKey: u + '|' + hero.display });
     }
     return (_ALT_ART_CACHE = out);
 }
@@ -25167,10 +25215,27 @@ function MOMENT_CARDS() {
         const n = cleanMomentName(sc.desc), sig = u + '|' + normalizeRG(n).replace(/\b(combat complet|full hd|clip officiel|bataille finale)\b/g, '').trim();
         if (!n || seen.has(sig) || (per.get(u) || 0) >= 2) continue;
         seen.add(sig); per.set(u, (per.get(u) || 0) + 1);
-        out.push({ id: sc.id, u, name: n, anime: ARC_UNIVERSE_ANIME[u], img: sceneThumb(sc.id), source: n });
+        // A removed video keeps its card (same id) but borrows a live scene of the same anime.
+        const live = sceneLiveFor(sc, u);
+        out.push({ id: sc.id, u, name: n, anime: ARC_UNIVERSE_ANIME[u], img: live ? sceneThumb(live.id) : sceneHeroPortrait(u), source: n });
     }
     return (_MOMENT_CACHE = out);
 }
+// Videos keep disappearing from YouTube: re-probe the thumbnails at boot and daily so a newly
+// removed scene stops being played and its cards switch to a live image.
+async function sceneDeadProbe() {
+    let found = 0;
+    for (const sc of ARC_SCENES) {
+        if (ARC_SCENES_DEAD.has(sc.id)) continue;
+        try {
+            const r = await fetch(sceneThumb(sc.id), { signal: AbortSignal.timeout(8000) });
+            const len = r.ok ? (await r.arrayBuffer()).byteLength : 0;
+            if (r.status === 404 || (r.ok && len < 2000)) { ARC_SCENES_DEAD.add(sc.id); BT_BAD_IDS.add(sc.id); found++; }
+        } catch (_) { /* network hiccup: keep the scene */ }
+    }
+    if (found) { _ALT_ART_CACHE = null; _MOMENT_CACHE = null; console.log(`[scenes] ${found} vidéo(s) YouTube supprimée(s) écartée(s)`); }
+}
+setTimeout(() => { sceneDeadProbe(); setInterval(sceneDeadProbe, 24 * 3600 * 1000).unref(); }, 60 * 1000).unref();
 function altArtById(id) { return ALT_ART_CARDS().find(x => x.id === String(id)) || null; }
 function momentById(id) { return MOMENT_CARDS().find(x => x.id === String(id)) || null; }
 async function awardBonusCard(uid, kind) {
