@@ -1,0 +1,42 @@
+{
+  "key": "akame",
+  "name": "Akame ga Kill!",
+  "quotes": [
+    {"text":"Incursio !","speaker":"Tatsumi","recipient":"en invoquant son armure","aliases":[]},
+    {"text":"Les faibles meurent et les forts survivent. C'est la loi de ce monde.","speaker":"Esdeath","recipient":"à Tatsumi","aliases":["Esdese"]},
+    {"text":"Night Raid élimine ceux qui pourrissent l'Empire de l'intérieur.","speaker":"Najenda","recipient":"à Tatsumi","aliases":[]},
+    {"text":"Je suis une tireuse de génie !","speaker":"Mine","recipient":"à Tatsumi","aliases":[]},
+    {"text":"Justice !","speaker":"Seryu Ubiquitous","recipient":"à Night Raid","aliases":["Seryu"]},
+    {"text":"Tatsumi, je te confie Incursio.","speaker":"Bulat","recipient":"à Tatsumi, avant de mourir","aliases":[]},
+    {"text":"Je suis maladroite pour tout… sauf pour tuer.","speaker":"Sheele","recipient":"à Tatsumi","aliases":[]},
+    {"text":"Onee-chan…","speaker":"Kurome","recipient":"à Akame","aliases":[]},
+    {"text":"Je vais t'éliminer.","speaker":"Akame","recipient":"à ses cibles","aliases":[]},
+    {"text":"Najenda-san… je t'ai toujours aimée.","speaker":"Lubbock","recipient":"en pensant à Najenda, avant de mourir","aliases":[]}
+  ],
+  "dle": {
+    "categories": ["Camp","Teigu","Type d'arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Akame","attrs":["Night Raid","Murasame","Katana","Femme","Noirs"]},
+      {"name":"Tatsumi","attrs":["Night Raid","Incursio","Armure","Homme","Bruns"]},
+      {"name":"Leone","attrs":["Night Raid","Lionelle","Transformation","Femme","Blonds"]},
+      {"name":"Mine","attrs":["Night Raid","Pumpkin","Fusil","Femme","Roses"]},
+      {"name":"Lubbock","attrs":["Night Raid","Cross Tail","Fils","Homme","Verts"]},
+      {"name":"Najenda","attrs":["Night Raid","Susanoo","Teigu vivant","Femme","Blancs"]},
+      {"name":"Bulat","attrs":["Night Raid","Incursio","Armure","Homme","Noirs"]},
+      {"name":"Chelsea","attrs":["Night Raid","Gaea Foundation","Transformation","Femme","Rouges"]},
+      {"name":"Sheele","attrs":["Night Raid","Extase","Ciseaux","Femme","Violets"]},
+      {"name":"Susanoo","attrs":["Night Raid","Susanoo","Teigu vivant","Homme","Bleus"]},
+      {"name":"Esdeath","attrs":["Jaegers","Demon's Extract","Glace","Femme","Bleus"]},
+      {"name":"Kurome","attrs":["Jaegers","Yatsufusa","Katana","Femme","Noirs"]},
+      {"name":"Wave","attrs":["Jaegers","Grand Chariot","Armure","Homme","Bleus"]},
+      {"name":"Seryu Ubiquitous","attrs":["Jaegers","Hekatonkheires","Teigu vivant","Femme","Roux"]},
+      {"name":"Run","attrs":["Jaegers","Mastema","Ailes","Homme","Blonds"]},
+      {"name":"Bols","attrs":["Jaegers","Rubicante","Lance-flammes","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Esdeath",100],["Akame",95],["Tatsumi",92],["Najenda",80],["Bulat",88],["Leone",86],
+    ["Susanoo",88],["Kurome",86],["Wave",84],["Run",80],["Mine",82],["Lubbock",78],
+    ["Seryu Ubiquitous",76],["Bols",75],["Sheele",74],["Chelsea",70]
+  ]
+}

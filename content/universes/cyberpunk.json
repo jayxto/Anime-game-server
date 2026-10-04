@@ -1,0 +1,21 @@
+{
+  "key": "cyberpunk",
+  "name": "Cyberpunk: Edgerunners",
+  "quotes": [],
+  "dle": {
+    "categories": ["Rôle","Groupe","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"David Martinez","attrs":["Edgerunner","Équipe de Maine","Mort","Homme","Bruns"]},
+      {"name":"Lucy","attrs":["Netrunner","Équipe de Maine","Vivant","Femme","Blancs"]},
+      {"name":"Rebecca","attrs":["Edgerunner","Équipe de Maine","Mort","Femme","Verts"]},
+      {"name":"Falco","attrs":["Chauffeur","Équipe de Maine","Vivant","Homme","Noirs"]},
+      {"name":"Faraday","attrs":["Fixer","Aucun","Mort","Homme","Gris"]},
+      {"name":"Gloria Martinez","attrs":["Infirmière","Aucun","Mort","Femme","Rouges"]},
+      {"name":"Adam Smasher","attrs":["Cyborg","Arasaka","Vivant","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Adam Smasher",100],["David Martinez",92],["Maine",85],["Rebecca",82],["Lucy",80],["Lucy Kushinada",80],
+    ["Dorio",75],["Pilar",70],["Kiwi",70],["Falco",60],["Faraday",50],["Gloria Martinez",20]
+  ]
+}

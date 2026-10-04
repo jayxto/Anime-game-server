@@ -1,0 +1,25 @@
+{
+  "key": "monster",
+  "name": "Monster",
+  "quotes": [],
+  "dle": {
+    "categories": ["Rôle","Origine","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kenzo Tenma","attrs":["Chirurgien","Japon","Vivant","Homme","Bruns"]},
+      {"name":"Johan Liebert","attrs":["Tueur","Tchécoslovaquie","Vivant","Homme","Blonds"]},
+      {"name":"Nina Fortner","attrs":["Étudiante","Tchécoslovaquie","Vivant","Femme","Blonds"]},
+      {"name":"Heinrich Lunge","attrs":["Inspecteur","Allemagne","Vivant","Homme","Noirs"]},
+      {"name":"Dieter","attrs":["Enfant","Allemagne","Vivant","Homme","Bruns"]},
+      {"name":"Wolfgang Grimmer","attrs":["Journaliste","Tchécoslovaquie","Mort","Homme","Bruns"]},
+      {"name":"Roberto","attrs":["Tueur","Tchécoslovaquie","Mort","Homme","Bruns"]},
+      {"name":"Franz Bonaparta","attrs":["Écrivain","Tchécoslovaquie","Mort","Homme","Gris"]},
+      {"name":"Karl Neumann","attrs":["Étudiant","Allemagne","Vivant","Homme","Noirs"]},
+      {"name":"Lotte Frank","attrs":["Étudiante","Allemagne","Vivant","Femme","Bruns"]},
+      {"name":"Martin Reest","attrs":["Garde du corps","Allemagne","Mort","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Johan Liebert",100],["Roberto",85],["Heinrich Lunge",82],["Kenzo Tenma",80],["Wolfgang Grimmer",80],["Franz Bonaparta",78],
+    ["Nina Fortner",75],["Martin Reest",65],["Eva Heinemann",50],["Karl Neumann",40],["Lotte Frank",30],["Dieter",20]
+  ]
+}

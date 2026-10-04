@@ -1,0 +1,22 @@
+{
+  "key": "parasyte",
+  "name": "Parasite (Kiseijuu)",
+  "quotes": [],
+  "dle": {
+    "categories": ["Nature","Rôle","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Shinichi Izumi","attrs":["Hybride","Lycéen","Vivant","Homme","Noirs"]},
+      {"name":"Satomi Murano","attrs":["Humain","Lycéen","Vivant","Femme","Bruns"]},
+      {"name":"Kana Kimishima","attrs":["Humain","Lycéen","Mort","Femme","Noirs"]},
+      {"name":"Hideo Shimada","attrs":["Parasite","Lycéen","Mort","Homme","Bruns"]},
+      {"name":"Mitsuo","attrs":["Humain","Lycéen","Mort","Homme","Bruns"]},
+      {"name":"Gotou","attrs":["Parasite","Combattant","Mort","Homme","Noirs"]},
+      {"name":"Mamoru Uda","attrs":["Hybride","Adulte","Vivant","Homme","Noirs"]},
+      {"name":"Hirokawa","attrs":["Humain","Maire","Mort","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Gotou",100],["Migi",90],["Shinichi Izumi",88],["Ryoko Tamiya",85],["Hideo Shimada",70],["Jaw",68],
+    ["Mamoru Uda",60],["Hirokawa",40],["Mitsuo",30],["Satomi Murano",10],["Kana Kimishima",10]
+  ]
+}

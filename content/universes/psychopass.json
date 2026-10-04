@@ -1,0 +1,27 @@
+{
+  "key": "psychopass",
+  "name": "Psycho-Pass",
+  "quotes": [],
+  "dle": {
+    "categories": ["Rôle","Division","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Akane Tsunemori","attrs":["Inspecteur","Division 1","Dominator","Femme","Bruns"]},
+      {"name":"Shinya Kogami","attrs":["Exécuteur","Division 1","Dominator","Homme","Noirs"]},
+      {"name":"Nobuchika Ginoza","attrs":["Inspecteur","Division 1","Dominator","Homme","Noirs"]},
+      {"name":"Tomomi Masaoka","attrs":["Exécuteur","Division 1","Dominator","Homme","Gris"]},
+      {"name":"Yayoi Kunizuka","attrs":["Exécuteur","Division 1","Dominator","Femme","Noirs"]},
+      {"name":"Shusei Kagari","attrs":["Exécuteur","Division 1","Dominator","Homme","Roux"]},
+      {"name":"Shion Karanomori","attrs":["Analyste","Division 1","Aucune","Femme","Blonds"]},
+      {"name":"Mika Shimotsuki","attrs":["Inspecteur","Division 1","Dominator","Femme","Noirs"]},
+      {"name":"Sakuya Togane","attrs":["Exécuteur","Division 1","Dominator","Homme","Noirs"]},
+      {"name":"Shogo Makishima","attrs":["Criminel","Aucune","Rasoir","Homme","Blancs"]},
+      {"name":"Kirito Kamui","attrs":["Criminel","Aucune","Aucune","Homme","Noirs"]},
+      {"name":"Arata Shindo","attrs":["Inspecteur","Bureau des étrangers","Dominator","Homme","Noirs"]},
+      {"name":"Kei Mikhail Ignatov","attrs":["Inspecteur","Bureau des étrangers","Dominator","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Shinya Kogami",95],["Shogo Makishima",93],["Akane Tsunemori",85],["Nobuchika Ginoza",82],["Kirito Kamui",82],["Tomomi Masaoka",78],
+    ["Sakuya Togane",76],["Shusei Kagari",75],["Kei Mikhail Ignatov",75],["Arata Shindo",74],["Yayoi Kunizuka",70],["Mika Shimotsuki",55],["Shion Karanomori",40]
+  ]
+}
