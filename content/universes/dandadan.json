@@ -1,0 +1,38 @@
+{
+  "key": "dandadan",
+  "name": "Dandadan",
+  "quotes": [
+    {"text":"Je crois aux fantômes, pas aux extraterrestres !","speaker":"Momo Ayase","recipient":"à Okarun","aliases":["Momo"]},
+    {"text":"Je crois aux extraterrestres, pas aux fantômes !","speaker":"Ken Takakura","recipient":"à Momo","aliases":["Okarun","Takakura"]},
+    {"text":"Le premier qui prouve que l'autre a tort a gagné !","speaker":"Momo Ayase","recipient":"à Okarun","aliases":["Momo"]},
+    {"text":"Rends-moi mes… mes bijoux de famille !","speaker":"Ken Takakura","recipient":"à Turbo Granny","aliases":["Okarun","Takakura"]},
+    {"text":"Ma petite-fille a beau être sotte, personne n'y touche !","speaker":"Seiko Ayase","recipient":"aux Serpoians","aliases":["Seiko","Mamie"]},
+    {"text":"Si tu veux récupérer tes boules, rattrape-moi !","speaker":"Turbo Granny","recipient":"à Okarun","aliases":["Turbo Mamie"]},
+    {"text":"Je suis l'élue ! C'est moi qui vais sauver la Terre !","speaker":"Aira Shiratori","recipient":"à Momo et Okarun","aliases":["Aira"]},
+    {"text":"Momo, je t'ai toujours aimée, depuis tout petit !","speaker":"Jiji Enjoji","recipient":"à Momo","aliases":["Jiji","Enjoji"]},
+    {"text":"Ma fille… je voulais juste te retrouver.","speaker":"Acrobatic Silky","recipient":"à Aira","aliases":["Acro Silky"]},
+    {"text":"Je veux jouer ! Personne ne veut jamais jouer avec moi !","speaker":"Evil Eye","recipient":"à Jiji","aliases":["Mauvais Œil"]}
+  ],
+  "dle": {
+    "categories": ["Nature","Pouvoir","Camp","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Momo Ayase","attrs":["Humain","Psychokinésie","Allié","Femme","Roses"]},
+      {"name":"Ken Takakura","attrs":["Humain","Malédiction de Turbo Granny","Allié","Homme","Bruns"]},
+      {"name":"Aira Shiratori","attrs":["Humain","Malédiction d'Acrobatic Silky","Allié","Femme","Roses"]},
+      {"name":"Jiji Enjoji","attrs":["Humain","Malédiction de l'Evil Eye","Allié","Homme","Roux"]},
+      {"name":"Seiko Ayase","attrs":["Humain","Médium","Allié","Femme","Blancs"]},
+      {"name":"Kinta Sakata","attrs":["Humain","Aucun","Allié","Homme","Noirs"]},
+      {"name":"Vamola","attrs":["Extraterrestre","Force surhumaine","Allié","Femme","Blonds"]},
+      {"name":"Turbo Granny","attrs":["Yokai","Vitesse","Allié","Femme","Blancs"]},
+      {"name":"Acrobatic Silky","attrs":["Yokai","Cheveux","Ennemi","Femme","Noirs"]},
+      {"name":"Evil Eye","attrs":["Yokai","Malédiction","Ennemi","Homme","Blancs"]},
+      {"name":"Naki Kito","attrs":["Humain","Famille Kito","Ennemi","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Evil Eye",95], ["Turbo Granny",92], ["Momo Ayase",88], ["Ken Takakura",88], ["Seiko Ayase",85], ["Count Saint-Germain",84],
+    ["Acrobatic Silky",82], ["Jiji Enjoji",82], ["Vamola",80], ["Aira Shiratori",76], ["Flatwoods Monster",74], ["Serpoians",70],
+    ["Dover Demon",68], ["Unji Zuma",70], ["Naki Kito",66], ["Taro",60], ["Hana",58], ["Kinta Sakata",50],
+    ["Rin Sawaki",48], ["Manjiro",45], ["Chiquitita",40]
+  ]
+}

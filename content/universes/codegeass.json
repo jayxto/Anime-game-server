@@ -1,0 +1,49 @@
+{
+  "key": "codegeass",
+  "name": "Code Geass",
+  "quotes": [
+    {"text":"Moi, Lelouch vi Britannia, je vous l'ordonne : mourez !","speaker":"Lelouch Lamperouge","recipient":"aux soldats britanniens","aliases":["Lelouch","Zero","Lelouch vi Britannia"]},
+    {"text":"Le seul qui a le droit de tirer, c'est celui qui est prêt à se faire tirer dessus.","speaker":"Lelouch Lamperouge","recipient":"à Clovis","aliases":["Lelouch","Zero"]},
+    {"text":"Je détruirai Britannia.","speaker":"Lelouch Lamperouge","recipient":"à Suzaku, enfant","aliases":["Lelouch","Zero"]},
+    {"text":"Si le roi ne se met pas en mouvement, comment ses sujets pourraient-ils le suivre ?","speaker":"Lelouch Lamperouge","recipient":"aux Chevaliers Noirs","aliases":["Lelouch","Zero"]},
+    {"text":"Nous sommes les Chevaliers Noirs !","speaker":"Lelouch Lamperouge","recipient":"au monde entier, en tant que Zero","aliases":["Lelouch","Zero"]},
+    {"text":"Tous les hommes ne naissent pas égaux !","speaker":"Charles zi Britannia","recipient":"aux funérailles de Clovis","aliases":["Charles","L'empereur"]},
+    {"text":"Le pouvoir du roi te condamnera à la solitude.","speaker":"C.C.","recipient":"à Lelouch","aliases":["CC","C2"]},
+    {"text":"Je veux changer ce monde de l'intérieur.","speaker":"Suzaku Kururugi","recipient":"à Lelouch","aliases":["Suzaku"]},
+    {"text":"Un résultat obtenu par de mauvais moyens n'a aucune valeur.","speaker":"Suzaku Kururugi","recipient":"à Zero","aliases":["Suzaku"]},
+    {"text":"Japonais, je vous demande de mourir !","speaker":"Euphemia li Britannia","recipient":"aux Japonais, sous l'effet du Geass","aliases":["Euphemia","Euphie"]},
+    {"text":"Je suis japonaise ! Mon nom est Kallen Kozuki !","speaker":"Kallen Stadtfeld","recipient":"aux Britanniens","aliases":["Kallen","Kallen Kozuki"]},
+    {"text":"Grand frère… je t'aime.","speaker":"Nunnally Lamperouge","recipient":"à Lelouch, après le Zero Requiem","aliases":["Nunnally","Nunnally vi Britannia"]},
+    {"text":"Même si je renais encore et encore, je tomberai toujours amoureuse de toi, Lulu.","speaker":"Shirley Fenette","recipient":"à Lelouch","aliases":["Shirley"]},
+    {"text":"Désormais, c'est toi qui seras Zero.","speaker":"Lelouch Lamperouge","recipient":"à Suzaku, pour le Zero Requiem","aliases":["Lelouch","Zero"]}
+  ],
+  "dle": {
+    "categories": ["Camp","Rôle","Geass","Pilote","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Lelouch Lamperouge","attrs":["Chevaliers Noirs","Zero","Geass","Oui","Mort","Homme","Noirs"]},
+      {"name":"Suzaku Kururugi","attrs":["Britannia","Chevalier de la Table ronde","Aucun","Oui","Vivant","Homme","Bruns"]},
+      {"name":"C.C.","attrs":["Chevaliers Noirs","Sorcière","Code","Oui","Vivant","Femme","Verts"]},
+      {"name":"Kallen Stadtfeld","attrs":["Chevaliers Noirs","Pilote","Aucun","Oui","Vivant","Femme","Rouges"]},
+      {"name":"Nunnally Lamperouge","attrs":["Britannia","Princesse","Aucun","Non","Vivant","Femme","Bruns"]},
+      {"name":"Shirley Fenette","attrs":["Académie Ashford","Élève","Aucun","Non","Mort","Femme","Roux"]},
+      {"name":"Cornelia li Britannia","attrs":["Britannia","Princesse","Aucun","Oui","Vivant","Femme","Violets"]},
+      {"name":"Euphemia li Britannia","attrs":["Britannia","Princesse","Aucun","Non","Mort","Femme","Roses"]},
+      {"name":"Charles zi Britannia","attrs":["Britannia","Empereur","Code","Non","Mort","Homme","Blancs"]},
+      {"name":"Schneizel el Britannia","attrs":["Britannia","Prince","Aucun","Non","Vivant","Homme","Blonds"]},
+      {"name":"Jeremiah Gottwald","attrs":["Britannia","Officier","Aucun","Oui","Vivant","Homme","Verts"]},
+      {"name":"Rolo Lamperouge","attrs":["Ordre du Geass","Assassin","Geass","Oui","Mort","Homme","Bruns"]},
+      {"name":"Villetta Nu","attrs":["Britannia","Officier","Aucun","Oui","Vivant","Femme","Blancs"]},
+      {"name":"Lloyd Asplund","attrs":["Britannia","Scientifique","Aucun","Non","Vivant","Homme","Blancs"]},
+      {"name":"Kaname Ohgi","attrs":["Chevaliers Noirs","Officier","Aucun","Oui","Vivant","Homme","Bruns"]},
+      {"name":"Xingke","attrs":["Fédération chinoise","Officier","Aucun","Oui","Vivant","Homme","Noirs"]},
+      {"name":"Anya Alstreim","attrs":["Britannia","Chevalier de la Table ronde","Aucun","Oui","Vivant","Femme","Roses"]},
+      {"name":"Gino Weinberg","attrs":["Britannia","Chevalier de la Table ronde","Aucun","Oui","Vivant","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Suzaku Kururugi",100], ["Kallen Stadtfeld",96], ["Xingke",88], ["Gino Weinberg",88], ["Jeremiah Gottwald",86], ["Anya Alstreim",86],
+    ["Charles zi Britannia",85], ["Cornelia li Britannia",82], ["Rolo Lamperouge",82], ["Lelouch Lamperouge",80], ["Schneizel el Britannia",80], ["C.C.",78],
+    ["Mao",70], ["Villetta Nu",65], ["Nunnally Lamperouge",60], ["Kaname Ohgi",55], ["Lloyd Asplund",45], ["Rakshata Chawla",45],
+    ["Diethard Ried",40], ["Euphemia li Britannia",30], ["Shirley Fenette",15]
+  ]
+}

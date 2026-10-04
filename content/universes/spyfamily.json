@@ -1,0 +1,51 @@
+{
+  "key": "spyfamily",
+  "name": "Spy x Family",
+  "quotes": [
+    {"text":"Waku waku !","speaker":"Anya Forger","recipient":"en découvrant une nouvelle mission","aliases":["Anya"]},
+    {"text":"Anya aime les cacahuètes.","speaker":"Anya Forger","recipient":"à toute la classe, le jour de la rentrée","aliases":["Anya"]},
+    {"text":"Anya déteste les carottes.","speaker":"Anya Forger","recipient":"à table","aliases":["Anya"]},
+    {"text":"Je veux créer un monde où les enfants n'ont plus à pleurer.","speaker":"Loid Forger","recipient":"en pensant à son enfance","aliases":["Loid","Twilight"]},
+    {"text":"Opération Strix : je dois approcher Donovan Desmond et préserver la paix entre l'Est et l'Ouest.","speaker":"Loid Forger","recipient":"en recevant sa mission","aliases":["Loid","Twilight"]},
+    {"text":"Accepteriez-vous de faire semblant d'être mon petit ami pour une soirée ?","speaker":"Yor Forger","recipient":"à Loid, chez le tailleur","aliases":["Yor","Princesse épine","Thorn Princess"]},
+    {"text":"Je ne suis pas très douée en cuisine…","speaker":"Yor Forger","recipient":"à Loid","aliases":["Yor","Princesse épine"]},
+    {"text":"Ma grande sœur est tout pour moi !","speaker":"Yuri Briar","recipient":"à Loid","aliases":["Yuri"]},
+    {"text":"Élégance !","speaker":"Henry Henderson","recipient":"aux élèves d'Eden","aliases":["Henderson"]},
+    {"text":"Je suis le second fils de Donovan Desmond !","speaker":"Damian Desmond","recipient":"à Anya, le jour de la rentrée","aliases":["Damian"]},
+    {"text":"C'est pas comme si je t'aimais bien, compris ?!","speaker":"Damian Desmond","recipient":"à Anya","aliases":["Damian"]},
+    {"text":"Ton papa est trop beau, Anya-chan !","speaker":"Becky Blackbell","recipient":"à Anya","aliases":["Becky"]},
+    {"text":"Je ferais une bien meilleure épouse que Yor Forger pour Twilight.","speaker":"Fiona Frost","recipient":"en pensant à Loid","aliases":["Fiona","Nightfall"]},
+    {"text":"Je suis le meilleur informateur de Berlint, et je n'ai toujours pas de copine.","speaker":"Franky Franklin","recipient":"à Loid","aliases":["Franky"]},
+    {"text":"Les gens ne pourront jamais vraiment se comprendre.","speaker":"Donovan Desmond","recipient":"à Loid, lors de leur rencontre","aliases":["Donovan"]},
+    {"text":"Anya a eu une Stella !","speaker":"Anya Forger","recipient":"à Loid et Yor","aliases":["Anya"]},
+    {"text":"Heh.","speaker":"Anya Forger","recipient":"avec son sourire narquois, à Damian","aliases":["Anya"]},
+    {"text":"Twilight, la mission passe avant tout.","speaker":"Sylvia Sherwood","recipient":"à Loid","aliases":["Sylvia","Handler"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Organisation","Pays","Âge","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Loid Forger","attrs":["Espion","WISE","Westalis","Adulte","Homme","Blonds"]},
+      {"name":"Anya Forger","attrs":["Télépathe","Eden","Ostania","Enfant","Femme","Roses"]},
+      {"name":"Yor Forger","attrs":["Assassin","Garden","Ostania","Adulte","Femme","Noirs"]},
+      {"name":"Bond Forger","attrs":["Chien","Projet Apple","Ostania","Animal","Mâle","Blancs"]},
+      {"name":"Yuri Briar","attrs":["Agent","Police secrète","Ostania","Adulte","Homme","Noirs"]},
+      {"name":"Fiona Frost","attrs":["Espion","WISE","Westalis","Adulte","Femme","Blancs"]},
+      {"name":"Sylvia Sherwood","attrs":["Espion","WISE","Westalis","Adulte","Femme","Roux"]},
+      {"name":"Franky Franklin","attrs":["Informateur","Aucune","Ostania","Adulte","Homme","Bruns"]},
+      {"name":"Matthew McMahon","attrs":["Assassin","Garden","Ostania","Adulte","Homme","Gris"]},
+      {"name":"Damian Desmond","attrs":["Élève","Eden","Ostania","Enfant","Homme","Noirs"]},
+      {"name":"Becky Blackbell","attrs":["Élève","Eden","Ostania","Enfant","Femme","Noirs"]},
+      {"name":"Emile Elman","attrs":["Élève","Eden","Ostania","Enfant","Homme","Blonds"]},
+      {"name":"Ewen Egeburg","attrs":["Élève","Eden","Ostania","Enfant","Homme","Blonds"]},
+      {"name":"Henry Henderson","attrs":["Professeur","Eden","Ostania","Adulte","Homme","Blancs"]},
+      {"name":"Donovan Desmond","attrs":["Homme politique","Parti de l'unité nationale","Ostania","Adulte","Homme","Noirs"]},
+      {"name":"Melinda Desmond","attrs":["Épouse du ministre","Famille Desmond","Ostania","Adulte","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Yor Forger",100], ["Loid Forger",92], ["Shopkeeper",86], ["Fiona Frost",85], ["Matthew McMahon",82], ["Yuri Briar",76],
+    ["Sylvia Sherwood",72], ["Bond Forger",70], ["Henry Henderson",48], ["Franky Franklin",40], ["Donovan Desmond",40], ["Anya Forger",36],
+    ["Daybreak",30], ["Bill Watkins",30], ["Melinda Desmond",25], ["Damian Desmond",20], ["Becky Blackbell",15], ["Emile Elman",12],
+    ["Ewen Egeburg",12]
+  ]
+}

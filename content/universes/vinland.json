@@ -1,0 +1,43 @@
+{
+  "key": "vinland",
+  "name": "Vinland Saga",
+  "quotes": [
+    {"text":"Tu n'as pas d'ennemis. Personne au monde n'a d'ennemis.","speaker":"Thors","recipient":"à Thorfinn","aliases":["Thors le Troll"]},
+    {"text":"Un vrai guerrier n'a pas besoin d'épée.","speaker":"Thors","recipient":"à Thorfinn","aliases":["Thors le Troll"]},
+    {"text":"Je n'ai pas d'ennemis.","speaker":"Thorfinn","recipient":"aux hommes de Ketil","aliases":["Thorfinn Karlsefni"]},
+    {"text":"Je vais bâtir un pays sans guerre ni esclavage, là-bas, au Vinland.","speaker":"Thorfinn","recipient":"à Einar","aliases":["Thorfinn Karlsefni"]},
+    {"text":"Tu veux me tuer ? Alors deviens plus fort et provoque-moi en duel.","speaker":"Askeladd","recipient":"à Thorfinn","aliases":[]},
+    {"text":"Va plus loin, Thorfinn. Trouve ton vrai combat.","speaker":"Askeladd","recipient":"à Thorfinn, avant de mourir","aliases":[]},
+    {"text":"Je suis un descendant d'Artorius.","speaker":"Askeladd","recipient":"au roi Sweyn","aliases":[]},
+    {"text":"Je bâtirai un paradis sur cette terre, sans l'aide de Dieu.","speaker":"Canute","recipient":"à Thorfinn","aliases":["Knut"]},
+    {"text":"Le combat, c'est ce qui donne du sens à la vie !","speaker":"Thorkell","recipient":"à Askeladd","aliases":[]},
+    {"text":"Au-delà de la mer, il existe une terre chaude et riche : le Vinland.","speaker":"Leif Erikson","recipient":"à Thorfinn, enfant","aliases":["Leif"]}
+  ],
+  "dle": {
+    "categories": ["Origine","Rôle","Groupe","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Thorfinn","attrs":["Islande","Guerrier","Famille de Thors","Vivant","Homme","Blonds"]},
+      {"name":"Thors","attrs":["Islande","Guerrier","Famille de Thors","Mort","Homme","Blonds"]},
+      {"name":"Helga","attrs":["Islande","Villageoise","Famille de Thors","Vivant","Femme","Blonds"]},
+      {"name":"Ylva","attrs":["Islande","Villageoise","Famille de Thors","Vivant","Femme","Blonds"]},
+      {"name":"Askeladd","attrs":["Danemark","Chef de guerre","Bande d'Askeladd","Mort","Homme","Blonds"]},
+      {"name":"Bjorn","attrs":["Danemark","Guerrier","Bande d'Askeladd","Mort","Homme","Bruns"]},
+      {"name":"Canute","attrs":["Danemark","Roi","Famille royale danoise","Vivant","Homme","Blonds"]},
+      {"name":"Sweyn","attrs":["Danemark","Roi","Famille royale danoise","Mort","Homme","Noirs"]},
+      {"name":"Thorkell","attrs":["Danemark","Guerrier","Armée danoise","Vivant","Homme","Blonds"]},
+      {"name":"Ketil","attrs":["Danemark","Fermier","Ferme de Ketil","Vivant","Homme","Blonds"]},
+      {"name":"Olmar","attrs":["Danemark","Fermier","Ferme de Ketil","Vivant","Homme","Blonds"]},
+      {"name":"Einar","attrs":["Angleterre","Esclave","Ferme de Ketil","Vivant","Homme","Bruns"]},
+      {"name":"Leif Erikson","attrs":["Groenland","Explorateur","Aucun","Vivant","Homme","Bruns"]},
+      {"name":"Gudrid","attrs":["Islande","Navigatrice","Expédition au Vinland","Vivant","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Thors",100], ["Thorkell",98], ["Askeladd",92], ["Thorfinn",90], ["Snake",85], ["Bjorn",80],
+    ["Floki",78], ["Wulf",72], ["Hild",75], ["Gardar",70], ["Droott",60],
+    ["Badger",60], ["Fox",60], ["Halfdan",60], ["Canute",60], ["Einar",55], ["Sweyn",55],
+    ["Sigurd",50], ["Hakon",50], ["Ragnar",45], ["Ketil",40], ["Leif Erikson",40], ["Pater",40],
+    ["Olmar",35], ["Atli",30], ["Gudrid",30], ["Ylva",30], ["Torgrim",30], ["Cordelia",30],
+    ["Arnheid",15], ["Helga",10], ["Karli",5]
+  ]
+}

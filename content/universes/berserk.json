@@ -1,0 +1,42 @@
+{
+  "key": "berserk",
+  "name": "Berserk",
+  "quotes": [
+    {"text":"Si tu as le temps de penser à une belle fin, alors vis magnifiquement jusqu'au bout.","speaker":"Guts","recipient":"à Farnese","aliases":["Le Guerrier noir","Black Swordsman"]},
+    {"text":"Débats-toi. C'est la seule chose que tu peux faire.","speaker":"Skull Knight","recipient":"à Guts","aliases":["Chevalier squelette"]},
+    {"text":"Je veux mon propre royaume.","speaker":"Griffith","recipient":"à Guts","aliases":["Femto"]},
+    {"text":"Je sacrifie.","speaker":"Griffith","recipient":"à la God Hand, pendant l'Éclipse","aliases":["Femto"]},
+    {"text":"Un ami, c'est quelqu'un qui a son propre rêve et qui le poursuit, même contre moi.","speaker":"Griffith","recipient":"à Charlotte, près de la fontaine","aliases":["Femto"]},
+    {"text":"Pour réaliser mon rêve, je suis prêt à gravir une montagne de cadavres.","speaker":"Griffith","recipient":"à Casca","aliases":["Femto"]},
+    {"text":"Quand ton rêve s'effondrera, ce garçon deviendra ton ennemi.","speaker":"Nosferatu Zodd","recipient":"à Griffith","aliases":["Zodd","Zodd l'immortel"]},
+    {"text":"Je ne fais qu'accomplir la volonté de Dieu.","speaker":"Mozgus","recipient":"aux hérétiques d'Albion","aliases":[]},
+    {"text":"Tu es à moi, Guts.","speaker":"Griffith","recipient":"à Guts, après leur premier duel","aliases":["Femto"]},
+    {"text":"Je veux devenir quelqu'un qui puisse se tenir à côté de Griffith en égal, pas un soldat de son rêve.","speaker":"Guts","recipient":"en quittant la Troupe du Faucon","aliases":["Le Guerrier noir"]}
+  ],
+  "dle": {
+    "categories": ["Race","Affiliation","Arme","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Guts","attrs":["Humain","Groupe de Guts","Épée","Vivant","Homme","Noirs"]},
+      {"name":"Griffith","attrs":["God Hand","Néo-Troupe du Faucon","Épée","Vivant","Homme","Blancs"]},
+      {"name":"Casca","attrs":["Humain","Groupe de Guts","Épée","Vivant","Femme","Noirs"]},
+      {"name":"Puck","attrs":["Elfe","Groupe de Guts","Aucune","Vivant","Homme","Bleus"]},
+      {"name":"Farnese","attrs":["Humain","Groupe de Guts","Magie","Vivant","Femme","Blonds"]},
+      {"name":"Serpico","attrs":["Humain","Groupe de Guts","Épée","Vivant","Homme","Blonds"]},
+      {"name":"Schierke","attrs":["Humain","Groupe de Guts","Magie","Vivant","Femme","Bruns"]},
+      {"name":"Isidro","attrs":["Humain","Groupe de Guts","Épée","Vivant","Homme","Bruns"]},
+      {"name":"Skull Knight","attrs":["Inconnue","Aucune","Épée","Vivant","Homme","Aucun"]},
+      {"name":"Nosferatu Zodd","attrs":["Apôtre","Néo-Troupe du Faucon","Épée","Vivant","Homme","Noirs"]},
+      {"name":"Judeau","attrs":["Humain","Troupe du Faucon","Couteaux","Mort","Homme","Blonds"]},
+      {"name":"Rickert","attrs":["Humain","Troupe du Faucon","Aucune","Vivant","Homme","Blonds"]},
+      {"name":"Corkus","attrs":["Humain","Troupe du Faucon","Épée","Mort","Homme","Noirs"]},
+      {"name":"Mozgus","attrs":["Humain","Saint-Siège","Aucune","Mort","Homme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Void",100], ["Griffith",99], ["Slan",97], ["Ubik",96], ["Conrad",96], ["Skull Knight",96],
+    ["Guts",95], ["Ganishka",92], ["Nosferatu Zodd",92], ["Zodd",92], ["Grunbeld",88], ["Locus",84],
+    ["Irvine",82], ["Schierke",80], ["Serpico",72], ["Casca",70], ["Mozgus",70], ["Judeau",60],
+    ["Farnese",55], ["Isidro",50], ["Corkus",45], ["Rickert",40], ["Godo",35], ["Puck",30],
+    ["Ivalera",30], ["Luca",20], ["Charlotte",10], ["Erica",10]
+  ]
+}
