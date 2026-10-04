@@ -16041,6 +16041,59 @@ const THEME_VIDEO_REPLACEMENTS = {
     'LrYGhu2jzA0': 'WgKs_gtZW-4'  // Goku vs Freezer, combat complet
 };
 for (const id of ['9p3uVC9mexQ', 'OGFNX4aPCe0', 'ldbpfouF60Q', 'kD6XWRVpcYA', 'AGEuQ3Q6Tm4', 'ksXLy4gezZo', 'In5qd9-J7Rc', '-EZjAeR9jDg', 'hjh23tn0jtg', ...Object.keys(THEME_VIDEO_REPLACEMENTS)]) BT_BAD_IDS.add(id);
+// AG_MORE_FIGHTS_V1 — 45 combats ajoutés à « Meilleur combat » (vidéos vérifiées le 2026-10-05 :
+// intégrables, bon combat, ni fan-made ni live action). Sondées chaque jour comme les autres.
+const MORE_FIGHTS_V1 = [
+    ["Boruto", "Naruto et Sasuke vs Momoshiki", 'RzClCJFpSoM'],
+    ["Naruto", "Gaï Maito vs Madara, la 8e porte", 'LMyk4Ny8Dvk'],
+    ["Naruto", "Sasuke vs Itachi, le dernier combat des frères", 'OilpVlqKfEg'],
+    ["Naruto", "Rock Lee vs Gaara, examen Chûnin", 'DEnkmR6zyUU'],
+    ["Naruto", "Kakashi vs Obito", 'Gi8jxlEiQ50'],
+    ["One Piece", "Luffy vs Lucci", 'jidMn2TMEys'],
+    ["One Piece", "Luffy Snake Man vs Katakuri", 'wz1H3jxl_tA'],
+    ["One Piece", "Zoro vs King", 'Zuu6ClXRabE'],
+    ["One Piece", "Luffy vs Crocodile", 'rmRzTBY-8EY'],
+    ["Bleach", "Ichigo vs Ulquiorra, combat complet", 'N6vnJ1Jp_vM'],
+    ["Bleach", "Kenpachi vs Unohana", 'ezu9NcDSfb8'],
+    ["Bleach", "Ichigo (Hollow) vs Byakuya", 'Y83dmIBMRp4'],
+    ["Dragon Ball", "Goku et Freezer vs Jiren", 'hYYXfLdpuds'],
+    ["Dragon Ball", "Gohan Super Saiyan 2 vs Cell", 'nDes0uYtizg'],
+    ["Dragon Ball", "Goku Kaioken x3 vs Vegeta", 'lyoeacUSi2Q'],
+    ["Demon Slayer", "Tengen Uzui vs Gyutaro", '9lpnxyZXeG4'],
+    ["Demon Slayer", "Muichiro vs Gyokko", 'tZPY0Gdd8yE'],
+    ["Jujutsu Kaisen", "Gojo vs Sukuna, saison 1", '0tFr9rSrKZ0'],
+    ["Jujutsu Kaisen", "Gojo vs Jogo et Hanami", 'CARcWG8XoCY'],
+    ["Jujutsu Kaisen", "Sukuna vs Mahoraga", '_jZ6WDKgQvY'],
+    ["Hunter x Hunter", "Netero vs Meruem", 'ktMIUVnbCBU'],
+    ["Hunter x Hunter", "Gon vs Hisoka, l'Arène Céleste", 'Txl2imn11bM'],
+    ["L'Attaque des Titans", "Livaï vs le Titan Bestial", 'F0sqfPkCcyM'],
+    ["L'Attaque des Titans", "Eren vs le Titan Féminin", 'lhuqxNZxG98'],
+    ["My Hero Academia", "Deku vs Muscular", 'zKFdBKfZ1wY'],
+    ["My Hero Academia", "Deku vs Overhaul", 'B5DKmO5FR1c'],
+    ["One Punch Man", "Saitama vs Genos", '7PpacbTvUtI'],
+    ["Mob Psycho 100", "Mob vs Suzuki", 'gLIzj3JVgWE'],
+    ["Fullmetal Alchemist", "Edward vs Père", 's6hxs16-ImE'],
+    ["Hajime no Ippo", "Ippo vs Sendo", 'NR-r1YLVelQ'],
+    ["Hajime no Ippo", "Takamura vs Bryan Hawk", 'IUCez1s0jYE'],
+    ["Yu Yu Hakusho", "Yusuke vs Toguro", 'DubTw1fF48w'],
+    ["Spy x Family", "Yor en mode assassin", 'PLohL09GAZQ'],
+    ["Samurai Champloo", "Mugen et Jin vs Kariya", '4Z-enjtn7t0'],
+    ["Cowboy Bebop", "Spike vs Vicious", 'pHxRpwvDo7w'],
+    ["Hellsing Ultimate", "Alucard vs Anderson", 'wEV4zs09i1Y'],
+    ["Inuyasha", "Inuyasha (démon) vs Sesshomaru", 'd4rRbuREJHU'],
+    ["Gintama", "Gintoki vs Takasugi", 'Atao3mpZO98'],
+    ["Gurren Lagann", "La Dai-Gurren vs l'Anti-Spiral", 'eab5d38UOxE'],
+    ["Kill la Kill", "Ryuko vs Satsuki", 'oLokBjwk9Os'],
+    ["Fate/stay night", "Shirou vs Archer", 'A5PZCaUup4I'],
+    ["Fate/stay night", "Gilgamesh vs Berserker", 'OH0SeSw4x6U'],
+    ["Akame ga Kill", "Akame vs Esdeath", 'Q7Eb_grGOVE'],
+    ["Trigun", "Vash vs Knives", 'E51a3qbhprg'],
+    ["Overlord", "Ainz vs Shalltear", 'UPOx2O2uEEo']
+];
+if (QT_BY_ID.combat) {
+    const have = new Set(QT_BY_ID.combat.items.map(i => i.video));
+    for (const [sub, name, video] of MORE_FIGHTS_V1) if (!have.has(video)) QT_BY_ID.combat.items.push({ name, sub, video, img: `https://i.ytimg.com/vi/${video}/hqdefault.jpg`, start: 0 });
+}
 const arcItemsForLiveVideos = arcItemsFor;
 arcItemsFor = function (source) {
     const items = arcItemsForLiveVideos(source);
@@ -25582,3 +25635,11 @@ try {
         }
     }
 } catch (e) { console.warn('[pool bridge]', e.message); }
+
+/* AG_KEEP_AWAKE_V1 — sur l'offre gratuite, Render endort le serveur après 15 min sans visite et le
+   joueur suivant attend 30-60 s le réveil. Un petit appel toutes les 10 min via l'adresse publique
+   (variable fournie par Render) le garde éveillé ; sans cette variable (local), rien ne se passe. */
+if (process.env.RENDER_EXTERNAL_URL) {
+    const keepAwakeUrl = String(process.env.RENDER_EXTERNAL_URL).replace(/\/+$/, '') + '/api/site';
+    setInterval(() => { fetch(keepAwakeUrl, { signal: AbortSignal.timeout(15000) }).catch(() => {}); }, 10 * 60 * 1000).unref();
+}

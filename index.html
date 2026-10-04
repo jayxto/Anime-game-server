@@ -18,7 +18,12 @@
     <!--SEO-->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Anime Game","alternateName":["AnimeGame","Anime Game – Quiz anime"],"url":"https://anime-game-server.onrender.com/"}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Anime Game","inLanguage":"fr","description":"Quiz et jeux anime multijoueur gratuits dans le navigateur : blind test d'openings, Undercover, Dessine le perso, citations, AnimeDLE et plus de 20 mini-jeux.","genre":["Quiz","Party game","Anime"],"playMode":["MultiPlayer","SinglePlayer"],"gamePlatform":"Navigateur web","applicationCategory":"Game","operatingSystem":"Tous","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Polices chargées sans bloquer l'affichage : la page s'affiche tout de suite, la police arrive ensuite. -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" href="/socket.io/socket.io.js" as="script">
     <style>
         :root {
             --bg-color: #0b0b10;
