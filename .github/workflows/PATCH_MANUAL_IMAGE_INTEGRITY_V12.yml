@@ -1,0 +1,78 @@
+name: Patch manual image integrity v12
+on:
+  push:
+    paths:
+      - '.github/workflows/PATCH_MANUAL_IMAGE_INTEGRITY_V12.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Decode patch
+        run: |
+          echo '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' | base64 -d | gzip -d > /tmp/patch_manual_image_integrity_v12.py
+      - name: Apply patch
+        run: python /tmp/patch_manual_image_integrity_v12.py
+      - name: Install runtime dependencies
+        run: npm ci --omit=dev
+      - name: Verify server syntax and invariants
+        run: |
+          node --check server.js
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          checks={
+            'canonical v11 kept':'AG_CANONICAL_CHARACTER_IMAGE_V11' in s,
+            'integrity marker':'AG_MANUAL_IMAGE_INTEGRITY_V12' in s,
+            'sharp import':"require('sharp')" in s or 'require("sharp")' in s,
+            'manual normalize':"if (status === 'manual-admin')" in s and "simpleNormalizeImage(image)" in s,
+            'startup repair':'await simpleRepairManualImageRows();' in s,
+            'route self heal':"X-AG-Image-Integrity','v12'" in s,
+            'no immutable unversioned':"req.query.v ? 'public,max-age=31536000,immutable' : 'no-cache,max-age=0,must-revalidate'" in s,
+            'save checks decode':'const storedOk=await simpleStoreImage' in s,
+          }
+          for name,ok in checks.items():
+              print(name,ok)
+              if not ok: raise SystemExit('FAILED: '+name)
+          PY
+      - name: Test real decode and fake-byte rejection
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'), vm=require('vm'), assert=require('assert'), sharp=require('sharp');
+          const s=fs.readFileSync('server.js','utf8');
+          const a=s.indexOf('function simpleImageLooksValid');
+          const b=s.indexOf('function simpleImageIsPrivateHost',a);
+          assert(a>=0 && b>a);
+          const ctx={Buffer,sharp};
+          vm.createContext(ctx);
+          vm.runInContext(s.slice(a,b),ctx);
+          (async()=>{
+            const png=await sharp({create:{width:64,height:64,channels:4,background:{r:255,g:0,b:0,alpha:1}}}).png().toBuffer();
+            const normalized=await ctx.simpleNormalizeImage({bytes:png,mime:'image/png'});
+            assert(normalized && normalized.mime==='image/webp');
+            const meta=await sharp(normalized.bytes).metadata();
+            assert(meta.format==='webp' && meta.width===64 && meta.height===64);
+            const fake=Buffer.alloc(1200,65);
+            assert.strictEqual(await ctx.simpleNormalizeImage({bytes:fake,mime:'image/jpeg'}),null);
+            console.log('manual image integrity decode tests OK');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Run transformation regression tests
+        run: |
+          if [ -f .github/transform-audit.test.cjs ]; then node .github/transform-audit.test.cjs; fi
+      - name: Commit tested integrity fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/AUDIT_CANONICAL_IMAGE_PERSISTENCE.yml
+          rm -f .github/workflows/PATCH_MANUAL_IMAGE_INTEGRITY_V12.yml
+          git add server.js .github/workflows
+          git commit -m "fix: normalize and self-heal manual character images [skip ci]"
+          git push origin HEAD:main
