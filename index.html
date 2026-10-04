@@ -10903,14 +10903,17 @@ body.ag-game-page #app-root > #mode,
         function tbRender() {
             const box = document.getElementById('eco-shop');
             if (!box || !isAccount() || !tb.list) return;
-            let sec = document.getElementById('tb-sec');
-            if (!sec) { sec = document.createElement('div'); sec.id = 'tb-sec'; const firstH = box.querySelector('h3.adm-h'); box.insertBefore(sec, firstH || null); }
+            // dans la grille « Boosters de cartes », après les boosters normaux, avec la même icône 🎴
+            const h = [...box.querySelectorAll('h3.adm-h')].find(x => /Boosters de cartes/.test(x.textContent));
+            const grid = h && h.nextElementSibling && h.nextElementSibling.classList.contains('shop-grid') ? h.nextElementSibling : null;
+            if (!grid) return;
+            grid.querySelectorAll('.tb-item').forEach(x => x.remove());
             const opts = tb.animes.map(([u, n, c]) => `<option value="${v7esc(u)}">${v7esc(n)} (${c} cartes)</option>`).join('');
-            sec.innerHTML = `<h3 class="adm-h">🎁 Boosters à thème</h3><div class="shop-grid">${tb.list.map((b, bi) => `
-                <div class="shop-item tb-item${b.event ? ' tb-event' : ''}"><div class="shop-prev"><span style="font-size:2rem;">${v7esc(b.emoji || '🎴')}</span></div>
-                    <b>${v7esc(b.name)}</b><small class="tl-hint" style="display:block;margin:4px 0 6px;">${v7esc(b.desc || '')}</small>
+            grid.insertAdjacentHTML('beforeend', tb.list.map((b, bi) => `
+                <div class="shop-item tb-item${b.event ? ' tb-event' : ''}"><div class="shop-prev"><span style="font-size:2rem;">🎴</span></div>
+                    <b>${v7esc(b.name)} ${v7esc(b.emoji || '')}</b><small class="tl-hint" style="display:block;margin:4px 0 6px;">${v7esc(b.desc || '')}</small>
                     ${b.pick ? `<select class="v7-input tb-pick" id="tb-pick" style="margin:0 0 6px;padding:6px;"><option value="">— Choisis un anime —</option>${opts}</select>` : ''}
-                    <button class="buy" ${eco.coins < b.price ? 'disabled' : ''} onclick="tbBuy(${bi})">🪙 ${b.price}</button></div>`).join('')}</div>`;
+                    <button class="buy" ${eco.coins < b.price ? 'disabled' : ''} onclick="tbBuy(${bi})">🪙 ${b.price}</button></div>`).join(''));
         }
         async function tbBuy(bi) {
             if (tbBuy.busy) return;
@@ -10918,7 +10921,7 @@ body.ag-game-page #app-root > #mode,
             const u = b.pick ? (document.getElementById('tb-pick') || {}).value : '';
             if (b.pick && !u) return toast('🎯 Choisis d’abord un anime.', 'var(--accent-yellow)');
             tbBuy.busy = true;
-            document.querySelectorAll('#tb-sec .buy').forEach(x => x.disabled = true);
+            document.querySelectorAll('.tb-item .buy').forEach(x => x.disabled = true);
             if (typeof summonPending === 'function') summonPending();
             let d; try { d = await v7post('/api/boosters/buy', { id, u }); } finally { tbBuy.busy = false; }
             if ((!d || !d.ok || !d.cards) && typeof summonCancel === 'function') summonCancel();
