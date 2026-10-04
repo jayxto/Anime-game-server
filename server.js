@@ -23689,7 +23689,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { omega: 9, eternelle: 8, legende: 7.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -23722,8 +23722,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { omega: 'Oméga', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { omega: '#ffffff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -25688,3 +25688,185 @@ if (process.env.RENDER_EXTERNAL_URL) {
     const keepAwakeUrl = String(process.env.RENDER_EXTERNAL_URL).replace(/\/+$/, '') + '/api/site';
     setInterval(() => { fetch(keepAwakeUrl, { signal: AbortSignal.timeout(15000) }).catch(() => {}); }, 10 * 60 * 1000).unref();
 }
+
+/* =====================================================================
+   AG_THEMED_BOOSTERS_V1 — boosters à thème (boutique → « Boosters à thème »)
+   • anime au choix • booster de la semaine • Big 3 / Nouvelle génération • genres
+   • Méchants / Waifus / Rivaux / Pères (listes de « Qui a le plus… »)
+   • événements (Noël, Saint-Valentin, Été, booster lancé par un admin) • anniversaire du perso
+   + 3 nouvelles raretés : Céleste, Abyssale, Primordiale.
+   ===================================================================== */
+SPECIAL_TIERS.push(
+    { id: 'celeste', label: 'Céleste', top: 2, rate: 1 / 1500, coins: 250 },
+    { id: 'abyssale', label: 'Abyssale', top: 1, rate: 1 / 20000, coins: 2000 },
+    { id: 'primordiale', label: 'Primordiale', top: 1, rate: 1 / 150000, coins: 8000 }
+);
+SPECIAL_TIERS.sort((a, b) => b.rate - a.rate);
+SPECIAL_TIERS.forEach(t => { SPECIAL_BY_ID[t.id] = t; });
+Object.assign(RAR_RANK, { celeste: 6.5, abyssale: 8.5, primordiale: 10 });
+RAR_ORDER.splice(RAR_ORDER.indexOf('divine') + 1, 0, 'celeste');
+RAR_ORDER.splice(RAR_ORDER.indexOf('eternelle') + 1, 0, 'abyssale');
+RAR_ORDER.push('primordiale');
+Object.assign(DECK_BONUS, { celeste: 28, abyssale: 60, primordiale: 120 });
+Object.assign(MARKET_HINT, { celeste: [15000, 40000], abyssale: [150000, 400000], primordiale: [600000, 2000000] });
+
+const TB_GROUPS = {
+    big3: ['Booster Big 3', '👑', 'Naruto, One Piece et Bleach', ['naruto', 'onepiece', 'bleach']],
+    newgen: ['Booster Nouvelle génération', '⚡', 'Les gros animes récents', ['jjk', 'demonslayer', 'chainsaw', 'frieren', 'spyfamily', 'dandadan', 'solo', 'kaiju8', 'sakamoto', 'oshinoko', 'bluelock', 'gachiakuta', 'mashle', 'apothecary', 'dungeonmeshi']],
+    shonen: ['Booster Shonen', '🔥', 'Les grands shonen de baston', ['naruto', 'onepiece', 'bleach', 'hxh', 'dragonball', 'fairy', 'clover', 'sds', 'mha', 'jjk', 'demonslayer', 'chainsaw', 'fireforce', 'souleater', 'yuyuhakusho', 'jojo', 'opm', 'mobpsycho', 'hellsparadise', 'blueexorcist']],
+    isekai: ['Booster Isekai', '🌀', 'Réincarnés dans un autre monde', ['rezero', 'mushoku', 'tensura', 'sao', 'konosuba', 'overlord', 'shieldhero', 'eminence', 'nogamenolife', 'danmachi', 'shangrila']],
+    sport: ['Booster Sport', '🏀', 'Volley, basket, foot, boxe, course…', ['haikyuu', 'kuroko', 'slamdunk', 'bluelock', 'ippo', 'initiald', 'mfghost', 'beyblade']],
+    seinen: ['Booster Seinen sombre', '🌑', 'Les animes adultes et sombres', ['berserk', 'vinland', 'monster', 'parasyte', 'psychopass', 'devilman', 'cyberpunk', 'hellsing', 'blacklagoon', 'dorohedoro', 'tokyoghoul', 'madeinabyss', 'another', 'deathnote']],
+    romance: ['Booster Romance & tranches de vie', '💞', 'Comédies romantiques et histoires douces', ['kaguya', 'toradora', 'clannad', 'anohana', 'dressup', 'rascal', 'bluebox', 'callnight', 'horimiya', 'yourlie', 'violet', 'bocchi', 'grandblue', 'lycoris']]
+};
+const TB_CHARS = { // thèmes de « Qui a le plus… » → cartes
+    mechants: ['Booster Méchants', '😈', 'Que des antagonistes', ['antagoniste']],
+    waifus: ['Booster Waifus', '💖', 'Les waifus les plus populaires', ['waifu']],
+    rivaux: ['Booster Rivaux', '⚔️', 'Les plus grands rivaux', ['rival']],
+    peres: ['Booster Pères', '👨‍👧', 'Les meilleurs (et les pires) pères', ['bonpere', 'pirepere']]
+};
+const TB_SEASON = { noel: ['Booster de Noël', '🎄'], valentin: ['Booster Saint-Valentin', '💘'], ete: ['Booster de l’Été', '☀️'] };
+const TB_BIRTHDAYS = (() => { try { return JSON.parse(fs.readFileSync(path.join(__dirname, 'content', 'birthdays.json'), 'utf8')); } catch (e) { console.warn('[boosters] anniversaires :', e.message); return []; } })();
+if (!('eventBooster' in SITE)) SITE.eventBooster = null; // { title, emoji, us: [...], until (ms), price }
+
+const tbUs = list => list.filter(u => ARC_UNIVERSE_ANIME[u] && cardPool(u).length);
+const tbAnimeOfSub = (() => { let m = null; return sub => { if (!m) { m = new Map(); for (const [u, n] of Object.entries(ARC_UNIVERSE_ANIME)) m.set(normalizeRG(n), u); } return m.get(normalizeRG(sub)) || null; }; })();
+const TB_CHAR_CACHE = new Map();
+function tbCharCards(themes) {
+    const k = themes.join('+');
+    if (TB_CHAR_CACHE.has(k)) return TB_CHAR_CACHE.get(k);
+    const out = [], seen = new Set();
+    for (const t of themes) for (const it of (arcItemsFor('qt:' + t) || [])) {
+        const u = tbAnimeOfSub(it.sub || ''); if (!u) continue;
+        const c = cardResolve(u, String(it.name || '').replace(/\s*\(.*\)\s*$/, '')); if (!c || seen.has(c.key)) continue;
+        seen.add(c.key); out.push({ u, display: c.display, rank: RAR_RANK[cardRarityAt(u, c.idx)] || 0 });
+    }
+    TB_CHAR_CACHE.set(k, out);
+    return out;
+}
+function tbWeekly(ms = hubNow()) {
+    const list = Object.keys(ARC_UNIVERSE_ANIME).filter(u => cardPool(u).length >= 20).sort();
+    return list.length ? list[hubHash('tbweek' + weekKey(ms)) % list.length] : null;
+}
+function tbBirthdaysToday(ms = hubNow()) {
+    const p = parisParts(ms);
+    return TB_BIRTHDAYS.filter(([u, , m, d]) => m === p.m && d === p.d && ARC_UNIVERSE_ANIME[u]).slice(0, 3)
+        .map(([u, display]) => { const c = cardResolve(u, display); return c ? { u, display: c.display } : null; }).filter(Boolean);
+}
+// Catalogue du moment (les boosters du jour/de la semaine/d'événement changent tout seuls)
+function tbCatalog() {
+    const list = [];
+    list.push({ id: 'anime', name: 'Booster d’un anime au choix', emoji: '🎯', desc: '5 cartes de l’anime que tu choisis • 1 rare min.', price: 300, pick: true });
+    const wk = tbWeekly();
+    if (wk) list.push({ id: 'week', name: `Booster de la semaine : ${ARC_UNIVERSE_ANIME[wk]}`, emoji: '📅', desc: '5 cartes • moins cher • raretés x2 cette semaine', price: 200, u: wk });
+    for (const [id, [name, emoji, desc, us]] of Object.entries(TB_GROUPS)) if (tbUs(us).length) list.push({ id: 'g:' + id, name, emoji, desc: `${desc} • 5 cartes • 1 rare min.`, price: 260 });
+    for (const [id, [name, emoji, desc, th]] of Object.entries(TB_CHARS)) if (tbCharCards(th).length >= 10) list.push({ id: 'c:' + id, name, emoji, desc: `${desc} • 5 cartes • 1 épique min.`, price: 350 });
+    for (const [id, [name, emoji]] of Object.entries(TB_SEASON)) if (seasonActive(SEASON_CARDS[id]) && seasonChars(id).length) list.push({ id: 's:' + id, name, emoji, desc: `5 cartes • 1 carte ${SEASON_CARDS[id].label} garantie • durée limitée`, price: 600, event: true });
+    const ev = SITE.eventBooster;
+    if (ev && ev.until > Date.now() && tbUs(ev.us || []).length) list.push({ id: 'ev', name: ev.title, emoji: ev.emoji || '🎉', desc: `Événement • 5 cartes • 1 épique min. • jusqu’au ${new Date(ev.until).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}`, price: ev.price || 400, event: true });
+    for (const b of tbBirthdaysToday()) list.push({ id: 'b:' + b.u + '|' + b.display, name: `Anniversaire de ${b.display}`, emoji: '🎂', desc: `Aujourd’hui seulement • sa carte garantie (brillante 1 fois sur 4) + 4 cartes de ${ARC_UNIVERSE_ANIME[b.u]}`, price: 400, event: true, u: b.u });
+    return [...list.filter(b => b.event), ...list.filter(b => !b.event)]; // durée limitée en premier
+}
+
+// --- tirage ---
+async function tbFromUniverses(uid, us, luck, minRank, n) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+        const u = us[Math.floor(Math.random() * us.length)];
+        let special = null;
+        for (const t of SPECIAL_TIERS.slice().reverse()) {
+            if (Math.random() >= t.rate * luck) continue;
+            const sc = cardSpecials(t.id, u);
+            if (sc.length) { special = sc[Math.floor(Math.random() * sc.length)]; break; }
+        }
+        if (special) { const c = await cardAwardSecret(uid, special.u, special.display, Math.random() < Math.min(0.9, luck / 10), special.tier); if (c) out.push(c); continue; }
+        const list = cardPool(u);
+        let idx = Math.min(list.length - 1, Math.floor(Math.pow(Math.random(), 1.6 / Math.sqrt(luck)) * list.length));
+        if (i === n - 1 && minRank && !out.some(c => (RAR_RANK[c.rarity] || 0) >= minRank)) {
+            const ok = list.map((c, j) => j).filter(j => (RAR_RANK[cardRarityAt(u, j)] || 0) >= minRank);
+            if (ok.length) idx = ok[Math.floor(Math.random() * ok.length)];
+        }
+        const c = await cardAward({ userId: uid, id: null }, u, list[idx].display, { silent: true, shinyRate: 1 / 10 });
+        if (c) out.push(c);
+    }
+    return out;
+}
+async function tbFromChars(uid, cards, luck, minRank, n) {
+    const out = [];
+    // les cartes rares sortent moins souvent ; la chance rapproche des rares
+    const weight = c => 1 / (1 + c.rank * 1.4 / Math.sqrt(luck));
+    const pickW = list => { const tot = list.reduce((s, c) => s + weight(c), 0); let r = Math.random() * tot; for (const c of list) { r -= weight(c); if (r <= 0) return c; } return list[list.length - 1]; };
+    for (let i = 0; i < n; i++) {
+        let pool = cards;
+        if (i === n - 1 && minRank && !out.some(c => (RAR_RANK[c.rarity] || 0) >= minRank)) { const hi = cards.filter(c => c.rank >= minRank); if (hi.length) pool = hi; }
+        const c = pickW(pool);
+        const r = await cardAward({ userId: uid, id: null }, c.u, c.display, { silent: true, shinyRate: 1 / 10 });
+        if (r) out.push(r);
+    }
+    return out;
+}
+async function tbOpen(uid, b, chosenU) {
+    const luck = await cardLuck(uid);
+    if (b.id === 'anime') return tbFromUniverses(uid, [chosenU], luck, 1, 5);
+    if (b.id === 'week') return tbFromUniverses(uid, [b.u], luck * 2, 1, 5);
+    if (b.id.startsWith('g:')) return tbFromUniverses(uid, tbUs(TB_GROUPS[b.id.slice(2)][3]), luck, 1, 5);
+    if (b.id.startsWith('c:')) return tbFromChars(uid, tbCharCards(TB_CHARS[b.id.slice(2)][3]), luck, 2, 5);
+    if (b.id === 'ev') return tbFromUniverses(uid, tbUs(SITE.eventBooster.us), luck, 2, 5);
+    if (b.id.startsWith('s:')) {
+        const id = b.id.slice(2), list = seasonChars(id), c = list[Math.floor(Math.random() * list.length)];
+        const out = await openBooster(uid, 4, '');
+        const sc = await cardAwardSecret(uid, c.u, c.display, Math.random() < Math.min(0.9, luck / 10), id);
+        out.splice(Math.floor(Math.random() * (out.length + 1)), 0, sc);
+        return out;
+    }
+    if (b.id.startsWith('b:')) {
+        const [u, display] = b.id.slice(2).split('|');
+        const star = await cardAward({ userId: uid, id: null }, u, display, { silent: true, shinyRate: 1 / 4 });
+        const rest = await tbFromUniverses(uid, [u], luck, 0, 4);
+        return star ? [...rest, star] : rest; // le perso fêté se révèle en dernier
+    }
+    return [];
+}
+
+app.get('/api/boosters', async (req, res) => {
+    const uid = authUserId(req), e = uid ? await ecoGet(uid) : null;
+    const animes = Object.keys(ARC_UNIVERSE_ANIME).map(u => [u, ARC_UNIVERSE_ANIME[u], cardPool(u).length]).filter(a => a[2] >= 5).sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+    res.json({ ok: true, coins: e ? e.coins : 0, account: !!uid, boosters: tbCatalog(), animes });
+});
+const TB_BUSY = new Set();
+app.post('/api/boosters/buy', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || ''), chosenU = String((req.body || {}).u || '');
+    const b = tbCatalog().find(x => x.id === id);
+    if (!b) return res.json({ ok: false, error: 'Ce booster n’est plus disponible.' });
+    if (b.pick && !(ARC_UNIVERSE_ANIME[chosenU] && cardPool(chosenU).length >= 5)) return res.json({ ok: false, error: 'Choisis un anime.' });
+    if (TB_BUSY.has(uid)) return res.json({ ok: false, error: 'Ouverture déjà en cours…' });
+    TB_BUSY.add(uid);
+    try {
+        const e = await ecoGet(uid);
+        if (e.coins < b.price) return res.json({ ok: false, error: `Il te manque ${b.price - e.coins} pièces.` });
+        if (HAS_DB) {
+            const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, b.price])).rows[0];
+            if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' });
+        } else e.coins -= b.price;
+        const cards = await tbOpen(uid, b, chosenU);
+        const after = await ecoGet(uid);
+        res.json({ ok: true, coins: after.coins, owned: after.owned, cards });
+    } catch (err) { res.json({ ok: false, error: 'Erreur pendant l’ouverture.' }); }
+    finally { TB_BUSY.delete(uid); }
+});
+// Admin : lancer un booster d'événement (sortie d'un anime, anniversaire du site…)
+app.get('/api/admin/event-booster', adminOnly(async (req, res) => res.json({ ok: true, ev: SITE.eventBooster })));
+app.post('/api/admin/event-booster', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    if (b.action === 'stop') SITE.eventBooster = null;
+    else {
+        const us = (Array.isArray(b.us) ? b.us : String(b.us || '').split(/[,+\s]+/)).map(String).filter(u => ARC_UNIVERSE_ANIME[u]);
+        const days = Math.max(1, Math.min(60, Number(b.days) || 7));
+        const title = String(b.title || '').trim().slice(0, 60);
+        if (!title || !us.length) return res.json({ ok: false, error: 'Titre et au moins un anime requis.' });
+        SITE.eventBooster = { title, emoji: String(b.emoji || '🎉').slice(0, 4), us, until: Date.now() + days * 86400000, price: Math.max(50, Math.min(5000, Number(b.price) || 400)) };
+    }
+    await siteSave('eventBooster');
+    res.json({ ok: true, ev: SITE.eventBooster });
+}));

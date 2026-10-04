@@ -3754,6 +3754,17 @@ body.ag-game-page #app-root > #mode,
             <button class="btn-action" style="margin-top:4px;background:#ff7a00;color:#111;" onclick="hwAdmin('add')">➕ Ajouter la carte Halloween</button>
             <div id="adm-hw-list" class="card-grid" style="margin-top:10px;"></div>
         </div>
+        <div class="opt-panel" id="adm-evb">
+            <h2>🎉 Booster d'événement</h2>
+            <p class="tl-hint" style="text-align:left;">Pour une sortie d'anime, l'anniversaire du site… Le booster apparaît dans la boutique (« Boosters à thème ») jusqu'à la date de fin : 5 cartes des animes choisis, 1 épique minimum.</p>
+            <div id="adm-evb-cur" class="tl-hint" style="text-align:left;margin-bottom:6px;"></div>
+            <input id="adm-evb-title" class="v7-input" maxlength="60" placeholder="Titre (ex : Booster Saison 2 de Solo Leveling)">
+            <div style="display:flex;gap:6px;"><input id="adm-evb-emoji" class="v7-input" maxlength="4" placeholder="Emoji 🎉" style="max-width:90px;"><input id="adm-evb-days" class="v7-input" type="number" min="1" max="60" placeholder="Durée (jours)" value="7"><input id="adm-evb-price" class="v7-input" type="number" min="50" max="5000" placeholder="Prix" value="400"></div>
+            <select id="adm-evb-us" class="v7-input" multiple size="6"></select>
+            <small class="tl-hint" style="display:block;text-align:left;margin-bottom:6px;">Ctrl/Cmd + clic pour choisir plusieurs animes.</small>
+            <button class="btn-action" style="margin-top:0;" onclick="evbAdmin('start')">🚀 Lancer le booster</button>
+            <button class="btn-action" style="margin-top:6px;background:#333;" onclick="evbAdmin('stop')">⏹ Arrêter</button>
+        </div>
         <div class="opt-panel">
             <h2>🍀 Chance sur les cartes</h2>
             <p class="tl-hint" style="text-align:left;">Plus de cartes brillantes, de cartes rares et de raretés spéciales (Secrète → Oméga) dans les boosters et les parties.</p>
@@ -10689,6 +10700,24 @@ body.ag-game-page #app-root > #mode,
             const d = await v7post('/api/admin/settings', { maintenance: { on: document.getElementById('adm-maint').checked, lock, msg: document.getElementById('adm-maint-msg').value, back: document.getElementById('adm-maint-back').value } });
             toast(d && d.ok ? (lock ? '🔒 Site fermé : les joueurs voient l’écran de mise à jour' : '✅ Maintenance mise à jour pour tout le monde') : '❌ Impossible (server.js à jour ?)', d && d.ok ? '#00ff88' : 'var(--accent-pink)');
         }
+        // --- Booster d'événement (AG_THEMED_BOOSTERS_V1) ---
+        function evbRender(ev) {
+            const cur = document.getElementById('adm-evb-cur'); if (!cur) return;
+            cur.innerHTML = ev && ev.until > Date.now() ? `En cours : <b>${v7esc(ev.emoji || '')} ${v7esc(ev.title)}</b> • ${ev.us.map(u => v7esc((UNIVERSE_CHOICES.find(x => x[0] === u) || [u, u])[1])).join(', ')} • 🪙 ${ev.price} • jusqu'au ${new Date(ev.until).toLocaleDateString('fr-FR')}` : 'Aucun booster d’événement en cours.';
+        }
+        async function evbLoad() {
+            const sel = document.getElementById('adm-evb-us');
+            if (sel && !sel.options.length) sel.innerHTML = UNIVERSE_CHOICES.map(([k, l]) => `<option value="${k}">${v7esc(l)}</option>`).join('');
+            const d = await v7get('/api/admin/event-booster'); if (d && d.ok) evbRender(d.ev);
+        }
+        async function evbAdmin(action) {
+            const v = id => (document.getElementById(id) || {}).value || '';
+            const us = [...((document.getElementById('adm-evb-us') || {}).selectedOptions || [])].map(o => o.value);
+            const d = await v7post('/api/admin/event-booster', action === 'stop' ? { action } : { title: v('adm-evb-title'), emoji: v('adm-evb-emoji'), days: v('adm-evb-days'), price: v('adm-evb-price'), us });
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(action === 'stop' ? '⏹ Booster d’événement arrêté' : '🚀 Booster d’événement lancé !', '#00ff88');
+            evbRender(d.ev);
+        }
         // --- Cartes Halloween ---
         let hwAdminCards = [];
         function hwAdminRender(d) {
@@ -10701,6 +10730,7 @@ body.ag-game-page #app-root > #mode,
                 <div style="display:flex;gap:4px;justify-content:center;margin-top:3px;">${c.off ? `<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;" title="Remettre dans le tirage" onclick="hwAdmin('readd',${i})">↩️</button>` : `<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;background:#2a2a40;" title="Retirer du tirage" onclick="hwAdmin('remove',${i})">✖</button>`}<button class="btn-action" style="width:auto;margin:0;padding:3px 8px;font-size:.75rem;background:#2a2a40;" title="Me la donner" onclick="hwAdmin('give',${i})">🎁</button></div></div>`).join('') : '<p class="tl-hint">Aucune carte Halloween pour l’instant.</p>';
         }
         function hwAdminLoad() {
+            evbLoad().catch(() => {});
             const sel = document.getElementById('adm-hw-u');
             if (sel && !sel.options.length) sel.innerHTML = UNIVERSE_CHOICES.map(([k, l]) => `<option value="${k}">${v7esc(l)}</option>`).join('');
             hwAdminNames();
@@ -10863,6 +10893,49 @@ body.ag-game-page #app-root > #mode,
             else { const it = eco.items.find(i => i.id === id); toast(`🛒 ${v7esc(it ? it.name : 'Objet')} acheté !`, '#00ff88'); if (it) await shopEquip(it.kind, it.key, true); }
             renderShop();
         }
+        // AG_THEMED_BOOSTERS_V1 — boosters à thème (anime au choix, semaine, genres, persos, événements, anniversaires)
+        const tb = { list: null, animes: [], at: 0 };
+        async function tbLoad(force) {
+            if (!force && tb.list && Date.now() - tb.at < 60000) return;
+            const d = await v7get('/api/boosters');
+            if (d && d.ok) { tb.list = d.boosters; tb.animes = d.animes; tb.at = Date.now(); }
+        }
+        function tbRender() {
+            const box = document.getElementById('eco-shop');
+            if (!box || !isAccount() || !tb.list) return;
+            let sec = document.getElementById('tb-sec');
+            if (!sec) { sec = document.createElement('div'); sec.id = 'tb-sec'; const firstH = box.querySelector('h3.adm-h'); box.insertBefore(sec, firstH || null); }
+            const opts = tb.animes.map(([u, n, c]) => `<option value="${v7esc(u)}">${v7esc(n)} (${c} cartes)</option>`).join('');
+            sec.innerHTML = `<h3 class="adm-h">🎁 Boosters à thème</h3><div class="shop-grid">${tb.list.map((b, bi) => `
+                <div class="shop-item tb-item${b.event ? ' tb-event' : ''}"><div class="shop-prev"><span style="font-size:2rem;">${v7esc(b.emoji || '🎴')}</span></div>
+                    <b>${v7esc(b.name)}</b><small class="tl-hint" style="display:block;margin:4px 0 6px;">${v7esc(b.desc || '')}</small>
+                    ${b.pick ? `<select class="v7-input tb-pick" id="tb-pick" style="margin:0 0 6px;padding:6px;"><option value="">— Choisis un anime —</option>${opts}</select>` : ''}
+                    <button class="buy" ${eco.coins < b.price ? 'disabled' : ''} onclick="tbBuy(${bi})">🪙 ${b.price}</button></div>`).join('')}</div>`;
+        }
+        async function tbBuy(bi) {
+            if (tbBuy.busy) return;
+            const b = (tb.list || [])[bi]; if (!b) return; const id = b.id;
+            const u = b.pick ? (document.getElementById('tb-pick') || {}).value : '';
+            if (b.pick && !u) return toast('🎯 Choisis d’abord un anime.', 'var(--accent-yellow)');
+            tbBuy.busy = true;
+            document.querySelectorAll('#tb-sec .buy').forEach(x => x.disabled = true);
+            if (typeof summonPending === 'function') summonPending();
+            let d; try { d = await v7post('/api/boosters/buy', { id, u }); } finally { tbBuy.busy = false; }
+            if ((!d || !d.ok || !d.cards) && typeof summonCancel === 'function') summonCancel();
+            if (!d || !d.ok) { toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); tbLoad(true).then(renderShop); return; }
+            eco.coins = d.coins; if (d.owned) eco.owned = d.owned; ecoCoinsUi();
+            if (d.cards && d.cards.length) showBooster(d.cards);
+            renderShop();
+        }
+        (function () {
+            const orig = renderShop;
+            renderShop = function () {
+                const r = orig.apply(this, arguments);
+                if (tb.list) tbRender();
+                tbLoad().then(tbRender).catch(() => {});
+                return r;
+            };
+        })();
         async function shopEquip(kind, key, quiet) {
             const d = await v7post('/api/shop/equip', { kind, key: key || null });
             if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
@@ -11602,7 +11675,7 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['primordiale', 'omega', 'abyssale', 'eternelle', 'legende', 'cosmique', 'celeste', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -12932,11 +13005,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, celeste: 6.5, abyssale: 8.5, primordiale: 10 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -12948,7 +13021,9 @@ body.ag-game-page #app-root > #mode,
                 eveillee: [46, ['#ff2d55', '#ff8a00', '#ffffff', '#b3001b'], 260, 'up'], legende: [64, ['#ff4500', '#ffd700', '#ffffff', '#ff2a5f'], 320, 'out'],
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
                 valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
-                altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out']
+                altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
+                celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
+                primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out']
             };
             function smParticles(host, rar) {
                 const cfg = PARTS[rar]; if (!cfg) return;
@@ -13782,6 +13857,25 @@ body.ag-game-page #app-root > #mode,
         .tcard.r-eveillee .tc-rar{color:#ff4d6d;font-weight:900;text-shadow:0 0 8px #ff2d55;}
         .tcard.r-legende{border:3px solid transparent;background:linear-gradient(#150800,#150800) padding-box,conic-gradient(from var(--la,0deg),#ff4500,#ffd700,#fff,#ff2a5f,#ff4500) border-box;box-shadow:0 0 20px rgba(255,69,0,.8),0 0 40px rgba(255,215,0,.4);animation:rLegSpin 4s linear infinite;}
         .tcard.r-legende .tc-img img{animation:rLegZoom 7s ease-in-out infinite;}
+        /* AG_NEW_RARITIES_V1 — Céleste, Abyssale, Primordiale */
+        .tcard.r-celeste{border:2px solid #8fe3ff;box-shadow:0 0 14px #8fe3ff,0 0 34px rgba(160,140,255,.45);background:linear-gradient(180deg,#0b1630,#120a2a);}
+        .tcard.r-celeste .tc-img::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.55) 0 2px,transparent 3px),radial-gradient(circle at 75% 30%,rgba(255,255,255,.5) 0 1.5px,transparent 3px),radial-gradient(circle at 40% 70%,rgba(143,227,255,.5) 0 2px,transparent 3px),linear-gradient(180deg,rgba(143,227,255,.18),transparent 60%);pointer-events:none;}
+        .tcard.r-celeste .tc-rar{color:#bdefff;font-weight:900;text-shadow:0 0 8px #8fe3ff;}
+        .tcard.r-abyssale{border:3px solid #7a00ff;box-shadow:0 0 18px #7a00ff,0 0 40px rgba(255,42,95,.35),inset 0 0 26px rgba(0,0,0,.8);background:#07000f;animation:rAbyss 2.4s ease-in-out infinite;}
+        .tcard.r-abyssale .tc-img img{filter:saturate(1.2) contrast(1.2) brightness(.9);}
+        .tcard.r-abyssale .tc-img::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 120%,rgba(122,0,255,.75),transparent 60%),radial-gradient(ellipse at 50% -20%,rgba(0,0,0,.7),transparent 55%);pointer-events:none;}
+        .tcard.r-abyssale .tc-rar{color:#c9a6ff;font-weight:900;text-shadow:0 0 10px #7a00ff,0 0 4px #ff2a5f;}
+        @keyframes rAbyss{0%,100%{box-shadow:0 0 16px #7a00ff,0 0 36px rgba(255,42,95,.3),inset 0 0 26px rgba(0,0,0,.8);}50%{box-shadow:0 0 26px #a64dff,0 0 56px rgba(255,42,95,.5),inset 0 0 26px rgba(0,0,0,.8);}}
+        .tcard.r-primordiale{border:3px solid transparent;background:linear-gradient(#000d0b,#000d0b) padding-box,conic-gradient(from var(--pa,0deg),#00ffd5,#ffd700,#ff2a5f,#7a00ff,#00c8ff,#00ffd5) border-box;box-shadow:0 0 22px rgba(0,255,213,.7),0 0 60px rgba(255,215,0,.35);animation:rPrim 3s linear infinite;}
+        .tcard.r-primordiale .tc-img::after{content:'';position:absolute;inset:-20%;background:conic-gradient(from 0deg,rgba(0,255,213,.18),rgba(255,215,0,.18),rgba(255,42,95,.18),rgba(122,0,255,.18),rgba(0,255,213,.18));mix-blend-mode:screen;animation:rPrimSpin 6s linear infinite;pointer-events:none;}
+        .tcard.r-primordiale .tc-rar{background:linear-gradient(90deg,#00ffd5,#ffd700,#ff2a5f,#7a00ff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
+        @property --pa{syntax:'<angle>';inherits:false;initial-value:0deg;}
+        @keyframes rPrim{to{--pa:360deg;}} @keyframes rPrimSpin{to{transform:rotate(360deg);}}
+        #summon .sm-screen.fx-celeste{background:radial-gradient(circle,rgba(143,227,255,.4),rgba(8,10,40,.9) 70%);}
+        #summon .sm-screen.fx-abyssale{background:radial-gradient(circle,rgba(122,0,255,.5),rgba(4,0,10,.95) 70%);}
+        #summon .sm-screen.fx-primordiale{background:conic-gradient(from 0deg,rgba(0,255,213,.35),rgba(255,215,0,.35),rgba(255,42,95,.35),rgba(122,0,255,.35),rgba(0,255,213,.35)),#000;}
+        .tb-item small{line-height:1.25;} .tb-item.tb-event{border-color:var(--accent-yellow);box-shadow:0 0 14px rgba(255,230,0,.25);}
+        .trd-mini.r-celeste{border-color:#8fe3ff;} .trd-mini.r-abyssale{border-color:#7a00ff;} .trd-mini.r-primordiale{border-color:#00ffd5;}
         .tcard.r-legende .tc-img::after{content:'';position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg,rgba(255,215,0,.22) 0 6deg,transparent 6deg 20deg);animation:rLegRays 10s linear infinite;mix-blend-mode:screen;}
         .tcard.r-legende .tc-rar{background:linear-gradient(90deg,#ff4500,#ffd700,#ff2a5f);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;}
         .tcard.r-duo{border:2px solid #00e5a0;box-shadow:0 0 12px rgba(0,229,160,.6);}
@@ -13884,9 +13978,9 @@ body.ag-game-page #app-root > #mode,
             const FIN_ICON = { holo: '🌈', reverse: '🪩', glitter: '✨', gold: '🥇', dark: '🌑', fullart: '🖼️', manga: '🖋️', galaxy: '🔮', glitch: '📺', signed: '✍️', numbered: '🔢' };
             const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff' };
             const FIN_ORDER = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
-            const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'noel', 'valentin', 'ete'];
-            Object.assign(RAR_LABEL, { eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
-            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'celeste', 'abyssale', 'primordiale', 'noel', 'valentin', 'ete'];
+            Object.assign(RAR_LABEL, { celeste: 'Céleste 🌠', abyssale: 'Abyssale 🌑', primordiale: 'Primordiale 🔱', eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { celeste: 'Céleste', abyssale: 'Abyssale', primordiale: 'Primordiale', eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
             const CARD_CACHE = window.CARD_CACHE = {};
             const esc = s => v7esc(s == null ? '' : String(s));
             function keyOf(c) {
@@ -14045,7 +14139,7 @@ body.ag-game-page #app-root > #mode,
                     <p class="tl-hint" style="text-align:left;">Chaque carte que tu gagnes peut sortir avec une <b>finition</b> en plus de sa rareté (la chance x2 / x10 marche aussi). Passe la souris sur une carte, ou clique dessus pour l’inspecter en 3D.</p>
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
-                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['legende', 'Légende vivante • 1/6000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/api/character-image-file?u=naruto&n=Naruto%20Uzumaki', '/api/character-image-file?u=naruto&n=Sasuke%20Uchiha'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
+                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['celeste', 'Céleste • 1/1500'], ['legende', 'Légende vivante • 1/6000'], ['abyssale', 'Abyssale • 1/20000'], ['primordiale', 'Primordiale • 1/150000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/api/character-image-file?u=naruto&n=Naruto%20Uzumaki', '/api/character-image-file?u=naruto&n=Sasuke%20Uchiha'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
                     <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
@@ -14109,8 +14203,8 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['omega', 'eternelle', 'legende', 'cosmique', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['primordiale', 'omega', 'abyssale', 'eternelle', 'legende', 'cosmique', 'celeste', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['primordiale', 'omega', 'abyssale', 'eternelle', 'legende', 'cosmique', 'celeste', 'divine', 'eveillee', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'glitch', 'galaxy', 'manga', 'fullart', 'dark', 'gold', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
