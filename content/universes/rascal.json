@@ -1,0 +1,24 @@
+{
+  "key": "rascal",
+  "name": "Rascal Does Not Dream of Bunny Girl Senpai",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Syndrome de l'adolescence","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Sakuta Azusagawa","attrs":["Lycéen","Oui","Homme","Bruns"]},
+      {"name":"Mai Sakurajima","attrs":["Actrice","Oui","Femme","Noirs"]},
+      {"name":"Tomoe Koga","attrs":["Lycéenne","Oui","Femme","Bruns"]},
+      {"name":"Nodoka Toyohama","attrs":["Idole","Oui","Femme","Blonds"]},
+      {"name":"Kaede Azusagawa","attrs":["Collégienne","Oui","Femme","Bruns"]},
+      {"name":"Shoko Makinohara","attrs":["Collégienne","Oui","Femme","Noirs"]},
+      {"name":"Yuuma Kunimi","attrs":["Lycéen","Non","Homme","Bruns"]},
+      {"name":"Saki Kamisato","attrs":["Lycéenne","Non","Femme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Shoko Makinohara",90], ["Mai Sakurajima",85], ["Sakuta Azusagawa",80], ["Rio Futaba",75], ["Tomoe Koga",70], ["Nodoka Toyohama",70],
+    ["Kaede Azusagawa",50], ["Yuuma Kunimi",50], ["Saki Kamisato",40]
+  ]
+}

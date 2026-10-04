@@ -1,0 +1,25 @@
+{
+  "key": "deathparade",
+  "name": "Death Parade",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Lieu","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Decim","attrs":["Arbitre","Quindecim","Homme","Blancs"]},
+      {"name":"Chiyuki","attrs":["Assistante","Quindecim","Femme","Noirs"]},
+      {"name":"Nona","attrs":["Directrice","Tour de Nona","Femme","Blancs"]},
+      {"name":"Ginti","attrs":["Arbitre","Viginti","Homme","Rouges"]},
+      {"name":"Clavis","attrs":["Liftier","Ascenseur","Homme","Bleus"]},
+      {"name":"Quin","attrs":["Ancienne arbitre","Aucun","Femme","Noirs"]},
+      {"name":"Oculus","attrs":["Dieu","Aucun","Homme","Gris"]},
+      {"name":"Mayu Arita","attrs":["Invité","Viginti","Femme","Roux"]},
+      {"name":"Harada","attrs":["Invité","Viginti","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Oculus",100], ["Nona",90], ["Decim",85], ["Ginti",80], ["Quin",80], ["Clavis",60],
+    ["Chiyuki",50], ["Mayu Arita",20], ["Harada",20]
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "key": "bluebox",
+  "name": "Blue Box",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": [],
+    "characters": [
+
+    ]
+  },
+  "power": [
+    ["Taiki Inomata",85], ["Kengo Haryu",85], ["Chinatsu Kano",84], ["Hina Chono",80], ["Kyo Kasahara",70], ["Nagisa Funami",75],
+    ["Ayame Moriya",60], ["Karen Moriya",55]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "key": "clannad",
+  "name": "Clannad",
+  "quotes": [
+    {"text":"Cette ville… je la déteste.","speaker":"Tomoya Okazaki","recipient":"à lui-même, au début de l'histoire","aliases":["Tomoya","Okazaki"]},
+    {"text":"Tu aimes cette ville ?","speaker":"Nagisa Furukawa","recipient":"à Tomoya","aliases":["Nagisa"]},
+    {"text":"Anpan !","speaker":"Nagisa Furukawa","recipient":"pour se donner du courage","aliases":["Nagisa"]},
+    {"text":"Fuko n'est pas une enfant !","speaker":"Fuko Ibuki","recipient":"à Tomoya","aliases":["Fuko"]},
+    {"text":"Appelle-moi Kotomi, avec « -chan » !","speaker":"Kotomi Ichinose","recipient":"à Tomoya","aliases":["Kotomi"]},
+    {"text":"Dictionnaire !","speaker":"Kyou Fujibayashi","recipient":"à Sunohara","aliases":["Kyou"]},
+    {"text":"Mes pains… ne sont pas si mauvais, n'est-ce pas ?","speaker":"Sanae Furukawa","recipient":"à Akio, avant de s'enfuir en courant","aliases":["Sanae"]},
+    {"text":"Moi, je suis le génie du baseball !","speaker":"Akio Furukawa","recipient":"à Tomoya","aliases":["Akio"]},
+    {"text":"Okazaki, t'es un vrai pote !","speaker":"Youhei Sunohara","recipient":"à Tomoya","aliases":["Sunohara"]},
+    {"text":"Papa, tu veux bien me porter ?","speaker":"Ushio Okazaki","recipient":"à Tomoya","aliases":["Ushio"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Club","Famille","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Tomoya Okazaki","attrs":["Élève","Club de théâtre","Okazaki","Homme","Bleus"]},
+      {"name":"Nagisa Furukawa","attrs":["Élève","Club de théâtre","Furukawa","Femme","Bruns"]},
+      {"name":"Ushio Okazaki","attrs":["Enfant","Aucun","Okazaki","Femme","Bruns"]},
+      {"name":"Kyou Fujibayashi","attrs":["Élève","Aucun","Fujibayashi","Femme","Violets"]},
+      {"name":"Ryou Fujibayashi","attrs":["Élève","Aucun","Fujibayashi","Femme","Violets"]},
+      {"name":"Tomoyo Sakagami","attrs":["Élève","Conseil des élèves","Sakagami","Femme","Gris"]},
+      {"name":"Kotomi Ichinose","attrs":["Élève","Aucun","Ichinose","Femme","Violets"]},
+      {"name":"Fuko Ibuki","attrs":["Élève","Aucun","Ibuki","Femme","Bruns"]},
+      {"name":"Youhei Sunohara","attrs":["Élève","Aucun","Sunohara","Homme","Blonds"]},
+      {"name":"Mei Sunohara","attrs":["Collégienne","Aucun","Sunohara","Femme","Bleus"]},
+      {"name":"Akio Furukawa","attrs":["Adulte","Aucun","Furukawa","Homme","Bruns"]},
+      {"name":"Sanae Furukawa","attrs":["Adulte","Aucun","Furukawa","Femme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Tomoyo Sakagami",95], ["Akio Furukawa",85], ["Kyou Fujibayashi",80], ["Tomoya Okazaki",50], ["Youhei Sunohara",40], ["Fuko Ibuki",30],
+    ["Kotomi Ichinose",30], ["Ryou Fujibayashi",30], ["Sanae Furukawa",30], ["Mei Sunohara",30], ["Nagisa Furukawa",20], ["Ushio Okazaki",10]
+  ]
+}

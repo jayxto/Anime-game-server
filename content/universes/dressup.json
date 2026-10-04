@@ -1,0 +1,24 @@
+{
+  "key": "dressup",
+  "name": "My Dress-Up Darling",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Famille","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Marin Kitagawa","attrs":["Cosplayeuse","Kitagawa","Femme","Blonds"]},
+      {"name":"Wakana Gojo","attrs":["Artisan de poupées","Gojo","Homme","Noirs"]},
+      {"name":"Kaoru Gojo","attrs":["Artisan de poupées","Gojo","Homme","Gris"]},
+      {"name":"Sajuna Inui","attrs":["Cosplayeuse","Inui","Femme","Roses"]},
+      {"name":"Shinju Inui","attrs":["Photographe","Inui","Femme","Roses"]},
+      {"name":"Nowa Sugaya","attrs":["Lycéenne","Sugaya","Femme","Noirs"]},
+      {"name":"Daia","attrs":["Lycéenne","Aucune","Femme","Bruns"]},
+      {"name":"Rune","attrs":["Lycéenne","Aucune","Femme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Marin Kitagawa",85], ["Wakana Gojo",85], ["Sajuna Inui",80], ["Kaoru Gojo",75], ["Shinju Inui",70], ["Nowa Sugaya",40],
+    ["Daia",40], ["Rune",40]
+  ]
+}

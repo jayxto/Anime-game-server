@@ -1,0 +1,25 @@
+{
+  "key": "another",
+  "name": "Another",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Statut","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Mei Misaki","attrs":["Élève","Vivant","Femme","Noirs"]},
+      {"name":"Koichi Sakakibara","attrs":["Élève","Vivant","Homme","Bruns"]},
+      {"name":"Izumi Akazawa","attrs":["Élève","Mort","Femme","Rouges"]},
+      {"name":"Reiko Mikami","attrs":["Professeur","Mort","Femme","Bruns"]},
+      {"name":"Naoya Teshigawara","attrs":["Élève","Vivant","Homme","Blonds"]},
+      {"name":"Yukari Sakuragi","attrs":["Élève","Mort","Femme","Bruns"]},
+      {"name":"Yuya Mochizuki","attrs":["Élève","Vivant","Homme","Bruns"]},
+      {"name":"Takako Sugiura","attrs":["Élève","Mort","Femme","Bruns"]},
+      {"name":"Tomohiko Kazami","attrs":["Élève","Mort","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Mei Misaki",90], ["Koichi Sakakibara",80], ["Reiko Mikami",75], ["Izumi Akazawa",70], ["Naoya Teshigawara",60], ["Yuya Mochizuki",55],
+    ["Takako Sugiura",50], ["Tomohiko Kazami",45], ["Yukari Sakuragi",40]
+  ]
+}

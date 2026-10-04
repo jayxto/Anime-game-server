@@ -1,0 +1,24 @@
+{
+  "key": "anohana",
+  "name": "AnoHana",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Surnom","Rôle","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Jinta Yadomi","attrs":["Jintan","Lycéen","Super Peace Busters","Homme","Noirs"]},
+      {"name":"Meiko Honma","attrs":["Menma","Fantôme","Super Peace Busters","Femme","Blancs"]},
+      {"name":"Naruko Anjo","attrs":["Anaru","Lycéen","Super Peace Busters","Femme","Roux"]},
+      {"name":"Atsumu Matsuyuki","attrs":["Yukiatsu","Lycéen","Super Peace Busters","Homme","Bruns"]},
+      {"name":"Chiriko Tsurumi","attrs":["Tsuruko","Lycéen","Super Peace Busters","Femme","Noirs"]},
+      {"name":"Tetsudo Hisakawa","attrs":["Poppo","Voyageur","Super Peace Busters","Homme","Bruns"]},
+      {"name":"Irene Honma","attrs":["Aucun","Mère","Famille Honma","Femme","Blonds"]},
+      {"name":"Satoshi Honma","attrs":["Aucun","Collégien","Famille Honma","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Tetsudo Hisakawa",70], ["Jinta Yadomi",65], ["Atsumu Matsuyuki",60], ["Naruko Anjo",50], ["Chiriko Tsurumi",50], ["Meiko Honma",40],
+    ["Irene Honma",20], ["Satoshi Honma",15]
+  ]
+}

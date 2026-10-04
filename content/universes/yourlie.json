@@ -1,0 +1,34 @@
+{
+  "key": "yourlie",
+  "name": "Your Lie in April",
+  "quotes": [
+    {"text":"Je t'aime, Kosei Arima.","speaker":"Kaori Miyazono","recipient":"à Kosei, dans sa dernière lettre","aliases":["Kaori"]},
+    {"text":"Arima Kosei, tu seras mon accompagnateur !","speaker":"Kaori Miyazono","recipient":"à Kosei","aliases":["Kaori"]},
+    {"text":"La musique, c'est la liberté !","speaker":"Kaori Miyazono","recipient":"à Kosei","aliases":["Kaori"]},
+    {"text":"Je n'entends plus le son de mon piano.","speaker":"Kosei Arima","recipient":"à Tsubaki","aliases":["Kosei"]},
+    {"text":"Kosei, t'es vraiment un idiot !","speaker":"Tsubaki Sawabe","recipient":"à Kosei","aliases":["Tsubaki"]},
+    {"text":"Un jour, je te dépasserai, Arima.","speaker":"Takeshi Aiza","recipient":"à Kosei","aliases":["Takeshi"]},
+    {"text":"Je joue pour que tu m'entendes, Kosei Arima.","speaker":"Emi Igawa","recipient":"à Kosei","aliases":["Emi"]},
+    {"text":"Tu dois jouer sans la moindre erreur, Kosei.","speaker":"Saki Arima","recipient":"à Kosei","aliases":["Saki"]},
+    {"text":"Joue pour quelqu'un, Kosei. C'est comme ça que la musique prend vie.","speaker":"Hiroko Seto","recipient":"à Kosei","aliases":["Hiroko"]},
+    {"text":"Les filles, je m'y connais, fais-moi confiance.","speaker":"Ryota Watari","recipient":"à Kosei","aliases":["Watari"]}
+  ],
+  "dle": {
+    "categories": ["Instrument","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kosei Arima","attrs":["Piano","Pianiste","Homme","Noirs"]},
+      {"name":"Kaori Miyazono","attrs":["Violon","Violoniste","Femme","Blonds"]},
+      {"name":"Tsubaki Sawabe","attrs":["Aucun","Sportive","Femme","Bruns"]},
+      {"name":"Ryota Watari","attrs":["Aucun","Footballeur","Homme","Roux"]},
+      {"name":"Emi Igawa","attrs":["Piano","Pianiste","Femme","Bruns"]},
+      {"name":"Takeshi Aiza","attrs":["Piano","Pianiste","Homme","Blonds"]},
+      {"name":"Nagi Aiza","attrs":["Piano","Pianiste","Femme","Blonds"]},
+      {"name":"Hiroko Seto","attrs":["Piano","Professeur","Femme","Noirs"]},
+      {"name":"Saki Arima","attrs":["Piano","Professeur","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Kosei Arima",95], ["Kaori Miyazono",92], ["Saki Arima",90], ["Hiroko Seto",88], ["Takeshi Aiza",85], ["Emi Igawa",85],
+    ["Nagi Aiza",70], ["Tsubaki Sawabe",40], ["Ryota Watari",40]
+  ]
+}

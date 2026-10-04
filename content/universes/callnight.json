@@ -1,0 +1,26 @@
+{
+  "key": "callnight",
+  "name": "Call of the Night",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Nature","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ko Yamori","attrs":["Humain","Collégien","Homme","Noirs"]},
+      {"name":"Nazuna Nanakusa","attrs":["Vampire","Vampire","Femme","Blancs"]},
+      {"name":"Akira Asai","attrs":["Humain","Collégienne","Femme","Noirs"]},
+      {"name":"Anko Uguisu","attrs":["Humain","Détective","Femme","Noirs"]},
+      {"name":"Seri Kikyo","attrs":["Vampire","Vampire","Femme","Blonds"]},
+      {"name":"Nico Hirata","attrs":["Vampire","Vampire","Femme","Roux"]},
+      {"name":"Kabura Honda","attrs":["Vampire","Infirmière","Femme","Noirs"]},
+      {"name":"Midori Kohakobe","attrs":["Vampire","Serveuse","Femme","Noirs"]},
+      {"name":"Hatsuka Suzushiro","attrs":["Vampire","Vampire","Femme","Gris"]},
+      {"name":"Mahiru Seki","attrs":["Humain","Lycéen","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Nazuna Nanakusa",90], ["Anko Uguisu",88], ["Kabura Honda",85], ["Seri Kikyo",75], ["Nico Hirata",75], ["Hatsuka Suzushiro",74],
+    ["Midori Kohakobe",72], ["Ko Yamori",70], ["Mahiru Seki",30], ["Akira Asai",20]
+  ]
+}

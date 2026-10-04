@@ -1,0 +1,27 @@
+{
+  "key": "windbreaker",
+  "name": "Wind Breaker",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Groupe","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Haruka Sakura","attrs":["Bofurin","Chef de classe","Homme","Noirs et blancs"]},
+      {"name":"Hajime Umemiya","attrs":["Bofurin","Chef","Homme","Blancs"]},
+      {"name":"Toma Hiragi","attrs":["Bofurin","Quatre Rois","Homme","Blonds"]},
+      {"name":"Ren Kaji","attrs":["Bofurin","Chef de classe","Homme","Blonds"]},
+      {"name":"Hayato Suo","attrs":["Bofurin","Membre","Homme","Bruns"]},
+      {"name":"Akihiko Nirei","attrs":["Bofurin","Membre","Homme","Blonds"]},
+      {"name":"Kyotaro Sugishita","attrs":["Bofurin","Membre","Homme","Noirs"]},
+      {"name":"Mitsuki Kiryu","attrs":["Bofurin","Membre","Homme","Roses"]},
+      {"name":"Taiga Tsugeura","attrs":["Bofurin","Membre","Homme","Roux"]},
+      {"name":"Choji Tomiyama","attrs":["Shishitoren","Chef","Homme","Gris"]},
+      {"name":"Jo Togame","attrs":["Shishitoren","Vice-chef","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Hajime Umemiya",98], ["Choji Tomiyama",92], ["Jo Togame",88], ["Toma Hiragi",88], ["Haruka Sakura",86], ["Hayato Suo",85],
+    ["Ren Kaji",84], ["Kyotaro Sugishita",82], ["Mitsuki Kiryu",78], ["Taiga Tsugeura",75], ["Akihiko Nirei",30]
+  ]
+}
