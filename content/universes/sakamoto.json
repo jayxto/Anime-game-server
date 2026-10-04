@@ -1,0 +1,28 @@
+{
+  "key": "sakamoto",
+  "name": "Sakamoto Days",
+  "quotes": [],
+  "dle": {
+    "categories": ["Organisation","Rôle","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Taro Sakamoto","attrs":["Magasin Sakamoto","Ancien tueur","Objets du quotidien","Homme","Noirs"]},
+      {"name":"Shin Asakura","attrs":["Magasin Sakamoto","Télépathe","Pistolet","Homme","Blonds"]},
+      {"name":"Lu Shaotang","attrs":["Magasin Sakamoto","Combattante","Arts martiaux","Femme","Roses"]},
+      {"name":"Heisuke Mashimo","attrs":["Magasin Sakamoto","Sniper","Fusil","Homme","Bruns"]},
+      {"name":"Nagumo","attrs":["ORDER","Tueur","Couteau multifonction","Homme","Noirs"]},
+      {"name":"Osaragi","attrs":["ORDER","Tueur","Scie","Femme","Noirs"]},
+      {"name":"Shishiba","attrs":["ORDER","Tueur","Arts martiaux","Homme","Blonds"]},
+      {"name":"Takamura","attrs":["ORDER","Tueur","Katana","Homme","Gris"]},
+      {"name":"Slur","attrs":["Bande de Slur","Chef","Pistolet","Homme","Blancs"]},
+      {"name":"Gaku","attrs":["Bande de Slur","Tueur","Arme blanche","Homme","Bleus"]},
+      {"name":"Akira Akao","attrs":["JCC","Élève","Pistolet","Femme","Bleus"]},
+      {"name":"Rion Akao","attrs":["Aucune","Tueur","Pistolet","Femme","Verts"]}
+    ]
+  },
+  "power": [
+    ["Takamura",100],["Taro Sakamoto",97],["Nagumo",95],["Slur",93],["Kei Uzuki",93],["Shishiba",90],
+    ["Osaragi",88],["Gaku",86],["Rion Akao",85],["Hyo",82],["Kanaguri",80],["Haruma",80],
+    ["Kumanomi",78],["Kindaka",76],["Shin Asakura",78],["Lu Shaotang",72],["Heisuke Mashimo",72],["Satoru Yotsumura",70],
+    ["Amane Yotsumura",65],["Akira Akao",62]
+  ]
+}

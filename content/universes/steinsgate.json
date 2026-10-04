@@ -1,0 +1,39 @@
+{
+  "key": "steinsgate",
+  "name": "Steins;Gate",
+  "quotes": [
+    {"text":"Je suis Hououin Kyouma, le savant fou !","speaker":"Rintaro Okabe","recipient":"à Kurisu","aliases":["Okabe","Okarin","Hououin Kyouma"]},
+    {"text":"El Psy Kongroo.","speaker":"Rintaro Okabe","recipient":"au téléphone, à personne","aliases":["Okabe","Okarin","Hououin Kyouma"]},
+    {"text":"C'est le choix de Steins Gate !","speaker":"Rintaro Okabe","recipient":"aux membres du laboratoire","aliases":["Okabe","Okarin","Hououin Kyouma"]},
+    {"text":"Tu es mon assistante, Christina.","speaker":"Rintaro Okabe","recipient":"à Kurisu","aliases":["Okabe","Okarin"]},
+    {"text":"Tutturu ♪ ! C'est Mayushii !","speaker":"Mayuri Shiina","recipient":"à Okabe","aliases":["Mayuri","Mayushii"]},
+    {"text":"Il n'y a pas de « -tina » !","speaker":"Kurisu Makise","recipient":"à Okabe","aliases":["Kurisu","Christina","Assistante"]},
+    {"text":"Je suis un super hacker. Rien ne me résiste.","speaker":"Itaru Hashida","recipient":"à Okabe","aliases":["Daru","Hashida"]},
+    {"text":"Bienvenue, maître, nyan !","speaker":"Faris NyanNyan","recipient":"aux clients du maid café","aliases":["Faris","Rumiho Akiha"]},
+    {"text":"Mais… je suis un garçon.","speaker":"Luka Urushibara","recipient":"à Okabe","aliases":["Luka","Ruka"]},
+    {"text":"Je suis venue du futur pour changer ce qui doit arriver.","speaker":"Suzuha Amane","recipient":"à Okabe","aliases":["Suzuha","John Titor"]},
+    {"text":"Okabe ! Arrête de faire du bruit dans mon immeuble !","speaker":"Yugo Tennouji","recipient":"à Okabe","aliases":["Mr. Braun","Tennouji"]}
+  ],
+  "dle": {
+    "categories": ["Affiliation","Rôle","Lunettes","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Rintaro Okabe","attrs":["Laboratoire de gadgets du futur","Savant fou","Non","Homme","Noirs"]},
+      {"name":"Kurisu Makise","attrs":["Laboratoire de gadgets du futur","Neuroscientifique","Non","Femme","Roux"]},
+      {"name":"Mayuri Shiina","attrs":["Laboratoire de gadgets du futur","Cosplayeuse","Non","Femme","Noirs"]},
+      {"name":"Itaru Hashida","attrs":["Laboratoire de gadgets du futur","Hacker","Oui","Homme","Bruns"]},
+      {"name":"Faris NyanNyan","attrs":["Laboratoire de gadgets du futur","Serveuse","Non","Femme","Roses"]},
+      {"name":"Luka Urushibara","attrs":["Laboratoire de gadgets du futur","Prêtre","Non","Homme","Noirs"]},
+      {"name":"Moeka Kiryu","attrs":["Rounders","Agent","Oui","Femme","Bruns"]},
+      {"name":"Yugo Tennouji","attrs":["Rounders","Agent","Non","Homme","Aucun"]},
+      {"name":"Nae Tennouji","attrs":["Aucune","Enfant","Non","Femme","Bruns"]},
+      {"name":"Maho Hiyajo","attrs":["Viktor Chondria","Chercheuse","Non","Femme","Noirs"]},
+      {"name":"Alexis Leskinen","attrs":["Viktor Chondria","Professeur","Non","Homme","Blonds"]},
+      {"name":"Kagari Shiina","attrs":["Aucune","Voyageuse temporelle","Non","Femme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Rintaro Okabe",95],["Kurisu Makise",95],["Suzuha Amane",85],["Yugo Tennouji",80],["Maho Hiyajo",80],["Itaru Hashida",75],
+    ["Moeka Kiryu",70],["Kagari Shiina",65],["Alexis Leskinen",60],["Faris NyanNyan",55],["Mayuri Shiina",50],["Yuki Amane",50],
+    ["Luka Urushibara",45],["Nae Tennouji",40]
+  ]
+}

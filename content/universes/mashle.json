@@ -1,0 +1,26 @@
+{
+  "key": "mashle",
+  "name": "Mashle",
+  "quotes": [],
+  "dle": {
+    "categories": ["Camp","Magie","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Mash Burnedead","attrs":["Élève d'Easton","Aucune (muscles)","Homme","Noirs"]},
+      {"name":"Finn Ames","attrs":["Élève d'Easton","Transfert","Homme","Noirs"]},
+      {"name":"Lance Crown","attrs":["Élève d'Easton","Gravité","Homme","Blancs"]},
+      {"name":"Dot Barrett","attrs":["Élève d'Easton","Explosion","Homme","Roux"]},
+      {"name":"Rayne Ames","attrs":["Divins Visionnaires","Épées","Homme","Blonds"]},
+      {"name":"Margarette Macaron","attrs":["Divins Visionnaires","Son","Homme","Blancs"]},
+      {"name":"Abel Walker","attrs":["Magia Lupus","Marionnettes","Homme","Blancs"]},
+      {"name":"Abyss Razor","attrs":["Magia Lupus","Œil du démon","Homme","Bleus"]},
+      {"name":"Innocent Zero","attrs":["Famille d'Innocent Zero","Temps","Homme","Blancs"]},
+      {"name":"Cell War","attrs":["Famille d'Innocent Zero","Cire","Homme","Blonds"]},
+      {"name":"Domina Blowelive","attrs":["Famille d'Innocent Zero","Eau","Homme","Roses"]}
+    ]
+  },
+  "power": [
+    ["Innocent Zero",100],["Mash Burnedead",97],["Wahlberg Baigan",95],["Renatus Revol",88],["Rayne Ames",90],["Domina Blowelive",88],
+    ["Orter Madl",88],["Cell War",84],["Margarette Macaron",84],["Carpaccio Luo-yang",86],["Lance Crown",80],["Abel Walker",78],
+    ["Abyss Razor",76],["Dot Barrett",70],["Finn Ames",65],["Lemon Irvine",40]
+  ]
+}

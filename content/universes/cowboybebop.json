@@ -1,0 +1,36 @@
+{
+  "key": "cowboybebop",
+  "name": "Cowboy Bebop",
+  "quotes": [
+    {"text":"Je n'y vais pas pour mourir. J'y vais pour savoir si je suis vraiment vivant.","speaker":"Spike Spiegel","recipient":"à Faye","aliases":["Spike"]},
+    {"text":"Bang.","speaker":"Spike Spiegel","recipient":"aux hommes du syndicat, à la fin","aliases":["Spike"]},
+    {"text":"J'avais l'impression de regarder un rêve dont je ne me réveillerais jamais.","speaker":"Spike Spiegel","recipient":"à Faye","aliases":["Spike"]},
+    {"text":"Je déteste trois choses : les enfants, les animaux et les femmes qui ont du caractère.","speaker":"Spike Spiegel","recipient":"à Jet","aliases":["Spike"]},
+    {"text":"Il n'y a rien en quoi croire dans ce monde.","speaker":"Vicious","recipient":"à Spike","aliases":[]},
+    {"text":"Tout ça n'est qu'un rêve.","speaker":"Julia","recipient":"à Spike","aliases":[]},
+    {"text":"Edward Wong Hau Pepelu Tivrusky IV !","speaker":"Edward Wong","recipient":"en se présentant","aliases":["Ed","Edward"]},
+    {"text":"Je ne sais même pas qui j'étais avant de me réveiller.","speaker":"Faye Valentine","recipient":"à Spike","aliases":["Faye"]},
+    {"text":"Ce soir, c'est poivrons au bœuf… sans le bœuf.","speaker":"Jet Black","recipient":"à Spike","aliases":["Jet","Black Dog"]},
+    {"text":"Les papillons… je les vois partout.","speaker":"Vincent Volaju","recipient":"à Faye","aliases":["Vincent"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Groupe","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Spike Spiegel","attrs":["Chasseur de primes","Équipage du Bebop","Pistolet","Homme","Verts"]},
+      {"name":"Jet Black","attrs":["Chasseur de primes","Équipage du Bebop","Pistolet","Homme","Aucun"]},
+      {"name":"Faye Valentine","attrs":["Chasseur de primes","Équipage du Bebop","Pistolet","Femme","Violets"]},
+      {"name":"Edward Wong","attrs":["Hacker","Équipage du Bebop","Ordinateur","Femme","Roux"]},
+      {"name":"Ein","attrs":["Chien","Équipage du Bebop","Aucune","Mâle","Bruns"]},
+      {"name":"Vicious","attrs":["Tueur","Syndicat du Dragon Rouge","Katana","Homme","Blancs"]},
+      {"name":"Julia","attrs":["Ancienne du syndicat","Aucun","Pistolet","Femme","Blonds"]},
+      {"name":"Gren","attrs":["Musicien","Aucun","Pistolet","Homme","Noirs"]},
+      {"name":"Judy","attrs":["Animatrice","Big Shot","Aucune","Femme","Blonds"]},
+      {"name":"Vincent Volaju","attrs":["Terroriste","Aucun","Pistolet","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Spike Spiegel",95],["Vicious",94],["Vincent Volaju",88],["Jet Black",80],["Gren",75],["Faye Valentine",70],
+    ["Electra Ovilo",65],["Julia",60],["Edward Wong",30],["Edward",30],["Laughing Bull",30],["Ein",20],
+    ["Punch",15],["Judy",10]
+  ]
+}

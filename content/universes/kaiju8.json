@@ -1,0 +1,25 @@
+{
+  "key": "kaiju8",
+  "name": "Kaiju No. 8",
+  "quotes": [],
+  "dle": {
+    "categories": ["Unité","Rôle","Nature","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kafka Hibino","attrs":["3e division","Recrue","Hybride","Homme","Noirs"]},
+      {"name":"Mina Ashiro","attrs":["3e division","Capitaine","Humain","Femme","Noirs"]},
+      {"name":"Soshiro Hoshina","attrs":["3e division","Vice-capitaine","Humain","Homme","Violets"]},
+      {"name":"Reno Ichikawa","attrs":["3e division","Recrue","Humain","Homme","Blancs"]},
+      {"name":"Kikoru Shinomiya","attrs":["3e division","Recrue","Humain","Femme","Blonds"]},
+      {"name":"Haruichi Izumo","attrs":["3e division","Recrue","Humain","Homme","Verts"]},
+      {"name":"Aoi Kaguragi","attrs":["3e division","Recrue","Humain","Homme","Blonds"]},
+      {"name":"Konomi Okonogi","attrs":["3e division","Opératrice","Humain","Femme","Noirs"]},
+      {"name":"Gen Narumi","attrs":["1re division","Capitaine","Humain","Homme","Roses"]},
+      {"name":"Isao Shinomiya","attrs":["Quartier général","Directeur général","Humain","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Kaiju No. 9",100],["Kafka Hibino",96],["Isao Shinomiya",92],["Gen Narumi",92],["Mina Ashiro",90],["Kaiju No. 10",86],
+    ["Soshiro Hoshina",88],["Kikoru Shinomiya",82],["Reno Ichikawa",76],["Iharu Furuhashi",65],["Haruichi Izumo",64],["Aoi Kaguragi",66],
+    ["Rin Shinonome",55],["Konomi Okonogi",30]
+  ]
+}
