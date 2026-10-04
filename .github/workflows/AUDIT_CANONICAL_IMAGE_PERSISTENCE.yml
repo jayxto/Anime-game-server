@@ -1,0 +1,52 @@
+name: Audit canonical image persistence
+on:
+  push:
+    paths:
+      - '.github/workflows/AUDIT_CANONICAL_IMAGE_PERSISTENCE.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract canonical image persistence context
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('server.js').read_text(encoding='utf-8')
+          i=Path('index.html').read_text(encoding='utf-8')
+          def emit(label,text,needles,r=4200,limit=5):
+              print('\n===== '+label+' =====')
+              for n in needles:
+                  print('\n### '+n)
+                  pos=0;c=0
+                  while c<limit:
+                      k=text.find(n,pos)
+                      if k<0: break
+                      c+=1
+                      print('\n-- byte',k,'--')
+                      print(text[max(0,k-r):min(len(text),k+r)])
+                      pos=k+len(n)
+                  if c==0: print('NOT FOUND')
+          emit('SERVER',s,[
+            'function normalizeImageKey',
+            'function simpleImageCompact',
+            'function simpleImageRoute',
+            'async function simpleFetchImage',
+            'function simpleImageLooksValid',
+            'async function simpleStoreImage',
+            'async function getCachedCharacterImage',
+            "app.get('/api/character-image-file'",
+            "app.post('/api/admin/character-image'",
+            "app.get('/api/admin/character-catalog-persistent'",
+            'resolveCharacterImage = async function'
+          ])
+          emit('INDEX',i,[
+            'async function saveUrl',
+            'function mergeCatalogue',
+            'function loadTheme',
+            'function drainThemeImages',
+            'AG_MANUAL_IMAGE_LOCK_V10'
+          ])
+          PY
