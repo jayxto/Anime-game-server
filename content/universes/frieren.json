@@ -1,0 +1,489 @@
+{
+  "key": "frieren",
+  "name": "Frieren",
+  "quotes": [
+    {
+      "text": "Je n'ai passé que dix ans avec lui… Pourquoi n'ai-je pas cherché à mieux le connaître ?",
+      "speaker": "Frieren",
+      "recipient": "aux funérailles de Himmel",
+      "aliases": []
+    },
+    {
+      "text": "Le héros Himmel aurait fait la même chose.",
+      "speaker": "Frieren",
+      "recipient": "à Fern et Stark",
+      "aliases": []
+    },
+    {
+      "text": "Ces statues, c'est pour que tu ne sois pas seule dans le futur.",
+      "speaker": "Himmel",
+      "recipient": "à Frieren",
+      "aliases": [
+        "Himmel le héros"
+      ]
+    },
+    {
+      "text": "J'ai gaspillé l'eau sacrée pour boire un coup… mais j'aimerais vivre encore un peu, au moins jusqu'à ce que cette enfant grandisse.",
+      "speaker": "Heiter",
+      "recipient": "à Frieren, à propos de Fern",
+      "aliases": []
+    },
+    {
+      "text": "Frieren-sama, levez-vous. Nous allons encore être en retard.",
+      "speaker": "Fern",
+      "recipient": "à Frieren",
+      "aliases": []
+    },
+    {
+      "text": "J'ai peur… mais je suis un guerrier. Je dois me tenir devant pour protéger tout le monde.",
+      "speaker": "Stark",
+      "recipient": "avant d'affronter le dragon",
+      "aliases": []
+    },
+    {
+      "text": "Agenouille-toi.",
+      "speaker": "Aura",
+      "recipient": "à Frieren, avec la Balance de l'obéissance",
+      "aliases": [
+        "Aura l'Exécutrice"
+      ]
+    },
+    {
+      "text": "Aura, mets-toi à genoux.",
+      "speaker": "Frieren",
+      "recipient": "à Aura, après avoir révélé son mana",
+      "aliases": []
+    },
+    {
+      "text": "Les démons sont des monstres qui parlent le langage des hommes uniquement pour les tromper.",
+      "speaker": "Frieren",
+      "recipient": "à propos des démons",
+      "aliases": []
+    },
+    {
+      "text": "Dissimule ton mana. Trompe ton ennemi. C'est ainsi qu'on survit en tant que mage.",
+      "speaker": "Flamme",
+      "recipient": "à la jeune Frieren",
+      "aliases": []
+    },
+    {
+      "text": "Une magie que je peux imaginer, je peux la trancher.",
+      "speaker": "Übel",
+      "recipient": "pendant l'examen de mage de première classe",
+      "aliases": [
+        "Ubel"
+      ]
+    },
+    {
+      "text": "Je n'ai plus de mana ? Alors je me battrai avec mes poings.",
+      "speaker": "Denken",
+      "recipient": "pendant l'examen de mage de première classe",
+      "aliases": []
+    },
+    {
+      "text": "La magie, c'est l'art de donner forme à l'imagination.",
+      "speaker": "Frieren",
+      "recipient": "à Fern",
+      "aliases": []
+    },
+    {
+      "text": "Ce n'est pas grave d'être lâche. Ce qui compte, c'est de se battre quand même.",
+      "speaker": "Eisen",
+      "recipient": "à Stark",
+      "aliases": []
+    },
+    {
+      "text": "Je n'aime pas vraiment la magie… mais j'aime regarder Frieren-sama utiliser la magie.",
+      "speaker": "Fern",
+      "recipient": "à Frieren",
+      "aliases": []
+    },
+    {
+      "text": "Une fois l'aventure finie, je veux partir à la recherche de mon ami.",
+      "speaker": "Sein",
+      "recipient": "à Frieren",
+      "aliases": []
+    },
+    {
+      "text": "Je vais trouver une magie qui fait pousser des champs de fleurs. Elle plaisait à Himmel.",
+      "speaker": "Frieren",
+      "recipient": "à Fern",
+      "aliases": []
+    },
+    {
+      "text": "Il est temps de partir. Allons voir le monde que nous avons sauvé.",
+      "speaker": "Himmel",
+      "recipient": "au groupe du héros",
+      "aliases": []
+    },
+    {
+      "text": "Zoltraak était la magie qui tuait les hommes. Aujourd'hui, c'est une magie de base.",
+      "speaker": "Frieren",
+      "recipient": "à Qual",
+      "aliases": []
+    }
+  ],
+  "dle": {
+    "categories": [
+      "Race",
+      "Rôle",
+      "Groupe",
+      "Statut",
+      "Sexe",
+      "Cheveux"
+    ],
+    "characters": [
+      {
+        "name": "Frieren",
+        "attrs": [
+          "Elfe",
+          "Mage",
+          "Groupe du héros",
+          "Vivant",
+          "Femme",
+          "Blancs"
+        ]
+      },
+      {
+        "name": "Fern",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Groupe de Frieren",
+          "Vivant",
+          "Femme",
+          "Violets"
+        ]
+      },
+      {
+        "name": "Stark",
+        "attrs": [
+          "Humain",
+          "Guerrier",
+          "Groupe de Frieren",
+          "Vivant",
+          "Homme",
+          "Roux"
+        ]
+      },
+      {
+        "name": "Himmel",
+        "attrs": [
+          "Humain",
+          "Héros",
+          "Groupe du héros",
+          "Mort",
+          "Homme",
+          "Bleus"
+        ]
+      },
+      {
+        "name": "Eisen",
+        "attrs": [
+          "Nain",
+          "Guerrier",
+          "Groupe du héros",
+          "Vivant",
+          "Homme",
+          "Roux"
+        ]
+      },
+      {
+        "name": "Flamme",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Aucun",
+          "Mort",
+          "Femme",
+          "Blonds"
+        ]
+      },
+      {
+        "name": "Serie",
+        "attrs": [
+          "Elfe",
+          "Mage",
+          "Association magique continentale",
+          "Vivant",
+          "Femme",
+          "Blonds"
+        ]
+      },
+      {
+        "name": "Aura",
+        "attrs": [
+          "Démon",
+          "Mage",
+          "Armée du Roi démon",
+          "Mort",
+          "Femme",
+          "Roses"
+        ]
+      },
+      {
+        "name": "Übel",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Femme",
+          "Verts"
+        ]
+      },
+      {
+        "name": "Denken",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Homme",
+          "Gris"
+        ]
+      },
+      {
+        "name": "Heiter",
+        "attrs": [
+          "Humain",
+          "Prêtre",
+          "Groupe du héros",
+          "Mort",
+          "Homme",
+          "Verts"
+        ]
+      },
+      {
+        "name": "Sein",
+        "attrs": [
+          "Humain",
+          "Prêtre",
+          "Groupe de Frieren",
+          "Vivant",
+          "Homme",
+          "Bruns"
+        ]
+      },
+      {
+        "name": "Land",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Homme",
+          "Blonds"
+        ]
+      },
+      {
+        "name": "Wirbel",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Homme",
+          "Gris"
+        ]
+      },
+      {
+        "name": "Laufen",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Femme",
+          "Roux"
+        ]
+      },
+      {
+        "name": "Kanne",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Femme",
+          "Roux"
+        ]
+      },
+      {
+        "name": "Lawine",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Candidat à l'examen",
+          "Vivant",
+          "Femme",
+          "Bruns"
+        ]
+      },
+      {
+        "name": "Lernen",
+        "attrs": [
+          "Humain",
+          "Mage",
+          "Association magique continentale",
+          "Vivant",
+          "Homme",
+          "Blancs"
+        ]
+      },
+      {
+        "name": "Lugner",
+        "attrs": [
+          "Démon",
+          "Mage",
+          "Armée du Roi démon",
+          "Mort",
+          "Homme",
+          "Blonds"
+        ]
+      }
+    ]
+  },
+  "power": [
+    [
+      "Serie",
+      100
+    ],
+    [
+      "Frieren",
+      96
+    ],
+    [
+      "Himmel",
+      93
+    ],
+    [
+      "Hero of the South",
+      90
+    ],
+    [
+      "Eisen",
+      88
+    ],
+    [
+      "Flamme",
+      87
+    ],
+    [
+      "Aura",
+      82
+    ],
+    [
+      "Fern",
+      82
+    ],
+    [
+      "Stark",
+      80
+    ],
+    [
+      "Lernen",
+      78
+    ],
+    [
+      "Heiter",
+      77
+    ],
+    [
+      "Revolte",
+      76
+    ],
+    [
+      "Qual",
+      74
+    ],
+    [
+      "Übel",
+      74
+    ],
+    [
+      "Denken",
+      73
+    ],
+    [
+      "Kraft",
+      72
+    ],
+    [
+      "Genau",
+      72
+    ],
+    [
+      "Sense",
+      70
+    ],
+    [
+      "Methode",
+      70
+    ],
+    [
+      "Lugner",
+      66
+    ],
+    [
+      "Linie",
+      64
+    ],
+    [
+      "Draht",
+      62
+    ],
+    [
+      "Sword Demon",
+      60
+    ],
+    [
+      "Sein",
+      60
+    ],
+    [
+      "Wirbel",
+      58
+    ],
+    [
+      "Land",
+      58
+    ],
+    [
+      "Richter",
+      55
+    ],
+    [
+      "Ehre",
+      52
+    ],
+    [
+      "Scharf",
+      50
+    ],
+    [
+      "Lawine",
+      48
+    ],
+    [
+      "Kanne",
+      48
+    ],
+    [
+      "Laufen",
+      46
+    ],
+    [
+      "Edel",
+      44
+    ],
+    [
+      "Hemon",
+      40
+    ],
+    [
+      "Zoltraak Demon",
+      35
+    ]
+  ]
+}

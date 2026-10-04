@@ -4453,7 +4453,7 @@ body.ag-game-page #app-root > #mode,
         UNIVERSE_CHOICES.push(...[["mha", "My Hero Academia"], ["dandadan", "Dandadan"], ["frieren", "Frieren"], ["vinland", "Vinland Saga"], ["berserk", "Berserk"], ["spyfamily", "Spy x Family"], ["oshinoko", "Oshi no Ko"], ["drstone", "Dr. Stone"], ["mobpsycho", "Mob Psycho 100"], ["codegeass", "Code Geass"], ["steinsgate", "Steins;Gate"], ["cowboybebop", "Cowboy Bebop"], ["evangelion", "Neon Genesis Evangelion"], ["sakamoto", "Sakamoto Days"], ["kaiju8", "Kaiju No. 8"], ["mashle", "Mashle"], ["promised", "The Promised Neverland"], ["noragami", "Noragami"], ["blueexorcist", "Blue Exorcist"], ["bungou", "Bungo Stray Dogs"], ["blackbutler", "Black Butler"], ["assclass", "Assassination Classroom"], ["kuroko", "Kuroko no Basket"], ["slamdunk", "Slam Dunk"], ["ippo", "Hajime no Ippo"], ["gintama", "Gintama"], ["souleater", "Soul Eater"], ["dgrayman", "D.Gray-man"], ["yuyuhakusho", "Yu Yu Hakusho"], ["inuyasha", "Inuyasha"], ["samuraichamploo", "Samurai Champloo"], ["trigun", "Trigun"], ["gurren", "Gurren Lagann"], ["killlakill", "Kill la Kill"], ["fatezero", "Fate/Zero"], ["fatestay", "Fate/stay night"], ["fateapo", "Fate/Apocrypha"], ["monster", "Monster"], ["parasyte", "Parasyte"], ["psychopass", "Psycho-Pass"], ["cyberpunk", "Cyberpunk: Edgerunners"], ["devilman", "Devilman Crybaby"], ["akame", "Akame ga Kill"], ["kaguya", "Kaguya-sama"], ["konosuba", "Konosuba"], ["overlord", "Overlord"], ["shieldhero", "The Rising of the Shield Hero"], ["eminence", "The Eminence in Shadow"], ["danmachi", "DanMachi"], ["nogamenolife", "No Game No Life"], ["madeinabyss", "Made in Abyss"], ["kakegurui", "Kakegurui"], ["hellsing", "Hellsing Ultimate"], ["deathparade", "Death Parade"], ["erased", "Erased"], ["another", "Another"], ["violet", "Violet Evergarden"], ["clannad", "Clannad"], ["anohana", "Anohana"], ["toradora", "Toradora!"], ["dressup", "My Dress-Up Darling"], ["rascal", "Rascal Does Not Dream"], ["bluebox", "Blue Box"], ["windbreaker", "WIND BREAKER"], ["callnight", "Call of the Night"], ["apothecary", "The Apothecary Diaries"], ["zom100", "Zom 100"], ["eightysix", "86 Eighty-Six"], ["rankingkings", "Ranking of Kings"], ["dungeonmeshi", "Dungeon Meshi"], ["shangrila", "Shangri-La Frontier"], ["beastars", "Beastars"], ["dorohedoro", "Dorohedoro"], ["lycoris", "Lycoris Recoil"], ["bocchi", "Bocchi the Rock!"], ["horimiya", "Horimiya"], ["grandblue", "Grand Blue"], ["tokyomewmew", "Tokyo Mew Mew"], ["sailormoon", "Sailor Moon"], ["digimon", "Digimon"], ["yugioh", "Yu-Gi-Oh!"], ["beyblade", "Beyblade"], ["cardcaptor", "Cardcaptor Sakura"], ["conan", "Detective Conan"], ["initiald", "Initial D"], ["mfghost", "MF Ghost"], ["foodwars", "Food Wars!"], ["blacklagoon", "Black Lagoon"], ["greatpretender", "Great Pretender"], ["durarara", "Durarara!!"], ["baccano", "Baccano!"], ["recreators", "Re:Creators"], ["yourlie", "Your Lie in April"]]);
 
         const UNIVERSE_SELECT_MODES = {
-            quote:          { title:'À QUI APPARTIENT CETTE CITATION ?', sub:'Choisis ton univers — 25 à 42 citations dans chacun des 31 animes.', tag:'25 citations' },
+            quote:          { title:'À QUI APPARTIENT CETTE CITATION ?', sub:'Choisis ton univers — des dizaines de citations par anime.', tag:'25 citations' },
             rollandgaros:   { title:'ROLLAND GAROS', sub:'Choisis ton univers — trouvez un max de persos à tour de rôle.', tag:'' },
             enchere:        { title:'ENCHÈRE', sub:'Choisis ton univers — 1v1, 50M chacun, 4 persos par équipe.', tag:'' },
             enchereaveugle: { title:"ENCHÈRE À L'AVEUGLE", sub:"Choisis ton univers — un seul voit le perso, l'autre mise à l'aveugle.", tag:'' },
@@ -4475,6 +4475,10 @@ body.ag-game-page #app-root > #mode,
         };
         let QUOTE_COUNTS = {};
         fetch('/api/quote-counts').then(r => r.json()).then(d => { if (d && d.counts) QUOTE_COUNTS = d.counts; }).catch(() => {});
+        // Modes with per-anime content only list the animes the server really has content for.
+        let MODE_UNIVERSES = null;
+        fetch('/api/mode-universes').then(r => r.json()).then(d => { if (d && d.ok) MODE_UNIVERSES = d; }).catch(() => {});
+        const MODE_CONTENT_KEY = { quote: 'quote', enchere: 'enchere', enchereaveugle: 'enchere', dle: 'dle' };
         function openUniverseSelection(mode) {
             const cfg = UNIVERSE_SELECT_MODES[mode] || UNIVERSE_SELECT_MODES.quote;
             hideAllPanels();
@@ -4501,7 +4505,9 @@ body.ag-game-page #app-root > #mode,
                 all.onclick = () => pick('all');
                 grid.appendChild(all);
             }
+            const contentList = MODE_UNIVERSES && MODE_CONTENT_KEY[mode] ? new Set(MODE_UNIVERSES[MODE_CONTENT_KEY[mode]] || []) : null;
             UNIVERSE_CHOICES.forEach(([key, label]) => {
+                if (contentList && !contentList.has(key)) return;
                 const b = document.createElement('button');
                 b.className = 'quote-universe-btn';
                 b.textContent = label;
