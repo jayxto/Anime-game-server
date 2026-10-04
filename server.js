@@ -15229,7 +15229,7 @@ const QT_THEMES = (() => {
     catch (e) { console.warn('[Qui a le plus] qap-themes.json introuvable :', e.message); return []; }
 })();
 const QT_BY_ID = Object.fromEntries(QT_THEMES.map(t => [t.id, t]));
-app.get('/api/qap/themes', (req, res) => res.json({ ok: true, themes: QT_THEMES.map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: t.items.length })) }));
+app.get('/api/qap/themes', (req, res) => res.json({ ok: true, themes: QT_THEMES.map(t => ({ id: t.id, title: t.title, emoji: t.emoji, kind: t.kind, n: (arcItemsFor('qt:' + t.id) || t.items).length })) }));
 
 // Tier lists à thème (tierlist-themes.json : waifu, combats, protagonistes, antagonistes, deutéragonistes, OST) + openings du blind test
 const TLT_THEMES = (() => {
@@ -16112,6 +16112,41 @@ arcItemsFor = function (source) {
         .map(i => i && i.video && BT_BAD_IDS.has(i.video) && THEME_VIDEO_REPLACEMENTS[i.video] && !BT_BAD_IDS.has(THEME_VIDEO_REPLACEMENTS[i.video])
             ? { ...i, video: THEME_VIDEO_REPLACEMENTS[i.video], start: 0 } : i)
         .filter(i => !(i && i.video && BT_BAD_IDS.has(i.video)));
+};
+// AG_QAP_DEDUPE_V1 — « Qui a le plus… » / « Tu préfères » : un même perso ne doit apparaître qu'une fois.
+// Même anime + même nom une fois les graphies rapprochées (Uchiha/Uchiwa, Jäger/Yeager, voyelles longues,
+// ordre des mots, « (…) » ignoré), ou même image dans un thème : on garde le premier, on retire les suivants.
+// Plus 11 combats présents deux fois (même combat, autre upload).
+const QAP_DUP_FIGHT_VIDEOS = new Set(['iYbDA-m1u-c', '9CCXlnUn3z0', 'NMMvLQu1xMQ', 'zK8jsOExJqs', 'VNfztmILGyQ', 'PgYa9UcSkpo', 'QFfir-ApRsg', 'yKGcngfS3YY', '4AQdwNRNCRI', 'VXgm75IqAfU', 'x3whtAlq2V8']);
+const qapDupFold = w => w.replace(/uchiha/g, 'uchiwa').replace(/yeager|jaeger|jager/g, 'jager').replace(/frieza|freezer/g, 'freezer').replace(/ou/g, 'o').replace(/uu/g, 'u').replace(/oo/g, 'o').replace(/y$/, 'i');
+const qapDupKey = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\(.*?\)/g, ' ')
+    .split(/[^a-z0-9]+/).filter(Boolean).map(qapDupFold).sort().join(' ');
+const QAP_DEDUPE_CACHE = new WeakMap();
+function qapDedupe(items, byImage) {
+    if (!Array.isArray(items)) return items;
+    if (QAP_DEDUPE_CACHE.has(items)) return QAP_DEDUPE_CACHE.get(items);
+    const names = new Set(), imgs = new Set(), out = [];
+    for (const it of items) {
+        if (!it || (it.video && QAP_DUP_FIGHT_VIDEOS.has(it.video))) continue;
+        const paren = (/\(([^)]*)\)/.exec(String(it.name || '')) || [])[1] || '';
+        const nk = qapDupKey(it.name) + '|' + qapDupKey(it.sub || (ARC_ANIMES_NAMES_SET.has(paren) ? paren : ''));
+        const ik = byImage && !it.video && it.img ? it.img + '|' + (it.sub || '') : null;
+        if (names.has(nk) || (ik && imgs.has(ik))) continue;
+        names.add(nk); if (ik) imgs.add(ik);
+        out.push(it);
+    }
+    const res = out.length === items.length ? items : out;
+    QAP_DEDUPE_CACHE.set(items, res);
+    return res;
+}
+const ARC_ANIMES_NAMES_SET = new Set(Object.values(ARC_UNIVERSE_ANIME || {}));
+const arcItemsForNoDup = arcItemsFor;
+arcItemsFor = function (source) {
+    const items = arcItemsForNoDup(source);
+    const src = String(source || '');
+    if (src.startsWith('qt:')) return qapDedupe(items, true);
+    if (src.startsWith('tp:') || /^qap\d{1,3}\|tp:/.test(src)) return qapDedupe(items, false);
+    return items;
 };
 async function themeVideoDeadProbe() {
     const ids = new Set();
