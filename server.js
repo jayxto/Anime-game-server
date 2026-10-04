@@ -16094,6 +16094,16 @@ if (QT_BY_ID.combat) {
     const have = new Set(QT_BY_ID.combat.items.map(i => i.video));
     for (const [sub, name, video] of MORE_FIGHTS_V1) if (!have.has(video)) QT_BY_ID.combat.items.push({ name, sub, video, img: `https://i.ytimg.com/vi/${video}/hqdefault.jpg`, start: 0 });
 }
+// AG_REAL_ENTRANCES_V1 — « Qui a la meilleure entrée ? » : chaque vidéo doit être une VRAIE entrée ou
+// première apparition du perso. 50 vidéos remplacées (l'ancienne était un combat, une transformation…),
+// 24 persos retirés faute d'entrée sur YouTube. Vérifié à la main le 2026-10-05.
+const ENTRANCE_VIDEOS_V1 = {"Roronoa Zoro":"k26pfhCWpIY","Boa Hancock":"ZOU1nMYAId4","Madara Uchiwa":"oamGMaMSsnw","Itachi Uchiwa":"chvovVtgIvg","Kakashi Hatake":"iH1nKU6i-98","Satoru Gojo":"4Wl8Lj53pEU","Ryomen Sukuna":"IrU2dklT11s","Muzan Kibutsuji":"-3usJaDIWUk","Byakuya Kuchiki":"osv_LC__Hg0","Sosuke Aizen":"dXMU59jAmn8","Jotaro Kujo":"-oPlXNg_64c","Saitama":"ZWo8NTTnA8E","Tatsumaki":"FIxLke2_TLY","Sung Jinwoo":"2H9aEOkbrFE","Hisoka Morow":"rBWU8ljAixw","Asta":"e_mNVr1L_V0","Marco":"SPrdU1JacDw","Killer Bee":"uR8xWIimiHM","Megumi Fushiguro":"JfqQqqwmEvA","Hakari Kinji":"CUd5AR8H_lk","Jiren":"TjSaMniyrPk","Grimmjow Jaegerjaquez":"UIs2kQoHXAQ","Kisuke Urahara":"Q5hwAwpU3cQ","Jonathan Joestar":"rp2_Eprf9UA","Garou":"w_EUFomkHzA","Beru":"arM_5ylL7B8","Chrollo Lucilfer":"q9mHilXqphM","Katsuki Bakugo":"tEpIUJvy75w","Hawks":"FwVB0joe680","Veldora Tempest":"lsNNkT2GUd8","Anos Voldigoad":"RaKUYTGW60w","Kageno Cid":"wWp5mWeOTsA","Vash the Stampede":"BbBmhi0Orgw","Sae Itoshi":"eVFenlsMPf8","Sanji":"qjSJB0FvenE","Kaido":"srlCo6YNJPw","Son Gohan":"b_ZpqfW3-Yo","Genryusai Yamamoto":"y87ze-V-j4o","Eren Jäger":"RgR0r7sZk-s","Meliodas":"_LziO7infdM","Portgas D. Ace":"HtlfSaVaOyo","Rock Lee":"99k59zkWkt0","Yuji Itadori":"VmL0Ty6CT_s","Yoriichi Tsugikuni":"3xcfTEsTowQ","Tanjiro Kamado":"KoBKws90Te8","Genos":"qrm6-j3mp3s","Ban":"veI7vB8TGgs","Killua Zoldyck":"AfxLXEwITWE","Frieren":"8uDEiiV4mGY","Monkey D. Garp":"HEKGY782ZLA"};
+const ENTRANCE_DROP_V1 = new Set(["Hashirama Senju","Kyojuro Rengoku","Giyu Tomioka","Giorno Giovanna","Isaac Netero","Akainu","Pain","Toji Fushiguro","Zenitsu Agatsuma","Gohan (Beast)","Joseph Joestar","Bruno Bucciarati","Bang","Igris","Mereoleona Vermillion","Endeavor","Rimuru Tempest","Lelouch (Zero)","Simon","Griffith","Spike Spiegel","Kuroko Tetsuya","Mash Burnedead","Sakamoto"]);
+if (QT_BY_ID.entree) {
+    QT_BY_ID.entree.items = QT_BY_ID.entree.items
+        .filter(i => !ENTRANCE_DROP_V1.has(i.name))
+        .map(i => ENTRANCE_VIDEOS_V1[i.name] ? { ...i, video: ENTRANCE_VIDEOS_V1[i.name], img: `https://i.ytimg.com/vi/${ENTRANCE_VIDEOS_V1[i.name]}/hqdefault.jpg`, start: 0 } : i);
+}
 const arcItemsForLiveVideos = arcItemsFor;
 arcItemsFor = function (source) {
     const items = arcItemsForLiveVideos(source);

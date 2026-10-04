@@ -599,6 +599,12 @@
         @media (max-width:640px){#tl-player{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;border-width:2px 0 0;}#tl-player .tlp-box{aspect-ratio:auto;height:min(56vw,30vh);}}
         #tl-player .tlp-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:.78rem;font-weight:700;}
         #tl-player .tlp-bar button{background:none;border:1px solid var(--text-muted);color:#fff;border-radius:6px;cursor:pointer;padding:2px 8px;}
+        /* Vidéo d'un duel (combat, entrée, OST) : jouée directement dans la carte choisie, pas en bas de l'écran. */
+        #tl-player.tlp-in{position:absolute!important;inset:0!important;width:auto!important;z-index:5;border:0!important;border-radius:0!important;box-shadow:none;display:flex;flex-direction:column;cursor:default;}
+        #tl-player.tlp-in .tlp-box{flex:1;aspect-ratio:auto!important;height:auto!important;min-height:0;}
+        #tl-player.tlp-in .tlp-bar{padding:4px 6px;font-size:.72rem;gap:6px;} #tl-player.tlp-in .tlp-bar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        #tl-player .tlp-pick{background:var(--accent-cyan)!important;color:#111!important;border:0!important;font-weight:800;white-space:nowrap;}
+        #tl-player.tlp-in .tlp-hint{padding:4px 8px;font-size:.7rem;}
         .tl-sec{font-family:'Bangers',cursive;letter-spacing:1px;font-size:1.35rem;color:var(--accent-yellow);margin:18px 0 8px;}
         .tl-cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
         .tl-ccard{background:#161622;border:2px solid #34344a;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .15s;position:relative;}
@@ -661,7 +667,7 @@
         .bb-tabs{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap;}
         .bb-tabs button{width:auto;margin:0;padding:8px 14px;font-size:.85rem;background:#11111a;border:1px solid #34344a;color:#fff;}
         .bb-tabs button.on{border-color:var(--accent-cyan);color:var(--accent-cyan);}
-        @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}}
+        @media (max-width:560px){.bb-duel{grid-template-columns:1fr 1fr;}.bb-vs{display:none;}.bb-duel > .bb-playing{grid-column:1/-1;}.bb-playing .bb-card,.bb-card.bb-playing{aspect-ratio:16/11;}}
 
         /* ===== Party Mix / Combat de cartes / Bingo Anime ===== */
         .pm-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:14px 0}.pm-pick{display:flex;align-items:center;gap:8px;background:#101019;border:1px solid #34344a;border-radius:10px;padding:10px;cursor:pointer;font-size:.82rem}.pm-pick:has(input:checked){border-color:var(--accent-cyan);box-shadow:0 0 0 1px rgba(0,240,255,.18)}.pm-pick input{accent-color:var(--accent-cyan)}
@@ -7918,8 +7924,9 @@ body.ag-game-page #app-root > #mode,
             try { if (mediaYt && mediaYt.destroy) mediaYt.destroy(); } catch (_) {}
             mediaYt = null;
             document.getElementById('tl-player')?.remove();
+            document.querySelectorAll('.bb-playing').forEach(c => c.classList.remove('bb-playing'));
         }
-        async function mediaOpen(it, title) {
+        async function mediaOpen(it, title, anchor) {
             mediaClose();
             const key = ++mediaKey;
             if (typeof btPauseBackground === 'function') btPauseBackground();
@@ -7928,7 +7935,18 @@ body.ag-game-page #app-root > #mode,
             p.innerHTML = `<div class="tlp-bar"><span>${it.scene ? '🎬' : '🎵'} ${v7esc(title || it.name || '')}</span><button onclick="mediaClose()">✖</button></div>
                 <div class="tlp-box"><div id="tlp-yt"></div></div>
                 <div class="tlp-hint">⏳ Chargement…</div>`;
-            document.body.appendChild(p);
+            if (anchor) {
+                p.classList.add('tlp-in'); p.onclick = e => e.stopPropagation();
+                if (typeof anchor.onclick === 'function') {
+                    const pickBtn = document.createElement('button'); pickBtn.className = 'tlp-pick'; pickBtn.textContent = '✅ Choisir';
+                    pickBtn.onclick = e => { e.stopPropagation(); const vote = anchor.onclick; mediaClose(); vote.call(anchor, e); };
+                    p.querySelector('.tlp-bar').insertBefore(pickBtn, p.querySelector('.tlp-bar button'));
+                }
+                (anchor.closest('.bb-duel > *') || anchor).classList.add('bb-playing');
+                anchor.appendChild(p);
+                try { anchor.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+            }
+            else document.body.appendChild(p);
             const hint = p.querySelector('.tlp-hint');
             const ytUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(it.video)}${start ? '&t=' + start + 's' : ''}`;
             const fail = () => { if (key !== mediaKey) return; hint.innerHTML = `⚠️ Cette vidéo ne peut pas être lue ici. <a href="${ytUrl}" target="_blank" rel="noopener">▶ Ouvrir sur YouTube</a>`; };
@@ -8197,9 +8215,9 @@ body.ag-game-page #app-root > #mode,
             bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') || source.startsWith('qt:'), qap: kind === 'qap', qt: kind === 'qt', qtTitle: kind === 'qt' ? data.label : null };
             const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI A LE PLUS…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
             if (bb.qt && h2) h2.textContent = '🏆 QUI A LE PLUS…';
-            const unit = source === 'qt:entree' ? 'entrées' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
+            const unit = source === 'qt:entree' ? 'entrées' : source === 'qt:combat' ? 'combats' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
             if (bb.qt) bb.unit = unit;
-            document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : unit === 'entrées' ? ' (▶ pour voir la scène)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
+            document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : unit === 'entrées' || unit === 'combats' ? ' (▶ pour voir la scène)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             if (bb.qap) return qapSetup(document.getElementById('bb-body'));
             body.innerHTML = '';
             const h = document.createElement('div'); h.className = 'bb-head';
@@ -8372,13 +8390,14 @@ body.ag-game-page #app-root > #mode,
             const it = bbItem(name);
             if (it.video) card.classList.add('bb-op');
             if (it.video && onClick) {
-                const label = bb.source === 'qt:entree' ? '▶ Voir l’entrée' : '▶ Écouter';
+                const label = bb.source === 'qt:entree' ? '▶ Voir l’entrée' : bb.source === 'qt:combat' ? '▶ Voir le combat' : '▶ Écouter';
                 const play = document.createElement('button'); play.className = 'bb-play'; play.textContent = label;
                 play.onclick = e => {
                     e.stopPropagation();
                     document.querySelectorAll('.bb-play').forEach(b => b.textContent = b.dataset.l || label);
-                    mediaOpen({ ...it, start: it.start != null ? it.start : 35, scene: bb.source === 'qt:entree' }, name);
-                    play.textContent = bb.source === 'qt:entree' ? '🎬 En cours' : '🔊 En cours';
+                    const scene = bb.source === 'qt:entree' || bb.source === 'qt:combat';
+                    mediaOpen({ ...it, start: it.start != null ? it.start : 35, scene }, name, card);
+                    play.textContent = scene ? '🎬 En cours' : '🔊 En cours';
                 };
                 play.dataset.l = label;
                 card.appendChild(play);
