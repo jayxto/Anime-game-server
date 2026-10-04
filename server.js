@@ -23689,7 +23689,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { absolue: 11, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -23722,8 +23722,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { absolue: 'Absolue', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { absolue: '#fffbe6', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -25870,3 +25870,66 @@ app.post('/api/admin/event-booster', adminOnly(async (req, res) => {
     await siteSave('eventBooster');
     res.json({ ok: true, ev: SITE.eventBooster });
 }));
+
+/* =====================================================================
+   AG_MORE_RARITIES_V1 — 8 raretés spéciales de plus (styles de carte dédiés côté client)
+   + /api/cards/rates : les chances d'obtention réelles, affichées par le bouton « ? » de la boutique.
+   ===================================================================== */
+const MORE_TIERS_V1 = [
+    { id: 'stellaire', label: 'Stellaire', top: 2, rate: 1 / 400, coins: 70, rank: 5.3, deck: 20, market: [5000, 12000] },
+    { id: 'spectrale', label: 'Spectrale', top: 2, rate: 1 / 1200, coins: 180, rank: 6.2, deck: 26, market: [12000, 30000] },
+    { id: 'infernale', label: 'Infernale', top: 1, rate: 1 / 3500, coins: 450, rank: 7.2, deck: 32, market: [30000, 80000] },
+    { id: 'glaciale', label: 'Glaciale', top: 1, rate: 1 / 4500, coins: 500, rank: 7.3, deck: 33, market: [35000, 90000] },
+    { id: 'imperiale', label: 'Impériale', top: 1, rate: 1 / 8000, coins: 800, rank: 7.8, deck: 40, market: [60000, 160000] },
+    { id: 'dimensionnelle', label: 'Dimensionnelle', top: 1, rate: 1 / 35000, coins: 2500, rank: 8.8, deck: 70, market: [200000, 500000] },
+    { id: 'chaos', label: 'Chaos', top: 1, rate: 1 / 80000, coins: 4000, rank: 9.5, deck: 90, market: [400000, 1000000] },
+    { id: 'absolue', label: 'Absolue', top: 1, rate: 1 / 400000, coins: 15000, rank: 11, deck: 200, market: [2000000, 6000000] }
+];
+for (const t of MORE_TIERS_V1) {
+    SPECIAL_TIERS.push({ id: t.id, label: t.label, top: t.top, rate: t.rate, coins: t.coins });
+    RAR_RANK[t.id] = t.rank; DECK_BONUS[t.id] = t.deck; MARKET_HINT[t.id] = t.market;
+}
+SPECIAL_TIERS.sort((a, b) => b.rate - a.rate);
+SPECIAL_TIERS.forEach(t => { SPECIAL_BY_ID[t.id] = t; });
+{ // RAR_ORDER : de la plus commune à la plus rare, dans l'ordre des rangs
+    const all = [...new Set([...RAR_ORDER, ...MORE_TIERS_V1.map(t => t.id)])].sort((a, b) => (RAR_RANK[a] || 0) - (RAR_RANK[b] || 0));
+    RAR_ORDER.splice(0, RAR_ORDER.length, ...all);
+}
+
+let CARD_RATES_CACHE = null;
+function cardRatesCompute() {
+    // raretés de base : mesurées comme le tirage d'un booster normal (anime au hasard, persos connus plus fréquents)
+    const us = arcUniverses(), base = {}, N = 120000;
+    for (let i = 0; i < N; i++) {
+        const u = us[Math.floor(Math.random() * us.length)], list = cardPool(u);
+        if (!list.length) continue;
+        const r = cardRarityAt(u, Math.min(list.length - 1, Math.floor(Math.pow(Math.random(), 1.6) * list.length)));
+        base[r] = (base[r] || 0) + 1;
+    }
+    let keep = 1; const special = [];
+    for (const t of SPECIAL_TIERS.slice().reverse()) { const p = keep * t.rate; special.push({ id: t.id, label: t.label, p }); keep -= p; }
+    const totBase = Object.values(base).reduce((a, b) => a + b, 0) || 1;
+    const LBL = { commune: 'Commune', rare: 'Rare', epique: 'Épique', legendaire: 'Légendaire', mythique: 'Mythique' };
+    const rows = [
+        ...['commune', 'rare', 'epique', 'legendaire', 'mythique'].map(id => ({ id, label: LBL[id], p: keep * (base[id] || 0) / totBase })),
+        ...special.reverse()
+    ].sort((a, b) => (RAR_RANK[a.id] || 0) - (RAR_RANK[b.id] || 0));
+    const extras = [
+        { id: 'shiny', label: 'Brillante ✨ (sur n’importe quelle carte)', p: 1 / 10 },
+        { id: 'duo', label: 'Carte Duo 🎴 (par carte)', p: DUO_RATE },
+        { id: 'altart', label: 'Alt Art 🖼️ (bonus par booster de 5)', p: 1 - Math.pow(1 - ALT_ART_RATE, 5) },
+        { id: 'moment', label: 'Moment 🎬 (bonus par booster de 5)', p: 1 - Math.pow(1 - MOMENT_CARD_RATE, 5) },
+        { id: 'godpack', label: 'God Pack (que des cartes rares, par booster)', p: GOD_PACK_RATE },
+        ...(hwOn() ? [{ id: 'halloween', label: 'Halloween 🎃 (par carte, pendant l’événement)', p: HW_RATE }] : [])
+    ];
+    const finishes = FINISHES.map(f => ({ id: f.id, label: f.label, p: f.rate })).reverse();
+    return { rows, extras, finishes, at: Date.now() };
+}
+app.get('/api/cards/rates', (req, res) => {
+    if (!CARD_RATES_CACHE || Date.now() - CARD_RATES_CACHE.at > 6 * 3600 * 1000) CARD_RATES_CACHE = cardRatesCompute();
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json({ ok: true, ...CARD_RATES_CACHE, boosts: [
+        'Booster Épique : raretés spéciales x2 • Booster Mythique : x4',
+        'Booster de la semaine : raretés x2 • chance x2 / x10 pendant les événements « chance » du site'
+    ] });
+});
