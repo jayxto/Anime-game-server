@@ -1,0 +1,40 @@
+{
+  "key": "fatestay",
+  "name": "Fate/stay night",
+  "quotes": [
+    {"text":"Je suis l'os de mon épée.","speaker":"Archer","recipient":"à Shirou","aliases":["EMIYA"]},
+    {"text":"Unlimited Blade Works.","speaker":"Archer","recipient":"à Gilgamesh","aliases":["EMIYA"]},
+    {"text":"Je veux devenir un héros de la justice.","speaker":"Shirou Emiya","recipient":"à Kiritsugu","aliases":["Shirou"]},
+    {"text":"Trace on !","speaker":"Shirou Emiya","recipient":"en projetant une arme","aliases":["Shirou"]},
+    {"text":"Je te le demande : es-tu mon Maître ?","speaker":"Saber","recipient":"à Shirou","aliases":["Artoria","Arturia"]},
+    {"text":"Imposteur !","speaker":"Gilgamesh","recipient":"à Shirou","aliases":[]},
+    {"text":"Berserker, tue-les tous !","speaker":"Illyasviel von Einzbern","recipient":"à Berserker","aliases":["Illya"]},
+    {"text":"Gae Bolg !","speaker":"Lancer","recipient":"à Shirou","aliases":["Cú Chulainn"]},
+    {"text":"Réjouis-toi, garçon. Ton souhait va enfin se réaliser.","speaker":"Kirei Kotomine","recipient":"à Shirou","aliases":["Kirei"]},
+    {"text":"Cette Guerre du Saint Graal, c'est moi qui la gagnerai.","speaker":"Rin Tohsaka","recipient":"à Shirou","aliases":["Rin"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Classe","Partenaire","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Shirou Emiya","attrs":["Maître","Aucune","Saber","Homme","Roux"]},
+      {"name":"Saber","attrs":["Servant","Saber","Shirou Emiya","Femme","Blonds"]},
+      {"name":"Rin Tohsaka","attrs":["Maître","Aucune","Archer","Femme","Noirs"]},
+      {"name":"Archer","attrs":["Servant","Archer","Rin Tohsaka","Homme","Blancs"]},
+      {"name":"Sakura Matou","attrs":["Maître","Aucune","Rider","Femme","Violets"]},
+      {"name":"Rider","attrs":["Servant","Rider","Sakura Matou","Femme","Violets"]},
+      {"name":"Shinji Matou","attrs":["Maître","Aucune","Rider","Homme","Bleus"]},
+      {"name":"Illyasviel von Einzbern","attrs":["Maître","Aucune","Berserker","Femme","Blancs"]},
+      {"name":"Berserker","attrs":["Servant","Berserker","Illyasviel von Einzbern","Homme","Noirs"]},
+      {"name":"Kirei Kotomine","attrs":["Maître","Aucune","Lancer","Homme","Bruns"]},
+      {"name":"Lancer","attrs":["Servant","Lancer","Kirei Kotomine","Homme","Bleus"]},
+      {"name":"Gilgamesh","attrs":["Servant","Archer","Kirei Kotomine","Homme","Blonds"]},
+      {"name":"Caster","attrs":["Servant","Caster","Souichirou Kuzuki","Femme","Violets"]},
+      {"name":"Assassin","attrs":["Servant","Assassin","Caster","Homme","Violets"]}
+    ]
+  },
+  "power": [
+    ["Gilgamesh",100], ["Berserker",96], ["Saber",95], ["Archer",92], ["Lancer",90], ["Assassin",88],
+    ["Caster",88], ["Rider",85], ["Kirei Kotomine",75], ["Shirou Emiya",72], ["Rin Tohsaka",70], ["Sakura Matou",70],
+    ["Illyasviel von Einzbern",60], ["Shinji Matou",20]
+  ]
+}

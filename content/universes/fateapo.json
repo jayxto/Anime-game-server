@@ -1,0 +1,31 @@
+{
+  "key": "fateapo",
+  "name": "Fate/Apocrypha",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Faction","Rôle","Classe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Sieg","attrs":["Faction noire","Homoncule","Aucune","Homme","Blancs"]},
+      {"name":"Ruler Jeanne d Arc","attrs":["Arbitre","Servant","Ruler","Femme","Blonds"]},
+      {"name":"Amakusa Shirou Tokisada","attrs":["Faction rouge","Servant","Ruler","Homme","Blancs"]},
+      {"name":"Kairi Sisigou","attrs":["Faction rouge","Maître","Aucune","Homme","Noirs"]},
+      {"name":"Mordred","attrs":["Faction rouge","Servant","Saber","Femme","Blonds"]},
+      {"name":"Karna","attrs":["Faction rouge","Servant","Lancer","Homme","Blancs"]},
+      {"name":"Achilles","attrs":["Faction rouge","Servant","Rider","Homme","Verts"]},
+      {"name":"Atalanta","attrs":["Faction rouge","Servant","Archer","Femme","Verts"]},
+      {"name":"Semiramis","attrs":["Faction rouge","Servant","Assassin","Femme","Noirs"]},
+      {"name":"Astolfo","attrs":["Faction noire","Servant","Rider","Homme","Roses"]},
+      {"name":"Chiron","attrs":["Faction noire","Servant","Archer","Homme","Bruns"]},
+      {"name":"Vlad III","attrs":["Faction noire","Servant","Lancer","Homme","Blancs"]},
+      {"name":"Avicebron","attrs":["Faction noire","Servant","Caster","Homme","Aucun"]},
+      {"name":"Fran","attrs":["Faction noire","Servant","Berserker","Femme","Roses"]}
+    ]
+  },
+  "power": [
+    ["Karna",98], ["Achilles",96], ["Amakusa Shirou Tokisada",95], ["Shirou Kotomine",95], ["Saber of Black",94],
+    ["Semiramis",92], ["Mordred",92], ["Ruler Jeanne d Arc",92], ["Chiron",92], ["Vlad III",90], ["Atalanta",88],
+    ["Sieg",85], ["Fran",82], ["Astolfo",75], ["Avicebron",75], ["Kairi Sisigou",60]
+  ]
+}

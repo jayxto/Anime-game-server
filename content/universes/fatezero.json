@@ -1,0 +1,39 @@
+{
+  "key": "fatezero",
+  "name": "Fate/Zero",
+  "quotes": [
+    {"text":"Je suis Iskandar, le roi des conquérants !","speaker":"Iskandar","recipient":"aux autres Servants","aliases":["Rider"]},
+    {"text":"Waver, vis ! Et raconte au monde comment j'ai vécu.","speaker":"Iskandar","recipient":"à Waver","aliases":["Rider"]},
+    {"text":"Tout ce qui existe en ce monde m'appartient.","speaker":"Gilgamesh","recipient":"à Saber","aliases":["Archer"]},
+    {"text":"Je voulais sauver tout le monde.","speaker":"Kiritsugu Emiya","recipient":"à Irisviel","aliases":["Kiritsugu"]},
+    {"text":"Je ne trouve de joie que dans la souffrance des autres.","speaker":"Kirei Kotomine","recipient":"à Gilgamesh","aliases":["Kirei"]},
+    {"text":"Je te servirai, mon roi !","speaker":"Waver Velvet","recipient":"à Iskandar","aliases":["Waver"]},
+    {"text":"Avec le Saint Graal, je changerai le destin de mon royaume.","speaker":"Saber","recipient":"aux autres rois","aliases":["Artoria","Arturia"]},
+    {"text":"Je vous maudis, vous et votre Saint Graal !","speaker":"Diarmuid Ua Duibhne","recipient":"à Kayneth et Kiritsugu","aliases":["Lancer","Diarmuid"]},
+    {"text":"Cool !","speaker":"Ryunosuke Uryu","recipient":"à Gilles de Rais","aliases":["Ryunosuke"]},
+    {"text":"Un Tohsaka doit toujours garder son élégance.","speaker":"Tokiomi Tohsaka","recipient":"à Rin","aliases":["Tokiomi"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Classe","Partenaire","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kiritsugu Emiya","attrs":["Maître","Aucune","Saber","Homme","Noirs"]},
+      {"name":"Irisviel von Einzbern","attrs":["Maître","Aucune","Saber","Femme","Blancs"]},
+      {"name":"Saber","attrs":["Servant","Saber","Kiritsugu Emiya","Femme","Blonds"]},
+      {"name":"Kirei Kotomine","attrs":["Maître","Aucune","Gilgamesh","Homme","Bruns"]},
+      {"name":"Tokiomi Tohsaka","attrs":["Maître","Aucune","Gilgamesh","Homme","Bruns"]},
+      {"name":"Gilgamesh","attrs":["Servant","Archer","Tokiomi Tohsaka","Homme","Blonds"]},
+      {"name":"Waver Velvet","attrs":["Maître","Aucune","Iskandar","Homme","Noirs"]},
+      {"name":"Iskandar","attrs":["Servant","Rider","Waver Velvet","Homme","Rouges"]},
+      {"name":"Kayneth El-Melloi Archibald","attrs":["Maître","Aucune","Diarmuid Ua Duibhne","Homme","Blonds"]},
+      {"name":"Diarmuid Ua Duibhne","attrs":["Servant","Lancer","Kayneth El-Melloi Archibald","Homme","Noirs"]},
+      {"name":"Kariya Matou","attrs":["Maître","Aucune","Lancelot","Homme","Blancs"]},
+      {"name":"Lancelot","attrs":["Servant","Berserker","Kariya Matou","Homme","Violets"]},
+      {"name":"Ryunosuke Uryu","attrs":["Maître","Aucune","Gilles de Rais","Homme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Gilgamesh",100], ["Iskandar",96], ["Rider",96], ["Saber",95], ["Lancelot",92], ["Berserker",92],
+    ["Diarmuid Ua Duibhne",90], ["Lancer",90], ["Kirei Kotomine",85], ["Kiritsugu Emiya",82], ["Gilles de Rais",80], ["Caster",80],
+    ["Kayneth El-Melloi Archibald",72], ["Tokiomi Tohsaka",70], ["Kariya Matou",55], ["Irisviel von Einzbern",50], ["Waver Velvet",40], ["Ryunosuke Uryu",20]
+  ]
+}
