@@ -1,3 +1,4 @@
+const sharp = require('sharp');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -11759,6 +11760,33 @@ function simpleMimeFromPath(p) {
 function simpleImageLooksValid(buf) {
     return Buffer.isBuffer(buf) && buf.length >= 700 && buf.length <= 10 * 1024 * 1024;
 }
+
+/* AG_MANUAL_IMAGE_INTEGRITY_V12
+   Admin images are decoded and re-encoded on our server before persistence.
+   We never trust only a remote Content-Type or byte length. */
+async function simpleImageDecodes(buf) {
+    if (!simpleImageLooksValid(buf)) return false;
+    try {
+        const meta = await sharp(buf, { failOn:'error', limitInputPixels:40000000 }).metadata();
+        return Number(meta?.width) >= 16 && Number(meta?.height) >= 16
+            && Number(meta.width) <= 12000 && Number(meta.height) <= 12000;
+    } catch (_) { return false; }
+}
+async function simpleNormalizeImage(image) {
+    const bytes = Buffer.isBuffer(image?.bytes) ? image.bytes : null;
+    if (!simpleImageLooksValid(bytes)) return null;
+    try {
+        const meta = await sharp(bytes, { failOn:'error', limitInputPixels:40000000 }).metadata();
+        if (!meta?.width || !meta?.height || meta.width < 16 || meta.height < 16 || meta.width > 12000 || meta.height > 12000) return null;
+        const out = await sharp(bytes, { failOn:'error', limitInputPixels:40000000 })
+            .rotate()
+            .resize({ width:1600, height:1600, fit:'inside', withoutEnlargement:true })
+            .webp({ quality:92, alphaQuality:100, effort:4 })
+            .toBuffer();
+        if (!simpleImageLooksValid(out) || !(await simpleImageDecodes(out))) return null;
+        return { bytes:out, mime:'image/webp' };
+    } catch (_) { return null; }
+}
 function simpleImageIsPrivateHost(hostname) {
     const h = String(hostname || '').toLowerCase();
     if (!h || h === 'localhost' || h === '::1' || h.endsWith('.local')) return true;
@@ -12012,6 +12040,11 @@ async function simpleManualCharacterImage(rawUniverse, displayName, anime='') {
 
 async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
     if (!image || !simpleImageLooksValid(image.bytes)) return false;
+    if (status === 'manual-admin') {
+        const normalized = await simpleNormalizeImage(image);
+        if (!normalized) return false;
+        image = normalized;
+    }
     const identity = simpleCanonicalCharacterIdentity(x.u, x.name, x.anime || '');
     const storeU = identity.u || String(x.u || '').trim();
     const storeName = identity.name || cleanImageCharacterName(x.name);
@@ -12031,6 +12064,43 @@ async function simpleStoreImage(x, image, sourceUrl, status = 'ok') {
     `, [x.u,normName,x.name,stable,sourceUrl || null,status,image.bytes,image.mime || 'image/jpeg']);
     try { CHARACTER_IMAGE_CACHE.delete(`${x.u}|${normName}`); } catch (_) {}
     return true;
+}
+
+async function simpleRepairManualImageRows() {
+    if (!process.env.DATABASE_URL) return {checked:0,repaired:0,failed:0};
+    let rows=[];
+    try {
+        rows=(await pool.query(`
+            SELECT universe_key,norm_name,display_name,source_url,status,image_bytes,mime_type
+              FROM character_images
+             WHERE status='manual-admin' AND image_bytes IS NOT NULL
+        `)).rows || [];
+    } catch (_) { return {checked:0,repaired:0,failed:0}; }
+
+    let repaired=0, failed=0;
+    for (const row of rows) {
+        try {
+            if (String(row.mime_type||'').toLowerCase()==='image/webp' && await simpleImageDecodes(row.image_bytes)) continue;
+
+            let normalized=await simpleNormalizeImage({bytes:row.image_bytes,mime:row.mime_type});
+            if (!normalized && /^https:\/\//i.test(String(row.source_url||''))) {
+                const fetched=await simpleFetchImage(row.source_url,12000);
+                if (fetched) normalized=await simpleNormalizeImage(fetched);
+            }
+            if (!normalized) { failed++; continue; }
+
+            const stable=simpleImageRoute(row.universe_key,row.display_name || row.norm_name,Date.now());
+            await pool.query(`
+                UPDATE character_images
+                   SET image_bytes=$1,mime_type='image/webp',image_url=$2,updated_at=now()
+                 WHERE universe_key=$3 AND norm_name=$4 AND status='manual-admin'
+            `,[normalized.bytes,stable,row.universe_key,row.norm_name]);
+            try { CHARACTER_IMAGE_CACHE.delete(`${row.universe_key}|${row.norm_name}`); } catch (_) {}
+            repaired++;
+        } catch (_) { failed++; }
+    }
+    if (rows.length) console.log('[manual image integrity v12]',{checked:rows.length,repaired,failed});
+    return {checked:rows.length,repaired,failed};
 }
 
 async function simpleExistingRows() {
@@ -12507,6 +12577,7 @@ async function startSimpleImageMigration() {
     try {
         await initDb();
         await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS image_bytes BYTEA`);
+        await simpleRepairManualImageRows();
         await pool.query(`ALTER TABLE character_images ADD COLUMN IF NOT EXISTS mime_type TEXT`);
         let missing=[];
         for (let pass=1; pass<=3; pass++) {
@@ -12529,16 +12600,41 @@ app.get('/api/character-image-file', async (req,res)=>{
         const rawU=String(req.query.u||'').trim(), rawName=cleanImageCharacterName(String(req.query.n||'').trim());
         if (!rawU || !rawName) return res.status(404).end();
         const identity=simpleCanonicalCharacterIdentity(rawU,rawName,String(req.query.anime||''));
-        let r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[identity.u,identity.normName]);
+        let r=await pool.query(`SELECT universe_key,norm_name,display_name,source_url,status,image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[identity.u,identity.normName]);
         if (!r.rows[0] && (identity.u!==rawU || identity.normName!==normalizeImageKey(rawName))) {
-            r=await pool.query(`SELECT image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[rawU,normalizeImageKey(rawName)]);
+            r=await pool.query(`SELECT universe_key,norm_name,display_name,source_url,status,image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[rawU,normalizeImageKey(rawName)]);
         }
-        const row=r.rows[0]; if (!row?.image_bytes) return res.status(404).end();
-        res.set('Content-Type',row.mime_type || 'image/jpeg');
-        res.set('Cache-Control','public,max-age=31536000,immutable');
+        let row=r.rows[0];
+        if (!row?.image_bytes) { res.set('Cache-Control','no-store'); return res.status(404).end(); }
+
+        // AG_MANUAL_IMAGE_INTEGRITY_V12 — old manual rows are repaired on first access too.
+        if (row.status==='manual-admin' && (String(row.mime_type||'').toLowerCase()!=='image/webp' || !(await simpleImageDecodes(row.image_bytes)))) {
+            let normalized=await simpleNormalizeImage({bytes:row.image_bytes,mime:row.mime_type});
+            if (!normalized && /^https:\/\//i.test(String(row.source_url||''))) {
+                const fetched=await simpleFetchImage(row.source_url,12000);
+                if (fetched) normalized=await simpleNormalizeImage(fetched);
+            }
+            if (normalized) {
+                await pool.query(`
+                    UPDATE character_images
+                       SET image_bytes=$1,mime_type='image/webp',updated_at=now()
+                     WHERE universe_key=$2 AND norm_name=$3 AND status='manual-admin'
+                `,[normalized.bytes,row.universe_key,row.norm_name]);
+                row={...row,image_bytes:normalized.bytes,mime_type:'image/webp',updated_at:new Date()};
+                try { CHARACTER_IMAGE_CACHE.delete(`${row.universe_key}|${row.norm_name}`); } catch (_) {}
+            }
+        }
+
+        if (!(await simpleImageDecodes(row.image_bytes))) {
+            res.set('Cache-Control','no-store');
+            return res.status(404).end();
+        }
+        res.set('Content-Type',row.mime_type || 'image/webp');
+        res.set('Cache-Control',req.query.v ? 'public,max-age=31536000,immutable' : 'no-cache,max-age=0,must-revalidate');
         res.set('ETag',`W/"${Buffer.byteLength(row.image_bytes)}-${new Date(row.updated_at).getTime()}"`);
+        res.set('X-AG-Image-Integrity','v12');
         return res.send(row.image_bytes);
-    } catch (_) { return res.status(404).end(); }
+    } catch (_) { res.set('Cache-Control','no-store'); return res.status(404).end(); }
 });
 
 app.get('/api/image-migration-status', async (req,res)=>{
@@ -18295,7 +18391,8 @@ app.get('/api/character-image-health', async (req, res) => {
         const totals=(await pool.query(`
             SELECT count(*)::int AS rows,
                    sum(CASE WHEN image_bytes IS NOT NULL AND octet_length(image_bytes)>=700 THEN 1 ELSE 0 END)::int AS with_bytes,
-                   sum(CASE WHEN status='manual-admin' THEN 1 ELSE 0 END)::int AS manual
+                   sum(CASE WHEN status='manual-admin' THEN 1 ELSE 0 END)::int AS manual,
+                   sum(CASE WHEN status='manual-admin' AND mime_type='image/webp' THEN 1 ELSE 0 END)::int AS manual_normalized
             FROM character_images
         `)).rows[0] || {};
 
@@ -18367,7 +18464,9 @@ app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     if (!/^https:\/\/\S+$/i.test(url)) return res.status(400).json({ok:false,error:'URL https:// obligatoire.'});
     const img=await simpleFetchImage(url,10000);
     if (!img) return res.status(400).json({ok:false,error:'Image inaccessible ou invalide.'});
-    const x={u,name,anime}; await simpleStoreImage(x,img,url,'manual-admin');
+    const x={u,name,anime};
+    const storedOk=await simpleStoreImage(x,img,url,'manual-admin');
+    if (!storedOk) return res.status(400).json({ok:false,error:'Image reçue mais impossible à décoder proprement.'});
     // AG_MANUAL_IMAGE_LOCK_V9 — report success only after the durable BYTEA row is confirmed.
     const persisted = await pool.query(
         `SELECT source_url,status,updated_at
