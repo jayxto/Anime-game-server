@@ -1,0 +1,35 @@
+{
+  "key": "cardcaptor",
+  "name": "Cardcaptor Sakura",
+  "quotes": [
+    {"text":"Hoeee ?!","speaker":"Sakura Kinomoto","recipient":"en découvrant une nouvelle carte","aliases":["Sakura"]},
+    {"text":"Clé qui détient le pouvoir des ténèbres, libère-toi !","speaker":"Sakura Kinomoto","recipient":"en invoquant son sceptre","aliases":["Sakura"]},
+    {"text":"Tout ira bien, j'en suis sûre !","speaker":"Sakura Kinomoto","recipient":"à ses amis","aliases":["Sakura"]},
+    {"text":"Je suis Keroberos, la bête du sceau !","speaker":"Kero","recipient":"à Sakura","aliases":["Keroberos","Kerberos"]},
+    {"text":"Sakura, tu es trop mignonne dans ce costume !","speaker":"Tomoyo Daidouji","recipient":"à Sakura, caméra à la main","aliases":["Tomoyo"]},
+    {"text":"Je suis Syaoran Li, descendant de Clow Reed.","speaker":"Syaoran Li","recipient":"à Sakura","aliases":["Syaoran","Lionel"]},
+    {"text":"Alors, le petit monstre ?","speaker":"Touya Kinomoto","recipient":"à Sakura","aliases":["Touya"]},
+    {"text":"Je suis la réincarnation de Clow Reed.","speaker":"Eriol Hiiragizawa","recipient":"à Sakura","aliases":["Eriol"]},
+    {"text":"Syaoran est mon fiancé !","speaker":"Meiling Li","recipient":"à Sakura","aliases":["Meiling"]},
+    {"text":"Sakura-chan, tu es vraiment courageuse.","speaker":"Yukito Tsukishiro","recipient":"à Sakura","aliases":["Yukito","Yue"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Pouvoir","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Sakura Kinomoto","attrs":["Chasseuse de cartes","Cartes","Femme","Bruns"]},
+      {"name":"Syaoran Li","attrs":["Magicien","Épée","Homme","Bruns"]},
+      {"name":"Tomoyo Daidouji","attrs":["Amie","Aucun","Femme","Noirs"]},
+      {"name":"Kero","attrs":["Gardien","Soleil","Mâle","Aucun"]},
+      {"name":"Touya Kinomoto","attrs":["Grand frère","Aucun","Homme","Noirs"]},
+      {"name":"Yukito Tsukishiro","attrs":["Gardien","Lune","Homme","Gris"]},
+      {"name":"Eriol Hiiragizawa","attrs":["Magicien","Magie de Clow","Homme","Bleus"]},
+      {"name":"Meiling Li","attrs":["Amie","Arts martiaux","Femme","Noirs"]},
+      {"name":"Fujitaka Kinomoto","attrs":["Père","Aucun","Homme","Bruns"]},
+      {"name":"Spinel Sun","attrs":["Gardien","Soleil","Mâle","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Eriol Hiiragizawa",98], ["Sakura Kinomoto",95], ["Yukito Tsukishiro",92], ["Keroberos",90], ["Kero",90], ["Syaoran Li",85],
+    ["Spinel Sun",85], ["Ruby Moon",85], ["Meiling Li",50], ["Touya Kinomoto",40], ["Fujitaka Kinomoto",30], ["Tomoyo Daidouji",10]
+  ]
+}

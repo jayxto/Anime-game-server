@@ -1,0 +1,24 @@
+{
+  "key": "grandblue",
+  "name": "Grand Blue",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Année","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Iori Kitahara","attrs":["Étudiant","1re année","Homme","Noirs"]},
+      {"name":"Kohei Imamura","attrs":["Étudiant","1re année","Homme","Blonds"]},
+      {"name":"Chisa Kotegawa","attrs":["Étudiant","1re année","Femme","Roux"]},
+      {"name":"Aina Yoshiwara","attrs":["Étudiant","1re année","Femme","Violets"]},
+      {"name":"Nanaka Kotegawa","attrs":["Gérante","Adulte","Femme","Roux"]},
+      {"name":"Azusa Hamaoka","attrs":["Étudiant","Senior","Femme","Violets"]},
+      {"name":"Shinji Tokita","attrs":["Étudiant","Senior","Homme","Noirs"]},
+      {"name":"Ryujiro Kotobuki","attrs":["Étudiant","Senior","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Ryujiro Kotobuki",90], ["Shinji Tokita",90], ["Iori Kitahara",80], ["Azusa Hamaoka",75], ["Kohei Imamura",70], ["Nanaka Kotegawa",70],
+    ["Chisa Kotegawa",65], ["Aina Yoshiwara",50]
+  ]
+}

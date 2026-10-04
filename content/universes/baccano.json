@@ -1,0 +1,29 @@
+{
+  "key": "baccano",
+  "name": "Baccano!",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Immortel","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Isaac Dian","attrs":["Oui","Isaac et Miria","Homme","Bruns"]},
+      {"name":"Miria Harvent","attrs":["Oui","Isaac et Miria","Femme","Blonds"]},
+      {"name":"Firo Prochainezo","attrs":["Oui","Famille Martillo","Homme","Bruns"]},
+      {"name":"Maiza Avaro","attrs":["Oui","Famille Martillo","Homme","Bruns"]},
+      {"name":"Ennis","attrs":["Oui","Famille Martillo","Femme","Bruns"]},
+      {"name":"Luck Gandor","attrs":["Oui","Famille Gandor","Homme","Bruns"]},
+      {"name":"Czeslaw Meyer","attrs":["Oui","Aucun","Homme","Bruns"]},
+      {"name":"Claire Stanfield","attrs":["Non","Rail Tracer","Homme","Roux"]},
+      {"name":"Ladd Russo","attrs":["Non","Famille Russo","Homme","Blonds"]},
+      {"name":"Jacuzzi Splot","attrs":["Non","Gang de Jacuzzi","Homme","Bruns"]},
+      {"name":"Nice Holystone","attrs":["Non","Gang de Jacuzzi","Femme","Blonds"]},
+      {"name":"Chane Laforet","attrs":["Non","Lemures","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Claire Stanfield",98], ["Ladd Russo",90], ["Chane Laforet",88], ["Firo Prochainezo",85], ["Czeslaw Meyer",82], ["Luck Gandor",80],
+    ["Maiza Avaro",80], ["Jacuzzi Splot",78], ["Berga Gandor",75], ["Nice Holystone",75], ["Ennis",70], ["Keith Gandor",70],
+    ["Isaac Dian",50], ["Miria Harvent",50]
+  ]
+}

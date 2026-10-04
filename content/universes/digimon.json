@@ -1,0 +1,42 @@
+{
+  "key": "digimon",
+  "name": "Digimon Adventure",
+  "quotes": [
+    {"text":"Agumon digivolve en… Greymon !","speaker":"Agumon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Gabumon digivolve en… Garurumon !","speaker":"Gabumon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Patamon digivolve en… Angemon !","speaker":"Patamon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Tentomon digivolve en… Kabuterimon !","speaker":"Tentomon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Biyomon digivolve en… Birdramon !","speaker":"Biyomon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Palmon digivolve en… Togemon !","speaker":"Palmon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Gomamon digivolve en… Ikkakumon !","speaker":"Gomamon","recipient":"pendant un combat","aliases":[]},
+    {"text":"Griffe éclair !","speaker":"Gatomon","recipient":"à ses ennemis","aliases":["Tailmon"]},
+    {"text":"Je suis l'élu du Courage !","speaker":"Taichi Yagami","recipient":"aux autres élus","aliases":["Tai","Taichi"]},
+    {"text":"L'amitié, c'est ce qui nous rend forts.","speaker":"Yamato Ishida","recipient":"à Tai","aliases":["Matt","Yamato"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Partenaire","Emblème","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Taichi Yagami","attrs":["Élu","Agumon","Courage","Homme","Bruns"]},
+      {"name":"Yamato Ishida","attrs":["Élu","Gabumon","Amitié","Homme","Blonds"]},
+      {"name":"Sora Takenouchi","attrs":["Élu","Biyomon","Amour","Femme","Roux"]},
+      {"name":"Koshiro Izumi","attrs":["Élu","Tentomon","Connaissance","Homme","Roux"]},
+      {"name":"Mimi Tachikawa","attrs":["Élu","Palmon","Sincérité","Femme","Bruns"]},
+      {"name":"Joe Kido","attrs":["Élu","Gomamon","Fiabilité","Homme","Bleus"]},
+      {"name":"Takeru Takaishi","attrs":["Élu","Patamon","Espoir","Homme","Blonds"]},
+      {"name":"Hikari Yagami","attrs":["Élu","Gatomon","Lumière","Femme","Bruns"]},
+      {"name":"Agumon","attrs":["Digimon","Taichi Yagami","Courage","Mâle","Aucun"]},
+      {"name":"Gabumon","attrs":["Digimon","Yamato Ishida","Amitié","Mâle","Aucun"]},
+      {"name":"Biyomon","attrs":["Digimon","Sora Takenouchi","Amour","Femme","Aucun"]},
+      {"name":"Tentomon","attrs":["Digimon","Koshiro Izumi","Connaissance","Mâle","Aucun"]},
+      {"name":"Palmon","attrs":["Digimon","Mimi Tachikawa","Sincérité","Femme","Aucun"]},
+      {"name":"Gomamon","attrs":["Digimon","Joe Kido","Fiabilité","Mâle","Aucun"]},
+      {"name":"Patamon","attrs":["Digimon","Takeru Takaishi","Espoir","Mâle","Aucun"]},
+      {"name":"Gatomon","attrs":["Digimon","Hikari Yagami","Lumière","Femme","Aucun"]}
+    ]
+  },
+  "power": [
+    ["Agumon",90], ["Gabumon",90], ["Patamon",88], ["Gatomon",88], ["Tentomon",80], ["Biyomon",80],
+    ["Palmon",78], ["Gomamon",78], ["Taichi Yagami",50], ["Yamato Ishida",50], ["Tai Kamiya",50], ["Matt Ishida",50],
+    ["Sora Takenouchi",40], ["Koshiro Izumi",40], ["Mimi Tachikawa",40], ["Joe Kido",40], ["Takeru Takaishi",40], ["Hikari Yagami",40]
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "key": "yugioh",
+  "name": "Yu-Gi-Oh!",
+  "quotes": [
+    {"text":"C'est l'heure du duel !","speaker":"Yami Yugi","recipient":"à ses adversaires","aliases":["Atem","Pharaon"]},
+    {"text":"Crois au cœur des cartes.","speaker":"Yugi Muto","recipient":"à Joey","aliases":["Yugi"]},
+    {"text":"Dragon blanc aux yeux bleus, attaque ! Destruction suprême !","speaker":"Seto Kaiba","recipient":"à ses adversaires","aliases":["Kaiba"]},
+    {"text":"Le passé et ses légendes ne m'intéressent pas.","speaker":"Seto Kaiba","recipient":"à Yugi","aliases":["Kaiba"]},
+    {"text":"Mon Œil du Millénium voit toutes tes cartes.","speaker":"Maximillion Pegasus","recipient":"à Yugi","aliases":["Pegasus"]},
+    {"text":"Le Dragon ailé de Râ va t'anéantir !","speaker":"Marik Ishtar","recipient":"à Yugi","aliases":["Marik"]},
+    {"text":"L'amitié est notre plus grande force !","speaker":"Tea Gardner","recipient":"à Yugi et ses amis","aliases":["Téa","Anzu"]},
+    {"text":"Je suis Joey Wheeler, et je ne lâche jamais rien !","speaker":"Joey Wheeler","recipient":"à ses adversaires","aliases":["Joey","Jonouchi"]},
+    {"text":"Grand frère !","speaker":"Mokuba Kaiba","recipient":"à Kaiba","aliases":["Mokuba"]},
+    {"text":"Les Harpies vont te réduire en miettes !","speaker":"Mai Valentine","recipient":"à Joey","aliases":["Mai"]}
+  ],
+  "dle": {
+    "categories": ["Rôle","Carte fétiche","Objet du Millénium","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Yugi Muto","attrs":["Duelliste","Magicien des ténèbres","Puzzle du Millénium","Homme","Multicolores"]},
+      {"name":"Atem","attrs":["Pharaon","Magicien des ténèbres","Puzzle du Millénium","Homme","Multicolores"]},
+      {"name":"Seto Kaiba","attrs":["Duelliste","Dragon blanc aux yeux bleus","Aucun","Homme","Bruns"]},
+      {"name":"Joey Wheeler","attrs":["Duelliste","Dragon noir aux yeux rouges","Aucun","Homme","Blonds"]},
+      {"name":"Mai Valentine","attrs":["Duelliste","Harpies","Aucun","Femme","Blonds"]},
+      {"name":"Maximillion Pegasus","attrs":["Créateur","Toon","Œil du Millénium","Homme","Blancs"]},
+      {"name":"Marik Ishtar","attrs":["Duelliste","Dragon ailé de Râ","Baguette du Millénium","Homme","Blonds"]},
+      {"name":"Ishizu Ishtar","attrs":["Gardienne des tombes","Aucune","Collier du Millénium","Femme","Noirs"]},
+      {"name":"Ryo Bakura","attrs":["Duelliste","Aucune","Anneau du Millénium","Homme","Blancs"]},
+      {"name":"Tea Gardner","attrs":["Amie","Aucune","Aucun","Femme","Bruns"]},
+      {"name":"Tristan Taylor","attrs":["Ami","Aucune","Aucun","Homme","Bruns"]},
+      {"name":"Mokuba Kaiba","attrs":["Ami","Aucune","Aucun","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Atem",100], ["Yami Yugi",100], ["Seto Kaiba",96], ["Yugi Muto",95], ["Yami Marik",93], ["Marik Ishtar",92],
+    ["Maximillion Pegasus",90], ["Yami Bakura",90], ["Bakura",88], ["Joey Wheeler",85], ["Mai Valentine",80], ["Ishizu Ishtar",75],
+    ["Ryo Bakura",70], ["Mokuba Kaiba",30], ["Tea Gardner",20], ["Tristan Taylor",20]
+  ]
+}

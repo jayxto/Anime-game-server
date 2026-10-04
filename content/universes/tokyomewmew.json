@@ -1,0 +1,26 @@
+{
+  "key": "tokyomewmew",
+  "name": "Tokyo Mew Mew",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","ADN animal","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Ichigo Momomiya","attrs":["Mew Mew","Chat d'Iriomote","Femme","Roses"]},
+      {"name":"Mint Aizawa","attrs":["Mew Mew","Loriquet","Femme","Bleus"]},
+      {"name":"Lettuce Midorikawa","attrs":["Mew Mew","Marsouin","Femme","Verts"]},
+      {"name":"Pudding Fong","attrs":["Mew Mew","Tamarin doré","Femme","Blonds"]},
+      {"name":"Zakuro Fujiwara","attrs":["Mew Mew","Loup gris","Femme","Violets"]},
+      {"name":"Masaya Aoyama","attrs":["Chevalier bleu","Aucun","Homme","Noirs"]},
+      {"name":"Ryo Shirogane","attrs":["Scientifique","Chat","Homme","Blonds"]},
+      {"name":"Keiichiro Akasaka","attrs":["Pâtissier","Aucun","Homme","Bruns"]},
+      {"name":"Kish","attrs":["Extraterrestre","Aucun","Homme","Verts"]},
+      {"name":"Pai","attrs":["Extraterrestre","Aucun","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Masaya Aoyama",90], ["Kish",88], ["Pai",85], ["Ichigo Momomiya",85], ["Zakuro Fujiwara",85], ["Mint Aizawa",80],
+    ["Lettuce Midorikawa",78], ["Pudding Fong",78], ["Taruto",75], ["Ryo Shirogane",50], ["Keiichiro Akasaka",50]
+  ]
+}

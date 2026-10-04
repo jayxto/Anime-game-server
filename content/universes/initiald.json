@@ -1,0 +1,26 @@
+{
+  "key": "initiald",
+  "name": "Initial D",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Équipe","Voiture","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Takumi Fujiwara","attrs":["Project D","Toyota AE86","Homme","Bruns"]},
+      {"name":"Keisuke Takahashi","attrs":["Project D","Mazda RX-7 FD","Homme","Blonds"]},
+      {"name":"Ryosuke Takahashi","attrs":["Project D","Mazda RX-7 FC","Homme","Noirs"]},
+      {"name":"Bunta Fujiwara","attrs":["Aucune","Toyota AE86","Homme","Noirs"]},
+      {"name":"Itsuki Takeuchi","attrs":["Akina Speed Stars","Toyota AE85","Homme","Noirs"]},
+      {"name":"Koichiro Iketani","attrs":["Akina Speed Stars","Nissan S13","Homme","Bruns"]},
+      {"name":"Takeshi Nakazato","attrs":["Night Kids","Nissan Skyline GT-R","Homme","Noirs"]},
+      {"name":"Shingo Shoji","attrs":["Night Kids","Honda Civic","Homme","Bruns"]},
+      {"name":"Wataru Akiyama","attrs":["Aucune","Toyota AE86","Homme","Noirs"]},
+      {"name":"Natsuki Mogi","attrs":["Aucune","Aucune","Femme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Bunta Fujiwara",100], ["Takumi Fujiwara",96], ["Ryosuke Takahashi",95], ["Keisuke Takahashi",92], ["Kyoichi Sudo",88], ["Wataru Akiyama",85],
+    ["Takeshi Nakazato",82], ["Shingo Shoji",78], ["Koichiro Iketani",50], ["Kenji",40], ["Itsuki Takeuchi",30], ["Natsuki Mogi",5]
+  ]
+}

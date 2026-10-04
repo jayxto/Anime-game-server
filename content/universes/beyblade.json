@@ -1,0 +1,25 @@
+{
+  "key": "beyblade",
+  "name": "Beyblade",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Équipe","Spectre","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Tyson Granger","attrs":["Bladebreakers","Dragoon","Homme","Bleus"]},
+      {"name":"Kai Hiwatari","attrs":["Bladebreakers","Dranzer","Homme","Gris"]},
+      {"name":"Ray Kon","attrs":["Bladebreakers","Driger","Homme","Noirs"]},
+      {"name":"Max Tate","attrs":["Bladebreakers","Draciel","Homme","Blonds"]},
+      {"name":"Daichi Sumeragi","attrs":["Bladebreakers","Gaia Dragoon","Homme","Rouges"]},
+      {"name":"Kenny","attrs":["Bladebreakers","Aucun","Homme","Bruns"]},
+      {"name":"Hilary Tachibana","attrs":["Bladebreakers","Aucun","Femme","Bruns"]},
+      {"name":"Tala Valkov","attrs":["Demolition Boys","Wolborg","Homme","Rouges"]},
+      {"name":"Brooklyn","attrs":["BEGA","Zeus","Homme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Brooklyn",96], ["Tyson Granger",95], ["Kai Hiwatari",95], ["Ray Kon",88], ["Tala Valkov",88], ["Max Tate",86],
+    ["Daichi Sumeragi",82], ["Ozuma",80], ["Kenny",10], ["Hilary Tachibana",10]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "key": "recreators",
+  "name": "Re:Creators",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Monde","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Sota Mizushino","attrs":["Monde réel","Lycéen","Homme","Bruns"]},
+      {"name":"Selesia Upitiria","attrs":["Fiction","Chevalier","Femme","Rouges"]},
+      {"name":"Meteora Osterreich","attrs":["Fiction","Magicienne","Femme","Blancs"]},
+      {"name":"Altair","attrs":["Fiction","Antagoniste","Femme","Blancs"]},
+      {"name":"Mamika Kirameki","attrs":["Fiction","Magical girl","Femme","Roses"]},
+      {"name":"Alicetaria February","attrs":["Fiction","Chevalier","Femme","Blonds"]},
+      {"name":"Yuya Mirokuji","attrs":["Fiction","Délinquant","Homme","Violets"]},
+      {"name":"Rui Kanoya","attrs":["Fiction","Pilote de mecha","Homme","Bleus"]},
+      {"name":"Magane Chikujoin","attrs":["Fiction","Manipulatrice","Femme","Noirs"]},
+      {"name":"Blitz Talker","attrs":["Fiction","Tireur d'élite","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Altair",100], ["Blitz Talker",90], ["Selesia Upitiria",88], ["Alicetaria February",88], ["Magane Chikujoin",85], ["Rui Kanoya",85],
+    ["Meteora Osterreich",82], ["Mamika Kirameki",80], ["Yuya Mirokuji",78], ["Sota Mizushino",20]
+  ]
+}

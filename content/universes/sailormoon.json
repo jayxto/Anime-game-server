@@ -1,0 +1,40 @@
+{
+  "key": "sailormoon",
+  "name": "Sailor Moon",
+  "quotes": [
+    {"text":"Au nom de la Lune, je vais te punir !","speaker":"Usagi Tsukino","recipient":"aux ennemis","aliases":["Sailor Moon","Usagi","Bunny"]},
+    {"text":"Je suis Sailor Moon, la guerrière de l'amour et de la justice !","speaker":"Usagi Tsukino","recipient":"aux ennemis","aliases":["Sailor Moon","Usagi","Bunny"]},
+    {"text":"Au nom de Mars, je vais te punir !","speaker":"Rei Hino","recipient":"aux ennemis","aliases":["Sailor Mars","Rei","Raya"]},
+    {"text":"Bulles de Mercure, explosez !","speaker":"Ami Mizuno","recipient":"aux ennemis","aliases":["Sailor Mercury","Ami","Molly"]},
+    {"text":"Tonnerre de Jupiter !","speaker":"Makoto Kino","recipient":"aux ennemis","aliases":["Sailor Jupiter","Makoto","Marcy"]},
+    {"text":"Chaîne d'amour de Vénus !","speaker":"Minako Aino","recipient":"aux ennemis","aliases":["Sailor Venus","Minako","Mina"]},
+    {"text":"Sailor Moon, n'abandonne jamais !","speaker":"Mamoru Chiba","recipient":"à Sailor Moon","aliases":["Tuxedo Mask","Mamoru","Bourdu"]},
+    {"text":"Usagi, tu es encore en retard !","speaker":"Luna","recipient":"à Usagi","aliases":[]},
+    {"text":"Je viens du futur, et je suis ta fille !","speaker":"Chibiusa","recipient":"à Usagi","aliases":["Sailor Chibi Moon","Chibiusa"]},
+    {"text":"Le Cristal d'argent sera à moi !","speaker":"Queen Beryl","recipient":"à ses sbires","aliases":["Reine Beryl"]}
+  ],
+  "dle": {
+    "categories": ["Guerrière","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Usagi Tsukino","attrs":["Sailor Moon","Guerrières intérieures","Femme","Blonds"]},
+      {"name":"Ami Mizuno","attrs":["Sailor Mercury","Guerrières intérieures","Femme","Bleus"]},
+      {"name":"Rei Hino","attrs":["Sailor Mars","Guerrières intérieures","Femme","Noirs"]},
+      {"name":"Makoto Kino","attrs":["Sailor Jupiter","Guerrières intérieures","Femme","Bruns"]},
+      {"name":"Minako Aino","attrs":["Sailor Venus","Guerrières intérieures","Femme","Blonds"]},
+      {"name":"Chibiusa","attrs":["Sailor Chibi Moon","Futur","Femme","Roses"]},
+      {"name":"Setsuna Meioh","attrs":["Sailor Pluto","Guerrières extérieures","Femme","Verts"]},
+      {"name":"Haruka Tenoh","attrs":["Sailor Uranus","Guerrières extérieures","Femme","Blonds"]},
+      {"name":"Michiru Kaioh","attrs":["Sailor Neptune","Guerrières extérieures","Femme","Verts"]},
+      {"name":"Hotaru Tomoe","attrs":["Sailor Saturn","Guerrières extérieures","Femme","Noirs"]},
+      {"name":"Mamoru Chiba","attrs":["Tuxedo Mask","Alliés","Homme","Noirs"]},
+      {"name":"Luna","attrs":["Aucune","Chats gardiens","Femme","Aucun"]},
+      {"name":"Artemis","attrs":["Aucune","Chats gardiens","Homme","Aucun"]},
+      {"name":"Queen Beryl","attrs":["Aucune","Dark Kingdom","Femme","Rouges"]}
+    ]
+  },
+  "power": [
+    ["Hotaru Tomoe",98], ["Usagi Tsukino",97], ["Setsuna Meioh",92], ["Haruka Tenoh",90], ["Michiru Kaioh",90], ["Queen Beryl",88],
+    ["Makoto Kino",84], ["Minako Aino",84], ["Rei Hino",82], ["Ami Mizuno",78], ["Chibiusa",75], ["Mamoru Chiba",70],
+    ["Luna",10], ["Artemis",10]
+  ]
+}

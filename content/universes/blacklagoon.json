@@ -1,0 +1,27 @@
+{
+  "key": "blacklagoon",
+  "name": "Black Lagoon",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Organisation","Arme","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Revy","attrs":["Lagoon Company","Pistolets","Femme","Bruns"]},
+      {"name":"Rock","attrs":["Lagoon Company","Aucune","Homme","Noirs"]},
+      {"name":"Dutch","attrs":["Lagoon Company","Fusil","Homme","Aucun"]},
+      {"name":"Benny","attrs":["Lagoon Company","Ordinateur","Homme","Blonds"]},
+      {"name":"Balalaika","attrs":["Hôtel Moscou","Fusil de précision","Femme","Blonds"]},
+      {"name":"Roberta","attrs":["Famille Lovelace","Armes lourdes","Femme","Noirs"]},
+      {"name":"Garcia Lovelace","attrs":["Famille Lovelace","Aucune","Homme","Blonds"]},
+      {"name":"Eda","attrs":["Église de la Violence","Pistolet","Femme","Blonds"]},
+      {"name":"Shenhua","attrs":["Aucune","Couteaux","Femme","Noirs"]},
+      {"name":"Chang","attrs":["Triade","Pistolets","Homme","Noirs"]},
+      {"name":"Sawyer the Cleaner","attrs":["Aucune","Tronçonneuse","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Roberta",96], ["Revy",92], ["Chang",92], ["Balalaika",90], ["Shenhua",85], ["Eda",85],
+    ["Dutch",85], ["Sawyer the Cleaner",80], ["Garcia Lovelace",30], ["Benny",30], ["Rock",30], ["Rokuro Okajima",30]
+  ]
+}

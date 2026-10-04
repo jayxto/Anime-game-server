@@ -1,0 +1,17 @@
+{
+  "key": "mfghost",
+  "name": "MF Ghost",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": [],
+    "characters": [
+
+    ]
+  },
+  "power": [
+    ["Michael Beckenbauer",95], ["Beckenbauer",95], ["Kanata Rivington",94], ["Ryousuke Takahashi",92], ["Shun Aiba",90], ["Kouki Sawatari",88],
+    ["Kakeru Yashio",85], ["Fumihiro Joyu",70], ["Ogata",40], ["Ren Saionji",30], ["Nozomi Kitahara",20]
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "key": "durarara",
+  "name": "Durarara!!",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Groupe","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Mikado Ryugamine","attrs":["Dollars","Lycéen","Homme","Noirs"]},
+      {"name":"Masaomi Kida","attrs":["Turbans jaunes","Lycéen","Homme","Blonds"]},
+      {"name":"Anri Sonohara","attrs":["Saika","Lycéenne","Femme","Noirs"]},
+      {"name":"Celty Sturluson","attrs":["Dollars","Coursier","Femme","Aucun"]},
+      {"name":"Shizuo Heiwajima","attrs":["Aucun","Garde du corps","Homme","Blonds"]},
+      {"name":"Izaya Orihara","attrs":["Aucun","Informateur","Homme","Noirs"]},
+      {"name":"Shinra Kishitani","attrs":["Aucun","Médecin clandestin","Homme","Bruns"]},
+      {"name":"Kyohei Kadota","attrs":["Dollars","Chef de bande","Homme","Noirs"]},
+      {"name":"Walker Yumasaki","attrs":["Dollars","Otaku","Homme","Bruns"]},
+      {"name":"Erika Karisawa","attrs":["Dollars","Otaku","Femme","Bruns"]},
+      {"name":"Seiji Yagiri","attrs":["Aucun","Lycéen","Homme","Bruns"]},
+      {"name":"Namie Yagiri","attrs":["Aucun","Chercheuse","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Shizuo Heiwajima",96], ["Celty Sturluson",94], ["Izaya Orihara",90], ["Anri Sonohara",85], ["Kyohei Kadota",75], ["Masaomi Kida",70],
+    ["Mikado Ryugamine",60], ["Seiji Yagiri",55], ["Walker Yumasaki",50], ["Erika Karisawa",50], ["Namie Yagiri",45], ["Shinra Kishitani",40]
+  ]
+}

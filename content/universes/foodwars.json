@@ -1,0 +1,40 @@
+{
+  "key": "foodwars",
+  "name": "Food Wars!",
+  "quotes": [
+    {"text":"Désolé pour l'attente !","speaker":"Soma Yukihira","recipient":"au jury","aliases":["Soma"]},
+    {"text":"C'est immonde !","speaker":"Erina Nakiri","recipient":"à Soma","aliases":["Erina"]},
+    {"text":"Ma langue divine ne se trompe jamais.","speaker":"Erina Nakiri","recipient":"au jury","aliases":["Erina"]},
+    {"text":"Burning !","speaker":"Ryo Kurokiba","recipient":"pendant un duel culinaire","aliases":["Ryo"]},
+    {"text":"Yukihira, cette fois, c'est moi qui gagnerai !","speaker":"Takumi Aldini","recipient":"à Soma","aliases":["Takumi"]},
+    {"text":"La science, c'est la cuisine de demain !","speaker":"Alice Nakiri","recipient":"à Erina","aliases":["Alice"]},
+    {"text":"Un cuisinier ne doit jamais cesser de chercher de nouvelles saveurs.","speaker":"Joichiro Yukihira","recipient":"à Soma","aliases":["Joichiro"]},
+    {"text":"La vraie gastronomie est réservée à une élite.","speaker":"Azami Nakiri","recipient":"aux élèves de Totsuki","aliases":["Azami"]},
+    {"text":"Je vais faire de mon mieux… pour mes camarades !","speaker":"Megumi Tadokoro","recipient":"à Soma","aliases":["Megumi"]},
+    {"text":"Mes épices révéleront toute la saveur du plat.","speaker":"Akira Hayama","recipient":"à Soma","aliases":["Hayama"]}
+  ],
+  "dle": {
+    "categories": ["Groupe","Spécialité","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Soma Yukihira","attrs":["Dortoir Polar Star","Cuisine populaire","Homme","Rouges"]},
+      {"name":"Megumi Tadokoro","attrs":["Dortoir Polar Star","Cuisine régionale","Femme","Bleus"]},
+      {"name":"Satoshi Isshiki","attrs":["Dortoir Polar Star","Cuisine japonaise","Homme","Noirs"]},
+      {"name":"Erina Nakiri","attrs":["Elite Ten","Langue divine","Femme","Blonds"]},
+      {"name":"Eishi Tsukasa","attrs":["Elite Ten","Cuisine française","Homme","Blancs"]},
+      {"name":"Rindo Kobayashi","attrs":["Elite Ten","Ingrédients exotiques","Femme","Rouges"]},
+      {"name":"Akira Hayama","attrs":["Elite Ten","Épices","Homme","Gris"]},
+      {"name":"Alice Nakiri","attrs":["Famille Nakiri","Gastronomie moléculaire","Femme","Blancs"]},
+      {"name":"Ryo Kurokiba","attrs":["Famille Nakiri","Fruits de mer","Homme","Noirs"]},
+      {"name":"Hisako Arato","attrs":["Famille Nakiri","Médecine chinoise","Femme","Roses"]},
+      {"name":"Takumi Aldini","attrs":["Aucun","Cuisine italienne","Homme","Blonds"]},
+      {"name":"Isami Aldini","attrs":["Aucun","Cuisine italienne","Homme","Bruns"]},
+      {"name":"Joichiro Yukihira","attrs":["Aucun","Cuisine populaire","Homme","Noirs"]},
+      {"name":"Azami Nakiri","attrs":["Central","Gastronomie centrale","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Joichiro Yukihira",98], ["Erina Nakiri",95], ["Eishi Tsukasa",95], ["Soma Yukihira",92], ["Rindo Kobayashi",90], ["Azami Nakiri",90],
+    ["Akira Hayama",88], ["Satoshi Isshiki",88], ["Alice Nakiri",85], ["Takumi Aldini",84], ["Ryo Kurokiba",82], ["Megumi Tadokoro",80],
+    ["Isami Aldini",78], ["Hisako Arato",70]
+  ]
+}

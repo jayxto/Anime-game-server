@@ -1,0 +1,40 @@
+{
+  "key": "conan",
+  "name": "Détective Conan",
+  "quotes": [
+    {"text":"Il n'y a toujours qu'une seule vérité !","speaker":"Conan Edogawa","recipient":"au coupable","aliases":["Conan"]},
+    {"text":"Je m'appelle Conan Edogawa, et je suis détective.","speaker":"Conan Edogawa","recipient":"à Ran","aliases":["Conan"]},
+    {"text":"Je suis Shinichi Kudo, lycéen détective.","speaker":"Shinichi Kudo","recipient":"au public","aliases":["Shinichi"]},
+    {"text":"Je suis le détective de l'Ouest, Heiji Hattori !","speaker":"Heiji Hattori","recipient":"à Conan","aliases":["Heiji"]},
+    {"text":"Mesdames et messieurs, que le spectacle commence !","speaker":"Kaito Kid","recipient":"à la foule","aliases":["Kid","Kaito Kuroba"]},
+    {"text":"Il n'y a pas de place pour les traîtres dans l'Organisation.","speaker":"Gin","recipient":"à Vodka","aliases":[]},
+    {"text":"Un secret rend une femme plus femme.","speaker":"Vermouth","recipient":"à Conan","aliases":[]},
+    {"text":"Je m'appelais Shiho Miyano… avant de devenir Ai Haibara.","speaker":"Ai Haibara","recipient":"à Conan","aliases":["Ai","Shiho Miyano"]},
+    {"text":"Shinichi, j'ai une nouvelle invention pour toi !","speaker":"Hiroshi Agasa","recipient":"à Conan","aliases":["Professeur Agasa","Agasa"]},
+    {"text":"Le grand détective Kogoro Mouri a résolu l'affaire !","speaker":"Kogoro Mouri","recipient":"à la police","aliases":["Kogoro","Richard Moore"]}
+  ],
+  "dle": {
+    "categories": ["Camp","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Conan Edogawa","attrs":["Détectives","Détective","Homme","Noirs"]},
+      {"name":"Shinichi Kudo","attrs":["Détectives","Détective","Homme","Noirs"]},
+      {"name":"Kogoro Mouri","attrs":["Détectives","Détective","Homme","Noirs"]},
+      {"name":"Heiji Hattori","attrs":["Détectives","Détective","Homme","Noirs"]},
+      {"name":"Ran Mouri","attrs":["Amis","Lycéenne","Femme","Noirs"]},
+      {"name":"Kazuha Toyama","attrs":["Amis","Lycéenne","Femme","Bruns"]},
+      {"name":"Sonoko Suzuki","attrs":["Amis","Lycéenne","Femme","Bruns"]},
+      {"name":"Hiroshi Agasa","attrs":["Amis","Inventeur","Homme","Gris"]},
+      {"name":"Ai Haibara","attrs":["Ex-Organisation","Scientifique","Femme","Roux"]},
+      {"name":"Gin","attrs":["Organisation des hommes en noir","Tueur","Homme","Blonds"]},
+      {"name":"Vermouth","attrs":["Organisation des hommes en noir","Actrice","Femme","Blonds"]},
+      {"name":"Shuichi Akai","attrs":["FBI","Agent","Homme","Noirs"]},
+      {"name":"Rei Furuya","attrs":["Police","Agent infiltré","Homme","Blonds"]},
+      {"name":"Kaito Kid","attrs":["Voleur","Magicien","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Shuichi Akai",95], ["Rei Furuya",93], ["Gin",92], ["Conan Edogawa",90], ["Shinichi Kudo",90], ["Kaito Kid",90],
+    ["Vermouth",88], ["Heiji Hattori",88], ["Ran Mouri",85], ["Ai Haibara",75], ["Kazuha Toyama",70], ["Vodka",70],
+    ["Kogoro Mouri",60], ["Hiroshi Agasa",50], ["Sonoko Suzuki",20]
+  ]
+}

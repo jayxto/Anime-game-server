@@ -1,0 +1,26 @@
+{
+  "key": "horimiya",
+  "name": "Horimiya",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Conseil des élèves","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Kyoko Hori","attrs":["Élève","Aucun","Femme","Bruns"]},
+      {"name":"Izumi Miyamura","attrs":["Élève","Aucun","Homme","Noirs"]},
+      {"name":"Toru Ishikawa","attrs":["Élève","Aucun","Homme","Violets"]},
+      {"name":"Yuki Yoshikawa","attrs":["Élève","Aucun","Femme","Blonds"]},
+      {"name":"Kakeru Sengoku","attrs":["Élève","Président","Homme","Rouges"]},
+      {"name":"Remi Ayasaki","attrs":["Élève","Membre","Femme","Roses"]},
+      {"name":"Sakura Kono","attrs":["Élève","Membre","Femme","Verts"]},
+      {"name":"Shu Iura","attrs":["Élève","Aucun","Homme","Verts"]},
+      {"name":"Honoka Sawada","attrs":["Élève","Aucun","Femme","Noirs"]},
+      {"name":"Akane Yanagi","attrs":["Élève","Aucun","Homme","Roux"]}
+    ]
+  },
+  "power": [
+    ["Kyoko Hori",90], ["Izumi Miyamura",90], ["Toru Ishikawa",75], ["Kakeru Sengoku",70], ["Yuki Yoshikawa",70], ["Akane Yanagi",70],
+    ["Remi Ayasaki",65], ["Shu Iura",60], ["Sakura Kono",55], ["Honoka Sawada",55]
+  ]
+}
