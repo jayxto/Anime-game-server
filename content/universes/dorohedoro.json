@@ -1,0 +1,22 @@
+{
+  "key": "dorohedoro",
+  "name": "Dorohedoro",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Nature","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Caiman","attrs":["Humain","Hole","Homme","Aucun"]},
+      {"name":"Nikaido","attrs":["Sorcier","Hole","Femme","Blonds"]},
+      {"name":"Kasukabe","attrs":["Sorcier","Hole","Homme","Noirs"]},
+      {"name":"Shin","attrs":["Sorcier","Famille En","Homme","Blonds"]},
+      {"name":"Noi","attrs":["Sorcier","Famille En","Femme","Blancs"]},
+      {"name":"Ebisu","attrs":["Sorcier","Famille En","Femme","Violets"]}
+    ]
+  },
+  "power": [
+    ["En",95], ["Noi",92], ["Caiman",92], ["Shin",90], ["Nikaido",90], ["Aikawa",88],
+    ["Chota",80], ["Risu",75], ["Ebisu",70], ["Johnson",70], ["Fujita",60], ["Kasukabe",50]
+  ]
+}

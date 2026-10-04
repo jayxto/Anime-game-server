@@ -1,0 +1,26 @@
+{
+  "key": "dungeonmeshi",
+  "name": "Dungeon Meshi",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Race","Rôle","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Laios Touden","attrs":["Humain","Guerrier","Groupe de Laios","Homme","Blonds"]},
+      {"name":"Marcille Donato","attrs":["Demi-elfe","Mage","Groupe de Laios","Femme","Blonds"]},
+      {"name":"Chilchuck Tims","attrs":["Demi-pied","Crocheteur","Groupe de Laios","Homme","Roux"]},
+      {"name":"Senshi","attrs":["Nain","Cuisinier","Groupe de Laios","Homme","Noirs"]},
+      {"name":"Falin Touden","attrs":["Humain","Mage","Groupe de Laios","Femme","Blonds"]},
+      {"name":"Izutsumi","attrs":["Homme-bête","Ninja","Groupe de Laios","Femme","Noirs"]},
+      {"name":"Kabru","attrs":["Humain","Épéiste","Groupe de Kabru","Homme","Noirs"]},
+      {"name":"Shuro Nakamoto","attrs":["Humain","Épéiste","Groupe de Shuro","Homme","Noirs"]},
+      {"name":"Namari","attrs":["Nain","Guerrier","Groupe de Shuro","Femme","Roux"]},
+      {"name":"Mithrun","attrs":["Elfe","Capitaine","Canaris","Homme","Blancs"]}
+    ]
+  },
+  "power": [
+    ["Winged Lion",100], ["Falin Touden",95], ["Mithrun",92], ["Thistle",90], ["Shuro Nakamoto",85], ["Marcille Donato",82],
+    ["Laios Touden",80], ["Kabru",78], ["Senshi",75], ["Izutsumi",75], ["Namari",70], ["Chilchuck Tims",50]
+  ]
+}

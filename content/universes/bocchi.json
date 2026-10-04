@@ -1,0 +1,23 @@
+{
+  "key": "bocchi",
+  "name": "Bocchi the Rock!",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Instrument","Groupe","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Hitori Gotoh","attrs":["Guitare","Kessoku Band","Femme","Roses"]},
+      {"name":"Nijika Ijichi","attrs":["Batterie","Kessoku Band","Femme","Blonds"]},
+      {"name":"Ryo Yamada","attrs":["Basse","Kessoku Band","Femme","Bleus"]},
+      {"name":"Ikuyo Kita","attrs":["Chant et guitare","Kessoku Band","Femme","Rouges"]},
+      {"name":"Seika Ijichi","attrs":["Gérante","STARRY","Femme","Blonds"]},
+      {"name":"Kikuri Hiroi","attrs":["Basse","SICK HACK","Femme","Violets"]},
+      {"name":"Futari Gotoh","attrs":["Aucun","Famille Gotoh","Femme","Roses"]}
+    ]
+  },
+  "power": [
+    ["Hitori Gotoh",95], ["Kikuri Hiroi",92], ["Ryo Yamada",88], ["Nijika Ijichi",85], ["Seika Ijichi",85], ["Ikuyo Kita",80],
+    ["PA-san",70], ["Futari Gotoh",10]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "key": "apothecary",
+  "name": "Les Carnets de l'Apothicaire",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Lieu","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Maomao","attrs":["Apothicaire","Palais intérieur","Femme","Noirs"]},
+      {"name":"Jinshi","attrs":["Eunuque","Palais intérieur","Homme","Violets"]},
+      {"name":"Gaoshun","attrs":["Garde","Palais intérieur","Homme","Noirs"]},
+      {"name":"Gyokuyou","attrs":["Concubine","Palais intérieur","Femme","Roux"]},
+      {"name":"Lihua","attrs":["Concubine","Palais intérieur","Femme","Noirs"]},
+      {"name":"Lishu","attrs":["Concubine","Palais intérieur","Femme","Bruns"]},
+      {"name":"Loulan","attrs":["Concubine","Palais intérieur","Femme","Noirs"]},
+      {"name":"Lakan","attrs":["Stratège","Cour extérieure","Homme","Noirs"]},
+      {"name":"Luomen","attrs":["Médecin","Quartier des plaisirs","Homme","Gris"]}
+    ]
+  },
+  "power": [
+    ["Lakan",95], ["Jinshi",90], ["Maomao",88], ["Gaoshun",80], ["Luomen",80], ["Loulan",75],
+    ["Ah-Duo",72], ["Gyokuyou",70], ["Lihua",60], ["Pairin",60], ["Lishu",50], ["Meimei",50],
+    ["Joka",50], ["Xiaolan",30]
+  ]
+}

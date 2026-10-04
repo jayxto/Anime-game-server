@@ -1,0 +1,17 @@
+{
+  "key": "shangrila",
+  "name": "Shangri-La Frontier",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": [],
+    "characters": [
+
+    ]
+  },
+  "power": [
+    ["Wezaemon",100], ["Sunraku",92], ["Psyger-0",90], ["Rei Saiga",90], ["Oikatzo",90], ["Kei Uomi",90],
+    ["Arthur Pencilgon",88], ["Towa Amane",88], ["Vysache",85], ["Setsuna",70], ["Emul",60]
+  ]
+}

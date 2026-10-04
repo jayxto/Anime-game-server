@@ -1,0 +1,26 @@
+{
+  "key": "lycoris",
+  "name": "Lycoris Recoil",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Organisation","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Chisato Nishikigi","attrs":["Lycoris","Café LycoReco","Femme","Blonds"]},
+      {"name":"Takina Inoue","attrs":["Lycoris","Café LycoReco","Femme","Noirs"]},
+      {"name":"Mika","attrs":["Gérant","Café LycoReco","Homme","Noirs"]},
+      {"name":"Kurumi","attrs":["Hacker","Café LycoReco","Femme","Blonds"]},
+      {"name":"Mizuki Nakahara","attrs":["Ex-agent","Café LycoReco","Femme","Bruns"]},
+      {"name":"Fuki Harukawa","attrs":["Lycoris","DA","Femme","Bruns"]},
+      {"name":"Sakura Otome","attrs":["Lycoris","DA","Femme","Bruns"]},
+      {"name":"Kusunoki","attrs":["Commandante","DA","Femme","Rouges"]},
+      {"name":"Majima","attrs":["Terroriste","Aucune","Homme","Verts"]},
+      {"name":"Shinji Yoshimatsu","attrs":["Agent","Institut Alan","Homme","Blonds"]}
+    ]
+  },
+  "power": [
+    ["Chisato Nishikigi",98], ["Majima",90], ["Takina Inoue",88], ["Fuki Harukawa",85], ["Mika",80], ["Sakura Otome",75],
+    ["Shinji Yoshimatsu",70], ["Kusunoki",60], ["Mizuki Nakahara",50], ["Kurumi",40]
+  ]
+}

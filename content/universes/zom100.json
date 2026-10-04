@@ -1,0 +1,22 @@
+{
+  "key": "zom100",
+  "name": "Zom 100",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","État","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Akira Tendo","attrs":["Employé de bureau","Humain","Homme","Noirs"]},
+      {"name":"Shizuka Mikazuki","attrs":["Employée de bureau","Humain","Femme","Noirs"]},
+      {"name":"Kenichiro Ryuuzaki","attrs":["Agent immobilier","Humain","Homme","Blonds"]},
+      {"name":"Beatrix Amerhauser","attrs":["Étudiante","Humain","Femme","Blonds"]},
+      {"name":"Gonzo Kosugi","attrs":["Patron","Zombie","Homme","Noirs"]},
+      {"name":"Kanta Higurashi","attrs":["Survivant","Humain","Homme","Bruns"]}
+    ]
+  },
+  "power": [
+    ["Shizuka Mikazuki",85], ["Akira Tendo",80], ["Beatrix Amerhauser",80], ["Kenichiro Ryuuzaki",75], ["Gonzo Kosugi",70], ["Takeru Minakata",70],
+    ["Kanta Higurashi",60], ["Higurashi",60]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "key": "rankingkings",
+  "name": "Ranking of Kings",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Rôle","Espèce","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Bojji","attrs":["Prince","Humain","Homme","Noirs"]},
+      {"name":"Kage","attrs":["Assassin","Ombre","Homme","Aucun"]},
+      {"name":"Daida","attrs":["Prince","Humain","Homme","Blonds"]},
+      {"name":"Hiling","attrs":["Reine","Humain","Femme","Blonds"]},
+      {"name":"Domas","attrs":["Garde","Humain","Homme","Roux"]},
+      {"name":"Bebin","attrs":["Garde","Humain","Homme","Noirs"]},
+      {"name":"Apeas","attrs":["Ministre","Humain","Homme","Gris"]},
+      {"name":"Dorshe","attrs":["Garde","Humain","Homme","Aucun"]},
+      {"name":"Miranjo","attrs":["Sorcière","Humain","Femme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Bossee",100], ["Bojji",92], ["Desha",90], ["Bebin",88], ["Despa",88], ["Ouken",86],
+    ["Domas",85], ["Miranjo",85], ["Daida",82], ["Dorshe",80], ["Kage",75], ["Apeas",70],
+    ["Hiling",60]
+  ]
+}

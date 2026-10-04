@@ -1,0 +1,27 @@
+{
+  "key": "eightysix",
+  "name": "86 Eighty-Six",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Camp","Rôle","Sexe","Cheveux"],
+    "characters": [
+      {"name":"Vladilena Milize","attrs":["République de San Magnolia","Handler","Femme","Blancs"]},
+      {"name":"Shinei Nouzen","attrs":["Escadron Spearhead","Capitaine","Homme","Noirs"]},
+      {"name":"Raiden Shuga","attrs":["Escadron Spearhead","Vice-capitaine","Homme","Noirs"]},
+      {"name":"Anju Emma","attrs":["Escadron Spearhead","Pilote","Femme","Bleus"]},
+      {"name":"Theoto Rikka","attrs":["Escadron Spearhead","Pilote","Homme","Blonds"]},
+      {"name":"Kurena Kukumila","attrs":["Escadron Spearhead","Sniper","Femme","Rouges"]},
+      {"name":"Frederica Rosenfort","attrs":["Fédération de Giad","Mascotte","Femme","Bruns"]},
+      {"name":"Ernst Zimmerman","attrs":["Fédération de Giad","Président","Homme","Gris"]},
+      {"name":"Eugene Rantz","attrs":["Fédération de Giad","Soldat","Homme","Blancs"]},
+      {"name":"Grethe Wenzel","attrs":["Fédération de Giad","Officier","Femme","Blonds"]},
+      {"name":"Kiriya Nouzen","attrs":["Légion","Ennemi","Homme","Noirs"]}
+    ]
+  },
+  "power": [
+    ["Shinei Nouzen",95], ["Kiriya Nouzen",92], ["Vladilena Milize",85], ["Raiden Shuga",85], ["Kurena Kukumila",82], ["Theoto Rikka",80],
+    ["Anju Emma",80], ["Grethe Wenzel",75], ["Eugene Rantz",60], ["Frederica Rosenfort",50], ["Ernst Zimmerman",50]
+  ]
+}

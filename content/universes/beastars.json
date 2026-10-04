@@ -1,0 +1,28 @@
+{
+  "key": "beastars",
+  "name": "Beastars",
+  "quotes": [
+
+  ],
+  "dle": {
+    "categories": ["Espèce","Régime","Rôle","Sexe"],
+    "characters": [
+      {"name":"Legoshi","attrs":["Loup gris","Carnivore","Club de théâtre","Homme"]},
+      {"name":"Haru","attrs":["Lapin nain","Herbivore","Club de jardinage","Femme"]},
+      {"name":"Louis","attrs":["Cerf rouge","Herbivore","Club de théâtre","Homme"]},
+      {"name":"Juno","attrs":["Louve grise","Carnivore","Club de théâtre","Femme"]},
+      {"name":"Gohin","attrs":["Panda","Carnivore","Médecin","Homme"]},
+      {"name":"Jack","attrs":["Labrador","Carnivore","Élève","Homme"]},
+      {"name":"Melon","attrs":["Hybride","Hybride","Antagoniste","Homme"]},
+      {"name":"Bill","attrs":["Tigre","Carnivore","Club de théâtre","Homme"]},
+      {"name":"Pina","attrs":["Mouflon","Herbivore","Club de théâtre","Homme"]},
+      {"name":"Tem","attrs":["Alpaga","Herbivore","Club de théâtre","Homme"]},
+      {"name":"Riz","attrs":["Ours brun","Carnivore","Club de théâtre","Homme"]},
+      {"name":"Ibuki","attrs":["Lion","Carnivore","Shishigumi","Homme"]}
+    ]
+  },
+  "power": [
+    ["Legoshi",92], ["Riz",90], ["Melon",88], ["Gohin",85], ["Ibuki",85], ["Bill",80],
+    ["Louis",70], ["Juno",70], ["Jack",50], ["Pina",40], ["Haru",20], ["Tem",10]
+  ]
+}
