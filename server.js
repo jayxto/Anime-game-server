@@ -28120,3 +28120,263 @@ app.post('/api/vote', async (req, res) => {
     const v = await kvGet('vote', 'm:' + mk, {}); v[uid] = i; await kvSet('vote', 'm:' + mk, v);
     res.json({ ok: true });
 });
+
+/* =====================================================================
+   AG_WYR_TITLES_V1 — « Tu préfères… ? » (mini-jeu multijoueur : tu marques si tu votes
+   comme la majorité du salon, podium normal à la fin) + titres Bêta-testeur / Admin.
+   ===================================================================== */
+const WYR = [
+    // ⚡ pouvoirs
+    ['⚡ Pouvoirs', 'Avoir le Sharingan', 'Avoir le Byakugan'],
+    ['⚡ Pouvoirs', 'Manger le fruit de Luffy (Gomu Gomu)', 'Manger le fruit de Barbe Noire (Yami Yami)'],
+    ['⚡ Pouvoirs', 'Avoir l’Infini de Gojo', 'Avoir le Domaine de Sukuna'],
+    ['⚡ Pouvoirs', 'Avoir le Death Note', 'Avoir les yeux de Shinigami'],
+    ['⚡ Pouvoirs', 'Savoir faire le Rasengan', 'Savoir faire le Chidori'],
+    ['⚡ Pouvoirs', 'Être un Super Saiyan', 'Être un Titan de L’Attaque des Titans'],
+    ['⚡ Pouvoirs', 'Avoir la Respiration du Soleil', 'Avoir la Respiration de l’Eau'],
+    ['⚡ Pouvoirs', 'Avoir le pouvoir de Saitama (tout en un coup)', 'Avoir le pouvoir de Mob (psychokinésie max)'],
+    ['⚡ Pouvoirs', 'Avoir l’alchimie de Fullmetal', 'Avoir la magie de Black Clover'],
+    ['⚡ Pouvoirs', 'Avoir le Nen de Killua (électricité)', 'Avoir le Nen de Kurapika (chaînes)'],
+    ['⚡ Pouvoirs', 'Avoir le Haki des rois', 'Avoir le mode Ermite'],
+    ['⚡ Pouvoirs', 'Avoir un Stand', 'Avoir un Zanpakuto'],
+    ['⚡ Pouvoirs', 'Avoir le pouvoir de Rimuru (tout absorber)', 'Avoir le pouvoir de Sung Jin-Woo (armée des ombres)'],
+    ['⚡ Pouvoirs', 'Avoir le Geass de Lelouch', 'Avoir le pouvoir de remonter le temps de Subaru'],
+    ['⚡ Pouvoirs', 'Avoir l’Alter de Shoto (feu et glace)', 'Avoir le One For All'],
+    ['⚡ Pouvoirs', 'Pouvoir te téléporter comme Minato', 'Pouvoir voler comme Goku'],
+    ['⚡ Pouvoirs', 'Avoir le Sharingan éternel', 'Avoir le Rinnegan'],
+    ['⚡ Pouvoirs', 'Avoir un démon de Chainsaw Man', 'Avoir une Kagune de Tokyo Ghoul'],
+    ['⚡ Pouvoirs', 'Avoir la Mugetsu d’Ichigo', 'Avoir le Bankai de Byakuya'],
+    ['⚡ Pouvoirs', 'Pouvoir copier toutes les techniques (Kakashi)', 'Pouvoir inventer tes propres techniques (Naruto)'],
+    ['⚡ Pouvoirs', 'Avoir la force de Zoro', 'Avoir l’intelligence de Light'],
+    ['⚡ Pouvoirs', 'Avoir le Gear 5', 'Avoir l’Ultra Instinct'],
+    ['⚡ Pouvoirs', 'Contrôler le feu comme Ace', 'Contrôler la glace comme Aokiji'],
+    ['⚡ Pouvoirs', 'Avoir la vitesse de Minato', 'Avoir la force de Tsunade'],
+    ['⚡ Pouvoirs', 'Être un Dragon Slayer de Fairy Tail', 'Avoir la force des Ackerman comme Livaï'],
+    // ⚔️ combats
+    ['⚔️ Combats', 'Affronter Madara', 'Affronter Aizen'],
+    ['⚔️ Combats', 'Combattre Sukuna', 'Combattre Muzan'],
+    ['⚔️ Combats', 'Te battre contre Kaido', 'Te battre contre Big Mom'],
+    ['⚔️ Combats', 'Avoir Livaï comme allié', 'Avoir Gojo comme allié'],
+    ['⚔️ Combats', 'Être poursuivi par un Titan', 'Être poursuivi par un démon de Demon Slayer'],
+    ['⚔️ Combats', 'Affronter Frieza', 'Affronter Cell'],
+    ['⚔️ Combats', 'Combattre Hisoka', 'Combattre Meruem'],
+    ['⚔️ Combats', 'Être dans l’équipe de Luffy contre la Marine', 'Être dans l’Akatsuki contre Konoha'],
+    ['⚔️ Combats', 'Faire équipe avec Naruto', 'Faire équipe avec Goku'],
+    ['⚔️ Combats', 'Affronter Pain', 'Affronter Itachi'],
+    ['⚔️ Combats', 'Combattre Escanor à midi', 'Combattre Meliodas en mode démon'],
+    ['⚔️ Combats', 'Survivre à l’examen Hunter', 'Survivre à l’examen Chūnin'],
+    ['⚔️ Combats', 'Survivre une nuit à Sword Art Online', 'Survivre une nuit dans The Promised Neverland'],
+    ['⚔️ Combats', 'Avoir Saitama comme garde du corps', 'Avoir Kenpachi comme garde du corps'],
+    ['⚔️ Combats', 'Combattre au Tenkaichi Budokai', 'Combattre aux Grands Jeux Magiques de Fairy Tail'],
+    // 🌍 mondes
+    ['🌍 Mondes', 'Vivre à Konoha', 'Vivre sur un bateau pirate de One Piece'],
+    ['🌍 Mondes', 'Aller à l’école Jujutsu', 'Aller à U.A. (My Hero Academia)'],
+    ['🌍 Mondes', 'Vivre dans le monde de Pokémon', 'Vivre dans le monde de Dragon Ball'],
+    ['🌍 Mondes', 'Être réincarné en slime (Tensura)', 'Être réincarné comme Rudeus (Mushoku Tensei)'],
+    ['🌍 Mondes', 'Vivre derrière les murs (Attaque des Titans)', 'Vivre à Tokyo pendant Tokyo Ghoul'],
+    ['🌍 Mondes', 'Habiter à la Soul Society', 'Habiter sur la Grand Line'],
+    ['🌍 Mondes', 'Entrer dans la guilde Fairy Tail', 'Entrer dans la brigade Black Bull'],
+    ['🌍 Mondes', 'Vivre dans Spy x Family avec Anya', 'Vivre dans Frieren avec Frieren'],
+    ['🌍 Mondes', 'Être élève à la Classroom of the Elite', 'Être élève à la classe 3-E (Assassination Classroom)'],
+    ['🌍 Mondes', 'Rejoindre le Bataillon d’exploration', 'Rejoindre les pourfendeurs de démons'],
+    ['🌍 Mondes', 'Explorer Made in Abyss', 'Explorer le monde de Hunter x Hunter'],
+    ['🌍 Mondes', 'Vivre à Night City (Cyberpunk Edgerunners)', 'Vivre à Neo-Tokyo'],
+    ['🌍 Mondes', 'Être Hokage', 'Être Roi des pirates'],
+    ['🌍 Mondes', 'Être capitaine du Gotei 13', 'Être un Pilier (Hashira)'],
+    ['🌍 Mondes', 'Être un Chevalier Magique', 'Être un Hunter professionnel'],
+    // 👥 persos
+    ['👥 Persos', 'Avoir Kakashi comme prof', 'Avoir Koro-sensei comme prof'],
+    ['👥 Persos', 'Avoir Sanji comme cuisinier', 'Avoir Chopper comme médecin'],
+    ['👥 Persos', 'Avoir Naruto comme meilleur ami', 'Avoir Luffy comme meilleur ami'],
+    ['👥 Persos', 'Avoir Anya comme petite sœur', 'Avoir Nezuko comme petite sœur'],
+    ['👥 Persos', 'Avoir Happy comme animal de compagnie', 'Avoir Pikachu comme animal de compagnie'],
+    ['👥 Persos', 'Partir en voyage avec Gon', 'Partir en voyage avec Frieren'],
+    ['👥 Persos', 'Avoir Jiraiya comme sensei', 'Avoir Master Roshi comme sensei'],
+    ['👥 Persos', 'Avoir Livaï comme chef', 'Avoir Erwin comme chef'],
+    ['👥 Persos', 'Être coloc avec Denji et Power', 'Être coloc avec Gintoki'],
+    ['👥 Persos', 'Avoir L comme détective', 'Avoir Conan comme détective'],
+    ['👥 Persos', 'Avoir Zoro pour te guider (perdu garanti)', 'Avoir Nami pour gérer ton argent (tout perdu garanti)'],
+    ['👥 Persos', 'Faire la fête avec Shanks', 'Faire la fête avec Tsunade'],
+    ['👥 Persos', 'Avoir Kurama en toi', 'Avoir Sukuna en toi'],
+    ['👥 Persos', 'Être le rival de Vegeta', 'Être le rival de Bakugo'],
+    ['👥 Persos', 'Avoir Itachi comme grand frère', 'Avoir Ace comme grand frère'],
+    ['👥 Persos', 'Avoir Yor comme mère', 'Avoir Loid comme père'],
+    ['👥 Persos', 'Que Gojo t’entraîne', 'Que Rengoku t’entraîne'],
+    ['👥 Persos', 'Être dans l’équipe 7', 'Être dans l’équipage du Chapeau de paille'],
+    ['👥 Persos', 'Avoir Ryuk qui te suit partout', 'Avoir Makima qui te surveille'],
+    ['👥 Persos', 'Recevoir un conseil d’Itachi', 'Recevoir un conseil de Rayleigh'],
+    // 😂 drôle
+    ['😂 Drôle', 'Ne manger que des ramen d’Ichiraku toute ta vie', 'Ne manger que de la viande comme Luffy'],
+    ['😂 Drôle', 'Avoir le sens de l’orientation de Zoro', 'Avoir la chance de Kaneki'],
+    ['😂 Drôle', 'Crier le nom de chaque attaque avant de taper', 'Faire un discours de 3 épisodes avant chaque combat'],
+    ['😂 Drôle', 'Avoir un flashback à chaque fois que tu perds', 'Avoir un power-up à chaque fois que tu pleures'],
+    ['😂 Drôle', 'Parler comme Naruto « dattebayo »', 'Rire comme Light « keikaku doori »'],
+    ['😂 Drôle', 'Avoir les cheveux de Goku Super Saiyan 3', 'Avoir les sourcils de Rock Lee'],
+    ['😂 Drôle', 'Faire tes devoirs avec Light', 'Faire tes devoirs avec Senku'],
+    ['😂 Drôle', 'Être enfermé une journée avec Mineta', 'Être enfermé une journée avec Master Roshi'],
+    ['😂 Drôle', 'Te transformer en chibi quand tu es gêné', 'Saigner du nez quand tu es gêné'],
+    ['😂 Drôle', 'Voir les épisodes fillers de Naruto en entier', 'Attendre la fin de One Piece'],
+    ['😂 Drôle', 'Avoir la voix de Gojo', 'Avoir la voix de Light'],
+    ['😂 Drôle', 'Courir comme Naruto (bras en arrière)', 'Poser comme dans JoJo partout où tu vas'],
+    ['😂 Drôle', 'Être aussi naïf que Gon', 'Être aussi paresseux que Shikamaru'],
+    ['😂 Drôle', 'Avoir l’appétit de Goku', 'Avoir le sommeil de Shikamaru'],
+    ['😂 Drôle', 'Que ta vie soit commentée par le narrateur de Kaguya-sama', 'Que ta vie ait l’opening de JoJo en musique de fond'],
+    ['😂 Drôle', 'Finir chaque phrase par « … »', 'Finir chaque phrase par « ! »'],
+    ['😂 Drôle', 'Avoir un nouvel ennemi tous les jours', 'Revivre le même jour comme Subaru'],
+    ['😂 Drôle', 'Te réveiller dans un isekai sans pouvoir', 'Te réveiller dans un harem anime sans personnalité'],
+    // 🎬 anime
+    ['🎬 Anime', 'Oublier One Piece pour le revoir', 'Oublier L’Attaque des Titans pour le revoir'],
+    ['🎬 Anime', 'Ne regarder plus que des shonen', 'Ne regarder plus que des slice of life'],
+    ['🎬 Anime', 'Que Naruto ait une vraie suite avec Naruto adulte', 'Que Dragon Ball Super ait un nouvel arc'],
+    ['🎬 Anime', 'Regarder en VF', 'Regarder en VOSTFR'],
+    ['🎬 Anime', 'Lire le manga', 'Attendre l’anime'],
+    ['🎬 Anime', 'Avoir un opening magnifique et une histoire moyenne', 'Avoir une histoire magnifique et un opening moyen'],
+    ['🎬 Anime', 'Voir la fin de One Piece demain', 'Voir une saison 2 de Hunter x Hunter'],
+    ['🎬 Anime', 'Revoir Death Note', 'Revoir Code Geass'],
+    ['🎬 Anime', 'Que ton anime préféré ait un film', 'Que ton anime préféré ait un jeu vidéo incroyable'],
+    ['🎬 Anime', 'Un combat épique de 10 épisodes', '10 combats rapides d’un épisode'],
+    ['🎬 Anime', 'Spoil la fin de ton anime préféré', 'Ne jamais connaître la fin'],
+    ['🎬 Anime', 'Que Frieren dure 10 saisons', 'Que Chainsaw Man dure 10 saisons'],
+    ['🎬 Anime', 'Regarder un anime en binge en une nuit', 'Le regarder un épisode par semaine'],
+    ['🎬 Anime', 'Les années 2000 (Naruto, Bleach, One Piece)', 'Les années 2020 (JJK, Demon Slayer, Chainsaw Man)'],
+    ['🎬 Anime', 'Que tout le monde connaisse ton anime préféré', 'Que ton anime préféré reste un secret bien gardé'],
+    // 💥 dilemmes durs
+    ['💥 Dilemme', 'Sauver Ace', 'Sauver Itachi'],
+    ['💥 Dilemme', 'Que Rengoku survive', 'Que Jiraiya survive'],
+    ['💥 Dilemme', 'Sauver Neji', 'Sauver Erwin'],
+    ['💥 Dilemme', 'Être l’ami de Kaneki avant', 'Être l’ami de Kaneki après'],
+    ['💥 Dilemme', 'Avoir le destin d’Eren', 'Avoir le destin de Lelouch'],
+    ['💥 Dilemme', 'Que Light gagne', 'Que L gagne'],
+    ['💥 Dilemme', 'Être le dernier Uchiha', 'Être le dernier Saiyan'],
+    ['💥 Dilemme', 'Garder tes souvenirs mais perdre tes pouvoirs', 'Garder tes pouvoirs mais perdre tes souvenirs'],
+    ['💥 Dilemme', 'Être immortel comme Frieren', 'Vivre une vie courte mais légendaire comme Rengoku'],
+    ['💥 Dilemme', 'Être le héros n°1 détesté', 'Être un héros inconnu mais aimé de tes amis'],
+    ['💥 Dilemme', 'Avoir un grand rêve impossible (Roi des pirates)', 'Avoir une vie tranquille et heureuse'],
+    ['💥 Dilemme', 'Être le méchant qui a raison', 'Être le gentil qui a tort'],
+    ['💥 Dilemme', 'Être fort mais seul', 'Être faible mais entouré'],
+    ['💥 Dilemme', 'Revivre ton pire jour mais pouvoir le changer', 'Ne plus jamais revivre aucun jour passé'],
+    ['💥 Dilemme', 'Que ton anime préféré ait une fin parfaite', 'Qu’il continue pour toujours avec une fin moyenne']
+];
+WYR.push(
+    ['⚡ Pouvoirs', 'Avoir le Mangekyō Sharingan', 'Avoir le Tenseigan'],
+    ['⚡ Pouvoirs', 'Pouvoir invoquer Gamabunta', 'Pouvoir invoquer Katsuyu'],
+    ['⚡ Pouvoirs', 'Avoir le Bankai d’Ichigo', 'Avoir le Bankai de Hitsugaya'],
+    ['⚡ Pouvoirs', 'Avoir le Hollow d’Ichigo', 'Avoir le Kyubi de Naruto'],
+    ['⚡ Pouvoirs', 'Maîtriser le Ki comme Goku', 'Maîtriser le Chakra comme Naruto'],
+    ['⚡ Pouvoirs', 'Avoir le fruit de Law (Ope Ope)', 'Avoir le fruit de Marco (Phénix)'],
+    ['⚡ Pouvoirs', 'Avoir le Stand de Jotaro (Star Platinum)', 'Avoir le Stand de Dio (The World)'],
+    ['⚡ Pouvoirs', 'Avoir l’Alter d’All Might', 'Avoir l’Alter d’Aizawa (effacer les Alters)'],
+    ['⚡ Pouvoirs', 'Avoir la magie de Frieren', 'Avoir la magie d’Asta (anti-magie)'],
+    ['⚡ Pouvoirs', 'Devenir un Ghoul', 'Devenir un démon (Demon Slayer)'],
+    ['⚡ Pouvoirs', 'Pouvoir lire les pensées comme Anya', 'Pouvoir voir le futur comme Eren'],
+    ['⚡ Pouvoirs', 'Avoir le pouvoir de Denji (tronçonneuses)', 'Avoir le pouvoir de Power (sang)'],
+    ['⚡ Pouvoirs', 'Avoir le Susanoo', 'Avoir le mode Baryon'],
+    ['⚡ Pouvoirs', 'Avoir la Respiration de la Flamme', 'Avoir la Respiration de la Foudre'],
+    ['⚡ Pouvoirs', 'Avoir 10 vies comme Subaru', 'Avoir 1 seule vie mais être invincible 1 jour par an'],
+    ['⚔️ Combats', 'Affronter Dio', 'Affronter Kira Yoshikage'],
+    ['⚔️ Combats', 'Affronter All For One', 'Affronter Shigaraki'],
+    ['⚔️ Combats', 'Affronter Zeref', 'Affronter Acnologia'],
+    ['⚔️ Combats', 'Affronter Kokushibo', 'Affronter Akaza'],
+    ['⚔️ Combats', 'Affronter Mahito', 'Affronter Jogo'],
+    ['⚔️ Combats', 'Affronter l’Akatsuki au complet', 'Affronter les 4 Empereurs en même temps'],
+    ['⚔️ Combats', 'Combattre aux côtés de Vegeta', 'Combattre aux côtés de Piccolo'],
+    ['⚔️ Combats', 'Être sauvé par All Might', 'Être sauvé par Saitama'],
+    ['⚔️ Combats', 'Avoir Escanor comme allié', 'Avoir Mihawk comme allié'],
+    ['⚔️ Combats', 'Faire un duel d’épée contre Zoro', 'Faire un duel d’épée contre Kenpachi'],
+    ['🌍 Mondes', 'Vivre dans le monde de Jojo', 'Vivre dans le monde de Bleach'],
+    ['🌍 Mondes', 'Être Marine', 'Être Révolutionnaire'],
+    ['🌍 Mondes', 'Être un Shinigami', 'Être un Quincy'],
+    ['🌍 Mondes', 'Être un Exorciste (JJK)', 'Être un Chasseur de démons publics (Chainsaw Man)'],
+    ['🌍 Mondes', 'Être chevalier-mage dans Black Clover', 'Être élève à Yuei'],
+    ['🌍 Mondes', 'Vivre dans un village ninja caché du Sable', 'Vivre dans le village caché de la Brume'],
+    ['🌍 Mondes', 'Partir sur l’île de Wano', 'Partir sur l’île des hommes-poissons'],
+    ['🌍 Mondes', 'Vivre dans Haikyuu (tout le monde fait du volley)', 'Vivre dans Blue Lock (tout le monde fait du foot)'],
+    ['🌍 Mondes', 'Être pilote d’EVA', 'Être pilote de Gurren Lagann'],
+    ['🌍 Mondes', 'Être réincarné en noble dans un isekai', 'Être réincarné en monstre surpuissant'],
+    ['👥 Persos', 'Avoir Senku comme ami scientifique', 'Avoir Shikamaru comme ami stratège'],
+    ['👥 Persos', 'Avoir Mikasa pour te protéger', 'Avoir Rem pour te protéger'],
+    ['👥 Persos', 'Avoir Brook pour jouer de la musique', 'Avoir Rengoku pour t’encourager'],
+    ['👥 Persos', 'Dîner avec Goku', 'Dîner avec Luffy'],
+    ['👥 Persos', 'Avoir Killua comme meilleur ami', 'Avoir Kurapika comme meilleur ami'],
+    ['👥 Persos', 'Avoir Tanjiro comme frère', 'Avoir Zenitsu comme frère'],
+    ['👥 Persos', 'Être entraîné par Aizawa', 'Être entraîné par Bang (One Punch Man)'],
+    ['👥 Persos', 'Avoir Mob comme pote', 'Avoir Reigen comme manager'],
+    ['👥 Persos', 'Que Frieren t’apprenne la magie', 'Que Merlin t’apprenne la magie'],
+    ['👥 Persos', 'Voyager avec Mugen et Jin', 'Voyager avec Spike et Jet'],
+    ['😂 Drôle', 'Avoir les cheveux de Toge', 'Avoir la coupe de Gintoki'],
+    ['😂 Drôle', 'Ne parler qu’avec des noms d’ingrédients comme Toge', 'Ne pouvoir dire que « Pika Pika »'],
+    ['😂 Drôle', 'Être aussi perdu que Zoro', 'Être aussi peureux que Zenitsu'],
+    ['😂 Drôle', 'Hurler « BANKAI » en ouvrant une porte', 'Hurler « RASENGAN » en lançant une balle'],
+    ['😂 Drôle', 'Faire un monologue de méchant à chaque dispute', 'Faire une pose de JoJo à chaque photo'],
+    ['😂 Drôle', 'Avoir un rival qui crie ton nom partout', 'Avoir un fan-club qui te suit partout'],
+    ['😂 Drôle', 'Manger la cuisine de Sanji tous les jours', 'Manger les mochis de Katakuri tous les jours'],
+    ['😂 Drôle', 'Avoir un opening qui joue quand tu entres dans une pièce', 'Avoir un ending qui joue quand tu pars'],
+    ['😂 Drôle', 'Te faire appeler « senpai » partout', 'Te faire appeler « sensei » partout'],
+    ['🎬 Anime', 'Que Naruto ait le style de Demon Slayer', 'Que One Piece ait l’animation de JJK'],
+    ['🎬 Anime', 'Un remake de Bleach', 'Un remake de Fairy Tail'],
+    ['🎬 Anime', 'Regarder 1000 épisodes de One Piece', 'Lire 1100 chapitres de One Piece'],
+    ['🎬 Anime', 'Ne plus jamais voir de filler', 'Ne plus jamais voir de récap'],
+    ['🎬 Anime', 'Avoir l’anime en 4K', 'Avoir l’anime avec 0 censure'],
+    ['💥 Dilemme', 'Sauver Kamina', 'Sauver Maes Hughes'],
+    ['💥 Dilemme', 'Que Gon retrouve son père plus tôt', 'Que Killua ne quitte jamais Gon'],
+    ['💥 Dilemme', 'Être Luffy sans son équipage', 'Être son équipage sans Luffy'],
+    ['💥 Dilemme', 'Savoir que ton anime préféré finit mal', 'Ne pas savoir et être surpris'],
+    ['💥 Dilemme', 'Avoir une force immense mais perdre ceux que tu aimes', 'Rester normal mais garder tout le monde']
+);
+ARC_GAMES.tupreferes = { label: 'Tu préfères… ?', icon: '🤔', universe: false, rounds: 10, roundMs: 20000, answer: 'choice' };
+MODE_LABELS['arcade:tupreferes'] = 'Tu préfères… ?';
+const _arcBuildRoundWyr = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g?.game !== 'tupreferes') return _arcBuildRoundWyr(g);
+    if (!g.wyrUsed) g.wyrUsed = new Set();
+    let pool = WYR.map((_, i) => i).filter(i => !g.wyrUsed.has(i));
+    if (!pool.length) { g.wyrUsed.clear(); pool = WYR.map((_, i) => i); }
+    const i = pool[Math.floor(Math.random() * pool.length)]; g.wyrUsed.add(i);
+    const [cat, a, b] = WYR[i];
+    return { wyr: i, wyrCat: cat, choices: Math.random() < 0.5 ? [a, b] : [b, a], answer: null };
+};
+const _arcRevealWyr = arcReveal;
+arcReveal = function (room, roomCode) {
+    const g = arcGames[roomCode];
+    if (g && !g.dead && g.phase === 'playing' && g.game === 'tupreferes' && g.current) {
+        const [x, y] = g.current.choices, cnt = { [x]: 0, [y]: 0 };
+        for (const a of Object.values(g.answers)) if (a && cnt[a.choice] != null) cnt[a.choice]++;
+        const voters = cnt[x] + cnt[y], tie = cnt[x] === cnt[y], maj = tie ? null : (cnt[x] > cnt[y] ? x : y);
+        for (const [pid, a] of Object.entries(g.answers)) {
+            if (!a) continue;
+            const gain = voters < 2 ? 50 : tie ? 50 : a.choice === maj ? 100 : 0; // seul dans le salon : 50 pour avoir répondu
+            a.correct = gain > 0; g.gainedRound[pid] = gain; g.scores[pid] = (g.scores[pid] || 0) + gain;
+        }
+        g.current.answer = maj;
+        g.current.wyrRoom = cnt;
+        // statistiques de tout le site (dans l'ordre de la liste, pas de l'affichage)
+        const [, A, B] = WYR[g.current.wyr];
+        kvGet('wyr', 'stats', {}).then(st => {
+            const s = st[g.current.wyr] || [0, 0]; s[0] += cnt[A] || 0; s[1] += cnt[B] || 0; st[g.current.wyr] = s;
+            g.current.wyrSite = { [A]: s[0], [B]: s[1] };
+            return kvSet('wyr', 'stats', st);
+        }).catch(() => {}).finally(() => { if (!g.dead && g.phase === 'reveal') arcEmit(room, roomCode); });
+    }
+    return _arcRevealWyr(room, roomCode);
+};
+const _arcPublicWyr = arcPublic;
+arcPublic = function (room, g) {
+    const out = _arcPublicWyr(room, g);
+    if (out && g && g.game === 'tupreferes' && g.current && g.current.choices) {
+        const revealed = g.phase === 'reveal' || g.phase === 'finished';
+        out.stage = Object.assign(out.stage || {}, { wyr: { cat: g.current.wyrCat, choices: g.current.choices, room: revealed ? g.current.wyrRoom || null : null, site: revealed ? g.current.wyrSite || null : null } });
+    }
+    return out;
+};
+
+// ---------- titres Bêta-testeur et Admin ----------
+TITLES.push(
+    { id: 'betatesteur', name: 'Bêta-testeur 🧪', desc: 'Réservé aux bêta-testeurs du jeu', need: s => !!s.isBeta },
+    { id: 'admin', name: 'Admin 🛡️', desc: 'Réservé aux administrateurs du jeu', need: s => !!s.isAdmin }
+);
+const _titleStatsRoles = titleStats;
+titleStats = async function (uid) {
+    const s = await _titleStatsRoles(uid);
+    try { s.isAdmin = await isAdminUid(uid); s.isBeta = s.isAdmin || await isBetaUid(uid); } catch (_) {}
+    return s;
+};
