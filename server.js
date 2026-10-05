@@ -2,13 +2,9 @@
 // L'ancienne adresse (DATABASE_URL) ne sert plus qu'à recopier les données au tout premier démarrage.
 if (process.env.DB_DIR) {
     process.env.AG_IMPORT_URL = process.env.AG_IMPORT_URL || process.env.DATABASE_URL || '';
-    const fs0 = require('fs'), path0 = require('path'), crypto0 = require('crypto');
-    const dir0 = path0.resolve(process.env.DB_DIR), pwFile = path0.join(path0.dirname(dir0), '.' + path0.basename(dir0) + '-pass');
-    fs0.mkdirSync(path0.dirname(dir0), { recursive: true });
-    let pw = ''; try { pw = fs0.readFileSync(pwFile, 'utf8').trim(); } catch (_) {}
-    if (!pw) { pw = crypto0.randomBytes(18).toString('hex'); fs0.writeFileSync(pwFile, pw, { mode: 0o600 }); }
-    process.env.AG_LOCAL_PW = pw;
-    process.env.DATABASE_URL = `postgres://postgres:${pw}@127.0.0.1:${parseInt(process.env.DB_PORT, 10) || 5433}/postgres?sslmode=disable`;
+    // la base n'écoute que sur 127.0.0.1 (intérieur du serveur) et accepte ces connexions : pas de mot de passe à garder
+    process.env.AG_LOCAL_PW = require('crypto').randomBytes(12).toString('hex');
+    process.env.DATABASE_URL = `postgres://postgres:${process.env.AG_LOCAL_PW}@127.0.0.1:${parseInt(process.env.DB_PORT, 10) || 5433}/postgres?sslmode=disable`;
 }
 const sharp = require('sharp');
 // AG_LOCAL_DB_V1 : moins de mémoire gardée par le traitement d'images (place pour la base intégrée)
@@ -279,10 +275,14 @@ for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { LOCALDB_STOPPIN
 const LOCALDB_READY = process.env.DB_DIR ? (async () => {
     const fsx = require('fs'), pathx = require('path');
     const EmbeddedPostgres = (await import('embedded-postgres')).default; // module ESM : import dynamique (marche sur Node 20 et 22)
-    const dir = pathx.resolve(process.env.DB_DIR), marker = pathx.join(pathx.dirname(dir), '.' + pathx.basename(dir) + '-ready');
+    // le repère « copie faite » est rangé DANS le dossier de la base (donc sur le disque, quel que soit le chemin du disque)
+    const dir = pathx.resolve(process.env.DB_DIR), marker = pathx.join(dir, 'ag-ready'), oldMarker = pathx.join(pathx.dirname(dir), '.' + pathx.basename(dir) + '-ready');
     const importUrl = process.env.AG_IMPORT_URL;
-    const fresh = !fsx.existsSync(marker) || !fsx.existsSync(pathx.join(dir, 'PG_VERSION')); // dossier vide ou disque changé : on recopie
-    if (fresh && fsx.existsSync(dir)) fsx.rmSync(dir, { recursive: true, force: true }); // copie ratée la fois d'avant : on repart de zéro
+    const hasData = fsx.existsSync(pathx.join(dir, 'PG_VERSION'));
+    const imported = hasData && (fsx.existsSync(marker) || fsx.existsSync(oldMarker));
+    // sans adresse d'import, on ne supprime JAMAIS des données existantes
+    const fresh = !hasData || (!imported && !!importUrl);
+    if (fresh && hasData) { console.log('[base locale] copie précédente inachevée : on recommence'); for (const f of fsx.readdirSync(dir)) fsx.rmSync(pathx.join(dir, f), { recursive: true, force: true }); }
     const mk = () => new EmbeddedPostgres({
         databaseDir: dir, user: 'postgres',
         initdbFlags: ['--encoding=UTF8', '--locale-provider=builtin', '--builtin-locale=C.UTF-8', '--locale=C'], // UTF-8 sans dépendre des langues installées sur la machine
@@ -296,10 +296,13 @@ const LOCALDB_READY = process.env.DB_DIR ? (async () => {
     // un ancien Postgres encore vivant (serveur Node tué brutalement) garde le dossier : on l'arrête proprement d'abord
     try {
         const oldPid = parseInt(fsx.readFileSync(pathx.join(dir, 'postmaster.pid'), 'utf8').split('\n')[0], 10);
-        if (oldPid > 1) { process.kill(oldPid, 0); console.log('[base locale] arrêt de l’ancien Postgres', oldPid); process.kill(oldPid, 'SIGINT'); for (let i = 0; i < 60; i++) { await new Promise(r => setTimeout(r, 500)); try { process.kill(oldPid, 0); } catch (_) { break; } } }
+        let isPg = false; try { isPg = /postgres/.test(fsx.readFileSync(`/proc/${oldPid}/cmdline`, 'utf8')); } catch (_) {}
+        if (oldPid > 1 && oldPid !== process.pid && isPg) { process.kill(oldPid, 0); console.log('[base locale] arrêt de l’ancien Postgres', oldPid); process.kill(oldPid, 'SIGINT'); for (let i = 0; i < 60; i++) { await new Promise(r => setTimeout(r, 500)); try { process.kill(oldPid, 0); } catch (_) { break; } } }
     } catch (_) {}
     LOCALDB_PG = mk();
     if (!fsx.existsSync(pathx.join(dir, 'PG_VERSION'))) { console.log('[base locale] création de la base dans', dir); await LOCALDB_PG.initialise(); }
+    // connexions depuis l'intérieur du serveur acceptées sans mot de passe (Postgres n'écoute que sur 127.0.0.1)
+    fsx.writeFileSync(pathx.join(dir, 'pg_hba.conf'), 'local all all trust\nhost all all 127.0.0.1/32 trust\nhost all all ::1/128 trust\n');
     await LOCALDB_PG.start();
     // redémarrage automatique si le processus Postgres s'arrête tout seul
     const watch = () => LOCALDB_PG.process && LOCALDB_PG.process.once('exit', code => {
@@ -329,7 +332,7 @@ const LOCALDB_READY = process.env.DB_DIR ? (async () => {
         old.end().catch(() => {});
         LOCALDB.importedAt = Date.now();
     }
-    fsx.writeFileSync(marker, new Date().toISOString());
+    if (!fsx.existsSync(marker)) fsx.writeFileSync(marker, new Date().toISOString());
     LOCALDB.state = 'ready';
     console.log('[base locale] prête ✅');
 })().catch(e => {
