@@ -11817,15 +11817,15 @@ body.ag-game-page #app-root > #mode,
             box.innerHTML = `<div class="shop-head">🔴 <b>Échange en direct avec ${hubEsc(other.name)}</b></div>
                 <div class="trd-row"><div class="trd-swap"><div><b>Toi</b>${trdCard(me.card, '🃏')}<small>${me.accepted ? '✅ accepté' : 'en attente'}</small></div><span>⇄</span><div><b>${hubEsc(other.name)}</b>${trdCard(other.card, '⌛')}<small>${other.accepted ? '✅ accepté' : 'choisit sa carte'}</small></div></div>${status}</div>
                 <h3 class="adm-h">🃏 Tes cartes</h3><p class="tl-hint">Clique sur une carte pour la poser. Si tu changes de carte, les validations des deux joueurs sont automatiquement annulées.</p>
-                <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans tes cartes" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()"><select class="trd-sel" style="max-width:210px" onchange="trd.r1=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${trd.r1 === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${TRD_ORD.filter(r => trd.mine.some(c => c.rarity === r)).map(r => `<option value="${r}"${trd.r1 === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select></div>
+                <div class="ch-in"><input class="v7-input" placeholder="🔎 Chercher dans tes cartes" value="${hubEsc(trd.q1)}" oninput="trd.q1=this.value;tradeLists()">${cardSortSelect()}<select class="trd-sel" style="max-width:210px" onchange="trd.r1=this.value;tradeLists()"><option value="">Toutes les raretés</option><option value="fin"${trd.r1 === 'fin' ? ' selected' : ''}>✨ Avec finition</option>${TRD_ORD.filter(r => trd.mine.some(c => c.rarity === r)).map(r => `<option value="${r}"${trd.r1 === r ? ' selected' : ''}>${RAR_LABEL[r] || r}</option>`).join('')}</select></div>
                 <div class="trd-list" id="trd-l-give"></div>${hist}`;
             tradeLists(myPicked);
         }
         function tradeLists(selected) {
             const g = document.getElementById('trd-l-give'); if (!g) return;
             const rk = r => { const i = TRD_ORD.indexOf(r); return i < 0 ? 99 : i; };
-            const f = trd.mine.filter(c => (!trd.q1 || (c.name + ' ' + c.anime).toLowerCase().includes(trd.q1.toLowerCase())) && (!trd.r1 || (trd.r1 === 'fin' ? !!c.finish : c.rarity === trd.r1)))
-                .sort((a, b) => rk(a.rarity) - rk(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || a.name.localeCompare(b.name, 'fr'));
+            const f = cardSortList(trd.mine.filter(c => (!trd.q1 || (c.name + ' ' + c.anime).toLowerCase().includes(trd.q1.toLowerCase())) && (!trd.r1 || (trd.r1 === 'fin' ? !!c.finish : c.rarity === trd.r1)))
+                );
             const sel = selected != null ? selected : (trd.session && trd.session.me.card ? trdId(trd.session.me.card) : '');
             g.innerHTML = (f.length > 100 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (100 premières affichées)</p>` : '') + f.slice(0, 100).map(c => {
                 const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
@@ -13074,7 +13074,7 @@ body.ag-game-page #app-root > #mode,
                     <small class="tl-hint">Tu recevras <b id="mk-net">${Math.round(hint[0] * 2 * (1 - d.tax))}</b> 🪙 après la taxe.</small>
                     ${s.shiny ? `<label style="display:block;margin-top:6px;"><input type="checkbox" id="mk-shiny"> ✨ Vendre l’exemplaire brillant</label>` : ''}
                     <div class="hb-btns"><button onclick="mk.sell=null;loadMarket()">↩ Choisir une autre carte</button></div></div></div>`
-                    : `<p class="tl-hint">Choisis la carte à vendre (elle quitte ta collection pendant la vente, tu la récupères si tu annules).</p><input class="v7-input" placeholder="🔎 Chercher dans ta collection" oninput="mkFilter(this.value)"><div class="trd-list mk-pick" id="mk-pick"></div>`);
+                    : `<p class="tl-hint">Choisis la carte à vendre (elle quitte ta collection pendant la vente, tu la récupères si tu annules).</p><input class="v7-input" placeholder="🔎 Chercher dans ta collection" oninput="mkFilter(this.value)">${cardSortSelect()}<div class="trd-list mk-pick" id="mk-pick"></div>`);
                 if (!s) mkFilter('');
                 return;
             }
@@ -13087,7 +13087,7 @@ body.ag-game-page #app-root > #mode,
             const box = document.getElementById('mk-pick'); if (!box) return;
             const s = String(q || '').toLowerCase();
             const order = ['omega', 'eternelle', 'cosmique', 'divine', 'secrete', 'halloween', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            box.innerHTML = mk.cards.filter(c => !s || (c.name + ' ' + c.anime).toLowerCase().includes(s)).sort((a, b) => order.indexOf(a.rarity) - order.indexOf(b.rarity)).slice(0, 90)
+            box.innerHTML = cardSortList(mk.cards.filter(c => !s || (c.name + ' ' + c.anime).toLowerCase().includes(s))).slice(0, 90)
                 .map(c => `<button class="trd-mini r-${c.rarity}" onclick="mk.sell=${JSON.stringify(c.key).replace(/"/g, '&quot;')};loadMarket()"><img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15"><b>${v7esc(c.name)}</b><small>${v7esc(c.anime)} • x${c.n}${c.shiny ? ' ✨' : ''}</small></button>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
         async function mkSell() {
@@ -14411,6 +14411,7 @@ body.ag-game-page #app-root > #mode,
             const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
+            window.cardRarIdx = rIdx;
             const SORTS = {
                 rare: (a, b) => rIdx(a.rarity) - rIdx(b.rarity) || fIdx(a.finish) - fIdx(b.finish) || b.shiny - a.shiny || a.name.localeCompare(b.name, 'fr'),
                 fin: (a, b) => fIdx(a.finish) - fIdx(b.finish) || rIdx(a.rarity) - rIdx(b.rarity) || a.name.localeCompare(b.name, 'fr'),
@@ -16054,13 +16055,13 @@ async function loadHallOfFame(){
             const cards = (await myCards()).sort((a, b) => (b.lvl || 0) - (a.lvl || 0));
             const sel = [];
             const draw = q => {
-                const list = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120);
+                const list = cardSortList(cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase()))).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120);
                 body.querySelector('.cp-grid').innerHTML = list.map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
                 body.querySelectorAll('.cp-pick').forEach(el => el.onclick = e => { e.stopPropagation(); const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else if (sel.length < 3) sel.push(k); el.classList.toggle('on', sel.includes(k)); body.querySelector('#cp-go').textContent = `⚔️ Combattre (${sel.length}/3)`; body.querySelector('#cp-go').disabled = sel.length !== 3; });
             };
             body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Choisis 3 cartes. Leur puissance dépend de la rareté, du perso, du niveau ★ et de la finition. 3 manches contre l’ordinateur : gagne-en 2 ! (+60 🪙, 10 victoires payées par jour, et de l’XP pour tes cartes)</p>
                 <div id="cp2-duels"></div>
-                <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…"><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;flex:1;">⚔️ Combattre (0/3)</button><button class="btn-action" id="cp2-dfr" style="margin:0 0 10px;flex:1;background:#2a2a40;">🤝 Défier un ami</button></div><div class="cp-grid"></div>`;
+                <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…">${cardSortSelect()}<div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;flex:1;">⚔️ Combattre (0/3)</button><button class="btn-action" id="cp2-dfr" style="margin:0 0 10px;flex:1;background:#2a2a40;">🤝 Défier un ami</button></div><div class="cp-grid"></div>`;
             if (typeof cp2DuelExtras === 'function') cp2DuelExtras(body, sel);
             let qT = null; body.querySelector('#cp-q').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim()), 300); };
             body.querySelector('#cp-go').onclick = async () => {
@@ -16250,7 +16251,7 @@ async function loadHallOfFame(){
                 <h4>♻️ Recycler mes doublons</h4><p class="tl-hint" style="margin:0 0 6px;">Tu gardes toujours 1 exemplaire de chaque carte. Coche les raretés à recycler :</p>
                 ${rows.length ? rows.map(([r, x]) => `<label class="cp-row" style="cursor:pointer;"><span><input type="checkbox" value="${esc(r)}" ${['commune', 'rare'].includes(r) ? 'checked' : ''}> ${esc(RL(r))} <small class="tl-hint">(${x.cards} doublon${x.cards > 1 ? 's' : ''})</small></span><b>+${x.dust} ✨</b></label>`).join('') + `<button class="btn-action" id="cp3-go">♻️ Recycler la sélection</button>` : '<p class="tl-hint">Aucun doublon pour l’instant.</p>'}
                 <h4>🛒 Boutique de poussière</h4><p class="tl-hint" style="margin:0 0 6px;">Achète la carte précise que tu veux : Commune ${d.prices.commune} ✨ • Rare ${d.prices.rare} ✨ • Épique ${d.prices.epique} ✨ • Légendaire ${d.prices.legendaire} ✨ • Mythique ${d.prices.mythique} ✨</p>
-                <select class="v7-input" id="cp3-u"><option value="">— Choisis un anime —</option>${opts}</select><input class="v7-input" id="cp3-q" placeholder="🔎 Chercher un perso…"><div id="cp3-shop" class="cp-grid"></div>`;
+                <select class="v7-input" id="cp3-u"><option value="">— Choisis un anime —</option>${opts}</select><input class="v7-input" id="cp3-q" placeholder="🔎 Chercher un perso…">${cardSortSelect()}<div id="cp3-shop" class="cp-grid"></div>`;
             const go = body.querySelector('#cp3-go');
             if (go) go.onclick = async () => {
                 const rarities = [...body.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
@@ -16264,7 +16265,7 @@ async function loadHallOfFame(){
             const draw = () => {
                 const q = (body.querySelector('#cp3-q').value || '').toLowerCase();
                 const dust = +body.querySelector('#cp3-dust').textContent;
-                body.querySelector('#cp3-shop').innerHTML = shop.filter(c => !q || c.name.toLowerCase().includes(q)).slice(0, 80).map(c => `<div class="cp-pick" data-k="${esc(c.key)}">${cardHtml({ name: c.name, img: c.img, rarity: c.rarity, isNew: false })}<button class="btn-action" style="margin:4px 0 0;padding:4px;font-size:.8rem;" ${dust < c.price ? 'disabled' : ''}>✨ ${c.price}</button></div>`).join('');
+                body.querySelector('#cp3-shop').innerHTML = cardSortList(shop.filter(c => !q || c.name.toLowerCase().includes(q))).slice(0, 80).map(c => `<div class="cp-pick" data-k="${esc(c.key)}">${cardHtml({ name: c.name, img: c.img, rarity: c.rarity, isNew: false })}<button class="btn-action" style="margin:4px 0 0;padding:4px;font-size:.8rem;" ${dust < c.price ? 'disabled' : ''}>✨ ${c.price}</button></div>`).join('');
                 body.querySelectorAll('#cp3-shop .cp-pick button').forEach(b => b.onclick = async e => {
                     e.stopPropagation();
                     const k = b.closest('.cp-pick').dataset.k, c = shop.find(x => x.key === k);
@@ -16466,10 +16467,10 @@ async function loadHallOfFame(){
         function picker(body, cards, max, onChange) {
             const sel = [];
             const wrap = document.createElement('div');
-            wrap.innerHTML = `<input class="v7-input" placeholder="🔎 Chercher une carte…"><div class="cp-grid"></div>`;
+            wrap.innerHTML = `<input class="v7-input" placeholder="🔎 Chercher une carte…">${cardSortSelect()}<div class="cp-grid"></div>`;
             body.appendChild(wrap);
             const draw = q => {
-                wrap.querySelector('.cp-grid').innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                wrap.querySelector('.cp-grid').innerHTML = cardSortList(cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q))).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
                 wrap.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= max) sel.shift(); sel.push(k); } draw(wrap.querySelector('input').value.trim().toLowerCase()); onChange && onChange(sel); });
             };
             let qT = null; wrap.querySelector('input').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim().toLowerCase()), 300); };
@@ -16745,10 +16746,10 @@ async function loadHallOfFame(){
             const d = await v7get('/api/cards/mine');
             const cards = (d && d.ok ? d.cards : []).filter(c => !/^(collector|moment|champion)\|/.test(c.key));
             const sel = [];
-            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> (<span id="cp6-n">0</span>/5). Rareté, niveau ★ et finition rendent une carte plus forte.</p><button class="btn-action" id="cp6-go" disabled>⚔️ Lancer la survie</button><input class="v7-input" placeholder="🔎 Chercher une carte…" style="margin-top:8px;"><div class="cp-grid"></div>`;
+            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> (<span id="cp6-n">0</span>/5). Rareté, niveau ★ et finition rendent une carte plus forte.</p><button class="btn-action" id="cp6-go" disabled>⚔️ Lancer la survie</button><input class="v7-input" placeholder="🔎 Chercher une carte…" style="margin-top:8px;">${cardSortSelect()}<div class="cp-grid"></div>`;
             const grid = body.querySelector('.cp-grid'), go = body.querySelector('#cp6-go');
             const draw = q => {
-                grid.innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 150).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                grid.innerHTML = cardSortList(cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q))).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 150).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
                 grid.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= 5) sel.shift(); sel.push(k); } body.querySelector('#cp6-n').textContent = sel.length; go.disabled = sel.length !== 5; draw(body.querySelector('input').value.trim().toLowerCase()); });
             };
             let qT = null; body.querySelector('input').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim().toLowerCase()), 300); };
@@ -16885,5 +16886,53 @@ async function loadHallOfFame(){
         }
     })();
     </script>
+    <script>
+    /* AG_CARD_SORT_V1 : tri par rareté partout où il y a des cartes */
+    (function () {
+        const OPTS = [['rare', '💎 Plus rares d’abord'], ['rare-asc', '🪨 Moins rares d’abord'], ['name', '🔤 Nom A → Z'], ['anime', '📺 Par anime'], ['n', '📚 Plus d’exemplaires']];
+        try { window.CARD_SORT = localStorage.getItem('cardSort') || 'rare'; } catch (_) { window.CARD_SORT = 'rare'; }
+        const ri = r => (window.cardRarIdx ? window.cardRarIdx(r) : 0), nm = (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'fr');
+        const CMP = {
+            rare: (a, b) => ri(a.rarity) - ri(b.rarity) || (b.finish ? 1 : 0) - (a.finish ? 1 : 0) || (b.shiny ? 1 : 0) - (a.shiny ? 1 : 0) || nm(a, b),
+            'rare-asc': (a, b) => ri(b.rarity) - ri(a.rarity) || nm(a, b),
+            name: nm,
+            anime: (a, b) => String(a.anime || '').localeCompare(String(b.anime || ''), 'fr') || ri(a.rarity) - ri(b.rarity) || nm(a, b),
+            n: (a, b) => (b.n || 0) - (a.n || 0) || ri(a.rarity) - ri(b.rarity) || nm(a, b)
+        };
+        window.cardSortList = function (list, mode) { const c = CMP[mode || window.CARD_SORT]; return c && Array.isArray(list) ? list.slice().sort(c) : list; };
+        window.cardSortSelect = function (extra) {
+            return `<select class="v7-input cs-sort" title="Trier les cartes" onchange="cardSortSet(this)">${(extra || []).concat(OPTS).map(([v, t]) => `<option value="${v}"${v === window.CARD_SORT ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+        };
+        window.cardSortSet = function (el) {
+            window.CARD_SORT = el.value; try { localStorage.setItem('cardSort', el.value); } catch (_) {}
+            const inp = el.previousElementSibling;
+            if (el.dataset.dom) return cardSortDom(document.querySelector(el.dataset.dom), el.value);
+            if (inp && inp.tagName === 'INPUT') inp.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+        // tri directement sur les cartes affichées (albums)
+        window.cardSortDom = function (grid, mode) {
+            if (!grid) return;
+            const items = [...grid.children];
+            if (!grid.__order) grid.__order = items.slice();
+            if (mode === 'album') { grid.__order.forEach(x => grid.appendChild(x)); return; }
+            const info = el => { const t = el.querySelector('.tcard') || el, m = String(t.className).match(/\br-([a-z]+)/); return { el, rarity: m ? m[1] : '', name: (t.querySelector('.tc-name') || {}).textContent || '', anime: '', shiny: t.classList.contains('shiny'), n: +(((t.querySelector('.tc-rar') || {}).textContent || '').match(/x(\d+)/) || [0, 1])[1] }; };
+            cardSortList(items.map(info), mode).forEach(x => grid.appendChild(x.el));
+        };
+        // albums d'un anime : menu de tri au-dessus des cartes
+        const _loadAlbumSort = window.loadAlbum;
+        if (typeof _loadAlbumSort === 'function') {
+            window.loadAlbum = loadAlbum = async function (u) {
+                const r = await _loadAlbumSort.apply(this, arguments);
+                const box = document.getElementById('eco-album'), grid = box && box.querySelector(':scope > .card-grid, .card-grid');
+                if (box && grid && eco.albumU && !box.querySelector('.cs-album')) {
+                    grid.id = grid.id || 'album-grid';
+                    grid.insertAdjacentHTML('beforebegin', `<div class="cs-album" style="max-width:280px;margin:6px 0;">${cardSortSelect([['album', '📖 Ordre de l’album']]).replace('class="v7-input cs-sort"', `class="v7-input cs-sort" data-dom="#${grid.id}"`).replace(/ selected/g, '').replace('value="album"', 'value="album" selected')}</div>`);
+                }
+                return r;
+            };
+        }
+    })();
+    </script>
+    <style>.cs-sort{width:auto;min-width:190px;margin:0 0 8px;padding:8px;cursor:pointer;}</style>
 </body>
 </html>
