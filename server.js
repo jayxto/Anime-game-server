@@ -24531,6 +24531,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('month|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'mensuelle', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('evo|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'evolution', img: i.img, evo: true, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
         const special = (k.startsWith('altart|') || k.startsWith('moment|')) ? cardInfoOfKey(k) : null;
@@ -26607,4 +26608,118 @@ app.get('/api/admin/players-all', adminOnly(async (req, res) => {
     }
     const guests = [...GUESTS_SEEN.entries()].map(([pseudo, o]) => ({ pseudo, first: o.first, last: o.last, visits: o.n })).sort((a, b) => b.last - a.last);
     res.json({ ok: true, total: players.length, online: players.filter(p => p.online).length, players, guests });
+}));
+
+/* =====================================================================
+   AG_CARDS_PLUS_V3 — recyclage en poussière d'étoile ✨ + boutique de poussière,
+   carte du mois (exclusive, ne revient jamais).
+   ===================================================================== */
+const DUST_VALUE = r => ({ commune: 2, rare: 4, epique: 8, legendaire: 20, mythique: 50, duo: 30, evolution: 60, altart: 80, moment: 80, mensuelle: 150 }[r] || (SPECIAL_BY_ID[r] ? Math.round(60 * Math.pow(1.6, Math.max(0, (RAR_RANK[r] || 5) - 5))) : 2));
+const DUST_PRICE = { commune: 25, rare: 50, epique: 100, legendaire: 250, mythique: 600 }; // achat d'une carte précise
+async function dustGet(uid) { return (await kvGet('dust', String(uid), { n: 0 })).n || 0; }
+async function dustAdd(uid, n) { const o = await kvGet('dust', String(uid), { n: 0 }); o.n = Math.max(0, (o.n || 0) + n); await kvSet('dust', String(uid), o); return o.n; }
+async function recycleKey(uid, key, keep = 1) {
+    const m = (await cardsOf(uid)).get(key); const info = cardInfoOfKey(key);
+    if (!m || !info || m.n <= keep) return 0;
+    const extra = m.n - keep;
+    if (!(await cardTake(uid, key, extra))) return 0;
+    return extra * DUST_VALUE(info.rarity);
+}
+app.get('/api/cards/dust', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid), spare = {};
+    mine.forEach((v, k) => { if (v.n > 1 && !k.startsWith('collector|')) { const i = cardInfoOfKey(k); if (i) { const r = i.rarity; spare[r] = spare[r] || { cards: 0, dust: 0 }; spare[r].cards += v.n - 1; spare[r].dust += (v.n - 1) * DUST_VALUE(r); } } });
+    res.json({ ok: true, dust: await dustGet(uid), spare, prices: DUST_PRICE });
+});
+app.post('/api/cards/recycle', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {};
+    let gained = 0, cards = 0;
+    if (b.key) { const before = ((await cardsOf(uid)).get(String(b.key)) || {}).n || 0; gained = await recycleKey(uid, String(b.key)); cards = gained ? before - 1 : 0; }
+    else {
+        const rars = new Set((Array.isArray(b.rarities) ? b.rarities : []).map(String));
+        if (!rars.size) return res.json({ ok: false, error: 'Choisis au moins une rareté.' });
+        const vault = new Set(await kvGet('vault', String(uid), []));
+        for (const [k, v] of (await cardsOf(uid))) {
+            if (v.n <= 1 || k.startsWith('collector|') || vault.has(k)) continue;
+            const i = cardInfoOfKey(k); if (!i || !rars.has(i.rarity)) continue;
+            const g = await recycleKey(uid, k); if (g) { gained += g; cards += v.n - 1; }
+        }
+    }
+    if (!gained) return res.json({ ok: false, error: 'Aucun doublon à recycler.' });
+    res.json({ ok: true, gained, cards, dust: await dustAdd(uid, gained) });
+});
+app.get('/api/cards/dust-shop', async (req, res) => {
+    const u = String(req.query.u || '');
+    if (!ARC_UNIVERSE_ANIME[u]) return res.json({ ok: false, error: 'Anime inconnu.' });
+    const list = cardPool(u).map((c, i) => ({ name: c.display, rarity: cardRarityAt(u, i) })).filter(c => DUST_PRICE[c.rarity] && !lostSet().has(u + '|' + c.name))
+        .map(c => ({ ...c, key: u + '|' + c.name, price: DUST_PRICE[c.rarity], img: cardImg({ u, display: c.name }) }));
+    res.json({ ok: true, u, anime: ARC_UNIVERSE_ANIME[u], list });
+});
+app.post('/api/cards/dust-buy', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || ''), [u, name, sec] = key.split('|');
+    if (sec || !ARC_UNIVERSE_ANIME[u] || lostSet().has(key)) return res.json({ ok: false, error: 'Carte non disponible.' });
+    const c = cardResolve(u, name); if (!c || c.display !== name) return res.json({ ok: false, error: 'Carte introuvable.' });
+    const r = cardRarityAt(u, c.idx), price = DUST_PRICE[r];
+    if (!price) return res.json({ ok: false, error: 'Cette rareté ne s’achète pas avec de la poussière.' });
+    const have = await dustGet(uid);
+    if (have < price) return res.json({ ok: false, error: `Il te manque ${price - have} ✨ poussière d’étoile.` });
+    await dustAdd(uid, -price);
+    const card = await cardAward({ userId: uid, id: null }, u, name, { silent: true, shinyRate: 1 / 20 });
+    res.json({ ok: true, card, dust: await dustGet(uid) });
+});
+
+// ---------- carte du mois ----------
+if (!('monthCard' in SITE)) SITE.monthCard = {}; // { 'YYYY-MM': { u, display } } choix de l'admin (sinon automatique)
+const MONTH_RATE = 1 / 250; // par carte de booster pendant le mois
+function monthKeyNow() { const p = parisParts(hubNow()); return p.y + '-' + String(p.m).padStart(2, '0'); }
+function monthCardOf(mk) {
+    const set = (SITE.monthCard || {})[mk];
+    if (set && ARC_UNIVERSE_ANIME[set.u]) return { mk, u: set.u, display: set.display };
+    const big = ['naruto', 'onepiece', 'bleach', 'dragonball', 'jjk', 'demonslayer', 'hxh', 'snk', 'mha', 'chainsaw', 'jojo', 'fma', 'opm', 'solo', 'frieren', 'spyfamily', 'bluelock', 'tokyoghoul', 'deathnote', 'haikyuu'].filter(u => ARC_UNIVERSE_ANIME[u] && arcFamous(u).length);
+    if (!big.length) return null;
+    const h = hubHash('month' + mk), u = big[h % big.length], top = arcFamous(u).slice(0, 8);
+    return { mk, u, display: top[(h >>> 8) % top.length].display };
+}
+const monthKeyOfCard = m => 'month|' + m.mk + '|' + m.u + '|' + m.display;
+const _cardInfoOfKeyMonth = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'month') { const [, mk, u, display] = p; if (!ARC_UNIVERSE_ANIME[u]) return null; return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u], rarity: 'mensuelle', img: cardImg({ u, display }), month: mk }; }
+    return _cardInfoOfKeyMonth(k);
+};
+RAR_RANK.mensuelle = 6; DECK_BONUS.mensuelle = 26; MARKET_HINT.mensuelle = [10000, 40000];
+async function monthAward(uid) {
+    const m = monthCardOf(monthKeyNow()); if (!m) return null;
+    const key = monthKeyOfCard(m), isNew = await cardGive(uid, { key }, Math.random() < 0.1);
+    if (!isNew) await ecoAddCoins(uid, 150);
+    await recordTry('month:' + m.mk, `Premier à obtenir la carte du mois ${m.mk}`, uid, `${m.display} (${ARC_UNIVERSE_ANIME[m.u]})`);
+    return { key, name: m.display, anime: ARC_UNIVERSE_ANIME[m.u], u: m.u, rarity: 'mensuelle', img: cardImg({ u: m.u, display: m.display }), isNew, coins: isNew ? 0 : 150, month: m.mk };
+}
+async function monthMaybe(uid, cards, n, mult = 1) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const luck = await cardLuck(uid);
+    if (Math.random() < 1 - Math.pow(1 - Math.min(0.2, MONTH_RATE * luck * mult), Math.max(1, n || cards.length))) { const c = await monthAward(uid); if (c) cards.push(c); }
+    return cards;
+}
+const _openBoosterMonth = openBooster;
+openBooster = async function (uid, n, type = '') { return monthMaybe(uid, await _openBoosterMonth(uid, n, type), n); };
+const _tbOpenMonth = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return monthMaybe(uid, await _tbOpenMonth(uid, b, chosenU), 5); };
+app.get('/api/cards/month', async (req, res) => {
+    const uid = authUserId(req), mk = monthKeyNow(), m = monthCardOf(mk);
+    const mine = uid ? await cardsOf(uid) : new Map();
+    const owned = [...mine.keys()].filter(k => k.startsWith('month|')).map(k => ({ key: k, ...(cardInfoOfKey(k) || {}) }));
+    const p = parisParts(hubNow()), next = new Date(Date.UTC(p.m === 12 ? p.y + 1 : p.y, p.m % 12, 1));
+    res.json({ ok: true, current: m ? { key: monthKeyOfCard(m), name: m.display, anime: ARC_UNIVERSE_ANIME[m.u], u: m.u, img: cardImg({ u: m.u, display: m.display }), month: mk, owned: !!mine.get(monthKeyOfCard(m)) } : null,
+        endsAt: next.getTime(), rate: MONTH_RATE, owned });
+});
+app.post('/api/admin/month-card', adminOnly(async (req, res) => {
+    const b = req.body || {}, mk = String(b.month || monthKeyNow());
+    const c = cardResolve(String(b.u || ''), String(b.name || ''));
+    if (!c) return res.json({ ok: false, error: 'Perso introuvable dans cet anime.' });
+    SITE.monthCard = Object.assign({}, SITE.monthCard || {}, { [mk]: { u: c.u, display: c.display } });
+    await siteSave('monthCard');
+    res.json({ ok: true, month: mk, card: c.display });
 }));

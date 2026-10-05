@@ -3862,7 +3862,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -11777,7 +11777,7 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -13107,11 +13107,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -13124,7 +13124,7 @@ body.ag-game-page #app-root > #mode,
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
                 valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
                 altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
-                evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
+                mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
                 primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out'],
                 stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out']
             };
@@ -14399,8 +14399,8 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -15971,6 +15971,7 @@ async function loadHallOfFame(){
                     ${d.atelier ? `<button class="btn-action" data-cp="atelier" style="background:#2a2a40;">🛠️ Atelier de finitions</button>` : ''}
                     ${d.n >= 2 ? `<button class="btn-action" data-cp="surprise" style="background:#2a2a40;">🎁 Échange surprise</button>` : ''}
                     <button class="btn-action" data-cp="gift" style="background:#2a2a40;">💝 Offrir à un ami</button>
+                    ${d.n >= 2 ? `<button class="btn-action" data-cp="recycle" style="background:#2a2a40;">♻️ Recycler ${d.n - 1} doublon${d.n > 2 ? 's' : ''}</button>` : ''}
                     ${typeof IS_ADMIN !== 'undefined' && IS_ADMIN ? `<button class="btn-action" data-cp="lost" style="background:#5a1020;">${(window.LOST_KEYS || new Set()).has(key) ? '🔓 Remettre dans les boosters' : '🔒 Marquer « carte perdue »'}</button>` : ''}
                 </div><div class="cp-sub"></div>`;
             body.appendChild(box);
@@ -16005,6 +16006,12 @@ async function loadHallOfFame(){
                     if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
                     if (r.got) { close(); showBooster([r.got]); } else toast('🎁 Doublon déposé ! Tu recevras une carte surprise dès qu’un autre joueur échange la même rareté.', '#00ff88');
                     return;
+                }
+                if (a === 'recycle') {
+                    if (!confirm(`Recycler ${d.n - 1} doublon(s) en poussière d’étoile ✨ ? Tu gardes 1 exemplaire.`)) return;
+                    const r = await v7post('/api/cards/recycle', { key });
+                    if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                    toast(`♻️ +${r.gained} ✨ poussière d’étoile (total ${r.dust})`, '#7fdcff'); close(); return;
                 }
                 if (a === 'lost') {
                     const on = !(window.LOST_KEYS || new Set()).has(key);
@@ -16209,5 +16216,86 @@ async function loadHallOfFame(){
     })();
     </script>
     <style>.cp-bar button.cp2-ready{background:var(--accent-yellow);color:#111;animation:finNeon 1.6s ease-in-out infinite;}</style>
+    <script>
+    /* AG_CARDS_PLUS_V3 : recyclage ✨ et carte du mois */
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        if (typeof RAR_LABEL !== 'undefined') RAR_LABEL.mensuelle = 'Carte du mois 🗓️';
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const needAcc = () => { if (isAccount()) return true; toast('Connecte-toi à un compte.', 'var(--accent-yellow)'); return false; };
+        const RL = r => (RAR_LABEL && RAR_LABEL[r]) || r;
+        window.cp3Recycle = async function () {
+            if (!needAcc()) return;
+            const body = modal('♻️ Recyclage & poussière d’étoile ✨', 'Chargement…');
+            const d = await v7get('/api/cards/dust');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            const rows = Object.entries(d.spare).sort((a, b) => b[1].dust - a[1].dust);
+            const opts = (typeof UNIVERSE_CHOICES !== 'undefined' ? UNIVERSE_CHOICES : []).map(([k, l]) => `<option value="${k}">${esc(l)}</option>`).join('');
+            body.innerHTML = `<div class="ci-row" style="font-size:1.1rem;">✨ Tu as <b id="cp3-dust">${d.dust}</b> poussière d’étoile</div>
+                <h4>♻️ Recycler mes doublons</h4><p class="tl-hint" style="margin:0 0 6px;">Tu gardes toujours 1 exemplaire de chaque carte. Coche les raretés à recycler :</p>
+                ${rows.length ? rows.map(([r, x]) => `<label class="cp-row" style="cursor:pointer;"><span><input type="checkbox" value="${esc(r)}" ${['commune', 'rare'].includes(r) ? 'checked' : ''}> ${esc(RL(r))} <small class="tl-hint">(${x.cards} doublon${x.cards > 1 ? 's' : ''})</small></span><b>+${x.dust} ✨</b></label>`).join('') + `<button class="btn-action" id="cp3-go">♻️ Recycler la sélection</button>` : '<p class="tl-hint">Aucun doublon pour l’instant.</p>'}
+                <h4>🛒 Boutique de poussière</h4><p class="tl-hint" style="margin:0 0 6px;">Achète la carte précise que tu veux : Commune ${d.prices.commune} ✨ • Rare ${d.prices.rare} ✨ • Épique ${d.prices.epique} ✨ • Légendaire ${d.prices.legendaire} ✨ • Mythique ${d.prices.mythique} ✨</p>
+                <select class="v7-input" id="cp3-u"><option value="">— Choisis un anime —</option>${opts}</select><input class="v7-input" id="cp3-q" placeholder="🔎 Chercher un perso…"><div id="cp3-shop" class="cp-grid"></div>`;
+            const go = body.querySelector('#cp3-go');
+            if (go) go.onclick = async () => {
+                const rarities = [...body.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+                if (!rarities.length) return toast('Coche au moins une rareté.', 'var(--accent-yellow)');
+                if (!confirm('Recycler tous les doublons de : ' + rarities.map(RL).join(', ') + ' ?')) return;
+                const r = await v7post('/api/cards/recycle', { rarities });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                toast(`♻️ ${r.cards} doublons recyclés : +${r.gained} ✨`, '#7fdcff'); cp3Recycle();
+            };
+            let shop = [];
+            const draw = () => {
+                const q = (body.querySelector('#cp3-q').value || '').toLowerCase();
+                const dust = +body.querySelector('#cp3-dust').textContent;
+                body.querySelector('#cp3-shop').innerHTML = shop.filter(c => !q || c.name.toLowerCase().includes(q)).slice(0, 80).map(c => `<div class="cp-pick" data-k="${esc(c.key)}">${cardHtml({ name: c.name, img: c.img, rarity: c.rarity, isNew: false })}<button class="btn-action" style="margin:4px 0 0;padding:4px;font-size:.8rem;" ${dust < c.price ? 'disabled' : ''}>✨ ${c.price}</button></div>`).join('');
+                body.querySelectorAll('#cp3-shop .cp-pick button').forEach(b => b.onclick = async e => {
+                    e.stopPropagation();
+                    const k = b.closest('.cp-pick').dataset.k, c = shop.find(x => x.key === k);
+                    if (!confirm(`Acheter ${c.name} (${RL(c.rarity)}) pour ${c.price} ✨ ?`)) return;
+                    const r = await v7post('/api/cards/dust-buy', { key: k });
+                    if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                    body.querySelector('#cp3-dust').textContent = r.dust; draw();
+                    if (r.card) showBooster([r.card]);
+                });
+            };
+            body.querySelector('#cp3-u').onchange = async e => { if (!e.target.value) { shop = []; draw(); return; } const s = await v7get('/api/cards/dust-shop?u=' + encodeURIComponent(e.target.value)); shop = (s && s.ok) ? s.list : []; draw(); };
+            body.querySelector('#cp3-q').oninput = draw;
+        };
+        window.cp3Month = async function () {
+            const body = modal('🗓️ Carte du mois', 'Chargement…');
+            const d = await v7get('/api/cards/month');
+            if (!d || !d.ok || !d.current) { body.textContent = 'Indisponible.'; return; }
+            const c = d.current, left = Math.max(0, d.endsAt - Date.now()), days = Math.floor(left / 86400000), hours = Math.floor(left % 86400000 / 3600000);
+            body.innerHTML = `<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;"><div style="width:170px;">${cardHtml({ name: c.name, img: c.img, rarity: 'mensuelle', anime: c.anime, isNew: false })}</div>
+                <div style="flex:1;min-width:200px;"><h3 style="margin:0;">${esc(c.name)}</h3><div class="tl-hint" style="text-align:left;">${esc(c.anime)} • carte exclusive de ${esc(c.month)}</div>
+                <p>⏳ Disparaît dans <b>${days} j ${hours} h</b> et ne reviendra <b>jamais</b>.</p><p>🎴 Peut sortir de n’importe quel booster ce mois-ci (environ 1 carte sur ${Math.round(1 / d.rate)}).</p>
+                <p>${c.owned ? '✅ Tu l’as déjà !' : '❌ Tu ne l’as pas encore.'}</p></div></div>
+                ${d.owned.length ? `<h4>📚 Mes cartes du mois</h4><div class="cp-grid">${d.owned.map(x => `<div>${cardHtml(Object.assign({}, x, { isNew: false }))}<small class="tl-hint">${esc(x.month || '')}</small></div>`).join('')}</div>` : ''}
+                ${typeof IS_ADMIN !== 'undefined' && IS_ADMIN ? `<h4>👑 Admin : choisir la carte de ce mois</h4><div style="display:flex;gap:6px;flex-wrap:wrap;"><select class="v7-input" id="cp3-mu" style="flex:1;">${(typeof UNIVERSE_CHOICES !== 'undefined' ? UNIVERSE_CHOICES : []).map(([k, l]) => `<option value="${k}">${esc(l)}</option>`).join('')}</select><input class="v7-input" id="cp3-mn" placeholder="Perso (ex : Gojo)" style="flex:1;"></div><button class="btn-action" id="cp3-mset">✔ Définir la carte du mois</button>` : ''}`;
+            const set = body.querySelector('#cp3-mset');
+            if (set) set.onclick = async () => {
+                const r = await v7post('/api/admin/month-card', { u: body.querySelector('#cp3-mu').value, name: body.querySelector('#cp3-mn').value });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                toast(`🗓️ Carte du mois : ${esc(r.card)}`, '#00ff88'); cp3Month();
+            };
+        };
+    })();
+    </script>
+    <style>
+        .tcard.r-mensuelle{border:3px solid #00e0a0;box-shadow:0 0 14px rgba(0,224,160,.7),0 0 34px rgba(255,215,0,.3);background:linear-gradient(160deg,#002a20,#0b0b10);}
+        .tcard.r-mensuelle .tc-img::after{content:'🗓️';position:absolute;right:6px;bottom:6px;font-size:1.1rem;filter:drop-shadow(0 0 4px #000);}
+        .tcard.r-mensuelle .tc-rar{color:#5effc3;font-weight:900;text-shadow:0 0 8px #00e0a0;}
+        .trd-mini.r-mensuelle{border-color:#00e0a0;}
+    </style>
 </body>
 </html>
