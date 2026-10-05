@@ -3792,6 +3792,14 @@ body.ag-game-page #app-root > #mode,
             <p class="tl-hint" style="text-align:left;">Ajoute des pièces sur TON compte pour tester la boutique et les boosters.</p>
             <div style="display:flex;gap:6px;"><button class="btn-action" style="margin-top:0;" onclick="adminCoins(500)">+500</button><button class="btn-action" style="margin-top:0;" onclick="adminCoins(5000)">+5 000</button><button class="btn-action" style="margin-top:0;background:#ffd700;color:#111;" onclick="adminCoins(1000000)">+1 000 000</button></div>
         </div>
+        <div class="opt-panel" id="adm-players">
+            <h2>👥 Tous les joueurs</h2>
+            <p class="tl-hint" style="text-align:left;">Tous les comptes créés depuis le début du jeu. « Dernière partie » vient de l’historique des parties ; « Dernière connexion » est enregistrée à partir du 05/10/2026. Les invités (sans compte) ne sont listés qu’à partir de cette date aussi.</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-action" style="margin:0;width:auto;" onclick="admPlayersLoad()">🔄 Charger la liste</button><button class="btn-action" style="margin:0;width:auto;background:#2a2a40;" onclick="admPlayersCsv()">⬇️ Exporter (CSV)</button></div>
+            <input id="adm-pl-q" class="v7-input" style="margin-top:8px;" placeholder="🔎 Chercher un pseudo…" oninput="admPlayersRender()">
+            <div id="adm-pl-sum" class="tl-hint" style="text-align:left;"></div>
+            <div id="adm-pl-list" style="max-height:420px;overflow:auto;"></div>
+        </div>
         <div class="opt-panel" id="adm-give">
             <h2>🎁 Livrer des pièces à des joueurs</h2>
             <p class="tl-hint" style="text-align:left;">Mets un ou plusieurs pseudos (séparés par des virgules). Les joueurs reçoivent les pièces tout de suite, avec une notification.</p>
@@ -3854,7 +3862,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -11315,6 +11323,30 @@ body.ag-game-page #app-root > #mode,
             betaAdminRender(d.list);
         }
         socket.on('beta_status', () => { checkAdmin(); if (typeof ecoLoad === 'function') ecoLoad(); });
+        let ADM_PL = null;
+        const admDate = d => d ? new Date(d).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+        async function admPlayersLoad() {
+            const d = await v7get('/api/admin/players-all');
+            if (!d || !d.ok) return toast('❌ Liste indisponible (admin uniquement)', 'var(--accent-pink)');
+            ADM_PL = d; admPlayersRender();
+        }
+        function admPlayersRender() {
+            const box = document.getElementById('adm-pl-list'); if (!box || !ADM_PL) return;
+            const q = (document.getElementById('adm-pl-q').value || '').trim().toLowerCase();
+            const pl = ADM_PL.players.filter(p => !q || p.pseudo.toLowerCase().includes(q)), gu = ADM_PL.guests.filter(g => !q || g.pseudo.toLowerCase().includes(q));
+            document.getElementById('adm-pl-sum').innerHTML = `<b>${ADM_PL.total}</b> comptes • 🟢 <b>${ADM_PL.online}</b> en ligne maintenant • <b>${ADM_PL.guests.length}</b> invités vus depuis le 05/10/2026`;
+            box.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:.8rem;"><tr style="text-align:left;color:var(--accent-cyan);"><th>Pseudo</th><th>Inscrit</th><th>Dernière partie</th><th>Dernière connexion</th><th>Parties</th><th>Niv.</th><th>🪙</th></tr>`
+                + pl.map(p => `<tr style="border-top:1px solid #222;"><td>${p.online ? '🟢 ' : ''}<b>${v7esc(p.pseudo)}</b></td><td>${admDate(p.created)}</td><td>${admDate(p.lastGame)}</td><td>${admDate(p.lastSeen)}</td><td>${p.games}</td><td>${p.level}</td><td>${p.coins}</td></tr>`).join('')
+                + `</table>` + (gu.length ? `<h4 style="margin:12px 0 4px;">Invités (sans compte)</h4><table style="width:100%;font-size:.8rem;"><tr style="text-align:left;color:var(--accent-cyan);"><th>Pseudo</th><th>1re visite</th><th>Dernière visite</th><th>Visites</th></tr>${gu.map(g => `<tr style="border-top:1px solid #222;"><td>${v7esc(g.pseudo)}</td><td>${admDate(g.first)}</td><td>${admDate(g.last)}</td><td>${g.visits}</td></tr>`).join('')}</table>` : '');
+        }
+        function admPlayersCsv() {
+            if (!ADM_PL) return toast('Charge d’abord la liste.', 'var(--accent-yellow)');
+            const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+            const rows = [['type', 'pseudo', 'inscrit', 'derniere_partie', 'derniere_connexion', 'parties', 'niveau', 'pieces'].join(';')]
+                .concat(ADM_PL.players.map(p => ['compte', p.pseudo, p.created, p.lastGame, p.lastSeen, p.games, p.level, p.coins].map(q).join(';')))
+                .concat(ADM_PL.guests.map(g => ['invite', g.pseudo, new Date(g.first).toISOString(), '', new Date(g.last).toISOString(), g.visits, '', ''].map(q).join(';')));
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8' })); a.download = 'joueurs-anime-game.csv'; a.click();
+        }
         async function adminGiveCoins() {
             const v = id => (document.getElementById(id) || {}).value || '';
             const n = +v('adm-give-n');
@@ -15932,12 +15964,14 @@ async function loadHallOfFame(){
             if (!d || !d.n) return;
             const box = document.createElement('div'); box.className = 'cp-extra';
             const lvl = d.lvl || 0;
-            box.innerHTML = `<div class="ci-row">⭐ Niveau <b>${lvl ? '★'.repeat(lvl) : '0'}</b>${d.lvlNext ? ` • XP ${d.xp}/${d.lvlNext}` : ' • niveau max'} • ⚔️ Puissance <b>${d.power || '?'}</b><br><small class="tl-hint">La carte gagne de l’XP quand elle est dans ton deck pendant tes parties et dans les duels.</small></div>
+            const lostBadge = (window.LOST_KEYS || new Set()).has(key) ? `<div class="ci-row" style="color:#ff5c7a;">🔒 <b>Carte perdue</b> : elle ne sort plus des boosters, tu ne peux l’obtenir que par échange.</div>` : '';
+            box.innerHTML = lostBadge + `<div class="ci-row">⭐ Niveau <b>${lvl ? '★'.repeat(lvl) : '0'}</b>${d.lvlNext ? ` • XP ${d.xp}/${d.lvlNext}` : ' • niveau max'} • ⚔️ Puissance <b>${d.power || '?'}</b><br><small class="tl-hint">La carte gagne de l’XP quand elle est dans ton deck pendant tes parties et dans les duels.</small></div>
                 <div class="cp-btns">
                     ${d.evo && d.evo.next ? `<button class="btn-action" data-cp="evo" ${d.n < d.evo.cost ? 'disabled' : ''} style="background:#ff7b00;color:#111;">🧬 Évoluer en ${esc(d.evo.next)} (${d.n}/${d.evo.cost})</button>` : ''}
                     ${d.atelier ? `<button class="btn-action" data-cp="atelier" style="background:#2a2a40;">🛠️ Atelier de finitions</button>` : ''}
                     ${d.n >= 2 ? `<button class="btn-action" data-cp="surprise" style="background:#2a2a40;">🎁 Échange surprise</button>` : ''}
                     <button class="btn-action" data-cp="gift" style="background:#2a2a40;">💝 Offrir à un ami</button>
+                    ${typeof IS_ADMIN !== 'undefined' && IS_ADMIN ? `<button class="btn-action" data-cp="lost" style="background:#5a1020;">${(window.LOST_KEYS || new Set()).has(key) ? '🔓 Remettre dans les boosters' : '🔒 Marquer « carte perdue »'}</button>` : ''}
                 </div><div class="cp-sub"></div>`;
             body.appendChild(box);
             const sub = box.querySelector('.cp-sub');
@@ -15972,6 +16006,15 @@ async function loadHallOfFame(){
                     if (r.got) { close(); showBooster([r.got]); } else toast('🎁 Doublon déposé ! Tu recevras une carte surprise dès qu’un autre joueur échange la même rareté.', '#00ff88');
                     return;
                 }
+                if (a === 'lost') {
+                    const on = !(window.LOST_KEYS || new Set()).has(key);
+                    if (!confirm(on ? 'Cette carte ne sortira plus des boosters (elle reste échangeable). Continuer ?' : 'Remettre cette carte dans les boosters ?')) return;
+                    const r = await v7post('/api/admin/lost-card', { key, on });
+                    if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                    if (on) window.LOST_KEYS.add(key); else window.LOST_KEYS.delete(key);
+                    b.textContent = on ? '🔓 Remettre dans les boosters' : '🔒 Marquer « carte perdue »';
+                    toast(on ? '🔒 Carte perdue : elle ne sort plus des boosters' : '🔓 Carte remise dans les boosters', '#ffd700'); return;
+                }
                 if (a === 'gift') {
                     const fr = await v7get('/api/friends');
                     const list = (fr && fr.friends) || [];
@@ -16002,7 +16045,9 @@ async function loadHallOfFame(){
                 body.querySelectorAll('.cp-pick').forEach(el => el.onclick = e => { e.stopPropagation(); const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else if (sel.length < 3) sel.push(k); el.classList.toggle('on', sel.includes(k)); body.querySelector('#cp-go').textContent = `⚔️ Combattre (${sel.length}/3)`; body.querySelector('#cp-go').disabled = sel.length !== 3; });
             };
             body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Choisis 3 cartes. Leur puissance dépend de la rareté, du perso, du niveau ★ et de la finition. 3 manches contre l’ordinateur : gagne-en 2 ! (+60 🪙, 10 victoires payées par jour, et de l’XP pour tes cartes)</p>
-                <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;">⚔️ Combattre (0/3)</button><div class="cp-grid"></div>`;
+                <div id="cp2-duels"></div>
+                <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…"><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;flex:1;">⚔️ Combattre (0/3)</button><button class="btn-action" id="cp2-dfr" style="margin:0 0 10px;flex:1;background:#2a2a40;">🤝 Défier un ami</button></div><div class="cp-grid"></div>`;
+            if (typeof cp2DuelExtras === 'function') cp2DuelExtras(body, sel);
             body.querySelector('#cp-q').oninput = e => draw(e.target.value.trim());
             body.querySelector('#cp-go').onclick = async () => {
                 const r = await v7post('/api/cards/duel', { keys: sel });
@@ -16084,5 +16129,85 @@ async function loadHallOfFame(){
         };
     })();
     </script>
+    <script>
+    /* AG_CARDS_PLUS_V2 : Mystery Box, albums secrets, livre des records, duel entre amis, cartes perdues */
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        window.LOST_KEYS = new Set();
+        const loadLost = async () => { const d = await v7get('/api/cards/lost'); if (d && d.ok) window.LOST_KEYS = new Set(d.keys.map(x => x.key)); };
+        const mysUi = async () => { const b = document.getElementById('cp2-mys'); if (!b || !isAccount()) return; const d = await v7get('/api/cards/mystery'); if (d && d.ok) { b.textContent = d.available ? '🎁 Mystery Box (dispo !)' : '🎁 Mystery Box ✔'; b.classList.toggle('cp2-ready', d.available); } };
+        socket.on('connect', () => setTimeout(() => { loadLost(); mysUi(); }, 2000));
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const needAcc = () => { if (isAccount()) return true; toast('Connecte-toi à un compte.', 'var(--accent-yellow)'); return false; };
+
+        window.cp2Mystery = async function () {
+            if (!needAcc()) return;
+            if (typeof summonPending === 'function') summonPending();
+            const r = await v7post('/api/cards/mystery', {});
+            if ((!r || !r.ok || !r.cards) && typeof summonCancel === 'function') summonCancel();
+            if (!r || !r.ok) return toast('🎁 ' + ((r && r.error) || 'Impossible'), 'var(--accent-yellow)');
+            if (r.cards && r.cards.length) showBooster(r.cards);
+            mysUi();
+        };
+        window.cp2Secret = async function () {
+            if (!needAcc()) return;
+            const body = modal('🔐 Albums secrets', 'Chargement…');
+            const d = await v7get('/api/cards/secret-albums');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Des groupes de persos cachés. Réunis toutes leurs cartes pour révéler l’album (+${d.reward} 🪙). Albums révélés : <b>${d.found}/${d.albums.length}</b></p>`
+                + d.albums.map(a => `<div class="cp-row" style="flex-direction:column;"><div style="display:flex;justify-content:space-between;"><b>${a.emoji} ${esc(a.name)}</b><span>${a.have}/${a.total}</span></div>
+                    <div style="height:6px;background:#222;border-radius:4px;margin:4px 0;"><i style="display:block;height:100%;width:${Math.round(100 * a.have / a.total)}%;background:${a.revealed ? '#00ff88' : 'var(--accent-yellow)'};border-radius:4px;"></i></div>
+                    ${a.revealed ? `<div class="cp-grid" style="grid-template-columns:repeat(auto-fill,minmax(80px,1fr));">${a.cards.map(c => `<div>${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('')}</div>` : `<small class="tl-hint">${a.hint ? '💡 ' + esc(a.hint) : 'Groupe mystère…'}</small>`}</div>`).join('');
+        };
+        window.cp2Records = async function () {
+            const body = modal('📜 Livre des records du serveur', 'Chargement…');
+            const d = await v7get('/api/cards/records');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Les premiers joueurs à avoir réussi un exploit. Gravé pour toujours !</p>`
+                + (d.records.length ? d.records.map(r => `<div class="cp-row"><span>🏅 <b>${esc(r.label)}</b>${r.detail ? `<br><small class="tl-hint">${esc(r.detail)}</small>` : ''}</span><span style="text-align:right;"><b>${esc(r.who)}</b><br><small class="tl-hint">${new Date(r.at).toLocaleDateString('fr-FR')}</small></span></div>`).join('') : '<p class="tl-hint">Aucun record pour l’instant : sois le premier !</p>');
+        };
+        socket.on('server_record', r => { if (r) toast(`📜 Record : ${esc(r.who)} — ${esc(r.label)} !`, '#ffd700'); });
+
+        // duel entre amis : défis reçus + bouton « Défier un ami »
+        window.cp2DuelExtras = async function (body, sel) {
+            const box = body.querySelector('#cp2-duels');
+            const d = await v7get('/api/cards/duel-challenges');
+            const list = (d && d.ok ? d.list : []);
+            const open = list.filter(c => !c.mine && c.status === 'open'), mineOpen = list.filter(c => c.mine && c.status === 'open'), done = list.filter(c => c.status === 'done').slice(0, 5);
+            if (box) box.innerHTML = (open.length ? `<div class="ci-row">⚔️ <b>Défis reçus</b> : choisis 3 cartes puis clique « Répondre ».${open.map(c => `<div class="cp-row"><span>${esc(c.from)} te défie (${c.fromTeam.map(x => esc(RAR_LABEL[x.rarity] || x.rarity)).join(', ')})</span><button class="kick-btn" data-acc="${esc(c.id)}">Répondre</button></div>`).join('')}</div>` : '')
+                + (mineOpen.length ? `<div class="tl-hint" style="text-align:left;">⏳ En attente : ${mineOpen.map(c => esc(c.to)).join(', ')}</div>` : '')
+                + (done.length ? `<div class="tl-hint" style="text-align:left;">Derniers duels : ${done.map(c => `${esc(c.from)} vs ${esc(c.to)} → 🏆 ${esc(c.result.winner)}`).join(' • ')}</div>` : '');
+            box && box.querySelectorAll('[data-acc]').forEach(b => b.onclick = async () => {
+                if (sel.length !== 3) return toast('Choisis d’abord 3 cartes ci-dessous.', 'var(--accent-yellow)');
+                const r = await v7post('/api/cards/duel-accept', { id: b.dataset.acc, keys: sel });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                body.innerHTML = `<h3 style="text-align:center;">Contre ${esc(r.vs)}</h3>` + r.rounds.map((x, i) => `<div class="cp-round show"><div>${cardHtml(Object.assign({}, x.me, { isNew: false }))}<div class="cp-n ${x.win ? 'w' : 'l'}">${x.a}</div></div><div class="cp-vs">MANCHE ${i + 1}<br>VS</div><div>${cardHtml(Object.assign({}, x.foe, { isNew: false }))}<div class="cp-n ${x.win ? 'l' : 'w'}">${x.b}</div></div></div>`).join('')
+                    + `<div style="text-align:center;font-family:'Bangers',cursive;font-size:2rem;">${r.won ? '🏆 VICTOIRE !' : '💀 DÉFAITE…'}${r.coins ? ` +${r.coins} 🪙` : ''}</div>`;
+            });
+            const fb = body.querySelector('#cp2-dfr');
+            if (fb) fb.onclick = async () => {
+                if (sel.length !== 3) return toast('Choisis d’abord 3 cartes.', 'var(--accent-yellow)');
+                const fr = await v7get('/api/friends'); const fl = (fr && fr.friends) || [];
+                if (!fl.length) return toast('Ajoute d’abord des amis.', 'var(--accent-yellow)');
+                const to = prompt('Quel ami défier ?\n' + fl.map(f => f.pseudo).join(', '), fl[0].pseudo);
+                if (!to) return;
+                const r = await v7post('/api/cards/duel-challenge', { to, keys: sel });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                toast(`⚔️ Défi envoyé à ${esc(to)} ! Il choisira ses 3 cartes pour te répondre.`, '#00ff88');
+            };
+        };
+        socket.on('card_duel_invite', g => { if (g) toast(`⚔️ ${esc(g.from)} te défie en duel de cartes ! (Collection → Duel de cartes)`, '#ffd700'); });
+        socket.on('card_duel_done', g => { if (g) toast(`⚔️ Duel contre ${esc(g.vs)} : ${g.won ? '🏆 tu as gagné (+80 🪙) !' : '💀 tu as perdu…'}`, g.won ? '#00ff88' : 'var(--accent-pink)'); });
+    })();
+    </script>
+    <style>.cp-bar button.cp2-ready{background:var(--accent-yellow);color:#111;animation:finNeon 1.6s ease-in-out infinite;}</style>
 </body>
 </html>

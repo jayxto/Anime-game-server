@@ -26403,3 +26403,208 @@ app.post('/api/admin/coins-give', adminOnly(async (req, res) => {
     }
     res.json({ ok: true, done, missing });
 }));
+
+/* =====================================================================
+   AG_CARDS_PLUS_V2 — cartes perdues, livre des records, albums secrets,
+   duel de cartes entre amis, Mystery Box quotidienne.
+   ===================================================================== */
+// ---------- cartes perdues : ne sortent plus des boosters, s'échangent encore ----------
+if (!('lostCards' in SITE)) SITE.lostCards = [];
+const lostSet = () => new Set(Array.isArray(SITE.lostCards) ? SITE.lostCards : []);
+async function lostReplace(uid, cards) {
+    const lost = lostSet(); if (!lost.size || !Array.isArray(cards)) return cards;
+    for (let i = 0; i < cards.length; i++) {
+        const c = cards[i]; if (!c || !c.u || !c.name || c.duo) continue;
+        const k = cardKeyOf(c); if (!lost.has(k)) continue;
+        await cardTake(uid, k, 1).catch(() => null);
+        const list = cardPool(c.u).filter(x => !lost.has(c.u + '|' + x.display));
+        const pick = list[Math.floor(Math.random() * list.length)];
+        const r = pick ? await cardAward({ userId: uid, id: null }, c.u, pick.display, { silent: true, shinyRate: 1 / 10 }) : null;
+        if (r) cards[i] = r; else cards.splice(i--, 1);
+    }
+    return cards;
+}
+const _openBoosterLost = openBooster;
+openBooster = async function (uid, n, type = '') { return lostReplace(uid, await _openBoosterLost(uid, n, type)); };
+const _tbOpenLost = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return lostReplace(uid, await _tbOpenLost(uid, b, chosenU)); };
+app.post('/api/admin/lost-card', adminOnly(async (req, res) => {
+    const key = String((req.body || {}).key || ''), on = !!(req.body || {}).on;
+    if (!cardInfoOfKey(key)) return res.json({ ok: false, error: 'Carte inconnue.' });
+    const s = lostSet(); if (on) s.add(key); else s.delete(key);
+    SITE.lostCards = [...s]; await siteSave('lostCards');
+    res.json({ ok: true, lost: on });
+}));
+app.get('/api/cards/lost', (req, res) => res.json({ ok: true, keys: [...lostSet()].map(k => ({ key: k, ...(cardInfoOfKey(k) || {}) })) }));
+
+// ---------- livre des records : les premiers du serveur ----------
+const REC_SPECIAL = () => new Set([...SPECIAL_TIERS.map(t => t.id), 'evolution', 'mythique']);
+async function recordTry(id, label, uid, detail) {
+    const all = await kvGet('records', 'all', {});
+    if (all[id]) return false;
+    all[id] = { label, who: await pseudoOf(uid), detail: detail || '', at: Date.now() };
+    await kvSet('records', 'all', all);
+    io.emit('server_record', all[id]);
+    return true;
+}
+async function recordCards(uid, cards) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const sp = REC_SPECIAL();
+    for (const c of cards) {
+        if (!c) continue;
+        if (sp.has(c.rarity)) await recordTry('rar:' + c.rarity, `Première carte ${(SPECIAL_BY_ID[c.rarity] || {}).label || c.rarity}`, uid, `${c.name} (${c.anime || ''})`);
+        if (c.finish === 'numbered' || c.finish === 'signed' || c.finish === 'crystal' || c.finish === 'prism') await recordTry('fin:' + c.finish, `Première finition ${(FINISHES.find(f => f.id === c.finish) || {}).label || c.finish}`, uid, c.name);
+        if (c.shiny && (RAR_RANK[c.rarity] || 0) >= 6) await recordTry('shiny:' + c.rarity, `Première ${(SPECIAL_BY_ID[c.rarity] || {}).label || c.rarity} brillante`, uid, c.name);
+    }
+    return cards;
+}
+const _openBoosterRec = openBooster;
+openBooster = async function (uid, n, type = '') { return recordCards(uid, await _openBoosterRec(uid, n, type)); };
+const _tbOpenRec = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return recordCards(uid, await _tbOpenRec(uid, b, chosenU)); };
+app.get('/api/cards/records', async (req, res) => {
+    const all = await kvGet('records', 'all', {});
+    res.json({ ok: true, records: Object.entries(all).map(([id, r]) => ({ id, ...r })).sort((a, b) => a.at - b.at) });
+});
+
+// ---------- albums secrets : se révèlent quand on a tout le groupe ----------
+const SECRET_ALBUMS_RAW = [
+    ['akatsuki', 'Akatsuki', '☁️', 'naruto', ['Itachi', 'Kisame', 'Deidara', 'Sasori', 'Hidan', 'Kakuzu', 'Nagato', 'Konan', 'Obito', 'Zetsu']],
+    ['team7', 'Équipe 7', '🍥', 'naruto', ['Naruto Uzumaki', 'Sasuke', 'Sakura Haruno', 'Kakashi']],
+    ['sannin', 'Les Sannin légendaires', '🐸', 'naruto', ['Jiraiya', 'Tsunade', 'Orochimaru']],
+    ['mugiwara', 'Équipage du Chapeau de paille', '👒', 'onepiece', ['Monkey D. Luffy', 'Roronoa Zoro', 'Nami', 'Usopp', 'Sanji', 'Chopper', 'Nico Robin', 'Franky', 'Brook', 'Jinbe']],
+    ['yonko', 'Les Empereurs', '👑', 'onepiece', ['Shanks', 'Edward Newgate', 'Charlotte Linlin', 'Kaido', 'Marshall D. Teach']],
+    ['amiraux', 'Les Amiraux', '⚓', 'onepiece', ['Sakazuki', 'Kuzan', 'Borsalino', 'Issho', 'Aramaki']],
+    ['hashira', 'Les Hashira', '⚔️', 'demonslayer', ['Giyu Tomioka', 'Shinobu Kocho', 'Kyojuro Rengoku', 'Tengen Uzui', 'Mitsuri Kanroji', 'Muichiro Tokito', 'Gyomei Himejima', 'Obanai Iguro', 'Sanemi Shinazugawa']],
+    ['lunes', 'Les Lunes supérieures', '🌙', 'demonslayer', ['Kokushibo', 'Doma', 'Akaza', 'Hantengu', 'Gyokko', 'Gyutaro']],
+    ['espada', 'L’Espada', '💀', 'bleach', ['Coyote Starrk', 'Baraggan', 'Tier Harribel', 'Ulquiorra', 'Nnoitra', 'Grimmjow', 'Zommari', 'Szayelaporro', 'Aaroniero', 'Yammy']],
+    ['ryodan', 'La Brigade fantôme', '🕷️', 'hxh', ['Chrollo', 'Hisoka', 'Feitan', 'Phinks', 'Machi', 'Nobunaga', 'Shalnark', 'Franklin', 'Shizuku', 'Kortopi', 'Bonolenov', 'Pakunoda', 'Uvogin']],
+    ['peches', 'Les Sept Péchés capitaux', '🐉', 'sds', ['Meliodas', 'Diane', 'Ban', 'King', 'Gowther', 'Merlin', 'Escanor']],
+    ['bataillon', 'Le Bataillon d’exploration', '🪽', 'snk', ['Livaï', 'Erwin', 'Hansi Zoe', 'Mikasa', 'Armin', 'Eren']],
+    ['gojo', 'Les élèves de Gojo', '🤞', 'jjk', ['Yuji Itadori', 'Megumi Fushiguro', 'Nobara Kugisaki', 'Yuta Okkotsu', 'Maki Zenin', 'Toge Inumaki', 'Panda']],
+    ['taureaux', 'Le Taureau noir', '🐂', 'clover', ['Asta', 'Yami Sukehiro', 'Noelle Silva', 'Magna Swing', 'Luck Voltia', 'Vanessa Enoteca', 'Finral Roulacase', 'Gauche Adlai', 'Charmy Pappitson', 'Gordon Agrippa', 'Grey', 'Zora Ideale']]
+];
+const SECRET_ALBUMS = (() => SECRET_ALBUMS_RAW.map(([id, name, emoji, u, names]) => ({ id, name, emoji, u, cards: ARC_UNIVERSE_ANIME[u] ? names.map(n => { const c = cardResolve(u, n); return c ? c.key : null; }).filter(Boolean) : [] })).filter(a => a.cards.length >= 3))();
+app.get('/api/cards/secret-albums', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid), done = await kvGet('secretalb', String(uid), {});
+    const out = [];
+    for (const a of SECRET_ALBUMS) {
+        const have = a.cards.filter(k => mine.get(k)).length, complete = have === a.cards.length;
+        if (complete && !done[a.id]) {
+            done[a.id] = Date.now();
+            await ecoAddCoins(uid, 1000);
+            emitUser(uid, 'coins_gain', { gain: 1000, total: (await ecoGet(uid)).coins, why: 'album secret' });
+            await recordTry('album:' + a.id, `Premier à révéler l’album secret « ${a.name} »`, uid, ARC_UNIVERSE_ANIME[a.u]);
+        }
+        const revealed = !!done[a.id] || complete;
+        out.push({ id: a.id, revealed, have, total: a.cards.length, anime: ARC_UNIVERSE_ANIME[a.u],
+            name: revealed ? a.name : '???', emoji: revealed ? a.emoji : '❔', hint: !revealed && have / a.cards.length >= 0.5 ? `Un groupe de ${ARC_UNIVERSE_ANIME[a.u]}…` : null,
+            cards: revealed ? a.cards.map(k => ({ key: k, ...(cardInfoOfKey(k) || {}) })) : [] });
+    }
+    await kvSet('secretalb', String(uid), done);
+    res.json({ ok: true, albums: out, found: out.filter(a => a.revealed).length, reward: 1000 });
+});
+
+// ---------- duel de cartes entre amis (asynchrone) ----------
+function duelResolve(a, b) {
+    return a.map((c, i) => { const o = b[i], x = Math.round(c.power * (0.8 + Math.random() * 0.4)), y = Math.round(o.power * (0.8 + Math.random() * 0.4)); return { me: c, foe: o, a: x, b: y, win: x >= y }; });
+}
+app.post('/api/cards/duel-challenge', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const toUid = await uidByPseudo(String((req.body || {}).to || ''));
+    if (!toUid || toUid === uid) return res.json({ ok: false, error: 'Joueur introuvable.' });
+    if (!(await areFriends(uid, toUid))) return res.json({ ok: false, error: 'Tu ne peux défier qu’un ami.' });
+    const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
+    const team = await cardsWithMeta(uid, keys);
+    if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
+    team.forEach(c => { c.power = cardPower(c); });
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const ch = { id, from: uid, fromName: await pseudoOf(uid), to: toUid, toName: await pseudoOf(toUid), team, at: Date.now(), status: 'open' };
+    const box = await kvGet('cduel', 'all', {}); box[id] = ch;
+    for (const [k, v] of Object.entries(box)) if (Date.now() - v.at > 7 * 86400000) delete box[k]; // une semaine max
+    await kvSet('cduel', 'all', box);
+    emitUser(toUid, 'card_duel_invite', { from: ch.fromName });
+    res.json({ ok: true });
+});
+app.get('/api/cards/duel-challenges', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const box = await kvGet('cduel', 'all', {});
+    const view = c => ({ id: c.id, from: c.fromName, to: c.toName, status: c.status, at: c.at, mine: c.from === uid, result: c.result || null, fromTeam: c.status === 'done' || c.from === uid ? c.team : c.team.map(x => ({ rarity: x.rarity })) });
+    const list = Object.values(box).filter(c => c.from === uid || c.to === uid).sort((a, b) => b.at - a.at).slice(0, 20).map(view);
+    res.json({ ok: true, list });
+});
+app.post('/api/cards/duel-accept', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const id = String((req.body || {}).id || '');
+    const box = await kvGet('cduel', 'all', {}), ch = box[id];
+    if (!ch || ch.to !== uid || ch.status !== 'open') return res.json({ ok: false, error: 'Défi introuvable ou déjà joué.' });
+    const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
+    const team = await cardsWithMeta(uid, keys);
+    if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
+    team.forEach(c => { c.power = cardPower(c); });
+    const rounds = duelResolve(team, ch.team), wins = rounds.filter(r => r.win).length, won = wins >= 2;
+    ch.status = 'done'; ch.result = { rounds: rounds.map(r => ({ to: r.me, from: r.foe, toPts: r.a, fromPts: r.b, toWin: r.win })), winner: won ? ch.toName : ch.fromName };
+    await kvSet('cduel', 'all', box);
+    const winUid = won ? uid : ch.from;
+    await ecoAddCoins(winUid, 80);
+    await cardXpAdd(uid, keys, won ? 15 : 6);
+    await cardXpAdd(ch.from, ch.team.map(c => c.key), won ? 6 : 15);
+    emitUser(ch.from, 'card_duel_done', { vs: ch.toName, won: !won });
+    res.json({ ok: true, rounds, won, wins, coins: won ? 80 : 0, vs: ch.fromName });
+});
+
+// ---------- Mystery Box quotidienne (gratuite, 1 carte, raretés spéciales x5) ----------
+app.get('/api/cards/mystery', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const p = parisParts(hubNow()), day = `${p.y}-${p.m}-${p.d}`;
+    const st = await kvGet('mystery', String(uid), {});
+    res.json({ ok: true, available: st.day !== day });
+});
+app.post('/api/cards/mystery', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const p = parisParts(hubNow()), day = `${p.y}-${p.m}-${p.d}`;
+    const st = await kvGet('mystery', String(uid), {});
+    if (st.day === day) return res.json({ ok: false, error: 'Déjà ouverte aujourd’hui : reviens demain !' });
+    st.day = day; st.n = (st.n || 0) + 1; await kvSet('mystery', String(uid), st);
+    const luck = await cardLuck(uid);
+    let cards = await tbFromUniverses(uid, arcUniverses(), luck * 5, 0, 1);
+    cards = await recordCards(uid, await lostReplace(uid, await autoDelApply(uid, cards)));
+    res.json({ ok: true, cards });
+});
+
+/* =====================================================================
+   AG_ADMIN_PLAYERS_V1 — admin : liste de tous les joueurs (tous les comptes depuis le début),
+   avec inscription, dernière partie, dernière connexion (enregistrée à partir de maintenant)
+   et les invités vus (pseudos sans compte, à partir de maintenant).
+   ===================================================================== */
+if (HAS_DB) pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen TIMESTAMPTZ').catch(() => {});
+const GUESTS_SEEN = new Map(); let guestsSaveT = null;
+kvGet('guests', 'seen', {}).then(m => { for (const [k, v] of Object.entries(m || {})) if (!GUESTS_SEEN.has(k)) GUESTS_SEEN.set(k, v); }).catch(() => {});
+io.use((socket, next) => {
+    try {
+        const u = socket.user;
+        if (u && u.id && HAS_DB) pool.query('UPDATE users SET last_seen=now() WHERE id=$1', [u.id]).catch(() => {});
+        else if (u && u.isGuest && u.pseudo) {
+            const k = String(u.pseudo).slice(0, 20), o = GUESTS_SEEN.get(k) || { first: Date.now(), n: 0 };
+            o.last = Date.now(); o.n++; GUESTS_SEEN.set(k, o);
+            if (GUESTS_SEEN.size > 3000) { const old = [...GUESTS_SEEN.entries()].sort((a, b) => a[1].last - b[1].last).slice(0, 500); old.forEach(([kk]) => GUESTS_SEEN.delete(kk)); }
+            clearTimeout(guestsSaveT); guestsSaveT = setTimeout(() => kvSet('guests', 'seen', Object.fromEntries(GUESTS_SEEN)), 10000);
+        }
+    } catch (_) {}
+    next();
+});
+app.get('/api/admin/players-all', adminOnly(async (req, res) => {
+    let players = [];
+    if (HAS_DB) {
+        players = (await pool.query(`
+            SELECT u.id, u.pseudo, u.created_at, u.last_seen, u.xp, u.coins, g.games, g.last_game
+              FROM users u
+              LEFT JOIN (SELECT user_id, count(*)::int AS games, max(created_at) AS last_game FROM game_results GROUP BY user_id) g ON g.user_id = u.id
+             ORDER BY GREATEST(COALESCE(u.last_seen, 'epoch'), COALESCE(g.last_game, 'epoch'), u.created_at) DESC`)).rows
+            .map(r => ({ pseudo: r.pseudo, created: r.created_at, lastSeen: r.last_seen, lastGame: r.last_game, games: r.games || 0, level: levelFromXp(+r.xp || 0).level, coins: r.coins || 0,
+                online: socketsOfUser(r.id).length > 0 }));
+    }
+    const guests = [...GUESTS_SEEN.entries()].map(([pseudo, o]) => ({ pseudo, first: o.first, last: o.last, visits: o.n })).sort((a, b) => b.last - a.last);
+    res.json({ ok: true, total: players.length, online: players.filter(p => p.online).length, players, guests });
+}));
