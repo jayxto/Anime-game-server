@@ -16623,20 +16623,22 @@ app.get('/api/profile', async (req, res) => {
 });
 
 app.get('/api/leaderboard', async (req, res) => {
-    const period = req.query.period === 'all' ? 'all' : 'week';
+    const period = req.query.period === 'all' ? 'all' : req.query.period === 'season' ? 'season' : 'week';
+    const seasonFrom = typeof sznStart === 'function' ? sznStart(monthKeyNow()) : new Date(Date.now() - 30 * 86400000); // AG_SEASONS_V1
     const mode = String(req.query.mode || '');
     let rows = [];
     if (HAS_DB) {
         try {
             const params = [];
             let where = period === 'week' ? `created_at > now() - interval '7 days'` : 'true';
+            if (period === 'season') { params.push(seasonFrom); where = `created_at >= $${params.length}`; }
             if (mode) { params.push(mode); where += ` AND mode = $${params.length}`; }
             const order = mode ? 'wins DESC, points DESC, games ASC, pseudo ASC' : 'points DESC, wins DESC, games ASC, pseudo ASC';
             rows = (await pool.query(`SELECT user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games,
                 sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins FROM game_results WHERE ${where} GROUP BY user_id ORDER BY ${order} LIMIT 50`, params)).rows;
         } catch (_) {}
     } else {
-        const since = period === 'week' ? Date.now() - 7 * 86400000 : 0;
+        const since = period === 'week' ? Date.now() - 7 * 86400000 : period === 'season' ? seasonFrom.getTime() : 0;
         const agg = {};
         PROG_MEM.results.filter(r => r.created_at > since && (!mode || r.mode === mode)).forEach(r => {
             const o = agg[r.user_id] = agg[r.user_id] || { user_id: r.user_id, pseudo: r.pseudo, points: 0, games: 0, wins: 0 };
@@ -24590,6 +24592,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('saison|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'saison', anime: i.anime, rarity: 'saison', img: i.img }); return; }
         if (k.startsWith('champion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'champion', anime: i.anime, rarity: 'champion', img: i.img }); return; }
         if (k.startsWith('fusion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'fusion', img: i.img, imgs: i.imgs || null, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('month|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'mensuelle', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
@@ -27491,4 +27494,293 @@ app.post('/api/cards/alembic', async (req, res) => {
         await potion2Add(uid, t, 1);
         res.json({ ok: true, type: t, used, dust: await dustGet(uid) });
     } finally { ALEMBIC_LOCK.delete(uid); }
+});
+
+/* =====================================================================
+   AG_PWA_PUSH_V1 — appli installable (service worker) + notifications push
+   ===================================================================== */
+let webpush = null;
+try { webpush = require('web-push'); } catch (e) { console.warn('[push] module web-push absent :', e.message); }
+let PUSH_READY = null;
+async function pushInit() {
+    if (!webpush) return false;
+    if (PUSH_READY) return PUSH_READY;
+    PUSH_READY = (async () => {
+        let k = process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY ? { publicKey: process.env.VAPID_PUBLIC_KEY, privateKey: process.env.VAPID_PRIVATE_KEY } : await kvGet('push', 'vapid', null);
+        if (!k || !k.publicKey) { k = webpush.generateVAPIDKeys(); await kvSet('push', 'vapid', k); }
+        webpush.setVapidDetails('mailto:admin@anime-game.app', k.publicKey, k.privateKey);
+        return k;
+    })();
+    return PUSH_READY;
+}
+pushInit().catch(e => console.warn('[push] init :', e.message));
+// préférences par type (toutes activées par défaut)
+const PUSH_TYPES = {
+    expe: '🧭 Expédition terminée', market: '🌙 Ouverture du marché noir', duel: '⚔️ Défis de cartes', gift: '🎁 Cadeaux et échanges',
+    raid: '🐉 Raid et boss', season: '🏆 Saisons classées', events: '📅 Événements (anniversaires, boosters spéciaux)', market_sold: '💰 Ventes au marché'
+};
+async function pushPrefs(uid) { return Object.assign(Object.fromEntries(Object.keys(PUSH_TYPES).map(k => [k, true])), await kvGet('pushpref', String(uid), {})); }
+async function pushSend(uid, type, msg) {
+    if (!webpush || !uid) return 0;
+    try {
+        await pushInit();
+        const subs = await kvGet('pushsub', String(uid), []);
+        if (!subs.length) return 0;
+        const pr = await pushPrefs(uid); if (type && pr[type] === false) return 0;
+        const payload = JSON.stringify({ title: msg.title || 'Anime Game', body: msg.body || '', url: msg.url || '/', tag: msg.tag || type || 'ag' });
+        let sent = 0; const keep = [];
+        for (const s of subs) {
+            try { await webpush.sendNotification(s, payload, { TTL: 6 * 3600 }); sent++; keep.push(s); }
+            catch (e) { if (e.statusCode !== 404 && e.statusCode !== 410) keep.push(s); } // abonnement expiré → retiré
+        }
+        if (keep.length !== subs.length) await kvSet('pushsub', String(uid), keep);
+        return sent;
+    } catch (e) { console.warn('[push]', e.message); return 0; }
+}
+app.get('/api/push/key', async (req, res) => { const k = await pushInit(); res.json({ ok: !!k, key: k ? k.publicKey : null }); });
+app.post('/api/push/subscribe', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = (req.body || {}).sub;
+    if (!s || typeof s.endpoint !== 'string' || !/^https:\/\//.test(s.endpoint) || !s.keys || !s.keys.p256dh || !s.keys.auth) return res.json({ ok: false, error: 'Abonnement invalide.' });
+    const subs = (await kvGet('pushsub', String(uid), [])).filter(x => x.endpoint !== s.endpoint);
+    subs.push({ endpoint: s.endpoint, keys: { p256dh: String(s.keys.p256dh), auth: String(s.keys.auth) } });
+    await kvSet('pushsub', String(uid), subs.slice(-5)); // 5 appareils max
+    res.json({ ok: true });
+});
+app.post('/api/push/unsubscribe', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const ep = String((req.body || {}).endpoint || '');
+    await kvSet('pushsub', String(uid), (await kvGet('pushsub', String(uid), [])).filter(x => ep && x.endpoint !== ep));
+    res.json({ ok: true });
+});
+app.get('/api/push/prefs', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    res.json({ ok: true, prefs: await pushPrefs(uid), types: PUSH_TYPES, devices: (await kvGet('pushsub', String(uid), [])).length });
+});
+app.post('/api/push/prefs', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = (req.body || {}).prefs || {}, cur = await pushPrefs(uid);
+    for (const k of Object.keys(PUSH_TYPES)) if (k in b) cur[k] = !!b[k];
+    await kvSet('pushpref', String(uid), cur);
+    res.json({ ok: true, prefs: cur });
+});
+app.post('/api/push/test', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const n = await pushSend(uid, null, { title: '🔔 Notifications activées !', body: 'Tu seras prévenu ici pour tes expéditions, défis, cadeaux, raids…', tag: 'test' });
+    res.json({ ok: n > 0, sent: n, error: n ? null : 'Aucun appareil abonné.' });
+});
+// service worker : réseau d'abord (jamais de vieille version du jeu), page de secours hors ligne, notifications
+app.get('/sw.js', (req, res) => {
+    res.type('application/javascript').set('Cache-Control', 'no-cache').set('Service-Worker-Allowed', '/');
+    res.send(`// Anime Game — service worker (AG_PWA_PUSH_V1)
+const OFFLINE = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center"><div><div style="font-size:3rem">📡</div><h2>Pas de connexion</h2><p>Reconnecte-toi à internet puis réessaie.</p><button onclick="location.reload()" style="padding:10px 18px;border-radius:10px;border:0;background:#ff7b00;color:#fff;font-weight:700">Réessayer</button></div></body>';
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch', e => {
+    if (e.request.mode !== 'navigate') return;
+    e.respondWith(fetch(e.request).catch(() => new Response(OFFLINE, { headers: { 'Content-Type': 'text/html; charset=utf-8' } })));
+});
+self.addEventListener('push', e => {
+    let d = {}; try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data && e.data.text() }; }
+    e.waitUntil(self.registration.showNotification(d.title || 'Anime Game', { body: d.body || '', icon: '/icon-192.png', badge: '/favicon-96.png', tag: d.tag || 'ag', renotify: true, data: { url: d.url || '/' } }));
+});
+self.addEventListener('notificationclick', e => {
+    e.notification.close();
+    const url = (e.notification.data && e.notification.data.url) || '/';
+    e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+        for (const c of list) if ('focus' in c) { c.postMessage({ type: 'push-open', url }); return c.focus(); }
+        return self.clients.openWindow(url);
+    }));
+});
+`);
+});
+// les événements envoyés en direct au joueur partent aussi en notification quand il n'a pas le site ouvert
+const PUSH_OF_EVENT = {
+    card_gift: d => ['gift', { title: '🎁 Carte offerte !', body: `${d.from} t’a offert ${d.name}${d.msg ? ' : « ' + d.msg + ' »' : ''}` }],
+    card_duel_invite: d => ['duel', { title: '⚔️ Défi de cartes', body: `${d.from} te défie en duel de cartes !` }],
+    card_duel_done: d => ['duel', { title: '⚔️ Duel terminé', body: `Ton duel contre ${d.vs} est fini : ${d.won ? 'victoire !' : 'défaite…'}` }],
+    trade_live_invite: d => ['gift', { title: '🔄 Proposition d’échange', body: `${d.from} veut faire un échange avec toi.` }],
+    card_surprise: d => ['gift', { title: '🎁 Échange surprise', body: `Tu as reçu ${d.name} (${d.anime}) !` }],
+    admin_gift: d => ['gift', { title: '🎁 Cadeau !', body: `Tu as reçu ${d.coins} 🪙${d.msg ? ' : ' + d.msg : ''}` }],
+    raid_win: d => ['raid', { title: '🐉 Raid gagné !', body: `${d.name} est tombé : +${d.coins} 🪙, +200 ✨ et une carte Secrète.` }],
+    boss_reward: d => ['raid', { title: '👹 Boss vaincu', body: `${d.name} est tombé : +${d.coins} 🪙.` }],
+    market_sold: d => ['market_sold', { title: '💰 Carte vendue !', body: `${d.name} vendue ${d.price} 🪙 à ${d.buyer || 'un joueur'}.` }],
+    season_reward: d => ['season', { title: '🏆 Fin de saison !', body: d.text }]
+};
+const _emitUserPush = emitUser;
+emitUser = function (uid, ev, data) {
+    _emitUserPush(uid, ev, data);
+    const f = PUSH_OF_EVENT[ev];
+    if (f && !userOnline(+uid)) { try { const [t, m] = f(data || {}); pushSend(+uid, t, m); } catch (_) {} }
+};
+// expéditions terminées + ouverture du marché noir (vérifié chaque minute)
+setInterval(async () => {
+    try {
+        for (const { k, v } of await kvList('expe')) {
+            if (!v || !v.end || v.end > Date.now() || v.notified) continue;
+            v.notified = true; await kvSet('expe', k, v);
+            if (!userOnline(+k)) pushSend(+k, 'expe', { title: '🧭 Expédition terminée !', body: 'Tes cartes sont rentrées avec leur butin. Viens le récupérer !' });
+        }
+        if (parisHour() === 23) {
+            const day = parisDay();
+            if (!(await kvGet('push', 'bm:' + day, null))) {
+                await kvSet('push', 'bm:' + day, 1);
+                for (const { k } of await kvList('pushsub')) pushSend(+k, 'market', { title: '🌙 Le marché noir est ouvert', body: 'Cartes rares à prix cassé jusqu’à minuit seulement !' });
+            }
+        }
+    } catch (e) { console.warn('[push] tâche :', e.message); }
+}, 60 * 1000).unref();
+
+/* =====================================================================
+   AG_SEASONS_V1 — saisons classées : chaque mois le classement repart à zéro,
+   le top 10 gagne pièces + titre + carte exclusive, rangs classés remis à niveau.
+   ===================================================================== */
+const SZN_MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const sznLabel = mk => { const [y, m] = mk.split('-').map(Number); return `Saison ${SZN_MONTHS[m - 1]} ${y}`; };
+const sznStart = mk => { // minuit heure de Paris le 1er du mois (heure d'été ou d'hiver de CE jour-là)
+    const [y, m] = mk.split('-').map(Number), base = Date.UTC(y, m - 1, 1);
+    for (const off of [1, 2, 0, 3]) { const t = base - off * 3600000, p = parisParts(t); if (p.y === y && p.m === m && p.d === 1 && p.h === 0 && p.min === 0) return new Date(t); }
+    return parisDayStart(mk + '-01');
+};
+const sznNext = mk => { const [y, m] = mk.split('-').map(Number); return m === 12 ? `${y + 1}-01` : `${y}-${String(m + 1).padStart(2, '0')}`; };
+const SZN_REWARDS = [ // places 1, 2, 3, 4-10
+    { from: 1, to: 1, coins: 5000, badge: 'season_top1', label: '🥇 1er' },
+    { from: 2, to: 3, coins: 2500, badge: 'season_top3', label: '🥈🥉 2e-3e' },
+    { from: 4, to: 10, coins: 1000, badge: 'season_top10', label: '🏅 4e-10e' }
+];
+const SZN_RANKED = { Bronze: 0, Argent: 100, Or: 250, Platine: 500, Diamant: 800, Kage: 1200, Hokage: 2000 };
+const SZN_MODE_WIN = 500; // n°1 de chaque jeu
+TITLES.push(
+    { id: 'saison_top10', name: 'Top 10 de saison', desc: 'Finir dans le top 10 d’une saison classée', need: s => s.badges.some(b => ['season_top1', 'season_top3', 'season_top10'].includes(b)) },
+    { id: 'saison_podium', name: 'Podium de saison', desc: 'Finir dans le top 3 d’une saison classée', need: s => s.badges.some(b => ['season_top1', 'season_top3'].includes(b)) },
+    { id: 'saison_champion', name: 'Champion de saison', desc: 'Finir 1er d’une saison classée', need: s => s.badges.includes('season_top1') }
+);
+async function sznTop(mk, n = 10) {
+    const from = sznStart(mk), to = sznStart(sznNext(mk));
+    if (!HAS_DB) return [];
+    try {
+        return (await pool.query(`SELECT user_id, max(pseudo) AS pseudo, COALESCE(sum(points),0)::int AS points, count(*)::int AS games, sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins
+            FROM game_results WHERE created_at >= $1 AND created_at < $2 GROUP BY user_id HAVING COALESCE(sum(points),0) > 0 ORDER BY points DESC, wins DESC, games ASC, pseudo ASC LIMIT $3`, [from, to, n])).rows;
+    } catch (_) { return []; }
+}
+async function sznModeWinners(mk) {
+    if (!HAS_DB) return [];
+    const from = sznStart(mk), to = sznStart(sznNext(mk));
+    try {
+        return (await pool.query(`SELECT DISTINCT ON (mode) mode, user_id, pseudo, wins FROM (SELECT mode, user_id, max(pseudo) AS pseudo, sum(CASE WHEN won THEN 1 ELSE 0 END)::int AS wins
+            FROM game_results WHERE created_at >= $1 AND created_at < $2 GROUP BY mode, user_id) t WHERE wins > 0 ORDER BY mode, wins DESC, user_id`, [from, to])).rows;
+    } catch (_) { return []; }
+}
+const sznCardKey = (mk, rank, pseudo) => `saison|${mk}|${rank}|${pseudo}`;
+let SZN_RUNNING = false;
+async function sznProcess() {
+    if (SZN_RUNNING || !HAS_DB) return; SZN_RUNNING = true;
+    try {
+        const cur = monthKeyNow(), prev = prevMonthKey();
+        const state = await kvGet('season', 'state', null);
+        if (!state) { await kvSet('season', 'state', { first: cur, done: [prev] }); return; } // 1re saison = le mois en cours, rien de rétroactif
+        if (state.done.includes(prev) || prev < state.first) return;
+        state.done.push(prev); await kvSet('season', 'state', state); // marqué avant de distribuer : jamais deux fois
+        const top = await sznTop(prev, 10), out = { mk: prev, top: [], modes: [], at: Date.now() };
+        for (let i = 0; i < top.length; i++) {
+            const r = top[i], rank = i + 1, rw = SZN_REWARDS.find(x => rank >= x.from && rank <= x.to);
+            await ecoAddCoins(r.user_id, rw.coins);
+            try { await pool.query('INSERT INTO user_badges (user_id, badge) VALUES ($1,$2) ON CONFLICT DO NOTHING', [r.user_id, rw.badge]); } catch (_) {}
+            await cardGive(r.user_id, { key: sznCardKey(prev, rank, r.pseudo) }, rank === 1);
+            out.top.push({ rank, uid: r.user_id, pseudo: r.pseudo, points: r.points, coins: rw.coins });
+            emitUser(r.user_id, 'season_reward', { text: `${sznLabel(prev)} : tu finis ${rank === 1 ? '1er' : rank + 'e'} ! +${rw.coins} 🪙, un titre et une carte exclusive.` });
+        }
+        for (const w of await sznModeWinners(prev)) {
+            await ecoAddCoins(w.user_id, SZN_MODE_WIN);
+            out.modes.push({ mode: w.mode, label: MODE_LABELS[w.mode] || w.mode, pseudo: w.pseudo, wins: w.wins });
+        }
+        // classé : récompense selon le rang atteint, puis remise à niveau (moitié du chemin vers 1000)
+        for (const { k, v } of await kvList('ranked')) {
+            if (!v || !(v.w + v.l + v.d > 0)) continue;
+            const t = rankedTier(v.elo), coins = SZN_RANKED[t.name] || 0;
+            if (coins) await ecoAddCoins(+k, coins);
+            v.lastSeason = { mk: prev, tier: t.name, elo: v.elo, coins };
+            v.elo = Math.round(1000 + (v.elo - 1000) / 2);
+            await kvSet('ranked', k, v);
+        }
+        await kvSet('season', 'result:' + prev, out);
+        io.emit('season_end', { label: sznLabel(prev), champion: out.top[0] ? out.top[0].pseudo : null });
+        console.log('[saison] récompenses distribuées pour', prev, out.top.length, 'joueurs');
+    } catch (e) { console.warn('[saison]', e.message); } finally { SZN_RUNNING = false; }
+}
+setTimeout(sznProcess, 20000); setInterval(sznProcess, 10 * 60 * 1000).unref();
+app.get('/api/season-img', (req, res) => {
+    const p = String(req.query.p || '?').slice(0, 20).replace(/[<>&"]/g, ''), mk = String(req.query.m || '').replace(/[^0-9-]/g, ''), r = Math.max(1, Math.min(10, +req.query.r || 10));
+    const col = r === 1 ? ['#fff6c2', '#ffcc00', '#3a2400'] : r <= 3 ? ['#f2f6ff', '#9fb6d9', '#141c2b'] : ['#ffe2c7', '#d9823b', '#2a1405'];
+    const lbl = mk ? sznLabel(mk).replace('Saison ', '') : '';
+    res.type('image/svg+xml').set('Cache-Control', 'public, max-age=86400').send(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420"><defs><radialGradient id="g" cx="50%" cy="38%"><stop offset="0" stop-color="${col[0]}"/><stop offset=".55" stop-color="${col[1]}"/><stop offset="1" stop-color="${col[2]}"/></radialGradient></defs><rect width="300" height="420" fill="url(#g)"/><g fill="none" stroke="#fff" stroke-opacity=".35"><circle cx="150" cy="170" r="105"/><circle cx="150" cy="170" r="80"/></g><text x="150" y="150" font-size="70" text-anchor="middle">${r === 1 ? '👑' : r <= 3 ? '🏆' : '🏅'}</text><text x="150" y="215" font-family="Arial Black,Arial" font-weight="900" font-size="46" fill="#fff" text-anchor="middle" stroke="#000" stroke-width="2">#${r}</text><text x="150" y="300" font-family="Arial" font-weight="700" font-size="26" fill="#fff" text-anchor="middle">${p}</text><text x="150" y="335" font-family="Arial" font-size="17" fill="#fff" fill-opacity=".9" text-anchor="middle">Saison ${lbl}</text></svg>`);
+});
+const _cardInfoOfKeySzn = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'saison') { const [, mk, rank, pseudo] = p; return { u: 'saison', name: `${sznLabel(mk)} · #${rank} ${pseudo}`, display: pseudo, anime: 'Anime Game', rarity: 'saison', img: `/api/season-img?p=${encodeURIComponent(pseudo)}&m=${encodeURIComponent(mk)}&r=${encodeURIComponent(rank)}` }; }
+    return _cardInfoOfKeySzn(k);
+};
+RAR_RANK.saison = 6.8; DECK_BONUS.saison = 30; MARKET_HINT.saison = [20000, 80000];
+app.get('/api/season', async (req, res) => {
+    const uid = authUserId(req), cur = monthKeyNow(), prev = prevMonthKey();
+    const top = await sznTop(cur, 10), last = await kvGet('season', 'result:' + prev, null);
+    let me = null;
+    if (uid && HAS_DB) {
+        try {
+            const r = (await pool.query(`WITH t AS (SELECT user_id, COALESCE(sum(points),0)::int AS points FROM game_results WHERE created_at >= $1 GROUP BY user_id)
+                SELECT points, (SELECT count(*) FROM t t2 WHERE t2.points > t.points)::int + 1 AS rank FROM t WHERE user_id = $2`, [sznStart(cur), uid])).rows[0];
+            if (r) me = r;
+        } catch (_) {}
+    }
+    const rk = uid ? await rankedGet(uid) : null;
+    res.json({ ok: true, key: cur, label: sznLabel(cur), endsAt: sznStart(sznNext(cur)).getTime(), rewards: SZN_REWARDS, rankedRewards: SZN_RANKED, modeWin: SZN_MODE_WIN,
+        top: top.map((r, i) => ({ rank: i + 1, pseudo: r.pseudo, points: r.points, wins: r.wins, me: r.user_id === uid })), me,
+        ranked: rk ? { elo: rk.elo, tier: rankedTier(rk.elo).name, lastSeason: rk.lastSeason || null } : null,
+        last: last ? { label: sznLabel(last.mk), top: last.top.slice(0, 10).map(x => ({ rank: x.rank, pseudo: x.pseudo, points: x.points })), modes: last.modes } : null });
+});
+
+/* =====================================================================
+   AG_CALENDAR_V1 — calendrier des événements à venir
+   ===================================================================== */
+function calRaidOf(ms) {
+    const wk = weekKey(ms), pool2 = ['naruto', 'onepiece', 'dragonball', 'bleach', 'jjk', 'demonslayer', 'hxh', 'snk'].filter(u => ARC_UNIVERSE_ANIME[u]);
+    const u = pool2[hubHash('raid' + wk) % pool2.length], villains = tbCharCards(['antagoniste']).filter(c => c.u === u);
+    const v = villains.length ? villains[hubHash('raidv' + wk) % villains.length] : { u, display: (arcFamous(u)[0] || {}).display };
+    return { wk, u, anime: ARC_UNIVERSE_ANIME[u], display: v.display, img: cardImg({ u, display: v.display }) };
+}
+const calDay = ms => { const p = parisParts(ms); return `${p.y}-${String(p.m).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`; };
+app.get('/api/calendar', async (req, res) => {
+    const now = hubNow(), DAY = 86400000, ev = [];
+    const add = (day, e) => ev.push({ day, ...e });
+    // aujourd'hui + 13 jours
+    for (let i = 0; i < 14; i++) {
+        const ms = now + i * DAY, day = calDay(ms), p = parisParts(ms);
+        const w = WEATHER[hubHash('weather' + day) % WEATHER.length];
+        if (i < 7) add(day, { type: 'weather', emoji: w.emoji, title: `Météo : ${w.label}`, text: `Chances x3 : ${w.tiers.map(t => (SPECIAL_BY_ID[t] || {}).label || t).join(', ')}` });
+        TB_BIRTHDAYS.filter(([u, , m, d]) => m === p.m && d === p.d && ARC_UNIVERSE_ANIME[u]).slice(0, 3).forEach(([u, display]) => {
+            const c = cardResolve(u, display); if (c) add(day, { type: 'birthday', emoji: '🎂', title: `Anniversaire de ${c.display}`, text: `${ARC_UNIVERSE_ANIME[u]} • booster spécial avec sa carte garantie`, img: cardImg({ u, display: c.display }) });
+        });
+        if (p.d === 1 && i > 0) {
+            const mk = `${p.y}-${String(p.m).padStart(2, '0')}`, mc = monthCardOf(mk);
+            add(day, { type: 'season', emoji: '🏆', title: `Nouvelle saison classée : ${sznLabel(mk)}`, text: 'Récompenses du top 10 distribuées, classement remis à zéro.' });
+            if (mc) add(day, { type: 'month', emoji: '🗓️', title: `Nouvelle carte du mois : ${mc.display}`, text: ARC_UNIVERSE_ANIME[mc.u], img: cardImg({ u: mc.u, display: mc.display }) });
+        }
+        if (i > 0 && weekKey(ms) !== weekKey(ms - DAY)) {
+            const r = calRaidOf(ms), wb = tbWeekly(ms);
+            add(day, { type: 'raid', emoji: '🐉', title: `Nouveau raid : ${r.display}`, text: `${r.anime} • tout le serveur l’attaque ensemble`, img: r.img });
+            if (wb) add(day, { type: 'booster', emoji: '📅', title: `Booster de la semaine : ${ARC_UNIVERSE_ANIME[wb]}`, text: 'Moins cher, raretés x2' });
+        }
+        for (const [id, s] of Object.entries(SEASON_CARDS)) if (p.m - 1 === s.from[0] && p.d === s.from[1]) add(day, { type: 'event', emoji: '🎉', title: `Début de l’événement ${s.label}`, text: `Boosters ${s.label} et cartes spéciales en boutique` });
+    }
+    // en cours
+    const r = calRaidOf(now), cur = [];
+    cur.push({ emoji: '🐉', title: `Raid de la semaine : ${r.display}`, text: r.anime, img: r.img });
+    const mc = monthCardOf(monthKeyNow()); if (mc) cur.push({ emoji: '🗓️', title: `Carte du mois : ${mc.display}`, text: ARC_UNIVERSE_ANIME[mc.u], img: cardImg({ u: mc.u, display: mc.display }) });
+    const wb = tbWeekly(now); if (wb) cur.push({ emoji: '📅', title: `Booster de la semaine : ${ARC_UNIVERSE_ANIME[wb]}`, text: 'Moins cher, raretés x2' });
+    for (const s of Object.values(SEASON_CARDS)) if (seasonActive(s)) cur.push({ emoji: '🎉', title: `Événement ${s.label}`, text: `Jusqu’au ${s.to[1]}/${String(s.to[0] + 1).padStart(2, '0')}` });
+    const eb = SITE.eventBooster; if (eb && eb.until > Date.now()) cur.push({ emoji: eb.emoji || '🎉', title: eb.title, text: `Booster événement jusqu’au ${new Date(eb.until).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}` });
+    cur.push({ emoji: '🏆', title: sznLabel(monthKeyNow()), text: `Fin le ${new Date(sznStart(sznNext(monthKeyNow())).getTime() - 1000).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })} à minuit • top 10 récompensé` });
+    const daily = [{ emoji: '🌙', title: 'Marché noir', text: 'Tous les soirs de 23 h à minuit' }, { emoji: '🌌', title: 'Cartes de Minuit', text: 'Seulement entre minuit et 6 h' }, { emoji: '🗺️', title: 'Chasse au trésor', text: 'Un nouveau 🃏 caché chaque jour' }];
+    res.json({ ok: true, today: calDay(now), current: cur, daily, events: ev });
 });
