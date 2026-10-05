@@ -3832,6 +3832,21 @@ body.ag-game-page #app-root > #mode,
             <button class="btn-action" style="margin-top:0;background:#ffd700;color:#111;" onclick="adminGiveCoins()">🪙 Livrer les pièces</button>
             <div id="adm-give-res" class="tl-hint" style="text-align:left;margin-top:6px;"></div>
         </div>
+        <div class="opt-panel" id="adm-dbmove">
+            <h2>🗄️ Transférer la base de données vers Render</h2>
+            <ol class="tl-hint" style="text-align:left;line-height:1.7;margin:0 0 8px 18px;padding:0;">
+                <li>Sur <b>dashboard.render.com</b> : <b>New +</b> → <b>Postgres</b> → même région que ton jeu → offre payante la moins chère → <b>Create</b>.</li>
+                <li>Dans la nouvelle base, copie l’<b>Internal Database URL</b>.</li>
+                <li>Dans ton service du jeu → <b>Environment</b> → ajoute <code>NEW_DATABASE_URL</code> = l’adresse copiée → <b>Save</b> (le jeu redémarre).</li>
+                <li>Reviens ici et clique sur <b>Transférer</b>. Attends le ✅.</li>
+                <li>Dans <b>Environment</b> : remplace la valeur de <code>DATABASE_URL</code> par la même adresse, supprime <code>NEW_DATABASE_URL</code> → <b>Save</b>.</li>
+                <li>Vérifie que tout marche, puis supprime le projet sur Neon quelques jours plus tard.</li>
+            </ol>
+            <div id="adm-dbmove-st" class="tl-hint" style="text-align:left;">Chargement…</div>
+            <label style="display:block;margin:6px 0;font-size:.85rem;"><input type="checkbox" id="adm-dbmove-maint" checked> 🔧 Mettre le site en maintenance pendant la copie (conseillé : rien n’est perdu)</label>
+            <button class="btn-action" style="margin-top:0;background:#00b36b;" onclick="adminDbMove()">🚚 Transférer la base</button>
+            <div id="adm-dbmove-prog" style="margin-top:8px;font-size:.8rem;"></div>
+        </div>
         <div class="opt-panel">
             <h2>🤖 Bots de test</h2>
             <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
@@ -17504,6 +17519,28 @@ async function loadHallOfFame(){
             const x = document.getElementById('arc-extra');
             if (x) x.textContent = (x.textContent ? x.textContent + ' • ' : '') + `💬 Le chat a choisi « ${top} » à ${Math.round(100 * cnt[top] / tot)} % (${tot} vote${tot > 1 ? 's' : ''})` + (me.choice ? (me.choice === top ? ' — d’accord avec toi ✅' : ' — pas comme toi ❌') : '');
         };
+    })();
+    </script>
+    <script>
+    /* AG_DB_MOVE_V1 : panneau admin du transfert de base */
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        let timer = null;
+        async function refresh() {
+            const st = document.getElementById('adm-dbmove-st'); if (!st || !st.offsetParent) return;
+            const d = await v7get('/api/admin/dbmove'); if (!d || !d.ok) { st.textContent = 'Réservé aux admins.'; return; }
+            st.innerHTML = `Base actuelle : <b>${esc(d.current || '—')}</b><br>Nouvelle base : <b>${d.target ? esc(d.target) : '❌ pas encore configurée (étape 3)'}</b>`;
+            const s = d.state, pr = document.getElementById('adm-dbmove-prog');
+            if (pr && (s.running || s.done)) pr.innerHTML = `<b>${esc(s.step)}</b>` + (s.tables.length ? `<table style="width:100%;margin-top:6px;border-collapse:collapse;">${s.tables.map(t => `<tr style="border-top:1px solid #222;"><td>${t.done ? (t.src === t.dst ? '✅' : '⚠️') : '⏳'} ${esc(t.name)}</td><td style="text-align:right;">${t.dst} / ${t.src == null ? '?' : t.src}</td></tr>`).join('')}</table>` : '');
+            clearTimeout(timer); if (s.running) timer = setTimeout(refresh, 2000);
+        }
+        window.adminDbMove = async function () {
+            if (!confirm('Copier toute la base actuelle vers la nouvelle base ? (l’ancienne n’est pas modifiée)')) return;
+            const r = await v7post('/api/admin/dbmove', { maintenance: document.getElementById('adm-dbmove-maint').checked });
+            if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+            toast('🚚 Transfert lancé…', '#00e676'); setTimeout(refresh, 800);
+        };
+        setInterval(() => { const st = document.getElementById('adm-dbmove-st'); if (st && st.offsetParent && st.textContent === 'Chargement…') refresh(); }, 2500);
     })();
     </script>
 </body>
