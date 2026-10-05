@@ -27200,15 +27200,15 @@ app.post('/api/cards/potion', async (req, res) => {
 });
 
 // ---------- mode survie ----------
-const SURV_RUNS = 3, SURV_LOCK = new Set();
-function survReward(floor) { // récompense pour avoir passé l'étage `floor` (tour 1 contre 1, beaucoup d'étages)
-    const r = { coins: Math.min(15, 2 + Math.floor(floor / 2)), dust: 0, potions: 0, secret: false, items: {} };
-    if (floor % 10 === 0) r.dust = floor;
-    if (floor % 30 === 0) { r.potions = 1; r.coins += floor * 2; }
-    if (floor % 20 === 0) r.items.xp = 1;
-    if (floor % 50 === 0) r.items.shiny = 1;
-    if (floor % 75 === 0) r.items.univ = 1;
-    if (floor % 100 === 0) r.secret = true;
+const SURV_RUNS = Infinity, SURV_LOCK = new Set();
+function survReward(floor) { // récompense pour avoir passé l'étage `floor` (tour 1 contre 1, parties illimitées)
+    const r = { coins: Math.min(25, 2 + Math.floor(floor / 2)), dust: 0, potions: 0, secret: false, items: {} };
+    if (floor % 10 === 0) r.dust = floor * 2;
+    if (floor % 25 === 0) { r.potions = Math.min(3, floor / 25); r.coins += floor * 4; }
+    if (floor % 15 === 0) r.items.xp = 1;
+    if (floor % 40 === 0) r.items.shiny = 1;
+    if (floor % 60 === 0) r.items.univ = 1;
+    if (floor % 75 === 0) r.secret = true;
     return r;
 }
 function survRandCard() {
@@ -27257,8 +27257,8 @@ const survTop = async k => Object.values(await kvGet('survlb2', k, {})).sort((a,
 app.get('/api/cards/survival', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const s = await survState(uid);
-    const rewards = [1, 10, 20, 30, 50, 60, 75, 90, 100, 150].map(f => ({ floor: f, ...survReward(f) }));
-    res.json({ ok: true, run: s.run, runsLeft: Math.max(0, SURV_RUNS - s.runs) + (s.run ? 1 : 0), maxRuns: SURV_RUNS, best: s.best2 || 0, potion: await potionGet(uid), rewards, top: await survTop('all'), week: await survTop('w' + weekKey()) });
+    const rewards = [1, 10, 15, 25, 40, 50, 60, 75, 100, 150].map(f => ({ floor: f, ...survReward(f) }));
+    res.json({ ok: true, run: s.run, runsLeft: SURV_RUNS === Infinity ? 999 : Math.max(0, SURV_RUNS - s.runs) + (s.run ? 1 : 0), maxRuns: SURV_RUNS === Infinity ? 0 : SURV_RUNS, runsToday: s.runs || 0, best: s.best2 || 0, potion: await potionGet(uid), rewards, top: await survTop('all'), week: await survTop('w' + weekKey()) });
 });
 app.post('/api/cards/survival/start', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
