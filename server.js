@@ -24531,6 +24531,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('fusion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'fusion', img: i.img, imgs: i.imgs || null, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('month|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'mensuelle', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('evo|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'evolution', img: i.img, evo: true, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
@@ -25835,14 +25836,15 @@ async function tbOpen(uid, b, chosenU) {
 app.get('/api/boosters', async (req, res) => {
     const uid = authUserId(req), e = uid ? await ecoGet(uid) : null;
     const animes = Object.keys(ARC_UNIVERSE_ANIME).map(u => [u, ARC_UNIVERSE_ANIME[u], cardPool(u).length]).filter(a => a[2] >= 5).sort((a, b) => a[1].localeCompare(b[1], 'fr'));
-    res.json({ ok: true, coins: e ? e.coins : 0, account: !!uid, boosters: tbCatalog(), animes });
+    res.json({ ok: true, coins: e ? e.coins : 0, account: !!uid, boosters: await tbCatalogFor(uid), animes });
 });
 const TB_BUSY = new Set();
 app.post('/api/boosters/buy', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const id = String((req.body || {}).id || ''), chosenU = String((req.body || {}).u || '');
-    const b = tbCatalog().find(x => x.id === id);
-    if (!b) return res.json({ ok: false, error: 'Ce booster n’est plus disponible.' });
+    const b = (await tbCatalogFor(uid)).find(x => x.id === id);
+    if (!b || b.choice) return res.json({ ok: false, error: 'Ce booster n’est plus disponible.' });
+    if (b.id === 'welcome') { if (await kvGet('welcome', String(uid), null)) return res.json({ ok: false, error: 'Déjà récupéré.' }); await kvSet('welcome', String(uid), { at: Date.now() }); }
     if (b.pick && !(ARC_UNIVERSE_ANIME[chosenU] && cardPool(chosenU).length >= 5)) return res.json({ ok: false, error: 'Choisis un anime.' });
     if (TB_BUSY.has(uid)) return res.json({ ok: false, error: 'Ouverture déjà en cours…' });
     TB_BUSY.add(uid);
@@ -26723,3 +26725,133 @@ app.post('/api/admin/month-card', adminOnly(async (req, res) => {
     await siteSave('monthCard');
     res.json({ ok: true, month: mk, card: c.display });
 }));
+
+/* =====================================================================
+   AG_CARDS_PLUS_V4 — roue de la fortune ✨, booster « Choix » (3 cartes face cachée : 2 moyennes
+   + 1 cool), cartes Fusion (fusions officielles + duos de rivaux), booster de bienvenue.
+   ===================================================================== */
+// ---------- roue de la fortune (100 ✨ le tour) ----------
+const WHEEL = [
+    { label: '🪙 200 pièces', w: 30, coins: 200 }, { label: '✨ +50 poussière', w: 20, dust: 50 },
+    { label: '🃏 Booster 3 cartes', w: 18, booster: [3, ''] }, { label: '🪙 500 pièces', w: 12, coins: 500 },
+    { label: '✨ +250 poussière', w: 8, dust: 250 }, { label: '💜 Booster Épique', w: 6, booster: [5, 'epique'] },
+    { label: '🔥 Carte Légendaire', w: 4, rar: 'legendaire' }, { label: '🌈 Carte spéciale', w: 2, special: true }
+];
+const WHEEL_COST = 100;
+app.get('/api/cards/wheel', (req, res) => res.json({ ok: true, cost: WHEEL_COST, segments: WHEEL.map(s => ({ label: s.label, pct: Math.round(1000 * s.w / WHEEL.reduce((a, x) => a + x.w, 0)) / 10 })) }));
+app.post('/api/cards/wheel', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    if ((await dustGet(uid)) < WHEEL_COST) return res.json({ ok: false, error: `Il faut ${WHEEL_COST} ✨ pour faire tourner la roue (recycle des doublons !).` });
+    await dustAdd(uid, -WHEEL_COST);
+    let r = Math.random() * WHEEL.reduce((a, x) => a + x.w, 0), i = 0;
+    for (; i < WHEEL.length - 1; i++) { r -= WHEEL[i].w; if (r <= 0) break; }
+    const s = WHEEL[i]; let cards = null, coins = 0, dust = 0;
+    if (s.coins) { coins = s.coins; await ecoAddCoins(uid, coins); }
+    if (s.dust) { dust = s.dust; await dustAdd(uid, dust); }
+    if (s.booster) cards = await openBooster(uid, s.booster[0], s.booster[1]);
+    if (s.rar) { const p = randomCardOfRarity(s.rar); if (p) cards = [await cardAward({ userId: uid, id: null }, p.u, p.display, { silent: true, shinyRate: 1 / 8 })]; }
+    if (s.special) {
+        const tiers = SPECIAL_TIERS.filter(t => t.rate >= 1 / 2500); // Secrète → Cosmique
+        const t = tiers[Math.floor(Math.random() * tiers.length)], p = randomCardOfRarity(t.id);
+        if (p) cards = [await cardAwardSecret(uid, p.u, p.display, Math.random() < 0.15, t.id)];
+    }
+    if (cards) cards = await recordCards(uid, cards.filter(Boolean));
+    res.json({ ok: true, index: i, label: s.label, coins, dust, cards, dustLeft: await dustGet(uid), total: (await ecoGet(uid)).coins });
+});
+
+// ---------- booster « Choix » : 3 cartes face cachée (2 moyennes + 1 cool), on en garde une ----------
+function choiceDraw() {
+    const us = arcUniverses(), pickU = () => us[Math.floor(Math.random() * us.length)];
+    const ofRank = (lo, hi) => { for (let t = 0; t < 60; t++) { const u = pickU(), list = cardPool(u), ok = list.map((c, j) => j).filter(j => { const r = RAR_RANK[cardRarityAt(u, j)] || 0; return r >= lo && r <= hi; }); if (ok.length) { const j = ok[Math.floor(Math.random() * ok.length)]; return { u, display: list[j].display, rarity: cardRarityAt(u, j) }; } } return null; };
+    const mid = [ofRank(1, 2), ofRank(1, 2)];
+    let cool;
+    if (Math.random() < 0.12) { const tiers = SPECIAL_TIERS.filter(t => t.rate >= 1 / 1500); const t = tiers[Math.floor(Math.random() * tiers.length)], p = randomCardOfRarity(t.id); if (p) cool = { u: p.u, display: p.display, rarity: t.id, secret: true }; }
+    if (!cool) cool = ofRank(3, 4);
+    return arcShuffle([...mid, cool].filter(Boolean)).map(c => ({ ...c, cool: c === cool }));
+}
+app.post('/api/boosters/choice/start', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const pend = await kvGet('choice', String(uid), null);
+    if (pend && pend.cards && !pend.done) return res.json({ ok: true, slots: pend.cards.length, resumed: true });
+    const price = 300, e = await ecoGet(uid);
+    if (e.coins < price) return res.json({ ok: false, error: `Il te manque ${price - e.coins} pièces.` });
+    if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, price])).rows[0]; if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' }); }
+    else e.coins -= price;
+    const cards = choiceDraw();
+    await kvSet('choice', String(uid), { cards, at: Date.now(), done: false });
+    res.json({ ok: true, slots: cards.length, coins: (await ecoGet(uid)).coins });
+});
+app.post('/api/boosters/choice/pick', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const pend = await kvGet('choice', String(uid), null), i = Math.floor(+(req.body || {}).i);
+    if (!pend || pend.done || !pend.cards || !pend.cards[i]) return res.json({ ok: false, error: 'Aucun booster Choix en cours.' });
+    pend.done = true; await kvSet('choice', String(uid), pend);
+    const c = pend.cards[i];
+    let card = c.secret ? await cardAwardSecret(uid, c.u, c.display, Math.random() < 0.15, c.rarity) : await cardAward({ userId: uid, id: null }, c.u, c.display, { silent: true, shinyRate: 1 / 10 });
+    [card] = await recordCards(uid, [card]);
+    res.json({ ok: true, card, all: pend.cards.map(x => ({ name: x.display, anime: ARC_UNIVERSE_ANIME[x.u], rarity: x.rarity, img: cardImg({ u: x.u, display: x.display }), cool: x.cool })), picked: i });
+});
+
+// ---------- cartes Fusion ----------
+const FUSION_RAW = [
+    ['gogeta', 'dragonball', 'Sangoku', 'Vegeta', 'Gogeta', 'Gogeta'], ['gotenks', 'dragonball', 'Sangoten', 'Trunks', 'Gotenks', 'Gotenks'],
+    ['kefla', 'dragonball', 'Caulifla', 'Kale', 'Kefla', 'Kefla'],
+    ['narusasu', 'naruto', 'Naruto Uzumaki', 'Sasuke', 'Naruto × Sasuke'], ['madahashi', 'naruto', 'Madara', 'Hashirama', 'Madara × Hashirama'],
+    ['zosan', 'onepiece', 'Roronoa Zoro', 'Sanji', 'Zoro × Sanji'], ['luffykaido', 'onepiece', 'Monkey D. Luffy', 'Kaido', 'Luffy × Kaido'],
+    ['ichigrimm', 'bleach', 'Ichigo Kurosaki', 'Grimmjow', 'Ichigo × Grimmjow'], ['hisochrollo', 'hxh', 'Hisoka', 'Chrollo', 'Hisoka × Chrollo'],
+    ['erenreiner', 'snk', 'Eren', 'Reiner', 'Eren × Reiner'], ['lightl', 'deathnote', 'Light Yagami', 'L Lawliet', 'Light × L'],
+    ['gojosukuna', 'jjk', 'Satoru Gojo', 'Ryomen Sukuna', 'Gojo × Sukuna'], ['dekubaku', 'mha', 'Izuku Midoriya', 'Katsuki Bakugo', 'Deku × Bakugo'],
+    ['rengokuakaza', 'demonslayer', 'Kyojuro Rengoku', 'Akaza', 'Rengoku × Akaza'], ['kanearima', 'tokyoghoul', 'Ken Kaneki', 'Kishou Arima', 'Kaneki × Arima'],
+    ['hinakage', 'haikyuu', 'Shoyo Hinata', 'Tobio Kageyama', 'Hinata × Kageyama'], ['isagirin', 'bluelock', 'Yoichi Isagi', 'Rin Itoshi', 'Isagi × Rin'],
+    ['gokuvegeta', 'dragonball', 'Sangoku', 'Vegeta', 'Goku × Vegeta'], ['astayuno', 'clover', 'Asta', 'Yuno', 'Asta × Yuno'],
+    ['natsugray', 'fairy', 'Natsu Dragneel', 'Gray Fullbuster', 'Natsu × Gray'], ['edroy', 'fma', 'Edward Elric', 'Roy Mustang', 'Edward × Mustang']
+];
+const FUSIONS = (() => FUSION_RAW.map(([id, u, a, b, name, out]) => {
+    if (!ARC_UNIVERSE_ANIME[u]) return null;
+    const ca = cardResolve(u, a), cb = cardResolve(u, b), co = out ? cardResolve(u, out) : null;
+    if (!ca || !cb || ca.key === cb.key) return null;
+    return { id, u, a: ca, b: cb, name, out: co && co.display === out ? co.display : null };
+}).filter(Boolean))();
+const FUSION_BY_ID = Object.fromEntries(FUSIONS.map(f => [f.id, f]));
+const FUSION_NEED = 3; // 3 exemplaires de chaque (2 utilisés, 1 gardé)
+const _cardInfoOfKeyFusion = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'fusion') {
+        const f = FUSION_BY_ID[p[1]]; if (!f) return null;
+        const base = { u: f.u, name: f.name, display: f.name, anime: ARC_UNIVERSE_ANIME[f.u], rarity: 'fusion' };
+        return f.out ? { ...base, img: cardImg({ u: f.u, display: f.out }) } : { ...base, imgs: [cardImg({ u: f.u, display: f.a.display }), cardImg({ u: f.u, display: f.b.display })], img: cardImg({ u: f.u, display: f.a.display }) };
+    }
+    return _cardInfoOfKeyFusion(k);
+};
+RAR_RANK.fusion = 6.3; DECK_BONUS.fusion = 30; MARKET_HINT.fusion = [12000, 35000];
+app.get('/api/cards/fusions', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid);
+    res.json({ ok: true, need: FUSION_NEED, list: FUSIONS.map(f => ({ id: f.id, name: f.name, anime: ARC_UNIVERSE_ANIME[f.u], a: f.a.display, b: f.b.display, haveA: (mine.get(f.a.key) || {}).n || 0, haveB: (mine.get(f.b.key) || {}).n || 0, owned: !!mine.get('fusion|' + f.id), card: { key: 'fusion|' + f.id, ...cardInfoOfKey('fusion|' + f.id) } })) });
+});
+app.post('/api/cards/fusion', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const f = FUSION_BY_ID[String((req.body || {}).id || '')];
+    if (!f) return res.json({ ok: false, error: 'Fusion inconnue.' });
+    const mine = await cardsOf(uid);
+    if (((mine.get(f.a.key) || {}).n || 0) < FUSION_NEED || ((mine.get(f.b.key) || {}).n || 0) < FUSION_NEED) return res.json({ ok: false, error: `Il faut ${FUSION_NEED} exemplaires de ${f.a.display} et de ${f.b.display}.` });
+    if (!(await cardTake(uid, f.a.key, FUSION_NEED - 1))) return res.json({ ok: false, error: 'Impossible, réessaie.' });
+    if (!(await cardTake(uid, f.b.key, FUSION_NEED - 1))) { await cardGive(uid, { key: f.a.key }, false); await cardGive(uid, { key: f.a.key }, false); return res.json({ ok: false, error: 'Impossible, réessaie.' }); }
+    const key = 'fusion|' + f.id, isNew = await cardGive(uid, { key }, Math.random() < 0.12);
+    await recordTry('fusion:' + f.id, `Première fusion ${f.name}`, uid, ARC_UNIVERSE_ANIME[f.u]);
+    res.json({ ok: true, card: { key, ...cardInfoOfKey(key), isNew, coins: 0 } });
+});
+
+// ---------- booster de bienvenue (gratuit, une fois par compte) ----------
+async function tbCatalogFor(uid) {
+    const extra = [];
+    if (uid && !(await kvGet('welcome', String(uid), null))) extra.push({ id: 'welcome', name: 'Booster de bienvenue', emoji: '🎁', desc: 'Gratuit, une seule fois • 10 cartes dont 1 Légendaire garantie', price: 0, event: true });
+    extra.push({ id: 'choix', name: 'Booster Choix', emoji: '🎴', desc: '3 cartes face cachée : 2 moyennes et 1 cool… tu n’en gardes qu’une !', price: 300, choice: true });
+    return [...extra, ...tbCatalog()];
+}
+const _tbOpenWelcome = tbOpen;
+tbOpen = async function (uid, b, chosenU) {
+    if (b && b.id === 'welcome') return autoDelApply(uid, await recordCards(uid, await tbFromUniverses(uid, arcUniverses(), await cardLuck(uid), 3, 10)));
+    return _tbOpenWelcome(uid, b, chosenU);
+};
