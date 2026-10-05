@@ -3862,7 +3862,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -10926,7 +10926,9 @@ body.ag-game-page #app-root > #mode,
             const grid = h && h.nextElementSibling && h.nextElementSibling.classList.contains('shop-grid') ? h.nextElementSibling : null;
             if (!grid) return;
             grid.querySelectorAll('.tb-item').forEach(x => x.remove());
-            if (!h.querySelector('.rates-q')) h.insertAdjacentHTML('beforeend', ' <button class="rates-q" title="Chances d’obtention" onclick="ratesOpen()">?</button>');
+            if (!h.querySelector('.rates-q')) h.insertAdjacentHTML('beforeend', ' <button class="rates-q" title="Chances d’obtention" onclick="ratesOpen()">?</button> <span id="cp5-weather" class="cp5-weather"></span>');
+            if (typeof cp5WeatherUi === 'function') cp5WeatherUi();
+            if (typeof cp5Treasure === 'function') cp5Treasure('shop', box);
             const opts = tb.animes.map(([u, n, c]) => `<option value="${v7esc(u)}">${v7esc(n)} (${c} cartes)</option>`).join('');
             grid.insertAdjacentHTML('beforeend', tb.list.map((b, bi) => `
                 <div class="shop-item tb-item${b.event ? ' tb-event' : ''}"><div class="shop-prev"><span style="font-size:2rem;">🎴</span></div>
@@ -11779,7 +11781,7 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'fusion', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'champion', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -13109,11 +13111,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, minuit: 5.6, champion: 6.6, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', minuit: '#5b6bff', champion: '#ffb300', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', minuit: '🌙 MINUIT 🌙', champion: '🏆 CHAMPION 🏆', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -13126,7 +13128,7 @@ body.ag-game-page #app-root > #mode,
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
                 valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
                 altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
-                fusion: [64, ['#ff3df0', '#00e5ff', '#ffffff', '#ffd700'], 310, 'orbit'], mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
+                minuit: [50, ['#5b6bff', '#c9d0ff', '#ffffff', '#1a1f5c'], 270, 'down'], champion: [70, ['#ffb300', '#fff3b0', '#ffffff', '#ff7b00'], 320, 'out'], fusion: [64, ['#ff3df0', '#00e5ff', '#ffffff', '#ffd700'], 310, 'orbit'], mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
                 primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out'],
                 stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out']
             };
@@ -14198,7 +14200,8 @@ body.ag-game-page #app-root > #mode,
                     ? `<div class="tc-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`).join('')}</div>`
                     : `<img src="${esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15">`;
                 const first = String(c.name).split(/[ &]/)[0];
-                return `<div class="tcard r-${esc(c.rarity)}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}${fin ? ' f-' + fin : ''}"${key ? ` data-key="${esc(key)}"` : ''} style="--fc:${FIN_COL[fin] || '#fff'}"><i class="tc-bgfx"></i>
+                const cfr = key && window.CARD_FRAMES_ON ? window.CARD_FRAMES_ON[key] : null;
+                return `<div class="tcard r-${esc(c.rarity)}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}${fin ? ' f-' + fin : ''}${cfr ? ' cf-' + esc(cfr) : ''}"${key ? ` data-key="${esc(key)}"` : ''} style="--fc:${FIN_COL[fin] || '#fff'}"><i class="tc-bgfx"></i>
                     <div class="tc-img">${imgs}<i class="tc-fx"></i><i class="tc-glare"></i>${(c.lvl || (window.CARD_LVLS && key && window.CARD_LVLS[key])) ? `<i class="tc-lvl">${'★'.repeat(c.lvl || window.CARD_LVLS[key])}</i>` : ''}${fin ? `<b class="tc-fin">${FIN_ICON[fin]} ${FIN_LABEL[fin]}</b>` : ''}${fin === 'signed' ? `<i class="tc-sign">${esc(first)}</i>` : ''}${ser && (fin === 'numbered' || fin === 'signed') ? `<b class="tc-ser">#${ser}${fin === 'numbered' ? '/' + (c.serialMax || 50) : ''}</b>` : ''}</div>
                     <div class="tc-name">${esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity] || esc(c.rarity)}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}${c.god ? '<em class="tc-god">GOD PACK</em>' : ''}</div>`;
             };
@@ -14401,8 +14404,8 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'fusion', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'fusion', 'mensuelle', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'champion', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'champion', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -16409,6 +16412,214 @@ async function loadHallOfFame(){
                 if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
                 document.getElementById('cp-modal')?.remove(); showBooster([r.card]);
             });
+        };
+    })();
+    </script>
+    <style>
+        /* AG_CARDS_PLUS_V5 */
+        .cp5-weather{font-size:.8rem;font-weight:700;color:#bfe9ff;background:#14243a;border:1px solid #2f5a85;border-radius:99px;padding:3px 10px;vertical-align:middle;}
+        .tcard.r-minuit{border:2px solid #5b6bff;box-shadow:0 0 14px rgba(91,107,255,.7),0 0 30px rgba(20,30,90,.6);background:linear-gradient(180deg,#05061a,#0d1140);}
+        .tcard.r-minuit .tc-img img{filter:saturate(.7) brightness(.85) hue-rotate(200deg);}
+        .tcard.r-minuit .tc-img::after{content:'🌙';position:absolute;right:6px;top:6px;font-size:1.1rem;filter:drop-shadow(0 0 6px #c9d0ff);}
+        .tcard.r-minuit .tc-rar{color:#c9d0ff;font-weight:900;text-shadow:0 0 8px #5b6bff;}
+        .tcard.r-champion{border:3px solid #ffb300;box-shadow:0 0 20px rgba(255,179,0,.7);background:linear-gradient(180deg,#2a1600,#120900);}
+        .tcard.r-champion .tc-rar{color:#ffd23f;font-weight:900;}
+        .trd-mini.r-minuit{border-color:#5b6bff;} .trd-mini.r-champion{border-color:#ffb300;}
+        /* cadres posés sur une carte */
+        .tcard[class*=" cf-"]{position:relative;}
+        .tcard.cf-flammes{box-shadow:0 -6px 18px #ff5a00,0 0 12px #ff9a00 !important;border-color:#ff5a00 !important;}
+        .tcard.cf-flammes::after{content:'';position:absolute;left:-4px;right:-4px;bottom:-4px;height:30%;border-radius:0 0 12px 12px;background:linear-gradient(0deg,rgba(255,90,0,.55),transparent);animation:rFlame 1.2s ease-in-out infinite alternate;pointer-events:none;z-index:5;}
+        .tcard.cf-petales{border-color:#ffb7d5 !important;box-shadow:0 0 14px #ffb7d5 !important;}
+        .tcard.cf-petales::after{content:'🌸 🌸 🌸';position:absolute;top:-10px;left:0;right:0;text-align:center;font-size:.8rem;pointer-events:none;z-index:5;}
+        .tcard.cf-eclairs{border-color:#ffe600 !important;animation:cfZap 1.4s steps(2) infinite;}
+        @keyframes cfZap{0%,100%{box-shadow:0 0 6px #ffe600;}50%{box-shadow:0 0 22px #ffe600,0 0 40px #00e5ff;}}
+        .tcard.cf-glace{border-color:#bdf0ff !important;box-shadow:0 0 16px #7fdcff,inset 0 0 18px rgba(189,240,255,.5) !important;}
+        .tcard.cf-or{border:4px double #ffd700 !important;box-shadow:0 0 18px rgba(255,215,0,.8) !important;}
+        .tcard.cf-neon{border-color:#ff2bd6 !important;animation:finNeon 1.6s ease-in-out infinite;}
+        .tcard.cf-ombre{border-color:#000 !important;box-shadow:0 0 0 2px #3a0066,0 0 26px #000,0 0 40px rgba(90,0,160,.6) !important;}
+        .tcard.cf-arcenciel{border:3px solid transparent !important;background-image:linear-gradient(#111,#111),linear-gradient(90deg,#ff5e5e,#ffd93d,#6bff6b,#5ec8ff,#c55eff,#ff5e5e) !important;background-origin:border-box;background-clip:padding-box,border-box !important;}
+        .cp5-hp{height:14px;background:#2a0010;border-radius:8px;overflow:hidden;margin:6px 0;} .cp5-hp i{display:block;height:100%;background:linear-gradient(90deg,#ff2a5f,#ff9a00);transition:width .6s;}
+        .cp5-quiz img{width:min(240px,70vw);aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:12px;filter:blur(14px) saturate(1.2);transition:filter 1s;display:block;margin:0 auto;}
+        .cp5-quiz img.clear{filter:none;}
+        .cp5-tr{position:absolute;z-index:50;font-size:1.3rem;cursor:pointer;opacity:.55;animation:cpTr 2.4s ease-in-out infinite;filter:drop-shadow(0 0 4px gold);}
+        .cp5-tr:hover{opacity:1;transform:scale(1.3);}
+        @keyframes cpTr{0%,100%{transform:translateY(0) rotate(-8deg);}50%{transform:translateY(-4px) rotate(8deg);}}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        if (typeof RAR_LABEL !== 'undefined') Object.assign(RAR_LABEL, { minuit: 'Minuit 🌙', champion: 'Champion 🏆' });
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body" style="position:relative;">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const needAcc = () => { if (isAccount()) return true; toast('Connecte-toi à un compte.', 'var(--accent-yellow)'); return false; };
+        const err = r => toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+        async function myCards() { const d = await v7get('/api/cards/mine'); return (d && d.ok ? d.cards : []).filter(c => !/^(collector|moment)\|/.test(c.key)); }
+        function picker(body, cards, max, onChange) {
+            const sel = [];
+            const wrap = document.createElement('div');
+            wrap.innerHTML = `<input class="v7-input" placeholder="🔎 Chercher une carte…"><div class="cp-grid"></div>`;
+            body.appendChild(wrap);
+            const draw = q => {
+                wrap.querySelector('.cp-grid').innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, 120).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                wrap.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= max) sel.shift(); sel.push(k); } draw(wrap.querySelector('input').value.trim().toLowerCase()); onChange && onChange(sel); });
+            };
+            wrap.querySelector('input').oninput = e => draw(e.target.value.trim().toLowerCase());
+            draw('');
+            return sel;
+        }
+        // cadres posés (pour l'affichage des cartes)
+        window.CARD_FRAMES_ON = {};
+        const loadFrames = async () => { if (!isAccount()) return; const d = await v7get('/api/cards/frames-on'); if (d && d.ok) window.CARD_FRAMES_ON = d.on || {}; };
+        socket.on('connect', () => setTimeout(loadFrames, 1800));
+
+        // ---------- météo ----------
+        let WX = null;
+        window.cp5WeatherUi = async function () {
+            if (!WX || Date.now() - WX.at > 10 * 60000) { const d = await v7get('/api/cards/weather'); if (d && d.ok) WX = { ...d, at: Date.now() }; }
+            const el = document.getElementById('cp5-weather'); if (!el || !WX) return;
+            el.textContent = `🌦️ Météo : ${WX.emoji} ${WX.label} → ${WX.labels.join(', ')} x3${WX.night ? ' • 🌙 cartes de Minuit actives' : ''}${WX.market ? ' • 🌑 marché noir ouvert' : ''}`;
+        };
+
+        // ---------- chasse au trésor ----------
+        let TR = null;
+        window.cp5Treasure = async function (spot, host) {
+            if (!isAccount() || !host) return;
+            if (!TR || Date.now() - TR.at > 5 * 60000) { const d = await v7get('/api/treasure'); if (d && d.ok) TR = { ...d, at: Date.now() }; }
+            if (!TR || TR.found || TR.spot !== spot || host.querySelector('.cp5-tr')) return;
+            if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+            const t = document.createElement('span'); t.className = 'cp5-tr'; t.textContent = '🃏'; t.title = '???';
+            t.style.left = (8 + TR.seed % 80) + '%'; t.style.top = (6 + (TR.seed * 7) % 70) + '%';
+            t.onclick = async e => {
+                e.stopPropagation();
+                const r = await v7post('/api/treasure', { spot });
+                if (!r || !r.ok) return err(r);
+                t.remove(); TR.found = true;
+                toast('🗺️ Trésor trouvé ! +100 ✨', '#ffd700');
+                if (r.card) showBooster([r.card]);
+            };
+            host.appendChild(t);
+        };
+        (function () { const bar = () => document.getElementById('cards-plus-bar'); setInterval(() => { const b = bar(); if (b && b.offsetParent) cp5Treasure('collection', b); }, 4000); })();
+
+        // ---------- expéditions ----------
+        window.cp5Expe = async function () {
+            if (!needAcc()) return;
+            const body = modal('🧭 Expéditions', 'Chargement…');
+            const d = await v7get('/api/cards/expedition');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            cp5Treasure('expedition', body);
+            if (d.expe) {
+                const left = d.expe.end - Date.now();
+                body.innerHTML = `<p>Tes cartes sont en mission (puissance <b>${d.expe.power}</b>) :</p><div class="cp-grid">${d.expe.cards.map(c => `<div>${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('')}</div>
+                    ${d.expe.ready ? `<button class="btn-action" id="cp5-claim">🎁 Récupérer le butin</button>` : `<p style="text-align:center;">⏳ Retour dans <b>${Math.floor(left / 3600000)} h ${Math.ceil(left % 3600000 / 60000)} min</b></p>`}`;
+                const c = body.querySelector('#cp5-claim');
+                if (c) c.onclick = async () => { const r = await v7post('/api/cards/expedition', { action: 'claim' }); if (!r || !r.ok) return err(r); toast(`🧭 Butin : +${r.coins} 🪙 • +${r.dust} ✨`, '#ffd700'); if (typeof ecoLoad === 'function') ecoLoad(); document.getElementById('cp-modal')?.remove(); if (r.cards.length) showBooster(r.cards); };
+                return;
+            }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 6px;">Envoie 3 cartes en mission pendant ${d.hours} h. Plus elles sont puissantes (rareté, niveau ★, finition), meilleur est le butin : pièces, poussière ✨, XP et peut-être une carte Légendaire ou Mythique.</p><button class="btn-action" id="cp5-go" disabled>🧭 Partir (0/3)</button>`;
+            const go = body.querySelector('#cp5-go');
+            const sel = picker(body, await myCards(), 3, s => { go.disabled = s.length !== 3; go.textContent = `🧭 Partir (${s.length}/3)`; });
+            go.onclick = async () => { const r = await v7post('/api/cards/expedition', { keys: sel }); if (!r || !r.ok) return err(r); toast('🧭 Expédition partie ! Reviens dans 8 h.', '#00ff88'); cp5Expe(); };
+        };
+
+        // ---------- musées ----------
+        window.cp5Museums = async function () {
+            const body = modal('🏛️ Musées des joueurs', 'Chargement…');
+            const d = await v7get('/api/museums');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Les plus belles vitrines du serveur (ajoute tes cartes à ton musée depuis leur fiche). Like tes préférées !</p>`
+                + (d.museums.length ? d.museums.map((m, i) => `<div class="cp-row" style="flex-direction:column;"><div style="display:flex;justify-content:space-between;align-items:center;"><b>${['🥇', '🥈', '🥉'][i] || '🏛️'} Musée de ${esc(m.pseudo)}</b><button class="kick-btn" data-like="${esc(m.pseudo)}" ${m.mine ? 'disabled' : ''}>${m.liked ? '❤️' : '🤍'} ${m.likes}</button></div>
+                    <div class="cp-grid" style="grid-template-columns:repeat(auto-fill,minmax(85px,1fr));margin-top:6px;">${m.cards.map(c => `<div>${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('')}</div></div>`).join('') : '<p class="tl-hint">Aucun musée pour l’instant.</p>');
+            body.querySelectorAll('[data-like]').forEach(b => b.onclick = async () => { if (!needAcc()) return; const r = await v7post('/api/museums/like', { pseudo: b.dataset.like }); if (!r || !r.ok) return err(r); b.textContent = `${r.liked ? '❤️' : '🤍'} ${r.likes}`; });
+            cp5Treasure('museum', body);
+        };
+
+        // ---------- marché noir ----------
+        window.cp5Market = async function () {
+            const body = modal('🌙 Marché noir', 'Chargement…');
+            const d = await v7get('/api/blackmarket');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            if (!d.open) { body.innerHTML = `<p style="text-align:center;font-size:1.1rem;">🌑 Le marchand n’est pas là…<br><small class="tl-hint">Il n’ouvre qu’une heure par nuit, de <b>23 h à minuit</b> (heure de Paris), avec 4 cartes rares à prix fixe. Reviens ce soir !</small></p>`; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Ouvert jusqu’à minuit. Chaque carte ne s’achète qu’une fois par nuit.</p><div class="cp-grid">${d.items.map(x => `<div style="text-align:center;">${cardHtml({ name: x.name, img: x.img, rarity: x.rarity, anime: x.anime, isNew: false })}<button class="btn-action" data-i="${x.i}" style="margin:4px 0 0;padding:4px;" ${x.bought ? 'disabled' : ''}>${x.bought ? '✔ Acheté' : '🪙 ' + x.price.toLocaleString('fr-FR')}</button></div>`).join('')}</div>`;
+            body.querySelectorAll('[data-i]').forEach(b => b.onclick = async () => { if (!needAcc()) return; if (!confirm('Acheter cette carte ?')) return; const r = await v7post('/api/blackmarket', { i: +b.dataset.i }); if (!r || !r.ok) return err(r); if (typeof eco !== 'undefined') { eco.coins = r.coins; ecoCoinsUi(); } b.disabled = true; b.textContent = '✔ Acheté'; showBooster([r.card]); });
+        };
+
+        // ---------- raid légendaire ----------
+        window.cp5Raid = async function () {
+            const body = modal('🐉 Raid légendaire de la semaine', 'Chargement…');
+            const d = await v7get('/api/raid');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            const nextIn = d.me && d.me.next > Date.now() ? Math.ceil((d.me.next - Date.now()) / 60000) : 0;
+            body.innerHTML = `<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;"><img src="${esc(d.img)}" style="width:140px;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:12px;border:3px solid #ff2a5f;" onerror="this.style.opacity=.2">
+                <div style="flex:1;min-width:200px;"><h3 style="margin:0;">${esc(d.name)}</h3><div class="tl-hint" style="text-align:left;">${esc(d.anime)} • ${d.fighters} combattants</div>
+                <div class="cp5-hp"><i style="width:${Math.round(100 * d.hp / d.max)}%"></i></div><b>${d.hp.toLocaleString('fr-FR')} / ${d.max.toLocaleString('fr-FR')} PV</b>
+                <p class="tl-hint" style="text-align:left;">Tout le serveur l’attaque ensemble avec son deck (1 attaque par heure). Quand il tombe, chaque participant gagne des pièces, 200 ✨ et une carte Secrète de son anime.</p>
+                ${d.dead ? '<b style="color:#00ff88;">✅ Vaincu cette semaine !</b>' : `<button class="btn-action" id="cp5-hit" ${nextIn ? 'disabled' : ''}>${nextIn ? `⏳ Prochaine attaque dans ${nextIn} min` : '⚔️ Attaquer avec mon deck'}</button>`}
+                ${d.me ? `<div class="tl-hint" style="text-align:left;">Tes dégâts : <b>${d.me.dmg.toLocaleString('fr-FR')}</b></div>` : ''}</div></div>
+                <h4>🏆 Meilleurs combattants</h4>${d.top.map((t, i) => `<div class="cp-row"><span>${i + 1}. ${esc(t.name)}</span><b>${t.dmg.toLocaleString('fr-FR')}</b></div>`).join('') || '<p class="tl-hint">Personne n’a encore attaqué.</p>'}`;
+            const hit = body.querySelector('#cp5-hit');
+            if (hit) hit.onclick = async () => { if (!needAcc()) return; const r = await v7post('/api/raid', {}); if (!r || !r.ok) return err(r); toast(`⚔️ ${r.dmg.toLocaleString('fr-FR')} dégâts !${r.killed ? ' Le boss est vaincu !' : ''}`, '#ffd700'); cp5Raid(); };
+            cp5Treasure('raid', body);
+        };
+        socket.on('raid_down', g => { if (g) toast(`🐉 Le boss de raid ${esc(g.name)} est tombé ! Coup final : ${esc(g.killer)}`, '#ffd700'); });
+        socket.on('raid_win', g => { if (g) toast(`🐉 Raid gagné : +${g.coins} 🪙, +200 ✨ et une carte Secrète !`, '#00ff88'); });
+
+        // ---------- quiz carte ----------
+        window.cp5Quiz = async function () {
+            if (!needAcc()) return;
+            const body = modal('🧠 Quiz carte', 'Chargement…');
+            const d = await v7get('/api/cards/quiz');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            if (!d.quiz) { body.innerHTML = '<p style="text-align:center;">✅ Tu as fait tes 5 quiz du jour. Reviens demain !</p>'; return; }
+            body.innerHTML = `<div class="cp5-quiz"><p style="text-align:center;margin:0 0 8px;">Devine le perso (${esc(d.quiz.anime)}) pour gagner sa carte ! <small class="tl-hint">(${d.left} quiz restants aujourd’hui)</small></p><img id="cp5-qi" src="${esc(d.quiz.img)}" alt="">
+                <input class="v7-input" id="cp5-qg" placeholder="Nom du perso…" style="margin-top:10px;"><button class="btn-action" id="cp5-qs">✔ Valider</button><div id="cp5-qr" style="text-align:center;font-weight:900;"></div></div>`;
+            const send = async () => {
+                const r = await v7post('/api/cards/quiz', { guess: body.querySelector('#cp5-qg').value });
+                if (!r || !r.ok) return err(r);
+                body.querySelector('#cp5-qi').classList.add('clear');
+                body.querySelector('#cp5-qr').innerHTML = r.right ? `🎉 Bravo, c’était <b>${esc(r.answer)}</b> ! La carte est à toi.` : `❌ Raté, c’était <b>${esc(r.answer)}</b>.`;
+                body.querySelector('#cp5-qs').outerHTML = r.left > 0 ? '<button class="btn-action" onclick="cp5Quiz()">➡️ Quiz suivant</button>' : '<p class="tl-hint">Fini pour aujourd’hui !</p>';
+                if (r.card) setTimeout(() => showBooster([r.card]), 900);
+            };
+            body.querySelector('#cp5-qs').onclick = send;
+            body.querySelector('#cp5-qg').onkeydown = e => { if (e.key === 'Enter') send(); };
+            cp5Treasure('quiz', body);
+        };
+
+        // ---------- cadres ----------
+        window.cp5Frames = async function () {
+            if (!needAcc()) return;
+            const body = modal('🖼️ Cadres de cartes', 'Chargement…');
+            const d = await v7get('/api/cards/frames');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<div class="ci-row">✨ Poussière : <b>${d.dust}</b></div><h4>🔨 Fabriquer</h4><div class="cp-fins">${d.frames.map(f => `<button data-craft="${f.id}" ${d.dust < f.cost ? 'disabled' : ''}>${esc(f.label)}<br><small>${f.cost} ✨ • tu en as ${d.owned[f.id] || 0}</small></button>`).join('')}</div>
+                <h4>🎨 Poser un cadre sur une carte</h4><select class="v7-input" id="cp5-fr"><option value="">— Choisis un cadre que tu as —</option>${d.frames.filter(f => d.owned[f.id] > 0).map(f => `<option value="${f.id}">${esc(f.label)} (x${d.owned[f.id]})</option>`).join('')}<option value="__remove">❌ Retirer le cadre de la carte</option></select><button class="btn-action" id="cp5-fa" disabled>🖼️ Appliquer</button>`;
+            body.querySelectorAll('[data-craft]').forEach(b => b.onclick = async () => { const r = await v7post('/api/cards/frames', { action: 'craft', id: b.dataset.craft }); if (!r || !r.ok) return err(r); toast('🔨 Cadre fabriqué !', '#00ff88'); cp5Frames(); });
+            const apply = body.querySelector('#cp5-fa');
+            const sel = picker(body, await myCards(), 1, s => { apply.disabled = !s.length; });
+            apply.onclick = async () => {
+                const f = body.querySelector('#cp5-fr').value; if (!f) return toast('Choisis un cadre.', 'var(--accent-yellow)');
+                const r = await v7post('/api/cards/frames', f === '__remove' ? { action: 'remove', key: sel[0] } : { action: 'apply', id: f, key: sel[0] });
+                if (!r || !r.ok) return err(r);
+                window.CARD_FRAMES_ON = r.on || window.CARD_FRAMES_ON; toast('🖼️ Cadre mis à jour !', '#00ff88'); cp5Frames();
+            };
+        };
+
+        // ---------- champion du mois ----------
+        window.cp5Champion = async function () {
+            const body = modal('🏆 Champion du mois', 'Chargement…');
+            const d = await v7get('/api/champion');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = d.champion ? `<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;"><div style="width:170px;">${cardHtml({ name: 'Champion ' + d.champion.mk + ' : ' + d.champion.pseudo, img: d.champion.img, rarity: 'champion', isNew: false })}</div>
+                <div style="flex:1;min-width:200px;"><h3 style="margin:0;">👑 ${esc(d.champion.pseudo)}</h3><p>Champion de ${esc(d.champion.mk)} avec <b>${d.champion.wins}</b> victoires.</p><p>Sa carte peut sortir de n’importe quel booster ce mois-ci (environ 1 booster sur 300 cartes). Deviens le prochain champion en gagnant un max de parties ce mois-ci !</p></div></div>`
+                : '<p style="text-align:center;">Le premier champion sera désigné à la fin du mois : le joueur avec le plus de victoires aura sa propre carte à collectionner ! 🏆</p>';
         };
     })();
     </script>

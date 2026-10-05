@@ -24531,6 +24531,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('champion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'champion', anime: i.anime, rarity: 'champion', img: i.img }); return; }
         if (k.startsWith('fusion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'fusion', img: i.img, imgs: i.imgs || null, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('month|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'mensuelle', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('evo|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'evolution', img: i.img, evo: true, lvl: cardLvlOf(xpm[k] || 0) }); return; }
@@ -26855,3 +26856,313 @@ tbOpen = async function (uid, b, chosenU) {
     if (b && b.id === 'welcome') return autoDelApply(uid, await recordCards(uid, await tbFromUniverses(uid, arcUniverses(), await cardLuck(uid), 3, 10)));
     return _tbOpenWelcome(uid, b, chosenU);
 };
+
+/* =====================================================================
+   AG_CARDS_PLUS_V5 — expéditions, météo des boosters, cartes de minuit, musées à visiter,
+   marché noir nocturne, raid légendaire, chasse au trésor, carte du champion, quiz carte,
+   cadres de cartes fabriqués avec la poussière.
+   ===================================================================== */
+const parisDay = () => { const p = parisParts(hubNow()); return `${p.y}-${String(p.m).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`; };
+const mkPayCoins = async (uid, price) => {
+    const e = await ecoGet(uid);
+    if (e.coins < price) return `Il te manque ${price - e.coins} pièces.`;
+    if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, price])).rows[0]; if (!r) return 'Pas assez de pièces.'; }
+    else e.coins -= price;
+    return null;
+};
+
+// ---------- carte de minuit : nouvelle rareté qui ne sort qu'entre minuit et 6 h ----------
+SPECIAL_TIERS.push({ id: 'minuit', label: 'Minuit', top: 5, rate: 0, coins: 120 });
+SPECIAL_BY_ID.minuit = SPECIAL_TIERS[SPECIAL_TIERS.length - 1];
+Object.assign(RAR_RANK, { minuit: 5.6 }); DECK_BONUS.minuit = 22; MARKET_HINT.minuit = [8000, 25000];
+RAR_ORDER.splice(RAR_ORDER.indexOf('eveillee') + 1, 0, 'minuit');
+
+// ---------- météo des boosters : un élément par jour, raretés liées x3 ----------
+const WEATHER = [
+    { id: 'feu', label: 'Feu', emoji: '🔥', tiers: ['infernale'] }, { id: 'glace', label: 'Glace', emoji: '❄️', tiers: ['glaciale'] },
+    { id: 'ombre', label: 'Ombre', emoji: '🌑', tiers: ['abyssale', 'chaos'] }, { id: 'lumiere', label: 'Lumière', emoji: '☀️', tiers: ['celeste', 'stellaire', 'divine'] },
+    { id: 'esprit', label: 'Esprits', emoji: '👻', tiers: ['spectrale', 'eveillee'] }, { id: 'cosmos', label: 'Cosmos', emoji: '🌌', tiers: ['cosmique', 'dimensionnelle'] },
+    { id: 'royal', label: 'Royauté', emoji: '👑', tiers: ['imperiale', 'legende'] }
+];
+SPECIAL_TIERS.forEach(t => { if (t.baseRate == null) t.baseRate = t.id === 'minuit' ? 1 / 60 : t.rate; });
+function weatherToday() { return WEATHER[hubHash('weather' + parisDay()) % WEATHER.length]; }
+let WEATHER_APPLIED = '';
+function weatherApply() {
+    const h = parisHour(), night = h < 6, key = parisDay() + (night ? 'n' : 'd');
+    if (WEATHER_APPLIED === key) return;
+    WEATHER_APPLIED = key;
+    const w = weatherToday();
+    SPECIAL_TIERS.forEach(t => {
+        if (t.baseRate == null) t.baseRate = t.rate;
+        t.rate = t.id === 'minuit' ? (night ? t.baseRate : 0) : t.baseRate * (w.tiers.includes(t.id) ? 3 : 1);
+    });
+    CARD_RATES_CACHE = null;
+}
+weatherApply(); setInterval(weatherApply, 60 * 1000).unref();
+app.get('/api/cards/weather', (req, res) => { weatherApply(); const w = weatherToday(), h = parisHour(); res.json({ ok: true, ...w, labels: w.tiers.map(t => (SPECIAL_BY_ID[t] || {}).label || t), night: h < 6, market: h === 23 }); });
+
+// ---------- cadres de cartes (fabriqués avec la poussière, posés sur une carte) ----------
+const CARD_FRAMES = { flammes: ['🔥 Flammes', 400], petales: ['🌸 Pétales', 400], eclairs: ['⚡ Éclairs', 500], glace: ['❄️ Glace', 500], or: ['👑 Or royal', 900], neon: ['💡 Néon', 700], ombre: ['🌑 Ombre', 800], arcenciel: ['🌈 Arc-en-ciel', 1200] };
+app.get('/api/cards/frames', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    res.json({ ok: true, frames: Object.entries(CARD_FRAMES).map(([id, [label, cost]]) => ({ id, label, cost })), owned: await kvGet('cframes', String(uid), {}), on: await kvGet('cframe', String(uid), {}), dust: await dustGet(uid) });
+});
+app.post('/api/cards/frames', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {}, id = String(b.id || ''), key = String(b.key || '');
+    const owned = await kvGet('cframes', String(uid), {}), on = await kvGet('cframe', String(uid), {});
+    if (b.action === 'craft') {
+        const f = CARD_FRAMES[id]; if (!f) return res.json({ ok: false, error: 'Cadre inconnu.' });
+        if ((await dustGet(uid)) < f[1]) return res.json({ ok: false, error: `Il faut ${f[1]} ✨.` });
+        await dustAdd(uid, -f[1]); owned[id] = (owned[id] || 0) + 1; await kvSet('cframes', String(uid), owned);
+        return res.json({ ok: true, owned, dust: await dustGet(uid) });
+    }
+    if (!(await cardsOf(uid)).get(key)) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' });
+    if (b.action === 'remove') { if (on[key]) { owned[on[key]] = (owned[on[key]] || 0) + 1; delete on[key]; } }
+    else {
+        if (!CARD_FRAMES[id] || !(owned[id] > 0)) return res.json({ ok: false, error: 'Fabrique d’abord ce cadre.' });
+        if (on[key]) owned[on[key]] = (owned[on[key]] || 0) + 1;
+        owned[id]--; on[key] = id;
+    }
+    await kvSet('cframes', String(uid), owned); await kvSet('cframe', String(uid), on);
+    res.json({ ok: true, owned, on });
+});
+
+// ---------- expéditions : 3 cartes partent 8 h ----------
+const EXPE_MS = 8 * 3600 * 1000;
+app.get('/api/cards/expedition', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const e = await kvGet('expe', String(uid), null);
+    res.json({ ok: true, expe: e ? { ...e, cards: e.keys.map(k => ({ key: k, ...(cardInfoOfKey(k) || {}) })), ready: Date.now() >= e.end } : null, hours: EXPE_MS / 3600000 });
+});
+app.post('/api/cards/expedition', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {}, cur = await kvGet('expe', String(uid), null);
+    if (b.action === 'claim') {
+        if (!cur) return res.json({ ok: false, error: 'Aucune expédition.' });
+        if (Date.now() < cur.end) return res.json({ ok: false, error: 'L’expédition n’est pas encore revenue.' });
+        const pow = cur.power || 60;
+        const coins = Math.round(80 + pow * 0.9), dust = Math.round(10 + pow / 4);
+        await ecoAddCoins(uid, coins); await dustAdd(uid, dust); await cardXpAdd(uid, cur.keys, 30);
+        let cards = [];
+        if (Math.random() < Math.min(0.85, 0.25 + pow / 600)) { const rar = Math.random() < Math.min(0.5, pow / 900) ? 'mythique' : 'legendaire'; const p = randomCardOfRarity(rar); if (p) cards = [await cardAward({ userId: uid, id: null }, p.u, p.display, { silent: true, shinyRate: 1 / 8 })]; }
+        await kvSet('expe', String(uid), null);
+        return res.json({ ok: true, coins, dust, cards: cards.filter(Boolean) });
+    }
+    if (cur) return res.json({ ok: false, error: 'Une expédition est déjà en cours.' });
+    const keys = [...new Set((Array.isArray(b.keys) ? b.keys : []).map(String))].slice(0, 3);
+    const team = await cardsWithMeta(uid, keys);
+    if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
+    const power = team.reduce((a, c) => a + cardPower(c), 0);
+    await kvSet('expe', String(uid), { keys, start: Date.now(), end: Date.now() + EXPE_MS, power });
+    res.json({ ok: true, end: Date.now() + EXPE_MS, power });
+});
+
+// ---------- musées à visiter + likes ----------
+app.get('/api/museums', async (req, res) => {
+    const uid = authUserId(req);
+    let rows = [];
+    if (HAS_DB) { try { rows = (await pool.query("SELECT k, v FROM hub_kv WHERE ns='vitrine'")).rows; } catch (_) {} }
+    else KV.forEach((v, k) => { if (k.startsWith('vitrine|')) rows.push({ k: k.slice(8), v }); });
+    const likes = await kvGet('museumlikes', 'all', {});
+    const out = [];
+    for (const r of rows) {
+        const keys = Array.isArray(r.v) ? r.v : []; if (!keys.length) continue;
+        const owner = +r.k, l = likes[r.k] || [];
+        out.push({ pseudo: await pseudoOf(owner), likes: l.length, liked: uid ? l.includes(uid) : false, mine: owner === uid, cards: keys.slice(0, 10).map(k => ({ key: k, ...(cardInfoOfKey(k) || {}) })).filter(c => c.name) });
+    }
+    out.sort((a, b) => b.likes - a.likes || b.cards.length - a.cards.length);
+    res.json({ ok: true, museums: out.slice(0, 60) });
+});
+app.post('/api/museums/like', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const owner = await uidByPseudo(String((req.body || {}).pseudo || ''));
+    if (!owner || owner === uid) return res.json({ ok: false, error: 'Impossible.' });
+    const likes = await kvGet('museumlikes', 'all', {}), l = likes[owner] = likes[owner] || [];
+    const i = l.indexOf(uid); if (i >= 0) l.splice(i, 1); else l.push(uid);
+    await kvSet('museumlikes', 'all', likes);
+    res.json({ ok: true, likes: l.length, liked: i < 0 });
+});
+
+// ---------- marché noir : de 23 h à minuit, 4 cartes rares à prix fixe ----------
+function blackMarket() {
+    const day = parisDay(), h = hubHash('bm' + day);
+    const slots = [['legendaire', 1500], ['mythique', 3500], ['secrete', 7000], [['divine', 'celeste', 'spectrale', 'stellaire'][h % 4], 14000]];
+    const rnd = i => { let x = hubHash('bm' + day + i); return () => (x = Math.imul(x ^ (x >>> 15), 2246822507) >>> 0) / 4294967296; };
+    return slots.map(([rar, price], i) => {
+        const R = rnd(i), us = arcUniverses();
+        for (let t = 0; t < 80; t++) {
+            const u = us[Math.floor(R() * us.length)];
+            if (SPECIAL_BY_ID[rar]) { const sc = cardSpecials(rar, u); if (sc.length) { const c = sc[Math.floor(R() * sc.length)]; return { i, u, name: c.display, rarity: rar, price, secret: true, img: cardImg({ u, display: c.display }), anime: ARC_UNIVERSE_ANIME[u] }; } continue; }
+            const list = cardPool(u), ok = list.map((c, j) => j).filter(j => cardRarityAt(u, j) === rar);
+            if (ok.length) { const j = ok[Math.floor(R() * ok.length)]; return { i, u, name: list[j].display, rarity: rar, price, img: cardImg({ u, display: list[j].display }), anime: ARC_UNIVERSE_ANIME[u] }; }
+        }
+        return null;
+    }).filter(Boolean);
+}
+app.get('/api/blackmarket', async (req, res) => {
+    const uid = authUserId(req), open = parisHour() === 23;
+    const bought = uid ? await kvGet('bmbought', String(uid) + '|' + parisDay(), []) : [];
+    res.json({ ok: true, open, items: open ? blackMarket().map(x => ({ ...x, bought: bought.includes(x.i) })) : [], opensAt: '23:00' });
+});
+app.post('/api/blackmarket', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    if (parisHour() !== 23) return res.json({ ok: false, error: 'Le marché noir est fermé (ouvert de 23 h à minuit).' });
+    const i = +(req.body || {}).i, it = blackMarket().find(x => x.i === i);
+    if (!it) return res.json({ ok: false, error: 'Article introuvable.' });
+    const bk = String(uid) + '|' + parisDay(), bought = await kvGet('bmbought', bk, []);
+    if (bought.includes(i)) return res.json({ ok: false, error: 'Déjà acheté cette nuit.' });
+    const err = await mkPayCoins(uid, it.price); if (err) return res.json({ ok: false, error: err });
+    bought.push(i); await kvSet('bmbought', bk, bought);
+    const card = it.secret ? await cardAwardSecret(uid, it.u, it.name, Math.random() < 0.1, it.rarity) : await cardAward({ userId: uid, id: null }, it.u, it.name, { silent: true, shinyRate: 1 / 10 });
+    res.json({ ok: true, card, coins: (await ecoGet(uid)).coins });
+});
+
+// ---------- raid légendaire de la semaine (coop : tout le serveur attaque avec son deck) ----------
+async function raidGet() {
+    const wk = weekKey(), r = await kvGet('raid', wk, null);
+    if (r) return r;
+    const pool2 = ['naruto', 'onepiece', 'dragonball', 'bleach', 'jjk', 'demonslayer', 'hxh', 'snk'].filter(u => ARC_UNIVERSE_ANIME[u]);
+    const u = pool2[hubHash('raid' + wk) % pool2.length];
+    const villains = tbCharCards(['antagoniste']).filter(c => c.u === u);
+    const v = villains.length ? villains[hubHash('raidv' + wk) % villains.length] : { u, display: arcFamous(u)[0].display };
+    const fresh = { wk, u, display: v.display, max: 60000, hp: 60000, hits: {}, dead: false };
+    await kvSet('raid', wk, fresh);
+    return fresh;
+}
+app.get('/api/raid', async (req, res) => {
+    const uid = authUserId(req), r = await raidGet();
+    const top = Object.entries(r.hits).map(([id, h]) => ({ name: h.name, dmg: h.dmg })).sort((a, b) => b.dmg - a.dmg).slice(0, 10);
+    const me = uid ? r.hits[uid] : null;
+    res.json({ ok: true, name: r.display, anime: ARC_UNIVERSE_ANIME[r.u], img: cardImg({ u: r.u, display: r.display }), hp: r.hp, max: r.max, dead: r.dead, fighters: Object.keys(r.hits).length, top, me: me ? { dmg: me.dmg, next: (me.last || 0) + 3600000 } : null });
+});
+let RAID_LOCK = Promise.resolve();
+app.post('/api/raid', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const out = await (RAID_LOCK = RAID_LOCK.then(async () => {
+        const r = await raidGet();
+        if (r.dead) return { ok: false, error: 'Le boss de raid est déjà vaincu cette semaine !' };
+        const h = r.hits[uid] = r.hits[uid] || { name: await pseudoOf(uid), dmg: 0, last: 0 };
+        if (Date.now() - (h.last || 0) < 3600000) return { ok: false, error: `Prochaine attaque dans ${Math.ceil((h.last + 3600000 - Date.now()) / 60000)} min.` };
+        const deck = await deckOf(uid), xp = await cardXpMap(uid);
+        if (!deck.length) return { ok: false, error: 'Prépare d’abord ton deck (5 cartes).' };
+        const pow = deck.reduce((a, c) => a + cardPower({ ...c, lvl: cardLvlOf(xp[c.key] || 0) }), 0);
+        const dmg = Math.round(pow * (8 + Math.random() * 6));
+        h.dmg += dmg; h.last = Date.now(); r.hp = Math.max(0, r.hp - dmg);
+        let killed = false;
+        if (r.hp <= 0) {
+            r.dead = true; killed = true;
+            for (const id of Object.keys(r.hits)) {
+                const coins = 500 + Math.min(2000, Math.round(r.hits[id].dmg / 50));
+                await ecoAddCoins(+id, coins); await dustAdd(+id, 200);
+                const t = SPECIAL_TIERS.find(x => x.id === 'secrete'), sc = cardSpecials('secrete', r.u);
+                if (sc.length) await cardAwardSecret(+id, r.u, sc[0].display, false, t.id);
+                emitUser(+id, 'raid_win', { name: r.display, coins });
+            }
+            io.emit('raid_down', { name: r.display, killer: h.name });
+        }
+        await kvSet('raid', r.wk, r);
+        return { ok: true, dmg, hp: r.hp, max: r.max, killed };
+    }, () => ({ ok: false })));
+    res.json(out);
+});
+
+// ---------- chasse au trésor : une carte cachée chaque jour quelque part sur le site ----------
+const TREASURE_SPOTS = ['collection', 'shop', 'museum', 'raid', 'expedition', 'quiz'];
+app.get('/api/treasure', async (req, res) => {
+    const uid = authUserId(req), day = parisDay();
+    const found = uid ? !!(await kvGet('treasure', String(uid) + '|' + day, null)) : false;
+    res.json({ ok: true, spot: TREASURE_SPOTS[hubHash('tr' + day) % TREASURE_SPOTS.length], seed: hubHash('trs' + day) % 1000, found });
+});
+app.post('/api/treasure', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const day = parisDay(), spot = String((req.body || {}).spot || '');
+    if (spot !== TREASURE_SPOTS[hubHash('tr' + day) % TREASURE_SPOTS.length]) return res.json({ ok: false, error: 'Rien ici…' });
+    if (await kvGet('treasure', String(uid) + '|' + day, null)) return res.json({ ok: false, error: 'Déjà trouvé aujourd’hui !' });
+    await kvSet('treasure', String(uid) + '|' + day, { at: Date.now() });
+    const rar = Math.random() < 0.15 ? 'mythique' : 'legendaire', p = randomCardOfRarity(rar);
+    const card = p ? await cardAward({ userId: uid, id: null }, p.u, p.display, { silent: true, shinyRate: 1 / 4 }) : null;
+    await dustAdd(uid, 100);
+    await recordTry('treasure:' + day, `Premier à trouver le trésor du ${day}`, uid, card ? card.name : '');
+    res.json({ ok: true, card, dust: 100 });
+});
+
+// ---------- carte du champion : le n°1 du mois précédent (victoires) a sa carte ----------
+async function championOf(mk) {
+    const saved = await kvGet('champion', mk, null);
+    if (saved) return saved;
+    if (!HAS_DB) return null;
+    const [y, m] = mk.split('-').map(Number), from = new Date(Date.UTC(y, m - 1, 1)), to = new Date(Date.UTC(m === 12 ? y + 1 : y, m % 12, 1));
+    if (to.getTime() > hubNow()) return null; // mois pas encore fini
+    try {
+        const r = (await pool.query(`SELECT user_id, count(*) FILTER (WHERE won)::int AS w FROM game_results WHERE created_at >= $1 AND created_at < $2 GROUP BY user_id ORDER BY w DESC LIMIT 1`, [from, to])).rows[0];
+        if (!r || !r.w) return null;
+        const c = { mk, uid: r.user_id, pseudo: await pseudoOf(r.user_id), wins: r.w };
+        await kvSet('champion', mk, c);
+        return c;
+    } catch (_) { return null; }
+}
+const prevMonthKey = () => { const p = parisParts(hubNow()); return p.m === 1 ? `${p.y - 1}-12` : `${p.y}-${String(p.m - 1).padStart(2, '0')}`; };
+app.get('/api/champion-img', (req, res) => {
+    const p = String(req.query.p || '?').slice(0, 20).replace(/[<>&"]/g, ''), mk = String(req.query.m || '').replace(/[^0-9-]/g, '');
+    res.type('image/svg+xml').set('Cache-Control', 'public, max-age=86400').send(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420"><defs><radialGradient id="g" cx="50%" cy="40%"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#ffb300"/><stop offset="1" stop-color="#2a1600"/></radialGradient></defs><rect width="300" height="420" fill="url(#g)"/><text x="150" y="200" font-size="140" text-anchor="middle">🏆</text><text x="150" y="300" font-size="30" font-family="sans-serif" font-weight="900" text-anchor="middle" fill="#1a0f00">${p}</text><text x="150" y="340" font-size="20" font-family="sans-serif" text-anchor="middle" fill="#3a2400">Champion ${mk}</text></svg>`);
+});
+const _cardInfoOfKeyChamp = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'champion') { const [, mk, pseudo] = p; return { u: 'champion', name: `Champion ${mk} : ${pseudo}`, display: pseudo, anime: 'Anime Game', rarity: 'champion', img: `/api/champion-img?p=${encodeURIComponent(pseudo)}&m=${encodeURIComponent(mk)}` }; }
+    return _cardInfoOfKeyChamp(k);
+};
+RAR_RANK.champion = 6.6; DECK_BONUS.champion = 30; MARKET_HINT.champion = [15000, 50000];
+async function championMaybe(uid, cards, n) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const c = await championOf(prevMonthKey()); if (!c) return cards;
+    if (Math.random() < 1 - Math.pow(1 - 1 / 300, Math.max(1, n || cards.length))) {
+        const key = `champion|${c.mk}|${c.pseudo}`, isNew = await cardGive(uid, { key }, false);
+        cards.push({ key, ...cardInfoOfKey(key), isNew, coins: 0 });
+    }
+    return cards;
+}
+const _openBoosterChamp = openBooster;
+openBooster = async function (uid, n, type = '') { weatherApply(); return championMaybe(uid, await _openBoosterChamp(uid, n, type), n); };
+const _tbOpenChamp = tbOpen;
+tbOpen = async function (uid, b, chosenU) { weatherApply(); return championMaybe(uid, await _tbOpenChamp(uid, b, chosenU), 5); };
+app.get('/api/champion', async (req, res) => { const c = await championOf(prevMonthKey()); res.json({ ok: true, champion: c ? { pseudo: c.pseudo, wins: c.wins, mk: c.mk, img: `/api/champion-img?p=${encodeURIComponent(c.pseudo)}&m=${c.mk}` } : null }); });
+
+// ---------- quiz carte : une carte floutée, devine le perso pour la gagner (5 par jour) ----------
+const QUIZ_TOK = new Map(); // jeton anonyme -> perso (l'adresse de l'image ne trahit pas le nom)
+app.get('/api/cards/quiz-img/:tok', async (req, res) => {
+    const q = QUIZ_TOK.get(String(req.params.tok || ''));
+    if (!q) return res.status(404).end();
+    const route = (await avatarStoredImageRoute(q.u, q.display)) || staticCharImage(q.u, q.display);
+    const img = route ? await arcFetchImage(route) : null;
+    if (!img) return res.status(404).end();
+    res.set('Content-Type', img.type); res.set('Cache-Control', 'private, max-age=600'); res.send(img.buf);
+});
+app.get('/api/cards/quiz', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const day = parisDay(), st = await kvGet('cquiz', String(uid), {});
+    if (st.day !== day) { st.day = day; st.n = 0; st.cur = null; }
+    if (!st.cur && st.n < 5) {
+        const us = ['naruto', 'onepiece', 'bleach', 'dragonball', 'jjk', 'demonslayer', 'hxh', 'snk', 'mha', 'chainsaw', 'fairy', 'clover', 'jojo', 'fma', 'opm', 'tokyoghoul', 'deathnote', 'solo', 'frieren', 'spyfamily'].filter(u => ARC_UNIVERSE_ANIME[u]);
+        const u = us[Math.floor(Math.random() * us.length)], top = arcFamous(u).slice(0, 40), c = top[Math.floor(Math.random() * top.length)];
+        st.cur = { u, display: c.display, raw: c.raw, tok: Math.random().toString(36).slice(2) + Date.now().toString(36) };
+        await kvSet('cquiz', String(uid), st);
+    }
+    if (st.cur && !st.cur.tok) { st.cur.tok = Math.random().toString(36).slice(2); await kvSet('cquiz', String(uid), st); }
+    if (st.cur) QUIZ_TOK.set(st.cur.tok, { u: st.cur.u, display: st.cur.display, at: Date.now() });
+    res.json({ ok: true, left: 5 - st.n, quiz: st.cur ? { anime: ARC_UNIVERSE_ANIME[st.cur.u], img: '/api/cards/quiz-img/' + st.cur.tok } : null });
+});
+app.post('/api/cards/quiz', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const st = await kvGet('cquiz', String(uid), {}), guess = String((req.body || {}).guess || '').trim();
+    if (!st.cur || st.day !== parisDay()) return res.json({ ok: false, error: 'Pas de quiz en cours.' });
+    const c = st.cur, ok = arcNameMatches(c.u, { raw: c.raw, display: c.display }, guess);
+    st.n = (st.n || 0) + 1; st.cur = null; await kvSet('cquiz', String(uid), st);
+    let card = null;
+    if (ok) card = await cardAward({ userId: uid, id: null }, c.u, c.display, { silent: true, shinyRate: 1 / 6 });
+    res.json({ ok: true, right: ok, answer: c.display, card, left: 5 - st.n });
+});
+
+// ---------- infos pour la collection : cadres posés ----------
+app.get('/api/cards/frames-on', async (req, res) => { const uid = needUid(req, res); if (!uid) return; res.json({ ok: true, on: await kvGet('cframe', String(uid), {}) }); });
