@@ -27206,6 +27206,10 @@ function survReward(floor) { // récompense pour avoir passé l'étage `floor`
     if (floor % 5 === 0) r.dust = floor * 8;
     if (floor % 10 === 0) { r.potions = Math.min(3, floor / 10); r.coins += floor * 10; }
     if (floor % 25 === 0) r.secret = true;
+    r.items = {}; // potions spéciales (AG_CARDS_PLUS_V7)
+    if (floor % 5 === 0 && floor % 10 !== 0) r.items.xp = 1;
+    if (floor % 15 === 0) r.items.shiny = 1;
+    if (floor % 20 === 0) r.items.univ = 1;
     return r;
 }
 function survRandCard() {
@@ -27291,12 +27295,13 @@ app.post('/api/cards/survival/fight', async (req, res) => {
             coins = await ecoAddCoins(uid, reward.coins);
             if (reward.dust) await dustAdd(uid, reward.dust);
             if (reward.potions) await potionAdd(uid, reward.potions);
+            for (const [t, n] of Object.entries(reward.items || {})) await potion2Add(uid, t, n);
             if (reward.secret) {
                 const sp = cardSpecials('secrete', arcUniverses()[Math.floor(Math.random() * arcUniverses().length)]);
                 const c = sp[Math.floor(Math.random() * sp.length)];
                 if (c) { const isNew = await cardGive(uid, { key: c.key }, false); reward.card = { key: c.key, ...cardInfoOfKey(c.key), isNew, coins: 0 }; run.earned.secrets++; }
             }
-            run.earned.coins += reward.coins; run.earned.dust += reward.dust; run.earned.potions += reward.potions;
+            run.earned.coins += reward.coins; run.earned.dust += reward.dust; run.earned.potions += reward.potions; run.earned.items = run.earned.items || {}; for (const [t, n] of Object.entries(reward.items || {})) run.earned.items[t] = (run.earned.items[t] || 0) + n;
             run.floor++;
         }
         s.best = Math.max(s.best || 0, won ? floor : floor - 1);
@@ -27315,4 +27320,105 @@ app.post('/api/cards/survival/quit', async (req, res) => {
     const summary = { floor: s.run.floor - 1, earned: s.run.earned };
     s.run = null; await kvSet('surv', String(uid), s);
     res.json({ ok: true, summary });
+});
+
+
+/* =====================================================================
+   AG_CARDS_PLUS_V7 — potions de brillance, d'univers et d'XP + alambic
+   (fabrication de potions avec la poussière ✨ et les doublons).
+   ===================================================================== */
+const POTION_TYPES = {
+    chance: { label: 'Potion de chance', emoji: '🧪', desc: `Chances x${POTION_MULT} aux raretés spéciales et aux brillantes pendant ${POTION_PACKS} boosters.`, dust: 250, dups: 5 },
+    shiny: { label: 'Potion de brillance', emoji: '💎', desc: 'La première carte de ton prochain booster sera brillante à coup sûr.', dust: 350, dups: 8 },
+    univ: { label: 'Potion d’univers', emoji: '🌍', desc: 'Ton prochain booster normal ne donne que des cartes de l’anime choisi.', dust: 200, dups: 5 },
+    xp: { label: 'Potion d’XP', emoji: '📈', desc: 'XP des cartes doublée pendant 1 h (parties, duels, survie…).', dust: 120, dups: 3 }
+};
+const XP_POTION_MS = 60 * 60 * 1000;
+async function potion2Get(uid) { return kvGet('potion2', String(uid), { shiny: 0, univ: 0, xp: 0, shinyOn: 0, univOn: null, xpUntil: 0 }); }
+async function potion2Add(uid, t, n) {
+    if (t === 'chance') return potionAdd(uid, n);
+    const o = await potion2Get(uid); o[t] = Math.max(0, (o[t] || 0) + n); await kvSet('potion2', String(uid), o); return o;
+}
+// potion d'XP : on double l'XP gagnée par les cartes
+const _cardXpAddPotion = cardXpAdd;
+cardXpAdd = async function (uid, keys, n) {
+    try { const o = await potion2Get(uid); if (o.xpUntil > Date.now()) n *= 2; } catch (_) {}
+    return _cardXpAddPotion(uid, keys, n);
+};
+// potion de brillance : la 1re carte non brillante du booster devient brillante
+const boosterCardKey = c => c.key || (c.secret ? cardSpecialKey(c.u, c.name, c.rarity) : (c.u && c.name ? c.u + '|' + c.name : null));
+async function shinyApply(uid, cards) {
+    if (!Array.isArray(cards) || !cards.length) return cards;
+    const o = await potion2Get(uid); if (!(o.shinyOn > 0)) return cards;
+    const c = cards.find(x => x && !x.shiny && boosterCardKey(x)); if (!c) return cards;
+    const key = boosterCardKey(c);
+    if (HAS_DB) { try { await pool.query('UPDATE cards SET shiny = LEAST(n, shiny + 1) WHERE user_id=$1 AND ckey=$2', [uid, key]); } catch (_) {} }
+    else { const m = await cardsOf(uid), v = m.get(key); if (v) v.shiny = Math.min(v.n, (v.shiny || 0) + 1); }
+    c.shiny = true; c.potion = 'shiny';
+    o.shinyOn--; await kvSet('potion2', String(uid), o);
+    return cards;
+}
+const _openBoosterV7 = openBooster;
+openBooster = async function (uid, n, type = '') {
+    let cards;
+    const o = uid && type !== 'admin' ? await potion2Get(uid) : null;
+    if (o && o.univOn && ARC_UNIVERSE_ANIME[o.univOn]) {
+        const u = o.univOn; o.univOn = null; await kvSet('potion2', String(uid), o);
+        cards = await potionWrap(uid, type, async () => autoDelApply(uid, await recordCards(uid, await tbFromUniverses(uid, [u], await cardLuck(uid), n >= 5 ? 1 : 0, n))));
+        if (Array.isArray(cards)) cards.forEach(c => { if (c) c.potionU = u; });
+    } else cards = await _openBoosterV7(uid, n, type);
+    return uid && type !== 'admin' ? shinyApply(uid, cards) : cards;
+};
+const _tbOpenV7 = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return shinyApply(uid, await _tbOpenV7(uid, b, chosenU)); };
+
+app.get('/api/cards/potions', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const p1 = await potionGet(uid), p2 = await potion2Get(uid);
+    let dups = 0; const vault = new Set(await kvGet('vault', String(uid), []));
+    for (const [k, v] of (await cardsOf(uid))) if (v.n > 1 && !k.startsWith('collector|') && !vault.has(k)) dups += v.n - 1;
+    res.json({ ok: true, types: Object.entries(POTION_TYPES).map(([id, t]) => ({ id, ...t, n: id === 'chance' ? p1.n || 0 : p2[id] || 0 })),
+        active: { chance: p1.left || 0, shiny: p2.shinyOn || 0, univ: p2.univOn ? { u: p2.univOn, anime: ARC_UNIVERSE_ANIME[p2.univOn] } : null, xpUntil: p2.xpUntil > Date.now() ? p2.xpUntil : 0 },
+        dust: await dustGet(uid), dups, animes: arcUniverses().map(u => [u, ARC_UNIVERSE_ANIME[u]]).filter(x => x[1]).sort((a, b) => a[1].localeCompare(b[1], 'fr')) });
+});
+app.post('/api/cards/potions/use', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const b = req.body || {}, t = String(b.type || '');
+    if (t === 'chance') { const o = await potionGet(uid); if (!(o.n > 0)) return res.json({ ok: false, error: 'Tu n’as pas cette potion.' }); o.n--; o.left = (o.left || 0) + POTION_PACKS; await kvSet('potion', String(uid), o); return res.json({ ok: true }); }
+    if (!POTION_TYPES[t]) return res.json({ ok: false, error: 'Potion inconnue.' });
+    const o = await potion2Get(uid);
+    if (!(o[t] > 0)) return res.json({ ok: false, error: 'Tu n’as pas cette potion.' });
+    if (t === 'univ') {
+        const u = String(b.u || ''); if (!ARC_UNIVERSE_ANIME[u] || !cardPool(u).length) return res.json({ ok: false, error: 'Choisis un anime.' });
+        if (o.univOn) return res.json({ ok: false, error: 'Une potion d’univers est déjà active.' });
+        o.univOn = u;
+    } else if (t === 'shiny') o.shinyOn = (o.shinyOn || 0) + 1;
+    else if (t === 'xp') o.xpUntil = Math.max(Date.now(), o.xpUntil || 0) + XP_POTION_MS;
+    o[t]--; await kvSet('potion2', String(uid), o);
+    res.json({ ok: true });
+});
+const ALEMBIC_LOCK = new Set();
+app.post('/api/cards/alembic', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const t = String((req.body || {}).type || ''), rec = POTION_TYPES[t];
+    if (!rec) return res.json({ ok: false, error: 'Potion inconnue.' });
+    if (ALEMBIC_LOCK.has(uid)) return res.json({ ok: false, error: 'L’alambic chauffe déjà…' });
+    ALEMBIC_LOCK.add(uid);
+    try {
+        if ((await dustGet(uid)) < rec.dust) return res.json({ ok: false, error: `Il te faut ${rec.dust} ✨.` });
+        // doublons : on prend d'abord les moins rares (on garde toujours 1 exemplaire, le coffre est protégé)
+        const vault = new Set(await kvGet('vault', String(uid), [])), list = [];
+        for (const [k, v] of (await cardsOf(uid))) {
+            if (v.n <= 1 || k.startsWith('collector|') || vault.has(k)) continue;
+            const i = cardInfoOfKey(k); list.push({ k, extra: v.n - 1, rank: RAR_RANK[i && i.rarity] || 0 });
+        }
+        if (list.reduce((a, x) => a + x.extra, 0) < rec.dups) return res.json({ ok: false, error: `Il te faut ${rec.dups} doublons.` });
+        list.sort((a, b) => a.rank - b.rank);
+        let need = rec.dups; const used = [];
+        for (const x of list) { if (!need) break; const c = Math.min(need, x.extra); if (await cardTake(uid, x.k, c)) { need -= c; used.push({ name: (cardInfoOfKey(x.k) || {}).name || x.k, n: c }); } }
+        if (need) return res.json({ ok: false, error: 'Doublons insuffisants.' });
+        await dustAdd(uid, -rec.dust);
+        await potion2Add(uid, t, 1);
+        res.json({ ok: true, type: t, used, dust: await dustGet(uid) });
+    } finally { ALEMBIC_LOCK.delete(uid); }
 });
