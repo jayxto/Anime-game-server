@@ -278,6 +278,19 @@ const LOCALDB_READY = process.env.DB_DIR ? (async () => {
     // le repère « copie faite » est rangé DANS le dossier de la base (donc sur le disque, quel que soit le chemin du disque)
     const dir = pathx.resolve(process.env.DB_DIR), marker = pathx.join(dir, 'ag-ready'), oldMarker = pathx.join(pathx.dirname(dir), '.' + pathx.basename(dir) + '-ready');
     const importUrl = process.env.AG_IMPORT_URL;
+    // le dossier doit être sur un disque Render (sinon tout est effacé à chaque redémarrage)
+    try {
+        const mounts = fsx.readFileSync('/proc/mounts', 'utf8').split('\n').map(l => l.split(' ')[1]).filter(Boolean).map(m => m.replace(/\\040/g, ' '));
+        const best = mounts.filter(m => dir === m || dir.startsWith(m.endsWith('/') ? m : m + '/')).sort((a, b) => b.length - a.length)[0] || '/';
+        LOCALDB.mount = best; LOCALDB.onDisk = best !== '/';
+    } catch (_) { LOCALDB.onDisk = null; }
+    if (LOCALDB.onDisk === false && importUrl && !process.env.DB_ALLOW_NO_DISK) {
+        LOCALDB.state = 'nodisk'; LOCALDB.error = `Le dossier ${dir} n’est pas sur le disque Render : DB_DIR doit commencer par le « Mount Path » du disque.`;
+        console.error('[base locale]', LOCALDB.error, 'Le site reste sur l’ancienne base.');
+        LOCALDB_FALLBACK = new Pool({ connectionString: importUrl, ssl: pgSslFor(importUrl), max: 12, connectionTimeoutMillis: 10000, idleTimeoutMillis: 30000, query_timeout: 30000, keepAlive: true });
+        LOCALDB_FALLBACK.on('error', err => console.error('[PG] connexion perdue :', err.message));
+        return;
+    }
     const hasData = fsx.existsSync(pathx.join(dir, 'PG_VERSION'));
     const imported = hasData && (fsx.existsSync(marker) || fsx.existsSync(oldMarker));
     // sans adresse d'import, on ne supprime JAMAIS des données existantes
@@ -24121,7 +24134,7 @@ setTimeout(() => fwRewards().catch(() => {}), 45000);
         if (mb > 420) console.warn(`[mémoire] ${mb} Mo utilisés, ${Object.keys(rooms).length} salons, ${io.engine.clientsCount} joueurs`);
     }, 5 * 60000).unref();
 })();
-app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0 }));
+app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0, db: LOCALDB.on ? { state: LOCALDB.state, onDisk: LOCALDB.onDisk, mount: LOCALDB.mount, copiedThisBoot: !!LOCALDB.importedAt, copyStep: LOCALDB.state === 'importing' ? DBMOVE.step : undefined } : undefined }));
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
