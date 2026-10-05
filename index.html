@@ -17552,5 +17552,37 @@ async function loadHallOfFame(){
         setInterval(() => { const st = document.getElementById('adm-dbmove-st'); if (st && st.offsetParent && st.textContent === 'Chargement…') refresh(); }, 2500);
     })();
     </script>
+    <script>
+    /* AG_RENAME_V1 : changer de pseudo depuis les Paramètres */
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        async function renameDraw() {
+            const opt = document.querySelector('#options > div'); if (!opt || !currentUser || currentUser.isGuest) return;
+            let p = document.getElementById('rename-panel');
+            if (!p) { p = document.createElement('div'); p.id = 'rename-panel'; p.className = 'a11y-panel'; const a = document.getElementById('app-panel') || document.getElementById('a11y-panel'); a ? a.before(p) : opt.appendChild(p); }
+            const d = await v7get('/api/account/pseudo'); if (!d || !d.ok) { p.remove(); return; }
+            const wait = d.nextAt && d.nextAt > Date.now();
+            p.innerHTML = `<h3>✏️ Changer de pseudo</h3><div class="ag-panel">Pseudo actuel : <b>${esc(d.pseudo)}</b>
+                <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><input id="rename-in" class="v7-input" maxlength="20" placeholder="Nouveau pseudo" style="flex:1;min-width:150px;margin:0;" ${wait ? 'disabled' : ''}>
+                <button class="btn-action" style="width:auto;margin:0;" onclick="renameDo()" ${wait ? 'disabled' : ''}>Changer</button></div>
+                <small class="tl-hint">${wait ? `⏳ Prochain changement possible le ${new Date(d.nextAt).toLocaleDateString('fr-FR')}.` : '3 à 20 caractères. Gratuit, une fois tous les 7 jours. Ton ancien pseudo reste réservé pour toi.'}</small>
+                ${d.history && d.history.length ? `<br><small class="tl-hint">Anciens pseudos : ${d.history.map(esc).join(', ')}</small>` : ''}</div>`;
+        }
+        window.renameDo = async function () {
+            const v = (document.getElementById('rename-in') || {}).value || '';
+            if (!v.trim()) return;
+            if (!confirm(`Ton pseudo deviendra « ${v.trim()} ». Tu ne pourras plus le changer pendant 7 jours. Continuer ?`)) return;
+            const r = await v7post('/api/account/pseudo', { pseudo: v });
+            if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+            if (r.user) { currentUser = Object.assign({}, currentUser, r.user); try { updateProfileDisplay(); } catch (_) {} }
+            toast(`✅ Tu t’appelles maintenant <b>${esc(r.pseudo)}</b>`, '#00e676');
+            renameDraw();
+        };
+        const orig = window.appPanelDraw;
+        if (typeof orig === 'function') window.appPanelDraw = async function () { const r = await orig.apply(this, arguments); renameDraw(); return r; };
+        (function () { const o = window.switchTab; if (typeof o === 'function') window.switchTab = function (t) { const r = o.apply(this, arguments); if (t === 'options') setTimeout(renameDraw, 80); return r; }; })();
+        setTimeout(renameDraw, 3500);
+    })();
+    </script>
 </body>
 </html>

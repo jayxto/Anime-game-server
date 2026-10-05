@@ -348,6 +348,9 @@ if (LOCALDB_READY) pool.query = async function (...a) { await LOCALDB_READY; ret
 async function localDbStop() { if (!LOCALDB_PG) return; LOCALDB_STOPPING = true; try { await pool.end(); } catch (_) {} try { await LOCALDB_PG.stop(); } catch (_) {} }
 
 
+// AG_RENAME_V1 : admins / bêta testeurs retenus par numéro de compte (le statut suit le joueur s'il change de pseudo)
+const PRIV = { admins: new Set(), beta: new Set() };
+
 async function initDb() {
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -1672,6 +1675,8 @@ app.post('/api/register', async (req, res) => {
         if (existing.rows.length > 0) {
             return res.status(409).json({ error: 'Ce pseudo ou cet email est déjà utilisé.' });
         }
+        // AG_RENAME_V1 : un ancien pseudo reste réservé à son propriétaire
+        if (await kvGet('pseudo_old', cleanPseudo.toLowerCase(), null).catch(() => null)) return res.status(409).json({ error: 'Ce pseudo ou cet email est déjà utilisé.' });
 
         const passwordHash = bcrypt.hashSync(String(password), 10);
         const insert = await pool.query(
@@ -18670,6 +18675,7 @@ app.post('/api/suggest', async (req, res) => {
 async function isAdmin(req) {
     if (process.env.ADMIN_KEY && req.query.key === process.env.ADMIN_KEY) return true;
     const uid = authUserId(req);
+    if (uid && PRIV.admins.has(+uid)) return true;
     const list = String(process.env.ADMIN_PSEUDOS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
     if (!uid || !list.length || !HAS_DB) return false;
     try { const p = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0]?.pseudo; return !!p && list.includes(p.toLowerCase()); } catch (_) { return false; }
@@ -23924,8 +23930,9 @@ ${BANNER_CSS}.hero:not([class*="ban-"]){background:linear-gradient(135deg,#1b1b3
 /* ---------- Site fermé pour mise à jour : les joueurs voient un écran d'attente, seul l'admin peut jouer ---------- */
 function sockIsAdmin(socket) {
     const list = String(process.env.ADMIN_PSEUDOS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
-    const p = socket && socket.user && socket.user.pseudo;
-    return !!p && list.includes(String(p).toLowerCase());
+    const u = socket && socket.user;
+    if (!u || !u.id || u.isGuest) return false; // un invité qui prend le pseudo d'un admin n'est pas admin
+    return PRIV.admins.has(+u.id) || (!!u.pseudo && list.includes(String(u.pseudo).toLowerCase()));
 }
 io.on('connection', socket => {
     socket.use((pkt, next) => {
@@ -24128,7 +24135,7 @@ async function isAdminUid(uid) {
     const c = ADMIN_UID_CACHE.get(uid);
     if (c && Date.now() - c.at < 5 * 60000) return c.ok;
     const list = String(process.env.ADMIN_PSEUDOS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-    const ok = !!list.length && list.includes(String(await pseudoOf(uid)).toLowerCase());
+    const ok = PRIV.admins.has(+uid) || (!!list.length && list.includes(String(await pseudoOf(uid)).toLowerCase()));
     ADMIN_UID_CACHE.set(uid, { ok, at: Date.now() });
     return ok;
 }
@@ -24136,7 +24143,7 @@ async function isAdminUid(uid) {
    mais SANS le panneau admin (maintenance, joueurs, annonces…). Liste gérée dans le panneau admin. */
 const BETA_DEFAULT = ['Natox']; // bêta testeurs permanents
 const betaList = () => (Array.isArray(SITE.beta) ? SITE.beta : []).concat(BETA_DEFAULT, String(process.env.BETA_PSEUDOS || '').split(',')).map(s => String(s).trim().toLowerCase()).filter(Boolean);
-async function isBetaUid(uid) { return !!uid && betaList().includes(String(await pseudoOf(uid)).toLowerCase()); }
+async function isBetaUid(uid) { return !!uid && (PRIV.beta.has(+uid) || betaList().includes(String(await pseudoOf(uid)).toLowerCase())); }
 async function isPrivUid(uid) { return (await isAdminUid(uid)) || (await isBetaUid(uid)); } // admin OU bêta testeur
 app.get('/api/beta/me', async (req, res) => {
     const uid = authUserId(req);
@@ -24156,7 +24163,10 @@ app.post('/api/admin/beta', adminOnly(async (req, res) => {
     if (!Array.isArray(SITE.beta)) SITE.beta = [];
     if (!pseudo) return res.json({ ok: false, error: 'Donne un pseudo.' });
     const k = pseudo.toLowerCase();
-    if (b.action === 'remove') SITE.beta = SITE.beta.filter(x => x.toLowerCase() !== k);
+    if (b.action === 'remove') {
+        SITE.beta = SITE.beta.filter(x => x.toLowerCase() !== k);
+        try { const r = (await pool.query('SELECT id FROM users WHERE lower(pseudo)=$1', [k])).rows[0]; if (r && PRIV.beta.delete(+r.id)) await kvSet('priv', 'ids', { admins: [...PRIV.admins], beta: [...PRIV.beta] }); } catch (_) {} // AG_RENAME_V1
+    }
     else if (!SITE.beta.some(x => x.toLowerCase() === k)) SITE.beta.push(pseudo);
     await siteSave('beta');
     // on débloque tout de suite s'il est connecté
@@ -28719,3 +28729,67 @@ app.post('/api/admin/dbmove', adminOnly(async (req, res) => {
     dbMoveRun({ maintenance: !!(req.body || {}).maintenance, force: !!(req.body || {}).force });
     res.json({ ok: true });
 }));
+
+
+/* =====================================================================
+   AG_RENAME_V1 — changer de pseudo (Paramètres).
+   • gratuit, une fois tous les 7 jours (sans limite pour les admins)
+   • l'ancien pseudo reste réservé au joueur (personne d'autre ne peut le prendre)
+   • admins et bêta testeurs gardent leur statut : il est retenu par numéro de compte
+   ===================================================================== */
+const RENAME_COOLDOWN = 7 * 86400000;
+const PSEUDO_RE = /^[\p{L}\p{N}_\-. ]{3,20}$/u;
+async function privLoad() {
+    try { const v = await kvGet('priv', 'ids', null); if (v) { PRIV.admins = new Set((v.admins || []).map(Number)); PRIV.beta = new Set((v.beta || []).map(Number)); } }
+    catch (_) { setTimeout(privLoad, 15000); }
+}
+setTimeout(privLoad, 0);
+async function privAdd(kind, uid) {
+    if (PRIV[kind].has(+uid)) return;
+    PRIV[kind].add(+uid);
+    await kvSet('priv', 'ids', { admins: [...PRIV.admins], beta: [...PRIV.beta] });
+}
+app.get('/api/account/pseudo', async (req, res) => {
+    const uid = authUserId(req); if (!uid) return res.status(401).json({ ok: false });
+    const h = await kvGet('pseudo_hist', String(uid), { list: [], last: 0 });
+    const admin = await isAdminUid(uid);
+    res.json({ ok: true, pseudo: await pseudoOf(uid), nextAt: admin ? 0 : (h.last ? h.last + RENAME_COOLDOWN : 0), history: (h.list || []).slice(-5).map(x => x.p) });
+});
+app.post('/api/account/pseudo', async (req, res) => {
+    const uid = authUserId(req); if (!uid) return res.status(401).json({ ok: false, error: 'Connecte-toi d’abord.' });
+    const want = String((req.body || {}).pseudo || '').trim().replace(/\s+/g, ' ');
+    if (!PSEUDO_RE.test(want)) return res.json({ ok: false, error: 'Pseudo de 3 à 20 caractères : lettres, chiffres, espace, _ - .' });
+    const cur = (await pool.query('SELECT pseudo FROM users WHERE id=$1', [uid])).rows[0];
+    if (!cur) return res.status(401).json({ ok: false });
+    const old = cur.pseudo;
+    if (want === old) return res.json({ ok: false, error: 'C’est déjà ton pseudo.' });
+    const admin = await isAdminUid(uid), beta = await isBetaUid(uid);
+    const h = await kvGet('pseudo_hist', String(uid), { list: [], last: 0 });
+    if (!admin && h.last && Date.now() - h.last < RENAME_COOLDOWN) {
+        const d = Math.ceil((h.last + RENAME_COOLDOWN - Date.now()) / 86400000);
+        return res.json({ ok: false, error: `Tu pourras rechanger de pseudo dans ${d} jour${d > 1 ? 's' : ''}.` });
+    }
+    const taken = (await pool.query('SELECT id FROM users WHERE lower(pseudo) = lower($1) AND id <> $2 LIMIT 1', [want, uid])).rows[0];
+    const resv = await kvGet('pseudo_old', want.toLowerCase(), null);
+    if (taken || (resv && +resv.uid !== +uid)) return res.json({ ok: false, error: 'Ce pseudo est déjà pris.' });
+    // le statut suit le compte, plus le pseudo
+    if (admin) await privAdd('admins', uid);
+    if (beta) {
+        const i = Array.isArray(SITE.beta) ? SITE.beta.findIndex(x => String(x).toLowerCase() === old.toLowerCase()) : -1;
+        if (i >= 0) { SITE.beta[i] = want; await siteSave('beta'); } // liste du panneau admin mise à jour
+        else await privAdd('beta', uid); // bêta « permanent » (liste fixe) : retenu par numéro de compte
+    }
+    try { await pool.query('UPDATE users SET pseudo=$1 WHERE id=$2', [want, uid]); }
+    catch (e) { return res.json({ ok: false, error: /unique|duplicate/i.test(e.message) ? 'Ce pseudo est déjà pris.' : 'Erreur serveur, réessaie.' }); }
+    await kvSet('pseudo_old', old.toLowerCase(), { uid: +uid, at: Date.now() });
+    h.list = (h.list || []).concat({ p: old, at: Date.now() }).slice(-20); h.last = Date.now();
+    await kvSet('pseudo_hist', String(uid), h);
+    // les classements affichent le nouveau nom
+    for (const q of ['UPDATE game_results SET pseudo=$1 WHERE user_id=$2', 'UPDATE daily_results SET pseudo=$1 WHERE user_id=$2', 'UPDATE challenges SET from_pseudo=$1 WHERE from_id=$2', 'UPDATE challenges SET to_pseudo=$1 WHERE to_id=$2'])
+        await pool.query(q, [want, uid]).catch(() => {});
+    PSEUDO_CACHE.delete(uid); PSEUDO_CACHE.delete(+uid); ADMIN_UID_CACHE.delete(uid); ADMIN_UID_CACHE.delete(+uid);
+    const user = (await pool.query('SELECT * FROM users WHERE id=$1', [uid])).rows[0];
+    for (const sk of io.sockets.sockets.values()) if (sk.user && +sk.user.id === +uid) { sk.user.pseudo = want; sk.emit('profile_updated', { user: publicUser(user) }); }
+    console.log(`[pseudo] ${old} → ${want} (compte ${uid})`);
+    res.json({ ok: true, pseudo: want, user: publicUser(user), nextAt: admin ? 0 : Date.now() + RENAME_COOLDOWN });
+});
