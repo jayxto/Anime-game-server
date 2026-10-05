@@ -750,6 +750,8 @@
         .friend-row button{background:#2a2a40;color:#fff;border:0;border-radius:8px;padding:6px 10px;font-size:.75rem;font-weight:800;cursor:pointer;}
         .friend-row button.go{background:var(--accent-cyan);color:#000;}
         .v7-input{width:100%;background:#0b0b10;border:1px solid #2c2c44;border-radius:8px;color:#fff;padding:10px;font-size:.9rem;margin-bottom:8px;box-sizing:border-box;font-family:inherit;}
+        /* iPhone : sous 16px, Safari zoome sur le champ au toucher et fait sauter la page */
+        @media (pointer: coarse) { input, select, textarea, .v7-input { font-size:16px !important; } }
         .sugg-row{background:#101018;border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:.8rem;text-align:left;}
         .sugg-row b{color:var(--accent-cyan);}
 
@@ -11020,7 +11022,7 @@ body.ag-game-page #app-root > #mode,
         }
         // --- cartes ---
         function cardHtml(c, big) {
-            if (!c.name) return `<div class="tcard empty r-${c.rarity} missing-card"><div class="tc-img">${c.img ? `<img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" style="filter:brightness(0);opacity:.72;" onerror="this.remove();this.parentNode.textContent='?'">` : '?'}</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
+            if (!c.name) return `<div class="tcard empty r-${c.rarity} missing-card"><div class="tc-img">${c.img ? `<img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" style="filter:brightness(0);opacity:.72;" onerror="if(this.parentNode)this.parentNode.textContent='?'">` : '?'}</div><div class="tc-name">???</div><div class="tc-rar">${RAR_LABEL[c.rarity]}</div></div>`;
             return `<div class="tcard r-${c.rarity}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}"><div class="tc-img"><img src="${v7esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15"></div>
                 <div class="tc-name">${v7esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity]}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}</div>`;
         }
@@ -14442,7 +14444,7 @@ body.ag-game-page #app-root > #mode,
                 root.querySelectorAll('[data-cf]').forEach(el => {
                     const k = el.dataset.cf;
                     const upd = () => { f[k] = el.type === 'checkbox' ? el.checked : el.value; cb(); };
-                    if (k === 'q') el.oninput = () => { clearTimeout(tmo); tmo = setTimeout(upd, 180); }; else el.onchange = upd;
+                    if (k === 'q') el.oninput = () => { clearTimeout(tmo); tmo = setTimeout(upd, 350); }; else el.onchange = upd;
                 });
             };
 
@@ -14458,7 +14460,7 @@ body.ag-game-page #app-root > #mode,
                 el.querySelectorAll('button[data-p]').forEach(b => b.onclick = () => cb(+b.dataset.p));
             };
             /* --- collection : toutes mes cartes --- */
-            const CV = { f: newFilter(), cards: [], page: 1, per: 60, split: true };
+            const CV = { f: newFilter(), cards: [], page: 1, per: (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 30 : 60, split: true };
             window.cardsAllView = async function () {
                 const box = document.getElementById('eco-album'); if (!box) return;
                 if (typeof eco !== 'undefined') eco.albumU = null;
@@ -14525,7 +14527,7 @@ body.ag-game-page #app-root > #mode,
             };
             deckList = function () {
                 const box = document.getElementById('dk-list'); if (!box) return;
-                const list = cardFilter(dk.cards, dk.f), per = 60;
+                const list = cardFilter(dk.cards, dk.f), per = (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 30 : 60;
                 const pages = Math.max(1, Math.ceil(list.length / per)); dk.page = Math.min(Math.max(1, dk.page || 1), pages);
                 const cnt = document.getElementById('dk-count'); if (cnt) cnt.textContent = `${list.length} carte${list.length > 1 ? 's' : ''} • page ${dk.page} / ${pages} • clique pour l’ajouter ou la retirer du deck`;
                 const go = n => { dk.page = n; deckList(); cnt && cnt.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
@@ -16052,7 +16054,7 @@ async function loadHallOfFame(){
             const cards = (await myCards()).sort((a, b) => (b.lvl || 0) - (a.lvl || 0));
             const sel = [];
             const draw = q => {
-                const list = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, 120);
+                const list = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120);
                 body.querySelector('.cp-grid').innerHTML = list.map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
                 body.querySelectorAll('.cp-pick').forEach(el => el.onclick = e => { e.stopPropagation(); const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else if (sel.length < 3) sel.push(k); el.classList.toggle('on', sel.includes(k)); body.querySelector('#cp-go').textContent = `⚔️ Combattre (${sel.length}/3)`; body.querySelector('#cp-go').disabled = sel.length !== 3; });
             };
@@ -16060,7 +16062,7 @@ async function loadHallOfFame(){
                 <div id="cp2-duels"></div>
                 <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…"><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;flex:1;">⚔️ Combattre (0/3)</button><button class="btn-action" id="cp2-dfr" style="margin:0 0 10px;flex:1;background:#2a2a40;">🤝 Défier un ami</button></div><div class="cp-grid"></div>`;
             if (typeof cp2DuelExtras === 'function') cp2DuelExtras(body, sel);
-            body.querySelector('#cp-q').oninput = e => draw(e.target.value.trim());
+            let qT = null; body.querySelector('#cp-q').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim()), 300); };
             body.querySelector('#cp-go').onclick = async () => {
                 const r = await v7post('/api/cards/duel', { keys: sel });
                 if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
@@ -16467,10 +16469,10 @@ async function loadHallOfFame(){
             wrap.innerHTML = `<input class="v7-input" placeholder="🔎 Chercher une carte…"><div class="cp-grid"></div>`;
             body.appendChild(wrap);
             const draw = q => {
-                wrap.querySelector('.cp-grid').innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, 120).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                wrap.querySelector('.cp-grid').innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 120).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
                 wrap.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= max) sel.shift(); sel.push(k); } draw(wrap.querySelector('input').value.trim().toLowerCase()); onChange && onChange(sel); });
             };
-            wrap.querySelector('input').oninput = e => draw(e.target.value.trim().toLowerCase());
+            let qT = null; wrap.querySelector('input').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim().toLowerCase()), 300); };
             draw('');
             return sel;
         }
@@ -16746,10 +16748,10 @@ async function loadHallOfFame(){
             body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> (<span id="cp6-n">0</span>/5). Rareté, niveau ★ et finition rendent une carte plus forte.</p><button class="btn-action" id="cp6-go" disabled>⚔️ Lancer la survie</button><input class="v7-input" placeholder="🔎 Chercher une carte…" style="margin-top:8px;"><div class="cp-grid"></div>`;
             const grid = body.querySelector('.cp-grid'), go = body.querySelector('#cp6-go');
             const draw = q => {
-                grid.innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, 150).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                grid.innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 48 : 150).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
                 grid.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= 5) sel.shift(); sel.push(k); } body.querySelector('#cp6-n').textContent = sel.length; go.disabled = sel.length !== 5; draw(body.querySelector('input').value.trim().toLowerCase()); });
             };
-            body.querySelector('input').oninput = e => draw(e.target.value.trim().toLowerCase());
+            let qT = null; body.querySelector('input').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim().toLowerCase()), 300); };
             draw('');
             go.onclick = async () => { go.disabled = true; const r = await v7post('/api/cards/survival/start', { keys: sel }); if (!r || !r.ok) { go.disabled = false; return err(r); } RUN = r.run; drawRun(body); };
         }
