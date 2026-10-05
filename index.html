@@ -3862,7 +3862,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button><button onclick="cp6Survival()">🛡️ Mode survie</button><button onclick="cp6Potion()" id="cp6-pot-btn">🧪 Potions de chance</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -16621,6 +16621,157 @@ async function loadHallOfFame(){
                 <div style="flex:1;min-width:200px;"><h3 style="margin:0;">👑 ${esc(d.champion.pseudo)}</h3><p>Champion de ${esc(d.champion.mk)} avec <b>${d.champion.wins}</b> victoires.</p><p>Sa carte peut sortir de n’importe quel booster ce mois-ci (environ 1 booster sur 300 cartes). Deviens le prochain champion en gagnant un max de parties ce mois-ci !</p></div></div>`
                 : '<p style="text-align:center;">Le premier champion sera désigné à la fin du mois : le joueur avec le plus de victoires aura sa propre carte à collectionner ! 🏆</p>';
         };
+    })();
+    </script>
+    <style>
+        /* AG_CARDS_PLUS_V6 */
+        .cp6-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:8px 0;}
+        .cp6-c{position:relative;text-align:center;font-size:.72rem;transition:transform .15s,opacity .4s;}
+        .cp6-c img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:10px;border:2px solid #3a3f6b;display:block;}
+        .cp6-c.boss img{border:3px solid #ff2a5f;box-shadow:0 0 18px rgba(255,42,95,.7);}
+        .cp6-c.ko{opacity:.3;filter:grayscale(1);}
+        .cp6-c.hit{animation:cp6Hit .25s;}
+        .cp6-c b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        @keyframes cp6Hit{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+        .cp6-hp{height:7px;background:#2a0010;border-radius:5px;overflow:hidden;margin-top:3px;} .cp6-hp i{display:block;height:100%;background:linear-gradient(90deg,#00e676,#b2ff59);transition:width .25s;}
+        .cp6-foe .cp6-hp i{background:linear-gradient(90deg,#ff2a5f,#ff9a00);}
+        .cp6-vs{text-align:center;font-weight:900;font-size:1.2rem;color:#ffd700;margin:4px 0;}
+        .cp6-log{height:92px;overflow:hidden;font-size:.78rem;background:#0b0d1d;border-radius:8px;padding:6px 8px;line-height:1.35;}
+        .cp6-log .me{color:#7dffb0;} .cp6-log .foe{color:#ff8fa8;}
+        .cp6-stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:6px 0;} .cp6-stats span{background:#14183a;border-radius:99px;padding:3px 10px;font-size:.82rem;}
+        .cp6-rw{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;font-size:.78rem;}
+        .cp6-rw div{background:#14183a;border-radius:8px;padding:5px 7px;} .cp6-rw div.got{outline:2px solid #00e676;}
+        .cp6-pot{font-size:.8rem;font-weight:700;color:#e9d2ff;background:#2a1440;border:1px solid #8a4dff;border-radius:99px;padding:3px 10px;vertical-align:middle;cursor:pointer;margin-left:4px;}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body" style="position:relative;">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const needAcc = () => { if (isAccount()) return true; toast('Connecte-toi à un compte.', 'var(--accent-yellow)'); return false; };
+        const err = r => toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+        const fmt = n => Number(n || 0).toLocaleString('fr-FR');
+        const rwText = r => [`🪙 ${fmt(r.coins)}`, r.dust ? `✨ ${fmt(r.dust)}` : '', r.potions ? `🧪 ${r.potions} potion${r.potions > 1 ? 's' : ''}` : '', r.secret ? '🃏 carte Secrète' : ''].filter(Boolean).join(' + ');
+
+        // ---------- potions de chance ----------
+        window.cp6PotUi = async function () {
+            if (!isAccount()) return;
+            const d = await v7get('/api/cards/potion'); if (!d || !d.ok) return;
+            const w = document.getElementById('cp5-weather');
+            let el = document.getElementById('cp6-pot');
+            if (w && !el) { w.insertAdjacentHTML('afterend', '<span id="cp6-pot" class="cp6-pot" onclick="cp6Potion()"></span>'); el = document.getElementById('cp6-pot'); }
+            if (el) { el.textContent = d.left > 0 ? `🧪 Potion active : ${d.left} booster${d.left > 1 ? 's' : ''} x${d.mult}` : `🧪 ${d.n} potion${d.n > 1 ? 's' : ''}`; el.style.display = d.n || d.left ? '' : 'none'; }
+            const b = document.getElementById('cp6-pot-btn'); if (b) b.textContent = `🧪 Potions de chance (${d.n})`;
+        };
+        setInterval(() => { const w = document.getElementById('cp5-weather'); if (w && w.offsetParent && !document.getElementById('cp6-pot')) cp6PotUi(); }, 3000);
+        window.cp6Potion = async function () {
+            if (!needAcc()) return;
+            const body = modal('🧪 Potions de chance', 'Chargement…');
+            const d = await v7get('/api/cards/potion'); if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<div style="text-align:center;"><div style="font-size:3rem;">🧪</div><h3 style="margin:4px 0;">Tu as ${d.n} potion${d.n > 1 ? 's' : ''}</h3>
+                <p>Une potion multiplie par <b>${d.mult}</b> les chances des raretés spéciales (Secrète, Divine, Cosmique…), des cartes brillantes et des cartes spéciales pendant tes <b>${d.packs}</b> prochains boosters (normaux ou à thème).</p>
+                ${d.left > 0 ? `<p style="color:#00e676;font-weight:700;">✅ Potion active : encore ${d.left} booster${d.left > 1 ? 's' : ''}.</p>` : ''}
+                <button class="btn-action" id="cp6-drink" ${d.n ? '' : 'disabled'}>🧪 Boire une potion</button>
+                <p class="tl-hint">On gagne des potions en passant les étages 10, 20, 30… du 🛡️ mode survie.</p></div>`;
+            body.querySelector('#cp6-drink').onclick = async () => { const r = await v7post('/api/cards/potion', {}); if (!r || !r.ok) return err(r); toast(`🧪 Glou glou… chance x${d.mult} pour ${r.left} boosters !`, '#c38bff'); cp6PotUi(); cp6Potion(); };
+        };
+
+        // ---------- mode survie ----------
+        const cardBox = (c, foe) => `<div class="cp6-c${foe ? ' cp6-foe' : ''}${c.boss ? ' boss' : ''}${c.hp <= 0 ? ' ko' : ''}"><img src="${esc(c.img)}" onerror="this.style.opacity=.2"><b>${c.boss ? '👹 ' : ''}${esc(c.name)}</b><small>⚔️ ${fmt(c.power)}</small><div class="cp6-hp"><i style="width:${Math.max(0, Math.round(100 * c.hp / c.max))}%"></i></div></div>`;
+        let RUN = null;
+        window.cp6Survival = async function () {
+            if (!needAcc()) return;
+            const body = modal('🛡️ Mode survie', 'Chargement…');
+            const d = await v7get('/api/cards/survival'); if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            RUN = d.run;
+            if (RUN) return drawRun(body, d);
+            const board = (l, me) => l.map((t, i) => `<div class="cp-row"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(t.name)}</span><b>étage ${t.floor}</b></div>`).join('') || '<p class="tl-hint">Personne pour l’instant.</p>';
+            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> et grimpe le plus haut possible. Tes cartes <b>ne sont jamais soignées</b> entre les étages : chaque combat use ton équipe. Tous les 10 étages, un 👹 boss t’attend. Plus tu montes, plus les récompenses sont grosses, et elles sont gagnées tout de suite (tu ne les perds pas si tu tombes).</p>
+                <div class="cp6-stats"><span>🎟️ Parties restantes aujourd’hui : <b>${d.runsLeft}/${d.maxRuns}</b></span><span>🏔️ Ton record : <b>étage ${d.best}</b></span><span>🧪 Potions : <b>${d.potion.n}</b></span></div>
+                <h4 style="margin:8px 0 4px;">🎁 Récompenses par étage</h4><div class="cp6-rw">${d.rewards.map(r => `<div class="${r.floor <= d.best ? 'got' : ''}"><b>Étage ${r.floor}${r.floor % 10 === 0 ? ' 👹' : ''}</b><br>${rwText(r)}</div>`).join('')}</div>
+                <p class="tl-hint">Chaque étage passé donne des pièces (de plus en plus). Tous les 5 étages : poussière ✨. Tous les 10 : potions 🧪 et gros bonus. Étages 25, 50… : une carte Secrète.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div><h4 style="margin:6px 0;">📅 Cette semaine</h4>${board(d.week)}</div><div><h4 style="margin:6px 0;">🏆 Record de tous les temps</h4>${board(d.top)}</div></div>
+                ${d.runsLeft > 0 ? '<button class="btn-action" id="cp6-pick" style="margin-top:10px;">🃏 Choisir mes 5 cartes</button>' : '<p style="text-align:center;margin-top:10px;">⏳ Plus de parties aujourd’hui, reviens demain !</p>'}`;
+            const pick = body.querySelector('#cp6-pick'); if (pick) pick.onclick = () => pickTeam(body);
+        };
+        async function pickTeam(body) {
+            body.innerHTML = '<p>Chargement de ta collection…</p>';
+            const d = await v7get('/api/cards/mine');
+            const cards = (d && d.ok ? d.cards : []).filter(c => !/^(collector|moment|champion)\|/.test(c.key));
+            const sel = [];
+            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> (<span id="cp6-n">0</span>/5). Rareté, niveau ★ et finition rendent une carte plus forte.</p><button class="btn-action" id="cp6-go" disabled>⚔️ Lancer la survie</button><input class="v7-input" placeholder="🔎 Chercher une carte…" style="margin-top:8px;"><div class="cp-grid"></div>`;
+            const grid = body.querySelector('.cp-grid'), go = body.querySelector('#cp6-go');
+            const draw = q => {
+                grid.innerHTML = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q)).slice(0, 150).map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('');
+                grid.querySelectorAll('.cp-pick').forEach(el => el.onclick = () => { const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else { if (sel.length >= 5) sel.shift(); sel.push(k); } body.querySelector('#cp6-n').textContent = sel.length; go.disabled = sel.length !== 5; draw(body.querySelector('input').value.trim().toLowerCase()); });
+            };
+            body.querySelector('input').oninput = e => draw(e.target.value.trim().toLowerCase());
+            draw('');
+            go.onclick = async () => { go.disabled = true; const r = await v7post('/api/cards/survival/start', { keys: sel }); if (!r || !r.ok) { go.disabled = false; return err(r); } RUN = r.run; drawRun(body); };
+        }
+        function drawRun(body, info) {
+            const e = RUN.earned;
+            body.innerHTML = `<div class="cp6-stats"><span>🏔️ Étage <b>${RUN.floor}</b>${RUN.floor % 10 === 0 ? ' 👹 BOSS' : ''}</span><span>Gagné : 🪙 ${fmt(e.coins)} • ✨ ${fmt(e.dust)} • 🧪 ${e.potions}${e.secrets ? ' • 🃏 ' + e.secrets : ''}</span></div>
+                <div class="cp6-foes cp6-team"><p class="tl-hint" style="grid-column:1/-1;margin:0;">Prochain étage : ${rwText(survRw(RUN.floor))}</p></div>
+                <div class="cp6-vs">⚔️</div><div class="cp6-me cp6-team">${RUN.team.map(c => cardBox(c)).join('')}</div>
+                <div class="cp6-log"></div>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;"><button class="btn-action" id="cp6-fight" style="margin:0;">⚔️ Combattre l’étage ${RUN.floor}</button><button class="btn-action" id="cp6-quit" style="margin:0;background:#3a1f2b;">🏳️ Abandonner</button></div>`;
+            body.querySelector('#cp6-fight').onclick = () => fight(body);
+            body.querySelector('#cp6-quit').onclick = async () => { if (!confirm('Abandonner cette partie ? Tu gardes tout ce que tu as gagné.')) return; const r = await v7post('/api/cards/survival/quit', {}); if (!r || !r.ok) return err(r); summary(body, r.summary); };
+        }
+        function survRw(f) { const r = { coins: Math.min(150, 10 + f * 4), dust: f % 5 ? 0 : f * 8, potions: f % 10 ? 0 : Math.min(3, f / 10), secret: f % 25 === 0 }; if (f % 10 === 0) r.coins += f * 10; return r; }
+        async function fight(body) {
+            const btns = body.querySelectorAll('button'); btns.forEach(b => b.disabled = true);
+            const r = await v7post('/api/cards/survival/fight', {});
+            if (!r || !r.ok) { btns.forEach(b => b.disabled = false); return err(r); }
+            const foes = r.foes.map(f => ({ ...f })), team = RUN.team.map(c => ({ ...c }));
+            const foeBox = body.querySelector('.cp6-foes'), meBox = body.querySelector('.cp6-me'), logEl = body.querySelector('.cp6-log');
+            const render = () => { foeBox.innerHTML = foes.map(c => cardBox(c, true)).join(''); meBox.innerHTML = team.map(c => cardBox(c)).join(''); };
+            render();
+            const steps = r.log.length > 60 ? r.log.filter((_, i) => i % Math.ceil(r.log.length / 60) === 0 || r.log[i].ko) : r.log;
+            const byName = (list, n) => list.find(c => c.name === n && c.hp > 0) || list.find(c => c.name === n);
+            for (const st of r.log) { // on applique tout, mais on n'anime que les étapes retenues
+                const target = st.s === 'me' ? byName(foes, st.b) : byName(team, st.b);
+                if (target) target.hp = Math.max(0, target.hp - st.d);
+                if (!steps.includes(st)) continue;
+                render();
+                const host = st.s === 'me' ? foeBox : meBox, el = [...host.querySelectorAll('.cp6-c')][(st.s === 'me' ? foes : team).indexOf(target)];
+                if (el) el.classList.add('hit');
+                logEl.insertAdjacentHTML('afterbegin', `<div class="${st.s}">${st.s === 'me' ? '🟢' : '🔴'} ${esc(st.a)} → ${esc(st.b)} : -${fmt(st.d)}${st.ko ? ' 💀 K.O.' : ''}</div>`);
+                if (!document.body.contains(body)) return;
+                await sleep(130);
+            }
+            team.forEach((c, i) => { c.hp = r.team[i].hp; }); foes.forEach((c, i) => { c.hp = r.foesAfter[i]; }); render();
+            RUN.team = r.team;
+            if (r.won) {
+                const rw = r.reward;
+                if (typeof eco !== 'undefined' && r.coins != null) { eco.coins = r.coins; ecoCoinsUi(); }
+                RUN.floor = r.floor + 1; RUN.earned.coins += rw.coins; RUN.earned.dust += rw.dust; RUN.earned.potions += rw.potions; if (rw.card) RUN.earned.secrets++;
+                toast(`✅ Étage ${r.floor} passé ! ${rwText(rw)}`, '#00ff88');
+                if (rw.potions) cp6PotUi();
+                if (rw.card && typeof showBooster === 'function') showBooster([rw.card]);
+                await sleep(700);
+                if (document.body.contains(body)) drawRun(body);
+            } else {
+                toast(`💀 Ton équipe est tombée à l’étage ${r.floor}.`, 'var(--accent-pink)');
+                await sleep(900);
+                if (document.body.contains(body)) summary(body, r.summary);
+            }
+        }
+        function summary(body, s) {
+            RUN = null;
+            body.innerHTML = `<div style="text-align:center;"><div style="font-size:3rem;">🏔️</div><h3 style="margin:4px 0;">Fin de la partie : étage ${s.floor} atteint</h3>
+                <p>Tu as gagné 🪙 <b>${fmt(s.earned.coins)}</b> • ✨ <b>${fmt(s.earned.dust)}</b> • 🧪 <b>${s.earned.potions}</b>${s.earned.secrets ? ` • 🃏 <b>${s.earned.secrets}</b>` : ''}</p>
+                <button class="btn-action" onclick="cp6Survival()">↩️ Retour</button></div>`;
+        }
     })();
     </script>
 </body>

@@ -27166,3 +27166,153 @@ app.post('/api/cards/quiz', async (req, res) => {
 
 // ---------- infos pour la collection : cadres posés ----------
 app.get('/api/cards/frames-on', async (req, res) => { const uid = needUid(req, res); if (!uid) return; res.json({ ok: true, on: await kvGet('cframe', String(uid), {}) }); });
+
+/* =====================================================================
+   AG_CARDS_PLUS_V6 — mode survie (deck de 5 cartes, étages de plus en plus durs,
+   pas de soin entre les combats) + potions de chance (x3 aux raretés spéciales
+   pendant 3 boosters).
+   ===================================================================== */
+// ---------- potions de chance ----------
+const POTION_PACKS = 3, POTION_MULT = 3;
+async function potionGet(uid) { return kvGet('potion', String(uid), { n: 0, left: 0 }); }
+async function potionAdd(uid, n) { const o = await potionGet(uid); o.n = Math.max(0, (o.n || 0) + n); await kvSet('potion', String(uid), o); return o; }
+async function potionWrap(uid, type, fn) {
+    if (!uid || type === 'admin') return fn();
+    const o = await potionGet(uid);
+    if (!(o.left > 0)) return fn();
+    o.left--; await kvSet('potion', String(uid), o);
+    const prev = PACK_LUCK.get(uid);
+    PACK_LUCK.set(uid, (prev || 1) * POTION_MULT);
+    try { return await fn(); } finally { if (prev) PACK_LUCK.set(uid, prev); else PACK_LUCK.delete(uid); }
+}
+const _openBoosterPotion = openBooster;
+openBooster = async function (uid, n, type = '') { return potionWrap(uid, type, () => _openBoosterPotion(uid, n, type)); };
+const _tbOpenPotion = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return potionWrap(uid, '', () => _tbOpenPotion(uid, b, chosenU)); };
+app.get('/api/cards/potion', async (req, res) => { const uid = needUid(req, res); if (!uid) return; res.json({ ok: true, ...(await potionGet(uid)), packs: POTION_PACKS, mult: POTION_MULT }); });
+app.post('/api/cards/potion', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const o = await potionGet(uid);
+    if (!(o.n > 0)) return res.json({ ok: false, error: 'Tu n’as pas de potion de chance. Gagne-en dans le mode survie !' });
+    o.n--; o.left = (o.left || 0) + POTION_PACKS;
+    await kvSet('potion', String(uid), o);
+    res.json({ ok: true, ...o });
+});
+
+// ---------- mode survie ----------
+const SURV_RUNS = 3, SURV_LOCK = new Set();
+function survReward(floor) { // récompense pour avoir passé l'étage `floor`
+    const r = { coins: Math.min(150, 10 + floor * 4), dust: 0, potions: 0, secret: false };
+    if (floor % 5 === 0) r.dust = floor * 8;
+    if (floor % 10 === 0) { r.potions = Math.min(3, floor / 10); r.coins += floor * 10; }
+    if (floor % 25 === 0) r.secret = true;
+    return r;
+}
+function survRandCard() {
+    const us = arcUniverses();
+    for (let t = 0; t < 20; t++) {
+        const u = us[Math.floor(Math.random() * us.length)], list = cardPool(u); if (!list.length) continue;
+        const idx = Math.floor(Math.random() * list.length);
+        return { u, name: list[idx].display, anime: ARC_UNIVERSE_ANIME[u], rarity: cardRarityAt(u, idx), img: cardImg({ u, display: list[idx].display }) };
+    }
+    return null;
+}
+function survBossCard() {
+    const v = tbCharCards(['antagoniste']); if (!v.length) return survRandCard();
+    const c = v[Math.floor(Math.random() * v.length)];
+    return { u: c.u, name: c.display, anime: ARC_UNIVERSE_ANIME[c.u], rarity: 'mythique', img: cardImg({ u: c.u, display: c.display }) };
+}
+function survEnemies(floor, avg) {
+    // difficulté : en partie fixe, en partie selon ton équipe (une équipe forte va plus haut, mais tout le monde avance)
+    const boss = floor % 10 === 0, base = (avg * 0.4 + 45 * 0.6) * (0.3 + floor * 0.04);
+    if (boss) { const c = survBossCard(); return [{ ...c, boss: true, power: Math.round(base * 1.35), hp: Math.round(base * 1.35 * 7), max: Math.round(base * 1.35 * 7) }]; }
+    const n = floor < 4 ? 2 : 3, out = [];
+    for (let i = 0; i < n; i++) { const c = survRandCard(); if (!c) continue; const p = Math.max(5, Math.round(base * (0.85 + Math.random() * 0.3))); out.push({ ...c, power: p, hp: Math.round(p * 2.5), max: Math.round(p * 2.5) }); }
+    return out;
+}
+function survFight(team, foes) {
+    const log = [], alive = a => a.filter(c => c.hp > 0), hit = (from, list) => {
+        const t = alive(list); if (!t.length) return null;
+        const to = t[Math.floor(Math.random() * t.length)], dmg = Math.max(1, Math.round(from.power * (0.28 + Math.random() * 0.17) * (Math.random() < 0.1 ? 2 : 1)));
+        to.hp = Math.max(0, to.hp - dmg);
+        return { to, dmg };
+    };
+    for (let turn = 0; turn < 80 && alive(team).length && alive(foes).length; turn++) {
+        for (const c of alive(team)) { const h = hit(c, foes); if (h) log.push({ s: 'me', a: c.name, b: h.to.name, d: h.dmg, ko: h.to.hp === 0 }); if (!alive(foes).length) break; }
+        if (!alive(foes).length) break;
+        for (const f of alive(foes)) { const h = hit(f, team); if (h) log.push({ s: 'foe', a: f.name, b: h.to.name, d: h.dmg, ko: h.to.hp === 0 }); if (!alive(team).length) break; }
+    }
+    return { won: alive(foes).length === 0 && alive(team).length > 0, log };
+}
+async function survState(uid) {
+    const day = parisDay(), s = await kvGet('surv', String(uid), { day, runs: 0, run: null, best: 0 });
+    if (s.day !== day) { s.day = day; s.runs = 0; }
+    return s;
+}
+async function survBoard(uid, floor) {
+    const p = await pseudoOf(uid), wk = 'w' + weekKey();
+    for (const k of ['all', wk]) {
+        const b = await kvGet('survlb', k, {}), cur = b[uid];
+        if (!cur || floor > cur.floor) { b[uid] = { p, floor, at: Date.now() }; await kvSet('survlb', k, b); }
+    }
+}
+const survTop = async k => Object.values(await kvGet('survlb', k, {})).sort((a, b) => b.floor - a.floor || a.at - b.at).slice(0, 10).map(x => ({ name: x.p, floor: x.floor }));
+app.get('/api/cards/survival', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await survState(uid);
+    const rewards = [1, 5, 10, 15, 20, 25, 30, 40, 50].map(f => ({ floor: f, ...survReward(f) }));
+    res.json({ ok: true, run: s.run, runsLeft: Math.max(0, SURV_RUNS - s.runs) + (s.run ? 1 : 0), maxRuns: SURV_RUNS, best: s.best || 0, potion: await potionGet(uid), rewards, top: await survTop('all'), week: await survTop('w' + weekKey()) });
+});
+app.post('/api/cards/survival/start', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await survState(uid);
+    if (s.run) return res.json({ ok: false, error: 'Tu as déjà une partie en cours.' });
+    if (s.runs >= SURV_RUNS) return res.json({ ok: false, error: `Tu as fait tes ${SURV_RUNS} parties de survie du jour. Reviens demain !` });
+    const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
+    const team = await cardsWithMeta(uid, keys);
+    if (team.length !== 5) return res.json({ ok: false, error: 'Choisis 5 cartes de ta collection.' });
+    team.forEach(c => { c.power = cardPower(c); c.hp = c.max = c.power * 4; delete c.imgs; });
+    s.runs++; s.run = { team, floor: 1, avg: Math.round(team.reduce((a, c) => a + c.power, 0) / 5), earned: { coins: 0, dust: 0, potions: 0, secrets: 0 } };
+    await kvSet('surv', String(uid), s);
+    res.json({ ok: true, run: s.run });
+});
+app.post('/api/cards/survival/fight', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    if (SURV_LOCK.has(uid)) return res.json({ ok: false, error: 'Combat déjà en cours.' });
+    SURV_LOCK.add(uid);
+    try {
+        const s = await survState(uid), run = s.run;
+        if (!run) return res.json({ ok: false, error: 'Aucune partie en cours.' });
+        const floor = run.floor, foes = survEnemies(floor, run.avg), before = foes.map(f => ({ ...f }));
+        const { won, log } = survFight(run.team, foes);
+        let reward = null, coins = null;
+        if (won) {
+            reward = survReward(floor);
+            coins = await ecoAddCoins(uid, reward.coins);
+            if (reward.dust) await dustAdd(uid, reward.dust);
+            if (reward.potions) await potionAdd(uid, reward.potions);
+            if (reward.secret) {
+                const sp = cardSpecials('secrete', arcUniverses()[Math.floor(Math.random() * arcUniverses().length)]);
+                const c = sp[Math.floor(Math.random() * sp.length)];
+                if (c) { const isNew = await cardGive(uid, { key: c.key }, false); reward.card = { key: c.key, ...cardInfoOfKey(c.key), isNew, coins: 0 }; run.earned.secrets++; }
+            }
+            run.earned.coins += reward.coins; run.earned.dust += reward.dust; run.earned.potions += reward.potions;
+            run.floor++;
+        }
+        s.best = Math.max(s.best || 0, won ? floor : floor - 1);
+        const ended = !won, summary = ended ? { floor: floor - 1, earned: run.earned } : null;
+        if (ended) s.run = null;
+        await kvSet('surv', String(uid), s);
+        if (floor - (won ? 0 : 1) > 0) await survBoard(uid, won ? floor : floor - 1);
+        if (won) await cardXpAdd(uid, run.team.map(c => c.key), 3);
+        res.json({ ok: true, floor, won, log: log.slice(0, 120), foes: before, foesAfter: foes.map(f => f.hp), team: run.team, reward, ended, summary, next: won ? survReward(run.floor) : null, coins });
+    } finally { SURV_LOCK.delete(uid); }
+});
+app.post('/api/cards/survival/quit', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const s = await survState(uid);
+    if (!s.run) return res.json({ ok: false, error: 'Aucune partie en cours.' });
+    const summary = { floor: s.run.floor - 1, earned: s.run.earned };
+    s.run = null; await kvSet('surv', String(uid), s);
+    res.json({ ok: true, summary });
+});
