@@ -3845,6 +3845,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -11723,7 +11724,7 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -13053,11 +13054,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -13070,7 +13071,7 @@ body.ag-game-page #app-root > #mode,
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
                 valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
                 altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
-                celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
+                evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
                 primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out'],
                 stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out']
             };
@@ -14143,7 +14144,7 @@ body.ag-game-page #app-root > #mode,
                     : `<img src="${esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15">`;
                 const first = String(c.name).split(/[ &]/)[0];
                 return `<div class="tcard r-${esc(c.rarity)}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}${fin ? ' f-' + fin : ''}"${key ? ` data-key="${esc(key)}"` : ''} style="--fc:${FIN_COL[fin] || '#fff'}"><i class="tc-bgfx"></i>
-                    <div class="tc-img">${imgs}<i class="tc-fx"></i><i class="tc-glare"></i>${fin ? `<b class="tc-fin">${FIN_ICON[fin]} ${FIN_LABEL[fin]}</b>` : ''}${fin === 'signed' ? `<i class="tc-sign">${esc(first)}</i>` : ''}${ser && (fin === 'numbered' || fin === 'signed') ? `<b class="tc-ser">#${ser}${fin === 'numbered' ? '/' + (c.serialMax || 50) : ''}</b>` : ''}</div>
+                    <div class="tc-img">${imgs}<i class="tc-fx"></i><i class="tc-glare"></i>${(c.lvl || (window.CARD_LVLS && key && window.CARD_LVLS[key])) ? `<i class="tc-lvl">${'★'.repeat(c.lvl || window.CARD_LVLS[key])}</i>` : ''}${fin ? `<b class="tc-fin">${FIN_ICON[fin]} ${FIN_LABEL[fin]}</b>` : ''}${fin === 'signed' ? `<i class="tc-sign">${esc(first)}</i>` : ''}${ser && (fin === 'numbered' || fin === 'signed') ? `<b class="tc-ser">#${ser}${fin === 'numbered' ? '/' + (c.serialMax || 50) : ''}</b>` : ''}</div>
                     <div class="tc-name">${esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity] || esc(c.rarity)}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}${c.god ? '<em class="tc-god">GOD PACK</em>' : ''}</div>`;
             };
 
@@ -14239,6 +14240,7 @@ body.ag-game-page #app-root > #mode,
                         ${typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' && (matchMedia('(pointer: coarse)').matches || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="gyro">📱 Gyroscope</button>` : ''}
                     </div>
                     ${!d.canUpgrade && d.n ? `<div class="tl-hint" style="text-align:left;">✨ Avec 6 exemplaires, tu peux fusionner 5 doublons pour passer ta carte en Holo, puis Gold, puis Galaxie.</div>` : ''}`;
+                if (typeof cpExtras === 'function') cpExtras(body, d, key, c, close); // AG_CARDS_PLUS_V1
                 body.querySelectorAll('.ci-chips button').forEach(b => b.onclick = () => {
                     body.querySelectorAll('.ci-chips button').forEach(x => x.classList.toggle('on', x === b));
                     const f = b.dataset.f || null, ser = f && d.serials[f] ? Math.min(...d.serials[f]) : null;
@@ -14266,7 +14268,7 @@ body.ag-game-page #app-root > #mode,
                 const t = e.target.closest ? e.target.closest('.tcard[data-key]') : null;
                 if (!t || t.closest('#card-inspect') || e.target.closest('button,a')) return;
                 const sm = t.closest('#summon'); if (sm && !sm.classList.contains('done')) return;
-                if (t.closest('#adm-hw-list') || t.closest('[onclick]')) return;
+                if (t.closest('#adm-hw-list') || t.closest('[onclick]') || t.closest('.cp-pick')) return;
                 e.stopPropagation(); cardInspect(t.dataset.key);
             }, true);
 
@@ -14344,8 +14346,8 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -15837,5 +15839,229 @@ async function loadHallOfFame(){
 })();
 
 </script>
+    <!-- AG_CARDS_PLUS_V1 : évolution, niveaux, atelier, échange surprise, collectionneurs, carte offerte, duel 3v3, défis de deck, classeur -->
+    <style>
+        .cp-bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;}
+        .cp-bar button{background:#1a1a2e;color:var(--accent-yellow);border:2px solid var(--accent-yellow);border-radius:10px;padding:7px 12px;font-weight:800;cursor:pointer;font-size:.85rem;}
+        .cp-bar button:hover{background:var(--accent-yellow);color:#111;}
+        .tcard .tc-lvl{position:absolute;left:6px;top:6px;z-index:4;font-style:normal;font-size:.72rem;color:#ffd700;text-shadow:0 0 4px #000,0 0 2px #000;letter-spacing:-1px;}
+        .tcard.r-evolution{border:2px solid #ff7b00;box-shadow:0 0 14px rgba(255,123,0,.75),0 0 30px rgba(255,210,63,.3);background:linear-gradient(180deg,#1f0d00,#0d0602);}
+        .tcard.r-evolution .tc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 110%,rgba(255,123,0,.6),transparent 60%);animation:rFlicker 1.6s ease-in-out infinite;}
+        .tcard.r-evolution .tc-rar{color:#ffb347;font-weight:900;text-shadow:0 0 8px #ff7b00;}
+        .trd-mini.r-evolution{border-color:#ff7b00;}
+        #cp-modal{position:fixed;inset:0;z-index:10060;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:10px;}
+        #cp-modal .cp-box{background:#11111a;border:2px solid var(--accent-yellow);border-radius:14px;width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+        #cp-modal .cp-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;font-weight:900;color:var(--accent-yellow);border-bottom:1px solid #2c2c44;}
+        #cp-modal .cp-h button{background:none;border:1px solid #555;color:#fff;border-radius:6px;cursor:pointer;padding:2px 8px;}
+        #cp-modal .cp-body{overflow:auto;padding:12px 14px 16px;}
+        .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+        .cp-pick{cursor:pointer;border-radius:12px;outline:3px solid transparent;transition:outline-color .15s;}
+        .cp-pick.on{outline-color:var(--accent-yellow);}
+        .cp-round{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:10px 0;opacity:0;transform:translateY(8px);transition:all .4s;}
+        .cp-round.show{opacity:1;transform:none;}
+        .cp-round .tcard{max-width:150px;margin:0 auto;}
+        .cp-round .cp-vs{font-family:'Bangers',cursive;font-size:1.4rem;text-align:center;}
+        .cp-round .cp-n{text-align:center;font-weight:900;font-size:1.1rem;margin-top:4px;}
+        .cp-round .w{color:#00ff88;} .cp-round .l{color:#ff5c7a;}
+        .cp-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #1d1d2b;}
+        .cp-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+        .cp-tabs button{background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:700;}
+        .cp-tabs button.on{background:var(--accent-cyan);color:#111;}
+        .cp-extra{margin-top:10px;padding-top:10px;border-top:1px solid #2c2c44;}
+        .cp-extra .cp-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+        .cp-extra .cp-btns button{flex:1;min-width:140px;margin:0;}
+        .cp-fins{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px;}
+        .cp-fins button{background:#1a1a2e;color:#fff;border:1px solid #444;border-radius:8px;padding:6px;cursor:pointer;text-align:left;font-size:.8rem;}
+        .cp-fins button:disabled{opacity:.4;cursor:not-allowed;}
+        /* classeur */
+        .cp-book{perspective:1800px;display:flex;justify-content:center;gap:0;margin:6px auto;}
+        .cp-page{width:min(340px,44vw);min-height:420px;background:linear-gradient(90deg,#1b1530,#221a3a);border:2px solid #3b2f63;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start;box-shadow:inset 0 0 30px rgba(0,0,0,.5);}
+        .cp-page.left{border-radius:12px 0 0 12px;border-right:4px solid #0d0a18;}
+        .cp-page.right{border-radius:0 12px 12px 0;transform-origin:left center;}
+        .cp-page .tcard{transform:scale(.98);}
+        .cp-page .cp-slot{aspect-ratio:3/4.2;border:2px dashed #3b2f63;border-radius:8px;}
+        .cp-flip-next .right{animation:cpFlipN .55s ease-in;} .cp-flip-prev .left{animation:cpFlipP .55s ease-in;transform-origin:right center;}
+        @keyframes cpFlipN{from{transform:rotateY(0);}to{transform:rotateY(-170deg);opacity:.2;}}
+        @keyframes cpFlipP{from{transform:rotateY(0);}to{transform:rotateY(170deg);opacity:.2;}}
+        .cp-nav{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:8px;}
+        .cp-nav button{background:var(--accent-yellow);color:#111;border:0;border-radius:8px;padding:6px 14px;font-weight:900;cursor:pointer;}
+        @media (max-width:640px){.cp-page{width:min(92vw,360px);} .cp-page.left{display:none;} .cp-page.right{border-radius:12px;}}
+    </style>
+    <script>
+    (function () {
+        if (typeof RAR_LABEL !== 'undefined') RAR_LABEL.evolution = 'Évolution 🧬';
+        window.CARD_LVLS = window.CARD_LVLS || {};
+        const loadLvls = async () => { if (!isAccount()) return; const d = await v7get('/api/cards/levels'); if (d && d.ok) window.CARD_LVLS = d.lvls || {}; };
+        socket.on('connect', () => setTimeout(loadLvls, 1500));
+        const esc = s => v7esc(String(s == null ? '' : s));
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const needAcc = () => { if (isAccount()) return true; toast('Connecte-toi à un compte pour utiliser tes cartes.', 'var(--accent-yellow)'); return false; };
+        async function myCards() { const d = await v7get('/api/cards/mine'); return (d && d.ok ? d.cards : []).filter(c => !/^(collector|moment)\|/.test(c.key)); }
+
+        // ---------- fiche d'une carte : niveau, évolution, atelier, échange surprise, offrir ----------
+        window.cpExtras = function (body, d, key, c, close) {
+            if (!d || !d.n) return;
+            const box = document.createElement('div'); box.className = 'cp-extra';
+            const lvl = d.lvl || 0;
+            box.innerHTML = `<div class="ci-row">⭐ Niveau <b>${lvl ? '★'.repeat(lvl) : '0'}</b>${d.lvlNext ? ` • XP ${d.xp}/${d.lvlNext}` : ' • niveau max'} • ⚔️ Puissance <b>${d.power || '?'}</b><br><small class="tl-hint">La carte gagne de l’XP quand elle est dans ton deck pendant tes parties et dans les duels.</small></div>
+                <div class="cp-btns">
+                    ${d.evo && d.evo.next ? `<button class="btn-action" data-cp="evo" ${d.n < d.evo.cost ? 'disabled' : ''} style="background:#ff7b00;color:#111;">🧬 Évoluer en ${esc(d.evo.next)} (${d.n}/${d.evo.cost})</button>` : ''}
+                    ${d.atelier ? `<button class="btn-action" data-cp="atelier" style="background:#2a2a40;">🛠️ Atelier de finitions</button>` : ''}
+                    ${d.n >= 2 ? `<button class="btn-action" data-cp="surprise" style="background:#2a2a40;">🎁 Échange surprise</button>` : ''}
+                    <button class="btn-action" data-cp="gift" style="background:#2a2a40;">💝 Offrir à un ami</button>
+                </div><div class="cp-sub"></div>`;
+            body.appendChild(box);
+            const sub = box.querySelector('.cp-sub');
+            box.querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => {
+                const a = b.dataset.cp;
+                if (a === 'evo') {
+                    if (!confirm(`Utiliser ${d.evo.cost - 1} exemplaires pour obtenir ${c.name} — ${d.evo.next} ? (tu gardes 1 exemplaire)`)) return;
+                    const r = await v7post('/api/cards/evolve', { key });
+                    if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                    close(); showBooster([r.card]); return;
+                }
+                if (a === 'atelier') {
+                    const F = d.atelier; const L = window.FIN_COL ? null : null;
+                    sub.innerHTML = `<p class="tl-hint" style="text-align:left;margin:8px 0 0;">Choisis la finition à appliquer (doublons utilisés + pièces). Tu as ${d.n} exemplaire${d.n > 1 ? 's' : ''}, tu en gardes toujours 1.</p>
+                        <div class="cp-fins">${Object.entries(F).map(([f, [dup, coins]]) => `<button data-f="${f}" ${d.n < dup + 1 ? 'disabled' : ''}>${esc(f)}<br><small>${dup} doublons • 🪙 ${coins}</small></button>`).join('')}</div>`;
+                    // libellés lisibles
+                    sub.querySelectorAll('.cp-fins button').forEach(x => { const f = x.dataset.f; const lab = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', sakura: '🌸 Sakura', sketch: '✏️ Croquis', gold: '🥇 Gold', retro: '📼 Rétro VHS', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', neon: '💡 Néon', galaxy: '🔮 Galaxie', pixel: '👾 8-bit', glitch: '📺 Glitch', aurora: '🌌 Aurore boréale', prism: '💎 Prismatique', crystal: '🔷 Cristal' }[f] || f; x.innerHTML = x.innerHTML.replace(esc(f), lab);
+                        x.onclick = async () => {
+                            const [dup, coins] = F[f];
+                            if (!confirm(`Appliquer ${lab} pour ${dup} doublons et ${coins} pièces ?`)) return;
+                            const r = await v7post('/api/cards/atelier', { key, finish: f });
+                            if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                            if (typeof eco !== 'undefined') { eco.coins = r.coins; ecoCoinsUi(); }
+                            close(); showBooster([r.card]);
+                        }; });
+                    return;
+                }
+                if (a === 'surprise') {
+                    if (!confirm('Mettre 1 doublon de cette carte en échange surprise ? Tu recevras une carte de la même rareté d’un autre joueur (tout de suite si quelqu’un attend, sinon dès qu’un joueur en propose une).')) return;
+                    const r = await v7post('/api/cards/surprise', { key });
+                    if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                    if (r.got) { close(); showBooster([r.got]); } else toast('🎁 Doublon déposé ! Tu recevras une carte surprise dès qu’un autre joueur échange la même rareté.', '#00ff88');
+                    return;
+                }
+                if (a === 'gift') {
+                    const fr = await v7get('/api/friends');
+                    const list = (fr && fr.friends) || [];
+                    if (!list.length) return toast('Ajoute d’abord des amis pour leur offrir des cartes.', 'var(--accent-yellow)');
+                    sub.innerHTML = `<div style="margin-top:8px;"><select class="v7-input" id="cp-gift-to">${list.map(f => `<option value="${esc(f.pseudo)}">${esc(f.pseudo)}${f.online ? ' 🟢' : ''}</option>`).join('')}</select>
+                        <input class="v7-input" id="cp-gift-msg" maxlength="140" placeholder="Petit message (facultatif)"><button class="btn-action" id="cp-gift-go" style="margin:0;">💝 Offrir ${esc(c.name)}</button></div>`;
+                    sub.querySelector('#cp-gift-go').onclick = async () => {
+                        const r = await v7post('/api/cards/gift', { key, to: sub.querySelector('#cp-gift-to').value, msg: sub.querySelector('#cp-gift-msg').value });
+                        if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                        toast('💝 Carte offerte !', '#00ff88'); close();
+                    };
+                }
+            });
+        };
+        socket.on('card_gift', g => { if (!g) return; toast(`💝 ${esc(g.from)} t’offre ${esc(g.name)} (${esc(RAR_LABEL[g.rarity] || g.rarity)})${g.msg ? ' : « ' + esc(g.msg) + ' »' : ''}`, '#ff6fa8'); });
+        socket.on('card_surprise', g => { if (g) toast(`🎁 Échange surprise réussi : quelqu’un a pris ton doublon, tu as reçu une carte ${esc(RAR_LABEL[g.rarity] || g.rarity)} en retour !`, '#00ff88'); });
+        socket.on('deck_challenge', g => { if (g) toast(`🎯 Défi de deck réussi : ${esc(g.title)} (+${g.reward} 🪙)`, '#ffd700'); });
+
+        // ---------- duel de cartes 3 contre 3 ----------
+        window.cpDuelOpen = async function () {
+            if (!needAcc()) return;
+            const body = modal('⚔️ Duel de cartes — 3 contre 3', 'Chargement…');
+            const cards = (await myCards()).sort((a, b) => (b.lvl || 0) - (a.lvl || 0));
+            const sel = [];
+            const draw = q => {
+                const list = cards.filter(c => !q || (c.name + ' ' + c.anime).toLowerCase().includes(q.toLowerCase())).slice(0, 120);
+                body.querySelector('.cp-grid').innerHTML = list.map(c => `<div class="cp-pick${sel.includes(c.key) ? ' on' : ''}" data-k="${esc(c.key)}">${cardHtml(Object.assign({}, c, { isNew: false }))}</div>`).join('') || '<p class="tl-hint">Aucune carte.</p>';
+                body.querySelectorAll('.cp-pick').forEach(el => el.onclick = e => { e.stopPropagation(); const k = el.dataset.k, i = sel.indexOf(k); if (i >= 0) sel.splice(i, 1); else if (sel.length < 3) sel.push(k); el.classList.toggle('on', sel.includes(k)); body.querySelector('#cp-go').textContent = `⚔️ Combattre (${sel.length}/3)`; body.querySelector('#cp-go').disabled = sel.length !== 3; });
+            };
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Choisis 3 cartes. Leur puissance dépend de la rareté, du perso, du niveau ★ et de la finition. 3 manches contre l’ordinateur : gagne-en 2 ! (+60 🪙, 10 victoires payées par jour, et de l’XP pour tes cartes)</p>
+                <input class="v7-input" id="cp-q" placeholder="🔎 Chercher une carte…"><button class="btn-action" id="cp-go" disabled style="margin:0 0 10px;">⚔️ Combattre (0/3)</button><div class="cp-grid"></div>`;
+            body.querySelector('#cp-q').oninput = e => draw(e.target.value.trim());
+            body.querySelector('#cp-go').onclick = async () => {
+                const r = await v7post('/api/cards/duel', { keys: sel });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                body.innerHTML = r.rounds.map((x, i) => `<div class="cp-round" id="cp-r${i}"><div>${cardHtml(Object.assign({}, x.me, { isNew: false }))}<div class="cp-n ${x.win ? 'w' : 'l'}">${x.a}</div></div><div class="cp-vs">MANCHE ${i + 1}<br>VS</div><div>${cardHtml(Object.assign({}, x.foe, { isNew: false }))}<div class="cp-n ${x.win ? 'l' : 'w'}">${x.b}</div></div></div>`).join('')
+                    + `<div id="cp-res" style="text-align:center;font-family:'Bangers',cursive;font-size:2rem;opacity:0;transition:opacity .4s;">${r.won ? '🏆 VICTOIRE !' : '💀 DÉFAITE…'} ${r.wins}/3${r.coins ? ` • +${r.coins} 🪙` : ''}</div>
+                    <p class="tl-hint" style="text-align:center;">Victoires payées aujourd’hui : ${r.winsToday}/${r.maxWins}</p><button class="btn-action" onclick="cpDuelOpen()">⚔️ Rejouer</button>`;
+                r.rounds.forEach((x, i) => setTimeout(() => body.querySelector('#cp-r' + i)?.classList.add('show'), 500 + i * 900));
+                setTimeout(() => { const e = body.querySelector('#cp-res'); if (e) e.style.opacity = 1; }, 500 + r.rounds.length * 900);
+                if (r.coins && typeof ecoLoad === 'function') ecoLoad();
+            };
+            draw('');
+        };
+
+        // ---------- classement des collectionneurs ----------
+        window.cpLbOpen = async function (u) {
+            const body = modal('🏆 Classement des collectionneurs', 'Chargement…');
+            const d = await v7get('/api/cards/leaderboard' + (u ? '?u=' + encodeURIComponent(u) : ''));
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            const list = (rows, unit) => rows.length ? rows.map((r, i) => `<div class="cp-row"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(r.name)}</span><b>${r.v} ${unit}</b></div>`).join('') : '<p class="tl-hint">Personne pour l’instant.</p>';
+            const opts = (typeof UNIVERSE_CHOICES !== 'undefined' ? UNIVERSE_CHOICES : []).map(([k, l]) => `<option value="${k}" ${k === d.u ? 'selected' : ''}>${esc(l)}</option>`).join('');
+            body.innerHTML = `<div class="cp-tabs"><button data-t="total" class="on">📚 Cartes différentes</button><button data-t="special">💎 Raretés spéciales</button><button data-t="anime">🎌 Par anime</button></div>
+                <div data-p="total">${list(d.total, 'cartes')}</div><div data-p="special" style="display:none;">${list(d.special, 'spéciales')}</div>
+                <div data-p="anime" style="display:none;"><select class="v7-input" id="cp-lb-u"><option value="">— Choisis un anime —</option>${opts}</select>${d.u ? list(d.anime, 'cartes') : ''}</div>`;
+            const show = t => { body.querySelectorAll('.cp-tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); body.querySelectorAll('[data-p]').forEach(p => p.style.display = p.dataset.p === t ? '' : 'none'); };
+            body.querySelectorAll('.cp-tabs button').forEach(b => b.onclick = () => show(b.dataset.t));
+            body.querySelector('#cp-lb-u').onchange = e => cpLbOpen(e.target.value).then(() => { const m = document.querySelector('#cp-modal .cp-tabs button[data-t="anime"]'); if (m) m.click(); });
+            if (u) show('anime');
+        };
+
+        // ---------- défis de deck ----------
+        window.cpChOpen = async function () {
+            if (!needAcc()) return;
+            const body = modal('🎯 Défis de deck de la semaine', 'Chargement…');
+            const d = await v7get('/api/cards/deck-challenges');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Prépare ton deck (5 cartes) puis gagne une partie dans n’importe quel mode. Nouveaux défis chaque lundi.</p>`
+                + d.list.map(c => `<div class="cp-row"><span>${c.done ? '✅' : '⬜'} ${esc(c.title)}</span><b>+${c.reward} 🪙</b></div>`).join('')
+                + `<p class="tl-hint" style="margin-top:10px;">💡 Ton deck donne aussi un bonus de dégâts contre le boss du serveur : plus tes cartes sont puissantes (rareté, niveau ★, finitions), plus tu tapes fort (jusqu’à x3).</p>`;
+        };
+
+        // ---------- échanges surprise en attente ----------
+        window.cpSurpriseOpen = async function () {
+            if (!needAcc()) return;
+            const body = modal('🎁 Échanges surprise', 'Chargement…');
+            const d = await v7get('/api/cards/surprise');
+            if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p class="tl-hint" style="margin:0 0 8px;">Ouvre une carte dont tu as un doublon et clique « 🎁 Échange surprise » : tu reçois une carte de la même rareté d’un autre joueur.</p>`
+                + (d.pending.length ? d.pending.map(p => `<div class="cp-row"><span>⏳ ${esc(p.name)} <small class="tl-hint">(${esc(RAR_LABEL[p.rarity] || p.rarity)})</small></span><button class="kick-btn" data-k="${esc(p.key)}">Annuler</button></div>`).join('') : '<p class="tl-hint">Aucun doublon en attente.</p>');
+            body.querySelectorAll('[data-k]').forEach(b => b.onclick = async () => { const r = await v7post('/api/cards/surprise', { key: b.dataset.k, cancel: true }); if (r && r.ok) { toast('↩️ Carte récupérée', '#00ff88'); cpSurpriseOpen(); } else toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)'); });
+        };
+
+        // ---------- classeur 3D ----------
+        window.cpBinderOpen = async function () {
+            if (!needAcc()) return;
+            const body = modal('📖 Mon classeur', 'Chargement…');
+            const RO = { absolue: 0, primordiale: 1, chaos: 2, omega: 3 };
+            let all = (await myCards()).sort((a, b) => String(a.anime).localeCompare(String(b.anime), 'fr') || String(a.name).localeCompare(String(b.name), 'fr'));
+            const animes = [...new Set(all.map(c => c.anime))].filter(Boolean);
+            let list = all, page = 0;
+            const mobile = () => matchMedia('(max-width:640px)').matches;
+            const per = () => (mobile() ? 9 : 18);
+            const pageHtml = (cards, side) => `<div class="cp-page ${side}">${Array.from({ length: 9 }, (_, i) => cards[i] ? `<div>${cardHtml(Object.assign({}, cards[i], { isNew: false }))}</div>` : '<div class="cp-slot"></div>').join('')}</div>`;
+            const render = anim => {
+                const n = per(), start = page * n, cards = list.slice(start, start + n), pages = Math.max(1, Math.ceil(list.length / n));
+                const book = mobile() ? pageHtml(cards, 'right') : pageHtml(cards.slice(0, 9), 'left') + pageHtml(cards.slice(9, 18), 'right');
+                body.querySelector('#cp-book').className = 'cp-book' + (anim ? ' cp-flip-' + anim : '');
+                setTimeout(() => { body.querySelector('#cp-book').innerHTML = book; body.querySelector('#cp-book').className = 'cp-book'; body.querySelector('#cp-pg').textContent = `Page ${page + 1} / ${pages} • ${list.length} cartes`; }, anim ? 450 : 0);
+            };
+            body.innerHTML = `<select class="v7-input" id="cp-bd-a"><option value="">Toutes mes cartes (${all.length})</option>${animes.map(a => `<option>${esc(a)}</option>`).join('')}</select>
+                <div id="cp-book" class="cp-book"></div><div class="cp-nav"><button id="cp-prev">◀</button><span id="cp-pg"></span><button id="cp-next">▶</button></div>`;
+            const go = d => { const pages = Math.ceil(list.length / per()); const np = page + d; if (np < 0 || np >= pages) return; page = np; render(d > 0 ? 'next' : 'prev'); };
+            body.querySelector('#cp-prev').onclick = () => go(-1); body.querySelector('#cp-next').onclick = () => go(1);
+            body.querySelector('#cp-bd-a').onchange = e => { list = e.target.value ? all.filter(c => c.anime === e.target.value) : all; page = 0; render(); };
+            const key = e => { if (!document.getElementById('cp-modal')) return document.removeEventListener('keydown', key); if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); };
+            document.addEventListener('keydown', key);
+            let sx = null; body.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true }); body.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); sx = null; });
+            render();
+        };
+    })();
+    </script>
 </body>
 </html>

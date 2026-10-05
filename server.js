@@ -24455,7 +24455,8 @@ app.get('/api/cards/info', async (req, res) => {
     const info = cardInfoOfKey(key), u = info && info.u, name = info && info.name;
     res.json({ ok: true, key, n: m ? m.n : 0, shiny: m ? m.shiny : 0, mine: Object.fromEntries(FIN_IDS.filter(f => fin[f]).map(f => [f, fin[f]])), serials: fin.ser || {},
         world: Object.fromEntries(FIN_IDS.filter(f => g[f]).map(f => [f, g[f]])), total, numberedMax: NUMBERED_MAX, quote: info && info.rarity !== 'moment' && ARC_UNIVERSE_ANIME[u] ? cardQuote(u, name) : null,
-        canUpgrade: !!m && m.n >= 6 && !fin.galaxy && !key.startsWith('altart|') && !key.startsWith('moment|'), showcase: (await kvGet('vitrine', String(uid), [])).includes(key) });
+        canUpgrade: !!m && m.n >= 6 && !fin.galaxy && !key.startsWith('altart|') && !key.startsWith('moment|') && !key.startsWith('evo|'), showcase: (await kvGet('vitrine', String(uid), [])).includes(key),
+        ...(m ? await cardExtraInfo(uid, key, m) : {}) });
 });
 // améliorer la finition : 5 doublons d'une carte → Holo, puis Gold, puis Galaxie
 app.post('/api/cards/upgrade', async (req, res) => {
@@ -24527,8 +24528,10 @@ app.get('/api/cards/mine', async (req, res) => {
     const mine = await cardsOf(uid), fin = await kvGet('fin', String(uid), {});
     const duos = Object.fromEntries(DUO_CARDS().map(d => [d.name, d]));
     const out = [];
+    const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('evo|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'evolution', img: i.img, evo: true, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
         const special = (k.startsWith('altart|') || k.startsWith('moment|')) ? cardInfoOfKey(k) : null;
         if (special) {
@@ -24539,7 +24542,7 @@ app.get('/api/cards/mine', async (req, res) => {
         const base = { key: k, name, n: v.n, shiny: v.shiny || 0, finish: best, finishes, serial: best && e.ser && e.ser[best] ? Math.min(...e.ser[best]) : null };
         if (u === 'duo') { const d = duos[name]; if (d) out.push({ ...base, u: 'duo', anime: d.sub || '', rarity: 'duo', imgs: d.imgs, img: d.imgs[0] }); return; }
         const r = keyRarity(k); if (!r) return;
-        out.push({ ...base, u, anime: ARC_UNIVERSE_ANIME[u], rarity: r, secret: !!sec, img: cardImg({ u, display: name }) });
+        out.push({ ...base, u, anime: ARC_UNIVERSE_ANIME[u], rarity: r, secret: !!sec, img: cardImg({ u, display: name }), lvl: cardLvlOf(xpm[k] || 0) });
     });
     res.json({ ok: true, cards: out, finDeck: FIN_DECK });
 });
@@ -26044,3 +26047,339 @@ cardRarityAt = function (u, idx) {
     return e < 0.45 ? 'rare' : e < 0.78 ? 'epique' : e < 0.95 ? 'legendaire' : 'mythique';
 };
 CARD_RATES_CACHE = null;
+
+/* =====================================================================
+   AG_CARDS_PLUS_V1 — Évolution, niveau des cartes, atelier de finitions, échange surprise,
+   classement des collectionneurs, carte offerte, duel de cartes 3 contre 3, défis de deck,
+   raid du boss avec le deck. (Le classeur 3D est côté client.)
+   ===================================================================== */
+// ---------- puissance d'une carte (duels, boss) ----------
+const CP_ENCHERE = new Map();
+function cpEnchere(u, name) {
+    if (!CP_ENCHERE.has(u)) {
+        const m = new Map();
+        try { for (const c of (ENCHERE_UNIVERSES[u] && ENCHERE_UNIVERSES[u].characters) || []) m.set(normalizeRG(c.name), +c.value || 0); } catch (_) {}
+        CP_ENCHERE.set(u, m);
+    }
+    return CP_ENCHERE.get(u).get(normalizeRG(name)) || 0;
+}
+function cardPower(c) { // c : { u, name, rarity, finish, shiny, lvl }
+    const rank = RAR_RANK[c.rarity] || 0;
+    return Math.round(20 + rank * 11 + cpEnchere(c.u, c.name) * 0.45 + (c.lvl || 0) * 6 + (c.finish ? (FIN_DECK[c.finish] || 0) * 2 : 0) + (c.shiny ? 5 : 0));
+}
+
+// ---------- niveau des cartes : XP gagnée quand la carte est dans le deck pendant une partie ----------
+const CARD_LVL = [0, 40, 120, 280, 560, 1000]; // ★ à ★★★★★
+const cardLvlOf = xp => { let l = 0; CARD_LVL.forEach((t, i) => { if (xp >= t && i > 0) l = i; }); return l; };
+async function cardXpMap(uid) { return kvGet('cardxp', String(uid), {}); }
+async function cardXpAdd(uid, keys, n) {
+    if (!keys.length) return;
+    const m = await cardXpMap(uid);
+    for (const k of keys) m[k] = (m[k] || 0) + n;
+    await kvSet('cardxp', String(uid), m);
+}
+
+// ---------- Évolution : 10 exemplaires d'un perso → sa forme transformée ----------
+const EVO_LIST = (() => {
+    const map = new Map(); // u|display de base -> [{ name, char }]
+    const items = (QT_BY_ID.transformation && QT_BY_ID.transformation.items) || [];
+    for (const it of items) {
+        const [charName, anime] = String(it.sub || '').split('•').map(s => s.trim());
+        const u = tbAnimeOfSub(anime || ''); if (!u) continue;
+        const c = cardResolve(u, it.char || charName); if (!c) continue;
+        const k = u + '|' + c.display;
+        if (!map.has(k)) map.set(k, []);
+        map.get(k).push({ name: String(it.name), char: c.display, u });
+    }
+    return map;
+})();
+const evoKey = (u, base, form) => 'evo|' + u + '|' + base + '|' + form;
+const EVO_IMG_CACHE = new Map();
+app.get('/api/evo-img', async (req, res) => {
+    const form = String(req.query.f || ''), base = String(req.query.c || '');
+    const ck = base + '|' + form;
+    let url = EVO_IMG_CACHE.get(ck);
+    if (!url) {
+        try {
+            const r = await fetch(`http://127.0.0.1:${PORT}/api/arcade/item-image?source=${encodeURIComponent('qt:transformation')}&name=${encodeURIComponent(form)}`);
+            const j = await r.json(); url = j && j.imageUrl;
+        } catch (_) {}
+        if (url) EVO_IMG_CACHE.set(ck, url);
+    }
+    if (!url) return res.redirect(cardImg({ u: String(req.query.u || ''), display: base }));
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.redirect(/^https?:/.test(url) ? '/api/img?u=' + encodeURIComponent(url) : url);
+});
+const evoImg = (u, base, form) => `/api/evo-img?u=${encodeURIComponent(u)}&c=${encodeURIComponent(base)}&f=${encodeURIComponent(form)}`;
+const _cardInfoOfKeyEvo = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'evo') { const [, u, base, form] = p; if (!ARC_UNIVERSE_ANIME[u]) return null; return { u, name: `${base} — ${form}`, display: `${base} — ${form}`, anime: ARC_UNIVERSE_ANIME[u], rarity: 'evolution', img: evoImg(u, base, form), base, form }; }
+    return _cardInfoOfKeyEvo(k);
+};
+RAR_RANK.evolution = 5.8; DECK_BONUS.evolution = 24; MARKET_HINT.evolution = [6000, 15000];
+const EVO_COST = 10; // exemplaires nécessaires (on en garde 1)
+app.post('/api/cards/evolve', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || '');
+    const [u, base, sec] = key.split('|');
+    const forms = !sec && EVO_LIST.get(u + '|' + base);
+    if (!forms) return res.json({ ok: false, error: 'Ce perso n’a pas de transformation.' });
+    const mine = await cardsOf(uid), m = mine.get(key);
+    if (!m || m.n < EVO_COST) return res.json({ ok: false, error: `Il faut ${EVO_COST} exemplaires de ${base} (tu en gardes 1).` });
+    const next = forms.find(f => !mine.get(evoKey(u, base, f.name)));
+    if (!next) return res.json({ ok: false, error: 'Tu as déjà toutes ses transformations !' });
+    if (!(await cardTake(uid, key, EVO_COST - 1))) return res.json({ ok: false, error: 'Impossible, réessaie.' });
+    const ek = evoKey(u, base, next.name);
+    await cardGive(uid, { key: ek }, Math.random() < 0.15);
+    res.json({ ok: true, card: { key: ek, name: `${base} — ${next.name}`, anime: ARC_UNIVERSE_ANIME[u], u, rarity: 'evolution', img: evoImg(u, base, next.name), isNew: true, coins: 0 } });
+});
+
+// ---------- Atelier : choisir sa finition contre des doublons + des pièces ----------
+const ATELIER_TIERS = {
+    holo: [2, 300], reverse: [2, 300], glitter: [2, 350], sakura: [2, 400], sketch: [2, 400],
+    gold: [3, 800], retro: [3, 800], dark: [3, 900], fullart: [3, 1000], manga: [3, 1000], neon: [3, 1100],
+    galaxy: [5, 2000], pixel: [5, 2000], glitch: [5, 2200], aurora: [5, 2500], prism: [5, 2800], crystal: [5, 3000]
+}; // Signée et Numérotée restent introuvables à l'atelier
+app.post('/api/cards/atelier', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || ''), fid = String((req.body || {}).finish || '');
+    const cost = ATELIER_TIERS[fid];
+    if (!cost) return res.json({ ok: false, error: 'Finition indisponible à l’atelier.' });
+    if (/^(altart|moment|collector)\|/.test(key)) return res.json({ ok: false, error: 'Cette carte ne peut pas recevoir de finition.' });
+    const m = (await cardsOf(uid)).get(key);
+    if (!m || m.n < cost[0] + 1) return res.json({ ok: false, error: `Il faut ${cost[0]} doublons (+ la carte que tu gardes).` });
+    const e = await ecoGet(uid);
+    if (e.coins < cost[1]) return res.json({ ok: false, error: `Il te manque ${cost[1] - e.coins} pièces.` });
+    if (HAS_DB) { const r = (await pool.query('UPDATE users SET coins = coins - $2 WHERE id=$1 AND coins >= $2 RETURNING coins', [uid, cost[1]])).rows[0]; if (!r) return res.json({ ok: false, error: 'Pas assez de pièces.' }); }
+    else e.coins -= cost[1];
+    if (!(await cardTake(uid, key, cost[0]))) { await ecoAddCoins(uid, cost[1]); return res.json({ ok: false, error: 'Impossible, réessaie.' }); }
+    const r = await finAdd(uid, key, fid);
+    const info = cardInfoOfKey(key) || {};
+    res.json({ ok: true, coins: (await ecoGet(uid)).coins, card: { ...info, key, name: info.name, rarity: info.rarity, ...r, isNew: false } });
+});
+
+// ---------- Échange surprise : un doublon contre celui d'un autre joueur, même rareté ----------
+let SURPRISE_LOCK = Promise.resolve();
+const surpriseLock = fn => (SURPRISE_LOCK = SURPRISE_LOCK.then(fn, fn));
+app.get('/api/cards/surprise', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const q = await kvGet('surprise', 'queue', {});
+    const mine = []; Object.entries(q).forEach(([rar, l]) => (l || []).forEach(x => { if (x.uid === uid) { const i = cardInfoOfKey(x.key); mine.push({ key: x.key, rarity: rar, name: i ? i.name : x.key, at: x.at }); } }));
+    res.json({ ok: true, pending: mine });
+});
+app.post('/api/cards/surprise', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || ''), cancel = !!(req.body || {}).cancel;
+    const out = await surpriseLock(async () => {
+        const q = await kvGet('surprise', 'queue', {});
+        if (cancel) {
+            for (const [rar, l] of Object.entries(q)) { const i = (l || []).findIndex(x => x.uid === uid && x.key === key); if (i >= 0) { l.splice(i, 1); await kvSet('surprise', 'queue', q); await cardGive(uid, { key }, false); return { ok: true, cancelled: true }; } }
+            return { ok: false, error: 'Rien à annuler.' };
+        }
+        const info = cardInfoOfKey(key), m = (await cardsOf(uid)).get(key);
+        if (!info || /^(collector|moment)\|/.test(key)) return { ok: false, error: 'Carte non échangeable.' };
+        if (!m || m.n < 2) return { ok: false, error: 'Il faut un doublon (2 exemplaires minimum).' };
+        const rar = info.rarity || 'commune';
+        const list = q[rar] = q[rar] || [];
+        if (list.filter(x => x.uid === uid).length >= 5) return { ok: false, error: '5 échanges surprise en attente maximum.' };
+        if (!(await cardTake(uid, key, 1))) return { ok: false, error: 'Impossible, réessaie.' };
+        const j = list.findIndex(x => x.uid !== uid && x.key !== key);
+        if (j < 0) { list.push({ uid, key, at: Date.now() }); await kvSet('surprise', 'queue', q); return { ok: true, waiting: true }; }
+        const other = list.splice(j, 1)[0];
+        await kvSet('surprise', 'queue', q);
+        await cardGive(uid, { key: other.key }, false);
+        await cardGive(other.uid, { key }, false);
+        const got = cardInfoOfKey(other.key) || { name: other.key }, gave = info;
+        emitUser(other.uid, 'card_surprise', { name: gave.name, anime: gave.anime, rarity: rar });
+        return { ok: true, got: { ...got, key: other.key, isNew: true, coins: 0 } };
+    });
+    res.json(out);
+});
+
+// ---------- Classement des collectionneurs ----------
+let COLL_LB = { at: 0, data: null };
+app.get('/api/cards/leaderboard', async (req, res) => {
+    const u = String(req.query.u || '');
+    if (!COLL_LB.data || Date.now() - COLL_LB.at > 5 * 60 * 1000) {
+        const per = new Map(); // uid -> { total, special, anime: {u: n} }
+        const add = (uid, k) => {
+            const o = per.get(uid) || { total: 0, special: 0, anime: {} }; per.set(uid, o);
+            o.total++;
+            const p = String(k).split('|');
+            if (p.length >= 3 && SPECIAL_BY_ID[p[2]]) o.special++;
+            if (ARC_UNIVERSE_ANIME[p[0]]) o.anime[p[0]] = (o.anime[p[0]] || 0) + 1;
+        };
+        if (HAS_DB) { try { (await pool.query("SELECT user_id, ckey FROM cards WHERE ckey NOT LIKE 'collector|%'")).rows.forEach(r => add(r.user_id, r.ckey)); } catch (_) {} }
+        else CARDS_MEM.forEach((m, uid) => m.forEach((v, k) => add(uid, k)));
+        const rows = [];
+        for (const [uid, o] of per) rows.push({ uid, ...o });
+        COLL_LB = { at: Date.now(), data: rows };
+    }
+    const rows = COLL_LB.data;
+    const top = async (score, n = 20) => Promise.all(rows.map(r => ({ uid: r.uid, v: score(r) })).filter(r => r.v > 0).sort((a, b) => b.v - a.v).slice(0, n).map(async r => ({ name: await pseudoOf(r.uid), v: r.v })));
+    res.json({ ok: true, total: await top(r => r.total), special: await top(r => r.special), anime: ARC_UNIVERSE_ANIME[u] ? await top(r => r.anime[u] || 0) : [], u, animeName: ARC_UNIVERSE_ANIME[u] || null });
+});
+
+// ---------- Carte offerte à un ami ----------
+app.post('/api/cards/gift', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const key = String((req.body || {}).key || ''), to = String((req.body || {}).to || '').trim(), msg = String((req.body || {}).msg || '').trim().slice(0, 140);
+    const toUid = await uidByPseudo(to);
+    if (!toUid || toUid === uid) return res.json({ ok: false, error: 'Joueur introuvable.' });
+    if (!(await areFriends(uid, toUid))) return res.json({ ok: false, error: 'Tu ne peux offrir une carte qu’à un ami.' });
+    const day = new Date().toISOString().slice(0, 10), lim = await kvGet('giftday', String(uid), { day, n: 0 });
+    if (lim.day !== day) { lim.day = day; lim.n = 0; }
+    if (lim.n >= 10) return res.json({ ok: false, error: '10 cartes offertes par jour maximum.' });
+    const info = cardInfoOfKey(key);
+    if (!info || /^collector\|/.test(key)) return res.json({ ok: false, error: 'Carte non offrable.' });
+    if (!(await cardTake(uid, key, 1))) return res.json({ ok: false, error: 'Tu n’as pas cette carte.' });
+    const isNew = await cardGive(toUid, { key }, false);
+    lim.n++; await kvSet('giftday', String(uid), lim);
+    const from = await pseudoOf(uid);
+    emitUser(toUid, 'card_gift', { from, name: info.name, anime: info.anime, rarity: info.rarity, img: info.img, msg, isNew });
+    res.json({ ok: true });
+});
+
+// ---------- Duel de cartes 3 contre 3 (contre l'ordinateur) ----------
+async function cardsWithMeta(uid, keys) {
+    const mine = await cardsOf(uid), fin = await kvGet('fin', String(uid), {}), xp = await cardXpMap(uid);
+    return keys.map(k => { const m = mine.get(k), i = cardInfoOfKey(k); if (!m || !i) return null; return { key: k, u: i.u, name: i.name, anime: i.anime, rarity: i.rarity, img: i.img, imgs: i.imgs || null, shiny: m.shiny > 0, finish: finBestOf(fin[k]), lvl: cardLvlOf(xp[k] || 0) }; }).filter(Boolean);
+}
+app.post('/api/cards/duel', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
+    const mine = await cardsWithMeta(uid, keys);
+    if (mine.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes de ta collection.' });
+    mine.forEach(c => { c.power = cardPower(c); });
+    const target = mine.reduce((a, c) => a + c.power, 0);
+    // adversaire : 3 cartes au hasard d'une puissance proche
+    const us = arcUniverses(); let best = null;
+    for (let t = 0; t < 120; t++) {
+        const team = [];
+        for (let i = 0; i < 3; i++) {
+            const u = us[Math.floor(Math.random() * us.length)], list = cardPool(u); if (!list.length) continue;
+            const idx = Math.min(list.length - 1, Math.floor(Math.pow(Math.random(), 2.2) * list.length)), r = cardRarityAt(u, idx);
+            const c = { u, name: list[idx].display, anime: ARC_UNIVERSE_ANIME[u], rarity: r, img: cardImg({ u, display: list[idx].display }) };
+            c.power = cardPower(c); team.push(c);
+        }
+        const tot = team.reduce((a, c) => a + c.power, 0);
+        if (!best || Math.abs(tot - target) < Math.abs(best.tot - target)) best = { team, tot };
+        if (Math.abs(tot - target) <= target * 0.08) break;
+    }
+    const rounds = mine.map((c, i) => {
+        const o = best.team[i], a = Math.round(c.power * (0.8 + Math.random() * 0.4)), b = Math.round(o.power * (0.8 + Math.random() * 0.4));
+        return { me: c, foe: o, a, b, win: a >= b };
+    });
+    const wins = rounds.filter(r => r.win).length, won = wins >= 2;
+    const day = new Date().toISOString().slice(0, 10), st = await kvGet('cardduel', String(uid), { day, wins: 0 });
+    if (st.day !== day) { st.day = day; st.wins = 0; }
+    let coins = 0;
+    if (won && st.wins < 10) { coins = 60; st.wins++; await ecoAddCoins(uid, coins); }
+    await kvSet('cardduel', String(uid), st);
+    await cardXpAdd(uid, keys, won ? 15 : 6);
+    res.json({ ok: true, rounds, won, wins, coins, winsToday: st.wins, maxWins: 10 });
+});
+
+// ---------- Défis de deck de la semaine ----------
+function deckChallenges(ms = hubNow()) {
+    const wk = weekKey(ms), big = ['naruto', 'onepiece', 'bleach', 'dragonball', 'jjk', 'demonslayer', 'hxh', 'snk', 'mha', 'fairy', 'clover', 'chainsaw', 'jojo', 'opm', 'solo'].filter(u => ARC_UNIVERSE_ANIME[u]);
+    const u = big[hubHash('dc' + wk) % big.length];
+    return [
+        { id: wk + ':anime', title: `Gagne une partie avec un deck 100 % ${ARC_UNIVERSE_ANIME[u]}`, reward: 300, test: d => d.length === 5 && d.every(c => c.u === u) },
+        { id: wk + ':villains', title: 'Gagne une partie avec au moins 3 méchants dans ton deck', reward: 300, test: d => { const v = new Set(tbCharCards(['antagoniste']).map(c => c.u + '|' + c.display)); return d.filter(c => v.has(c.u + '|' + c.name)).length >= 3; } },
+        { id: wk + ':fin', title: 'Gagne une partie avec 3 cartes à finition dans ton deck', reward: 300, test: d => d.filter(c => c.finish).length >= 3 }
+    ];
+}
+app.get('/api/cards/deck-challenges', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const done = await kvGet('deckch', String(uid), {});
+    res.json({ ok: true, week: weekKey(), list: deckChallenges().map(c => ({ id: c.id, title: c.title, reward: c.reward, done: !!done[c.id] })) });
+});
+
+// ---------- fin de partie : XP des cartes du deck + défis de deck ----------
+const _progRecordCardsPlus = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordCardsPlus(room, mode, universe, entries);
+    for (const e of entries || []) {
+        const p = e.player; if (!p || !p.userId) continue;
+        try {
+            const deck = await deckOf(p.userId); if (!deck.length) continue;
+            await cardXpAdd(p.userId, deck.map(c => c.key), e.won ? 20 : 10);
+            if (!e.won) continue;
+            const done = await kvGet('deckch', String(p.userId), {});
+            for (const ch of deckChallenges()) {
+                if (done[ch.id] || !ch.test(deck)) continue;
+                done[ch.id] = Date.now();
+                const total = await ecoAddCoins(p.userId, ch.reward);
+                io.to(p.id).emit('coins_gain', { gain: ch.reward, total, why: 'défi de deck' });
+                emitUser(p.userId, 'deck_challenge', { title: ch.title, reward: ch.reward });
+            }
+            await kvSet('deckch', String(p.userId), done);
+        } catch (err) { console.warn('[cartes+] fin de partie', err.message); }
+    }
+    return r;
+};
+
+// ---------- Raid du boss : le deck augmente les dégâts ----------
+const BOSS_DECK_CACHE = new Map(); // uid -> { at, mult }
+async function bossDeckMult(uid) {
+    const c = BOSS_DECK_CACHE.get(uid);
+    if (c && Date.now() - c.at < 60000) return c.mult;
+    const deck = await deckOf(uid), xp = await cardXpMap(uid);
+    const pow = deck.reduce((a, c) => a + cardPower({ ...c, lvl: cardLvlOf(xp[c.key] || 0) }), 0);
+    const mult = Math.min(3, 1 + pow / 600);
+    BOSS_DECK_CACHE.set(uid, { at: Date.now(), mult });
+    return mult;
+}
+bossHit = async function (p, ms) {
+    const b = await bossGet();
+    if (b.dead) return;
+    const mult = p && p.userId ? await bossDeckMult(p.userId) : 1;
+    const dmg = Math.round((10 + (ms != null && ms < 3000 ? 5 : 0)) * (rushActive() ? 2 : 1) * mult);
+    const h = b.hits[p.userId] = b.hits[p.userId] || { name: p.name, dmg: 0 };
+    h.dmg += dmg; h.name = p.name;
+    b.hp = Math.max(0, b.hp - dmg);
+    if (b.hp <= 0 && !b.dead) {
+        b.dead = true; b.deadAt = hubNow();
+        await kvSet('boss', b.day, b);
+        io.emit('boss_down', { name: b.display, anime: ARC_UNIVERSE_ANIME[b.u], killer: p.name });
+        for (const uid of Object.keys(b.hits)) {
+            const id = +uid;
+            await ecoAddCoins(id, 100);
+            await cardAward({ userId: id, id: null }, b.u, b.display, { silent: true });
+            const k = await kvGet('bosskills', id, { n: 0 }); k.n++; await kvSet('bosskills', id, k);
+            emitUser(id, 'boss_reward', { coins: 100, name: b.display });
+        }
+    } else {
+        clearTimeout(bossSave); bossSave = setTimeout(() => kvSet('boss', b.day, b), 3000);
+    }
+    bossBroadcast(b);
+};
+
+// ---------- infos en plus pour la fiche d'une carte / la collection / le deck ----------
+async function cardExtraInfo(uid, key, m) {
+    const [u, base, sec] = key.split('|');
+    const xp = (await cardXpMap(uid))[key] || 0, lvl = cardLvlOf(xp);
+    const forms = !sec && ARC_UNIVERSE_ANIME[u] ? (EVO_LIST.get(u + '|' + base) || []) : [];
+    const mine = await cardsOf(uid);
+    const nextForm = forms.find(f => !mine.get(evoKey(u, base, f.name)));
+    const info = cardInfoOfKey(key) || {};
+    return {
+        xp, lvl, lvlNext: CARD_LVL[lvl + 1] || null,
+        evo: forms.length ? { forms: forms.map(f => f.name), next: nextForm ? nextForm.name : null, cost: EVO_COST } : null,
+        atelier: /^(altart|moment|collector)\|/.test(key) ? null : ATELIER_TIERS,
+        power: cardPower({ u: info.u, name: info.name, rarity: info.rarity, lvl })
+    };
+}
+const _deckOfLvl = deckOf;
+deckOf = async function (uid) {
+    const deck = await _deckOfLvl(uid), xp = await cardXpMap(uid);
+    deck.forEach(c => { c.lvl = cardLvlOf(xp[c.key] || 0); });
+    return deck;
+};
+app.get('/api/cards/levels', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const xp = await cardXpMap(uid);
+    res.json({ ok: true, lvls: Object.fromEntries(Object.entries(xp).map(([k, v]) => [k, cardLvlOf(v)]).filter(([, l]) => l > 0)) });
+});
