@@ -28380,3 +28380,52 @@ titleStats = async function (uid) {
     try { s.isAdmin = await isAdminUid(uid); s.isBeta = s.isAdmin || await isBetaUid(uid); } catch (_) {}
     return s;
 };
+
+/* =====================================================================
+   AG_TV_MODE_V1 — mode TV : une télé / un PC affiche le salon en grand (spectateur),
+   les téléphones des joueurs servent de manettes.
+   ===================================================================== */
+const TV_WATCH = new Map(); // code salon -> Set(socket id des écrans TV)
+const tvCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+function tvRoomInfo(code) {
+    const room = rooms[code]; if (!room) return null;
+    const host = (room.players || []).find(p => p.id === room.host);
+    const game = String(room.subMode || '').split(':')[0];
+    const label = room.mode === 'arcade' && ARC_GAMES[game] ? `${ARC_GAMES[game].icon} ${ARC_GAMES[game].label}` : (MODE_LABELS[room.mode + ':' + room.subMode] || MODE_LABELS[room.mode] || room.mode || 'Partie');
+    return { code, status: room.status, mode: room.mode, label, host: host ? host.name : null, players: (room.players || []).map(p => ({ name: p.name, offline: !!p.disconnected })) };
+}
+function tvBroadcast(code) { const s = TV_WATCH.get(code); if (s && s.size) { const info = tvRoomInfo(code); s.forEach(id => io.to(id).emit('tv_room', info)); } }
+function tvLeave(socket) {
+    const code = socket.tvRoom; if (!code) return;
+    const s = TV_WATCH.get(code); if (s) { s.delete(socket.id); if (!s.size) { TV_WATCH.delete(code); io.to(code).emit('tv_on', { code, on: false }); } }
+    socket.leave(code); socket.tvRoom = null;
+}
+io.on('connection', socket => {
+    socket.on('tv_watch', ({ roomCode } = {}) => {
+        const code = tvCode(roomCode), room = rooms[code];
+        if (!room) return socket.emit('tv_room', { error: 'Salon introuvable : vérifie le code (il s’affiche dans le salon d’attente).' });
+        if (socket.tvRoom && socket.tvRoom !== code) tvLeave(socket);
+        socket.tvRoom = code; socket.join(code);
+        if (!TV_WATCH.has(code)) TV_WATCH.set(code, new Set());
+        TV_WATCH.get(code).add(socket.id);
+        socket.emit('tv_room', tvRoomInfo(code));
+        io.to(code).emit('tv_on', { code, on: true });
+        try { if (arcGames[code] && room.mode === 'arcade') arcSendTo(socket, room, code); } catch (_) {}
+    });
+    socket.on('tv_leave', () => tvLeave(socket));
+    socket.on('disconnect', () => tvLeave(socket));
+});
+// le salon change (joueurs, statut) → les écrans TV sont mis à jour
+setInterval(() => { for (const code of TV_WATCH.keys()) { if (!rooms[code]) { io.to(code).emit('tv_room', { error: 'Le salon est fermé.' }); TV_WATCH.delete(code); continue; } tvBroadcast(code); } }, 2000).unref();
+const _arcPublicTv = arcPublic;
+arcPublic = function (room, g) { const out = _arcPublicTv(room, g); if (out && room) out.tv = TV_WATCH.has(room.code || Object.keys(rooms).find(k => rooms[k] === room)); return out; };
+// QR code généré par le serveur (plus besoin d'un site externe)
+let QRCODE = null; try { QRCODE = require('qrcode'); } catch (e) { console.warn('[qr] module absent :', e.message); }
+const QR_CACHE = new Map();
+app.get('/api/qr', async (req, res) => {
+    const d = String(req.query.d || '').slice(0, 300);
+    if (!d || !QRCODE) return res.status(404).end();
+    let svg = QR_CACHE.get(d);
+    if (!svg) { try { svg = await QRCODE.toString(d, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }); } catch (_) { return res.status(400).end(); } if (QR_CACHE.size > 500) QR_CACHE.clear(); QR_CACHE.set(d, svg); }
+    res.type('image/svg+xml').set('Cache-Control', 'public, max-age=86400').send(svg);
+});

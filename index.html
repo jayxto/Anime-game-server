@@ -17326,11 +17326,114 @@ async function loadHallOfFame(){
         const _render = renderArcade;
         renderArcade = function (q) {
             _render.apply(this, arguments);
+            document.body.classList.toggle('wyr-on', !!q && q.game === 'tupreferes');
+            if (q && q.game === 'tupreferes' && q.phase === 'playing') { const r0 = document.getElementById('arc-result'); if (r0 && !arcLastFeedback) { r0.style.color = 'var(--text-color)'; r0.textContent = document.documentElement.classList.contains('tv-mode') ? '📱 Votez sur vos téléphones !' : '🤔 Choisis ton camp !'; } }
             if (!q || q.game !== 'tupreferes' || q.phase !== 'reveal') return;
             const me = (q.players || []).find(p => p.id === socket.id) || {}, r = document.getElementById('arc-result'), x = document.getElementById('arc-extra');
             if (r) { r.style.color = me.gained ? '#00e676' : 'var(--accent-pink)'; r.textContent = !me.choice ? '⏳ Tu n’as pas voté' : q.answer ? (me.gained ? `✅ +${me.gained} — tu as voté comme la majorité !` : '❌ Tu étais dans la minorité…') : `⚖️ Égalité ! +${me.gained || 0}`; }
             if (x) x.textContent = q.answer ? `🗳️ La majorité a choisi : ${q.answer}` : '';
         };
+    })();
+    </script>
+    <style>
+        /* AG_TV_MODE_V1 */
+        .tv-help-qr{display:block;margin:10px auto;width:180px;height:180px;background:#fff;border-radius:12px;padding:8px;}
+        .tv-link{display:block;text-align:center;font-weight:900;font-size:1.05rem;word-break:break-all;background:#14183a;border-radius:10px;padding:8px;margin:6px 0;}
+        /* téléphone en manette */
+        body.pad-mode:not(.pad-show) #arcade-room #arc-stage{display:none;}
+        body.pad-mode #arcade-room #arc-choices .bt-choice{font-size:1.15rem;padding:18px 12px;}
+        #pad-banner{display:none;}
+        body.pad-mode #pad-banner{display:flex;gap:8px;align-items:center;justify-content:space-between;background:#14183a;border:1px solid #3a3f6b;border-radius:12px;padding:8px 12px;margin:8px 0;font-weight:700;}
+        #pad-banner button{border:0;border-radius:99px;padding:6px 12px;background:#2a2f66;color:#fff;font-weight:700;cursor:pointer;}
+        /* écran TV */
+        html.tv-mode body{overflow:hidden;}
+        html.tv-mode header, html.tv-mode #music-player, html.tv-mode #ag-mobile-nav, html.tv-mode .ag-dash-nav, html.tv-mode #reaction-bar, html.tv-mode .reaction-bar, html.tv-mode #pwa-banner, html.tv-mode #cp6-mini, html.tv-mode #arc-input-wrap, html.tv-mode #arcade-room .arc-actions, html.tv-mode #arc-end-infinite{display:none !important;}
+        html.tv-mode #arcade-room{font-size:1.25rem;max-width:1400px;margin:0 auto;}
+        html.tv-mode #arcade-room #arc-stage img{max-height:52vh;}
+        html.tv-mode #arc-choices{pointer-events:none;} html.tv-mode #seo-about{display:none !important;} html.tv-mode body.wyr-on #arc-choices{display:none !important;}
+        html.tv-mode #arc-choices .bt-choice{font-size:1.4rem;padding:20px;}
+        #tv-screen{position:fixed;inset:0;z-index:20000;background:radial-gradient(circle at 50% 30%,#241a4a,#08081a 70%);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:30px;text-align:center;font-family:inherit;}
+        html.tv-mode #tv-screen.on{display:flex;}
+        #tv-screen h1{font-family:'Bangers',cursive;font-size:clamp(2.4rem,6vw,5rem);margin:0;color:var(--accent-yellow);letter-spacing:2px;}
+        #tv-screen .tv-code{font-family:'Bangers',cursive;font-size:clamp(3rem,10vw,8rem);letter-spacing:12px;color:#fff;text-shadow:0 0 30px #8b5cf6;}
+        #tv-screen .tv-row{display:flex;gap:30px;align-items:center;justify-content:center;flex-wrap:wrap;}
+        #tv-screen .tv-qr{width:220px;height:220px;background:#fff;border-radius:16px;padding:10px;}
+        #tv-screen .tv-players{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:1100px;}
+        #tv-screen .tv-players span{background:#1d2147;border:2px solid #3a3f6b;border-radius:99px;padding:8px 18px;font-size:1.3rem;font-weight:800;}
+        #tv-screen .tv-sub{font-size:1.4rem;color:#c9c9ff;}
+        #tv-hud{display:none;position:fixed;right:14px;top:14px;z-index:19000;background:rgba(8,8,26,.85);border:2px solid #8b5cf6;border-radius:14px;padding:8px 10px;color:#fff;text-align:center;font-weight:900;}
+        html.tv-mode #tv-hud.on{display:block;} #tv-hud img{width:90px;height:90px;background:#fff;border-radius:8px;padding:4px;display:block;margin:4px auto 0;}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        const TV = (new URLSearchParams(location.search).get('tv') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+        const joinUrl = code => `${location.origin}/?join=${encodeURIComponent(code)}`;
+        const qr = (text, size) => `/api/qr?d=${encodeURIComponent(text)}`;
+
+        /* ---------- côté joueurs : bouton TV + mode manette ---------- */
+        window.tvOpenHelp = function () {
+            if (!currentRoomCode) return;
+            const url = `${location.origin}/?tv=${encodeURIComponent(currentRoomCode)}`;
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>📺 Afficher sur une TV</span><button>✖</button></div><div class="cp-body">
+                <p style="margin:0 0 6px;">Sur la <b>TV</b> (navigateur de la télé, PC branché, Chromecast…), ouvre cette adresse :</p>
+                <span class="tv-link">${esc(url)}</span>
+                <img class="tv-help-qr" src="${qr(url, 180)}" alt="QR code">
+                <p class="tl-hint">La TV affiche le salon en grand : code, joueurs, questions, scores et podium. Vos <b>téléphones deviennent les manettes</b> : chacun répond sur son tel.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn-action" id="tv-open" style="flex:1;margin:0;">🖥️ Ouvrir ici en plein écran</button><button class="btn-action" id="tv-copy" style="flex:1;margin:0;background:#1f3a5a;">📋 Copier l’adresse</button></div></div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove(); m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            m.querySelector('#tv-open').onclick = () => window.open(url, '_blank');
+            m.querySelector('#tv-copy').onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => toast('📋 Adresse copiée !', '#00e5ff')).catch(() => prompt('Copie l’adresse :', url)); };
+        };
+        const addTvBtn = () => { const inv = document.querySelector('#waiting-room .invite-btn'); if (inv && !document.getElementById('tv-btn')) inv.insertAdjacentHTML('afterend', ' <button class="invite-btn" id="tv-btn" onclick="tvOpenHelp()">📺 Afficher sur une TV</button>'); };
+        setTimeout(addTvBtn, 0); setInterval(addTvBtn, 3000);
+        function setPad(on) {
+            if (TV) return;
+            document.body.classList.toggle('pad-mode', !!on);
+            const room = document.getElementById('arcade-room');
+            if (on && room && !document.getElementById('pad-banner')) {
+                const b = document.createElement('div'); b.id = 'pad-banner';
+                b.innerHTML = '<span>📺 Le jeu s’affiche sur la TV : réponds ici !</span><button type="button">👁️ Voir l’écran</button>';
+                b.querySelector('button').onclick = () => { document.body.classList.toggle('pad-show'); b.querySelector('button').textContent = document.body.classList.contains('pad-show') ? '🙈 Cacher l’écran' : '👁️ Voir l’écran'; };
+                const st = document.getElementById('arc-stage'); (st ? st.parentNode : room).insertBefore(b, st || room.firstChild);
+            }
+        }
+        socket.on('tv_on', d => { if (d && d.code === currentRoomCode) setPad(d.on); });
+        socket.on('arc_state', q => { if (q && 'tv' in q) setPad(q.tv); });
+        if (!TV) return;
+
+        /* ---------- écran TV ---------- */
+        document.documentElement.classList.add('tv-mode');
+        const scr = document.createElement('div'); scr.id = 'tv-screen'; scr.className = 'on';
+        scr.innerHTML = '<h1>📺 ANIME GAME</h1><div class="tv-sub">Connexion au salon…</div>';
+        const hud = document.createElement('div'); hud.id = 'tv-hud';
+        hud.innerHTML = `<div>Salon <span style="color:var(--accent-yellow);letter-spacing:3px;">${esc(TV)}</span></div><img src="${qr(joinUrl(TV), 90)}" alt="">`;
+        document.body.append(scr, hud);
+        window.showAuthScreen = function () {}; // la TV n'a pas besoin de compte
+        try { document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-root').style.display = 'block'; } catch (_) {}
+        const watch = () => socket.emit('tv_watch', { roomCode: TV });
+        socket.on('connect', watch);
+        setTimeout(() => { if (socket.connected) watch(); else { currentUser = currentUser || { pseudo: 'TV', isGuest: true, rating: null, wins: 0, losses: 0, rank: null }; connectSocketAsGuest('📺 TV ' + TV); } }, 1500);
+        setInterval(() => { if (socket.connected) return; try { socket.connect(); } catch (_) {} }, 5000);
+        let last = null;
+        socket.on('tv_room', info => {
+            last = info;
+            if (!info || info.error) { scr.className = 'on'; hud.className = ''; scr.innerHTML = `<h1>📺 ANIME GAME</h1><div class="tv-sub">${esc((info && info.error) || 'Salon introuvable')}</div>`; return; }
+            const arcade = info.mode === 'arcade' && /^arc_/.test(info.status || '');
+            const waiting = info.status === 'waiting' || !info.status;
+            hud.className = arcade ? 'on' : '';
+            if (arcade) { scr.className = ''; return; }
+            scr.className = 'on';
+            const url = joinUrl(info.code);
+            scr.innerHTML = `<h1>📺 ANIME GAME</h1>
+                <div class="tv-row"><div><div class="tv-sub">Code du salon</div><div class="tv-code">${esc(info.code)}</div><div class="tv-sub">${esc(info.label || '')}</div></div><div><img class="tv-qr" src="${qr(url, 220)}" alt=""><div class="tv-sub" style="font-size:1rem;margin-top:6px;">Scanne pour rejoindre</div></div></div>
+                <div class="tv-sub">${waiting ? `👥 ${info.players.length} joueur${info.players.length > 1 ? 's' : ''} • ${info.host ? 'l’hôte ' + esc(info.host) + ' lance la partie' : 'en attente de l’hôte'}` : `🎮 Partie en cours : suivez-la sur vos téléphones`}</div>
+                <div class="tv-players">${info.players.map(p => `<span${p.offline ? ' style="opacity:.4"' : ''}>${esc(p.name)}</span>`).join('') || '<span>En attente des joueurs…</span>'}</div>`;
+            if (waiting) { try { document.getElementById('arcade-room').style.display = 'none'; } catch (_) {} }
+        });
     })();
     </script>
 </body>
