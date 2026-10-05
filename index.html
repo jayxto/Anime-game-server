@@ -3885,7 +3885,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button><button onclick="cp6Survival()">🛡️ Mode survie</button><button onclick="talOpen()" id="tal-btn">🌳 Talents</button><button onclick="calOpen()">📅 Calendrier</button><button onclick="cp6Potion()" id="cp6-pot-btn">🧪 Potions & alambic</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button><button onclick="cp6Survival()">🛡️ Mode survie</button><button onclick="talOpen()" id="tal-btn">🌳 Talents</button><button onclick="teamsOpen()">🤝 Équipes cultes</button><button onclick="voteOpen()">🗳️ Vote du mois</button><button onclick="calOpen()">📅 Calendrier</button><button onclick="cp6Potion()" id="cp6-pot-btn">🧪 Potions & alambic</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -11810,7 +11810,7 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
         const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
@@ -13140,11 +13140,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, minuit: 5.6, champion: 6.6, saison: 6.8, rectoverso: 6.2, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', minuit: '#5b6bff', champion: '#ffb300', saison: '#ffcc00', rectoverso: '#00d9ff', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, minuit: 5.6, champion: 6.6, saison: 6.8, rectoverso: 6.2, peuple: 6.4, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', minuit: '#5b6bff', champion: '#ffb300', saison: '#ffcc00', rectoverso: '#00d9ff', peuple: '#ff8a00', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', minuit: '🌙 MINUIT 🌙', champion: '🏆 CHAMPION 🏆', saison: '🏆 SAISON 🏆', rectoverso: '🔄 RECTO-VERSO 🔄', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', minuit: '🌙 MINUIT 🌙', champion: '🏆 CHAMPION 🏆', saison: '🏆 SAISON 🏆', rectoverso: '🔄 RECTO-VERSO 🔄', peuple: '🗳️ ÉLUE DU PEUPLE 🗳️', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -13157,7 +13157,7 @@ body.ag-game-page #app-root > #mode,
                 duo: [34, ['#00e5a0', '#00b3ff', '#ffffff'], 220, 'orbit'], noel: [40, ['#ffffff', '#e8363d', '#1faa59', '#ffd700'], 230, 'down'],
                 valentin: [40, ['#ff6fa8', '#ff2a5f', '#ffffff', '#ffc2d9'], 230, 'up'], ete: [40, ['#ffc233', '#ff7a00', '#00c2ff', '#ffffff'], 230, 'out'],
                 altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
-                minuit: [50, ['#5b6bff', '#c9d0ff', '#ffffff', '#1a1f5c'], 270, 'down'], champion: [70, ['#ffb300', '#fff3b0', '#ffffff', '#ff7b00'], 320, 'out'], saison: [72, ['#ffcc00', '#fff6c2', '#ffffff', '#c0c0c0'], 330, 'out'], rectoverso: [58, ['#00d9ff', '#b388ff', '#ffffff', '#00ffa3'], 300, 'out'], fusion: [64, ['#ff3df0', '#00e5ff', '#ffffff', '#ffd700'], 310, 'orbit'], mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
+                minuit: [50, ['#5b6bff', '#c9d0ff', '#ffffff', '#1a1f5c'], 270, 'down'], champion: [70, ['#ffb300', '#fff3b0', '#ffffff', '#ff7b00'], 320, 'out'], saison: [72, ['#ffcc00', '#fff6c2', '#ffffff', '#c0c0c0'], 330, 'out'], rectoverso: [58, ['#00d9ff', '#b388ff', '#ffffff', '#00ffa3'], 300, 'out'], peuple: [62, ['#ff8a00', '#ffd27f', '#ffffff', '#ff3d6e'], 310, 'out'], fusion: [64, ['#ff3df0', '#00e5ff', '#ffffff', '#ffd700'], 310, 'orbit'], mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
                 primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out'],
                 stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out']
             };
@@ -14433,8 +14433,8 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
+            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
             const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
             const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
@@ -16093,6 +16093,7 @@ async function loadHallOfFame(){
             let qT = null; body.querySelector('#cp-q').oninput = e => { clearTimeout(qT); qT = setTimeout(() => draw(e.target.value.trim()), 300); };
             body.querySelector('#cp-go').onclick = async () => {
                 const r = await v7post('/api/cards/duel', { keys: sel });
+                if (r && r.teamBonus) toast('🤝 ' + r.teamBonus, '#00e5a0');
                 if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
                 body.innerHTML = r.rounds.map((x, i) => `<div class="cp-round" id="cp-r${i}"><div>${cardHtml(Object.assign({}, x.me, { isNew: false }))}<div class="cp-n ${x.win ? 'w' : 'l'}">${x.a}</div></div><div class="cp-vs">MANCHE ${i + 1}<br>VS</div><div>${cardHtml(Object.assign({}, x.foe, { isNew: false }))}<div class="cp-n ${x.win ? 'l' : 'w'}">${x.b}</div></div></div>`).join('')
                     + `<div id="cp-res" style="text-align:center;font-family:'Bangers',cursive;font-size:2rem;opacity:0;transition:opacity .4s;">${r.won ? '🏆 VICTOIRE !' : '💀 DÉFAITE…'} ${r.wins}/3${r.coins ? ` • +${r.coins} 🪙` : ''}</div>
@@ -16788,7 +16789,7 @@ async function loadHallOfFame(){
         function drawRun(body) {
             if (!RUN) return cp6Survival();
             AUTO.keys = RUN.team.map(c => c.key); try { localStorage.setItem('cp6Keys', JSON.stringify(AUTO.keys)); } catch (_) {}
-            body.innerHTML = `<div class="cp6-stats"><span>🏔️ Étage <b>${RUN.floor}</b> • 🃏 ${RUN.team.filter(c => c.hp > 0).length}/5 debout</span><span>Gagné : ${earnedText(RUN.earned)}</span>${RUN.mult < 1 ? '<span title="Après tes 5 premières parties du jour, les récompenses sont divisées par 2. Retour à la normale demain.">½ récompenses</span>' : ''}</div>
+            body.innerHTML = `<div class="cp6-stats"><span>🏔️ Étage <b>${RUN.floor}</b> • 🃏 ${RUN.team.filter(c => c.hp > 0).length}/5 debout</span><span>Gagné : ${earnedText(RUN.earned)}</span>${RUN.teamBonus ? `<span>🤝 ${esc(RUN.teamBonus)}</span>` : ''}${RUN.mult < 1 ? '<span title="Après tes 5 premières parties du jour, les récompenses sont divisées par 2. Retour à la normale demain.">½ récompenses</span>' : ''}</div>
                 <div class="cp6-foes cp6-team"><p class="tl-hint" style="grid-column:1/-1;margin:0;">Prochain étage : ${rwText(survRw(RUN.floor))}${RUN.mult < 1 ? ' (x½)' : ''}</p></div>
                 <div class="cp6-vs">⚔️</div><div class="cp6-me cp6-team">${teamHtml(RUN.team)}</div>
                 <div class="cp6-log"></div>
@@ -17230,6 +17231,60 @@ async function loadHallOfFame(){
             new MutationObserver(() => { if (o.classList.contains('done')) b.textContent = '✖ Fermer'; }).observe(o, { attributes: true, attributeFilter: ['class'] });
         };
         new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.id === 'summon') add(); }).observe(document.body, { childList: true });
+    })();
+    </script>
+    <style>
+        /* AG_TEAMS_VOTE_V1 */
+        .tcard.r-peuple{border:2px solid #ff8a00;box-shadow:0 0 16px rgba(255,138,0,.6);background:linear-gradient(180deg,#2b1300,#140a00);}
+        .tcard.r-peuple .tc-rar{color:#ffc266;font-weight:900;} .tcard.r-peuple .tc-img::after{content:'🗳️';position:absolute;right:6px;top:6px;font-size:1.1rem;} .trd-mini.r-peuple{border-color:#ff8a00;}
+        .tm-team{background:#11142b;border:1px solid #2c2c44;border-radius:12px;padding:8px;margin:8px 0;}
+        .tm-team h4{margin:0 0 6px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+        .tm-mem{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;}
+        .tm-mem div{text-align:center;font-size:.66rem;} .tm-mem img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:8px;border:2px solid #00e5a0;}
+        .tm-mem div.no img{filter:grayscale(1) brightness(.45);border-color:#333;}
+        .vt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+        .vt-c{background:#14183a;border:2px solid #2f3566;border-radius:12px;padding:6px;text-align:center;cursor:pointer;position:relative;}
+        .vt-c.me{border-color:#ff8a00;box-shadow:0 0 14px rgba(255,138,0,.5);}
+        .vt-c img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:8px;}
+        .vt-bar{height:6px;background:#2a2d4a;border-radius:4px;overflow:hidden;margin-top:4px;} .vt-bar i{display:block;height:100%;background:linear-gradient(90deg,#ff8a00,#ff3d6e);}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        if (typeof RAR_LABEL !== 'undefined') RAR_LABEL.peuple = 'Élue du peuple 🗳️';
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body" style="position:relative;">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const acc = () => typeof isAccount === 'function' && isAccount();
+        window.teamsOpen = async function () {
+            if (!acc()) return toast('Connecte-toi à un compte.', 'var(--accent-yellow)');
+            const body = modal('🤝 Équipes cultes', 'Chargement…');
+            const d = await v7get('/api/cards/teams'); if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p style="margin:0 0 6px;">Mets plusieurs membres d’une même équipe ensemble dans la <b>🛡️ tour</b> ou en <b>⚔️ duel de cartes</b> : <b>3 membres = +${Math.round(d.part * 100)} %</b> de puissance, <b>5 membres (ou toute l’équipe si elle est plus petite) = +${Math.round(d.fullPct * 100)} %</b>.</p>
+                ${d.teams.map(t => { const own = t.members.filter(m => m.owned).length; return `<div class="tm-team"><h4><span>${esc(t.name)} <small class="tl-hint">${esc(t.anime)}</small></span><small>${own}/${t.members.length} cartes • bonus max à ${t.full}</small></h4><div class="tm-mem">${t.members.map(m => `<div class="${m.owned ? '' : 'no'}"><img src="${esc(m.img)}" alt="" loading="lazy" onerror="this.style.opacity=.2">${esc(m.name)}</div>`).join('')}</div></div>`; }).join('')}`;
+        };
+        const left = ms => { const s = Math.max(0, Math.floor(ms / 1000)), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600); return d ? `${d} j ${h} h` : `${h} h ${Math.floor(s % 3600 / 60)} min`; };
+        window.voteOpen = async function () {
+            const body = modal('🗳️ Vote du mois', 'Chargement…');
+            const d = await v7get('/api/vote'); if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            body.innerHTML = `<p style="margin:0 0 6px;">Vote pour le perso qui aura sa <b>carte exclusive « Élue du peuple » 🗳️</b>. À la fin du mois, <b>tous ceux qui ont voté pour le gagnant reçoivent sa carte</b>, puis elle tombe dans les boosters le mois suivant (1 carte sur ${Math.round(1 / ((d.last && d.last.rate) || 1 / 400))}). Tu peux changer ton vote jusqu’à la fin.</p>
+                <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin:6px 0;"><b>${esc(d.label)}</b><span>⏳ Fin dans <b>${left(d.endsAt - Date.now())}</b> • ${d.total} vote${d.total > 1 ? 's' : ''}</span></div>
+                <div class="vt-grid">${d.candidates.map(c => `<div class="vt-c${d.mine === c.i ? ' me' : ''}" data-i="${c.i}"><img src="${esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.2"><b style="display:block;font-size:.8rem;">${esc(c.name)}</b><small class="tl-hint">${esc(c.anime)}</small><div class="vt-bar"><i style="width:${c.pct}%"></i></div><small>${c.pct} % • ${c.votes}</small>${d.mine === c.i ? '<div style="color:#ff8a00;font-weight:800;font-size:.75rem;">✔ Ton vote</div>' : ''}</div>`).join('')}</div>
+                ${d.last ? `<h4 style="margin:12px 0 4px;">🏆 Élu du mois dernier</h4><div style="display:flex;gap:10px;align-items:center;"><img src="${esc(d.last.img)}" style="width:60px;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:8px;border:2px solid #ff8a00;"><div><b>${esc(d.last.name)}</b> <small class="tl-hint">${esc(d.last.anime)}</small><br><small>${d.last.votes} / ${d.last.total} votes • sa carte tombe en ce moment dans les boosters</small></div></div>` : ''}`;
+            body.querySelectorAll('.vt-c').forEach(el => el.onclick = async () => {
+                if (!acc()) return toast('Connecte-toi pour voter.', 'var(--accent-yellow)');
+                const r = await v7post('/api/vote', { i: +el.dataset.i }); if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                toast('🗳️ Vote enregistré !', '#ff8a00'); voteOpen();
+            });
+        };
+        socket.on('vote_win', d => { if (d) toast(`🗳️ ${esc(d.name)} a gagné le vote ! Sa carte exclusive est dans ta collection.`, '#ff8a00'); });
+        socket.on('vote_result', d => { if (d) toast(`🗳️ Le vote du mois est terminé : ${esc(d.name)} (${esc(d.anime)}) est l’élu !`, '#ff8a00'); });
     })();
     </script>
 </body>

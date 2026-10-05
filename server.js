@@ -24592,6 +24592,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('vote|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'peuple', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('rv|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'rectoverso', img: i.img, imgBack: i.imgBack, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('saison|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'saison', anime: i.anime, rarity: 'saison', img: i.img }); return; }
         if (k.startsWith('champion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'champion', anime: i.anime, rarity: 'champion', img: i.img }); return; }
@@ -26325,8 +26326,9 @@ app.post('/api/cards/duel', async (req, res) => {
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
     const mine = await cardsWithMeta(uid, keys);
     if (mine.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes de ta collection.' });
-    mine.forEach(c => { c.power = cardPower(c); });
-    const target = mine.reduce((a, c) => a + c.power, 0);
+    const tb = teamBonusOf(mine); // équipes cultes
+    mine.forEach(c => { c.power = Math.round(cardPower(c) * tb.mult); });
+    const target = Math.round(mine.reduce((a, c) => a + c.power, 0) / tb.mult); // l'adversaire ne s'adapte pas au bonus d'équipe
     // adversaire : 3 cartes au hasard d'une puissance proche
     const us = arcUniverses(); let best = null;
     for (let t = 0; t < 120; t++) {
@@ -26352,7 +26354,7 @@ app.post('/api/cards/duel', async (req, res) => {
     if (won && st.wins < 10) { coins = 60; st.wins++; await ecoAddCoins(uid, coins); }
     await kvSet('cardduel', String(uid), st);
     await cardXpAdd(uid, keys, won ? 15 : 6);
-    res.json({ ok: true, rounds, won, wins, coins, winsToday: st.wins, maxWins: 10 });
+    res.json({ ok: true, rounds, won, wins, coins, winsToday: st.wins, maxWins: 10, teamBonus: tb.label });
 });
 
 // ---------- Défis de deck de la semaine ----------
@@ -26592,7 +26594,7 @@ app.post('/api/cards/duel-challenge', async (req, res) => {
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
-    team.forEach(c => { c.power = cardPower(c); });
+    { const tb = teamBonusOf(team); team.forEach(c => { c.power = Math.round(cardPower(c) * tb.mult); }); } // équipes cultes
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const ch = { id, from: uid, fromName: await pseudoOf(uid), to: toUid, toName: await pseudoOf(toUid), team, at: Date.now(), status: 'open' };
     const box = await kvGet('cduel', 'all', {}); box[id] = ch;
@@ -26616,7 +26618,7 @@ app.post('/api/cards/duel-accept', async (req, res) => {
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 3);
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
-    team.forEach(c => { c.power = cardPower(c); });
+    { const tb = teamBonusOf(team); team.forEach(c => { c.power = Math.round(cardPower(c) * tb.mult); }); } // équipes cultes
     const rounds = duelResolve(team, ch.team), wins = rounds.filter(r => r.win).length, won = wins >= 2;
     ch.status = 'done'; ch.result = { rounds: rounds.map(r => ({ to: r.me, from: r.foe, toPts: r.a, fromPts: r.b, toWin: r.win })), winner: won ? ch.toName : ch.fromName };
     await kvSet('cduel', 'all', box);
@@ -27351,8 +27353,9 @@ app.post('/api/cards/survival/start', async (req, res) => {
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 5) return res.json({ ok: false, error: 'Choisis 5 cartes de ta collection.' });
     const talPow = 1 + 0.04 * (await talentRank(uid, 'survivant')); // talent Survivant
-    team.forEach(c => { c.power = Math.round(cardPower(c) * talPow); c.hp = c.max = c.power * 4; delete c.imgs; });
-    s.runs++; s.run = { team, floor: 1, mult: s.runs <= SURV_FULL ? 1 : 0.5, avg: Math.round(team.reduce((a, c) => a + c.power, 0) / 5), earned: { coins: 0, dust: 0, potions: 0, secrets: 0 } };
+    const tb = teamBonusOf(team); // équipes cultes
+    team.forEach(c => { c.power = Math.round(cardPower(c) * talPow * tb.mult); c.hp = c.max = c.power * 4; delete c.imgs; });
+    s.runs++; s.run = { team, teamBonus: tb.label, floor: 1, mult: s.runs <= SURV_FULL ? 1 : 0.5, avg: Math.round(team.reduce((a, c) => a + c.power, 0) / 5), earned: { coins: 0, dust: 0, potions: 0, secrets: 0 } };
     await kvSet('surv', String(uid), s);
     res.json({ ok: true, run: s.run });
 });
@@ -27783,6 +27786,7 @@ app.get('/api/calendar', async (req, res) => {
     const wb = tbWeekly(now); if (wb) cur.push({ emoji: '📅', title: `Booster de la semaine : ${ARC_UNIVERSE_ANIME[wb]}`, text: 'Moins cher, raretés x2' });
     for (const s of Object.values(SEASON_CARDS)) if (seasonActive(s)) cur.push({ emoji: '🎉', title: `Événement ${s.label}`, text: `Jusqu’au ${s.to[1]}/${String(s.to[0] + 1).padStart(2, '0')}` });
     const eb = SITE.eventBooster; if (eb && eb.until > Date.now()) cur.push({ emoji: eb.emoji || '🎉', title: eb.title, text: `Booster événement jusqu’au ${new Date(eb.until).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })}` });
+    { const vc = voteCandidates(monthKeyNow()); if (vc.length) cur.push({ emoji: '🗳️', title: 'Vote du mois en cours', text: `Choisis le perso qui aura sa carte exclusive • ${vc.slice(0, 3).map(c => c.display).join(', ')}…` }); }
     cur.push({ emoji: '🏆', title: sznLabel(monthKeyNow()), text: `Fin le ${new Date(sznStart(sznNext(monthKeyNow())).getTime() - 1000).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })} à minuit • top 10 récompensé` });
     const daily = [{ emoji: '🌙', title: 'Marché noir', text: 'Tous les soirs de 23 h à minuit' }, { emoji: '🌌', title: 'Cartes de Minuit', text: 'Seulement entre minuit et 6 h' }, { emoji: '🗺️', title: 'Chasse au trésor', text: 'Un nouveau 🃏 caché chaque jour' }];
     res.json({ ok: true, today: calDay(now), current: cur, daily, events: ev });
@@ -27968,3 +27972,137 @@ const _openBoosterRvSoul = openBooster;
 openBooster = async function (uid, n, type = '') { const c = await _openBoosterRvSoul(uid, n, type); return soulCheck(uid, await rvMaybe(uid, c, n)); };
 const _tbOpenRvSoul = tbOpen;
 tbOpen = async function (uid, b, chosenU) { const c = await _tbOpenRvSoul(uid, b, chosenU); return soulCheck(uid, await rvMaybe(uid, c, 5)); };
+
+/* =====================================================================
+   AG_TEAMS_VOTE_V1 — équipes cultes (bonus de puissance dans la tour et les duels)
+   + vote du mois (la communauté choisit le perso qui aura sa carte exclusive).
+   ===================================================================== */
+const CULT_TEAMS_RAW = [
+    ['equipe7', '🍥 Équipe 7', 'naruto', ['Naruto Uzumaki', 'Sasuke Uchiwa', 'Sakura Haruno', 'Kakashi Hatake', 'Sai', 'Yamato']],
+    ['akatsuki', '☁️ Akatsuki', 'naruto', ['Itachi Uchiwa', 'Kisame Hoshigaki', 'Nagato', 'Konan', 'Deidara', 'Sasori', 'Hidan', 'Kakuzu', 'Obito Uchiwa', 'Zetsu']],
+    ['sannin', '🐸 Les Sannin', 'naruto', ['Jiraiya', 'Orochimaru', 'Tsunade']],
+    ['mugiwara', '🏴‍☠️ Chapeau de paille', 'onepiece', ['Monkey D. Luffy', 'Roronoa Zoro', 'Nami', 'Usopp', 'Sanji', 'Tony Tony Chopper', 'Nico Robin', 'Franky', 'Brook', 'Jinbe']],
+    ['yonko', '👑 Les Empereurs', 'onepiece', ['Shanks', 'Kaido', 'Charlotte Linlin', 'Edward Newgate', 'Marshall D. Teach', 'Baggy']],
+    ['amiraux', '⚓ Les Amiraux', 'onepiece', ['Sakazuki', 'Kuzan', 'Borsalino', 'Issho', 'Aramaki']],
+    ['hashira', '🔥 Les Piliers', 'demonslayer', ['Kyojuro Rengoku', 'Giyu Tomioka', 'Shinobu Kocho', 'Tengen Uzui', 'Mitsuri Kanroji', 'Muichiro Tokito', 'Gyomei Himejima', 'Obanai Iguro', 'Sanemi Shinazugawa']],
+    ['lunes', '🌙 Lunes supérieures', 'demonslayer', ['Kokushibo', 'Doma', 'Akaza', 'Hantengu', 'Gyokko', 'Daki', 'Gyutaro']],
+    ['tanjiro', '🗡️ Le quatuor de Tanjiro', 'demonslayer', ['Tanjiro Kamado', 'Nezuko Kamado', 'Zenitsu Agatsuma', 'Inosuke Hashibira']],
+    ['zfighters', '🐉 Les Z Fighters', 'dragonball', ['Sangoku', 'Vegeta', 'Sangohan', 'Piccolo', 'Krilin', 'Trunks', 'Ten Shin Han', 'Yamcha']],
+    ['bataillon', '🪽 Bataillon d’exploration', 'snk', ['Eren Jäger', 'Mikasa Ackerman', 'Armin Arlert', 'Livaï Ackerman', 'Hansi Zoe', 'Erwin Smith', 'Jean Kirstein', 'Sasha Braus', 'Connie Springer']],
+    ['capitaines', '⚔️ Capitaines du Gotei 13', 'bleach', ['Byakuya Kuchiki', 'Toshiro Hitsugaya', 'Kenpachi Zaraki', 'Shunsui Kyoraku', 'Jushiro Ukitake', 'Mayuri Kurotsuchi', 'Retsu Unohana', 'Soi Fon', 'Genryusai Shigekuni Yamamoto', 'Sajin Komamura']],
+    ['espada', '💀 Les Espada', 'bleach', ['Coyote Starrk', 'Baraggan Louisenbairn', 'Tier Harribel', 'Ulquiorra Cifer', 'Nnoitra Gilga', 'Grimmjow Jaegerjaquez', 'Szayelaporro Granz']],
+    ['brigade', '🕷️ Brigade fantôme', 'hxh', ['Chrollo Lucilfer', 'Feitan', 'Phinks', 'Machi', 'Nobunaga', 'Shalnark', 'Uvogin', 'Kalluto', 'Hisoka']],
+    ['hunters', '🎣 Gon et ses amis', 'hxh', ['Gon Freecss', 'Killua Zoldyck', 'Kurapika', 'Leorio Paradinight']],
+    ['jujutsu', '🌀 Exorcistes de Tokyo', 'jjk', ['Yuji Itadori', 'Megumi Fushiguro', 'Nobara Kugisaki', 'Satoru Gojo', 'Maki Zenin', 'Toge Inumaki', 'Panda', 'Yuta Okkotsu']],
+    ['classe1a', '🦸 Classe 1-A', 'mha', ['Izuku Midoriya', 'Katsuki Bakugo', 'Shoto Todoroki', 'Ochaco Uraraka', 'Tenya Iida', 'Eijiro Kirishima', 'Tsuyu Asui', 'Momo Yaoyorozu', 'Denki Kaminari']],
+    ['fairy', '🧚 L’équipe de Natsu', 'fairy', ['Natsu Dragneel', 'Lucy Heartfilia', 'Gray Fullbuster', 'Erza Scarlet', 'Happy', 'Wendy Marvell']],
+    ['sds', '🐲 Les Seven Deadly Sins', 'sds', ['Meliodas', 'Ban', 'King', 'Diane', 'Gowther', 'Merlin', 'Escanor']]
+];
+function cultTeams() {
+    if (cultTeams.c) return cultTeams.c;
+    const out = [];
+    for (const [id, name, u, members] of CULT_TEAMS_RAW) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const res = [];
+        for (const m of members) {
+            const c = cardResolve(u, m); if (!c) continue;
+            // garde-fou : le nom trouvé doit vraiment correspondre (évite les faux amis du rapprochement de noms)
+            const a = normalizeRG(c.display), b = normalizeRG(m), first = b.split(' ')[0];
+            if (!(a === b || a.includes(first) || b.includes(a.split(' ')[0]))) continue;
+            if (!res.some(x => x.display === c.display)) res.push({ u, display: c.display });
+        }
+        if (res.length >= 3) out.push({ id, name, u, anime: ARC_UNIVERSE_ANIME[u], members: res, full: Math.min(5, res.length) });
+    }
+    return (cultTeams.c = out);
+}
+const TEAM_PART = 0.15, TEAM_FULL = 0.30; // 3 membres : +15 % • 5 membres (ou toute l'équipe si elle est plus petite) : +30 %
+function teamBonusOf(cards) {
+    const have = new Set((cards || []).map(c => { const i = c.key ? cardInfoOfKey(c.key) : null; return (c.u || (i && i.u)) + '|' + ((i && i.display) || c.display || c.name); }));
+    let best = { mult: 1, label: null };
+    for (const t of cultTeams()) {
+        const n = t.members.filter(m => have.has(m.u + '|' + m.display)).length;
+        const pct = n >= t.full ? TEAM_FULL : n >= 3 ? TEAM_PART : 0;
+        if (pct && 1 + pct > best.mult) best = { mult: 1 + pct, label: `${t.name} (${n} membres) : +${Math.round(pct * 100)} % de puissance`, id: t.id };
+    }
+    return best;
+}
+app.get('/api/cards/teams', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const mine = await cardsOf(uid), owned = new Set();
+    for (const k of mine.keys()) { const i = cardInfoOfKey(k); if (i) owned.add(i.u + '|' + (i.display || i.name)); }
+    res.json({ ok: true, part: TEAM_PART, fullPct: TEAM_FULL, teams: cultTeams().map(t => ({ id: t.id, name: t.name, anime: t.anime, full: t.full,
+        members: t.members.map(m => ({ name: m.display, img: cardImg(m), owned: owned.has(m.u + '|' + m.display) })) })) });
+});
+
+// ---------- vote du mois ----------
+const VOTE_RATE = 1 / 400; // la carte élue tombe dans les boosters pendant le mois suivant
+const VOTE_POOL_U = ['naruto', 'onepiece', 'dragonball', 'bleach', 'jjk', 'demonslayer', 'hxh', 'snk', 'mha', 'chainsaw', 'jojo', 'fma', 'opm', 'solo', 'frieren', 'spyfamily', 'bluelock', 'tokyoghoul', 'deathnote', 'haikyuu', 'fairy', 'sds', 'tensura', 'rezero'];
+function voteCandidates(mk) {
+    const us = VOTE_POOL_U.filter(u => ARC_UNIVERSE_ANIME[u] && arcFamous(u).length >= 6), out = [], seen = new Set();
+    for (let i = 0; out.length < 10 && i < 60; i++) {
+        const h = hubHash('vote' + mk + ':' + i), u = us[h % us.length], top = arcFamous(u).slice(0, 6), c = top[(h >>> 8) % top.length];
+        if (!c || seen.has(u) || seen.has(u + '|' + c.display)) continue; // un perso par anime
+        seen.add(u); seen.add(u + '|' + c.display);
+        out.push({ u, display: c.display, anime: ARC_UNIVERSE_ANIME[u], img: cardImg({ u, display: c.display }) });
+    }
+    return out;
+}
+const voteKey = (mk, u, display) => `vote|${mk}|${u}|${display}`;
+const _cardInfoOfKeyVote = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'vote') { const [, mk, u, display] = p; if (!ARC_UNIVERSE_ANIME[u]) return null; return { u, name: display, display, anime: ARC_UNIVERSE_ANIME[u], rarity: 'peuple', img: cardImg({ u, display }), month: mk }; }
+    return _cardInfoOfKeyVote(k);
+};
+RAR_RANK.peuple = 6.4; DECK_BONUS.peuple = 26; MARKET_HINT.peuple = [8000, 30000];
+async function voteTally(mk) { const v = await kvGet('vote', 'm:' + mk, {}), c = new Array(10).fill(0); for (const i of Object.values(v)) if (c[i] != null) c[i]++; return { votes: v, counts: c }; }
+let VOTE_RUNNING = false;
+async function voteProcess() {
+    if (VOTE_RUNNING) return; VOTE_RUNNING = true;
+    try {
+        const prev = prevMonthKey();
+        if (await kvGet('vote', 'result:' + prev, null)) return;
+        const st = await kvGet('vote', 'state', null);
+        if (!st) { await kvSet('vote', 'state', { first: monthKeyNow() }); return; } // 1er vote = ce mois-ci
+        if (prev < st.first) return;
+        const cands = voteCandidates(prev), { votes, counts } = await voteTally(prev);
+        const total = counts.reduce((a, b) => a + b, 0);
+        if (!total) { await kvSet('vote', 'result:' + prev, { mk: prev, none: true }); return; }
+        const wi = counts.indexOf(Math.max(...counts)), w = cands[wi], key = voteKey(prev, w.u, w.display);
+        await kvSet('vote', 'result:' + prev, { mk: prev, i: wi, u: w.u, display: w.display, votes: counts[wi], total, key });
+        // tous ceux qui ont voté pour l'élu reçoivent sa carte
+        for (const [uid, i] of Object.entries(votes)) if (i === wi) { await cardGive(+uid, { key }, false); emitUser(+uid, 'vote_win', { name: w.display, anime: w.anime }); }
+        io.emit('vote_result', { name: w.display, anime: w.anime });
+        console.log('[vote] élu de', prev, ':', w.display, counts[wi], '/', total);
+    } catch (e) { console.warn('[vote]', e.message); } finally { VOTE_RUNNING = false; }
+}
+setTimeout(voteProcess, 25000); setInterval(voteProcess, 10 * 60 * 1000).unref();
+PUSH_OF_EVENT.vote_win = d => ['events', { title: '🗳️ Ton perso a gagné le vote !', body: `${d.name} (${d.anime}) est l’élu du mois : sa carte exclusive est dans ta collection.` }];
+async function voteMaybe(uid, cards, n) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const r = await kvGet('vote', 'result:' + prevMonthKey(), null); if (!r || !r.key) return cards;
+    if (Math.random() < 1 - Math.pow(1 - VOTE_RATE, Math.max(1, n || cards.length))) {
+        const isNew = await cardGive(uid, { key: r.key }, false);
+        cards.push({ key: r.key, ...cardInfoOfKey(r.key), isNew, coins: 0 });
+    }
+    return cards;
+}
+const _openBoosterVote = openBooster;
+openBooster = async function (uid, n, type = '') { return voteMaybe(uid, await _openBoosterVote(uid, n, type), n); };
+const _tbOpenVote = tbOpen;
+tbOpen = async function (uid, b, chosenU) { return voteMaybe(uid, await _tbOpenVote(uid, b, chosenU), 5); };
+app.get('/api/vote', async (req, res) => {
+    const uid = authUserId(req), mk = monthKeyNow(), cands = voteCandidates(mk), { votes, counts } = await voteTally(mk);
+    const total = counts.reduce((a, b) => a + b, 0), last = await kvGet('vote', 'result:' + prevMonthKey(), null);
+    res.json({ ok: true, mk, label: (m => /^[aeiouéèêâîôûy]/i.test(m) ? 'Vote d’' + m : 'Vote de ' + m)(sznLabel(mk).replace('Saison ', '')), endsAt: sznStart(sznNext(mk)).getTime(), total,
+        candidates: cands.map((c, i) => ({ i, name: c.display, anime: c.anime, img: c.img, votes: counts[i], pct: total ? Math.round(100 * counts[i] / total) : 0 })),
+        mine: uid && votes[uid] != null ? votes[uid] : null,
+        last: last && last.key ? { name: last.display, anime: ARC_UNIVERSE_ANIME[last.u], img: cardImg({ u: last.u, display: last.display }), votes: last.votes, total: last.total, rate: VOTE_RATE } : null });
+});
+app.post('/api/vote', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const i = +(req.body || {}).i, mk = monthKeyNow();
+    if (!Number.isInteger(i) || i < 0 || i >= voteCandidates(mk).length) return res.json({ ok: false, error: 'Choix invalide.' });
+    const v = await kvGet('vote', 'm:' + mk, {}); v[uid] = i; await kvSet('vote', 'm:' + mk, v);
+    res.json({ ok: true });
+});
