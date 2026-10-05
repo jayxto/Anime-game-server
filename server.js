@@ -24592,6 +24592,7 @@ app.get('/api/cards/mine', async (req, res) => {
     const xpm = await cardXpMap(uid); // AG_CARDS_PLUS_V1 : niveau ★ des cartes
     mine.forEach((v, k) => {
         if (k.startsWith('collector|')) return;
+        if (k.startsWith('rv|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'rectoverso', img: i.img, imgBack: i.imgBack, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('saison|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'saison', anime: i.anime, rarity: 'saison', img: i.img }); return; }
         if (k.startsWith('champion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'champion', anime: i.anime, rarity: 'champion', img: i.img }); return; }
         if (k.startsWith('fusion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'fusion', img: i.img, imgs: i.imgs || null, lvl: cardLvlOf(xpm[k] || 0) }); return; }
@@ -27904,3 +27905,66 @@ async function talDrawOne(uid) {
 openBooster = async function (uid, n, type = '') { const c = await _openBoosterTalents(uid, n, type); return type === 'admin' ? c : talBonusCard(uid, c, () => talDrawOne(uid)); };
 const _tbOpenTalents = tbOpen;
 tbOpen = async function (uid, b, chosenU) { const c = await _tbOpenTalents(uid, b, chosenU); return talBonusCard(uid, c, () => talDrawOne(uid)); };
+
+/* =====================================================================
+   AG_RV_SOUL_V1 — cartes recto-verso (perso ⇄ sa transformation, on retourne la carte)
+   et cartes âmes sœurs (deux amis tirent la même carte le même jour → carte liée + bonus).
+   ===================================================================== */
+// ---------- recto-verso ----------
+const RV_RATE = 1 / 300; // par carte de booster
+const rvKey = (u, base, form) => `rv|${u}|${base}|${form}`;
+const RV_LIST = () => { const out = []; for (const [k, forms] of EVO_LIST) { const [u, base] = k.split('|'); forms.forEach(f => out.push({ u, base, form: f.name })); } return out; };
+const _cardInfoOfKeyRv = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    const p = String(k).split('|');
+    if (p[0] === 'rv') {
+        const [, u, base, form] = p; if (!ARC_UNIVERSE_ANIME[u]) return null;
+        return { u, name: `${base} ⇄ ${form}`, display: base, anime: ARC_UNIVERSE_ANIME[u], rarity: 'rectoverso', img: cardImg({ u, display: base }), imgBack: `/api/evo-img?c=${encodeURIComponent(base)}&f=${encodeURIComponent(form)}`, form };
+    }
+    return _cardInfoOfKeyRv(k);
+};
+RAR_RANK.rectoverso = 6.2; DECK_BONUS.rectoverso = 24; MARKET_HINT.rectoverso = [4000, 15000];
+async function rvMaybe(uid, cards, n) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const luck = await cardLuck(uid);
+    if (Math.random() >= 1 - Math.pow(1 - Math.min(0.2, RV_RATE * luck), Math.max(1, n || cards.length))) return cards;
+    const list = RV_LIST(); if (!list.length) return cards;
+    const x = list[Math.floor(Math.random() * list.length)], key = rvKey(x.u, x.base, x.form);
+    const shiny = Math.random() < 1 / 10, isNew = await cardGive(uid, { key }, shiny);
+    cards.push({ key, ...cardInfoOfKey(key), shiny, isNew, coins: 0 });
+    return cards;
+}
+// ---------- âmes sœurs ----------
+const SOUL_COINS = 150;
+const SOUL_PULLS = { day: '', m: new Map() }; // carte -> joueurs qui l'ont tirée aujourd'hui (mémoire, remis à zéro chaque jour)
+async function soulCheck(uid, cards) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const day = parisDay();
+    if (SOUL_PULLS.day !== day) { SOUL_PULLS.day = day; SOUL_PULLS.m.clear(); }
+    for (const c of cards) {
+        const key = c && (c.key || boosterCardKey(c)); if (!key) continue;
+        const set = SOUL_PULLS.m.get(key) || new Set();
+        for (const other of set) {
+            if (other === uid || !(await areFriends(uid, other).catch(() => false))) continue;
+            const mine = await kvGet('soul', String(uid), {}), theirs = await kvGet('soul', String(other), {});
+            if (mine[key] || theirs[key]) continue; // déjà liée
+            const pa = await pseudoOf(uid), pb = await pseudoOf(other);
+            mine[key] = { with: pb, day }; theirs[key] = { with: pa, day };
+            await kvSet('soul', String(uid), mine); await kvSet('soul', String(other), theirs);
+            await ecoAddCoins(uid, SOUL_COINS); await ecoAddCoins(other, SOUL_COINS);
+            c.soul = { with: pb };
+            emitUser(other, 'soul_bond', { name: c.name, with: pa, coins: SOUL_COINS, key });
+            emitUser(uid, 'soul_bond', { name: c.name, with: pb, coins: SOUL_COINS, key });
+            break;
+        }
+        set.add(uid); SOUL_PULLS.m.set(key, set);
+    }
+    return cards;
+}
+PUSH_OF_EVENT.soul_bond = d => ['gift', { title: '💞 Cartes âmes sœurs !', body: `${d.with} et toi avez tiré ${d.name} le même jour : carte liée et +${d.coins} 🪙 chacun.` }];
+app.get('/api/cards/souls', async (req, res) => { const uid = needUid(req, res); if (!uid) return; res.json({ ok: true, souls: await kvGet('soul', String(uid), {}) }); });
+// branchement sur tous les boosters
+const _openBoosterRvSoul = openBooster;
+openBooster = async function (uid, n, type = '') { const c = await _openBoosterRvSoul(uid, n, type); return soulCheck(uid, await rvMaybe(uid, c, n)); };
+const _tbOpenRvSoul = tbOpen;
+tbOpen = async function (uid, b, chosenU) { const c = await _tbOpenRvSoul(uid, b, chosenU); return soulCheck(uid, await rvMaybe(uid, c, 5)); };
