@@ -283,7 +283,12 @@ const LOCALDB_READY = process.env.DB_DIR ? (async () => {
         const mounts = fsx.readFileSync('/proc/mounts', 'utf8').split('\n').map(l => l.split(' ')[1]).filter(Boolean).map(m => m.replace(/\\040/g, ' '));
         const best = mounts.filter(m => dir === m || dir.startsWith(m.endsWith('/') ? m : m + '/')).sort((a, b) => b.length - a.length)[0] || '/';
         LOCALDB.mount = best; LOCALDB.onDisk = best !== '/';
-    } catch (_) { LOCALDB.onDisk = null; }
+        // 2e vérification : un autre système de fichiers que la racine = un disque
+        let probe = dir; while (!fsx.existsSync(probe) && probe !== '/') probe = pathx.dirname(probe);
+        const devDir = fsx.statSync(probe).dev, devRoot = fsx.statSync('/').dev;
+        LOCALDB.diag = { probe, real: fsx.realpathSync(probe), sameDevAsRoot: devDir === devRoot, mounts: mounts.filter(m => /var|data|render/.test(m)).slice(0, 12) };
+        if (devDir !== devRoot) LOCALDB.onDisk = true;
+    } catch (e) { LOCALDB.onDisk = null; LOCALDB.diag = { err: e.message }; }
     if (LOCALDB.onDisk === false && importUrl && !process.env.DB_ALLOW_NO_DISK) {
         LOCALDB.state = 'nodisk'; LOCALDB.error = `Le dossier ${dir} n’est pas sur le disque Render : DB_DIR doit commencer par le « Mount Path » du disque.`;
         console.error('[base locale]', LOCALDB.error, 'Le site reste sur l’ancienne base.');
@@ -24134,7 +24139,7 @@ setTimeout(() => fwRewards().catch(() => {}), 45000);
         if (mb > 420) console.warn(`[mémoire] ${mb} Mo utilisés, ${Object.keys(rooms).length} salons, ${io.engine.clientsCount} joueurs`);
     }, 5 * 60000).unref();
 })();
-app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0, db: LOCALDB.on ? { state: LOCALDB.state, onDisk: LOCALDB.onDisk, mount: LOCALDB.mount, copiedThisBoot: !!LOCALDB.importedAt, copyStep: LOCALDB.state === 'importing' ? DBMOVE.step : undefined } : undefined }));
+app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0, db: LOCALDB.on ? { state: LOCALDB.state, onDisk: LOCALDB.onDisk, mount: LOCALDB.mount, diag: LOCALDB.diag, copiedThisBoot: !!LOCALDB.importedAt, copyStep: LOCALDB.state === 'importing' ? DBMOVE.step : undefined } : undefined }));
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
