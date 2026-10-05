@@ -26,6 +26,30 @@ fs.readFileSync = function(file, options){
 
 const app = express();
 
+/* AG_ASYNC_SAFE_V1 — une route async qui plante ne laisse plus le joueur bloqué sur un chargement
+   infini : l'erreur est journalisée et le navigateur reçoit tout de suite une réponse propre. */
+(() => {
+    const safe = h => {
+        if (typeof h !== 'function' || h.length >= 4 || h.handle || h.stack) return h; // middlewares d'erreur, routeurs, sous-apps : inchangés
+        const w = function (req, res, next) {
+            const r = h.call(this, req, res, next);
+            if (r && typeof r.catch === 'function') r.catch(err => {
+                console.error('[route]', req.method, req.originalUrl || req.url, err && (err.stack || err.message || err));
+                if (!res.headersSent) { try { res.status(500).json({ ok: false, error: 'Erreur serveur, réessaie.' }); } catch (_) {} }
+            });
+            return r;
+        };
+        return w;
+    };
+    for (const m of ['get', 'post', 'put', 'patch', 'delete', 'all', 'use']) {
+        const orig = app[m].bind(app);
+        app[m] = function (...args) {
+            if (m === 'get' && args.length === 1 && typeof args[0] === 'string') return orig(...args); // app.get('réglage')
+            return orig(...args.map(a => Array.isArray(a) ? a.map(safe) : safe(a)));
+        };
+    }
+})();
+
 /* AG_REAL_LOCAL_IMAGES_V2: verified local image library fallback */
 const __agLocalImageCache = (() => {
   const agFs = require('fs');
@@ -213,7 +237,13 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+    // AG_ASYNC_SAFE_V1 : une base lente ou coupée ne bloque plus les requêtes indéfiniment
+    max: 12,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+    query_timeout: 30000,
+    keepAlive: true
 });
 
 async function initDb() {
@@ -3660,11 +3690,18 @@ function parseRGList(raw) {
 }
 
 function normalizeRG(s) {
-    return s.toLowerCase()
+    // AG_PERF_V1 : résultat mémorisé (appelée des centaines de milliers de fois sur les mêmes noms)
+    const c = normalizeRG.c || (normalizeRG.c = new Map());
+    let r = c.get(s);
+    if (r !== undefined) return r;
+    r = s.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9 ]/g, '')
         .replace(/\s+/g, ' ')
         .trim();
+    if (c.size > 300000) c.clear();
+    c.set(s, r);
+    return r;
 }
 
 
@@ -12815,10 +12852,25 @@ async function startSimpleImageMigration() {
     }
 }
 
+// AG_IMG_MEM_CACHE_V1 : images déjà vérifiées gardées en mémoire (adresse versionnée ?v=… → contenu figé),
+// plus besoin de relire la base et de revérifier l'image à chaque affichage d'une carte.
+const IMG_MEM = new Map(); let IMG_MEM_BYTES = 0; const IMG_MEM_MAX = 48 * 1024 * 1024;
+function imgMemPut(k, v) {
+    if (IMG_MEM.has(k)) return;
+    IMG_MEM.set(k, v); IMG_MEM_BYTES += v.bytes.length;
+    while (IMG_MEM_BYTES > IMG_MEM_MAX && IMG_MEM.size) { const [ok, ov] = IMG_MEM.entries().next().value; IMG_MEM.delete(ok); IMG_MEM_BYTES -= ov.bytes.length; }
+}
 app.get('/api/character-image-file', async (req,res)=>{
     try {
         const rawU=String(req.query.u||'').trim(), rawName=cleanImageCharacterName(String(req.query.n||'').trim());
         if (!rawU || !rawName) return res.status(404).end();
+        const memKey = req.query.v ? `${rawU}|${normalizeImageKey(rawName)}|${req.query.anime||''}|${req.query.v}` : null;
+        const hit = memKey && IMG_MEM.get(memKey);
+        if (hit) {
+            IMG_MEM.delete(memKey); IMG_MEM.set(memKey, hit); // LRU
+            res.set('Content-Type', hit.mime); res.set('Cache-Control','public,max-age=31536000,immutable'); res.set('ETag', hit.etag); res.set('X-AG-Image-Integrity','v12');
+            return res.send(hit.bytes);
+        }
         const identity=simpleCanonicalCharacterIdentity(rawU,rawName,String(req.query.anime||''));
         let r=await pool.query(`SELECT universe_key,norm_name,display_name,source_url,status,image_bytes,mime_type,updated_at FROM character_images WHERE universe_key=$1 AND norm_name=$2 LIMIT 1`,[identity.u,identity.normName]);
         if (!r.rows[0] && (identity.u!==rawU || identity.normName!==normalizeImageKey(rawName))) {
@@ -12853,6 +12905,7 @@ app.get('/api/character-image-file', async (req,res)=>{
         res.set('Cache-Control',req.query.v ? 'public,max-age=31536000,immutable' : 'no-cache,max-age=0,must-revalidate');
         res.set('ETag',`W/"${Buffer.byteLength(row.image_bytes)}-${new Date(row.updated_at).getTime()}"`);
         res.set('X-AG-Image-Integrity','v12');
+        if (memKey && Buffer.isBuffer(row.image_bytes) && row.image_bytes.length < 1024 * 1024) imgMemPut(memKey, { bytes: row.image_bytes, mime: row.mime_type || 'image/webp', etag: res.get('ETag') });
         return res.send(row.image_bytes);
     } catch (_) { res.set('Cache-Control','no-store'); return res.status(404).end(); }
 });
@@ -13362,8 +13415,14 @@ function arcDisplayName(u, name) {
     try {
         const pool = (typeof RG_POOLS_V2 !== 'undefined' && RG_POOLS_V2[u]) || [];
         if (!pool.length) return name;
+        // AG_PERF_V1 : mémorisé par anime (+ taille de la liste, pour suivre les ajouts)
+        const memo = arcDisplayName.c || (arcDisplayName.c = new Map()), mk = u + '\u0001' + pool.length + '\u0001' + name;
+        if (memo.has(mk)) return memo.get(mk);
         const c = rgCanonicalInput(u, name, pool);
-        return pool.find(n => normalizeRG(n) === c) || name;
+        const out = pool.find(n => normalizeRG(n) === c) || name;
+        if (memo.size > 200000) memo.clear();
+        memo.set(mk, out);
+        return out;
     } catch (_) { return name; }
 }
 
@@ -24589,7 +24648,14 @@ cardLuck = async function (uid) {
 };
 // on prépare les listes de cartes au démarrage : le premier booster ouvert ne rame plus
 setTimeout(() => {
-    try { arcUniverses().forEach(u => { cardPool(u); cardAllSpecials(u); }); cardQuote('naruto', 'Naruto Uzumaki'); Object.keys(SEASON_CARDS).forEach(seasonChars); hwBuiltin(); } catch (e) { console.warn('[cartes] préchauffage :', e.message); }
+    // AG_PERF_V1 : préparation découpée (un anime à la fois) pour ne jamais figer le serveur plusieurs secondes
+    const us = (() => { try { return arcUniverses().slice(); } catch (_) { return []; } })();
+    const step = () => {
+        const u = us.shift();
+        if (u) { try { cardPool(u); cardAllSpecials(u); } catch (e) { console.warn('[cartes] préchauffage', u, e.message); } return setImmediate(step); }
+        try { cardQuote('naruto', 'Naruto Uzumaki'); Object.keys(SEASON_CARDS).forEach(seasonChars); hwBuiltin(); } catch (e) { console.warn('[cartes] préchauffage :', e.message); }
+    };
+    step();
 }, 4000);
 
 /* =====================================================================
@@ -27131,6 +27197,7 @@ app.get('/api/champion', async (req, res) => { const c = await championOf(prevMo
 
 // ---------- quiz carte : une carte floutée, devine le perso pour la gagner (5 par jour) ----------
 const QUIZ_TOK = new Map(); // jeton anonyme -> perso (l'adresse de l'image ne trahit pas le nom)
+setInterval(() => { const lim = Date.now() - 6 * 3600 * 1000; for (const [k, v] of QUIZ_TOK) if (!v.at || v.at < lim) QUIZ_TOK.delete(k); }, 30 * 60 * 1000).unref();
 app.get('/api/cards/quiz-img/:tok', async (req, res) => {
     const q = QUIZ_TOK.get(String(req.params.tok || ''));
     if (!q) return res.status(404).end();

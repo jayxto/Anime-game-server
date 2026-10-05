@@ -963,7 +963,12 @@
         .hub-chest,.hub-pass-mini{display:flex;align-items:center;gap:10px;background:#101018;border:2px solid #2c2c44;border-radius:12px;padding:10px 12px;color:#fff;cursor:pointer;text-align:left;font-family:inherit;}
         .hub-chest .hc-ico{font-size:1.8rem;}
         .hub-chest b,.hub-chest small{display:block;} .hub-chest small{color:var(--text-muted);font-size:.75rem;}
-        .hub-chest.ready{border-color:#ffd700;box-shadow:0 0 18px rgba(255,215,0,.25);animation:hubPulse 1.8s ease-in-out infinite;}
+        .hub-chest.ready{border-color:#ffd700;box-shadow:0 0 18px rgba(255,215,0,.25);position:relative;}
+        /* halo animé via l'opacité d'un calque (géré par la carte graphique) : animer box-shadow redessinait toute la page à chaque image */
+        .hub-chest.ready::after{content:'';position:absolute;inset:-2px;border-radius:inherit;box-shadow:0 0 26px rgba(255,215,0,.45);opacity:0;pointer-events:none;animation:hubPulseO 1.8s ease-in-out infinite;will-change:opacity;}
+        @keyframes hubPulseO{50%{opacity:1;}}
+        /* téléphone : les aperçus animés de la boutique (pseudos, cadres) redessinaient la page en boucle → figés, animés quand on appuie dessus */
+        @media (pointer: coarse) { #eco-shop .cn, #eco-shop .cn *, #eco-shop .av[class*=fr-] { animation-play-state: paused !important; } #eco-shop .shop-item:active .cn, #eco-shop .shop-item:active .cn *, #eco-shop .shop-item:active .av[class*=fr-] { animation-play-state: running !important; } }
         @keyframes hubPulse{50%{box-shadow:0 0 26px rgba(255,215,0,.45);}}
         .hub-pass-mini{flex-direction:column;align-items:stretch;gap:4px;font-size:.8rem;border-color:#6a3fb5;}
         .hub-pass-mini b{font-size:.95rem;color:#d9c3ff;}
@@ -16934,5 +16939,24 @@ async function loadHallOfFame(){
     })();
     </script>
     <style>.cs-sort{width:auto;min-width:190px;margin:0 0 8px;padding:8px;cursor:pointer;}</style>
+    <script>
+    /* AG_PERF_V1 : les effets animés des cartes ne tournent que pour les cartes visibles à l'écran */
+    (function () {
+        if (!('IntersectionObserver' in window)) return;
+        const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('tc-off', !e.isIntersecting)), { rootMargin: '120px' });
+        const watch = root => {
+            if (!root || root.nodeType !== 1) return;
+            if (root.classList && root.classList.contains('tcard')) { if (!root.__io) { root.__io = 1; io.observe(root); } return; }
+            if (root.querySelectorAll) root.querySelectorAll('.tcard').forEach(el => { if (!el.__io) { el.__io = 1; io.observe(el); } });
+        };
+        let pending = [];
+        new MutationObserver(ms => {
+            for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) pending.push(n);
+            if (pending.length === 1 || pending.length > 0 && !watch.t) watch.t = requestAnimationFrame(() => { watch.t = 0; const list = pending; pending = []; list.forEach(watch); });
+        }).observe(document.body, { childList: true, subtree: true });
+        watch(document.body);
+    })();
+    </script>
+    <style>.tcard.tc-off,.tcard.tc-off *,.tcard.tc-off::before,.tcard.tc-off::after,.tcard.tc-off *::before,.tcard.tc-off *::after{animation-play-state:paused !important;}</style>
 </body>
 </html>
