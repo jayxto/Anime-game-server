@@ -1386,6 +1386,16 @@
         #summon.done .sm-skip{background:var(--c);color:#000;border-color:transparent;}
         #summon .sm-sum{color:#fff;font-weight:700;min-height:1.2em;text-shadow:0 1px 4px #000;}
         @media (max-width:600px){#summon .sm-card{width:104px;height:170px;}#summon .sm-cards{gap:8px;}}
+        /* beaucoup de cartes (bonus, recto-verso…) sur téléphone : la scène défile au lieu de couper le bas,
+           et « Tout révéler » / « Fermer » restent toujours visibles en bas de l'écran */
+        #summon{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;justify-content:flex-start;padding:14px 0 calc(10px + env(safe-area-inset-bottom));}
+        #summon::before,#summon::after{content:'';flex:1 1 0;min-height:0;}
+        #summon .sm-bg,#summon .sm-flash{position:fixed;}
+        @supports (height:100dvh){#summon{bottom:auto;height:100dvh;}} /* zone vraiment visible (sans les barres du navigateur) */
+        #summon .sm-topskip{position:fixed;top:calc(10px + env(safe-area-inset-top));right:10px;z-index:20;border:1px solid rgba(255,255,255,.35);background:rgba(5,5,16,.8);color:#fff;font-weight:800;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.85rem;opacity:0;transition:opacity .4s;}
+        #summon.show .sm-topskip{opacity:1;}
+        #summon.done .sm-topskip{background:var(--c);color:#000;border-color:transparent;}
+        #summon .sm-bottom{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));flex:none;background:rgba(5,5,16,.78);padding:8px 14px;border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.5);}
         @media (prefers-reduced-motion:reduce){#summon *{animation-duration:.01s!important;transition-duration:.01s!important;}}
         /* ---- Invocation : une animation par rareté ---- */
         #summon .sm-card{position:relative;}
@@ -16978,7 +16988,8 @@ async function loadHallOfFame(){
         .ag-panel h3{margin:0 0 6px;}
         .ag-sw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #20223a;font-size:.9rem;cursor:pointer;}
         .ag-sw:last-child{border-bottom:0;}
-        #pwa-banner{position:fixed;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:100000;background:#141833;border:2px solid #ff7b00;border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;color:#fff;box-shadow:0 6px 24px rgba(0,0,0,.6);font-size:.9rem;}
+        #pwa-banner{position:fixed;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));z-index:9990;background:#141833;border:2px solid #ff7b00;border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;color:#fff;box-shadow:0 6px 24px rgba(0,0,0,.6);font-size:.9rem;}
+        body:has(#summon) #pwa-banner,body:has(#cp-modal) #pwa-banner,body:has(#card-inspect) #pwa-banner{display:none;}
         #pwa-banner img{width:42px;height:42px;border-radius:10px;}
         #pwa-banner button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;}
         .szn-cd{font-family:'Bangers';font-size:1.6rem;color:var(--accent-yellow);letter-spacing:1px;}
@@ -17206,6 +17217,19 @@ async function loadHallOfFame(){
             if (d.key) window.CARD_SOULS[d.key] = { with: d.with };
             toast(`💞 Âmes sœurs ! ${esc(d.with)} et toi avez tiré ${esc(d.name)} aujourd’hui : carte liée, +${d.coins} 🪙 chacun !`, '#ff4d94');
         });
+    })();
+    </script>
+    <script>
+    /* AG_SUMMON_TOP_SKIP_V1 : bouton « Tout révéler / Fermer » aussi en haut à droite (toujours visible sur téléphone) */
+    (function () {
+        const add = () => {
+            const o = document.getElementById('summon'); if (!o || o.querySelector('.sm-topskip')) return;
+            const b = document.createElement('button'); b.className = 'sm-topskip'; b.textContent = '⏭ Tout révéler';
+            b.onclick = e => { e.stopPropagation(); if (o.classList.contains('done')) o.remove(); else if (typeof summonRevealAll === 'function') summonRevealAll(); };
+            o.appendChild(b);
+            new MutationObserver(() => { if (o.classList.contains('done')) b.textContent = '✖ Fermer'; }).observe(o, { attributes: true, attributeFilter: ['class'] });
+        };
+        new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.id === 'summon') add(); }).observe(document.body, { childList: true });
     })();
     </script>
 </body>
