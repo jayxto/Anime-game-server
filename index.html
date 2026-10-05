@@ -16630,6 +16630,8 @@ async function loadHallOfFame(){
         .cp6-c img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:10px;border:2px solid #3a3f6b;display:block;}
         .cp6-c.boss img{border:3px solid #ff2a5f;box-shadow:0 0 18px rgba(255,42,95,.7);}
         .cp6-c.ko{opacity:.3;filter:grayscale(1);}
+        .cp6-c.act img{border:3px solid #00e676;box-shadow:0 0 16px rgba(0,230,118,.7);} .cp6-c.act::before{content:'⚔️ EN COMBAT';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#00e676;color:#002b14;font-size:.6rem;font-weight:900;border-radius:99px;padding:1px 6px;z-index:2;white-space:nowrap;}
+        .cp6-foes.cp6-team{display:flex;flex-wrap:wrap;justify-content:center;} .cp6-foes .cp6-c{width:120px;} .cp6-foes p{flex-basis:100%;text-align:center;}
         .cp6-c.hit{animation:cp6Hit .25s;}
         .cp6-c b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         @keyframes cp6Hit{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
@@ -16713,7 +16715,8 @@ async function loadHallOfFame(){
         };
 
         // ---------- mode survie ----------
-        const cardBox = (c, foe) => `<div class="cp6-c${foe ? ' cp6-foe' : ''}${c.boss ? ' boss' : ''}${c.hp <= 0 ? ' ko' : ''}"><img src="${esc(c.img)}" onerror="this.style.opacity=.2"><b>${c.boss ? '👹 ' : ''}${esc(c.name)}</b><small>⚔️ ${fmt(c.power)}</small><div class="cp6-hp"><i style="width:${Math.max(0, Math.round(100 * c.hp / c.max))}%"></i></div></div>`;
+        const teamHtml = t => { const a = t.findIndex(c => c.hp > 0); return t.map((c, i) => cardBox(c, false, i === a)).join(''); };
+        const cardBox = (c, foe, act) => `<div class="cp6-c${foe ? ' cp6-foe' : ''}${act ? ' act' : ''}${c.boss ? ' boss' : ''}${c.hp <= 0 ? ' ko' : ''}"><img src="${esc(c.img)}" onerror="this.style.opacity=.2"><b>${c.boss ? '👹 ' : ''}${esc(c.name)}</b><small>⚔️ ${fmt(c.power)}</small><div class="cp6-hp"><i style="width:${Math.max(0, Math.round(100 * c.hp / c.max))}%"></i></div></div>`;
         let RUN = null, BODY = null;
         const AUTO = { on: false, replay: false, keys: null, busy: false, runs: 0, total: { coins: 0, dust: 0, potions: 0, secrets: 0, best: 0 } };
         try { const k = JSON.parse(localStorage.getItem('cp6Keys') || 'null'); if (Array.isArray(k)) AUTO.keys = k; } catch (_) {}
@@ -16726,10 +16729,10 @@ async function loadHallOfFame(){
             RUN = d.run;
             if (RUN) return drawRun(body);
             const board = l => l.map((t, i) => `<div class="cp-row"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(t.name)}</span><b>étage ${t.floor}</b></div>`).join('') || '<p class="tl-hint">Personne pour l’instant.</p>';
-            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> et grimpe le plus haut possible. Tes cartes <b>ne sont jamais soignées</b> entre les étages : chaque combat use ton équipe. Tous les 10 étages, un 👹 boss t’attend. Plus tu montes, plus les récompenses sont grosses, et elles sont gagnées tout de suite (tu ne les perds pas si tu tombes).</p>
+            body.innerHTML = `<p style="margin:0 0 6px;">Choisis <b>5 cartes</b> et grimpe le plus haut possible en <b>1 contre 1</b> : ta 1re carte affronte l’ennemi de l’étage, et quand elle tombe, la suivante prend sa place. Tes cartes <b>ne sont jamais soignées</b>, et chaque étage est un peu plus dur que le précédent. Des centaines d’étages à grimper ! Les récompenses sont gagnées tout de suite (tu ne les perds pas si tu tombes).</p>
                 <div class="cp6-stats"><span>🎟️ Parties restantes aujourd’hui : <b>${d.runsLeft}/${d.maxRuns}</b></span><span>🏔️ Ton record : <b>étage ${d.best}</b></span><span>🧪 Potions de chance : <b>${d.potion.n}</b></span></div>
-                <h4 style="margin:8px 0 4px;">🎁 Récompenses par étage</h4><div class="cp6-rw">${d.rewards.map(r => `<div class="${r.floor <= d.best ? 'got' : ''}"><b>Étage ${r.floor}${r.floor % 10 === 0 ? ' 👹' : ''}</b><br>${rwText(r)}</div>`).join('')}</div>
-                <p class="tl-hint">Chaque étage passé donne des pièces (de plus en plus). Tous les 5 étages : poussière ✨ et potions (XP, brillance, univers…). Tous les 10 : potions de chance 🧪 et gros bonus. Étages 25, 50… : une carte Secrète.</p>
+                <h4 style="margin:8px 0 4px;">🎁 Récompenses par étage</h4><div class="cp6-rw">${d.rewards.map(r => `<div class="${r.floor <= d.best ? 'got' : ''}"><b>Étage ${r.floor}</b><br>${rwText(r)}</div>`).join('')}</div>
+                <p class="tl-hint">Chaque étage passé donne des pièces (de plus en plus). Tous les 10 étages : poussière ✨. Tous les 20 : 📈 potion d’XP. Tous les 30 : 🧪 potion de chance et gros bonus. Tous les 50 : 💎 brillance. Tous les 75 : 🌍 univers. Tous les 100 : une carte Secrète 🃏.</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div><h4 style="margin:6px 0;">📅 Cette semaine</h4>${board(d.week)}</div><div><h4 style="margin:6px 0;">🏆 Record de tous les temps</h4>${board(d.top)}</div></div>
                 ${d.runsLeft > 0 ? `<button class="btn-action" id="cp6-pick" style="margin-top:10px;">🃏 Choisir mes 5 cartes</button>${AUTO.keys ? '<button class="btn-action" id="cp6-same" style="margin-top:6px;background:#1f3a5a;">🔁 Reprendre ma dernière équipe</button>' : ''}` : '<p style="text-align:center;margin-top:10px;">⏳ Plus de parties aujourd’hui, reviens demain !</p>'}`;
             const pick = body.querySelector('#cp6-pick'); if (pick) pick.onclick = () => pickTeam(body);
@@ -16750,14 +16753,14 @@ async function loadHallOfFame(){
             draw('');
             go.onclick = async () => { go.disabled = true; const r = await v7post('/api/cards/survival/start', { keys: sel }); if (!r || !r.ok) { go.disabled = false; return err(r); } RUN = r.run; drawRun(body); };
         }
-        function survRw(f) { const r = { coins: Math.min(150, 10 + f * 4), dust: f % 5 ? 0 : f * 8, potions: f % 10 ? 0 : Math.min(3, f / 10), secret: f % 25 === 0, items: {} }; if (f % 10 === 0) r.coins += f * 10; if (f % 5 === 0 && f % 10 !== 0) r.items.xp = 1; if (f % 15 === 0) r.items.shiny = 1; if (f % 20 === 0) r.items.univ = 1; return r; }
+        function survRw(f) { const r = { coins: Math.min(15, 2 + Math.floor(f / 2)), dust: f % 10 ? 0 : f, potions: f % 30 ? 0 : 1, secret: f % 100 === 0, items: {} }; if (f % 30 === 0) r.coins += f * 2; if (f % 20 === 0) r.items.xp = 1; if (f % 50 === 0) r.items.shiny = 1; if (f % 75 === 0) r.items.univ = 1; return r; }
         const earnedText = e => `🪙 ${fmt(e.coins)} • ✨ ${fmt(e.dust)} • 🧪 ${e.potions}${e.secrets ? ' • 🃏 ' + e.secrets : ''}${Object.entries(e.items || {}).map(([t, n]) => ` • ${(ITEM_LBL[t] || t).split(' ')[0]} ${n}`).join('')}`;
         function drawRun(body) {
             if (!RUN) return cp6Survival();
             AUTO.keys = RUN.team.map(c => c.key); try { localStorage.setItem('cp6Keys', JSON.stringify(AUTO.keys)); } catch (_) {}
-            body.innerHTML = `<div class="cp6-stats"><span>🏔️ Étage <b>${RUN.floor}</b>${RUN.floor % 10 === 0 ? ' 👹 BOSS' : ''}</span><span>Gagné : ${earnedText(RUN.earned)}</span></div>
+            body.innerHTML = `<div class="cp6-stats"><span>🏔️ Étage <b>${RUN.floor}</b> • 🃏 ${RUN.team.filter(c => c.hp > 0).length}/5 debout</span><span>Gagné : ${earnedText(RUN.earned)}</span></div>
                 <div class="cp6-foes cp6-team"><p class="tl-hint" style="grid-column:1/-1;margin:0;">Prochain étage : ${rwText(survRw(RUN.floor))}</p></div>
-                <div class="cp6-vs">⚔️</div><div class="cp6-me cp6-team">${RUN.team.map(c => cardBox(c)).join('')}</div>
+                <div class="cp6-vs">⚔️</div><div class="cp6-me cp6-team">${teamHtml(RUN.team)}</div>
                 <div class="cp6-log"></div>
                 <div class="cp6-auto"><label><input type="checkbox" id="cp6-auto" ${AUTO.on ? 'checked' : ''}> ⏩ Combat automatique (continue même si tu fermes la fenêtre)</label><label><input type="checkbox" id="cp6-replay" ${AUTO.replay ? 'checked' : ''}> 🔁 Relancer automatiquement une partie avec la même équipe</label></div>
                 <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap;"><button class="btn-action" id="cp6-fight" style="margin:0;flex:1;min-width:150px;" ${AUTO.on ? 'disabled' : ''}>⚔️ Combattre l’étage ${RUN.floor}</button><button class="btn-action" id="cp6-hide" style="margin:0;flex:1;min-width:150px;background:#1f3a5a;">🙈 Cacher (la tour continue)</button><button class="btn-action" id="cp6-quit" style="margin:0;flex:1;min-width:150px;background:#3a1f2b;">🏳️ Abandonner</button></div>`;
@@ -16781,10 +16784,10 @@ async function loadHallOfFame(){
             }
             return r;
         }
-        async function animate(body, r) {
+        async function animate(body, r, speed = 110) {
             const foes = r.foes.map(f => ({ ...f })), team = (r.teamBefore || r.team).map(c => ({ ...c }));
             const foeBox = body.querySelector('.cp6-foes'), meBox = body.querySelector('.cp6-me'), logEl = body.querySelector('.cp6-log');
-            const render = () => { foeBox.innerHTML = foes.map(c => cardBox(c, true)).join(''); meBox.innerHTML = team.map(c => cardBox(c)).join(''); };
+            const render = () => { foeBox.innerHTML = foes.map(c => cardBox(c, true)).join(''); meBox.innerHTML = teamHtml(team); };
             render();
             const step = Math.max(1, Math.ceil(r.log.length / 60)), byName = (list, n) => list.find(c => c.name === n && c.hp > 0) || list.find(c => c.name === n);
             for (let i = 0; i < r.log.length; i++) {
@@ -16796,7 +16799,7 @@ async function loadHallOfFame(){
                 if (el) el.classList.add('hit');
                 logEl.insertAdjacentHTML('afterbegin', `<div class="${st.s}">${st.s === 'me' ? '🟢' : '🔴'} ${esc(st.a)} → ${esc(st.b)} : -${fmt(st.d)}${st.ko ? ' 💀 K.O.' : ''}</div>`);
                 if (!document.body.contains(body)) return;
-                await sleep(130);
+                await sleep(speed);
             }
             team.forEach((c, i) => { c.hp = r.team[i].hp; }); foes.forEach((c, i) => { c.hp = r.foesAfter[i]; }); render();
         }
@@ -16851,11 +16854,11 @@ async function loadHallOfFame(){
                     if (!r || !r.ok) { toast('❌ ' + ((r && r.error) || 'Erreur de la tour'), 'var(--accent-pink)'); break; }
                     r.teamBefore = before;
                     const b = live();
-                    if (b && b.querySelector('.cp6-log')) { await animate(b, r); }
+                    if (b && b.querySelector('.cp6-log')) { await animate(b, r, 45); }
                     if (r.won) {
                         if (r.reward.card) toast(`🃏 Tour : carte Secrète ${esc(r.reward.card.name)} gagnée !`, '#ffd700');
                         miniUi(); const b2 = live(); if (b2) drawRun(b2);
-                        await sleep(b ? 600 : 1500);
+                        await sleep(b ? 300 : 900);
                     } else {
                         const s = r.summary; AUTO.runs++;
                         AUTO.total.coins += s.earned.coins; AUTO.total.dust += s.earned.dust; AUTO.total.potions += s.earned.potions; AUTO.total.secrets += s.earned.secrets; AUTO.total.best = Math.max(AUTO.total.best, s.floor);

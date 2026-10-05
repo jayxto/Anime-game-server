@@ -27201,15 +27201,14 @@ app.post('/api/cards/potion', async (req, res) => {
 
 // ---------- mode survie ----------
 const SURV_RUNS = 3, SURV_LOCK = new Set();
-function survReward(floor) { // récompense pour avoir passé l'étage `floor`
-    const r = { coins: Math.min(150, 10 + floor * 4), dust: 0, potions: 0, secret: false };
-    if (floor % 5 === 0) r.dust = floor * 8;
-    if (floor % 10 === 0) { r.potions = Math.min(3, floor / 10); r.coins += floor * 10; }
-    if (floor % 25 === 0) r.secret = true;
-    r.items = {}; // potions spéciales (AG_CARDS_PLUS_V7)
-    if (floor % 5 === 0 && floor % 10 !== 0) r.items.xp = 1;
-    if (floor % 15 === 0) r.items.shiny = 1;
-    if (floor % 20 === 0) r.items.univ = 1;
+function survReward(floor) { // récompense pour avoir passé l'étage `floor` (tour 1 contre 1, beaucoup d'étages)
+    const r = { coins: Math.min(15, 2 + Math.floor(floor / 2)), dust: 0, potions: 0, secret: false, items: {} };
+    if (floor % 10 === 0) r.dust = floor;
+    if (floor % 30 === 0) { r.potions = 1; r.coins += floor * 2; }
+    if (floor % 20 === 0) r.items.xp = 1;
+    if (floor % 50 === 0) r.items.shiny = 1;
+    if (floor % 75 === 0) r.items.univ = 1;
+    if (floor % 100 === 0) r.secret = true;
     return r;
 }
 function survRandCard() {
@@ -27221,32 +27220,26 @@ function survRandCard() {
     }
     return null;
 }
-function survBossCard() {
-    const v = tbCharCards(['antagoniste']); if (!v.length) return survRandCard();
-    const c = v[Math.floor(Math.random() * v.length)];
-    return { u: c.u, name: c.display, anime: ARC_UNIVERSE_ANIME[c.u], rarity: 'mythique', img: cardImg({ u: c.u, display: c.display }) };
-}
 function survEnemies(floor, avg) {
-    // difficulté : en partie fixe, en partie selon ton équipe (une équipe forte va plus haut, mais tout le monde avance)
-    const boss = floor % 10 === 0, base = (avg * 0.4 + 45 * 0.6) * (0.3 + floor * 0.04);
-    if (boss) { const c = survBossCard(); return [{ ...c, boss: true, power: Math.round(base * 1.35), hp: Math.round(base * 1.35 * 7), max: Math.round(base * 1.35 * 7) }]; }
-    const n = floor < 4 ? 2 : 3, out = [];
-    for (let i = 0; i < n; i++) { const c = survRandCard(); if (!c) continue; const p = Math.max(5, Math.round(base * (0.85 + Math.random() * 0.3))); out.push({ ...c, power: p, hp: Math.round(p * 2.5), max: Math.round(p * 2.5) }); }
-    return out;
+    // 1 seul ennemi par étage, pas de boss. Difficulté qui monte doucement (beaucoup d'étages),
+    // en partie fixe et en partie selon ton équipe.
+    const base = (avg * 0.3 + 50 * 0.7) * (0.2 + floor * 0.004);
+    const c = survRandCard(); if (!c) return [];
+    const p = Math.max(4, Math.round(base * (0.85 + Math.random() * 0.3)));
+    return [{ ...c, power: p, hp: Math.round(p * 2.5), max: Math.round(p * 2.5) }];
 }
-function survFight(team, foes) {
-    const log = [], alive = a => a.filter(c => c.hp > 0), hit = (from, list) => {
-        const t = alive(list); if (!t.length) return null;
-        const to = t[Math.floor(Math.random() * t.length)], dmg = Math.max(1, Math.round(from.power * (0.28 + Math.random() * 0.17) * (Math.random() < 0.1 ? 2 : 1)));
-        to.hp = Math.max(0, to.hp - dmg);
-        return { to, dmg };
-    };
-    for (let turn = 0; turn < 80 && alive(team).length && alive(foes).length; turn++) {
-        for (const c of alive(team)) { const h = hit(c, foes); if (h) log.push({ s: 'me', a: c.name, b: h.to.name, d: h.dmg, ko: h.to.hp === 0 }); if (!alive(foes).length) break; }
-        if (!alive(foes).length) break;
-        for (const f of alive(foes)) { const h = hit(f, team); if (h) log.push({ s: 'foe', a: f.name, b: h.to.name, d: h.dmg, ko: h.to.hp === 0 }); if (!alive(team).length) break; }
+function survFight(team, foes) { // 1 contre 1 : ta 1re carte encore debout affronte l'ennemi ; si elle tombe, la suivante prend le relais
+    const log = [], foe = foes[0], dmg = p => Math.max(1, Math.round(p * (0.28 + Math.random() * 0.17) * (Math.random() < 0.1 ? 2 : 1)));
+    if (!foe) return { won: true, log };
+    for (let turn = 0; turn < 400; turn++) {
+        const me = team.find(c => c.hp > 0); if (!me) break;
+        let d = dmg(me.power); foe.hp = Math.max(0, foe.hp - d);
+        log.push({ s: 'me', a: me.name, b: foe.name, d, ko: foe.hp === 0 });
+        if (!foe.hp) break;
+        d = dmg(foe.power); me.hp = Math.max(0, me.hp - d);
+        log.push({ s: 'foe', a: foe.name, b: me.name, d, ko: me.hp === 0 });
     }
-    return { won: alive(foes).length === 0 && alive(team).length > 0, log };
+    return { won: foe.hp === 0 && team.some(c => c.hp > 0), log };
 }
 async function survState(uid) {
     const day = parisDay(), s = await kvGet('surv', String(uid), { day, runs: 0, run: null, best: 0 });
@@ -27256,16 +27249,16 @@ async function survState(uid) {
 async function survBoard(uid, floor) {
     const p = await pseudoOf(uid), wk = 'w' + weekKey();
     for (const k of ['all', wk]) {
-        const b = await kvGet('survlb', k, {}), cur = b[uid];
-        if (!cur || floor > cur.floor) { b[uid] = { p, floor, at: Date.now() }; await kvSet('survlb', k, b); }
+        const b = await kvGet('survlb2', k, {}), cur = b[uid];
+        if (!cur || floor > cur.floor) { b[uid] = { p, floor, at: Date.now() }; await kvSet('survlb2', k, b); }
     }
 }
-const survTop = async k => Object.values(await kvGet('survlb', k, {})).sort((a, b) => b.floor - a.floor || a.at - b.at).slice(0, 10).map(x => ({ name: x.p, floor: x.floor }));
+const survTop = async k => Object.values(await kvGet('survlb2', k, {})).sort((a, b) => b.floor - a.floor || a.at - b.at).slice(0, 10).map(x => ({ name: x.p, floor: x.floor }));
 app.get('/api/cards/survival', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const s = await survState(uid);
-    const rewards = [1, 5, 10, 15, 20, 25, 30, 40, 50].map(f => ({ floor: f, ...survReward(f) }));
-    res.json({ ok: true, run: s.run, runsLeft: Math.max(0, SURV_RUNS - s.runs) + (s.run ? 1 : 0), maxRuns: SURV_RUNS, best: s.best || 0, potion: await potionGet(uid), rewards, top: await survTop('all'), week: await survTop('w' + weekKey()) });
+    const rewards = [1, 10, 20, 30, 50, 60, 75, 90, 100, 150].map(f => ({ floor: f, ...survReward(f) }));
+    res.json({ ok: true, run: s.run, runsLeft: Math.max(0, SURV_RUNS - s.runs) + (s.run ? 1 : 0), maxRuns: SURV_RUNS, best: s.best2 || 0, potion: await potionGet(uid), rewards, top: await survTop('all'), week: await survTop('w' + weekKey()) });
 });
 app.post('/api/cards/survival/start', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
@@ -27304,13 +27297,13 @@ app.post('/api/cards/survival/fight', async (req, res) => {
             run.earned.coins += reward.coins; run.earned.dust += reward.dust; run.earned.potions += reward.potions; run.earned.items = run.earned.items || {}; for (const [t, n] of Object.entries(reward.items || {})) run.earned.items[t] = (run.earned.items[t] || 0) + n;
             run.floor++;
         }
-        s.best = Math.max(s.best || 0, won ? floor : floor - 1);
+        s.best2 = Math.max(s.best2 || 0, won ? floor : floor - 1);
         const ended = !won, summary = ended ? { floor: floor - 1, earned: run.earned } : null;
         if (ended) s.run = null;
         await kvSet('surv', String(uid), s);
         if (floor - (won ? 0 : 1) > 0) await survBoard(uid, won ? floor : floor - 1);
-        if (won) await cardXpAdd(uid, run.team.map(c => c.key), 3);
-        res.json({ ok: true, floor, won, log: log.slice(0, 120), foes: before, foesAfter: foes.map(f => f.hp), team: run.team, reward, ended, summary, next: won ? survReward(run.floor) : null, coins });
+        if (won && floor % 3 === 0) await cardXpAdd(uid, run.team.map(c => c.key), 3);
+        res.json({ ok: true, floor, won, log: log.slice(-200), foes: before, foesAfter: foes.map(f => f.hp), team: run.team, reward, ended, summary, next: won ? survReward(run.floor) : null, coins });
     } finally { SURV_LOCK.delete(uid); }
 });
 app.post('/api/cards/survival/quit', async (req, res) => {
