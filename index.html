@@ -3792,6 +3792,15 @@ body.ag-game-page #app-root > #mode,
             <p class="tl-hint" style="text-align:left;">Ajoute des pièces sur TON compte pour tester la boutique et les boosters.</p>
             <div style="display:flex;gap:6px;"><button class="btn-action" style="margin-top:0;" onclick="adminCoins(500)">+500</button><button class="btn-action" style="margin-top:0;" onclick="adminCoins(5000)">+5 000</button><button class="btn-action" style="margin-top:0;background:#ffd700;color:#111;" onclick="adminCoins(1000000)">+1 000 000</button></div>
         </div>
+        <div class="opt-panel" id="adm-give">
+            <h2>🎁 Livrer des pièces à des joueurs</h2>
+            <p class="tl-hint" style="text-align:left;">Mets un ou plusieurs pseudos (séparés par des virgules). Les joueurs reçoivent les pièces tout de suite, avec une notification.</p>
+            <input id="adm-give-ps" class="v7-input" placeholder="Pseudos (ex : Jordan, Kenji, Mika)">
+            <input id="adm-give-n" class="v7-input" type="number" min="1" placeholder="Nombre de pièces" value="1000">
+            <input id="adm-give-msg" class="v7-input" maxlength="140" placeholder="Message (facultatif) : ex. Bravo pour le tournoi !">
+            <button class="btn-action" style="margin-top:0;background:#ffd700;color:#111;" onclick="adminGiveCoins()">🪙 Livrer les pièces</button>
+            <div id="adm-give-res" class="tl-hint" style="text-align:left;margin-top:6px;"></div>
+        </div>
         <div class="opt-panel">
             <h2>🤖 Bots de test</h2>
             <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
@@ -11306,6 +11315,18 @@ body.ag-game-page #app-root > #mode,
             betaAdminRender(d.list);
         }
         socket.on('beta_status', () => { checkAdmin(); if (typeof ecoLoad === 'function') ecoLoad(); });
+        async function adminGiveCoins() {
+            const v = id => (document.getElementById(id) || {}).value || '';
+            const n = +v('adm-give-n');
+            if (!v('adm-give-ps').trim() || !(n > 0)) return toast('Indique des pseudos et un nombre de pièces.', 'var(--accent-yellow)');
+            if (!confirm(`Livrer ${n.toLocaleString('fr-FR')} pièces à : ${v('adm-give-ps')} ?`)) return;
+            const d = await v7post('/api/admin/coins-give', { pseudos: v('adm-give-ps'), n, msg: v('adm-give-msg') });
+            const box = document.getElementById('adm-give-res');
+            if (!d || !d.ok) return toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)');
+            box.innerHTML = (d.done.length ? `✅ Livré à : <b>${d.done.map(v7esc).join(', ')}</b>` : '') + (d.missing.length ? `<br>❌ Introuvables : ${d.missing.map(v7esc).join(', ')}` : '');
+            if (d.done.length) toast(`🪙 ${n.toLocaleString('fr-FR')} pièces livrées à ${d.done.length} joueur${d.done.length > 1 ? 's' : ''}`, '#00ff88');
+        }
+        socket.on('admin_gift', g => { if (g) toast(`🎁 Cadeau de l’équipe : +${(g.coins || 0).toLocaleString('fr-FR')} 🪙${g.msg ? ' • « ' + v7esc(g.msg) + ' »' : ''}`, '#ffd700'); });
         async function adminCoins(n) { const d = await v7post('/api/admin/coins', { n }); if (!d || !d.ok) toast('❌ ' + ((d && d.error) || 'Impossible'), 'var(--accent-pink)'); }
         async function adminBots(n) {
             if (!currentRoomCode) return;

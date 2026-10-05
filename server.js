@@ -26383,3 +26383,23 @@ app.get('/api/cards/levels', async (req, res) => {
     const xp = await cardXpMap(uid);
     res.json({ ok: true, lvls: Object.fromEntries(Object.entries(xp).map(([k, v]) => [k, cardLvlOf(v)]).filter(([, l]) => l > 0)) });
 });
+
+/* AG_ADMIN_GIVE_COINS_V1 — admin : livrer des pièces à un ou plusieurs joueurs par pseudo */
+app.post('/api/admin/coins-give', adminOnly(async (req, res) => {
+    const b = req.body || {};
+    const n = Math.round(+b.n);
+    if (!(n >= 1 && n <= 10000000)) return res.json({ ok: false, error: 'Montant entre 1 et 10 000 000.' });
+    const pseudos = [...new Set(String(b.pseudos || '').split(/[,;\n]+/).map(s => s.trim()).filter(Boolean))].slice(0, 50);
+    if (!pseudos.length) return res.json({ ok: false, error: 'Indique au moins un pseudo.' });
+    const msg = String(b.msg || '').trim().slice(0, 140);
+    const done = [], missing = [];
+    for (const p of pseudos) {
+        const uid = await uidByPseudo(p);
+        if (!uid) { missing.push(p); continue; }
+        const total = await ecoAddCoins(uid, n, true);
+        emitUser(uid, 'coins_gain', { gain: n, total, why: 'cadeau admin' });
+        emitUser(uid, 'admin_gift', { coins: n, msg });
+        done.push(await pseudoOf(uid));
+    }
+    res.json({ ok: true, done, missing });
+}));
