@@ -14236,7 +14236,7 @@ body.ag-game-page #app-root > #mode,
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
                         ${d.canUpgrade ? `<button class="btn-action" style="margin:0;flex:1;" data-act="up">✨ Améliorer la finition (5 doublons)</button>` : ''}
                         ${d.n ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="vit">${d.showcase ? '🏛️ Retirer du musée' : '🏛️ Mettre au musée'}</button>` : ''}
-                        ${typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="gyro">📱 Gyroscope</button>` : ''}
+                        ${typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' && (matchMedia('(pointer: coarse)').matches || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) ? `<button class="btn-action" style="margin:0;flex:1;background:#2a2a40;" data-act="gyro">📱 Gyroscope</button>` : ''}
                     </div>
                     ${!d.canUpgrade && d.n ? `<div class="tl-hint" style="text-align:left;">✨ Avec 6 exemplaires, tu peux fusionner 5 doublons pour passer ta carte en Holo, puis Gold, puis Galaxie.</div>` : ''}`;
                 body.querySelectorAll('.ci-chips button').forEach(b => b.onclick = () => {
