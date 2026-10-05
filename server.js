@@ -1,5 +1,10 @@
 // AG_LOCAL_DB_V1 : avec DB_DIR (dossier sur un disque Render), Postgres tourne DANS le serveur : plus besoin de Neon.
 // L'ancienne adresse (DATABASE_URL) ne sert plus qu'à recopier les données au tout premier démarrage.
+if (process.env.DB_DIR) { // espaces, guillemets ou « / » oublié au début : on corrige (ex. « var/data/pg » → « /var/data/pg »)
+    let d = String(process.env.DB_DIR).trim().replace(/^['"]+|['"]+$/g, '').trim();
+    if (d && !d.startsWith('/')) d = '/' + d;
+    process.env.DB_DIR = d;
+}
 if (process.env.DB_DIR) {
     process.env.AG_IMPORT_URL = process.env.AG_IMPORT_URL || process.env.DATABASE_URL || '';
     // la base n'écoute que sur 127.0.0.1 (intérieur du serveur) et accepte ces connexions : pas de mot de passe à garder
