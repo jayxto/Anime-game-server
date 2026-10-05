@@ -24144,7 +24144,7 @@ setTimeout(() => fwRewards().catch(() => {}), 45000);
         if (mb > 420) console.warn(`[mémoire] ${mb} Mo utilisés, ${Object.keys(rooms).length} salons, ${io.engine.clientsCount} joueurs`);
     }, 5 * 60000).unref();
 })();
-app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0, db: LOCALDB.on ? { state: LOCALDB.state, onDisk: LOCALDB.onDisk, mount: LOCALDB.mount, diag: LOCALDB.diag, copiedThisBoot: !!LOCALDB.importedAt, copyStep: LOCALDB.state === 'importing' ? DBMOVE.step : undefined } : undefined }));
+app.get('/healthz', (req, res) => res.json({ ok: true, build: typeof SITE_BUILD !== 'undefined' ? SITE_BUILD : null, up: Math.round(process.uptime()), rooms: Object.keys(rooms).length, players: io.engine ? io.engine.clientsCount : 0, db: LOCALDB.on ? { state: LOCALDB.state, onDisk: LOCALDB.onDisk, copiedThisBoot: !!LOCALDB.importedAt, copyStep: LOCALDB.state === 'importing' ? DBMOVE.step : undefined } : undefined }));
 
 // Colorie le perso retiré du site : les anciens liens retombent sur un autre mini-jeu
 delete ARC_GAMES.couleur;
