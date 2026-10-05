@@ -12854,7 +12854,7 @@ async function startSimpleImageMigration() {
 
 // AG_IMG_MEM_CACHE_V1 : images déjà vérifiées gardées en mémoire (adresse versionnée ?v=… → contenu figé),
 // plus besoin de relire la base et de revérifier l'image à chaque affichage d'une carte.
-const IMG_MEM = new Map(); let IMG_MEM_BYTES = 0; const IMG_MEM_MAX = 48 * 1024 * 1024;
+const IMG_MEM = new Map(); let IMG_MEM_BYTES = 0; const IMG_MEM_MAX = 80 * 1024 * 1024;
 function imgMemPut(k, v) {
     if (IMG_MEM.has(k)) return;
     IMG_MEM.set(k, v); IMG_MEM_BYTES += v.bytes.length;
@@ -18482,7 +18482,18 @@ app.get('/api/avatar/search', (req, res) => {
 });
 // AG_AVATAR_DB_IMAGE_V1 — portraits already stored in PostgreSQL win over the legacy resolver,
 // which returns nothing for many catalogue characters (Berserk: Irvine, Isidro, Locus…).
+// AG_DB_SAVER_V1 : chaque affichage de carte interrogeait la base → résultat gardé 6 h en mémoire
+const AVATAR_ROUTE_CACHE = new Map();
 async function avatarStoredImageRoute(u, name) {
+    if (!HAS_DB) return null;
+    const ck = u + '|' + name, hit = AVATAR_ROUTE_CACHE.get(ck);
+    if (hit && Date.now() - hit.at < 6 * 3600 * 1000) return hit.v;
+    const v = await avatarStoredImageRouteDb(u, name);
+    if (AVATAR_ROUTE_CACHE.size > 50000) AVATAR_ROUTE_CACHE.clear();
+    AVATAR_ROUTE_CACHE.set(ck, { v, at: Date.now() });
+    return v;
+}
+async function avatarStoredImageRouteDb(u, name) {
     if (!HAS_DB) return null;
     try {
         const clean = cleanImageCharacterName(String(name || '').trim());
@@ -18508,7 +18519,7 @@ app.get('/api/avatar/img', async (req, res) => {
     if (!ARC_UNIVERSE_ANIME[u] || !requested) return res.status(404).end();
     const c = avatarFind(u, requested);
     const stored = await avatarStoredImageRoute(u, c ? c.display : requested) || (c && c.raw !== c.display ? await avatarStoredImageRoute(u, c.raw) : null);
-    if (stored) return res.redirect(stored);
+    if (stored) { res.set('Cache-Control', 'public, max-age=3600'); return res.redirect(stored); }
     const url = await arcCharImage(u, c ? c.raw : requested);
     if (!url) return res.status(404).end();
     // AG_CANONICAL_CHARACTER_IMAGE_V11 — DB-backed portraits are already same-origin.
@@ -20475,7 +20486,9 @@ async function kvGet(ns, k, def) {
     let v;
     if (HAS_DB) {
         await KV_READY;
-        try { const r = (await pool.query('SELECT v FROM hub_kv WHERE ns=$1 AND k=$2', [ns, String(k)])).rows[0]; if (r) v = r.v; } catch (_) {}
+        // AG_DB_SAVER_V1 : si la base ne répond pas, on n'invente PAS une valeur vide (elle écraserait ensuite
+        // les vraies données du joueur) : l'action échoue proprement et sera retentée plus tard.
+        const r = (await pool.query('SELECT v FROM hub_kv WHERE ns=$1 AND k=$2', [ns, String(k)])).rows[0]; if (r) v = r.v;
     }
     if (KV.has(key)) return KV.get(key); // chargé entre-temps par un autre appel
     if (v === undefined || v === null) v = def === undefined ? null : kvClone(def);
@@ -27620,9 +27633,10 @@ emitUser = function (uid, ev, data) {
     if (f && !userOnline(+uid)) { try { const [t, m] = f(data || {}); pushSend(+uid, t, m); } catch (_) {} }
 };
 // expéditions terminées + ouverture du marché noir (vérifié chaque minute)
+setTimeout(() => { kvList('expe').catch(() => {}); kvList('pushsub').catch(() => {}); }, 30000).unref(); // chargées une fois, ensuite tout se fait en mémoire
 setInterval(async () => {
     try {
-        for (const { k, v } of await kvList('expe')) {
+        for (const [key, v] of KV) { if (!key.startsWith('expe|')) continue; const k = key.slice(5);
             if (!v || !v.end || v.end > Date.now() || v.notified) continue;
             v.notified = true; await kvSet('expe', k, v);
             if (!userOnline(+k)) pushSend(+k, 'expe', { title: '🧭 Expédition terminée !', body: 'Tes cartes sont rentrées avec leur butin. Viens le récupérer !' });
@@ -27631,7 +27645,7 @@ setInterval(async () => {
             const day = parisDay();
             if (!(await kvGet('push', 'bm:' + day, null))) {
                 await kvSet('push', 'bm:' + day, 1);
-                for (const { k } of await kvList('pushsub')) pushSend(+k, 'market', { title: '🌙 Le marché noir est ouvert', body: 'Cartes rares à prix cassé jusqu’à minuit seulement !' });
+                for (const key of KV.keys()) if (key.startsWith('pushsub|')) pushSend(+key.slice(8), 'market', { title: '🌙 Le marché noir est ouvert', body: 'Cartes rares à prix cassé jusqu’à minuit seulement !' });
             }
         }
     } catch (e) { console.warn('[push] tâche :', e.message); }
