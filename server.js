@@ -1,4 +1,18 @@
+// AG_LOCAL_DB_V1 : avec DB_DIR (dossier sur un disque Render), Postgres tourne DANS le serveur : plus besoin de Neon.
+// L'ancienne adresse (DATABASE_URL) ne sert plus qu'à recopier les données au tout premier démarrage.
+if (process.env.DB_DIR) {
+    process.env.AG_IMPORT_URL = process.env.AG_IMPORT_URL || process.env.DATABASE_URL || '';
+    const fs0 = require('fs'), path0 = require('path'), crypto0 = require('crypto');
+    const dir0 = path0.resolve(process.env.DB_DIR), pwFile = path0.join(path0.dirname(dir0), '.' + path0.basename(dir0) + '-pass');
+    fs0.mkdirSync(path0.dirname(dir0), { recursive: true });
+    let pw = ''; try { pw = fs0.readFileSync(pwFile, 'utf8').trim(); } catch (_) {}
+    if (!pw) { pw = crypto0.randomBytes(18).toString('hex'); fs0.writeFileSync(pwFile, pw, { mode: 0o600 }); }
+    process.env.AG_LOCAL_PW = pw;
+    process.env.DATABASE_URL = `postgres://postgres:${pw}@127.0.0.1:${parseInt(process.env.DB_PORT, 10) || 5433}/postgres?sslmode=disable`;
+}
 const sharp = require('sharp');
+// AG_LOCAL_DB_V1 : moins de mémoire gardée par le traitement d'images (place pour la base intégrée)
+if (process.env.DB_DIR) { sharp.cache(false); sharp.concurrency(1); }
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -248,12 +262,88 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: process.env.DATABASE_URL ? pgSslFor(process.env.DATABASE_URL) : false,
     // AG_ASYNC_SAFE_V1 : une base lente ou coupée ne bloque plus les requêtes indéfiniment
-    max: 12,
+    max: process.env.DB_DIR ? 8 : 12,
     connectionTimeoutMillis: 10000,
     idleTimeoutMillis: 30000,
     query_timeout: 30000,
     keepAlive: true
 });
+globalThis.__agPool = pool;
+
+/* AG_LOCAL_DB_V1 — Postgres intégré (paquet embedded-postgres) dans DB_DIR.
+   Les requêtes attendent que la base soit prête. Premier démarrage : copie automatique depuis
+   l'ancienne base (AG_IMPORT_URL) ; si la copie échoue, le site reste sur l'ancienne base et réessaie au prochain démarrage. */
+const LOCALDB = { on: !!process.env.DB_DIR, state: process.env.DB_DIR ? 'starting' : 'off', error: null, restarts: 0, importedAt: null };
+let LOCALDB_PG = null, LOCALDB_FALLBACK = null, LOCALDB_STOPPING = false;
+for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { LOCALDB_STOPPING = true; });
+const LOCALDB_READY = process.env.DB_DIR ? (async () => {
+    const fsx = require('fs'), pathx = require('path');
+    const EmbeddedPostgres = (await import('embedded-postgres')).default; // module ESM : import dynamique (marche sur Node 20 et 22)
+    const dir = pathx.resolve(process.env.DB_DIR), marker = pathx.join(pathx.dirname(dir), '.' + pathx.basename(dir) + '-ready');
+    const importUrl = process.env.AG_IMPORT_URL;
+    const fresh = !fsx.existsSync(marker) || !fsx.existsSync(pathx.join(dir, 'PG_VERSION')); // dossier vide ou disque changé : on recopie
+    if (fresh && fsx.existsSync(dir)) fsx.rmSync(dir, { recursive: true, force: true }); // copie ratée la fois d'avant : on repart de zéro
+    const mk = () => new EmbeddedPostgres({
+        databaseDir: dir, user: 'postgres',
+        initdbFlags: ['--encoding=UTF8', '--locale-provider=builtin', '--builtin-locale=C.UTF-8', '--locale=C'], // UTF-8 sans dépendre des langues installées sur la machine
+        password: process.env.AG_LOCAL_PW, port: parseInt(process.env.DB_PORT, 10) || 5433, persistent: true,
+        createPostgresUser: typeof process.getuid === 'function' && process.getuid() === 0,
+        // réglages légers : le serveur Render Starter n'a que 512 Mo
+        postgresFlags: ['-c', 'listen_addresses=127.0.0.1', '-c', 'shared_buffers=32MB', '-c', 'max_connections=25', '-c', 'work_mem=4MB', '-c', 'maintenance_work_mem=32MB', '-c', 'effective_cache_size=128MB', '-c', 'max_wal_size=128MB', '-c', 'min_wal_size=32MB', '-c', 'log_min_messages=warning', '-c', 'timezone=UTC'],
+        onLog: m => { if (/FATAL|PANIC|ERROR/.test(m)) console.error('[postgres]', String(m).trim().slice(0, 400)); },
+        onError: e => console.error('[postgres]', e && e.message || e)
+    });
+    // un ancien Postgres encore vivant (serveur Node tué brutalement) garde le dossier : on l'arrête proprement d'abord
+    try {
+        const oldPid = parseInt(fsx.readFileSync(pathx.join(dir, 'postmaster.pid'), 'utf8').split('\n')[0], 10);
+        if (oldPid > 1) { process.kill(oldPid, 0); console.log('[base locale] arrêt de l’ancien Postgres', oldPid); process.kill(oldPid, 'SIGINT'); for (let i = 0; i < 60; i++) { await new Promise(r => setTimeout(r, 500)); try { process.kill(oldPid, 0); } catch (_) { break; } } }
+    } catch (_) {}
+    LOCALDB_PG = mk();
+    if (!fsx.existsSync(pathx.join(dir, 'PG_VERSION'))) { console.log('[base locale] création de la base dans', dir); await LOCALDB_PG.initialise(); }
+    await LOCALDB_PG.start();
+    // redémarrage automatique si le processus Postgres s'arrête tout seul
+    const watch = () => LOCALDB_PG.process && LOCALDB_PG.process.once('exit', code => {
+        if (LOCALDB_STOPPING) return;
+        LOCALDB.restarts++; console.error('[base locale] Postgres s’est arrêté (code', code, '), redémarrage…');
+        setTimeout(async function again() {
+            try { LOCALDB_PG.process = undefined; await LOCALDB_PG.start(); watch(); console.log('[base locale] Postgres relancé'); }
+            catch (e) { console.error('[base locale] relance impossible :', e && e.message); setTimeout(again, 5000); }
+        }, 1000);
+    });
+    watch();
+    if (fresh && importUrl) {
+        LOCALDB.state = 'importing';
+        console.log('[base locale] première mise en route : copie des données depuis l’ancienne base…');
+        const old = new Pool({ connectionString: importUrl, ssl: pgSslFor(importUrl), max: 3, connectionTimeoutMillis: 20000, query_timeout: 180000 });
+        old.on('error', () => {});
+        Object.assign(DBMOVE, { running: true, done: false, ok: false, step: 'Démarrage…', tables: [], error: null, startedAt: Date.now(), finishedAt: null });
+        await dbMoveRun({ src: old, dst: LOCAL_RAW, keepDst: true });
+        if (!DBMOVE.ok) {
+            LOCALDB.state = 'fallback'; LOCALDB.error = DBMOVE.error || DBMOVE.step;
+            console.error('[base locale] copie incomplète : le site reste sur l’ancienne base pour ce démarrage.', LOCALDB.error);
+            old.end().catch(() => {});
+            LOCALDB_FALLBACK = new Pool({ connectionString: importUrl, ssl: pgSslFor(importUrl), max: 12, connectionTimeoutMillis: 10000, idleTimeoutMillis: 30000, query_timeout: 30000, keepAlive: true });
+            LOCALDB_FALLBACK.on('error', err => console.error('[PG] connexion perdue :', err.message));
+            return;
+        }
+        old.end().catch(() => {});
+        LOCALDB.importedAt = Date.now();
+    }
+    fsx.writeFileSync(marker, new Date().toISOString());
+    LOCALDB.state = 'ready';
+    console.log('[base locale] prête ✅');
+})().catch(e => {
+    LOCALDB.state = 'error'; LOCALDB.error = e && e.message;
+    console.error('[base locale] impossible de démarrer :', e);
+    const u = process.env.AG_IMPORT_URL;
+    if (u && !LOCALDB_FALLBACK) { LOCALDB_FALLBACK = new Pool({ connectionString: u, ssl: pgSslFor(u), max: 12, connectionTimeoutMillis: 10000, query_timeout: 30000 }); LOCALDB_FALLBACK.on('error', () => {}); console.error('[base locale] le site continue sur l’ancienne base.'); }
+}) : null;
+// accès direct (sans attente) pour la copie initiale
+const LOCAL_RAW = { query: (...a) => _poolQueryRaw(...a), end: async () => {} };
+const _poolQueryRaw = pool.query.bind(pool);
+if (LOCALDB_READY) pool.query = async function (...a) { await LOCALDB_READY; return (LOCALDB_FALLBACK || { query: _poolQueryRaw }).query(...a); };
+async function localDbStop() { if (!LOCALDB_PG) return; LOCALDB_STOPPING = true; try { await pool.end(); } catch (_) {} try { await LOCALDB_PG.stop(); } catch (_) {} }
+
 
 async function initDb() {
     await pool.query(`
@@ -12863,7 +12953,7 @@ async function startSimpleImageMigration() {
 
 // AG_IMG_MEM_CACHE_V1 : images déjà vérifiées gardées en mémoire (adresse versionnée ?v=… → contenu figé),
 // plus besoin de relire la base et de revérifier l'image à chaque affichage d'une carte.
-const IMG_MEM = new Map(); let IMG_MEM_BYTES = 0; const IMG_MEM_MAX = 80 * 1024 * 1024;
+const IMG_MEM = new Map(); let IMG_MEM_BYTES = 0; const IMG_MEM_MAX = (process.env.DB_DIR ? 40 : 80) * 1024 * 1024; // base intégrée : relire une image coûte peu
 function imgMemPut(k, v) {
     if (IMG_MEM.has(k)) return;
     IMG_MEM.set(k, v); IMG_MEM_BYTES += v.bytes.length;
@@ -24012,7 +24102,7 @@ setTimeout(() => fwRewards().catch(() => {}), 45000);
         if (stopping) return; stopping = true;
         console.log('[arrêt] mise à jour en cours, on prévient les joueurs');
         try { io.emit('announce', { text: '🔧 Mise à jour du site : reconnexion automatique dans quelques secondes…', kind: 'admin' }); } catch (_) {}
-        setTimeout(() => { try { io.close(); } catch (_) {} process.exit(0); }, 2500);
+        setTimeout(async () => { try { io.close(); } catch (_) {} await Promise.race([localDbStop(), new Promise(r => setTimeout(r, 8000))]); process.exit(0); }, 2500); // AG_LOCAL_DB_V1 : base arrêtée proprement
     });
     // 5. surveillance de la mémoire (visible dans les logs Render)
     setInterval(() => {
@@ -28529,7 +28619,8 @@ const dbHost = url => { try { return new URL(url).hostname; } catch (_) { return
 const qi = n => '"' + String(n).replace(/"/g, '""') + '"';
 async function dbMoveRun(opts = {}) {
     const target = process.env.NEW_DATABASE_URL;
-    const dst = new Pool({ connectionString: target, ssl: pgSslFor(target), max: 3, connectionTimeoutMillis: 20000, query_timeout: 180000 });
+    const pool = opts.src || globalThis.__agPool; // AG_LOCAL_DB_V1 : source et cible au choix
+    const dst = opts.dst || new Pool({ connectionString: target, ssl: pgSslFor(target), max: 3, connectionTimeoutMillis: 20000, query_timeout: 180000 });
     const log = m => { DBMOVE.step = m; console.log('[transfert base]', m); };
     const wasMaint = SITE.maintenance ? Object.assign({}, SITE.maintenance) : null;
     try {
@@ -28611,11 +28702,11 @@ async function dbMoveRun(opts = {}) {
         if (opts.maintenance) SITE.maintenance = wasMaint || { on: false, msg: '' };
     } finally {
         DBMOVE.running = false; DBMOVE.done = true; DBMOVE.finishedAt = Date.now();
-        dst.end().catch(() => {});
+        if (!opts.keepDst) dst.end().catch(() => {});
     }
 }
 app.get('/api/admin/dbmove', adminOnly(async (req, res) => {
-    res.json({ ok: true, current: dbHost(process.env.DATABASE_URL), target: dbHost(process.env.NEW_DATABASE_URL), ready: !!process.env.NEW_DATABASE_URL && process.env.NEW_DATABASE_URL !== process.env.DATABASE_URL, state: DBMOVE });
+    res.json({ ok: true, local: { state: LOCALDB.state, error: LOCALDB.error, restarts: LOCALDB.restarts, importedAt: LOCALDB.importedAt }, current: LOCALDB.state === 'ready' ? 'base intégrée au serveur (disque Render)' : (LOCALDB_FALLBACK ? 'Neon (secours)' : dbHost(process.env.DATABASE_URL)), target: dbHost(process.env.NEW_DATABASE_URL), ready: !!process.env.NEW_DATABASE_URL && process.env.NEW_DATABASE_URL !== process.env.DATABASE_URL, state: DBMOVE });
 }));
 app.post('/api/admin/dbmove', adminOnly(async (req, res) => {
     if (!process.env.NEW_DATABASE_URL) return res.json({ ok: false, error: 'Ajoute d’abord la variable NEW_DATABASE_URL (adresse de la nouvelle base) sur Render.' });

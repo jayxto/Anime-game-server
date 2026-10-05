@@ -3833,15 +3833,20 @@ body.ag-game-page #app-root > #mode,
             <div id="adm-give-res" class="tl-hint" style="text-align:left;margin-top:6px;"></div>
         </div>
         <div class="opt-panel" id="adm-dbmove">
-            <h2>🗄️ Transférer la base de données vers Render</h2>
+            <h2>🗄️ Base de données dans le serveur Render (sans Neon)</h2>
+            <p class="tl-hint" style="text-align:left;margin:0 0 6px;"><b>Méthode simple (conseillée, sans abonnement en plus) :</b></p>
             <ol class="tl-hint" style="text-align:left;line-height:1.7;margin:0 0 8px 18px;padding:0;">
-                <li>Sur <b>dashboard.render.com</b> : <b>New +</b> → <b>Postgres</b> → même région que ton jeu → offre payante la moins chère → <b>Create</b>.</li>
-                <li>Dans la nouvelle base, copie l’<b>Internal Database URL</b>.</li>
-                <li>Dans ton service du jeu → <b>Environment</b> → ajoute <code>NEW_DATABASE_URL</code> = l’adresse copiée → <b>Save</b> (le jeu redémarre).</li>
-                <li>Reviens ici et clique sur <b>Transférer</b>. Attends le ✅.</li>
-                <li>Dans <b>Environment</b> : remplace la valeur de <code>DATABASE_URL</code> par la même adresse, supprime <code>NEW_DATABASE_URL</code> → <b>Save</b>.</li>
-                <li>Vérifie que tout marche, puis supprime le projet sur Neon quelques jours plus tard.</li>
+                <li>Sur <b>dashboard.render.com</b>, ouvre ton service du jeu → <b>Disks</b> → <b>Add Disk</b> : nom <code>data</code>, chemin <code>/var/data</code>, taille <b>2 Go</b> (environ 0,50 $ par mois) → <b>Save</b>.</li>
+                <li>Dans <b>Environment</b> : ajoute <code>DB_DIR</code> = <code>/var/data/pg</code> → <b>Save</b>. Ne touche pas à <code>DATABASE_URL</code>.</li>
+                <li>Le jeu redémarre et recopie tout seul les données de Neon (1 à 2 minutes). Ci-dessous, « Base intégrée » passe à ✅.</li>
+                <li>Vérifie que tout marche, puis supprime <code>DATABASE_URL</code> dans <b>Environment</b> et supprime le projet Neon.</li>
             </ol>
+            <details class="tl-hint" style="text-align:left;margin-bottom:8px;"><summary>Autre méthode : vers une autre base Postgres (NEW_DATABASE_URL)</summary>
+            <ol style="line-height:1.7;margin:6px 0 0 18px;padding:0;">
+                <li>Crée la base, copie son adresse interne, ajoute <code>NEW_DATABASE_URL</code> dans <b>Environment</b>.</li>
+                <li>Clique sur <b>Transférer</b> ci-dessous et attends le ✅.</li>
+                <li>Remplace <code>DATABASE_URL</code> par cette adresse et supprime <code>NEW_DATABASE_URL</code>.</li>
+            </ol></details>
             <div id="adm-dbmove-st" class="tl-hint" style="text-align:left;">Chargement…</div>
             <label style="display:block;margin:6px 0;font-size:.85rem;"><input type="checkbox" id="adm-dbmove-maint" checked> 🔧 Mettre le site en maintenance pendant la copie (conseillé : rien n’est perdu)</label>
             <button class="btn-action" style="margin-top:0;background:#00b36b;" onclick="adminDbMove()">🚚 Transférer la base</button>
@@ -17529,10 +17534,11 @@ async function loadHallOfFame(){
         async function refresh() {
             const st = document.getElementById('adm-dbmove-st'); if (!st || !st.offsetParent) return;
             const d = await v7get('/api/admin/dbmove'); if (!d || !d.ok) { st.textContent = 'Réservé aux admins.'; return; }
-            st.innerHTML = `Base actuelle : <b>${esc(d.current || '—')}</b><br>Nouvelle base : <b>${d.target ? esc(d.target) : '❌ pas encore configurée (étape 3)'}</b>`;
+            const L = d.local || {}, LS = { ready: '✅ prête, les données sont dans le serveur', importing: '⏳ copie des données depuis Neon…', starting: '⏳ démarrage…', fallback: '⚠️ copie ratée : le site tourne encore sur Neon (nouvel essai au prochain redémarrage)', error: '❌ ne démarre pas : le site tourne sur Neon', off: 'pas activée (ajoute DB_DIR)' };
+            st.innerHTML = `Base intégrée : <b>${esc(LS[L.state] || L.state || '—')}</b>${L.error ? '<br><small>' + esc(L.error) + '</small>' : ''}${L.restarts ? '<br><small>Relances automatiques : ' + L.restarts + '</small>' : ''}<br>Base actuelle : <b>${esc(d.current || '—')}</b><br>Nouvelle base : <b>${d.target ? esc(d.target) : '—'}</b>`;
             const s = d.state, pr = document.getElementById('adm-dbmove-prog');
             if (pr && (s.running || s.done)) pr.innerHTML = `<b>${esc(s.step)}</b>` + (s.tables.length ? `<table style="width:100%;margin-top:6px;border-collapse:collapse;">${s.tables.map(t => `<tr style="border-top:1px solid #222;"><td>${t.done ? (t.src === t.dst ? '✅' : '⚠️') : '⏳'} ${esc(t.name)}</td><td style="text-align:right;">${t.dst} / ${t.src == null ? '?' : t.src}</td></tr>`).join('')}</table>` : '');
-            clearTimeout(timer); if (s.running) timer = setTimeout(refresh, 2000);
+            clearTimeout(timer); if (s.running || ['importing', 'starting'].includes(L.state)) timer = setTimeout(refresh, 2000);
         }
         window.adminDbMove = async function () {
             if (!confirm('Copier toute la base actuelle vers la nouvelle base ? (l’ancienne n’est pas modifiée)')) return;
