@@ -27023,8 +27023,9 @@ app.post('/api/cards/expedition', async (req, res) => {
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 3) return res.json({ ok: false, error: 'Choisis 3 cartes.' });
     const power = team.reduce((a, c) => a + cardPower(c), 0);
-    await kvSet('expe', String(uid), { keys, start: Date.now(), end: Date.now() + EXPE_MS, power });
-    res.json({ ok: true, end: Date.now() + EXPE_MS, power });
+    const expeMs = Math.round(EXPE_MS * (1 - 0.08 * (await talentRank(uid, 'explorateur')))); // talent Explorateur
+    await kvSet('expe', String(uid), { keys, start: Date.now(), end: Date.now() + expeMs, power });
+    res.json({ ok: true, end: Date.now() + expeMs, power });
 });
 
 // ---------- musées à visiter + likes ----------
@@ -27348,7 +27349,8 @@ app.post('/api/cards/survival/start', async (req, res) => {
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 5) return res.json({ ok: false, error: 'Choisis 5 cartes de ta collection.' });
-    team.forEach(c => { c.power = cardPower(c); c.hp = c.max = c.power * 4; delete c.imgs; });
+    const talPow = 1 + 0.04 * (await talentRank(uid, 'survivant')); // talent Survivant
+    team.forEach(c => { c.power = Math.round(cardPower(c) * talPow); c.hp = c.max = c.power * 4; delete c.imgs; });
     s.runs++; s.run = { team, floor: 1, mult: s.runs <= SURV_FULL ? 1 : 0.5, avg: Math.round(team.reduce((a, c) => a + c.power, 0) / 5), earned: { coins: 0, dust: 0, potions: 0, secrets: 0 } };
     await kvSet('surv', String(uid), s);
     res.json({ ok: true, run: s.run });
@@ -27784,3 +27786,121 @@ app.get('/api/calendar', async (req, res) => {
     const daily = [{ emoji: '🌙', title: 'Marché noir', text: 'Tous les soirs de 23 h à minuit' }, { emoji: '🌌', title: 'Cartes de Minuit', text: 'Seulement entre minuit et 6 h' }, { emoji: '🗺️', title: 'Chasse au trésor', text: 'Un nouveau 🃏 caché chaque jour' }];
     res.json({ ok: true, today: calDay(now), current: cur, daily, events: ev });
 });
+
+
+/* =====================================================================
+   AG_TALENTS_V1 — arbre de talents : 1 point par niveau de compte (les points gagnés avant
+   un prestige restent acquis), à placer dans des bonus permanents.
+   ===================================================================== */
+const TALENTS = [
+    // rang 1 : ouvert tout de suite
+    { id: 'fortune', row: 1, emoji: '💰', name: 'Fortune', per: 4, unit: '% de pièces en fin de partie', max: 5 },
+    { id: 'erudit', row: 1, emoji: '📚', name: 'Érudit', per: 5, unit: '% d’XP de compte', max: 5 },
+    { id: 'chance', row: 1, emoji: '🍀', name: 'Chance', per: 3, unit: '% de chances aux raretés spéciales', max: 5 },
+    // rang 2 : 5 points placés
+    { id: 'brillance', row: 2, emoji: '✨', name: 'Brillance', per: 6, unit: '% de chances de carte brillante', max: 5 },
+    { id: 'poussiere', row: 2, emoji: '🌌', name: 'Poussière d’étoile', per: 8, unit: '% de poussière ✨ gagnée', max: 5 },
+    { id: 'explorateur', row: 2, emoji: '🧭', name: 'Explorateur', per: 8, unit: '% de durée en moins pour les expéditions', max: 5 },
+    // rang 3 : 12 points placés
+    { id: 'bonus', row: 3, emoji: '🃏', name: 'Carte bonus', per: 2, unit: '% de chances d’une carte en plus par booster', max: 5 },
+    { id: 'survivant', row: 3, emoji: '🛡️', name: 'Survivant', per: 4, unit: '% de puissance dans la tour (mode survie)', max: 5 }
+];
+const TAL_BY_ID = Object.fromEntries(TALENTS.map(t => [t.id, t]));
+const TAL_ROW_NEED = { 1: 0, 2: 5, 3: 12 };
+const TAL_RESET_COST = 500;
+async function talentGet(uid) { return kvGet('talents', String(uid), { ranks: {}, resets: 0 }); }
+async function talentRank(uid, id) { if (!uid) return 0; try { const t = await talentGet(uid); return Math.min((TAL_BY_ID[id] || {}).max || 0, +(t.ranks || {})[id] || 0); } catch (_) { return 0; } }
+async function talentPoints(uid) {
+    const lvl = levelFromXp(await userXp(uid)).level, pr = PRESTIGE.get(+uid) || 0;
+    return Math.max(0, lvl - 1) + pr * (PRESTIGE_LEVEL - 1);
+}
+const talSpent = t => Object.values(t.ranks || {}).reduce((a, b) => a + (+b || 0), 0);
+async function talentView(uid) {
+    const t = await talentGet(uid), total = await talentPoints(uid), spent = talSpent(t);
+    return { total, spent, free: Math.max(0, total - spent), ranks: t.ranks || {}, resetCost: t.resets ? TAL_RESET_COST : 0, rowNeed: TAL_ROW_NEED,
+        talents: TALENTS.map(x => ({ ...x, rank: +(t.ranks || {})[x.id] || 0 })) };
+}
+app.get('/api/talents', async (req, res) => { const uid = needUid(req, res); if (!uid) return; res.json({ ok: true, ...(await talentView(uid)) }); });
+const TAL_LOCK = new Set();
+app.post('/api/talents', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    if (TAL_LOCK.has(uid)) return res.json({ ok: false, error: 'Patiente une seconde…' });
+    TAL_LOCK.add(uid);
+    try {
+        const b = req.body || {}, t = await talentGet(uid); t.ranks = t.ranks || {};
+        if (b.action === 'reset') {
+            if (!talSpent(t)) return res.json({ ok: false, error: 'Aucun point placé.' });
+            if (t.resets) { const err = await mkPayCoins(uid, TAL_RESET_COST); if (err) return res.json({ ok: false, error: err }); }
+            t.ranks = {}; t.resets = (t.resets || 0) + 1;
+            await kvSet('talents', String(uid), t);
+            return res.json({ ok: true, ...(await talentView(uid)) });
+        }
+        const x = TAL_BY_ID[String(b.id || '')]; if (!x) return res.json({ ok: false, error: 'Talent inconnu.' });
+        const cur = +t.ranks[x.id] || 0, spent = talSpent(t), total = await talentPoints(uid);
+        if (cur >= x.max) return res.json({ ok: false, error: 'Ce talent est déjà au maximum.' });
+        if (spent >= total) return res.json({ ok: false, error: 'Plus de points : monte de niveau en jouant pour en gagner.' });
+        if (spent < TAL_ROW_NEED[x.row]) return res.json({ ok: false, error: `Place d’abord ${TAL_ROW_NEED[x.row]} points pour débloquer cette rangée.` });
+        t.ranks[x.id] = cur + 1;
+        await kvSet('talents', String(uid), t);
+        res.json({ ok: true, ...(await talentView(uid)) });
+    } finally { TAL_LOCK.delete(uid); }
+});
+// 💰 Fortune + 📚 Érudit : bonus en fin de partie (même calcul de base que les gains normaux)
+const _progRecordTalents = progRecord;
+progRecord = async function (room, mode, universe, entries) {
+    const r = await _progRecordTalents(room, mode, universe, entries);
+    for (const e of entries || []) {
+        const p = e.player; if (!p || !p.userId) continue;
+        try {
+            const fo = await talentRank(p.userId, 'fortune'), er = await talentRank(p.userId, 'erudit');
+            if (fo) {
+                const base = (10 + (e.won ? 20 : 0) + Math.min(30, Math.round(Math.max(0, e.points || 0) / 80))) * hubMult();
+                const extra = Math.round(base * fo * TAL_BY_ID.fortune.per / 100);
+                if (extra > 0) { const total = await ecoAddCoins(p.userId, extra); io.to(p.id).emit('coins_gain', { gain: extra, total, why: 'talent Fortune' }); }
+            }
+            if (er && HAS_DB) {
+                const xb = (15 + (e.won ? 25 : 0) + Math.min(40, Math.round(Math.max(0, e.points || 0) / 40))) * hubMult();
+                const add = Math.round(xb * er * TAL_BY_ID.erudit.per / 100);
+                if (add > 0) await pool.query('UPDATE users SET xp = xp + $1 WHERE id = $2', [add, p.userId]);
+            }
+        } catch (err) { console.warn('[talents] fin de partie', err.message); }
+    }
+    return r;
+};
+// 🍀 Chance
+const _cardLuckTalents = cardLuck;
+cardLuck = async function (uid) { const l = await _cardLuckTalents(uid); const r = uid ? await talentRank(uid, 'chance') : 0; return r ? l * (1 + r * TAL_BY_ID.chance.per / 100) : l; };
+// ✨ Brillance
+const _cardAwardTalents = cardAward;
+cardAward = async function (p, u, name, opts) {
+    const r = p && p.userId ? await talentRank(p.userId, 'brillance') : 0;
+    if (!r) return _cardAwardTalents(p, u, name, opts);
+    const o = Object.assign({}, opts || {});
+    o.shinyRate = Math.min(0.9, (o.shinyRate || 1 / 12) * (1 + r * TAL_BY_ID.brillance.per / 100));
+    return _cardAwardTalents(p, u, name, o);
+};
+// 🌌 Poussière d'étoile (gains uniquement, jamais les dépenses)
+const _dustAddTalents = dustAdd;
+dustAdd = async function (uid, n) { if (n > 0) { const r = await talentRank(uid, 'poussiere'); if (r) n = Math.round(n * (1 + r * TAL_BY_ID.poussiere.per / 100)); } return _dustAddTalents(uid, n); };
+// 🃏 Carte bonus
+async function talBonusCard(uid, cards, inner) {
+    if (!uid || !Array.isArray(cards)) return cards;
+    const r = await talentRank(uid, 'bonus');
+    if (r && Math.random() < r * TAL_BY_ID.bonus.per / 100) { try { const x = await inner(); if (Array.isArray(x) && x[0]) { x[0].talentBonus = true; cards.push(x[0]); } } catch (_) {} }
+    return cards;
+}
+const _openBoosterTalents = openBooster;
+// carte tirée directement (ne consomme pas les potions actives, contrairement à un vrai booster)
+async function talDrawOne(uid) {
+    const us = arcUniverses();
+    for (let t = 0; t < 10; t++) {
+        const u = us[Math.floor(Math.random() * us.length)], list = cardPool(u); if (!list.length) continue;
+        const idx = Math.min(list.length - 1, Math.floor(Math.pow(Math.random(), 1.6) * list.length));
+        const c = await cardAward({ userId: uid, id: null }, u, list[idx].display, { silent: true });
+        if (c) return [c];
+    }
+    return [];
+}
+openBooster = async function (uid, n, type = '') { const c = await _openBoosterTalents(uid, n, type); return type === 'admin' ? c : talBonusCard(uid, c, () => talDrawOne(uid)); };
+const _tbOpenTalents = tbOpen;
+tbOpen = async function (uid, b, chosenU) { const c = await _tbOpenTalents(uid, b, chosenU); return talBonusCard(uid, c, () => talDrawOne(uid)); };

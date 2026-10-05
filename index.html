@@ -3875,7 +3875,7 @@ body.ag-game-page #app-root > #mode,
     <section id="collection" class="tab-content">
         <div class="opt-panel" style="max-width:900px;">
             <div class="eco-tabs"><button data-t="shop" class="on" onclick="ecoTab('shop')">🛒 Boutique</button><button data-t="album" onclick="ecoTab('album')">📖 Albums</button><button data-t="titles" onclick="ecoTab('titles')">🏷️ Titres</button><button data-t="challenges" onclick="ecoTab('challenges')">⚔️ Défis</button><button data-t="pass" onclick="ecoTab('pass')">🎟️ Pass</button><button data-t="trade" onclick="ecoTab('trade')">🔁 Échanges</button><button data-t="fuse" onclick="ecoTab('fuse')">⚗️ Fusion</button><button data-t="clan" onclick="ecoTab('clan')">🛡️ Clan</button><button data-t="stats" onclick="ecoTab('stats')">📊 Stats</button><button data-t="deck" onclick="ecoTab('deck')">🎴 Deck</button><button data-t="market" onclick="ecoTab('market')">🏪 Marché</button><button data-t="museum" onclick="ecoTab('museum')">🏛️ Musée</button></div>
-            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button><button onclick="cp6Survival()">🛡️ Mode survie</button><button onclick="calOpen()">📅 Calendrier</button><button onclick="cp6Potion()" id="cp6-pot-btn">🧪 Potions & alambic</button></div>
+            <div id="cards-plus-bar" class="cp-bar"><button onclick="cpDuelOpen()">⚔️ Duel de cartes</button><button onclick="cpLbOpen()">🏆 Collectionneurs</button><button onclick="cpChOpen()">🎯 Défis de deck</button><button onclick="cpBinderOpen()">📖 Classeur</button><button onclick="cpSurpriseOpen()">🎁 Échanges surprise</button><button onclick="cp2Mystery()" id="cp2-mys">🎁 Mystery Box</button><button onclick="cp2Secret()">🔐 Albums secrets</button><button onclick="cp2Records()">📜 Livre des records</button><button onclick="cp3Recycle()">♻️ Recyclage</button><button onclick="cp3Month()">🗓️ Carte du mois</button><button onclick="cp4Wheel()">🎡 Roue de la fortune</button><button onclick="cp4Fusions()">🔗 Fusions</button><button onclick="cp5Expe()">🧭 Expéditions</button><button onclick="cp5Museums()">🏛️ Musées</button><button onclick="cp5Market()">🌙 Marché noir</button><button onclick="cp5Raid()">🐉 Raid légendaire</button><button onclick="cp5Quiz()">🧠 Quiz carte</button><button onclick="cp5Frames()">🖼️ Cadres</button><button onclick="cp5Champion()">🏆 Champion du mois</button><button onclick="cp6Survival()">🛡️ Mode survie</button><button onclick="talOpen()" id="tal-btn">🌳 Talents</button><button onclick="calOpen()">📅 Calendrier</button><button onclick="cp6Potion()" id="cp6-pot-btn">🧪 Potions & alambic</button></div>
             <div id="eco-shop"></div>
             <div id="eco-album" style="display:none;"></div>
             <div id="eco-titles" style="display:none;"></div>
@@ -17074,7 +17074,7 @@ async function loadHallOfFame(){
                 : st === 'na' ? (isIOS && !standalone() ? 'Sur iPhone : installe d’abord l’appli, puis active les notifications depuis l’appli.' : 'Ton navigateur ne gère pas les notifications.')
                 : `<button class="btn-action" style="width:auto;margin:8px 0 0;" onclick="pushEnable()">🔔 Activer les notifications</button>`}
                 ${d && d.ok ? `<div style="margin-top:8px;">${Object.entries(d.types).map(([k, l]) => `<label class="ag-sw"><span>${esc(l)}</span><input type="checkbox" data-pp="${k}" ${d.prefs[k] ? 'checked' : ''}></label>`).join('')}</div>` : ''}</div>
-                <button class="btn-action" style="width:auto;margin:4px 0 0;background:#1f3a5a;" onclick="calOpen()">📅 Calendrier des événements</button>`;
+                <button class="btn-action" style="width:auto;margin:4px 0 0;background:#1f3a5a;" onclick="calOpen()">📅 Calendrier des événements</button> <button class="btn-action" style="width:auto;margin:4px 0 0;background:#1f5a3a;" onclick="talOpen()">🌳 Arbre de talents</button>`;
             p.querySelectorAll('[data-pp]').forEach(i => i.onchange = () => v7post('/api/push/prefs', { prefs: { [i.dataset.pp]: i.checked } }));
         }
         window.appPanelDraw = appPanelDraw;
@@ -17112,6 +17112,57 @@ async function loadHallOfFame(){
                 <h3 style="margin:12px 0 4px;">🔁 Tous les jours</h3>${d.daily.map(item).join('')}
                 <h3 style="margin:12px 0 4px;">🗓️ Les 2 prochaines semaines</h3>${Object.keys(byDay).sort().map(k => `<div class="cal-day">${dayLbl(k)}</div>${byDay[k].map(item).join('')}`).join('')}`;
         };
+    })();
+    </script>
+    <style>
+        /* AG_TALENTS_V1 */
+        .tal-row{border:1px solid #2c2c44;border-radius:12px;padding:8px;margin:8px 0;background:#10132a;}
+        .tal-row.locked{opacity:.55;}
+        .tal-row h4{margin:0 0 6px;font-size:.85rem;color:var(--text-muted);}
+        .tal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:8px;}
+        .tal-n{background:#171b3d;border:2px solid #2f3566;border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;gap:3px;}
+        .tal-n.max{border-color:#ffd700;box-shadow:0 0 12px rgba(255,215,0,.35);}
+        .tal-n .e{font-size:1.8rem;} .tal-n small{color:var(--text-muted);font-size:.74rem;min-height:30px;}
+        .tal-dots{letter-spacing:3px;color:#3a3f6b;} .tal-dots b{color:#00e676;}
+        .tal-n button{border:0;border-radius:8px;padding:6px;font-weight:800;cursor:pointer;background:#00b36b;color:#fff;} .tal-n button:disabled{background:#2a2d4a;color:#777;cursor:default;}
+        #tal-btn.has{box-shadow:0 0 0 2px #00e676;}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        function modal(title, html) {
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>${title}</span><button>✖</button></div><div class="cp-body" style="position:relative;">${html}</div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove();
+            m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            return m.querySelector('.cp-body');
+        }
+        const err = r => toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+        const ROWS = { 1: '🌱 Rangée 1', 2: '🌿 Rangée 2', 3: '🌳 Rangée 3' };
+        function badge(d) { const b = document.getElementById('tal-btn'); if (b && d) { b.textContent = d.free ? `🌳 Talents (${d.free} point${d.free > 1 ? 's' : ''} !)` : '🌳 Talents'; b.classList.toggle('has', d.free > 0); } }
+        function draw(body, d) {
+            badge(d);
+            body.innerHTML = `<div class="cp6-stats" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;"><span style="background:#14183a;border-radius:99px;padding:3px 10px;">⭐ Points gagnés : <b>${d.total}</b></span><span style="background:#14183a;border-radius:99px;padding:3px 10px;">🟢 À placer : <b>${d.free}</b></span></div>
+                <p class="tl-hint" style="margin:6px 0;">Tu gagnes <b>1 point par niveau</b> de compte (les points restent après un prestige). Place-les dans des bonus permanents. Plus tu places de points, plus de rangées se débloquent.</p>
+                ${[1, 2, 3].map(row => { const locked = d.spent < d.rowNeed[row]; return `<div class="tal-row${locked ? ' locked' : ''}"><h4>${ROWS[row]}${locked ? ` 🔒 (place ${d.rowNeed[row]} points pour débloquer)` : ''}</h4><div class="tal-grid">${d.talents.filter(t => t.row === row).map(t => `
+                    <div class="tal-n${t.rank >= t.max ? ' max' : ''}"><span class="e">${t.emoji}</span><b>${esc(t.name)}</b><small>+${t.per * Math.max(1, t.rank)}${esc(t.unit)}${t.rank ? '' : ' (au 1er point)'}</small>
+                    <span class="tal-dots">${'●'.repeat(t.max).split('').map((c, i) => i < t.rank ? '<b>●</b>' : '●').join('')}</span>
+                    <button data-t="${t.id}" ${t.rank >= t.max || !d.free || locked ? 'disabled' : ''}>${t.rank >= t.max ? 'MAX' : '+1'}</button></div>`).join('')}</div></div>`; }).join('')}
+                <div style="text-align:center;margin-top:8px;"><button class="btn-action" id="tal-reset" style="width:auto;background:#3a1f2b;" ${d.spent ? '' : 'disabled'}>♻️ Réinitialiser ${d.resetCost ? `(${d.resetCost} 🪙)` : '(gratuit la 1re fois)'}</button></div>`;
+            body.querySelectorAll('[data-t]').forEach(b => b.onclick = async () => { b.disabled = true; const r = await v7post('/api/talents', { id: b.dataset.t }); if (!r || !r.ok) { err(r); b.disabled = false; return; } draw(body, r); });
+            body.querySelector('#tal-reset').onclick = async () => { if (!confirm(`Récupérer tous tes points${d.resetCost ? ` pour ${d.resetCost} 🪙` : ' (gratuit cette fois)'} ?`)) return; const r = await v7post('/api/talents', { action: 'reset' }); if (!r || !r.ok) return err(r); toast('♻️ Points récupérés !', '#7fc8ff'); if (typeof eco !== 'undefined' && r.coins != null) { eco.coins = r.coins; ecoCoinsUi(); } draw(body, r); };
+        }
+        window.talOpen = async function () {
+            if (!(typeof isAccount === 'function' && isAccount())) return toast('Connecte-toi à un compte.', 'var(--accent-yellow)');
+            const body = modal('🌳 Arbre de talents', 'Chargement…');
+            const d = await v7get('/api/talents'); if (!d || !d.ok) { body.textContent = 'Indisponible.'; return; }
+            draw(body, d);
+        };
+        const refresh = async () => { if (typeof isAccount === 'function' && isAccount()) { const d = await v7get('/api/talents'); if (d && d.ok) badge(d); } };
+        socket.on('connect', () => setTimeout(refresh, 2500)); setTimeout(refresh, 4000);
+        setInterval(() => { const b = document.getElementById('tal-btn'); if (b && b.offsetParent && !document.hidden) refresh(); }, 120000);
     })();
     </script>
 </body>
