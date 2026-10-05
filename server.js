@@ -28429,3 +28429,81 @@ app.get('/api/qr', async (req, res) => {
     if (!svg) { try { svg = await QRCODE.toString(d, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }); } catch (_) { return res.status(400).end(); } if (QR_CACHE.size > 500) QR_CACHE.clear(); QR_CACHE.set(d, svg); }
     res.type('image/svg+xml').set('Cache-Control', 'public, max-age=86400').send(svg);
 });
+
+/* =====================================================================
+   AG_TV_PLUS_V1 — mots secrets de l'Undercover protégés (chaque joueur ne reçoit que le sien),
+   TV pour le blind test et l'Undercover, équipes sur la TV, catégories de « Tu préfères ».
+   ===================================================================== */
+// ---------- 1. mots secrets : on ne les envoie qu'à leur propriétaire (révélés à tous en fin de partie) ----------
+function scrubSecretsFor(payload, sid) {
+    const scrubRoom = r => (r && Array.isArray(r.players) && r.players.some(p => p && p.secretData))
+        ? Object.assign({}, r, { players: r.players.map(p => (p && p.id !== sid && (p.secretData || p.isImpostor != null)) ? Object.assign({}, p, { secretData: p.secretData ? '' : p.secretData, isImpostor: undefined }) : p) })
+        : r;
+    if (!payload || typeof payload !== 'object' || payload.gameOver === true) return payload;
+    if (Array.isArray(payload.players)) return scrubRoom(payload);
+    if (payload.room && Array.isArray(payload.room.players)) return Object.assign({}, payload, { room: scrubRoom(payload.room) });
+    return payload;
+}
+const hasSecrets = p => !!(p && typeof p === 'object' && p.gameOver !== true && ((Array.isArray(p.players) && p.players.some(x => x && x.secretData)) || (p.room && Array.isArray(p.room.players) && p.room.players.some(x => x && x.secretData))));
+io.use((socket, next) => { // envoi direct à un joueur
+    const _emit = socket.emit.bind(socket);
+    socket.emit = (ev, ...args) => (hasSecrets(args[0]) ? _emit(ev, scrubSecretsFor(args[0], socket.id), ...args.slice(1)) : _emit(ev, ...args));
+    next();
+});
+{ // envoi à tout un salon : une copie par joueur
+    const _ioTo = io.to.bind(io);
+    io.to = function (target) {
+        const op = _ioTo(target), _emit = op.emit.bind(op);
+        op.emit = (ev, ...args) => {
+            if (!hasSecrets(args[0]) || Array.isArray(target)) return _emit(ev, ...args);
+            const ids = io.sockets.adapter.rooms.get(target);
+            if (!ids) return _emit(ev, ...args); // cible = un seul socket (id)
+            for (const sid of ids) { const s = io.sockets.sockets.get(sid); if (s) s.emit(ev, args[0], ...args.slice(1)); }
+            return true;
+        };
+        return op;
+    };
+}
+// ---------- 2. TV : blind test + Undercover ----------
+const _tvRoomInfoPlus = tvRoomInfo;
+tvRoomInfo = function (code) {
+    const info = _tvRoomInfoPlus(code), room = rooms[code]; if (!info || !room) return info;
+    const st = String(room.status || '');
+    info.view = st === 'waiting' ? null : room.mode === 'arcade' && /^arc_/.test(st) ? 'arcade' : room.mode === 'blindtest' && room.blindtest ? 'blindtest' : (room.mode === 'undercover' || room.mode === 'note') ? 'undercover' : null;
+    info.teams = room.teams >= 2 ? room.teams : 0;
+    info.players = (room.players || []).map(p => ({ name: p.name, offline: !!p.disconnected, team: room.teams >= 2 && p.team != null ? p.team : null }));
+    return info;
+};
+io.on('connection', socket => {
+    socket.on('tv_watch', ({ roomCode } = {}) => {
+        const room = rooms[tvCode(roomCode)]; if (!room) return;
+        try {
+            if (room.mode === 'blindtest' && room.blindtest && room.status !== 'waiting') socket.emit('bt_state', btPublicState(room));
+            else if ((room.mode === 'undercover' || room.mode === 'note') && room.status !== 'waiting') socket.emit(room.status === 'voting' ? 'start_voting' : 'resume_gameplay', room);
+        } catch (_) {}
+    });
+});
+// ---------- 4. catégories de « Tu préfères » ----------
+const WYR_CATS = { pouvoirs: '⚡ Pouvoirs', combats: '⚔️ Combats', mondes: '🌍 Mondes', persos: '👥 Persos', drole: '😂 Drôle', anime: '🎬 Anime', dilemme: '💥 Dilemme' };
+const _arcBuildRoundWyrCat = arcBuildRound;
+arcBuildRound = async function (g) {
+    if (g?.game === 'tupreferes' && g.wyrCatId === undefined) { // la catégorie est dans les réglages du salon (« tupreferes:drole »)
+        const code = Object.keys(arcGames).find(k => arcGames[k] === g), sub = code && rooms[code] ? String(rooms[code].subMode || '') : '';
+        g.wyrCatId = WYR_CATS[sub.split(':')[1]] ? sub.split(':')[1] : null;
+    }
+    if (g?.game === 'tupreferes' && g.wyrCatId) {
+        const cat = WYR_CATS[g.wyrCatId];
+        if (!g.wyrUsed) g.wyrUsed = new Set();
+        let pool = WYR.map((x, i) => x[0] === cat ? i : -1).filter(i => i >= 0 && !g.wyrUsed.has(i));
+        if (!pool.length) { WYR.forEach((x, i) => { if (x[0] === cat) g.wyrUsed.delete(i); }); pool = WYR.map((x, i) => x[0] === cat ? i : -1).filter(i => i >= 0); }
+        const i = pool[Math.floor(Math.random() * pool.length)]; g.wyrUsed.add(i);
+        const [c, a, b] = WYR[i];
+        return { wyr: i, wyrCat: c, choices: Math.random() < 0.5 ? [a, b] : [b, a], answer: null };
+    }
+    return _arcBuildRoundWyrCat(g);
+};
+app.get('/api/wyr/cats', (req, res) => res.json({ ok: true, total: WYR.length, cats: Object.entries(WYR_CATS).map(([id, label]) => ({ id, label, n: WYR.filter(x => x[0] === label).length })) }));
+const _arcPublicWyrCat = arcPublic;
+arcPublic = function (room, g) { const out = _arcPublicWyrCat(room, g); if (out && g && g.game === 'tupreferes') out.universeLabel = WYR_CATS[g.wyrCatId] || 'Toutes les catégories'; return out; };
+const _btPublicStateTv = btPublicState;
+btPublicState = function (room) { const out = _btPublicStateTv(room); if (out && room) out.tv = TV_WATCH.has(room.code); return out; };

@@ -17330,6 +17330,7 @@ async function loadHallOfFame(){
             if (q && q.game === 'tupreferes' && q.phase === 'playing') { const r0 = document.getElementById('arc-result'); if (r0 && !arcLastFeedback) { r0.style.color = 'var(--text-color)'; r0.textContent = document.documentElement.classList.contains('tv-mode') ? '📱 Votez sur vos téléphones !' : '🤔 Choisis ton camp !'; } }
             if (!q || q.game !== 'tupreferes' || q.phase !== 'reveal') return;
             const me = (q.players || []).find(p => p.id === socket.id) || {}, r = document.getElementById('arc-result'), x = document.getElementById('arc-extra');
+            if (r && document.documentElement.classList.contains('tv-mode')) { r.style.color = 'var(--accent-yellow)'; r.textContent = q.answer ? `🗳️ La majorité a choisi : ${q.answer}` : '⚖️ Égalité parfaite !'; if (x) x.textContent = ''; return; }
             if (r) { r.style.color = me.gained ? '#00e676' : 'var(--accent-pink)'; r.textContent = !me.choice ? '⏳ Tu n’as pas voté' : q.answer ? (me.gained ? `✅ +${me.gained} — tu as voté comme la majorité !` : '❌ Tu étais dans la minorité…') : `⚖️ Égalité ! +${me.gained || 0}`; }
             if (x) x.textContent = q.answer ? `🗳️ La majorité a choisi : ${q.answer}` : '';
         };
@@ -17369,6 +17370,7 @@ async function loadHallOfFame(){
         const esc = s => v7esc(String(s == null ? '' : s));
         const TV = (new URLSearchParams(location.search).get('tv') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
         const joinUrl = code => `${location.origin}/?join=${encodeURIComponent(code)}`;
+        const TV_TEAM = [['Rouge', '#ff4d6d', '🔴'], ['Bleue', '#4da3ff', '🔵'], ['Verte', '#2ee88a', '🟢'], ['Jaune', '#ffd84d', '🟡']];
         const qr = (text, size) => `/api/qr?d=${encodeURIComponent(text)}`;
 
         /* ---------- côté joueurs : bouton TV + mode manette ---------- */
@@ -17422,18 +17424,86 @@ async function loadHallOfFame(){
         socket.on('tv_room', info => {
             last = info;
             if (!info || info.error) { scr.className = 'on'; hud.className = ''; scr.innerHTML = `<h1>📺 ANIME GAME</h1><div class="tv-sub">${esc((info && info.error) || 'Salon introuvable')}</div>`; return; }
-            const arcade = info.mode === 'arcade' && /^arc_/.test(info.status || '');
+            const arcade = !!info.view; // mini-jeux, blind test, Undercover : affichés en grand
             const waiting = info.status === 'waiting' || !info.status;
             hud.className = arcade ? 'on' : '';
+            window.TV_INFO = info; if (typeof tvTeamsUi === 'function') tvTeamsUi();
             if (arcade) { scr.className = ''; return; }
             scr.className = 'on';
             const url = joinUrl(info.code);
             scr.innerHTML = `<h1>📺 ANIME GAME</h1>
                 <div class="tv-row"><div><div class="tv-sub">Code du salon</div><div class="tv-code">${esc(info.code)}</div><div class="tv-sub">${esc(info.label || '')}</div></div><div><img class="tv-qr" src="${qr(url, 220)}" alt=""><div class="tv-sub" style="font-size:1rem;margin-top:6px;">Scanne pour rejoindre</div></div></div>
                 <div class="tv-sub">${waiting ? `👥 ${info.players.length} joueur${info.players.length > 1 ? 's' : ''} • ${info.host ? 'l’hôte ' + esc(info.host) + ' lance la partie' : 'en attente de l’hôte'}` : `🎮 Partie en cours : suivez-la sur vos téléphones`}</div>
-                <div class="tv-players">${info.players.map(p => `<span${p.offline ? ' style="opacity:.4"' : ''}>${esc(p.name)}</span>`).join('') || '<span>En attente des joueurs…</span>'}</div>`;
+                ${info.teams ? `<div class="tv-players">${[0, 1, 2, 3].slice(0, info.teams).map(t => `<div class="tv-teamcol" style="--tc:${TV_TEAM[t][1]}"><b>${TV_TEAM[t][2]} Équipe ${TV_TEAM[t][0]}</b>${info.players.filter(p => p.team === t).map(p => `<span${p.offline ? ' style="opacity:.4"' : ''}>${esc(p.name)}</span>`).join('') || '<span style="opacity:.5">—</span>'}</div>`).join('')}</div>`
+                : `<div class="tv-players">${info.players.map(p => `<span${p.offline ? ' style="opacity:.4"' : ''}>${esc(p.name)}</span>`).join('') || '<span>En attente des joueurs…</span>'}</div>`}
+                ${window.TV_SOUND ? '' : '<button class="tv-sound" onclick="tvSoundOn()">🔊 Cliquer ici pour activer le son de la TV</button>'}`;
             if (waiting) { try { document.getElementById('arcade-room').style.display = 'none'; } catch (_) {} }
         });
+    })();
+    </script>
+    <style>
+        /* AG_TV_PLUS_V1 */
+        #tv-screen .tv-teamcol{display:flex;flex-direction:column;gap:8px;align-items:center;background:color-mix(in srgb,var(--tc) 15%,#0b0b1d);border:3px solid var(--tc);border-radius:16px;padding:12px 18px;min-width:200px;}
+        #tv-screen .tv-teamcol b{font-size:1.4rem;color:var(--tc);}
+        #tv-screen .tv-sound{border:0;border-radius:99px;padding:12px 26px;font-size:1.2rem;font-weight:900;background:#ff7b00;color:#fff;cursor:pointer;animation:hubPulseO 1.6s infinite;}
+        #tv-teams{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:19000;gap:12px;}
+        html.tv-mode #tv-teams.on{display:flex;}
+        #tv-teams div{background:rgba(8,8,26,.9);border:3px solid var(--tc);border-radius:14px;padding:8px 18px;font-weight:900;font-size:1.3rem;color:#fff;text-align:center;min-width:150px;}
+        #tv-teams div b{display:block;color:var(--tc);font-size:1rem;}
+        .wyr-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}
+        .wyr-cats button{border:2px solid #3a3f6b;background:#14183a;color:#fff;border-radius:12px;padding:12px 8px;font-weight:800;cursor:pointer;font-size:.95rem;}
+        .wyr-cats button:hover{border-color:var(--accent-yellow);}
+        .wyr-cats button small{display:block;color:var(--text-muted);font-weight:600;margin-top:3px;}
+    </style>
+    <script>
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        const TEAMC = [['Rouge', '#ff4d6d', '🔴'], ['Bleue', '#4da3ff', '🔵'], ['Verte', '#2ee88a', '🟢'], ['Jaune', '#ffd84d', '🟡']];
+        /* ---------- TV : son + scores d'équipe en grand ---------- */
+        window.tvSoundOn = function () { window.TV_SOUND = true; try { const a = new Audio(); a.muted = true; a.play().catch(() => {}); } catch (_) {} document.querySelector('#tv-screen .tv-sound')?.remove(); toast('🔊 Son de la TV activé', '#00e676'); };
+        let lastTeams = null;
+        window.tvTeamsUi = function () {
+            if (!document.documentElement.classList.contains('tv-mode')) return;
+            let bar = document.getElementById('tv-teams'); if (!bar) { bar = document.createElement('div'); bar.id = 'tv-teams'; document.body.appendChild(bar); }
+            const show = lastTeams && lastTeams.length && window.TV_INFO && window.TV_INFO.view;
+            bar.className = show ? 'on' : '';
+            if (show) bar.innerHTML = lastTeams.map(t => { const c = TEAMC[t.idx] || TEAMC[0]; return `<div style="--tc:${c[1]}"><b>${c[2]} ${esc(t.name)}</b>${t.score} pts</div>`; }).join('');
+        };
+        ['arc_state', 'bt_state'].forEach(ev => socket.on(ev, q => { lastTeams = q && Array.isArray(q.teams) ? q.teams.slice().sort((a, b) => a.idx - b.idx) : null; tvTeamsUi(); }));
+        /* ---------- téléphones : pas de double musique quand la TV joue le blind test ---------- */
+        const isTv = document.documentElement.classList.contains('tv-mode');
+        socket.on('bt_state', q => { if (isTv || !q || !('tv' in q)) return; try { btAudio.muted = !!q.tv; } catch (_) {} document.body.classList.toggle('pad-mode', !!q.tv); });
+        socket.on('tv_on', d => { if (isTv || !d || d.code !== currentRoomCode) return; try { btAudio.muted = !!d.on; } catch (_) {} });
+        /* ---------- Tu préfères : choix de la catégorie ---------- */
+        const _open = openArcadeGame;
+        openArcadeGame = function (game) {
+            if (game !== 'tupreferes') return _open.apply(this, arguments);
+            document.getElementById('cp-modal')?.remove();
+            const m = document.createElement('div'); m.id = 'cp-modal';
+            m.innerHTML = `<div class="cp-box"><div class="cp-h"><span>🤔 Tu préfères… ? — choisis la catégorie</span><button>✖</button></div><div class="cp-body"><div class="wyr-cats"><button data-c="all">🎲 Toutes<small>tout mélangé</small></button></div></div></div>`;
+            m.querySelector('.cp-h button').onclick = () => m.remove(); m.onclick = e => { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+            const grid = m.querySelector('.wyr-cats');
+            const go = c => { m.remove(); createRoom('arcade', c === 'all' ? 'tupreferes' : 'tupreferes:' + c); };
+            grid.querySelector('[data-c=all]').onclick = () => go('all');
+            v7get('/api/wyr/cats').then(d => {
+                if (!d || !d.ok) return;
+                grid.querySelector('[data-c=all] small').textContent = `${d.total} dilemmes mélangés`;
+                d.cats.forEach(c => { const b = document.createElement('button'); b.dataset.c = c.id; b.innerHTML = `${esc(c.label)}<small>${c.n} dilemmes</small>`; b.onclick = () => go(c.id); grid.appendChild(b); });
+            });
+        };
+        /* ---------- Tu préfères : le chat Twitch / TikTok face au streamer ---------- */
+        const _ra = renderArcade;
+        renderArcade = function (q) {
+            _ra.apply(this, arguments);
+            if (!q || q.game !== 'tupreferes' || q.phase !== 'reveal' || typeof stream === 'undefined' || !stream.ws || !stream.votes || !stream.votes.size) return;
+            const cnt = {}; stream.votes.forEach(v => { const l = stream.labels[v.idx]; if (l) cnt[l] = (cnt[l] || 0) + 1; });
+            const tot = Object.values(cnt).reduce((a, b) => a + b, 0); if (!tot) return;
+            const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+            const me = (q.players || []).find(p => p.id === socket.id) || {};
+            const x = document.getElementById('arc-extra');
+            if (x) x.textContent = (x.textContent ? x.textContent + ' • ' : '') + `💬 Le chat a choisi « ${top} » à ${Math.round(100 * cnt[top] / tot)} % (${tot} vote${tot > 1 ? 's' : ''})` + (me.choice ? (me.choice === top ? ' — d’accord avec toi ✅' : ' — pas comme toi ❌') : '');
+        };
     })();
     </script>
 </body>
