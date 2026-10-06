@@ -3852,6 +3852,16 @@ body.ag-game-page #app-root > #mode,
             <button class="btn-action" style="margin-top:0;background:#00b36b;" onclick="adminDbMove()">🚚 Transférer la base</button>
             <div id="adm-dbmove-prog" style="margin-top:8px;font-size:.8rem;"></div>
         </div>
+        <div class="opt-panel" id="adm-backup">
+            <h2>💾 Sauvegardes de la base</h2>
+            <p class="tl-hint" style="text-align:left;">Chaque nuit (vers 4h) : une sauvegarde légère (tout sauf les images), les 7 dernières sont gardées. Une fois par semaine : une sauvegarde complète avec les images (2 gardées). Télécharge-en une de temps en temps sur ton PC : c'est ta copie de secours.</p>
+            <div id="adm-bk-st" class="tl-hint" style="text-align:left;">Chargement…</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;">
+                <button class="btn-action" style="width:auto;margin:0;background:#1f5a3a;" onclick="adminBackup('daily')">💾 Sauvegarde légère maintenant</button>
+                <button class="btn-action" style="width:auto;margin:0;background:#1f3a5a;" onclick="adminBackup('full')">🗄️ Sauvegarde complète maintenant</button>
+            </div>
+            <div id="adm-bk-list"></div>
+        </div>
         <div class="opt-panel">
             <h2>🤖 Bots de test</h2>
             <p class="tl-hint" style="text-align:left;">Crée un salon de n'importe quel mode : dans le salon d'attente, une barre « Bots de test » apparaît (visible que par toi). Ajoute des bots puis lance : ils répondent tout seuls (bonnes et mauvaises réponses selon leur niveau). Ils partent tout seuls quand tu quittes le salon.</p>
@@ -17592,6 +17602,38 @@ async function loadHallOfFame(){
         if (typeof orig === 'function') window.appPanelDraw = async function () { const r = await orig.apply(this, arguments); renameDraw(); return r; };
         (function () { const o = window.switchTab; if (typeof o === 'function') window.switchTab = function (t) { const r = o.apply(this, arguments); if (t === 'options') setTimeout(renameDraw, 80); return r; }; })();
         setTimeout(renameDraw, 3500);
+    })();
+    </script>
+    <script>
+    /* AG_BACKUP_V1 : panneau admin des sauvegardes */
+    (function () {
+        const esc = s => v7esc(String(s == null ? '' : s));
+        const mb = b => b >= 1073741824 ? (b / 1073741824).toFixed(2) + ' Go' : (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + ' Mo';
+        let timer = null;
+        async function refresh() {
+            const st = document.getElementById('adm-bk-st'); if (!st || !st.offsetParent) return;
+            const d = await v7get('/api/admin/backups'); if (!d || !d.ok) { st.textContent = 'Réservé aux admins.'; return; }
+            const s = d.state;
+            st.innerHTML = `Rangement : <b>${esc(d.dir)}</b>${d.disk ? ` • disque : <b>${mb(d.disk.free)}</b> libres sur ${mb(d.disk.total)}` : ''}`
+                + (s.running ? `<br>⏳ Sauvegarde ${s.kind === 'full' ? 'complète' : 'légère'} en cours… <b>${esc(s.step)}</b>` : '')
+                + (s.error ? `<br>❌ Dernier échec : ${esc(s.error)}` : '')
+                + (s.skipped ? `<br>⚠️ Sauvegarde complète sautée le ${new Date(s.skipped.at).toLocaleString('fr-FR')} : ${esc(s.skipped.why)}` : '');
+            const L = document.getElementById('adm-bk-list');
+            L.innerHTML = d.list.length ? `<table style="width:100%;border-collapse:collapse;font-size:.85rem;">${d.list.map(b => `<tr style="border-top:1px solid #222;"><td style="padding:5px 0;">${b.kind === 'full' ? '🗄️ Complète' : '💾 Légère'}</td><td>${new Date(b.at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</td><td style="text-align:right;">${mb(b.size)}</td><td style="text-align:right;"><button class="btn-action" style="width:auto;margin:0;padding:4px 10px;" data-dl="${esc(b.name)}">⬇️</button></td></tr>`).join('')}</table>`
+                : '<p class="tl-hint">Pas encore de sauvegarde.</p>';
+            L.querySelectorAll('[data-dl]').forEach(btn => btn.onclick = async () => {
+                const r = await v7post('/api/admin/backups/link', { name: btn.dataset.dl });
+                if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+                const a = document.createElement('a'); a.href = r.url; a.download = btn.dataset.dl; document.body.appendChild(a); a.click(); a.remove();
+            });
+            clearTimeout(timer); if (s.running) timer = setTimeout(refresh, 2000);
+        }
+        window.adminBackup = async function (kind) {
+            const r = await v7post('/api/admin/backups', { kind });
+            if (!r || !r.ok) return toast('❌ ' + ((r && r.error) || 'Impossible'), 'var(--accent-pink)');
+            toast(kind === 'full' ? '🗄️ Sauvegarde complète lancée (quelques minutes)…' : '💾 Sauvegarde lancée…', '#00e676'); setTimeout(refresh, 800);
+        };
+        setInterval(() => { const st = document.getElementById('adm-bk-st'); if (st && st.offsetParent && st.textContent === 'Chargement…') refresh(); }, 2500);
     })();
     </script>
 </body>

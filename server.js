@@ -28816,3 +28816,85 @@ app.post('/api/account/pseudo', async (req, res) => {
     console.log(`[pseudo] ${old} → ${want} (compte ${uid})`);
     res.json({ ok: true, pseudo: want, user: publicUser(user), nextAt: admin ? 0 : Date.now() + RENAME_COOLDOWN });
 });
+
+/* =====================================================================
+   AG_BACKUP_V1 — sauvegardes automatiques de la base sur le disque Render.
+   • chaque nuit (4h-6h, heure de Paris) : sauvegarde « légère » (tout sauf les images), 7 gardées
+   • une fois par semaine : sauvegarde complète (avec les images), 2 gardées, seulement s'il reste assez de place
+   • panneau admin : liste, « sauvegarder maintenant », téléchargement
+   • remise en place : node restore-backup.js <fichier> <adresse d'une base vide>
+   ===================================================================== */
+const BK_LIB = require('./db-backup');
+const BK_DIR = process.env.BACKUP_DIR || (process.env.DB_DIR ? require('path').join(require('path').dirname(process.env.DB_DIR), 'backups') : require('path').join(require('os').tmpdir(), 'ag-backups'));
+const BK_AUTO = !!(process.env.BACKUP_DIR || process.env.DB_DIR);
+const BK_KEEP = { daily: 7, full: 2 };
+const BK = { running: false, kind: null, step: '', last: null, error: null, skipped: null };
+const BK_RE = /^ag-(daily|full)-\d{8}-\d{4}\.agbak\.gz$/;
+function bkList() {
+    try {
+        return fs.readdirSync(BK_DIR).filter(f => BK_RE.test(f)).map(f => { const st = fs.statSync(require('path').join(BK_DIR, f)); return { name: f, kind: f.split('-')[1], size: st.size, at: st.mtimeMs }; }).sort((a, b) => b.at - a.at);
+    } catch (_) { return []; }
+}
+function bkDisk() { try { const s = fs.statfsSync(fs.existsSync(BK_DIR) ? BK_DIR : require('path').dirname(BK_DIR)); return { free: s.bavail * s.bsize, total: s.blocks * s.bsize }; } catch (_) { return null; } }
+async function bkRun(kind) {
+    if (BK.running) return { ok: false, error: 'Une sauvegarde est déjà en cours.' };
+    if (typeof LOCALDB !== 'undefined' && LOCALDB.on && LOCALDB.state !== 'ready' && LOCALDB.state !== 'nodisk') return { ok: false, error: 'La base démarre encore, réessaie dans une minute.' };
+    fs.mkdirSync(BK_DIR, { recursive: true });
+    if (kind === 'full') {
+        const disk = bkDisk();
+        let need = 400 * 1048576;
+        try { need = Number((await pool.query('SELECT pg_database_size(current_database()) AS s')).rows[0].s) + 200 * 1048576; } catch (_) {}
+        const prev = bkList().filter(b => b.kind === 'full');
+        if (prev.length >= BK_KEEP.full) need -= prev[prev.length - 1].size; // la plus ancienne sera supprimée
+        if (disk && disk.free < need) { BK.skipped = { at: Date.now(), why: `pas assez de place sur le disque (${Math.round(disk.free / 1048576)} Mo libres)` }; return { ok: false, error: 'Pas assez de place sur le disque pour une sauvegarde complète.' }; }
+    }
+    const d = new Date(), pad = n => String(n).padStart(2, '0');
+    const name = `ag-${kind}-${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}.agbak.gz`;
+    Object.assign(BK, { running: true, kind, step: 'Démarrage…', error: null });
+    const t0 = Date.now();
+    try {
+        const r = await BK_LIB.createBackup({ pool, file: require('path').join(BK_DIR, name), skipBytes: kind === 'daily', onProgress: m => { BK.step = m; } });
+        BK.last = { name, kind, at: Date.now(), ms: Date.now() - t0, ...r };
+        console.log(`[sauvegarde] ${name} : ${r.tables} tables, ${r.rows} lignes, ${Math.round(r.bytes / 1048576)} Mo en ${Math.round((Date.now() - t0) / 1000)} s`);
+        // on ne garde que les plus récentes
+        bkList().filter(b => b.kind === kind).slice(BK_KEEP[kind]).forEach(b => { try { fs.rmSync(require('path').join(BK_DIR, b.name)); } catch (_) {} });
+        return { ok: true, name };
+    } catch (e) {
+        BK.error = e.message; console.error('[sauvegarde] échec :', e.message);
+        return { ok: false, error: e.message };
+    } finally { BK.running = false; BK.step = ''; }
+}
+// planification : vérifie toutes les 10 minutes
+setInterval(async () => {
+    if (!BK_AUTO || BK.running) return;
+    const h = +new Intl.DateTimeFormat('fr-FR', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Europe/Paris' }).format(new Date());
+    if (h < 4 || h > 6) return;
+    const list = bkList(), last = k => (list.find(b => b.kind === k) || {}).at || 0;
+    if (Date.now() - last('daily') > 20 * 3600000) { await bkRun('daily'); return; }
+    if (Date.now() - last('full') > 6.5 * 86400000) await bkRun('full');
+}, 10 * 60000);
+const BK_LINKS = new Map(); // jeton -> { name, exp }
+app.get('/api/admin/backups', adminOnly(async (req, res) => res.json({ ok: true, auto: BK_AUTO, dir: BK_AUTO ? 'disque' : 'temporaire (pas de disque : télécharge-les)', list: bkList(), state: BK, disk: bkDisk() })));
+app.post('/api/admin/backups', adminOnly(async (req, res) => {
+    const kind = (req.body || {}).kind === 'full' ? 'full' : 'daily';
+    if (BK.running) return res.json({ ok: false, error: 'Une sauvegarde est déjà en cours.' });
+    bkRun(kind); // en arrière-plan, le panneau suit l'avancement
+    res.json({ ok: true });
+}));
+app.post('/api/admin/backups/link', adminOnly(async (req, res) => {
+    const name = String((req.body || {}).name || '');
+    if (!BK_RE.test(name) || !fs.existsSync(require('path').join(BK_DIR, name))) return res.json({ ok: false, error: 'Sauvegarde introuvable.' });
+    const t = require('crypto').randomBytes(18).toString('hex');
+    BK_LINKS.set(t, { name, exp: Date.now() + 10 * 60000 });
+    res.json({ ok: true, url: `/api/backup-file/${encodeURIComponent(name)}?t=${t}` });
+}));
+app.get('/api/backup-file/:name', (req, res) => {
+    const l = BK_LINKS.get(String(req.query.t || ''));
+    if (!l || l.exp < Date.now() || l.name !== req.params.name) return res.status(403).send('Lien expiré : redemande-le dans le panneau admin.');
+    const f = require('path').join(BK_DIR, l.name);
+    if (!fs.existsSync(f)) return res.status(404).end();
+    res.setHeader('Content-Type', 'application/gzip');
+    res.setHeader('Content-Disposition', `attachment; filename="${l.name}"`);
+    res.setHeader('Content-Length', fs.statSync(f).size);
+    fs.createReadStream(f).pipe(res);
+});
