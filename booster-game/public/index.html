@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anime Boosters</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="logo">🎴 Anime <b>Boosters</b></div>
+  <nav>
+    <button data-tab="shop" class="on">Boutique</button>
+    <button data-tab="album">Collection</button>
+    <button data-tab="stats">Stats</button>
+  </nav>
+  <div class="wallet"><span id="coins">0</span> 🪙</div>
+</header>
+
+<main>
+  <section id="tab-shop" class="tab on">
+    <div class="free">
+      <div>
+        <h2>Booster gratuit</h2>
+        <p id="free-txt">…</p>
+      </div>
+      <button id="free-btn" class="btn gold">Ouvrir</button>
+    </div>
+    <div class="free daily">
+      <div>
+        <h2>Cadeau du jour</h2>
+        <p id="daily-txt">…</p>
+      </div>
+      <button id="daily-btn" class="btn">Récupérer</button>
+    </div>
+    <h2 class="sec">Boosters</h2>
+    <div id="packs" class="packs"></div>
+    <h2 class="sec">Boosters par animé <small>5 cartes d'un seul animé</small></h2>
+    <input id="anime-search" class="search" placeholder="Chercher un animé…">
+    <div id="anime-packs" class="packs small"></div>
+  </section>
+
+  <section id="tab-album" class="tab">
+    <div class="album-bar">
+      <select id="album-anime"></select>
+      <select id="album-filter">
+        <option value="all">Toutes</option>
+        <option value="owned">Possédées</option>
+        <option value="missing">Manquantes</option>
+        <option value="dupes">Doublons</option>
+      </select>
+      <button id="sell-dupes" class="btn">Vendre les doublons</button>
+    </div>
+    <p id="album-prog" class="prog"></p>
+    <div id="album" class="grid"></div>
+  </section>
+
+  <section id="tab-stats" class="tab">
+    <div id="stats"></div>
+    <h2 class="sec">Taux de drop</h2>
+    <div id="rates"></div>
+    <button id="reset" class="btn danger">Réinitialiser ma partie</button>
+  </section>
+</main>
+
+<div id="opening" class="opening">
+  <div class="op-pack" id="op-pack"><div class="op-tear"></div><div class="op-name" id="op-name"></div></div>
+  <div class="op-god" id="op-god">✨ GOD PACK ✨</div>
+  <div class="op-cards" id="op-cards"></div>
+  <div class="op-bar">
+    <button id="op-flip" class="btn">Tout retourner</button>
+    <button id="op-again" class="btn gold">Rouvrir</button>
+    <button id="op-close" class="btn">Fermer</button>
+  </div>
+</div>
+
+<div id="zoom" class="zoom"></div>
+<div id="toast" class="toast"></div>
+<script src="game.js"></script>
+</body>
+</html>

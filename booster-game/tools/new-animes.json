@@ -1,0 +1,671 @@
+{
+ "shamanking": {
+  "anime": "Shaman King",
+  "chars": [
+   "Yoh Asakura",
+   "Hao Asakura",
+   "Anna Kyoyama",
+   "Ren Tao",
+   "Horohoro",
+   "Amidamaru",
+   "Manta Oyamada",
+   "Faust VIII",
+   "Lyserg Diethel",
+   "Ryu",
+   "Jeanne",
+   "Tamao Tamamura",
+   "Silva",
+   "Chocolove McDonell"
+  ]
+ },
+ "kenshin": {
+  "anime": "Rurouni Kenshin",
+  "chars": [
+   "Kenshin Himura",
+   "Makoto Shishio",
+   "Hajime Saito",
+   "Sanosuke Sagara",
+   "Kaoru Kamiya",
+   "Aoshi Shinomori",
+   "Misao Makimachi",
+   "Yahiko Myojin",
+   "Enishi Yukishiro",
+   "Seijuro Hiko",
+   "Tomoe Yukishiro",
+   "Megumi Takani",
+   "Soujiro Seta"
+  ]
+ },
+ "saintseiya": {
+  "anime": "Saint Seiya",
+  "chars": [
+   "Pegasus Seiya",
+   "Dragon Shiryu",
+   "Andromeda Shun",
+   "Cygnus Hyoga",
+   "Phoenix Ikki",
+   "Athena",
+   "Gemini Saga",
+   "Virgo Shaka",
+   "Leo Aiolia",
+   "Scorpio Milo",
+   "Aquarius Camus",
+   "Sagittarius Aiolos",
+   "Hades",
+   "Poseidon",
+   "Capricorn Shura",
+   "Pisces Aphrodite"
+  ]
+ },
+ "hokuto": {
+  "anime": "Ken le Survivant",
+  "chars": [
+   "Kenshiro",
+   "Raoh",
+   "Toki",
+   "Jagi",
+   "Shin",
+   "Rei",
+   "Souther",
+   "Yuria",
+   "Bat",
+   "Lin",
+   "Juza",
+   "Shu",
+   "Falco",
+   "Kaioh"
+  ]
+ },
+ "cityhunter": {
+  "anime": "City Hunter",
+  "chars": [
+   "Ryo Saeba",
+   "Kaori Makimura",
+   "Umibozu",
+   "Saeko Nogami",
+   "Hideyuki Makimura",
+   "Miki",
+   "Kazue Natori",
+   "Professeur"
+  ]
+ },
+ "tsubasa": {
+  "anime": "Captain Tsubasa",
+  "chars": [
+   "Tsubasa Ozora",
+   "Kojiro Hyuga",
+   "Genzo Wakabayashi",
+   "Taro Misaki",
+   "Hikaru Matsuyama",
+   "Jun Misugi",
+   "Ken Wakashimazu",
+   "Ryo Ishizaki",
+   "Karl Heinz Schneider",
+   "Roberto Hongo",
+   "Shingo Aoi",
+   "Sanae Nakazawa"
+  ]
+ },
+ "fruitsbasket": {
+  "anime": "Fruits Basket",
+  "chars": [
+   "Tohru Honda",
+   "Kyo Sohma",
+   "Yuki Sohma",
+   "Shigure Sohma",
+   "Akito Sohma",
+   "Momiji Sohma",
+   "Hatsuharu Sohma",
+   "Kisa Sohma",
+   "Hiro Sohma",
+   "Ayame Sohma",
+   "Hatori Sohma",
+   "Rin Sohma",
+   "Kagura Sohma",
+   "Ritsu Sohma"
+  ]
+ },
+ "nana": {
+  "anime": "Nana",
+  "chars": [
+   "Nana Osaki",
+   "Nana Komatsu",
+   "Ren Honjo",
+   "Takumi Ichinose",
+   "Nobuo Terashima",
+   "Shinichi Okazaki",
+   "Yasushi Takagi",
+   "Reira Serizawa",
+   "Shoji Endo"
+  ]
+ },
+ "franxx": {
+  "anime": "Darling in the Franxx",
+  "chars": [
+   "Zero Two",
+   "Hiro",
+   "Ichigo",
+   "Goro",
+   "Mitsuru",
+   "Kokoro",
+   "Futoshi",
+   "Zorome",
+   "Miku",
+   "Ikuno",
+   "Nana",
+   "Hachi",
+   "Dr. Franxx"
+  ]
+ },
+ "kingdom": {
+  "anime": "Kingdom",
+  "chars": [
+   "Shin",
+   "Ei Sei",
+   "Ka Ryo Ten",
+   "Kyou Kai",
+   "Ou Hon",
+   "Mou Ten",
+   "Ou Ki",
+   "Ri Boku",
+   "Hyou Kou",
+   "Ren Pa",
+   "Kan Ki",
+   "Tou",
+   "Sei Kyou"
+  ]
+ },
+ "goldenkamuy": {
+  "anime": "Golden Kamuy",
+  "chars": [
+   "Saichi Sugimoto",
+   "Asirpa",
+   "Yoshitake Shiraishi",
+   "Hyakunosuke Ogata",
+   "Tokushiro Tsurumi",
+   "Toshizo Hijikata",
+   "Kiroranke",
+   "Tanigaki Genjirou",
+   "Koito Otonoshin",
+   "Tsukishima Hajime",
+   "Ushiyama Tatsuuma"
+  ]
+ },
+ "baki": {
+  "anime": "Baki",
+  "chars": [
+   "Baki Hanma",
+   "Yujiro Hanma",
+   "Doppo Orochi",
+   "Kaoru Hanayama",
+   "Retsu Kaioh",
+   "Jack Hanma",
+   "Biscuit Oliva",
+   "Pickle",
+   "Musashi Miyamoto",
+   "Kiyosumi Katou",
+   "Katsumi Orochi",
+   "Gouki Shibukawa",
+   "Kaku Kaioh"
+  ]
+ },
+ "kengan": {
+  "anime": "Kengan Ashura",
+  "chars": [
+   "Ohma Tokita",
+   "Kazuo Yamashita",
+   "Raian Kure",
+   "Julius Reinhold",
+   "Agito Kanoh",
+   "Kiryu Setsuna",
+   "Hatsumi Sen",
+   "Wakatsuki Takeshi",
+   "Kuroki Gensai",
+   "Okubo Naoya",
+   "Kaneda Suekichi",
+   "Gaoh Ryuki"
+  ]
+ },
+ "ranma": {
+  "anime": "Ranma ½",
+  "chars": [
+   "Ranma Saotome",
+   "Akane Tendo",
+   "Ryoga Hibiki",
+   "Shampoo",
+   "Genma Saotome",
+   "Ukyo Kuonji",
+   "Kodachi Kuno",
+   "Tatewaki Kuno",
+   "Mousse",
+   "Happosai",
+   "Cologne",
+   "Nabiki Tendo",
+   "Kasumi Tendo"
+  ]
+ },
+ "drslump": {
+  "anime": "Dr. Slump",
+  "chars": [
+   "Arale Norimaki",
+   "Senbei Norimaki",
+   "Gatchan",
+   "Midori Yamabuki",
+   "Akane Kimidori",
+   "Obotchaman",
+   "Taro Soramame",
+   "Peasuke Soramame",
+   "Dr. Mashirito"
+  ]
+ },
+ "undeadunluck": {
+  "anime": "Undead Unluck",
+  "chars": [
+   "Andy",
+   "Fuuko Izumo",
+   "Juiz",
+   "Shen",
+   "Tatiana",
+   "Billy",
+   "Top",
+   "Latla",
+   "Victor",
+   "Gina",
+   "Ichico",
+   "Nico Nikolaevich"
+  ]
+ },
+ "hanako": {
+  "anime": "Toilet-Bound Hanako-kun",
+  "chars": [
+   "Hanako-kun",
+   "Nene Yashiro",
+   "Kou Minamoto",
+   "Tsukasa",
+   "Teru Minamoto",
+   "Mitsuba",
+   "Sakura Nanamine",
+   "Natsuhiko Hyuuga",
+   "Mokke"
+  ]
+ },
+ "quintuplets": {
+  "anime": "The Quintessential Quintuplets",
+  "chars": [
+   "Miku Nakano",
+   "Nino Nakano",
+   "Ichika Nakano",
+   "Yotsuba Nakano",
+   "Itsuki Nakano",
+   "Futaro Uesugi",
+   "Raiha Uesugi",
+   "Maruo Nakano"
+  ]
+ },
+ "oregairu": {
+  "anime": "My Teen Romantic Comedy SNAFU",
+  "chars": [
+   "Hachiman Hikigaya",
+   "Yukino Yukinoshita",
+   "Yui Yuigahama",
+   "Iroha Isshiki",
+   "Haruno Yukinoshita",
+   "Komachi Hikigaya",
+   "Shizuka Hiratsuka",
+   "Saki Kawasaki",
+   "Hayato Hayama",
+   "Yoshiteru Zaimokuza"
+  ]
+ },
+ "edenszero": {
+  "anime": "Edens Zero",
+  "chars": [
+   "Shiki Granbell",
+   "Rebecca Bluegarden",
+   "Happy",
+   "Weisz Steiner",
+   "Homura Kougetsu",
+   "Witch Regret",
+   "Hermit Mio",
+   "Pino",
+   "Drakken Joe",
+   "Ziggy",
+   "Valkyrie Yuna",
+   "Elsie Crimson",
+   "Jinn Gate"
+  ]
+ },
+ "spiritedaway": {
+  "anime": "Studio Ghibli",
+  "chars": [
+   "Chihiro Ogino",
+   "Haku",
+   "Sans-Visage",
+   "Totoro",
+   "Kiki",
+   "Jiji",
+   "Howl",
+   "Sophie Hatter",
+   "Calcifer",
+   "San",
+   "Ashitaka",
+   "Nausicaä",
+   "Ponyo",
+   "Porco Rosso",
+   "Yubaba",
+   "Satsuki Kusakabe",
+   "Mei Kusakabe",
+   "Arrietty",
+   "Sheeta",
+   "Pazu"
+  ]
+ },
+ "yourname": {
+  "anime": "Makoto Shinkai",
+  "chars": [
+   "Taki Tachibana",
+   "Mitsuha Miyamizu",
+   "Hina Amano",
+   "Hodaka Morishima",
+   "Suzume Iwato",
+   "Souta Munakata",
+   "Daijin",
+   "Yotsuha Miyamizu"
+  ]
+ },
+ "vagabond": {
+  "anime": "Vagabond",
+  "chars": [
+   "Miyamoto Musashi",
+   "Sasaki Kojiro",
+   "Matahachi Hon'iden",
+   "Takuan Soho",
+   "Otsu",
+   "Inshun Hozoin",
+   "Yoshioka Seijuro",
+   "Yoshioka Denshichiro",
+   "Yagyu Sekishusai",
+   "Ittosai Ito"
+  ]
+ },
+ "kenichi": {
+  "anime": "Kenichi",
+  "chars": [
+   "Kenichi Shirahama",
+   "Miu Furinji",
+   "Hayato Furinji",
+   "Akisame Koetsuji",
+   "Sakaki Shio",
+   "Apachai Hopachai",
+   "Kensei Ma",
+   "Shigure Kosaka",
+   "Ryuto Asamiya",
+   "Natsu Tanimoto"
+  ]
+ },
+ "magi": {
+  "anime": "Magi",
+  "chars": [
+   "Aladdin",
+   "Alibaba Saluja",
+   "Morgiana",
+   "Judar",
+   "Sinbad",
+   "Hakuryuu Ren",
+   "Kougyoku Ren",
+   "Kouen Ren",
+   "Ja'far",
+   "Masrur",
+   "Yamuraiha",
+   "Ugo",
+   "Al-Sarmen"
+  ]
+ },
+ "seraph": {
+  "anime": "Seraph of the End",
+  "chars": [
+   "Yuichiro Hyakuya",
+   "Mikaela Hyakuya",
+   "Guren Ichinose",
+   "Shinoa Hiragi",
+   "Krul Tepes",
+   "Ferid Bathory",
+   "Yoichi Saotome",
+   "Shiho Kimizuki",
+   "Mitsuba Sangu",
+   "Kureto Hiragi",
+   "Shinya Hiragi",
+   "Asuramaru"
+  ]
+ },
+ "tomodachi": {
+  "anime": "Toriko",
+  "chars": [
+   "Toriko",
+   "Komatsu",
+   "Coco",
+   "Sunny",
+   "Zebra",
+   "Ichiryuu",
+   "Starjun",
+   "Midora",
+   "Jirou",
+   "Terry Cloth",
+   "Rin",
+   "Acacia",
+   "Neo"
+  ]
+ },
+ "zatchbell": {
+  "anime": "Zatch Bell!",
+  "chars": [
+   "Zatch Bell",
+   "Kiyomaro Takamine",
+   "Brago",
+   "Sherry Belmont",
+   "Tio",
+   "Megumi Oumi",
+   "Kanchome",
+   "Folgore",
+   "Zeno",
+   "Clear Note",
+   "Wonrei",
+   "Kafka Sunbeam"
+  ]
+ },
+ "orb": {
+  "anime": "Dragon Quest: Dai",
+  "chars": [
+   "Dai",
+   "Popp",
+   "Maam",
+   "Avan",
+   "Hyunckel",
+   "Leona",
+   "Baran",
+   "Vearn",
+   "Hadlar",
+   "Crocodine",
+   "Kill Vearn",
+   "Zaboera",
+   "Mystvearn"
+  ]
+ },
+ "onimai": {
+  "anime": "Kaiji",
+  "chars": [
+   "Kaiji Ito",
+   "Yukio Tonegawa",
+   "Kazutaka Hyodo",
+   "Kazuya Hyodo",
+   "Endou Yuuji",
+   "Ichijou Seiya",
+   "Sahara Makoto",
+   "Funai Yuji"
+  ]
+ },
+ "akira": {
+  "anime": "Akira",
+  "chars": [
+   "Shotaro Kaneda",
+   "Tetsuo Shima",
+   "Kei",
+   "Kaisuke",
+   "Colonel Shikishima",
+   "Akira",
+   "Takashi",
+   "Kiyoko",
+   "Masaru",
+   "Ryu"
+  ]
+ },
+ "ghostshell": {
+  "anime": "Ghost in the Shell",
+  "chars": [
+   "Motoko Kusanagi",
+   "Batou",
+   "Togusa",
+   "Daisuke Aramaki",
+   "Saito",
+   "Ishikawa",
+   "Tachikoma",
+   "Kuze Hideo",
+   "Puppet Master",
+   "Pazu"
+  ]
+ },
+ "lupin": {
+  "anime": "Lupin III",
+  "chars": [
+   "Arsène Lupin III",
+   "Daisuke Jigen",
+   "Goemon Ishikawa XIII",
+   "Fujiko Mine",
+   "Inspecteur Zenigata",
+   "Count Cagliostro",
+   "Clarisse",
+   "Mamo"
+  ]
+ },
+ "cobra": {
+  "anime": "Cobra",
+  "chars": [
+   "Cobra",
+   "Lady Armaroid",
+   "Crystal Boy",
+   "Jane Royal",
+   "Dominique Royal",
+   "Catherine Royal",
+   "Sandra"
+  ]
+ },
+ "albator": {
+  "anime": "Albator",
+  "chars": [
+   "Albator",
+   "Tochiro",
+   "Emeraldas",
+   "Clio",
+   "Tadashi Daiba",
+   "Mayu Oyama",
+   "Lamime",
+   "Kei Yuki"
+  ]
+ },
+ "helck": {
+  "anime": "Helck",
+  "chars": [
+   "Helck",
+   "Vermilio",
+   "Hon",
+   "Azudra",
+   "Kenros",
+   "Ikuse",
+   "Piwi",
+   "Alaire",
+   "Mikaros",
+   "Hyura"
+  ]
+ },
+ "wistoria": {
+  "anime": "Wistoria",
+  "chars": [
+   "Will Serfort",
+   "Elfaria Albis Serfort",
+   "Colette Loire",
+   "Sion Tarbo",
+   "Julius Reinberg",
+   "Edward",
+   "Wiegraf",
+   "Lihanna"
+  ]
+ },
+ "blackrock": {
+  "anime": "Black Rock Shooter",
+  "chars": [
+   "Black Rock Shooter",
+   "Dead Master",
+   "Strength",
+   "Chariot",
+   "Mato Kuroi",
+   "Yomi Takanashi"
+  ]
+ },
+ "himouto": {
+  "anime": "Mushishi",
+  "chars": [
+   "Ginko",
+   "Tanyuu Karibusa",
+   "Adashino",
+   "Kumado"
+  ]
+ },
+ "tsukimichi": {
+  "anime": "Tsukimichi",
+  "chars": [
+   "Makoto Misumi",
+   "Tomoe",
+   "Mio",
+   "Shiki",
+   "Hibiki Otonashi",
+   "Rembrandt",
+   "Lime Latte",
+   "Megami"
+  ]
+ },
+ "rentagf": {
+  "anime": "Rent-a-Girlfriend",
+  "chars": [
+   "Chizuru Mizuhara",
+   "Kazuya Kinoshita",
+   "Ruka Sarashina",
+   "Sumi Sakurasawa",
+   "Mami Nanami",
+   "Mini Yaemori"
+  ]
+ },
+ "kagurabachi": {
+  "anime": "Kagurabachi",
+  "chars": [
+   "Chihiro Rokuhira",
+   "Shiba",
+   "Sojo Sazanami",
+   "Hakuri Sazanami",
+   "Char",
+   "Kunimitsu Rokuhira",
+   "Hiyuki",
+   "Samura Iori"
+  ]
+ },
+ "blueperiod": {
+  "anime": "Blue Period",
+  "chars": [
+   "Yatora Yaguchi",
+   "Ryuji Ayukawa",
+   "Yotasuke Takahashi",
+   "Haruka Hashida",
+   "Maru Mori",
+   "Masako Saeki"
+  ]
+ }
+}
