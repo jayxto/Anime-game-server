@@ -23894,7 +23894,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { absolue: 11, ombre: 5.1, mirage: 5.7, eclat: 6.1, heroique: 6.7, onirique: 7.25, solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { absolue: 11, lieu: 5.4, technique: 6.0, organisation: 6.8, ombre: 5.1, mirage: 5.7, eclat: 6.1, heroique: 6.7, onirique: 7.25, solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -23927,8 +23927,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { absolue: 'Absolue', ombre: 'Ombre', mirage: 'Mirage', eclat: 'Éclat', heroique: 'Héroïque', onirique: 'Onirique', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { absolue: '#fffbe6', ombre: '#8a7fb8', mirage: '#7fffd4', eclat: '#00d4ff', heroique: '#ff4d4d', onirique: '#c39bff', solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { absolue: 'Absolue', lieu: 'Lieu', technique: 'Technique', organisation: 'Organisation', ombre: 'Ombre', mirage: 'Mirage', eclat: 'Éclat', heroique: 'Héroïque', onirique: 'Onirique', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { absolue: '#fffbe6', lieu: '#d9a066', technique: '#ff8c1a', organisation: '#e04848', ombre: '#8a7fb8', mirage: '#7fffd4', eclat: '#00d4ff', heroique: '#ff4d4d', onirique: '#c39bff', solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24752,6 +24752,7 @@ app.get('/api/cards/mine', async (req, res) => {
         if (k.startsWith('champion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: null, finishes: {}, serial: null, u: 'champion', anime: i.anime, rarity: 'champion', img: i.img }); return; }
         if (k.startsWith('fusion|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'fusion', img: i.img, imgs: i.imgs || null, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         if (k.startsWith('month|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'mensuelle', img: i.img, month: i.month, lvl: cardLvlOf(xpm[k] || 0) }); return; }
+        if (/^(lieu|tech|orga)\|/.test(k)) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: i.rarity, img: i.img, v9: i.v9, lvl: cardLvlOf(xpm[k] || 0) }); return; } // AG_CARDS_V9
         if (k.startsWith('evo|')) { const i = cardInfoOfKey(k); if (i) out.push({ key: k, name: i.name, n: v.n, shiny: v.shiny || 0, finish: finBestOf(fin[k]), finishes: {}, serial: null, u: i.u, anime: i.anime, rarity: 'evolution', img: i.img, evo: true, lvl: cardLvlOf(xpm[k] || 0) }); return; }
         const e = fin[k] || {}, finishes = Object.fromEntries(FIN_IDS.filter(f => e[f]).map(f => [f, e[f]])), best = finBestOf(e);
         const special = (k.startsWith('altart|') || k.startsWith('moment|')) ? cardInfoOfKey(k) : null;
@@ -29016,3 +29017,286 @@ cardSpecials = function (tier, u) {
     WIDE_CACHE.set(ck, { at: Date.now(), list });
     return list;
 };
+
+/* =====================================================================
+   AG_CARDS_V9 — nouveaux types de cartes (Lieux, Techniques, Organisations), packs Ténèbres / Céleste /
+   mystère / du jour, événements Nuit des Ombres et Éclipse.
+   ===================================================================== */
+const V9_LIEUX = [ // [u, nom FR, page wiki]
+ ['naruto','Konoha','Konohagakure'],['naruto','Suna','Sunagakure'],['naruto','Kiri','Kirigakure'],['naruto','Vallée de la Fin','Valley of the End'],['naruto','Mont Myôboku','Mount Myōboku'],
+ ['onepiece','Vogue Merry','Going Merry'],['onepiece','Thousand Sunny','Thousand Sunny'],['onepiece','Marineford','Marineford'],['onepiece','Pays des Wa','Wano Country'],['onepiece','Skypiea','Skypiea'],['onepiece','Water Seven','Water 7'],
+ ['bleach','Soul Society','Soul Society'],['bleach','Hueco Mundo','Hueco Mundo'],['bleach','Las Noches','Las Noches'],['bleach','Karakura','Karakura Town'],
+ ['dragonball','Kame House','Kame House'],['dragonball','Planète Namek','Namek'],['dragonball','Salle de l’Esprit et du Temps','Hyperbolic Time Chamber'],['dragonball','Planète Vegeta','Planet Vegeta'],
+ ['hxh','Tour céleste','Heavens Arena'],['hxh','York Shin','Yorknew City'],['hxh','Île de la Baleine','Whale Island'],['hxh','Greed Island','Greed Island'],
+ ['snk','Shiganshina','Shiganshina District'],['snk','Mur Maria','Wall Maria'],['snk','Île du Paradis','Paradis Island'],['snk','Mahr','Marley'],
+ ['jjk','École d’exorcisme de Tokyo','Tokyo Metropolitan Curse Technical College'],['jjk','Shibuya','Shibuya'],
+ ['demonslayer','Mont Natagumo','Mount Natagumo'],['demonslayer','Quartier des plaisirs','Entertainment District'],['demonslayer','Château de l’Infini','Infinity Castle'],['demonslayer','Village des forgerons','Swordsmith Village'],
+ ['mha','Lycée Yuei','U.A. High School'],
+ ['fairy','Guilde Fairy Tail','Fairy Tail (Guild)'],['fairy','Magnolia','Magnolia Town'],['fairy','Île Tenrô','Tenrou Island'],
+ ['fma','Central','Central City'],['fma','Resembool','Resembool'],
+ ['tokyoghoul','Anteiku','Anteiku'],
+ ['sds','Boar Hat','Boar Hat'],['sds','Royaume de Liones','Kingdom of Liones'],
+ ['clover','Royaume de Clover','Clover Kingdom'],
+ ['opm','Ville Z','Z-City'],
+ ['jojo','Morioh','Morioh'],
+ ['pokemon','Bourg Palette','Pallet Town'],
+ ['chainsaw','Bureau de sécurité publique','Public Safety Devil Hunters'],
+];
+const V9_TECHS = [ // [u, technique, perso, page wiki]
+ ['naruto','Rasengan','Naruto Uzumaki','Rasengan'],['naruto','Orbe Tourbillonnant','Naruto Uzumaki','Wind Release: Rasenshuriken'],['naruto','Multi-clonage','Naruto Uzumaki','Multiple Shadow Clone Technique'],
+ ['naruto','Chidori','Sasuke Uchiwa','Chidori'],['naruto','Amaterasu','Itachi Uchiwa','Amaterasu'],['naruto','Tsukuyomi','Itachi Uchiwa','Tsukuyomi'],['naruto','Kamui','Kakashi Hatake','Kamui'],['naruto','Shinra Tensei','Nagato','Almighty Push'],['naruto','Susanô','Madara Uchiwa','Susanoo'],
+ ['onepiece','Gomu Gomu no Mi','Monkey D. Luffy','Gomu Gomu no Mi'],['onepiece','Santôryû','Roronoa Zoro','Santoryu'],['onepiece','Diable Jambe','Sanji','Diable Jambe'],['onepiece','Mera Mera no Mi','Portgas D. Ace','Mera Mera no Mi'],['onepiece','Haki des Rois','Shanks','Haki'],['onepiece','Gura Gura no Mi','Edward Newgate','Gura Gura no Mi'],
+ ['bleach','Getsuga Tenshô','Ichigo Kurosaki','Getsuga Tenshō'],['bleach','Senbonzakura','Byakuya Kuchiki','Senbonzakura'],['bleach','Hyôrinmaru','Tōshirō Hitsugaya','Hyōrinmaru'],['bleach','Kyôka Suigetsu','Sōsuke Aizen','Kyōka Suigetsu'],['bleach','Zanka no Tachi','Genryūsai Shigekuni Yamamoto','Ryūjin Jakka'],
+ ['dragonball','Kamehameha','Sangoku','Kamehameha'],['dragonball','Genki Dama','Sangoku','Spirit Bomb'],['dragonball','Final Flash','Vegeta','Final Flash'],['dragonball','Makankôsappô','Piccolo','Special Beam Cannon'],['dragonball','Kienzan','Krilin','Destructo Disc'],
+ ['jjk','Sanctuaire Démoniaque','Ryomen Sukuna','Malevolent Shrine'],['jjk','Sphère de l’Infini','Satoru Gojo','Unlimited Void'],['jjk','Pourpre','Satoru Gojo','Hollow Technique: Purple'],['jjk','Black Flash','Yuji Itadori','Black Flash'],['jjk','Dix Ombres','Megumi Fushiguro','Ten Shadows Technique'],
+ ['demonslayer','Souffle de l’eau','Tanjiro Kamado','Water Breathing'],['demonslayer','Souffle du soleil','Tanjiro Kamado','Sun Breathing'],['demonslayer','Souffle de la foudre','Zenitsu Agatsuma','Thunder Breathing'],['demonslayer','Souffle de la flamme','Kyojuro Rengoku','Flame Breathing'],['demonslayer','Souffle de la bête','Inosuke Hashibira','Beast Breathing'],
+ ['hxh','Jajanken','Gon Freecss',null],['hxh','Godspeed','Killua Zoldyck','Godspeed'],['hxh','Bungee Gum','Hisoka',null],['hxh','Chaîne du jugement','Kurapika',null],['hxh','Skill Hunter','Chrollo Lucilfer',null],
+ ['mha','One For All','Izuku Midoriya','One For All'],['mha','Explosion','Katsuki Bakugo','Explosion'],['mha','Demi-froid demi-chaud','Shoto Todoroki','Half-Cold Half-Hot'],['mha','All For One','All For One','All For One (Quirk)'],
+ ['fairy','Magie du Chasseur de Dragon','Natsu Dragneel','Fire Dragon Slayer Magic'],['fairy','Fairy Law','Makarov Draer','Fairy Law'],['fairy','Rééquipement','Erza Scarlet','Requip'],
+ ['jojo','Star Platinum','Jotaro Kujo','Star Platinum'],['jojo','The World','Dio Brando','The World'],['jojo','Gold Experience','Giorno Giovanna','Gold Experience'],['jojo','Killer Queen','Yoshikage Kira','Killer Queen'],
+ ['fma','Alchimie de flamme','Roy Mustang','Flame Alchemy'],
+ ['clover','Anti-magie','Asta','Anti Magic'],
+ ['sds','Full Counter','Meliodas','Full Counter'],
+ ['opm','Série sérieuse','Saitama','Serious Series'],
+ ['snk','Titan Assaillant','Eren Jäger','Attack Titan'],['snk','Titan Colossal','Armin Arlert','Colossus Titan'],
+];
+const V9_ORGAS = [ // [u, id, nom, page wiki, membres]
+ ['naruto','akatsuki','Akatsuki','Akatsuki',['Nagato','Konan','Itachi Uchiwa','Kisame Hoshigaki','Deidara','Sasori','Hidan','Kakuzu','Zetsu Noir','Obito Uchiwa']],
+ ['naruto','equipe7','Équipe 7','Team Kakashi',['Naruto Uzumaki','Sasuke Uchiwa','Sakura Haruno','Kakashi Hatake']],
+ ['naruto','sannin','Les trois Sannin','Sannin',['Jiraiya','Tsunade','Orochimaru']],
+ ['naruto','hokage','Les Hokage','Hokage',['Hashirama Senju','Tobirama Senju','Hiruzen Sarutobi','Minato Namikaze','Tsunade','Kakashi Hatake']],
+ ['onepiece','mugiwara','Équipage du Chapeau de paille','Straw Hat Pirates',['Monkey D. Luffy','Roronoa Zoro','Nami','Usopp','Sanji','Tony Tony Chopper','Nico Robin','Franky','Brook','Jinbe']],
+ ['onepiece','yonko','Les Empereurs','Four Emperors',['Shanks','Marshall D. Teach','Kaido','Charlotte Linlin']],
+ ['onepiece','amiraux','Les Amiraux','Admiral',['Sakazuki','Kuzan','Borsalino','Issho']],
+ ['bleach','espada','Espada','Espada',['Coyote Starrk','Baraggan Louisenbairn','Tier Harribel','Ulquiorra Cifer','Nnoitra Gilga','Grimmjow Jaegerjaquez']],
+ ['hxh','brigade','Brigade fantôme','Phantom Troupe',['Chrollo Lucilfer','Feitan','Phinks','Machi','Nobunaga','Shalnark','Uvogin','Franklin','Shizuku','Pakunoda']],
+ ['dragonball','ginyu','Commando Ginyu','Ginyu Force',['Capitaine Ginyu','Jeece','Barta','Recoome','Guldo']],
+ ['demonslayer','piliers','Les Piliers','Hashira',['Giyu Tomioka','Kyojuro Rengoku','Tengen Uzui','Mitsuri Kanroji','Muichiro Tokito','Gyomei Himejima','Sanemi Shinazugawa','Obanai Iguro','Shinobu Kocho']],
+ ['demonslayer','lunes','Lunes supérieures','Twelve Kizuki',['Kokushibo','Doma','Akaza','Hantengu','Gyokko','Gyutaro','Daki']],
+ ['snk','bataillon','Bataillon d’exploration','Survey Corps',['Erwin Smith','Livaï Ackerman','Hansi Zoe','Eren Jäger','Mikasa Ackerman','Armin Arlert']],
+ ['fairy','equipenatsu','Équipe Natsu','Team Natsu',['Natsu Dragneel','Lucy Heartfilia','Gray Fullbuster','Erza Scarlet','Wendy Marvell','Happy']],
+ ['sds','sins','Les Sept Péchés capitaux','Seven Deadly Sins',['Meliodas','Diane','Ban','King','Gowther','Merlin','Escanor']],
+ ['mha','ligue','Ligue des super-vilains','League of Villains',['Tomura Shigaraki','Dabi','Himiko Toga','Twice','Mr. Compress','Spinner']],
+ ['jjk','exorcistes','Exorcistes de première année','Tokyo Metropolitan Curse Technical College',['Yuji Itadori','Megumi Fushiguro','Nobara Kugisaki','Satoru Gojo']],
+];
+const V9_RAR = { lieu: { label: 'Lieu', rank: 5.4, deck: 20, market: [4000, 12000] }, technique: { label: 'Technique', rank: 6.0, deck: 25, market: [8000, 22000] }, organisation: { label: 'Organisation', rank: 6.8, deck: 32, market: [20000, 60000] } };
+for (const [id, r] of Object.entries(V9_RAR)) { RAR_RANK[id] = r.rank; DECK_BONUS[id] = r.deck; MARKET_HINT[id] = r.market; }
+let V9_CACHE = null;
+function v9Resolve(u, name) { // plus strict que cardResolve : « Pain » ne doit pas tomber sur « A »
+    const n = normalizeRG(name), list = cardPool(u);
+    let c = list.find(x => normalizeRG(x.display) === n);
+    if (!c) c = list.find(x => { const d = normalizeRG(x.display); return Math.min(d.length, n.length) >= 4 && (d.includes(n) || n.includes(d)); });
+    return c ? { display: c.display } : null;
+}
+function v9Data() {
+    if (V9_CACHE) return V9_CACHE;
+    const lieux = V9_LIEUX.filter(([u]) => ARC_UNIVERSE_ANIME[u]).map(([u, name, wiki]) => ({ kind: 'lieu', u, name, wiki, key: `lieu|${u}|${name}` }));
+    const techs = [], orgas = [], missing = [];
+    for (const [u, name, ch, wiki] of V9_TECHS) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const c = v9Resolve(u, ch); if (!c) { missing.push(u + ':' + ch); continue; }
+        techs.push({ kind: 'tech', u, name, char: c.display, wiki, key: `tech|${u}|${c.display}|${name}` });
+    }
+    for (const [u, id, name, wiki, members] of V9_ORGAS) {
+        if (!ARC_UNIVERSE_ANIME[u]) continue;
+        const ms = members.map(m => { const c = v9Resolve(u, m); if (!c) missing.push(u + ':' + m); return c ? c.display : null; }).filter(Boolean);
+        if (ms.length >= 3) orgas.push({ kind: 'orga', u, id, name, wiki, members: [...new Set(ms)], key: `orga|${u}|${id}` });
+    }
+    if (missing.length) console.log('[cartes V9] persos introuvables :', missing.join(', '));
+    const byKey = new Map([...lieux, ...techs, ...orgas].map(x => [x.key, x]));
+    const lieuxByU = {}, techByChar = {};
+    lieux.forEach(l => (lieuxByU[l.u] = lieuxByU[l.u] || []).push(l));
+    techs.forEach(t => (techByChar[t.u + '|' + t.char] = techByChar[t.u + '|' + t.char] || []).push(t));
+    V9_CACHE = { lieux, techs, orgas, byKey, lieuxByU, techByChar };
+    return V9_CACHE;
+}
+const v9Img = key => '/api/cardx-img?k=' + encodeURIComponent(key);
+function v9Info(e) {
+    if (!e) return null;
+    const anime = ARC_UNIVERSE_ANIME[e.u];
+    if (e.kind === 'lieu') return { u: e.u, name: e.name, display: e.name, anime, rarity: 'lieu', img: v9Img(e.key), v9: 'lieu' };
+    if (e.kind === 'tech') return { u: e.u, name: `${e.name} — ${e.char}`, display: `${e.name} — ${e.char}`, anime, rarity: 'technique', img: v9Img(e.key), v9: 'tech', char: e.char };
+    return { u: e.u, name: e.name, display: e.name, anime, rarity: 'organisation', img: v9Img(e.key), v9: 'orga', members: e.members };
+}
+const _cardInfoOfKeyV9 = cardInfoOfKey;
+cardInfoOfKey = function (k) {
+    if (/^(lieu|tech|orga)\|/.test(String(k))) return v9Info(v9Data().byKey.get(String(k)));
+    return _cardInfoOfKeyV9(k);
+};
+// image : l'image principale de la page du wiki de l'anime (gardée en base), sinon un perso lié
+app.get('/api/cardx-img', async (req, res) => {
+    const key = String(req.query.k || ''), e = v9Data().byKey.get(key);
+    if (!e) return res.status(404).end();
+    const fallback = () => cardImg({ u: e.u, display: e.kind === 'tech' ? e.char : e.kind === 'orga' ? e.members[0] : ((arcFamous(e.u)[0] || {}).display || '') });
+    let url = null;
+    try { const c = await getCachedCharacterImage('_cardx', key); if (c && c.imageUrl) url = c.imageUrl; else if (c && c.status === 'missing' && c.sourceUrl && Date.now() - Number(c.sourceUrl) < 86400000) url = ''; } catch (_) {}
+    if (url == null && e.wiki && FANDOM_WIKIS[e.u]) {
+        try {
+            const p = new URLSearchParams({ action: 'query', titles: e.wiki, prop: 'pageimages', piprop: 'thumbnail', pithumbsize: '700', redirects: '1', format: 'json' });
+            const j = await fetchJsonWithTimeout(`https://${FANDOM_WIKIS[e.u]}/api.php?${p}`, 6000);
+            const pg = Object.values((j && j.query && j.query.pages) || {}).find(x => x && x.thumbnail && x.thumbnail.source);
+            url = pg ? pg.thumbnail.source : '';
+            await saveCachedCharacterImage('_cardx', key, url ? { imageUrl: url, sourceUrl: '', status: 'ok' } : { imageUrl: null, sourceUrl: String(Date.now()), status: 'missing' });
+        } catch (_) { url = ''; }
+    }
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.redirect(url ? '/api/img?u=' + encodeURIComponent(url) : fallback());
+});
+// ---------- obtention : lieux et techniques tombent en bonus des boosters ----------
+const V9_LIEU_RATE = 1 / 110, V9_TECH_RATE = 1 / 70;
+async function v9Award(uid, e) {
+    const isNew = await cardGive(uid, { key: e.key }, Math.random() < 1 / 12);
+    if (!isNew) await ecoAddCoins(uid, e.kind === 'tech' ? 40 : 25);
+    const i = v9Info(e);
+    return { key: e.key, name: i.name, anime: i.anime, u: e.u, rarity: i.rarity, shiny: false, isNew, coins: isNew ? 0 : (e.kind === 'tech' ? 40 : 25), img: i.img, v9: i.v9 };
+}
+async function v9Extras(uid, cards) {
+    if (!uid || !Array.isArray(cards) || !cards.length) return cards;
+    try {
+        const D = v9Data(), luck = Math.min(10, await cardLuck(uid)), add = [];
+        for (const c of cards.slice()) {
+            if (!c || !c.u || add.length >= 2) continue;
+            const base = String(c.name || '').split(' — ')[0];
+            const tl = D.techByChar[c.u + '|' + base];
+            if (tl && Math.random() < Math.min(0.25, V9_TECH_RATE * luck)) { add.push(await v9Award(uid, tl[Math.floor(Math.random() * tl.length)])); continue; }
+            const ll = D.lieuxByU[c.u];
+            if (ll && Math.random() < Math.min(0.2, V9_LIEU_RATE * luck)) add.push(await v9Award(uid, ll[Math.floor(Math.random() * ll.length)]));
+        }
+        return add.length ? cards.concat(add) : cards;
+    } catch (e) { console.warn('[cartes V9]', e.message); return cards; }
+}
+// ---------- organisations : la carte se réclame quand on a tous les membres ----------
+async function v9Owned(uid) {
+    const mine = await cardsOf(uid), owned = new Set(), keys = new Set();
+    for (const k of mine.keys()) { keys.add(k); const i = cardInfoOfKey(k); if (i && !i.v9) owned.add(i.u + '|' + String(i.display || i.name).split(' — ')[0]); }
+    return { owned, keys };
+}
+app.get('/api/cards/orgas', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const { owned, keys } = await v9Owned(uid), D = v9Data();
+    res.json({ ok: true, bonus: { lieu: 6, tech: 12, orga: 8 }, orgas: D.orgas.map(o => ({ id: o.id, key: o.key, name: o.name, anime: ARC_UNIVERSE_ANIME[o.u], img: v9Img(o.key), claimed: keys.has(o.key),
+        members: o.members.map(m => ({ name: m, img: cardImg({ u: o.u, display: m }), owned: owned.has(o.u + '|' + m) })) })),
+        lieux: D.lieux.filter(l => keys.has(l.key)).length, lieuxTotal: D.lieux.length, techs: D.techs.filter(t => keys.has(t.key)).length, techsTotal: D.techs.length });
+});
+app.post('/api/cards/orgas/claim', async (req, res) => {
+    const uid = needUid(req, res); if (!uid) return;
+    const o = v9Data().orgas.find(x => x.id === String((req.body || {}).id || ''));
+    if (!o) return res.json({ ok: false, error: 'Organisation inconnue.' });
+    const { owned, keys } = await v9Owned(uid);
+    if (keys.has(o.key)) return res.json({ ok: false, error: 'Tu as déjà cette carte.' });
+    const miss = o.members.filter(m => !owned.has(o.u + '|' + m));
+    if (miss.length) return res.json({ ok: false, error: `Il te manque : ${miss.join(', ')}.` });
+    res.json({ ok: true, card: await v9Award(uid, o) });
+});
+// ---------- bonus en combat (duels, défis entre amis, Tour de l'infini) ----------
+const _cardsWithMetaV9 = cardsWithMeta;
+cardsWithMeta = async function (uid, keys) {
+    const list = await _cardsWithMetaV9(uid, keys);
+    try {
+        const mine = await cardsOf(uid), D = v9Data(), lieuU = new Set(), techC = new Set(), orgaC = new Set();
+        for (const k of mine.keys()) {
+            const e = D.byKey.get(k); if (!e) continue;
+            if (e.kind === 'lieu') lieuU.add(e.u); else if (e.kind === 'tech') techC.add(e.u + '|' + e.char); else e.members.forEach(m => orgaC.add(e.u + '|' + m));
+        }
+        list.forEach(c => {
+            if (!c || /^(lieu|tech|orga)\|/.test(c.key || '')) return;
+            const b = String(c.name || '').split(' — ')[0], why = [];
+            let m = 1;
+            if (lieuU.has(c.u)) { m += 0.06; why.push('lieu'); }
+            if (techC.has(c.u + '|' + b)) { m += 0.12; why.push('technique'); }
+            if (orgaC.has(c.u + '|' + b)) { m += 0.08; why.push('organisation'); }
+            if (m > 1) { c.xmult = m; c.xbonus = why; }
+        });
+    } catch (e) { console.warn('[cartes V9] bonus', e.message); }
+    return list;
+};
+const _cardPowerV9 = cardPower;
+cardPower = function (c) { return Math.round(_cardPowerV9(c) * ((c && c.xmult) || 1)); };
+
+// ---------- packs : Ténèbres, Céleste, mystère, du jour ----------
+const V9_PACKS = {
+    tenebres: { tiers: { ombre: 50, minuit: 18, corrompue: 14, demoniaque: 9, abyssale: 3, spectrale: 6 }, fins: ['bloodseal', 'dark', 'inverted', 'glitch'] },
+    celeste: { tiers: { solaire: 22, lunaire: 22, celeste: 16, eclat: 14, sacree: 11, onirique: 8, divine: 7 }, fins: ['goldleaf', 'aurora', 'holo', 'glitter'] }
+};
+function v9PickTier(w) { const tot = Object.values(w).reduce((a, b) => a + b, 0); let r = Math.random() * tot; for (const [k, v] of Object.entries(w)) { r -= v; if (r <= 0) return k; } return Object.keys(w)[0]; }
+async function v9ThemedSpecial(uid, pack, luck) {
+    const P = V9_PACKS[pack], us = arcUniverses();
+    for (let tries = 0; tries < 12; tries++) {
+        const tier = v9PickTier(P.tiers); if (!SPECIAL_BY_ID[tier]) continue;
+        const t = SPECIAL_BY_ID[tier], cu = t.animes ? t.animes[Math.floor(Math.random() * t.animes.length)] : us[Math.floor(Math.random() * us.length)];
+        const sc = cardSpecials(tier, cu); if (!sc.length) continue;
+        const s = sc[Math.floor(Math.random() * sc.length)];
+        const c = await cardAwardSecret(uid, s.u, s.display, Math.random() < Math.min(0.9, luck / 10), tier);
+        if (c && !c.finish && Math.random() < 0.3) Object.assign(c, await finAdd(uid, cardKeyOf(c), P.fins[Math.floor(Math.random() * P.fins.length)]));
+        return c;
+    }
+    return null;
+}
+const _tbCatalogForV9 = tbCatalogFor;
+tbCatalogFor = async function (uid) {
+    const list = await _tbCatalogForV9(uid), wk = tbWeekly();
+    const extra = [];
+    if (uid && wk && (await kvGet('dailypack', String(uid), '')) !== parisDay()) extra.push({ id: 'x:daily', name: `Pack du jour : ${ARC_UNIVERSE_ANIME[wk]}`, emoji: '🎁', desc: 'Gratuit chaque jour • 3 cartes de l’anime de la semaine', price: 0, event: true });
+    extra.push({ id: 'x:tenebres', name: 'Booster Ténèbres', emoji: '🌑', desc: '5 cartes dont 2 sombres garanties (Ombre, Minuit, Corrompue, Démoniaque, Abyssale…) • finitions sombres plus fréquentes', price: 2200 });
+    extra.push({ id: 'x:celeste', name: 'Booster Céleste', emoji: '☀️', desc: '5 cartes dont 2 lumineuses garanties (Solaire, Lunaire, Céleste, Éclat, Sacrée, Onirique…) • finitions dorées plus fréquentes', price: 2200 });
+    extra.push({ id: 'x:mystere', name: 'Pack mystère', emoji: '❓', desc: '5 cartes d’un anime surprise, révélé à l’ouverture • raretés x1,5 • 1 épique min.', price: 450 });
+    return [...list.filter(b => b.event), ...extra, ...list.filter(b => !b.event)];
+};
+const _tbOpenV9 = tbOpen;
+tbOpen = async function (uid, b, chosenU) {
+    const id = b && b.id;
+    if (!['x:daily', 'x:tenebres', 'x:celeste', 'x:mystere'].includes(id)) return v9Extras(uid, await _tbOpenV9(uid, b, chosenU));
+    const luck = await cardLuck(uid);
+    let cards = [];
+    if (id === 'x:daily') { await kvSet('dailypack', String(uid), parisDay()); cards = await tbFromUniverses(uid, [tbWeekly()], luck, 1, 3); }
+    else if (id === 'x:mystere') {
+        const us = Object.keys(ARC_UNIVERSE_ANIME).filter(u => cardPool(u).length >= 20), u = us[Math.floor(Math.random() * us.length)];
+        cards = await tbFromUniverses(uid, [u], luck * 1.5, 2, 5);
+        cards.forEach(c => { if (c) c.mystery = ARC_UNIVERSE_ANIME[u]; });
+    } else {
+        const pack = id.slice(2);
+        cards = await tbFromUniverses(uid, arcUniverses(), luck, 0, 3);
+        for (let i = 0; i < 2; i++) { const c = await v9ThemedSpecial(uid, pack, luck); if (c) cards.splice(Math.floor(Math.random() * (cards.length + 1)), 0, c); }
+    }
+    return v9Extras(uid, await autoDelApply(uid, await recordCards(uid, cards)));
+};
+const _openBoosterV9 = openBooster;
+openBooster = async function (uid, n, type = '') { return v9Extras(uid, await _openBoosterV9(uid, n, type)); };
+
+// ---------- événements : Nuit des Ombres (1er samedi du mois, 20h-minuit) et Éclipse (dimanche 21h-22h) ----------
+const V9_EVENTS = [
+    { id: 'ombres', label: 'Nuit des Ombres', emoji: '🌑', desc: 'Cartes Ombre x2', tiers: { ombre: 2 }, at: p => p.wd === 'Sat' && p.d <= 7 && p.h >= 20 },
+    { id: 'eclipse', label: 'Éclipse', emoji: '🌘', desc: 'Solaire et Lunaire x5', tiers: { solaire: 5, lunaire: 5 }, at: p => p.wd === 'Sun' && p.h === 21 }
+];
+function v9EventsNow(ms = hubNow()) { const p = parisParts(ms); return V9_EVENTS.filter(e => e.at(p)); }
+let V9_NEXT = { at: 0, list: [] };
+function v9NextEvents() {
+    if (Date.now() - V9_NEXT.at < 60000) return V9_NEXT.list;
+    const out = [], start = hubNow();
+    for (const e of V9_EVENTS) {
+        let wasOn = e.at(parisParts(start));
+        for (let t = start + 15 * 60000; t < start + 40 * 86400000; t += 15 * 60000) {
+            const on = e.at(parisParts(t));
+            if (on && !wasOn) { out.push({ id: e.id, label: e.label, emoji: e.emoji, desc: e.desc, at: t - (t % (15 * 60000)) }); break; }
+            wasOn = on;
+        }
+    }
+    V9_NEXT = { at: Date.now(), list: out.sort((a, b) => a.at - b.at) };
+    return V9_NEXT.list;
+}
+// les multiplicateurs s'ajoutent à la météo du jour (calculés à partir des taux de base)
+const _weatherApplyV9 = weatherApply;
+weatherApply = function () {
+    _weatherApplyV9();
+    const h = parisHour(), night = h < 6, w = weatherToday(), ev = v9EventsNow();
+    SPECIAL_TIERS.forEach(t => {
+        if (t.baseRate == null) t.baseRate = t.rate;
+        let r = t.id === 'minuit' ? (night ? t.baseRate : 0) : t.baseRate * (w.tiers.includes(t.id) ? 3 : 1);
+        for (const e of ev) r *= e.tiers[t.id] || 1;
+        t.rate = r;
+    });
+    CARD_RATES_CACHE = null;
+};
+setInterval(() => weatherApply(), 60 * 1000).unref();
+weatherApply();
+app.get('/api/cards/events', (req, res) => res.json({ ok: true, now: v9EventsNow().map(e => ({ id: e.id, label: e.label, emoji: e.emoji, desc: e.desc })), next: v9NextEvents() }));
