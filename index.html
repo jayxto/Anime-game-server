@@ -1396,6 +1396,10 @@
         #summon.show .sm-topskip{opacity:1;}
         #summon.done .sm-topskip{background:var(--c);color:#000;border-color:transparent;}
         #summon .sm-bottom{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));flex:none;background:rgba(5,5,16,.78);padding:8px 14px;border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.5);}
+        /* AG_SUMMON_STABLE_V1 : le texte d'invocation flotte au-dessus (il ne pousse plus les cartes) et les cartes gardent
+           toujours la même place : elles ne sautent plus vers le haut puis vers le milieu à l'ouverture */
+        #summon .sm-txt{position:fixed;left:0;right:0;top:calc(14% + env(safe-area-inset-top));margin:0;pointer-events:none;}
+        #summon.show .sm-txt{height:auto;}
         @media (prefers-reduced-motion:reduce){#summon *{animation-duration:.01s!important;transition-duration:.01s!important;}}
         /* ---- Invocation : une animation par rareté ---- */
         #summon .sm-card{position:relative;}
