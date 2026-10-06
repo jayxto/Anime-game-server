@@ -21128,8 +21128,8 @@ app.post('/api/trade/live/confirm', async (req, res) => {
         if (t.b.fin) await finMove(t.b.uid, t.a.uid, t.b.key, t.b.fin);
         const aGot = tradeCardInfo(t.b.key, t.b.fin), bGot = tradeCardInfo(t.a.key, t.a.fin);
         await closeLiveTrade(t, 'done');
-        emitUser(t.a.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${aGot.name}${aGot.finish ? ' (' + (FINISHES.find(f => f.id === aGot.finish)?.label || aGot.finish) + ')' : ''} !` });
-        emitUser(t.b.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${bGot.name}${bGot.finish ? ' (' + (FINISHES.find(f => f.id === bGot.finish)?.label || bGot.finish) + ')' : ''} !` });
+        emitUser(t.a.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${aGot.name}${aGot.finish ? ' (' + finLabel(aGot.finish) + ')' : ''} !` });
+        emitUser(t.b.uid, 'trade_done', { text: `✅ Échange terminé : tu reçois ${bGot.name}${bGot.finish ? ' (' + finLabel(bGot.finish) + ')' : ''} !` });
         return res.json({ ok: true, done: true, got: aGot.name });
     } catch (e) {
         t.locked = false;
@@ -23894,7 +23894,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { absolue: 11, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { absolue: 11, solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -23927,8 +23927,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { absolue: 'Absolue', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { absolue: '#fffbe6', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { absolue: 'Absolue', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { absolue: '#fffbe6', solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -24492,7 +24492,13 @@ async function finAdd(uid, key, fid) {
     kvSet('fin', String(uid), m);
     return { finish: fid, serial, serialMax: fid === 'numbered' ? NUMBERED_MAX : null, finCount: g[fid] };
 }
-const finBestOf = e => e ? FIN_IDS.find(f => e[f] > 0) || null : null;
+// AG_CARDS_V8 : une double finition (« fire+holo ») passe avant les finitions simples
+const finBestOf = e => {
+    if (!e) return null;
+    let best = null, bs = Infinity;
+    for (const k in e) if (k.includes('+') && e[k] > 0) { const sc = k.split('+').reduce((a, x) => a + Math.max(0, FIN_IDS.indexOf(x)), 0); if (sc < bs) { bs = sc; best = k; } }
+    return best || FIN_IDS.find(f => e[f] > 0) || null;
+};
 const cardKeyOf = c => c.secret || SPECIAL_BY_ID[c.rarity] ? cardSpecialKey(c.u, c.name, c.rarity) : c.u + '|' + c.name;
 
 // --- répliques cultes (tirées des citations du mode Citations) ---
@@ -24701,11 +24707,11 @@ publicProfile = async function (pseudo) {
     if (!p) return p;
     try {
         const fin = await kvGet('fin', String(p.uid), {}), vit = await kvGet('vitrine', String(p.uid), []), mine = await cardsOf(p.uid);
-        const view = k => { const m = mine.get(k), info = cardInfoOfKey(k); if (!m || !info) return null; const f = finBestOf(fin[k]); return { key:k, name: info.name, anime: info.anime, rarity: info.rarity || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null, finish: f, finishLabel: f ? FINISHES.find(x => x.id === f).label : null }; };
+        const view = k => { const m = mine.get(k), info = cardInfoOfKey(k); if (!m || !info) return null; const f = finBestOf(fin[k]); return { key:k, name: info.name, anime: info.anime, rarity: info.rarity || 'commune', shiny: m.shiny > 0, img: info.img, imgs: info.imgs || null, finish: f, finishLabel: f ? finLabel(f) : null }; };
         const top = vit.map(view).filter(Boolean);
         p.showcase = top; p.museum = top;
         p.cards = top.concat(p.cards.filter(c => !top.some(t => t.name === c.name))).slice(0, 12);
-        p.cards.forEach(c => { if (c.finish) return; const k = Object.keys(fin).find(k => k.split('|')[1] === c.name); const f = k && finBestOf(fin[k]); if (f) { c.finish = f; c.finishLabel = FINISHES.find(x => x.id === f).label; } });
+        p.cards.forEach(c => { if (c.finish) return; const k = Object.keys(fin).find(k => k.split('|')[1] === c.name); const f = k && finBestOf(fin[k]); if (f) { c.finish = f; c.finishLabel = finLabel(f); } });
     } catch (_) {}
     return p;
 };
@@ -28898,3 +28904,78 @@ app.get('/api/backup-file/:name', (req, res) => {
     res.setHeader('Content-Length', fs.statSync(f).size);
     fs.createReadStream(f).pipe(res);
 });
+
+/* =====================================================================
+   AG_CARDS_V8 — 7 nouvelles raretés, 9 nouvelles finitions, doubles finitions.
+   Raretés (versions spéciales des persos iconiques) : Solaire, Lunaire, Sacrée, Tempête, Corrompue, Démoniaque, Ancestrale.
+   Finitions : Sceau de sang, Chibi, Vitrail, Inversée, Feuille d'or, Électrique, En feu, Givrée, Aquarelle.
+   Double finition : quand une finition sort, 1 chance sur 40 qu'une 2e s'ajoute (ex. « fire+holo »).
+   ===================================================================== */
+const V8_TIERS = [
+    { id: 'solaire', label: 'Solaire', top: 2, rate: 1 / 1700, coins: 220, rank: 6.4, deck: 27, market: [14000, 36000] },
+    { id: 'lunaire', label: 'Lunaire', top: 2, rate: 1 / 1800, coins: 230, rank: 6.45, deck: 27, market: [14000, 36000] },
+    { id: 'sacree', label: 'Sacrée', top: 1, rate: 1 / 2800, coins: 350, rank: 6.9, deck: 30, market: [22000, 60000] },
+    { id: 'tempete', label: 'Tempête', top: 1, rate: 1 / 3200, coins: 420, rank: 7.1, deck: 31, market: [26000, 70000] },
+    { id: 'corrompue', label: 'Corrompue', top: 1, rate: 1 / 5000, coins: 550, rank: 7.4, deck: 34, market: [40000, 100000] },
+    { id: 'demoniaque', label: 'Démoniaque', top: 1, rate: 1 / 12000, coins: 1200, rank: 8.2, deck: 48, market: [90000, 240000] },
+    { id: 'ancestrale', label: 'Ancestrale', top: 1, rate: 1 / 25000, coins: 2200, rank: 8.6, deck: 62, market: [160000, 420000] }
+];
+for (const t of V8_TIERS) {
+    if (SPECIAL_BY_ID[t.id]) continue;
+    SPECIAL_TIERS.push({ id: t.id, label: t.label, top: t.top, rate: t.rate, coins: t.coins });
+    RAR_RANK[t.id] = t.rank; DECK_BONUS[t.id] = t.deck; MARKET_HINT[t.id] = t.market;
+    // rangée juste avant la première rareté plus forte (les raretés sans rang connu sont ignorées)
+    const at = RAR_ORDER.findIndex(r => RAR_RANK[r] != null && RAR_RANK[r] > t.rank);
+    if (!RAR_ORDER.includes(t.id)) RAR_ORDER.splice(at < 0 ? RAR_ORDER.length : at, 0, t.id);
+}
+SPECIAL_TIERS.sort((a, b) => b.rate - a.rate);
+SPECIAL_TIERS.forEach(t => { SPECIAL_BY_ID[t.id] = t; });
+
+const V8_FINISHES = [
+    { id: 'bloodseal', label: 'Sceau de sang', rate: 1 / 1200, deck: 8, atelier: [5, 3200] },
+    { id: 'chibi', label: 'Chibi', rate: 1 / 800, deck: 6, atelier: [5, 2600] },
+    { id: 'stained', label: 'Vitrail', rate: 1 / 600, deck: 7, atelier: [5, 2400] },
+    { id: 'inverted', label: 'Inversée', rate: 1 / 500, deck: 6, atelier: [4, 1800] },
+    { id: 'goldleaf', label: 'Feuille d’or', rate: 1 / 350, deck: 5, atelier: [4, 1500] },
+    { id: 'electric', label: 'Électrique', rate: 1 / 260, deck: 4, atelier: [3, 1000] },
+    { id: 'fire', label: 'En feu', rate: 1 / 220, deck: 4, atelier: [3, 900] },
+    { id: 'frost', label: 'Givrée', rate: 1 / 160, deck: 3, atelier: [3, 700] },
+    { id: 'watercolor', label: 'Aquarelle', rate: 1 / 140, deck: 3, atelier: [2, 500] }
+];
+for (const f of V8_FINISHES) {
+    if (FIN_IDS.includes(f.id)) continue;
+    FINISHES.push({ id: f.id, label: f.label, rate: f.rate }); FIN_DECK[f.id] = f.deck; ATELIER_TIERS[f.id] = f.atelier;
+}
+FINISHES.sort((a, b) => a.rate - b.rate);
+FIN_IDS.splice(0, FIN_IDS.length, ...FINISHES.map(f => f.id));
+CARD_RATES_CACHE = null;
+// bonus de deck d'une double finition = somme des deux + 3 (calculé à la demande)
+Object.setPrototypeOf(FIN_DECK, new Proxy({}, { get: (t, k) => typeof k === 'string' && k.includes('+') ? k.split('+').reduce((a, x) => a + (FIN_DECK[x] || 0), 0) + 3 : undefined }));
+function finLabel(f) {
+    if (!f) return '';
+    return String(f).split('+').map(x => (FINISHES.find(y => y.id === x) || {}).label || x).join(' + ');
+}
+const COMBO_RATE = 1 / 40;
+const COMBO_NO = new Set(['numbered', 'signed']); // les finitions à numéro restent seules
+const _cardDecorateV8 = cardDecorate;
+cardDecorate = async function (uid, card, luck) {
+    const out = await _cardDecorateV8(uid, card, luck);
+    try {
+        const f1 = out && out.finish;
+        if (!uid || !f1 || f1.includes('+') || COMBO_NO.has(f1) || Math.random() >= COMBO_RATE) return out;
+        const off = await finOff(uid);
+        const pool = FINISHES.filter(f => f.id !== f1 && !COMBO_NO.has(f.id) && !off.has(f.id));
+        const tot = pool.reduce((a, f) => a + f.rate, 0); let r = Math.random() * tot, f2 = pool[pool.length - 1];
+        for (const f of pool) { r -= f.rate; if (r <= 0) { f2 = f; break; } }
+        if (!f2) return out;
+        const combo = [f1, f2.id].sort((a, b) => FIN_IDS.indexOf(a) - FIN_IDS.indexOf(b)).join('+');
+        const key = cardKeyOf(out);
+        // la copie passe de « finition simple » à « double finition »
+        const m = await kvGet('fin', String(uid), {}); const e = m[key] = m[key] || {};
+        if (e[f1] > 0) { e[f1]--; if (!e[f1]) delete e[f1]; }
+        e[combo] = (e[combo] || 0) + 1; await kvSet('fin', String(uid), m);
+        const g = await kvGet('fincount', key, {}); if (g[f1] > 0) g[f1]--; g[combo] = (g[combo] || 0) + 1; kvSet('fincount', key, g);
+        out.finish = combo; out.finishLabel = finLabel(combo); out.combo = true;
+    } catch (e) { console.warn('[double finition]', e.message); }
+    return out;
+};

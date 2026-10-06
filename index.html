@@ -10996,7 +10996,7 @@ body.ag-game-page #app-root > #mode,
                     <button class="buy" ${eco.coins < b.price ? 'disabled' : ''} onclick="tbBuy(${bi})">🪙 ${b.price}</button></div>`).join(''));
         }
         // AG_MORE_RARITIES_V1 — « ? » : chances d'obtention de chaque rareté
-        const RATE_COL = { commune: '#9aa0a6', rare: '#3fa7ff', epique: '#b44dff', legendaire: '#ffb300', mythique: '#ff3c7a', secrete: '#00f0ff', stellaire: '#ffe98a', eveillee: '#ff2d55', divine: '#fff3b0', spectrale: '#b0fff0', celeste: '#8fe3ff', cosmique: '#7b5cff', infernale: '#ff3b00', glaciale: '#7fdcff', legende: '#ff4500', imperiale: '#d4a017', eternelle: '#ffd700', abyssale: '#7a00ff', dimensionnelle: '#00ffa3', omega: '#ffffff', chaos: '#ff0044', primordiale: '#00ffd5', absolue: '#fffbe6' };
+        const RATE_COL = { commune: '#9aa0a6', rare: '#3fa7ff', epique: '#b44dff', legendaire: '#ffb300', mythique: '#ff3c7a', secrete: '#00f0ff', stellaire: '#ffe98a', eveillee: '#ff2d55', divine: '#fff3b0', spectrale: '#b0fff0', celeste: '#8fe3ff', cosmique: '#7b5cff', infernale: '#ff3b00', glaciale: '#7fdcff', legende: '#ff4500', imperiale: '#d4a017', eternelle: '#ffd700', abyssale: '#7a00ff', dimensionnelle: '#00ffa3', omega: '#ffffff', chaos: '#ff0044', primordiale: '#00ffd5', absolue: '#fffbe6' , solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878'};
         function ratesFmt(p) {
             const pct = p * 100;
             const txt = pct >= 1 ? pct.toFixed(1) : pct >= 0.01 ? pct.toFixed(2) : pct.toFixed(pct >= 0.001 ? 3 : 4);
@@ -11840,8 +11840,8 @@ body.ag-game-page #app-root > #mode,
 
         // --- échanges directs ---
         const trd = { friend: null, friends: [], mine: [], session: null, q1: '', r1: '', showHistory: false };
-        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-        const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
+        const TRD_ORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'ancestrale', 'abyssale', 'demoniaque', 'eternelle', 'imperiale', 'legende', 'corrompue', 'glaciale', 'infernale', 'tempete', 'cosmique', 'sacree', 'celeste', 'lunaire', 'solaire', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'collector', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+        const TRD_FIN = { holo: '🌈 Holo', reverse: '🪩 Reverse', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' , bloodseal: '🩸 Sceau de sang', chibi: '🧸 Chibi', stained: '🪟 Vitrail', inverted: '🔄 Inversée', goldleaf: '🏅 Feuille d’or', electric: '⚡ Électrique', fire: '🔥 En feu', frost: '❄️ Givrée', watercolor: '🎨 Aquarelle'};
         const trdId = c => c.key + '#' + (c.finish || '');
         const trdSplit = id => { const i = String(id || '').lastIndexOf('#'); return i < 0 ? [String(id || ''), null] : [id.slice(0, i), id.slice(i + 1) || null]; };
         function trdCard(c, empty) {
@@ -13170,11 +13170,11 @@ body.ag-game-page #app-root > #mode,
 
         /* ---------- scène d'invocation pour les boosters ---------- */
         (function () {
-            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, minuit: 5.6, champion: 6.6, saison: 6.8, rectoverso: 6.2, peuple: 6.4, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 };
-            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', minuit: '#5b6bff', champion: '#ffb300', saison: '#ffcc00', rectoverso: '#00d9ff', peuple: '#ff8a00', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' };
+            const RANK = { commune: 0, rare: 1, epique: 2, legendaire: 3, mythique: 4, secrete: 5, divine: 6, cosmique: 7, eternelle: 8, omega: 9, halloween: 5, eveillee: 5, legende: 7, duo: 4, noel: 5, valentin: 5, ete: 5, altart: 5, moment: 5, evolution: 5.8, mensuelle: 6, fusion: 6.3, minuit: 5.6, champion: 6.6, saison: 6.8, rectoverso: 6.2, peuple: 6.4, celeste: 6.5, abyssale: 8.5, primordiale: 10, stellaire: 5.3, spectrale: 6.2, infernale: 7.2, glaciale: 7.3, imperiale: 7.8, dimensionnelle: 8.8, chaos: 9.5, absolue: 11 , solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6};
+            const XCOL = { halloween: '#ff7a00', eveillee: '#ff2d55', legende: '#ff4500', duo: '#00e5a0', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', altart: '#8b5cf6', moment: '#ffb020', evolution: '#ff7b00', mensuelle: '#00e0a0', fusion: '#ff3df0', minuit: '#5b6bff', champion: '#ffb300', saison: '#ffcc00', rectoverso: '#00d9ff', peuple: '#ff8a00', celeste: '#8fe3ff', abyssale: '#7a00ff', primordiale: '#00ffd5', stellaire: '#ffe98a', spectrale: '#b0fff0', infernale: '#ff3b00', glaciale: '#7fdcff', imperiale: '#d4a017', dimensionnelle: '#00ffa3', chaos: '#ff0044', absolue: '#fffbe6' , solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878'};
             const COL = ['#d6e4ff', '#3fa7ff', '#b44dff', '#ffb300', '#ff3c7a', '#00f0ff', '#fff3b0', '#7b5cff', '#ffd700', '#ffffff'];
             const RNAME = ['commune', 'rare', 'epique', 'legendaire', 'mythique', 'secrete', 'divine', 'cosmique', 'eternelle', 'omega'];
-            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', minuit: '🌙 MINUIT 🌙', champion: '🏆 CHAMPION 🏆', saison: '🏆 SAISON 🏆', rectoverso: '🔄 RECTO-VERSO 🔄', peuple: '🗳️ ÉLUE DU PEUPLE 🗳️', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' };
+            const BANNER = { legendaire: 'LÉGENDAIRE !', mythique: '🔥 MYTHIQUE 🔥', secrete: '🌈 SECRÈTE 🌈', divine: '👑 DIVINE 👑', cosmique: '🌌 COSMIQUE 🌌', eternelle: '♾️ ÉTERNELLE ♾️', omega: 'Ω OMÉGA Ω', halloween: '🎃 HALLOWEEN 🎃', eveillee: '🩸 ÉVEILLÉE 🩸', legende: '👑 LÉGENDE VIVANTE 👑', duo: '🎴 CARTE DUO 🎴', noel: '🎄 NOËL 🎄', valentin: '💘 SAINT-VALENTIN 💘', ete: '☀️ ÉTÉ ☀️', altart: '🖼️ ALT ART 🖼️', moment: '🎬 CARTE MOMENT 🎬', evolution: '🧬 ÉVOLUTION 🧬', mensuelle: '🗓️ CARTE DU MOIS 🗓️', fusion: '🔗 FUSION 🔗', minuit: '🌙 MINUIT 🌙', champion: '🏆 CHAMPION 🏆', saison: '🏆 SAISON 🏆', rectoverso: '🔄 RECTO-VERSO 🔄', peuple: '🗳️ ÉLUE DU PEUPLE 🗳️', celeste: '🌠 CÉLESTE 🌠', abyssale: '🌑 ABYSSALE 🌑', primordiale: '🔱 PRIMORDIALE 🔱', stellaire: '⭐ STELLAIRE ⭐', spectrale: '👻 SPECTRALE 👻', infernale: '🔥 INFERNALE 🔥', glaciale: '❄️ GLACIALE ❄️', imperiale: '🏯 IMPÉRIALE 🏯', dimensionnelle: '🌀 DIMENSIONNELLE 🌀', chaos: '☄️ CHAOS ☄️', absolue: '✴️ ABSOLUE ✴️' , solaire: '☀️ SOLAIRE ☀️', lunaire: '🌙 LUNAIRE 🌙', sacree: '⛩️ SACRÉE ⛩️', tempete: '⛈️ TEMPÊTE ⛈️', corrompue: '👾 CORROMPUE 👾', demoniaque: '😈 DÉMONIAQUE 😈', ancestrale: '🗿 ANCESTRALE 🗿'};
             // particules : [nombre, couleurs, distance, direction ('out' | 'up' | 'down' | 'orbit')]
             const PARTS = {
                 rare: [10, ['#3fa7ff', '#9fd4ff'], 110, 'out'], epique: [18, ['#b44dff', '#e3b0ff', '#fff'], 150, 'out'],
@@ -13189,7 +13189,7 @@ body.ag-game-page #app-root > #mode,
                 altart: [46, ['#8b5cf6', '#00e5ff', '#ff4fd8', '#ffffff'], 265, 'orbit'], moment: [50, ['#ffb020', '#ff5a36', '#ffffff', '#ffe28a'], 275, 'out'],
                 minuit: [50, ['#5b6bff', '#c9d0ff', '#ffffff', '#1a1f5c'], 270, 'down'], champion: [70, ['#ffb300', '#fff3b0', '#ffffff', '#ff7b00'], 320, 'out'], saison: [72, ['#ffcc00', '#fff6c2', '#ffffff', '#c0c0c0'], 330, 'out'], rectoverso: [58, ['#00d9ff', '#b388ff', '#ffffff', '#00ffa3'], 300, 'out'], peuple: [62, ['#ff8a00', '#ffd27f', '#ffffff', '#ff3d6e'], 310, 'out'], fusion: [64, ['#ff3df0', '#00e5ff', '#ffffff', '#ffd700'], 310, 'orbit'], mensuelle: [60, ['#00e0a0', '#ffffff', '#ffd700', '#00b3ff'], 300, 'orbit'], evolution: [58, ['#ff7b00', '#ffd23f', '#ffffff', '#ff2a5f'], 300, 'up'], celeste: [52, ['#8fe3ff', '#ffffff', '#c9b6ff', '#5ac8ff'], 280, 'down'], abyssale: [70, ['#7a00ff', '#120024', '#ff2a5f', '#b48cff'], 320, 'orbit'],
                 primordiale: [96, ['#00ffd5', '#ffd700', '#ffffff', '#ff2a5f', '#7a00ff', '#00c8ff'], 380, 'out'],
-                stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out']
+                stellaire: [44, ['#ffe98a', '#ffffff', '#ffd23f', '#fff6c2'], 250, 'out'], spectrale: [46, ['#b0fff0', '#ffffff', '#7affd9', '#d9fffa'], 260, 'up'], infernale: [60, ['#ff3b00', '#ff9a00', '#ffd000', '#7a0000'], 280, 'up'], glaciale: [60, ['#7fdcff', '#ffffff', '#bdf0ff', '#3fa7ff'], 280, 'down'], imperiale: [62, ['#d4a017', '#ffe08a', '#6b0f1a', '#ffffff'], 300, 'out'], dimensionnelle: [80, ['#00ffa3', '#ff00e6', '#00c8ff', '#ffffff'], 340, 'orbit'], chaos: [90, ['#ff0044', '#000000', '#ff6a00', '#ffffff'], 360, 'out'], absolue: [120, ['#ffffff', '#fffbe6', '#ffd700', '#00ffd5', '#ff2a5f', '#7a00ff'], 420, 'out'], solaire: [52, ['#ffb300', '#ffe066', '#ffffff', '#ff7a00'], 270, 'out'], lunaire: [48, ['#b8c4ff', '#ffffff', '#6f7dff', '#e6eaff'], 270, 'down'], sacree: [56, ['#ff3b3b', '#ffffff', '#ffd700', '#b3001b'], 285, 'up'], tempete: [60, ['#4fc3ff', '#ffffff', '#ffe600', '#1b2a4a'], 290, 'down'], corrompue: [64, ['#39ff14', '#ff00e6', '#000000', '#00e5ff'], 300, 'out'], demoniaque: [80, ['#c4002b', '#000000', '#ff4500', '#5c0010'], 340, 'up'], ancestrale: [88, ['#c2a878', '#f5e6c8', '#6b5a3a', '#00e5a0'], 360, 'out']
             };
             function smParticles(host, rar) {
                 const cfg = PARTS[rar]; if (!cfg) return;
@@ -14232,13 +14232,13 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const FIN_LABEL = { holo: 'Holo', reverse: 'Reverse Holo', glitter: 'Pailletée', gold: 'Gold', dark: 'Dark', fullart: 'Full Art', manga: 'Manga', galaxy: 'Galaxie', glitch: 'Glitch', signed: 'Signée', numbered: 'Numérotée', crystal: 'Cristal', prism: 'Prismatique', aurora: 'Aurore boréale', pixel: '8-bit', neon: 'Néon', retro: 'Rétro VHS', sketch: 'Croquis', sakura: 'Sakura' };
-            const FIN_ICON = { holo: '🌈', reverse: '🪩', glitter: '✨', gold: '🥇', dark: '🌑', fullart: '🖼️', manga: '🖋️', galaxy: '🔮', glitch: '📺', signed: '✍️', numbered: '🔢', crystal: '🔷', prism: '💎', aurora: '🌌', pixel: '👾', neon: '💡', retro: '📼', sketch: '✏️', sakura: '🌸' };
-            const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff', crystal: '#9be7ff', prism: '#ff9ff3', aurora: '#5effc3', pixel: '#7cff4f', neon: '#ff2bd6', retro: '#ffb347', sketch: '#d9d9d9', sakura: '#ffb7d5' };
-            const FIN_ORDER = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
-            const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'celeste', 'abyssale', 'primordiale', 'stellaire', 'spectrale', 'infernale', 'glaciale', 'imperiale', 'dimensionnelle', 'chaos', 'absolue', 'noel', 'valentin', 'ete'];
-            Object.assign(RAR_LABEL, { stellaire: 'Stellaire ⭐', spectrale: 'Spectrale 👻', infernale: 'Infernale 🔥', glaciale: 'Glaciale ❄️', imperiale: 'Impériale 🏯', dimensionnelle: 'Dimensionnelle 🌀', chaos: 'Chaos ☄️', absolue: 'Absolue ✴️', celeste: 'Céleste 🌠', abyssale: 'Abyssale 🌑', primordiale: 'Primordiale 🔱', eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
-            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { stellaire: 'Stellaire', spectrale: 'Spectrale', infernale: 'Infernale', glaciale: 'Glaciale', imperiale: 'Impériale', dimensionnelle: 'Dimensionnelle', chaos: 'Chaos', absolue: 'Absolue', celeste: 'Céleste', abyssale: 'Abyssale', primordiale: 'Primordiale', eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            const FIN_LABEL = { holo: 'Holo', reverse: 'Reverse Holo', glitter: 'Pailletée', gold: 'Gold', dark: 'Dark', fullart: 'Full Art', manga: 'Manga', galaxy: 'Galaxie', glitch: 'Glitch', signed: 'Signée', numbered: 'Numérotée', crystal: 'Cristal', prism: 'Prismatique', aurora: 'Aurore boréale', pixel: '8-bit', neon: 'Néon', retro: 'Rétro VHS', sketch: 'Croquis', sakura: 'Sakura' , bloodseal: 'Sceau de sang', chibi: 'Chibi', stained: 'Vitrail', inverted: 'Inversée', goldleaf: 'Feuille d’or', electric: 'Électrique', fire: 'En feu', frost: 'Givrée', watercolor: 'Aquarelle'};
+            const FIN_ICON = { holo: '🌈', reverse: '🪩', glitter: '✨', gold: '🥇', dark: '🌑', fullart: '🖼️', manga: '🖋️', galaxy: '🔮', glitch: '📺', signed: '✍️', numbered: '🔢', crystal: '🔷', prism: '💎', aurora: '🌌', pixel: '👾', neon: '💡', retro: '📼', sketch: '✏️', sakura: '🌸' , bloodseal: '🩸', chibi: '🧸', stained: '🪟', inverted: '🔄', goldleaf: '🏅', electric: '⚡', fire: '🔥', frost: '❄️', watercolor: '🎨'};
+            const FIN_COL = window.FIN_COL = { holo: '#d7a8ff', reverse: '#8ff', glitter: '#fff2b3', gold: '#ffd700', dark: '#8a2be2', fullart: '#ffffff', manga: '#f5f5f5', galaxy: '#7b5cff', glitch: '#0ff', signed: '#ffd700', numbered: '#dfe9ff', crystal: '#9be7ff', prism: '#ff9ff3', aurora: '#5effc3', pixel: '#7cff4f', neon: '#ff2bd6', retro: '#ffb347', sketch: '#d9d9d9', sakura: '#ffb7d5' , bloodseal: '#ff1f3d', chibi: '#ffb3d9', stained: '#ff5ea8', inverted: '#00e5ff', goldleaf: '#e6b422', electric: '#ffe600', fire: '#ff6a00', frost: '#bfefff', watercolor: '#7ec8e3'};
+            const FIN_ORDER = ['numbered', 'bloodseal', 'signed', 'crystal', 'chibi', 'prism', 'aurora', 'stained', 'glitch', 'inverted', 'pixel', 'galaxy', 'neon', 'goldleaf', 'manga', 'electric', 'fullart', 'fire', 'dark', 'retro', 'frost', 'gold', 'watercolor', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
+            const SPECIAL_RARS = ['secrete', 'divine', 'cosmique', 'eternelle', 'omega', 'halloween', 'eveillee', 'legende', 'celeste', 'abyssale', 'primordiale', 'stellaire', 'spectrale', 'infernale', 'glaciale', 'imperiale', 'dimensionnelle', 'chaos', 'absolue', 'solaire', 'lunaire', 'sacree', 'tempete', 'corrompue', 'demoniaque', 'ancestrale', 'noel', 'valentin', 'ete'];
+            Object.assign(RAR_LABEL, { stellaire: 'Stellaire ⭐', spectrale: 'Spectrale 👻', infernale: 'Infernale 🔥', glaciale: 'Glaciale ❄️', imperiale: 'Impériale 🏯', dimensionnelle: 'Dimensionnelle 🌀', chaos: 'Chaos ☄️', absolue: 'Absolue ✴️', solaire: 'Solaire ☀️', lunaire: 'Lunaire 🌙', sacree: 'Sacrée ⛩️', tempete: 'Tempête ⛈️', corrompue: 'Corrompue 👾', demoniaque: 'Démoniaque 😈', ancestrale: 'Ancestrale 🗿', celeste: 'Céleste 🌠', abyssale: 'Abyssale 🌑', primordiale: 'Primordiale 🔱', eveillee: 'Éveillée 🩸', legende: 'Légende vivante 👑', duo: 'Duo 🎴', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
+            if (typeof MK_RAR !== 'undefined') Object.assign(MK_RAR, { stellaire: 'Stellaire', spectrale: 'Spectrale', infernale: 'Infernale', glaciale: 'Glaciale', imperiale: 'Impériale', dimensionnelle: 'Dimensionnelle', chaos: 'Chaos', absolue: 'Absolue', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', celeste: 'Céleste', abyssale: 'Abyssale', primordiale: 'Primordiale', eveillee: 'Éveillée', legende: 'Légende vivante', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', altart: 'Alt Art 🖼️', moment: 'Moment 🎬' });
             const CARD_CACHE = window.CARD_CACHE = {};
             const esc = s => v7esc(s == null ? '' : String(s));
             function keyOf(c) {
@@ -14260,8 +14260,9 @@ body.ag-game-page #app-root > #mode,
                     : `<img src="${esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15">`;
                 const first = String(c.name).split(/[ &]/)[0];
                 const cfr = key && window.CARD_FRAMES_ON ? window.CARD_FRAMES_ON[key] : null;
-                return `<div class="tcard r-${esc(c.rarity)}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}${fin ? ' f-' + fin : ''}${cfr ? ' cf-' + esc(cfr) : ''}"${key ? ` data-key="${esc(key)}"` : ''} style="--fc:${FIN_COL[fin] || '#fff'}"><i class="tc-bgfx"></i>
-                    <div class="tc-img">${imgs}<i class="tc-fx"></i><i class="tc-glare"></i>${(c.lvl || (window.CARD_LVLS && key && window.CARD_LVLS[key])) ? `<i class="tc-lvl">${'★'.repeat(c.lvl || window.CARD_LVLS[key])}</i>` : ''}${fin ? `<b class="tc-fin">${FIN_ICON[fin]} ${FIN_LABEL[fin]}</b>` : ''}${fin === 'signed' ? `<i class="tc-sign">${esc(first)}</i>` : ''}${ser && (fin === 'numbered' || fin === 'signed') ? `<b class="tc-ser">#${ser}${fin === 'numbered' ? '/' + (c.serialMax || 50) : ''}</b>` : ''}</div>
+                const [fa, fb] = fin ? String(fin).split('+') : [null, null]; // AG_CARDS_V8 : double finition
+                return `<div class="tcard r-${esc(c.rarity)}${c.shiny ? ' shiny' : ''}${big ? ' big' : ''}${fa ? ' f-' + fa : ''}${fb ? ' f-combo' : ''}${cfr ? ' cf-' + esc(cfr) : ''}"${key ? ` data-key="${esc(key)}"` : ''} style="--fc:${FIN_COL[fa] || '#fff'}"><i class="tc-bgfx"></i>
+                    <div class="tc-img">${imgs}<i class="tc-fx"></i>${fb ? `<span class="tcard tc-combo f-${fb}" style="--fc:${FIN_COL[fb] || '#fff'}"><i class="tc-fx"></i></span>` : ''}<i class="tc-glare"></i>${(c.lvl || (window.CARD_LVLS && key && window.CARD_LVLS[key])) ? `<i class="tc-lvl">${'★'.repeat(c.lvl || window.CARD_LVLS[key])}</i>` : ''}${fa ? `<b class="tc-fin">${FIN_ICON[fa] || ''} ${FIN_LABEL[fa] || esc(fa)}${fb ? ` + ${FIN_ICON[fb] || ''} ${FIN_LABEL[fb] || esc(fb)}` : ''}</b>` : ''}${fin === 'signed' ? `<i class="tc-sign">${esc(first)}</i>` : ''}${ser && (fin === 'numbered' || fin === 'signed') ? `<b class="tc-ser">#${ser}${fin === 'numbered' ? '/' + (c.serialMax || 50) : ''}</b>` : ''}</div>
                     <div class="tc-name">${esc(c.name)}</div><div class="tc-rar">${c.shiny ? '✨ ' : ''}${RAR_LABEL[c.rarity] || esc(c.rarity)}${c.n > 1 ? ` • x${c.n}` : ''}</div>${c.isNew ? '<em class="tc-new">NOUVELLE</em>' : ''}${c.god ? '<em class="tc-god">GOD PACK</em>' : ''}</div>`;
             };
 
@@ -14283,7 +14284,14 @@ body.ag-game-page #app-root > #mode,
             }
 
             /* --- effets plein écran quand une finition sort à l'invocation --- */
+            window.finLabelOf = f => f ? String(f).split('+').map(x => `${FIN_ICON[x] || ''} ${FIN_LABEL[x] || x}`).join(' + ') : '';
             window.finishFx = function (o, el, c) {
+                if (c && c.finish && String(c.finish).includes('+')) { // AG_CARDS_V8 : double finition = effet de la 1re + bandeau spécial
+                    const [a, b] = String(c.finish).split('+');
+                    window.finishFx(o, el, Object.assign({}, c, { finish: a }));
+                    setTimeout(() => { o.querySelectorAll('.fin-banner').forEach(x => x.remove()); const bn = document.createElement('div'); bn.className = 'fin-banner combo'; bn.style.setProperty('--fc', FIN_COL[b] || '#fff'); bn.textContent = `💥 DOUBLE FINITION : ${FIN_ICON[a]} ${FIN_LABEL[a]} + ${FIN_ICON[b]} ${FIN_LABEL[b]} 💥`; o.appendChild(bn); setTimeout(() => bn.remove(), 3000); }, 900);
+                    return;
+                }
                 const f = c.finish; if (!f) return;
                 o.querySelectorAll('.fin-banner').forEach(b => b.remove());
                 const b = document.createElement('div'); b.className = 'fin-banner'; b.style.setProperty('--fc', FIN_COL[f]);
@@ -14393,13 +14401,13 @@ body.ag-game-page #app-root > #mode,
             window.cardFinishGuide = function () {
                 document.getElementById('fin-guide-modal')?.remove();
                 const sample = Object.values(CARD_CACHE).find(c => c.img && !c.imgs) || { name: 'Naruto Uzumaki', img: '/api/avatar/img?u=naruto&n=Naruto%20Uzumaki', u: 'naruto' };
-                const RATES = { holo: '1/20', reverse: '1/30', glitter: '1/40', gold: '1/150', dark: '1/200', fullart: '1/250', manga: '1/300', galaxy: '1/400', glitch: '1/500', signed: '1/1000', numbered: '1/2000 • 50 max' };
+                const RATES = { holo: '1/20', reverse: '1/30', glitter: '1/40', gold: '1/150', dark: '1/200', fullart: '1/250', manga: '1/300', galaxy: '1/400', glitch: '1/500', signed: '1/1000', numbered: '1/2000 • 50 max' , bloodseal: '1/1200', chibi: '1/800', stained: '1/600', inverted: '1/500', goldleaf: '1/350', electric: '1/260', fire: '1/220', frost: '1/160', watercolor: '1/140'};
                 const m = document.createElement('div'); m.className = 'v7-modal'; m.id = 'fin-guide-modal';
                 m.innerHTML = `<div class="v7-box" style="max-width:820px;"><button class="v7-close" onclick="this.closest('.v7-modal').remove()">✕</button><h3>✨ Finitions & raretés</h3>
                     <p class="tl-hint" style="text-align:left;">Chaque carte que tu gagnes peut sortir avec une <b>finition</b> en plus de sa rareté (la chance x2 / x10 marche aussi). Passe la souris sur une carte, ou clique dessus pour l’inspecter en 3D.</p>
                     <div class="fin-guide">${FIN_ORDER.slice().reverse().map(f => `<div>${cardHtml({ name: sample.name, img: sample.img, rarity: 'legendaire', finish: f, serial: f === 'numbered' ? 7 : f === 'signed' ? 12 : null })}<small>${FIN_ICON[f]} ${FIN_LABEL[f]} • ${RATES[f]}</small></div>`).join('')}</div>
                     <h3 style="margin-top:16px;">🆕 Nouvelles raretés</h3>
-                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['celeste', 'Céleste • 1/1500'], ['legende', 'Légende vivante • 1/6000'], ['abyssale', 'Abyssale • 1/20000'], ['primordiale', 'Primordiale • 1/150000'], ['stellaire', 'Stellaire • 1/400'], ['spectrale', 'Spectrale • 1/1200'], ['infernale', 'Infernale • 1/3500'], ['glaciale', 'Glaciale • 1/4500'], ['imperiale', 'Impériale • 1/8000'], ['dimensionnelle', 'Dimensionnelle • 1/35000'], ['chaos', 'Chaos • 1/80000'], ['absolue', 'Absolue • 1/400000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/api/character-image-file?u=naruto&n=Naruto%20Uzumaki', '/api/character-image-file?u=naruto&n=Sasuke%20Uchiha'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
+                    <div class="fin-guide">${[['eveillee', 'Éveillée • 1/900'], ['celeste', 'Céleste • 1/1500'], ['legende', 'Légende vivante • 1/6000'], ['abyssale', 'Abyssale • 1/20000'], ['primordiale', 'Primordiale • 1/150000'], ['stellaire', 'Stellaire • 1/400'], ['spectrale', 'Spectrale • 1/1200'], ['infernale', 'Infernale • 1/3500'], ['glaciale', 'Glaciale • 1/4500'], ['imperiale', 'Impériale • 1/8000'], ['dimensionnelle', 'Dimensionnelle • 1/35000'], ['chaos', 'Chaos • 1/80000'], ['absolue', 'Absolue • 1/400000'], ['solaire', 'Solaire • 1/1700'], ['lunaire', 'Lunaire • 1/1800'], ['sacree', 'Sacrée • 1/2800'], ['tempete', 'Tempête • 1/3200'], ['corrompue', 'Corrompue • 1/5000'], ['demoniaque', 'Démoniaque • 1/12000'], ['ancestrale', 'Ancestrale • 1/25000'], ['duo', 'Duo • 1/300'], ['altart', 'Alt Art • bonus rare de booster'], ['moment', 'Moment • scène culte en bonus'], ['noel', 'Noël • décembre'], ['valentin', 'Saint-Valentin • février'], ['ete', 'Été • juillet-août']].map(([r, t]) => `<div>${cardHtml(r === 'duo' ? { name: 'Naruto & Sasuke', rarity: 'duo', imgs: ['/api/character-image-file?u=naruto&n=Naruto%20Uzumaki', '/api/character-image-file?u=naruto&n=Sasuke%20Uchiha'] } : { name: sample.name, img: sample.img, rarity: r })}<small>${t}</small></div>`).join('')}</div>
                     <p class="tl-hint" style="text-align:left;margin-top:12px;">🎴 <b>God Pack</b> (1 booster sur 500) : toutes les cartes du paquet sont rares. • ✍️ Les cartes <b>Signées</b> et <b>Numérotées</b> ont un numéro unique. • 🏆 Expose jusqu’à <b>10 cartes</b> dans ton <b>Musée</b> public. • 📖 Termine un album pour gagner le cadre <b>Album complet</b>.</p></div>`;
                 m.addEventListener('click', e => { if (e.target === m) m.remove(); });
                 document.body.appendChild(m);
@@ -14463,10 +14471,10 @@ body.ag-game-page #app-root > #mode,
     </style>
     <script>
         (function () {
-            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
-            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'abyssale', 'eternelle', 'imperiale', 'legende', 'glaciale', 'infernale', 'cosmique', 'celeste', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
-            const FORD = ['numbered', 'signed', 'crystal', 'prism', 'aurora', 'glitch', 'pixel', 'galaxy', 'neon', 'manga', 'fullart', 'dark', 'retro', 'gold', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
-            const FLAB = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
+            const RORD = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'ancestrale', 'abyssale', 'demoniaque', 'eternelle', 'imperiale', 'legende', 'corrompue', 'glaciale', 'infernale', 'tempete', 'cosmique', 'sacree', 'celeste', 'lunaire', 'solaire', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete', 'duo', 'mythique', 'legendaire', 'epique', 'rare', 'commune'];
+            const SPECIAL = ['absolue', 'primordiale', 'chaos', 'omega', 'dimensionnelle', 'ancestrale', 'abyssale', 'demoniaque', 'eternelle', 'imperiale', 'legende', 'corrompue', 'glaciale', 'infernale', 'tempete', 'cosmique', 'sacree', 'celeste', 'lunaire', 'solaire', 'spectrale', 'divine', 'eveillee', 'stellaire', 'secrete', 'moment', 'altart', 'saison', 'champion', 'rectoverso', 'peuple', 'fusion', 'mensuelle', 'minuit', 'evolution', 'halloween', 'noel', 'valentin', 'ete'];
+            const FORD = ['numbered', 'bloodseal', 'signed', 'crystal', 'chibi', 'prism', 'aurora', 'stained', 'glitch', 'inverted', 'pixel', 'galaxy', 'neon', 'goldleaf', 'manga', 'electric', 'fullart', 'fire', 'dark', 'retro', 'frost', 'gold', 'watercolor', 'sketch', 'sakura', 'glitter', 'reverse', 'holo'];
+            const FLAB = { holo: '🌈 Holo', bloodseal: '🩸 Sceau de sang', chibi: '🧸 Chibi', stained: '🪟 Vitrail', inverted: '🔄 Inversée', goldleaf: '🏅 Feuille d’or', electric: '⚡ Électrique', fire: '🔥 En feu', frost: '❄️ Givrée', watercolor: '🎨 Aquarelle', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', gold: '🥇 Gold', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', galaxy: '🔮 Galaxie', glitch: '📺 Glitch', signed: '✍️ Signée', numbered: '🔢 Numérotée' };
             const rIdx = r => { const i = RORD.indexOf(r); return i < 0 ? 99 : i; }, fIdx = f => f ? FORD.indexOf(f) : 99;
             window.cardRarIdx = rIdx;
             const SORTS = {
@@ -16064,7 +16072,7 @@ async function loadHallOfFame(){
                     sub.innerHTML = `<p class="tl-hint" style="text-align:left;margin:8px 0 0;">Choisis la finition à appliquer (doublons utilisés + pièces). Tu as ${d.n} exemplaire${d.n > 1 ? 's' : ''}, tu en gardes toujours 1.</p>
                         <div class="cp-fins">${Object.entries(F).map(([f, [dup, coins]]) => `<button data-f="${f}" ${d.n < dup + 1 ? 'disabled' : ''}>${esc(f)}<br><small>${dup} doublons • 🪙 ${coins}</small></button>`).join('')}</div>`;
                     // libellés lisibles
-                    sub.querySelectorAll('.cp-fins button').forEach(x => { const f = x.dataset.f; const lab = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', sakura: '🌸 Sakura', sketch: '✏️ Croquis', gold: '🥇 Gold', retro: '📼 Rétro VHS', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', neon: '💡 Néon', galaxy: '🔮 Galaxie', pixel: '👾 8-bit', glitch: '📺 Glitch', aurora: '🌌 Aurore boréale', prism: '💎 Prismatique', crystal: '🔷 Cristal' }[f] || f; x.innerHTML = x.innerHTML.replace(esc(f), lab);
+                    sub.querySelectorAll('.cp-fins button').forEach(x => { const f = x.dataset.f; const lab = { holo: '🌈 Holo', reverse: '🪩 Reverse Holo', glitter: '✨ Pailletée', sakura: '🌸 Sakura', bloodseal: '🩸 Sceau de sang', chibi: '🧸 Chibi', stained: '🪟 Vitrail', inverted: '🔄 Inversée', goldleaf: '🏅 Feuille d’or', electric: '⚡ Électrique', fire: '🔥 En feu', frost: '❄️ Givrée', watercolor: '🎨 Aquarelle', sketch: '✏️ Croquis', gold: '🥇 Gold', retro: '📼 Rétro VHS', dark: '🌑 Dark', fullart: '🖼️ Full Art', manga: '🖋️ Manga', neon: '💡 Néon', galaxy: '🔮 Galaxie', pixel: '👾 8-bit', glitch: '📺 Glitch', aurora: '🌌 Aurore boréale', prism: '💎 Prismatique', crystal: '🔷 Cristal' }[f] || f; x.innerHTML = x.innerHTML.replace(esc(f), lab);
                         x.onclick = async () => {
                             const [dup, coins] = F[f];
                             if (!confirm(`Appliquer ${lab} pour ${dup} doublons et ${coins} pièces ?`)) return;
@@ -17636,5 +17644,103 @@ async function loadHallOfFame(){
         setInterval(() => { const st = document.getElementById('adm-bk-st'); if (st && st.offsetParent && st.textContent === 'Chargement…') refresh(); }, 2500);
     })();
     </script>
+    <style>
+        /* ===== AG_CARDS_V8 : nouvelles finitions ===== */
+        .tcard .tc-combo{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;animation:none!important;transform:none!important;pointer-events:none;z-index:2;border-radius:inherit;overflow:hidden;display:block!important;}
+        .tcard .tc-combo .tc-fx{position:absolute;inset:0;}
+        .tcard.f-combo{outline:2px solid var(--fc);outline-offset:2px;}
+        .tcard.f-combo .tc-fin{background:linear-gradient(90deg,#ff2bd6,#ffd700,#00e5ff);color:#111;}
+        #summon .fin-banner.combo{background:linear-gradient(90deg,#ff2bd6,#ffd700,#00e5ff);color:#111;}
+        /* Feuille d'or */
+        .tcard.f-goldleaf{border:2px solid #e6b422;box-shadow:0 0 14px rgba(230,180,34,.7);}
+        .tcard.f-goldleaf .tc-fx{background-image:radial-gradient(3px 2px at 12% 18%,#ffe9a0 60%,transparent 70%),radial-gradient(4px 3px at 82% 12%,#e6b422 60%,transparent 70%),radial-gradient(3px 3px at 68% 58%,#fff1b8 60%,transparent 70%),radial-gradient(2px 2px at 28% 72%,#e6b422 60%,transparent 70%),radial-gradient(4px 2px at 88% 86%,#ffd86b 60%,transparent 70%),linear-gradient(105deg,transparent 35%,rgba(255,236,170,.75) 50%,transparent 65%);background-size:auto,auto,auto,auto,auto,250% 100%;animation:v8Sweep 3s ease-in-out infinite;mix-blend-mode:screen;}
+        .tcard.f-goldleaf .tc-name{color:#ffe08a;text-shadow:0 0 6px #b8860b;}
+        @keyframes v8Sweep{0%,100%{background-position:0 0,0 0,0 0,0 0,0 0,120% 0;}50%{background-position:0 0,0 0,0 0,0 0,0 0,-20% 0;}}
+        /* Givrée */
+        .tcard.f-frost{border:2px solid #dff7ff;box-shadow:0 0 12px rgba(191,239,255,.8),inset 0 0 14px rgba(191,239,255,.35);}
+        .tcard.f-frost .tc-img img{filter:saturate(.7) brightness(1.08) hue-rotate(8deg);}
+        .tcard.f-frost .tc-fx{background:radial-gradient(circle at 0 0,rgba(255,255,255,.85),transparent 28%),radial-gradient(circle at 100% 0,rgba(223,247,255,.8),transparent 26%),radial-gradient(circle at 0 100%,rgba(223,247,255,.7),transparent 25%),radial-gradient(circle at 100% 100%,rgba(255,255,255,.8),transparent 28%),linear-gradient(180deg,rgba(191,239,255,.18),rgba(191,239,255,.05));}
+        .tcard.f-frost .tc-fx::after{content:'❄';position:absolute;top:14%;right:8%;font-size:.9rem;color:#fff;text-shadow:0 0 6px #7fdcff;animation:v8Spin 8s linear infinite;}
+        @keyframes v8Spin{to{transform:rotate(360deg);}}
+        /* En feu */
+        .tcard.f-fire{border:2px solid #ff6a00;animation:v8FireGlow 1.2s ease-in-out infinite;}
+        .tcard.f-fire .tc-fx{background:radial-gradient(ellipse 18% 30% at 15% 105%,rgba(255,200,0,.9),transparent 70%),radial-gradient(ellipse 20% 38% at 50% 108%,rgba(255,120,0,.95),transparent 70%),radial-gradient(ellipse 18% 32% at 85% 105%,rgba(255,60,0,.9),transparent 70%),linear-gradient(0deg,rgba(255,80,0,.45),transparent 45%);animation:v8Flame .9s ease-in-out infinite alternate;transform-origin:bottom;}
+        .tcard.f-fire .tc-fx::after{content:'';position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 80%,#ffd000,transparent),radial-gradient(2px 2px at 60% 70%,#ff8a00,transparent),radial-gradient(1.5px 1.5px at 80% 85%,#fff3a0,transparent);animation:v8Embers 2.2s linear infinite;}
+        @keyframes v8FireGlow{0%,100%{box-shadow:0 0 12px #ff6a00,0 0 26px rgba(255,60,0,.35);}50%{box-shadow:0 0 20px #ff9a00,0 0 40px rgba(255,60,0,.55);}}
+        @keyframes v8Flame{from{transform:scaleY(.9);opacity:.85;}to{transform:scaleY(1.06);opacity:1;}}
+        @keyframes v8Embers{from{transform:translateY(0);opacity:1;}to{transform:translateY(-60%);opacity:0;}}
+        /* Électrique */
+        .tcard.f-electric{border:2px solid #ffe600;box-shadow:0 0 12px rgba(255,230,0,.7),0 0 24px rgba(79,195,255,.4);}
+        .tcard.f-electric .tc-fx{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpath d='M8 0 L22 30 L12 34 L30 70 L18 74 L34 110' fill='none' stroke='%23fff6a0' stroke-width='2'/%3E%3Cpath d='M92 140 L78 104 L88 100 L70 64 L84 60 L66 22' fill='none' stroke='%237fd8ff' stroke-width='2'/%3E%3C/svg%3E") center/100% 100% no-repeat;filter:drop-shadow(0 0 4px #ffe600);animation:v8Zap 1.6s steps(1) infinite;}
+        @keyframes v8Zap{0%,40%,48%,100%{opacity:0;}42%,46%,70%{opacity:1;}72%{opacity:.2;}}
+        /* Vitrail */
+        .tcard.f-stained{border:3px solid #1a1a1a;box-shadow:0 0 0 2px #ff5ea8,0 0 16px rgba(255,94,168,.5);}
+        .tcard.f-stained .tc-fx{background:linear-gradient(35deg,rgba(255,60,60,.35) 0 20%,rgba(255,210,0,.32) 20% 38%,rgba(60,200,120,.32) 38% 55%,rgba(60,140,255,.35) 55% 75%,rgba(190,80,255,.35) 75%),repeating-linear-gradient(35deg,transparent 0 19.3%,#111 19.3% 20.3%),repeating-linear-gradient(-55deg,transparent 0 24%,#111 24% 25%);mix-blend-mode:hard-light;}
+        /* Aquarelle */
+        .tcard.f-watercolor{border:2px solid #b8e2f2;}
+        .tcard.f-watercolor .tc-img img{filter:saturate(1.35) contrast(.92) brightness(1.05);}
+        .tcard.f-watercolor .tc-fx{background:radial-gradient(circle at 20% 25%,rgba(255,120,160,.35),transparent 30%),radial-gradient(circle at 75% 35%,rgba(120,200,255,.35),transparent 32%),radial-gradient(circle at 45% 80%,rgba(255,220,120,.35),transparent 30%),repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.06) 0 2px,transparent 2px 5px);mix-blend-mode:soft-light;}
+        /* Chibi */
+        .tcard.f-chibi{border:3px solid #ffb3d9;border-radius:18px;background:linear-gradient(180deg,#ffe3f1,#e3f0ff);}
+        .tcard.f-chibi .tc-img{border-radius:40%;overflow:hidden;}
+        .tcard.f-chibi .tc-img img{animation:v8Bounce 1.8s ease-in-out infinite;transform-origin:bottom;}
+        .tcard.f-chibi .tc-name{color:#c2185b;}
+        .tcard.f-chibi .tc-fx::after{content:'♡ ✿ ♡';font-size:.75rem;white-space:nowrap;position:absolute;top:4%;left:0;right:0;text-align:center;color:#ff6fa8;font-weight:900;letter-spacing:4px;text-shadow:0 0 4px #fff;}
+        @keyframes v8Bounce{0%,100%{transform:scale(1,1);}50%{transform:scale(1.04,.96);}}
+        /* Inversée */
+        .tcard.f-inverted{border:2px solid #00e5ff;box-shadow:0 0 14px rgba(0,229,255,.6);background:#f4f4f4;}
+        .tcard.f-inverted .tc-img img{filter:invert(1) contrast(1.1);}
+        .tcard.f-inverted .tc-name{color:#111;}
+        /* Sceau de sang */
+        .tcard.f-bloodseal{border:2px solid #7a0010;box-shadow:0 0 16px rgba(179,0,27,.75),inset 0 0 20px rgba(80,0,10,.6);background:#140003;}
+        .tcard.f-bloodseal .tc-img img{filter:contrast(1.15) saturate(.85);}
+        .tcard.f-bloodseal .tc-fx{background:radial-gradient(circle at 50% 50%,transparent 45%,rgba(120,0,15,.7) 100%),radial-gradient(circle 22% at 50% 52%,transparent 92%,rgba(255,31,61,.55) 94% 97%,transparent 99%);animation:v8Pulse 2.4s ease-in-out infinite;}
+        .tcard.f-bloodseal .tc-fx::after{content:'血 封 印';font-size:.8rem;white-space:nowrap;position:absolute;bottom:6%;left:0;right:0;text-align:center;color:#ff1f3d;font-weight:900;letter-spacing:6px;text-shadow:0 0 6px #b3001b;opacity:.85;}
+        .tcard.f-bloodseal .tc-name{color:#ff6b7d;}
+        @keyframes v8Pulse{0%,100%{opacity:.75;}50%{opacity:1;}}
+        /* ===== nouvelles raretés ===== */
+        .tcard.r-solaire{border:2px solid #ffb300;box-shadow:0 0 16px rgba(255,179,0,.75),0 0 34px rgba(255,122,0,.35);background:linear-gradient(180deg,#2a1400,#120800);}
+        .tcard.r-solaire .tc-img::after{content:'';position:absolute;inset:-35%;pointer-events:none;background:repeating-conic-gradient(from 0deg,rgba(255,200,60,.28) 0 8deg,transparent 8deg 22deg);mix-blend-mode:screen;animation:rPrimSpin 14s linear infinite;}
+        .tcard.r-solaire .tc-rar{color:#ffcf40;font-weight:900;text-shadow:0 0 8px #ff7a00;}
+        .tcard.r-lunaire{border:2px solid #b8c4ff;box-shadow:0 0 16px rgba(184,196,255,.6);background:linear-gradient(180deg,#0b0f2e,#05061a);}
+        .tcard.r-lunaire .tc-img img{filter:saturate(.75) brightness(.95) hue-rotate(-12deg);}
+        .tcard.r-lunaire .tc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 80% 14%,rgba(220,228,255,.55),transparent 28%),linear-gradient(0deg,rgba(11,15,46,.6),transparent 45%);}
+        .tcard.r-lunaire .tc-img::before{content:'☾';position:absolute;top:3%;right:9%;z-index:3;font-size:1.5rem;color:#f4f6ff;text-shadow:0 0 10px #b8c4ff,0 0 20px #6f7dff;pointer-events:none;}
+        .tcard.r-lunaire .tc-rar{color:#dfe4ff;font-weight:900;text-shadow:0 0 8px #6f7dff;}
+        .tcard.r-sacree{border:3px solid #ff3b3b;box-shadow:0 0 0 2px #fff,0 0 18px rgba(255,59,59,.6);background:linear-gradient(180deg,#fff5f0,#ffe0d6);}
+        .tcard.r-sacree .tc-img::after{content:'⛩';position:absolute;top:4%;right:6%;font-size:1.3rem;pointer-events:none;filter:drop-shadow(0 0 4px #fff);}
+        .tcard.r-sacree .tc-img::before{content:'';position:absolute;left:0;right:0;top:0;height:8px;z-index:3;pointer-events:none;background:repeating-linear-gradient(90deg,#d4a017 0 6px,#fff3c4 6px 12px);}
+        .tcard.r-sacree .tc-name{color:#7a0010;}
+        .tcard.r-sacree .tc-rar{color:#d10000;font-weight:900;}
+        .tcard.r-tempete{border:2px solid #4fc3ff;background:linear-gradient(180deg,#1b2a4a,#0a1020);animation:v8Storm 4s steps(1) infinite;}
+        .tcard.r-tempete .tc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(30,40,70,.7),transparent 35%),repeating-linear-gradient(105deg,rgba(180,220,255,.18) 0 1px,transparent 1px 7px);}
+        .tcard.r-tempete .tc-rar{color:#9fe0ff;font-weight:900;text-shadow:0 0 8px #4fc3ff;}
+        @keyframes v8Storm{0%,88%,94%,100%{box-shadow:0 0 12px rgba(79,195,255,.5);filter:none;}90%,96%{box-shadow:0 0 30px #fff,0 0 50px #4fc3ff;filter:brightness(1.6);}}
+        .tcard.r-corrompue{border:2px solid #39ff14;background:#020;box-shadow:-3px 0 10px #ff00e6,3px 0 10px #39ff14;}
+        .tcard.r-corrompue .tc-img img{animation:rGlitch 1.9s steps(1) infinite;filter:contrast(1.2) saturate(1.2);}
+        .tcard.r-corrompue .tc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(57,255,20,.12) 0 1px,transparent 1px 3px),linear-gradient(90deg,rgba(255,0,230,.15),transparent 25%,transparent 75%,rgba(0,229,255,.15));animation:finVhs 2s steps(2) infinite;}
+        .tcard.r-corrompue .tc-name{color:#39ff14;font-family:monospace;text-shadow:-1px 0 #ff00e6,1px 0 #00e5ff;}
+        .tcard.r-corrompue .tc-rar{color:#39ff14;font-family:monospace;font-weight:900;text-shadow:-2px 0 #ff00e6,2px 0 #00e5ff;}
+        .tcard.r-demoniaque{border:2px solid #c4002b;background:radial-gradient(circle at 50% 120%,#5c0010,#050000 70%);animation:rFlicker 1.6s ease-in-out infinite;}
+        .tcard.r-demoniaque .tc-img img{filter:contrast(1.2) saturate(1.1) brightness(.9);}
+        .tcard.r-demoniaque .tc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 50% 110%,rgba(196,0,43,.75),transparent 70%),radial-gradient(circle at 50% 50%,transparent 50%,rgba(0,0,0,.65));}
+        .tcard.r-demoniaque .tc-img::before{content:'😈';position:absolute;top:4%;left:6%;z-index:3;font-size:1.1rem;filter:drop-shadow(0 0 5px #c4002b);}
+        .tcard.r-demoniaque .tc-rar{color:#ff2a4a;font-weight:900;text-shadow:0 0 10px #c4002b;}
+        .tcard.r-ancestrale{border:3px solid #8a7550;box-shadow:0 0 16px rgba(194,168,120,.55),0 0 30px rgba(0,229,160,.25);background:repeating-linear-gradient(35deg,#4a3f2c 0 3px,#3e3524 3px 6px);}
+        .tcard.r-ancestrale .tc-img img{filter:sepia(.35) contrast(1.05);}
+        .tcard.r-ancestrale .tc-img::after{content:'ᚠ ᚱ ᛟ ᛞ ᛉ';font-size:.8rem;white-space:nowrap;position:absolute;left:0;right:0;bottom:4%;text-align:center;letter-spacing:5px;color:#00e5a0;font-weight:900;text-shadow:0 0 8px #00e5a0;animation:v8Pulse 3s ease-in-out infinite;pointer-events:none;}
+        .tcard.r-ancestrale .tc-name{color:#f5e6c8;}
+        .tcard.r-ancestrale .tc-rar{color:#00e5a0;font-weight:900;letter-spacing:1px;text-shadow:0 0 8px #00e5a0;}
+        #summon .sm-screen.fx-solaire{background:radial-gradient(circle,rgba(255,179,0,.55),rgba(30,12,0,.92) 70%);}
+        #summon .sm-screen.fx-lunaire{background:radial-gradient(circle at 70% 30%,rgba(244,246,255,.55),rgba(5,6,26,.94) 55%);}
+        #summon .sm-screen.fx-sacree{background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,59,59,.45) 40%,rgba(40,0,0,.92) 75%);}
+        #summon .sm-screen.fx-tempete{background:radial-gradient(circle,rgba(79,195,255,.45),rgba(10,16,32,.95) 70%);}
+        #summon .sm-screen.fx-corrompue{background:repeating-linear-gradient(0deg,rgba(57,255,20,.15) 0 2px,transparent 2px 5px),radial-gradient(circle,rgba(255,0,230,.35),#000 70%);}
+        #summon .sm-screen.fx-demoniaque{background:radial-gradient(circle at 50% 80%,rgba(196,0,43,.65),#000 70%);}
+        #summon .sm-screen.fx-ancestrale{background:radial-gradient(circle,rgba(0,229,160,.4),rgba(40,32,20,.95) 70%);}
+        .trd-mini.r-solaire{border-color:#ffb300;} .trd-mini.r-lunaire{border-color:#b8c4ff;} .trd-mini.r-sacree{border-color:#ff3b3b;} .trd-mini.r-tempete{border-color:#4fc3ff;}
+        .trd-mini.r-corrompue{border-color:#39ff14;} .trd-mini.r-demoniaque{border-color:#c4002b;} .trd-mini.r-ancestrale{border-color:#c2a878;}
+        @media (prefers-reduced-motion:reduce){.tcard.f-fire,.tcard.f-fire .tc-fx,.tcard.f-electric .tc-fx,.tcard.r-tempete,.tcard.r-corrompue .tc-img img,.tcard.f-chibi .tc-img img{animation:none!important;}}
+    </style>
 </body>
 </html>
