@@ -23894,7 +23894,7 @@ async function publicProfile(pseudo) {
     const lvl = levelFromXp(+xp || 0).level;
     const stats = await progStats(uid).catch(() => ({ games: 0, wins: 0, points: 0 }));
     const badges = (await progBadges(uid)).map(id => BADGES.find(b => b[0] === id)).filter(Boolean).map(b => ({ id: b[0], name: b[1], desc: b[2] }));
-    const RANK = { absolue: 11, solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
+    const RANK = { absolue: 11, ombre: 5.1, mirage: 5.7, eclat: 6.1, heroique: 6.7, onirique: 7.25, solaire: 6.4, lunaire: 6.45, sacree: 6.9, tempete: 7.1, corrompue: 7.4, demoniaque: 8.2, ancestrale: 8.6, chaos: 9.5, dimensionnelle: 8.8, imperiale: 7.8, glaciale: 7.3, infernale: 7.2, spectrale: 6.2, stellaire: 5.3, primordiale: 10, omega: 9, abyssale: 8.5, eternelle: 8, legende: 7.5, celeste: 6.5, cosmique: 7, divine: 6, eveillee: 5.5, secrete: 5, halloween: 4.8, noel: 4.8, valentin: 4.8, ete: 4.8, mythique: 4, legendaire: 3, epique: 2, rare: 1, commune: 0 };
     let cards = [];
     try {
         const m = await cardsOf(uid);
@@ -23927,8 +23927,8 @@ app.get('/u/:pseudo', async (req, res) => {
     const p = await publicProfile(String(req.params.pseudo || '').slice(0, 30));
     const base = siteUrl(req);
     if (!p) return res.status(404).type('html').send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Joueur introuvable – Anime Game</title><body style="background:#0b0b10;color:#fff;font-family:system-ui;text-align:center;padding:60px 16px"><h1>Joueur introuvable</h1><p><a style="color:#00f0ff" href="${base}/">Retour à Anime Game</a></p>`);
-    const RAR = { absolue: 'Absolue', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
-    const COL = { absolue: '#fffbe6', solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
+    const RAR = { absolue: 'Absolue', ombre: 'Ombre', mirage: 'Mirage', eclat: 'Éclat', heroique: 'Héroïque', onirique: 'Onirique', solaire: 'Solaire', lunaire: 'Lunaire', sacree: 'Sacrée', tempete: 'Tempête', corrompue: 'Corrompue', demoniaque: 'Démoniaque', ancestrale: 'Ancestrale', chaos: 'Chaos', dimensionnelle: 'Dimensionnelle', imperiale: 'Impériale', glaciale: 'Glaciale', infernale: 'Infernale', spectrale: 'Spectrale', stellaire: 'Stellaire', primordiale: 'Primordiale', omega: 'Oméga', abyssale: 'Abyssale', celeste: 'Céleste', eternelle: 'Éternelle', legende: 'Légende vivante', cosmique: 'Cosmique', divine: 'Divine', eveillee: 'Éveillée', secrete: 'Secrète', halloween: 'Halloween 🎃', noel: 'Noël 🎄', valentin: 'Saint-Valentin 💘', ete: 'Été ☀️', mythique: 'Mythique', legendaire: 'Légendaire', epique: 'Épique', rare: 'Rare', commune: 'Commune' };
+    const COL = { absolue: '#fffbe6', ombre: '#8a7fb8', mirage: '#7fffd4', eclat: '#00d4ff', heroique: '#ff4d4d', onirique: '#c39bff', solaire: '#ffb300', lunaire: '#b8c4ff', sacree: '#ff3b3b', tempete: '#4fc3ff', corrompue: '#39ff14', demoniaque: '#c4002b', ancestrale: '#c2a878', chaos: '#ff0044', dimensionnelle: '#00ffa3', imperiale: '#d4a017', glaciale: '#7fdcff', infernale: '#ff3b00', spectrale: '#b0fff0', stellaire: '#ffe98a', primordiale: '#00ffd5', omega: '#ffffff', abyssale: '#7a00ff', celeste: '#8fe3ff', eternelle: '#ffd700', legende: '#ff4500', cosmique: '#7b5cff', divine: '#fff3b0', eveillee: '#ff2d55', secrete: '#00f0ff', halloween: '#ff7a00', noel: '#e8363d', valentin: '#ff6fa8', ete: '#ffc233', mythique: '#ff3c7a', legendaire: '#ffb300', epique: '#b44dff', rare: '#3fa7ff', commune: '#9aa4b2' };
     const title = `${p.name} – profil Anime Game`;
     const desc = `Niveau ${p.lvl} • ${p.stats.games} parties • ${p.stats.wins} victoires • ${p.badges.length} succès • ${p.cardsTotal} cartes`;
     res.type('html').send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -28978,4 +28978,41 @@ cardDecorate = async function (uid, card, luck) {
         out.finish = combo; out.finishLabel = finLabel(combo); out.combo = true;
     } catch (e) { console.warn('[double finition]', e.message); }
     return out;
+};
+
+/* =====================================================================
+   AG_WIDE_RARITIES_V1 — raretés « larges » : des versions rares pour beaucoup plus de persos,
+   pas seulement les plus connus. Ombre = TOUS les persos de l'anime ont leur version Ombre.
+   ===================================================================== */
+const WIDE_TIERS = [
+    { id: 'ombre', label: 'Ombre', top: Infinity, rate: 1 / 500, coins: 60, rank: 5.1, deck: 18, market: [3000, 9000] },
+    { id: 'mirage', label: 'Mirage', top: 60, rate: 1 / 900, coins: 110, rank: 5.7, deck: 21, market: [6000, 16000] },
+    { id: 'eclat', label: 'Éclat', top: 40, rate: 1 / 1400, coins: 160, rank: 6.1, deck: 24, market: [10000, 26000] },
+    { id: 'heroique', label: 'Héroïque', top: 25, rate: 1 / 2400, coins: 280, rank: 6.7, deck: 29, market: [18000, 48000] },
+    { id: 'onirique', label: 'Onirique', top: 15, rate: 1 / 4500, coins: 520, rank: 7.25, deck: 33, market: [36000, 95000] }
+];
+const WIDE_BY_ID = Object.fromEntries(WIDE_TIERS.map(t => [t.id, t]));
+for (const t of WIDE_TIERS) {
+    if (SPECIAL_BY_ID[t.id]) continue;
+    SPECIAL_TIERS.push({ id: t.id, label: t.label, top: t.top, rate: t.rate, coins: t.coins, wide: true });
+    RAR_RANK[t.id] = t.rank; DECK_BONUS[t.id] = t.deck; MARKET_HINT[t.id] = t.market;
+    const at = RAR_ORDER.findIndex(r => RAR_RANK[r] != null && RAR_RANK[r] > t.rank);
+    if (!RAR_ORDER.includes(t.id)) RAR_ORDER.splice(at < 0 ? RAR_ORDER.length : at, 0, t.id);
+}
+SPECIAL_TIERS.sort((a, b) => b.rate - a.rate);
+SPECIAL_TIERS.forEach(t => { SPECIAL_BY_ID[t.id] = t; });
+CARD_RATES_CACHE = null;
+// les raretés larges piochent dans toute la liste des persos (rangée des plus connus aux moins connus)
+const WIDE_CACHE = new Map(); // tier|u -> { at, list }
+const _cardSpecialsWide = cardSpecials;
+cardSpecials = function (tier, u) {
+    const t = WIDE_BY_ID[tier];
+    if (!t) return _cardSpecialsWide(tier, u);
+    const ck = tier + '|' + u, c = WIDE_CACHE.get(ck);
+    if (c && Date.now() - c.at < 10 * 60000) return c.list;
+    let pool = [];
+    try { pool = cardPool(u) || []; } catch (_) { pool = []; }
+    const list = (t.top === Infinity ? pool : pool.slice(0, t.top)).map(x => ({ u, display: x.display, tier, key: cardSpecialKey(u, x.display, tier) }));
+    WIDE_CACHE.set(ck, { at: Date.now(), list });
+    return list;
 };
