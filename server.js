@@ -27415,7 +27415,7 @@ app.get('/api/cards/potion', async (req, res) => { const uid = needUid(req, res)
 app.post('/api/cards/potion', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const o = await potionGet(uid);
-    if (!(o.n > 0)) return res.json({ ok: false, error: 'Tu n’as pas de potion de chance. Gagne-en dans le mode survie !' });
+    if (!(o.n > 0)) return res.json({ ok: false, error: 'Tu n’as pas de potion de chance. Gagne-en dans la Tour de l’infini !' });
     o.n--; o.left = (o.left || 0) + POTION_PACKS;
     await kvSet('potion', String(uid), o);
     res.json({ ok: true, ...o });
@@ -27496,7 +27496,7 @@ app.post('/api/cards/survival/start', async (req, res) => {
     const uid = needUid(req, res); if (!uid) return;
     const s = await survState(uid);
     if (s.run) return res.json({ ok: false, error: 'Tu as déjà une partie en cours.' });
-    if (s.runs >= SURV_RUNS) return res.json({ ok: false, error: `Tu as fait tes ${SURV_RUNS} parties de survie du jour. Reviens demain !` });
+    if (s.runs >= SURV_RUNS) return res.json({ ok: false, error: `Tu as fait tes ${SURV_RUNS} parties de la Tour de l’infini du jour. Reviens demain !` });
     const keys = [...new Set((Array.isArray((req.body || {}).keys) ? req.body.keys : []).map(String))].slice(0, 5);
     const team = await cardsWithMeta(uid, keys);
     if (team.length !== 5) return res.json({ ok: false, error: 'Choisis 5 cartes de ta collection.' });
@@ -27558,7 +27558,7 @@ const POTION_TYPES = {
     chance: { label: 'Potion de chance', emoji: '🧪', desc: `Chances x${POTION_MULT} aux raretés spéciales et aux brillantes pendant ${POTION_PACKS} boosters.`, dust: 250, dups: 5 },
     shiny: { label: 'Potion de brillance', emoji: '💎', desc: 'La première carte de ton prochain booster sera brillante à coup sûr.', dust: 350, dups: 8 },
     univ: { label: 'Potion d’univers', emoji: '🌍', desc: 'Ton prochain booster normal ne donne que des cartes de l’anime choisi.', dust: 200, dups: 5 },
-    xp: { label: 'Potion d’XP', emoji: '📈', desc: 'XP des cartes doublée pendant 1 h (parties, duels, survie…).', dust: 120, dups: 3 }
+    xp: { label: 'Potion d’XP', emoji: '📈', desc: 'XP des cartes doublée pendant 1 h (parties, duels, Tour de l’infini…).', dust: 120, dups: 3 }
 };
 const XP_POTION_MS = 60 * 60 * 1000;
 async function potion2Get(uid) { return kvGet('potion2', String(uid), { shiny: 0, univ: 0, xp: 0, shinyOn: 0, univOn: null, xpUntil: 0 }); }
@@ -27957,7 +27957,7 @@ const TALENTS = [
     { id: 'explorateur', row: 2, emoji: '🧭', name: 'Explorateur', per: 8, unit: '% de durée en moins pour les expéditions', max: 5 },
     // rang 3 : 12 points placés
     { id: 'bonus', row: 3, emoji: '🃏', name: 'Carte bonus', per: 2, unit: '% de chances d’une carte en plus par booster', max: 5 },
-    { id: 'survivant', row: 3, emoji: '🛡️', name: 'Survivant', per: 4, unit: '% de puissance dans la tour (mode survie)', max: 5 }
+    { id: 'survivant', row: 3, emoji: '🛡️', name: 'Survivant', per: 4, unit: '% de puissance dans la Tour de l’infini', max: 5 }
 ];
 const TAL_BY_ID = Object.fromEntries(TALENTS.map(t => [t.id, t]));
 const TAL_ROW_NEED = { 1: 0, 2: 5, 3: 12 };
