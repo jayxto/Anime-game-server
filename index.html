@@ -13058,7 +13058,38 @@ body.ag-game-page #app-root > #mode,
         }
 
         /* ---------- Nouveautés ---------- */
+        window.AG_VERSION = '1.0';
         const CHANGELOG = [
+            { v: '2026-10-06', ver: '1.0', title: 'Version 1.0 : cartes, packs et sauvegardes', items: [
+                '🏯 Cartes Lieu (Konoha, Thousand Sunny, Soul Society…) : +6 % aux persos de l’anime',
+                '🌀 Cartes Technique (Rasengan, Kamehameha, Getsuga Tenshô…) : +12 % au perso',
+                '🏴 Organisations (Akatsuki, Chapeau de paille, Espada…) : réunis les membres pour gagner la carte',
+                '🌑 Booster Ténèbres, ☀️ Booster Céleste, ❓ Pack mystère et 🎁 Pack du jour gratuit',
+                '🌑 Nuit des Ombres (1er samedi du mois) et 🌘 Éclipse (dimanche 21h)',
+                '👤 5 raretés pour beaucoup plus de persos : Ombre, Mirage, Éclat, Héroïque, Onirique',
+                '☀️ 7 raretés : Solaire, Lunaire, Sacrée, Tempête, Corrompue, Démoniaque, Ancestrale',
+                '🔥 9 finitions : En feu, Électrique, Givrée, Vitrail, Aquarelle, Chibi, Inversée, Feuille d’or, Sceau de sang',
+                '💥 Doubles finitions : deux effets sur une même carte',
+                '✨ Cartes vivantes : zoom lent au survol',
+                '✏️ Changer de pseudo dans les Paramètres',
+                '🗼 Le mode survie des cartes devient la Tour de l’infini',
+                '🗂️ Boutons de la Collection rangés par catégories',
+                '💾 Sauvegarde automatique de la base chaque nuit',
+                '🛠️ La photo de profil ne clignote plus'] },
+            { v: '2026-10-05', ver: '0.9', title: 'Soirées TV, appli et nouvelles cartes', items: [
+                '📺 Mode TV : le jeu sur la télé, les téléphones servent de manettes',
+                '🤔 Tu préfères : 187 dilemmes anime, par catégories',
+                '🏷️ Titres Bêta-testeur et Admin',
+                '🤝 Équipes cultes et 🗳️ Vote du mois',
+                '🔁 Cartes recto-verso et 💞 cartes âmes sœurs entre amis',
+                '🌳 Arbre de talents, 🏆 saisons et 📅 calendrier',
+                '📲 Appli installable et notifications',
+                '⚡ Serveur plus rapide et plus solide'] },
+            { v: '2026-10-04', ver: '0.8', title: 'Tour de survie et potions', items: [
+                '🛡️ Tour en 1 contre 1 avec récompenses qui montent',
+                '🧪 Potions de chance, brillance, univers, XP et alambic',
+                '🔃 Tri par rareté partout',
+                '📱 Recherche corrigée sur téléphone'] },
             { v: '2026-10-03', title: 'Plus ou moins, Survie, Chaos et profils', items: ['⚖️ Plus ou moins : qui est le plus fort, le plus populaire ?', '☠️ Survie : une erreur et tu es éliminé', '🌀 Chaos : une règle surprise à chaque manche', '🔥 Échauffement dans la salle d’attente', '🎨 Bannières de profil à débloquer avec les succès', '🔗 Ta page profil publique à partager (Options)', '📺 Écran live pour les streamers'] },
             { v: '2026-10-01', title: 'Soutenir le jeu', items: ['💎 Badge Supporter : pseudo Prisme animé, invocations arc-en-ciel et plus de pub (bouton 💎 en haut)', '☕ Don libre sur Ko-fi ou abonnement à 1,99 €/mois, que du cosmétique'] },
             { v: '2026-09-30', title: 'Hôtel des ventes et invocations', items: ['🏪 Hôtel des ventes : vends tes cartes contre des pièces et achète celles des autres (onglet Marché de la Collection)', '🔮 Ouvrir un booster lance maintenant une vraie invocation : cercle magique, lumière et suspense avant la carte rare'] },
@@ -13071,7 +13102,7 @@ body.ag-game-page #app-root > #mode,
         function openChangelog() {
             try { localStorage.setItem('seenChangelog', CHANGELOG[0].v); } catch (_) {}
             h3NewsBtn();
-            hubModal('h3-news', `<h3>🆕 Nouveautés</h3>${CHANGELOG.map(c => `<div class="h3-news"><div class="h3-news-h"><b>${v7esc(c.title)}</b><small>${new Date(c.v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</small></div><ul>${c.items.map(i => `<li>${v7esc(i)}</li>`).join('')}</ul></div>`).join('')}`, true);
+            hubModal('h3-news', `<h3>🆕 Nouveautés</h3>${CHANGELOG.map(c => `<div class="h3-news"><div class="h3-news-h"><b>${c.ver ? `<span class="ag-ver-tag">v${c.ver}</span> ` : ''}${v7esc(c.title)}</b><small>${new Date(c.v).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</small></div><ul>${c.items.map(i => `<li>${v7esc(i)}</li>`).join('')}</ul></div>`).join('')}`, true);
         }
         function h3NewsBtn() {
             const menu = document.getElementById('menu-selection'); if (!menu) return;
@@ -15159,7 +15190,7 @@ async function loadHallOfFame(){
             hero.id = 'ag-home-hero';
             hero.innerHTML = `
                 <div class="ag-hero-copy">
-                    <div class="ag-hero-kicker">Quiz • Jeux • Collection • Multijoueur</div>
+                    <div class="ag-hero-kicker">Quiz • Jeux • Collection • Multijoueur <button type="button" class="ag-ver" onclick="openChangelog()" title="Nouveautés et mises à jour">v${window.AG_VERSION || '1.0'} ℹ️</button></div>
                     <div class="ag-hero-title">ANIME GAME</div>
                     <p class="ag-hero-sub">Tous tes modes anime dans un seul hub, entre amis, en solo ou en live.</p>
                     <button type="button" class="btn-action ag-hero-btn" id="ag-hero-play">JOUER MAINTENANT →</button>
@@ -15406,7 +15437,9 @@ async function loadHallOfFame(){
         const av = q('#ag-dash-avatar');
         if (av) {
             try {
-                av.innerHTML = typeof avatarHtml === 'function' ? avatarHtml(name, (typeof currentUser !== 'undefined' && currentUser?.cos) || null) : esc(name.charAt(0).toUpperCase());
+                // AG_AVATAR_STABLE_V1 : on ne redessine que si l'avatar a changé (sinon l'image se recharge et clignote)
+                const html = typeof avatarHtml === 'function' ? avatarHtml(name, (typeof currentUser !== 'undefined' && currentUser?.cos) || null) : esc(name.charAt(0).toUpperCase());
+                if (av.dataset.h !== html) { av.dataset.h = html; av.innerHTML = html; }
             } catch (_) { av.textContent = name.charAt(0).toUpperCase(); }
         }
         const coin = q('#coin-badge b')?.textContent?.trim();
@@ -17859,5 +17892,11 @@ async function loadHallOfFame(){
         setTimeout(evCheck, 4000); setInterval(evCheck, 120000);
     })();
     </script>
+    <style>
+        /* AG_VERSION_V1 */
+        .ag-ver{margin-left:6px;background:rgba(115,223,255,.12);border:1px solid rgba(115,223,255,.45);color:#9fe8ff;border-radius:999px;padding:1px 8px;font:800 .62rem sans-serif;letter-spacing:.05em;cursor:pointer;text-transform:none;vertical-align:middle;}
+        .ag-ver:hover{background:rgba(115,223,255,.25);}
+        .ag-ver-tag{display:inline-block;background:#176dff;color:#fff;border-radius:6px;padding:0 6px;font-size:.75em;margin-right:4px;}
+    </style>
 </body>
 </html>
