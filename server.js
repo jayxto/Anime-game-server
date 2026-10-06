@@ -18649,7 +18649,7 @@ app.get('/api/avatar/img', async (req, res) => {
     if (!ARC_UNIVERSE_ANIME[u] || !requested) return res.status(404).end();
     const c = avatarFind(u, requested);
     const stored = await avatarStoredImageRoute(u, c ? c.display : requested) || (c && c.raw !== c.display ? await avatarStoredImageRoute(u, c.raw) : null);
-    if (stored) { res.set('Cache-Control', 'public, max-age=3600'); return res.redirect(stored); }
+    if (stored) { res.set('Cache-Control', 'public, max-age=120'); return res.redirect(stored); } // AG_IMAGE_REFRESH_V1 : une image changée par l'admin apparaît en 2 min max
     const url = await arcCharImage(u, c ? c.raw : requested);
     if (!url) return res.status(404).end();
     // AG_CANONICAL_CHARACTER_IMAGE_V11 — DB-backed portraits are already same-origin.
@@ -29300,3 +29300,12 @@ weatherApply = function () {
 setInterval(() => weatherApply(), 60 * 1000).unref();
 weatherApply();
 app.get('/api/cards/events', (req, res) => res.json({ ok: true, now: v9EventsNow().map(e => ({ id: e.id, label: e.label, emoji: e.emoji, desc: e.desc })), next: v9NextEvents() }));
+
+/* AG_IMAGE_REFRESH_V1 — quand une image de perso est enregistrée (admin ou automatique), on oublie l'ancienne
+   adresse gardée en mémoire : la nouvelle image s'affiche tout de suite sur toutes les cartes (normales et spéciales). */
+const _simpleStoreImageRefresh = simpleStoreImage;
+simpleStoreImage = async function (x, image, sourceUrl, status) {
+    const ok = await _simpleStoreImageRefresh(x, image, sourceUrl, status);
+    try { AVATAR_ROUTE_CACHE.clear(); } catch (_) {}
+    return ok;
+};
