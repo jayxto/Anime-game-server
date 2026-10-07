@@ -682,6 +682,10 @@
         .bingo-wrap{width:100%;display:grid;grid-template-columns:minmax(160px,220px) 1fr;gap:14px;align-items:start}.bingo-char{background:#101019;border:1px solid #34344a;border-radius:12px;padding:9px;text-align:center}.bingo-char img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px}.bingo-char b{display:block;margin-top:7px}.bingo-char small{color:var(--text-muted)}.bingo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.bingo-cell{min-height:66px;background:#11111b;border:1px solid #34344a;border-radius:8px;padding:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:.66rem;cursor:pointer;line-height:1.15}.bingo-cell:hover:not(.marked){border-color:var(--accent-cyan)}.bingo-cell .em{font-size:1.05rem;margin-bottom:3px}.bingo-cell.marked{background:rgba(0,255,136,.14);border-color:#00ff88;color:#baffd8}.bingo-cell.match:not(.marked){border-color:var(--accent-yellow);box-shadow:inset 0 0 0 1px rgba(255,230,0,.35)}.bingo-pass{margin-top:9px;width:100%;background:#252538;border:1px solid #45455b;color:#fff;padding:8px;border-radius:8px;cursor:pointer}.bingo-reveal{margin-top:8px;font-size:.72rem;color:var(--accent-yellow);text-align:center}
         @media(max-width:700px){.bingo-wrap{grid-template-columns:1fr}.bingo-char{display:grid;grid-template-columns:85px 1fr;align-items:center;text-align:left;gap:10px}.bingo-char img{width:85px}.bingo-cell{min-height:58px;font-size:.56rem;padding:3px}.cb-vs{grid-template-columns:1fr}.cb-vs>div:nth-child(2){transform:rotate(90deg)}}
 
+        .qui-tools{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:center;margin:12px 0}
+        .qui-tools .v7-input,.qui-tools .btn-action{width:100%;margin:0;min-width:0}
+        .qui-note{color:var(--accent-yellow)!important;white-space:normal;line-height:1.4;margin-top:5px}
+        @media(max-width:640px){.qui-tools{grid-template-columns:1fr}.qt-btn{min-height:130px}}
     </style>
 
     <style>
@@ -3139,8 +3143,8 @@ body.ag-game-page #app-root > #mode,
                 </div>
 
                 <div class="quote-mode-card" style="border-color:#ff9f43;">
-                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Qui a le plus…</h3>
-                    <p style="margin:0 0 12px;font-size:.85rem;">Qui a le plus souffert ? Meilleure waifu ? Meilleur père ? Meilleur duo ? Meilleur OST ?… Des tournois à thème avec les bons persos, et c'est TOI qui choisis • jouable avec ton chat</p>
+                    <h3 style="color:var(--accent-yellow);margin-bottom:5px;">🏆 Qui…</h3>
+                    <p style="margin:0 0 12px;font-size:.85rem;">Qui a le plus d’aura ? Le meilleur surnom ? Qui est le meilleur père, mentor ou stratège ? Des sélections propres à chaque question, avec portraits et liens familiaux • jouable avec ton chat</p>
                     <button class="btn-action" style="margin-top:0;background:#ff9f43;color:#111;" onclick="openQapThemes()">Choisir un thème</button>
                 </div>
 
@@ -4571,7 +4575,7 @@ body.ag-game-page #app-root > #mode,
             arc_draft:      { title:'🃏 DRAFT 5V5', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             arc_couleur:    { title:'🎨 COLORIE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
             draw:           { title:'✏️ DESSINE LE PERSO', sub:'Choisis un univers, ou mélange tous les animes.', tag:'', all:true },
-            qap:            { title:'🏆 QUI A LE PLUS…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
+            qap:            { title:'🏆 QUI…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             tupref:         { title:'🤔 TU PRÉFÈRES…', sub:'Un anime, plusieurs (☑️), ou tous les animes : tous les persos du jeu sont dans le tirage.', tag:'', all:true },
             arc_fusion:     { title:'🧪 FUSION ANIME', sub:'4 persos du même univers, ou 4 animes différents mélangés.', tag:'', all:true },
             arc_connections:{ title:'🧩 ANIME CONNECTIONS', sub:'Choisis un univers, plusieurs (☑️), ou tous les animes. Les 16 personnages et les 4 liens seront générés uniquement avec ta sélection.', tag:'', all:true },
@@ -7808,11 +7812,11 @@ body.ag-game-page #app-root > #mode,
             const k = itemImageKey(source, item.name);
             if (ITEM_IMG_CACHE[k]) return ITEM_IMG_CACHE[k];
             ITEM_IMG_CACHE[k] = new Promise(resolve => {
-                if (item.img) return resolve('/api/img?u=' + encodeURIComponent(item.img));
+                if (item.img && !source.startsWith('qt:')) return resolve('/api/img?u=' + encodeURIComponent(item.img));
                 let stored = null;
                 try { stored = localStorage.getItem('itemimg6:' + k); } catch (e) {}
-                if (stored) return resolve('/api/img?u=' + encodeURIComponent(stored));
-                const job = { source, name: item.name, k, resolve };
+                if (stored && !source.startsWith('qt:')) return resolve('/api/img?u=' + encodeURIComponent(stored));
+                const job = { source, name: item.name, k, resolve, fallback:item.img || null };
                 if (priority === 'high') itemImgQueue.unshift(job); else itemImgQueue.push(job);
                 itemImagePump();
             });
@@ -7825,7 +7829,7 @@ body.ag-game-page #app-root > #mode,
                 fetch(`/api/arcade/item-image?source=${encodeURIComponent(job.source)}&name=${encodeURIComponent(job.name)}`)
                     .then(r => r.json()).catch(() => null)
                     .then(d => {
-                        const url = d && d.imageUrl;
+                        const url = (d && d.imageUrl) || job.fallback;
                         try {
                             if (url) localStorage.setItem('itemimg6:' + job.k, url);
                             else localStorage.removeItem('itemimg6:' + job.k);
@@ -8007,7 +8011,7 @@ body.ag-game-page #app-root > #mode,
         function tlPlay(it) { mediaOpen(it, it.name); }
         function tlStopPlayer() { mediaClose(); }
 
-        /* --- lecteur YouTube partagé (battles, « Qui a le plus… », tier lists) ---
+        /* --- lecteur YouTube partagé (battles, « Qui… », tier lists) ---
            Sur téléphone, le son ne peut démarrer qu'après un toucher DANS le lecteur : on l'affiche en grand
            en bas de l'écran avec ses commandes, et si la vidéo refuse d'être intégrée, un lien vers YouTube. */
         let mediaYt = null, mediaKey = 0;
@@ -8305,9 +8309,9 @@ body.ag-game-page #app-root > #mode,
             let data;
             try { data = await loadItems(source); } catch (e) { body.innerHTML = '<p style="text-align:center;padding:20px;">Impossible de charger la liste.</p>'; return; }
             bb = { source, label: data.label, all: data.items, tp: source.startsWith('tp:') || source.startsWith('qt:'), qap: kind === 'qap', qt: kind === 'qt', qtTitle: kind === 'qt' ? data.label : null };
-            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI A LE PLUS…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
-            if (bb.qt && h2) h2.textContent = '🏆 QUI A LE PLUS…';
-            const unit = source === 'qt:entree' ? 'entrées' : source === 'qt:combat' ? 'combats' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos';
+            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = bb.qap ? '🏆 QUI…' : bb.tp ? '🤔 TU PRÉFÈRES…' : '⚔️ BATTLE DE PRÉFÉRENCE';
+            if (bb.qt && h2) h2.textContent = '🏆 QUI…';
+            const unit = data.unit || (source === 'qt:entree' ? 'entrées' : source === 'qt:combat' ? 'combats' : data.items.some(i => i.video) ? 'musiques' : data.items.some(i => i.imgs) ? 'duos' : 'persos');
             if (bb.qt) bb.unit = unit;
             document.getElementById('bb-subtitle').textContent = bb.qt ? `${data.label} • ${data.items.length} ${unit} • clique sur ton choix${unit === 'musiques' ? ' (▶ pour écouter)' : unit === 'entrées' || unit === 'combats' ? ' (▶ pour voir la scène)' : ''}` : bb.qap ? `${data.label} • ${data.items.length} persos • pas de bonne réponse : c'est toi qui choisis` : bb.tp ? `${data.label} • ${data.items.length} persos • clique sur celui que tu préfères` : `${data.label} • ${data.items.length} génériques • clique sur ▶ pour écouter`;
             if (bb.qap) return qapSetup(document.getElementById('bb-body'));
@@ -8315,9 +8319,11 @@ body.ag-game-page #app-root > #mode,
             const h = document.createElement('div'); h.className = 'bb-head';
             h.innerHTML = '<div class="bb-round">COMBIEN DE PARTICIPANTS ?</div><p style="color:var(--text-muted);font-size:.85rem;margin-top:6px;">Ils sont tirés au hasard. À chaque duel, clique sur ton préféré (ou flèches ← →).</p>';
             body.appendChild(h);
+            if(data.description){const info=document.createElement('p');info.className='tl-hint';info.textContent=data.description;body.appendChild(info);}
             const sizes = document.createElement('div'); sizes.className = 'bb-sizes';
             const N = data.items.length;
             const opts = (bb.tp ? [8, 16, 32, 64, 128, 256, 512, 1024] : [8, 16, 32, 64]).filter(n => n <= N);
+            if(bb.qt && N>=2 && N<8)opts.push(N);
             opts.forEach(n => {
                 const b = document.createElement('button'); b.className = 'btn-action'; b.textContent = `${n} ${bb.qt ? bb.unit : bb.tp ? 'persos' : 'participants'}`;
                 b.onclick = () => bbStart(n);
@@ -8337,28 +8343,53 @@ body.ag-game-page #app-root > #mode,
             body.appendChild(rk);
             // Pas de préchargement massif ici : le duel courant passe en priorité.
         }
-        // Thèmes « Qui a le plus… » avec leurs propres persos (pères, duos, animaux, OST…)
+        // Thèmes « Qui… » avec leurs propres persos (pères, duos, animaux, OST…)
         async function openQapThemes() {
             hideAllPanels();
             document.getElementById('battle-room').style.display = 'block';
-            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = '🏆 QUI A LE PLUS…';
-            document.getElementById('bb-subtitle').textContent = 'Choisis un thème : pas de bonne réponse, c’est toi qui décides !';
+            const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = '🏆 QUI…';
+            document.getElementById('bb-subtitle').textContent = 'Une question, une sélection cohérente. À toi de départager les personnages !';
             const body = document.getElementById('bb-body');
             body.innerHTML = '<div class="arc-loading" style="padding:30px;"><div class="arc-spin"></div></div>';
-            let d = null; try { d = await (await fetch('/api/qap/themes')).json(); } catch (e) {}
-            body.innerHTML = '';
-            const grid = document.createElement('div'); grid.className = 'qt-grid';
-            ((d && d.themes) || []).forEach(t => {
-                const b = document.createElement('button'); b.className = 'qt-btn';
-                b.innerHTML = `<span class="qt-emo">${v7esc(t.emoji || '🏆')}</span><b>${v7esc(t.title)}</b><small>${t.n} ${t.kind === 'ost' ? 'musiques' : t.kind === 'duos' ? 'duos' : 'persos'}</small>`;
-                b.onclick = () => startBattleSetup('qt:' + t.id, 'qt');
-                grid.appendChild(b);
-            });
-            body.appendChild(grid);
-            const free = document.createElement('button'); free.className = 'btn-action'; free.style.cssText = 'background:#2a2a40;max-width:420px;display:block;margin:16px auto 0;';
-            free.textContent = '🎲 Mode libre : questions au hasard sur les persos d’un anime'; free.onclick = () => openUniverseSelection('qap');
-            body.appendChild(free);
-            window.scrollTo(0, 0);
+            let d;
+            try {
+                const response = await fetch('/api/qap/themes', {cache:'no-store'});
+                d = await response.json();
+                if (!response.ok || !d.ok || !Array.isArray(d.themes) || !d.themes.length) throw new Error('Catalogue indisponible');
+            } catch (e) {
+                body.innerHTML = '<p style="text-align:center">Impossible de charger les thèmes pour le moment.</p>';
+                const retry=document.createElement('button'); retry.className='btn-action'; retry.textContent='Réessayer'; retry.onclick=openQapThemes;body.appendChild(retry);return;
+            }
+            body.innerHTML='';
+            const toolbar=document.createElement('div'); toolbar.className='qui-tools';
+            const search=document.createElement('input'); search.type='search'; search.className='v7-input';
+            search.placeholder='Rechercher : père, surnom, aura…';search.setAttribute('aria-label','Rechercher un thème');
+            const filter=document.createElement('select');filter.className='v7-input';filter.setAttribute('aria-label','Famille de thèmes');
+            for(const group of ['',...new Set(d.themes.map(t=>t.group || 'Autres'))]){
+                const option=document.createElement('option');option.value=group;option.textContent=group || 'Toutes les catégories';filter.appendChild(option);
+            }
+            const random=document.createElement('button');random.className='btn-action';random.textContent='🎲 Surprends-moi';
+            toolbar.append(search,filter,random);body.appendChild(toolbar);
+            const count=document.createElement('p');count.className='tl-hint';count.setAttribute('aria-live','polite');body.appendChild(count);
+            const grid=document.createElement('div');grid.className='qt-grid';body.appendChild(grid);
+            const fold=value=>String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+            let visible=[];
+            const draw=()=>{
+                const term=fold(search.value.trim());
+                visible=d.themes.filter(t=>t.n>=2 && (!filter.value || t.group===filter.value) && (!term || fold(t.title+' '+t.group+' '+t.description).includes(term)));
+                count.textContent=visible.length+' thème'+(visible.length===1?'':'s')+' sur '+d.themes.length;
+                random.disabled=!visible.length;grid.innerHTML='';
+                if(!visible.length){const empty=document.createElement('p');empty.textContent='Aucun thème ne correspond à ta recherche.';grid.appendChild(empty);return;}
+                for(const t of visible){
+                    const button=document.createElement('button');button.className='qt-btn';
+                    button.innerHTML=`<span class="qt-emo">${v7esc(t.emoji || '🏆')}</span><b>${v7esc(t.title)}</b><small>${v7esc(t.group || '')} · ${t.n} ${v7esc(t.unit || 'personnages')}</small>`;
+                    if(t.description)button.title=t.description;
+                    button.onclick=()=>startBattleSetup('qt:'+t.id,'qt');grid.appendChild(button);
+                }
+            };
+            search.addEventListener('input',draw);filter.addEventListener('change',draw);
+            random.onclick=()=>{if(visible.length)startBattleSetup('qt:'+visible[Math.floor(Math.random()*visible.length)].id,'qt');};
+            draw();window.scrollTo(0,0);
         }
         function qapSetup(body) {
             body.innerHTML = '';
@@ -8463,6 +8494,8 @@ body.ag-game-page #app-root > #mode,
             const cap = document.createElement('div'); cap.className = 'bb-name'; cap.textContent = name;
             const sub0 = bbItem(name).sub;
             if (sub0) { const sm = document.createElement('small'); sm.className = 'bb-sub'; sm.textContent = sub0; cap.appendChild(sm); }
+            const note=bbItem(name).note;
+            if(note){const detail=document.createElement('small');detail.className='bb-sub qui-note';detail.textContent=note;cap.appendChild(detail);}
             card.appendChild(cap);
             const it0 = bbItem(name);
             if (it0.imgs && it0.imgs.length > 1) {
@@ -15633,7 +15666,7 @@ async function loadHallOfFame(){
         quote:'Citations', quotes:'Citations', citation:'Citations', citations:'Citations', chaine:'Chaîne de persos', chain:'Chaîne de persos',
         guess:'Devine le perso', devine:'Devine le perso', tierlist:'Tier List', tier_list:'Tier List', draw:'Dessine le perso', drawing:'Dessine le perso',
         battle:'Battle de préférence', card:'Combat de cartes', cards:'Combat de cartes', tournoi:'Tournoi', tournament:'Tournoi', arcade:'Mini-jeux',
-        static:'Catalogue images', images:'Catalogue images', character_images:'Catalogue images', qap_themes:'Qui a le plus…'
+        static:'Catalogue images', images:'Catalogue images', character_images:'Catalogue images', qap_themes:'Qui…'
     };
     const prettyMode = value => {
         const raw = String(value || '').trim();
@@ -15724,7 +15757,7 @@ async function loadHallOfFame(){
         admin.appendChild(wrap);
         const themeSel = document.createElement('select');
         themeSel.id = 'ag-charadmin-theme'; themeSel.hidden = true;
-        themeSel.setAttribute('aria-label', 'Sous-mode de Qui a le plus');
+        themeSel.setAttribute('aria-label', 'Thème de Qui…');
         document.getElementById('ag-charadmin-mode').insertAdjacentElement('afterend', themeSel);
         document.getElementById('ag-charadmin-load').addEventListener('click', load);
         document.getElementById('ag-charadmin-q').addEventListener('input', apply);
@@ -17904,3 +17937,4 @@ async function loadHallOfFame(){
     </style>
 </body>
 </html>
+
