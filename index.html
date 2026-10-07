@@ -8302,6 +8302,11 @@ body.ag-game-page #app-root > #mode,
             return bb.qBag.pop();
         }
         async function startBattleSetup(source, kind) {
+            bb = null;
+            mediaClose();
+            if (source.startsWith('qt:')) for (const key of Object.keys(ITEM_IMG_CACHE)) {
+                if (key.startsWith(source + '|')) delete ITEM_IMG_CACHE[key];
+            }
             hideAllPanels();
             document.getElementById('battle-room').style.display = 'block';
             const body = document.getElementById('bb-body');
@@ -8345,6 +8350,8 @@ body.ag-game-page #app-root > #mode,
         }
         // Thèmes « Qui… » avec leurs propres persos (pères, duos, animaux, OST…)
         async function openQapThemes() {
+            bb = null;
+            mediaClose();
             hideAllPanels();
             document.getElementById('battle-room').style.display = 'block';
             const h2 = document.querySelector('#battle-room h2'); if (h2) h2.textContent = '🏆 QUI…';
@@ -8562,6 +8569,7 @@ body.ag-game-page #app-root > #mode,
         function bbPick(side, ca, cb) {
             if (!bb || bb.done || bb.busy) return;
             bb.busy = true;
+            const activeBattle = bb;
             const a = bb.current[bb.idx], b = bb.current[bb.idx + 1];
             const winner = side === 0 ? a : b, loser = side === 0 ? b : a;
             (side === 0 ? ca : cb).classList.add('win');
@@ -8572,6 +8580,7 @@ body.ag-game-page #app-root > #mode,
             bb.next.push(winner);
             bb.idx += 2;
             setTimeout(() => {
+                if (bb !== activeBattle) return;
                 bb.busy = false;
                 if (bb.rounds) return qapRoundNext();
                 if (bb.idx >= bb.current.length) {
@@ -8582,7 +8591,7 @@ body.ag-game-page #app-root > #mode,
             }, 380);
         }
         function bbUndo() {
-            if (!bb || !bb.history.length) return;
+            if (!bb || bb.busy || !bb.history.length) return;
             Object.assign(bb, JSON.parse(bb.history.pop()));
             if (bb.rounds) bb.rounds.seen = new Set(bb.rounds.seen);
             bb.done = false;
@@ -8594,8 +8603,10 @@ body.ag-game-page #app-root > #mode,
             if (e.target && (e.target.tagName === 'INPUT' || e.target.isContentEditable)) return;
             const cards = panel.querySelectorAll('.bb-card');
             if (cards.length !== 2) return;
-            if (e.key === 'ArrowLeft') bbPick(0, cards[0], cards[1]);
-            if (e.key === 'ArrowRight') bbPick(1, cards[0], cards[1]);
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                bbPick(e.key === 'ArrowLeft' ? 0 : 1, cards[0], cards[1]);
+            }
         });
         function bbFinish(champion) {
             mediaClose();

@@ -64,3 +64,27 @@ test('frontend requests the canonical portrait instead of overriding it with sta
  const context={console,localStorage:{getItem:()=>'/stale.webp',setItem(){},removeItem(){}},fetch:async()=>{calls++;return {json:async()=>({imageUrl:'/manual.webp'})}}};vm.createContext(context);vm.runInContext(code,context);
  assert.equal(await vm.runInContext("itemImage('qt:bonpere',{name:'Minato',img:'/static.webp'})",context),'/api/img?u=%2Fmanual.webp');assert.equal(calls,1);
 });
+test('changing screens cancels stale duel callbacks and undo cannot race the animation',()=>{
+ const pending=[];const game=html.slice(html.indexOf('        let bb = null;'),html.indexOf('        /* ===================== CHRONO-QUIZ'));
+ const ctx={document:{addEventListener(){}},localStorage:{getItem:()=>null},setTimeout:fn=>pending.push(fn),Math,entrants:byId.bonpere.items,card:{classList:{add(){}}}};vm.createContext(ctx);
+ vm.runInContext(game+'\nbbRenderDuel=()=>{};bb={source:"qt:bonpere",qt:true,all:entrants};bbStart(8);bbPick(0,card,card);bbUndo();',ctx);
+ assert.equal(vm.runInContext('bb.duels.length',ctx),1,'undo must wait for the current choice animation');
+ vm.runInContext('bb=null',ctx);assert.doesNotThrow(()=>pending.shift()());assert.equal(vm.runInContext('bb',ctx),null);
+ vm.runInContext('bb={source:"qt:bonpere",qt:true,all:entrants};bbStart(8);bbPick(0,card,card);bb={source:"qt:surnom",qt:true,all:entrants};bbStart(8);',ctx);
+ const before=vm.runInContext('JSON.stringify(bb)',ctx);pending.shift()();assert.equal(vm.runInContext('JSON.stringify(bb)',ctx),before);
+});
+test('world ranking excludes removed candidates without deleting historical votes',async()=>{
+ const routes={};const memory=new Map([['qt:bonpere',new Map([['Jiraiya',{wins:99,matches:100,champions:20}],['Minato Namikaze',{wins:5,matches:8,champions:2}]])]]);
+ const ctx={app:{get:(p,h)=>routes[p]=h},process:{env:{}},arcItemsFor:()=>byId.bonpere.items,ARC_BATTLE_MEM:memory};vm.createContext(ctx);
+ const a=server.indexOf("app.get('/api/battle/ranking'"),b=server.indexOf('// Common Link',a);vm.runInContext(server.slice(a,b),ctx);
+ let out;const res={json:x=>out=x,status:()=>res};await routes['/api/battle/ranking']({query:{theme:'qt:bonpere'}},res);
+ assert.equal(out.rows.length,1);assert.equal(out.rows[0].name,'Minato Namikaze');assert.equal(memory.get('qt:bonpere').size,2);
+});
+test('an admin image change is visible even after the previous thematic portrait was cached',async()=>{
+ const routes={};let manual=null;
+ const ctx={console,Map,Date,app:{get:(p,h)=>routes[p]=h},arcItemsFor:()=>byId.bonpere.items,resolveImageUniverseKey:()=> 'naruto',simpleManualCharacterImage:async()=>manual,getCachedCharacterImage:async()=>null};vm.createContext(ctx);
+ const a=server.indexOf('const QAP_ITEM_IMAGE_CACHE ='),b=server.indexOf('// Classement mondial des battles',a);vm.runInContext(server.slice(a,b),ctx);
+ let out;const res={json:x=>out=x,set:()=>res};const req={query:{source:'qt:bonpere',name:'Minato Namikaze'}};
+ await routes['/api/arcade/item-image'](req,res);assert.equal(out.imageUrl,byId.bonpere.items[0].img);
+ manual={imageUrl:'/new-admin.webp'};await routes['/api/arcade/item-image'](req,res);assert.equal(out.imageUrl,'/new-admin.webp');
+});

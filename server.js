@@ -15529,7 +15529,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
     }
     const cacheKey = String(req.query.source||'') + '|' + String(req.query.name||'');
     const cached = QAP_ITEM_IMAGE_CACHE.get(cacheKey);
-    if (cached && Date.now() - cached.at < (cached.url ? 86400000 : 300000)) {
+    if (!overrideSource.startsWith('qt:') && cached && Date.now() - cached.at < (cached.url ? 86400000 : 300000)) {
         res.set('Cache-Control', overrideSource.startsWith('qt:') ? 'no-store' : (cached.url ? 'public, max-age=86400' : 'no-store'));
         return res.json({ok:!!cached.url,imageUrl:cached.url});
     }
@@ -15708,7 +15708,9 @@ app.post('/api/battle/result', express.json({ limit: '1mb' }), async (req, res) 
 
 app.get('/api/battle/ranking', async (req, res) => {
     const theme = String(req.query.theme || '');
-    if (!arcItemsFor(theme)) return res.status(400).json({ ok: false });
+    const currentItems = arcItemsFor(theme);
+    if (!currentItems) return res.status(400).json({ ok: false });
+    const eligibleNames = new Set(currentItems.map(item => item.name));
     let rows = [];
     if (process.env.DATABASE_URL) {
         try {
@@ -15717,7 +15719,7 @@ app.get('/api/battle/ranking', async (req, res) => {
         } catch (_) {}
     }
     if (!rows.length) rows = [...(ARC_BATTLE_MEM.get(theme) || new Map())].map(([name, o]) => ({ name, ...o }));
-    rows = rows.map(r => ({ name: r.name, wins: +r.wins, matches: +r.matches, champions: +r.champions, rate: r.matches ? Math.round(1000 * r.wins / r.matches) / 10 : 0 }))
+    rows = rows.filter(r => eligibleNames.has(r.name)).map(r => ({ name: r.name, wins: +r.wins, matches: +r.matches, champions: +r.champions, rate: r.matches ? Math.round(1000 * r.wins / r.matches) / 10 : 0 }))
         .sort((a, b) => b.champions - a.champions || b.rate - a.rate || b.matches - a.matches)
         .slice(0, 100);
     res.json({ ok: true, theme, rows });
