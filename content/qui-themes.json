@@ -2761,6 +2761,111 @@
           "img": "/assets/images/external/qui-fb3bf69a743c88ae.webp",
           "char": "Gildarts Clive",
           "note": "Père de Cana"
+        },
+        {
+          "name": "Hiruzen Sarutobi",
+          "sub": "Naruto",
+          "char": "Hiruzen Sarutobi",
+          "note": "Père d’Asuma",
+          "img": "/api/avatar/img?u=naruto&n=Hiruzen%20Sarutobi"
+        },
+        {
+          "name": "Shikamaru Nara",
+          "sub": "Naruto",
+          "char": "Shikamaru Nara",
+          "note": "Père de Shikadai",
+          "img": "/api/avatar/img?u=naruto&n=Shikamaru%20Nara"
+        },
+        {
+          "name": "Chôji Akimichi",
+          "sub": "Naruto",
+          "char": "Chôji Akimichi",
+          "note": "Père de Chocho",
+          "img": "/api/avatar/img?u=naruto&n=Ch%C3%B4ji%20Akimichi"
+        },
+        {
+          "name": "Saï",
+          "sub": "Naruto",
+          "char": "Saï",
+          "note": "Père d’Inojin",
+          "img": "/api/avatar/img?u=naruto&n=Sa%C3%AF"
+        },
+        {
+          "name": "Shibi Aburame",
+          "sub": "Naruto",
+          "char": "Shibi Aburame",
+          "note": "Père de Shino",
+          "img": "/api/avatar/img?u=naruto&n=Shibi%20Aburame"
+        },
+        {
+          "name": "Docteur Brief",
+          "sub": "Dragon Ball",
+          "char": "Docteur Brief",
+          "note": "Père de Bulma",
+          "img": "/api/avatar/img?u=dragonball&n=Docteur%20Brief"
+        },
+        {
+          "name": "Gyumao",
+          "sub": "Dragon Ball",
+          "char": "Gyumao",
+          "note": "Père de Chi-Chi",
+          "img": "/api/avatar/img?u=dragonball&n=Gyumao"
+        },
+        {
+          "name": "Monkey D. Dragon",
+          "sub": "One Piece",
+          "char": "Monkey D. Dragon",
+          "note": "Père de Luffy",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Dragon"
+        },
+        {
+          "name": "Yasopp",
+          "sub": "One Piece",
+          "char": "Yasopp",
+          "note": "Père d’Usopp",
+          "img": "/api/avatar/img?u=onepiece&n=Yasopp"
+        },
+        {
+          "name": "Gol D. Roger",
+          "sub": "One Piece",
+          "char": "Gol D. Roger",
+          "note": "Père d’Ace",
+          "img": "/api/avatar/img?u=onepiece&n=Gol%20D.%20Roger"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "Considère ses pirates comme ses fils",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Zeff",
+          "sub": "One Piece",
+          "char": "Zeff",
+          "note": "Père de cœur de Sanji",
+          "img": "/api/avatar/img?u=onepiece&n=Zeff"
+        },
+        {
+          "name": "Akio Furukawa",
+          "sub": "Clannad",
+          "char": "Akio Furukawa",
+          "note": "Père de Nagisa",
+          "img": "/api/avatar/img?u=clannad&n=Akio%20Furukawa"
+        },
+        {
+          "name": "George Joestar",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "George Joestar",
+          "note": "Père de Jonathan",
+          "img": "/api/avatar/img?u=jojo&n=George%20Joestar"
+        },
+        {
+          "name": "Rudeus Greyrat",
+          "sub": "Mushoku Tensei",
+          "char": "Rudeus Greyrat",
+          "note": "Père de Lucie",
+          "img": "/api/avatar/img?u=mushoku&n=Rudeus%20Greyrat"
         }
       ],
       "group": "Famille",
@@ -4449,6 +4554,139 @@
           "sub": "Tensura",
           "img": "/assets/images/external/214d24a3f9e90a73.webp",
           "char": "Ranga"
+        },
+        {
+          "name": "Gamabunta",
+          "sub": "Naruto",
+          "char": "Gamabunta",
+          "note": "Crapaud invoqué par Jiraiya et Naruto",
+          "img": "/api/avatar/img?u=naruto&n=Gamabunta"
+        },
+        {
+          "name": "Gamakichi",
+          "sub": "Naruto",
+          "char": "Gamakichi",
+          "note": "Fils de Gamabunta",
+          "img": "/api/avatar/img?u=naruto&n=Gamakichi"
+        },
+        {
+          "name": "Katsuyu",
+          "sub": "Naruto",
+          "char": "Katsuyu",
+          "note": "Limace de Tsunade",
+          "img": "/api/avatar/img?u=naruto&n=Katsuyu"
+        },
+        {
+          "name": "Manda",
+          "sub": "Naruto",
+          "char": "Manda",
+          "note": "Serpent d’Orochimaru",
+          "img": "/api/avatar/img?u=naruto&n=Manda"
+        },
+        {
+          "name": "Laboon",
+          "sub": "One Piece",
+          "char": "Laboon",
+          "note": "La baleine qui attend Brook",
+          "img": "/api/avatar/img?u=onepiece&n=Laboon"
+        },
+        {
+          "name": "Bepo",
+          "sub": "One Piece",
+          "char": "Bepo",
+          "note": "Ours polaire de l’équipage de Law",
+          "img": "/api/avatar/img?u=onepiece&n=Bepo"
+        },
+        {
+          "name": "Funkfreed",
+          "sub": "One Piece",
+          "char": "Funkfreed",
+          "note": "L’épée-éléphant de Spandam",
+          "img": "/api/avatar/img?u=onepiece&n=Funkfreed"
+        },
+        {
+          "name": "Miaouss",
+          "sub": "Pokémon",
+          "char": "Miaouss",
+          "note": "Le Pokémon de la Team Rocket",
+          "img": "/api/avatar/img?u=pokemon&n=Miaouss"
+        },
+        {
+          "name": "Psykokwak",
+          "sub": "Pokémon",
+          "char": "Psykokwak",
+          "note": "Le Pokémon d’Ondine",
+          "img": "/api/avatar/img?u=pokemon&n=Psykokwak"
+        },
+        {
+          "name": "Salamèche",
+          "sub": "Pokémon",
+          "char": "Salamèche",
+          "note": "Le Pokémon de Sacha",
+          "img": "/api/avatar/img?u=pokemon&n=Salam%C3%A8che"
+        },
+        {
+          "name": "Panther Lily",
+          "sub": "Fairy Tail",
+          "char": "Panther Lily",
+          "note": "Exceed de Gajeel",
+          "img": "/api/avatar/img?u=fairy&n=Panther%20Lily"
+        },
+        {
+          "name": "Lector",
+          "sub": "Fairy Tail",
+          "char": "Lector",
+          "note": "Exceed de Sting",
+          "img": "/api/avatar/img?u=fairy&n=Lector"
+        },
+        {
+          "name": "Frosch",
+          "sub": "Fairy Tail",
+          "char": "Frosch",
+          "note": "Exceed de Rogue",
+          "img": "/api/avatar/img?u=fairy&n=Frosch"
+        },
+        {
+          "name": "Keroberos",
+          "sub": "Cardcaptor Sakura",
+          "char": "Keroberos",
+          "note": "Gardien du livre de Clow",
+          "img": "/api/avatar/img?u=cardcaptor&n=Keroberos"
+        },
+        {
+          "name": "Hawk",
+          "sub": "Seven Deadly Sins",
+          "char": "Hawk",
+          "note": "Cochon des Sept Péchés",
+          "img": "/api/avatar/img?u=sds&n=Hawk"
+        },
+        {
+          "name": "Puck",
+          "sub": "Re:Zero",
+          "char": "Puck",
+          "note": "Esprit chat d’Emilia",
+          "img": "/api/avatar/img?u=rezero&n=Puck"
+        },
+        {
+          "name": "Black Hayate",
+          "sub": "Fullmetal Alchemist",
+          "char": "Black Hayate",
+          "note": "Chien de Riza Hawkeye",
+          "img": "/api/avatar/img?u=fma&n=Black%20Hayate"
+        },
+        {
+          "name": "Den",
+          "sub": "Fullmetal Alchemist",
+          "char": "Den",
+          "note": "Chien de Winry",
+          "img": "/api/avatar/img?u=fma&n=Den"
+        },
+        {
+          "name": "Kon",
+          "sub": "Bleach",
+          "char": "Kon",
+          "note": "L’âme modifiée en peluche",
+          "img": "/api/avatar/img?u=bleach&n=Kon"
         }
       ],
       "group": "Relations",
@@ -9914,6 +10152,454 @@
           "img": "/assets/images/external/3c43735b546af83a.webp",
           "char": "Ken Kaneki",
           "note": "Le Cache-œil"
+        },
+        {
+          "name": "Gaara",
+          "sub": "Naruto",
+          "char": "Gaara",
+          "note": "Gaara du Désert",
+          "img": "/api/avatar/img?u=naruto&n=Gaara"
+        },
+        {
+          "name": "Jiraiya",
+          "sub": "Naruto",
+          "char": "Jiraiya",
+          "note": "L’Ermite pas net",
+          "img": "/api/avatar/img?u=naruto&n=Jiraiya"
+        },
+        {
+          "name": "Kisame Hoshigaki",
+          "sub": "Naruto",
+          "char": "Kisame Hoshigaki",
+          "note": "Le Monstre de la Brume",
+          "img": "/api/avatar/img?u=naruto&n=Kisame%20Hoshigaki"
+        },
+        {
+          "name": "Zabuza Momochi",
+          "sub": "Naruto",
+          "char": "Zabuza Momochi",
+          "note": "Le Démon du Brouillard",
+          "img": "/api/avatar/img?u=naruto&n=Zabuza%20Momochi"
+        },
+        {
+          "name": "Hashirama Senju",
+          "sub": "Naruto",
+          "char": "Hashirama Senju",
+          "note": "Le Dieu des shinobis",
+          "img": "/api/avatar/img?u=naruto&n=Hashirama%20Senju"
+        },
+        {
+          "name": "Hiruzen Sarutobi",
+          "sub": "Naruto",
+          "char": "Hiruzen Sarutobi",
+          "note": "Le Professeur",
+          "img": "/api/avatar/img?u=naruto&n=Hiruzen%20Sarutobi"
+        },
+        {
+          "name": "Sasori",
+          "sub": "Naruto",
+          "char": "Sasori",
+          "note": "Sasori des Sables rouges",
+          "img": "/api/avatar/img?u=naruto&n=Sasori"
+        },
+        {
+          "name": "Sakumo Hatake",
+          "sub": "Naruto",
+          "char": "Sakumo Hatake",
+          "note": "Le Croc blanc de Konoha",
+          "img": "/api/avatar/img?u=naruto&n=Sakumo%20Hatake"
+        },
+        {
+          "name": "Monkey D. Garp",
+          "sub": "One Piece",
+          "char": "Monkey D. Garp",
+          "note": "Le Héros de la Marine",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Garp"
+        },
+        {
+          "name": "Sengoku",
+          "sub": "One Piece",
+          "char": "Sengoku",
+          "note": "Le Bouddha",
+          "img": "/api/avatar/img?u=onepiece&n=Sengoku"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "Barbe Blanche",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Marshall D. Teach",
+          "sub": "One Piece",
+          "char": "Marshall D. Teach",
+          "note": "Barbe Noire",
+          "img": "/api/avatar/img?u=onepiece&n=Marshall%20D.%20Teach"
+        },
+        {
+          "name": "Charlotte Linlin",
+          "sub": "One Piece",
+          "char": "Charlotte Linlin",
+          "note": "Big Mom",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Linlin"
+        },
+        {
+          "name": "Kaido",
+          "sub": "One Piece",
+          "char": "Kaido",
+          "note": "Kaido aux cent bêtes",
+          "img": "/api/avatar/img?u=onepiece&n=Kaido"
+        },
+        {
+          "name": "Sakazuki",
+          "sub": "One Piece",
+          "char": "Sakazuki",
+          "note": "Akainu",
+          "img": "/api/avatar/img?u=onepiece&n=Sakazuki"
+        },
+        {
+          "name": "Kuzan",
+          "sub": "One Piece",
+          "char": "Kuzan",
+          "note": "Aokiji",
+          "img": "/api/avatar/img?u=onepiece&n=Kuzan"
+        },
+        {
+          "name": "Borsalino",
+          "sub": "One Piece",
+          "char": "Borsalino",
+          "note": "Kizaru",
+          "img": "/api/avatar/img?u=onepiece&n=Borsalino"
+        },
+        {
+          "name": "Issho",
+          "sub": "One Piece",
+          "char": "Issho",
+          "note": "Fujitora",
+          "img": "/api/avatar/img?u=onepiece&n=Issho"
+        },
+        {
+          "name": "Usopp",
+          "sub": "One Piece",
+          "char": "Usopp",
+          "note": "Sogeking",
+          "img": "/api/avatar/img?u=onepiece&n=Usopp"
+        },
+        {
+          "name": "Jinbei",
+          "sub": "One Piece",
+          "char": "Jinbei",
+          "note": "Le Chevalier des mers",
+          "img": "/api/avatar/img?u=onepiece&n=Jinbei"
+        },
+        {
+          "name": "Boa Hancock",
+          "sub": "One Piece",
+          "char": "Boa Hancock",
+          "note": "L’Impératrice pirate",
+          "img": "/api/avatar/img?u=onepiece&n=Boa%20Hancock"
+        },
+        {
+          "name": "Marco",
+          "sub": "One Piece",
+          "char": "Marco",
+          "note": "Marco le Phénix",
+          "img": "/api/avatar/img?u=onepiece&n=Marco"
+        },
+        {
+          "name": "Baggy",
+          "sub": "One Piece",
+          "char": "Baggy",
+          "note": "Le Clown",
+          "img": "/api/avatar/img?u=onepiece&n=Baggy"
+        },
+        {
+          "name": "Arlong",
+          "sub": "One Piece",
+          "char": "Arlong",
+          "note": "Arlong la Scie",
+          "img": "/api/avatar/img?u=onepiece&n=Arlong"
+        },
+        {
+          "name": "Kuro",
+          "sub": "One Piece",
+          "char": "Kuro",
+          "note": "Kuro aux mille plans",
+          "img": "/api/avatar/img?u=onepiece&n=Kuro"
+        },
+        {
+          "name": "Nami",
+          "sub": "One Piece",
+          "char": "Nami",
+          "note": "La Chatte voleuse",
+          "img": "/api/avatar/img?u=onepiece&n=Nami"
+        },
+        {
+          "name": "Monkey D. Dragon",
+          "sub": "One Piece",
+          "char": "Monkey D. Dragon",
+          "note": "Le Révolutionnaire",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Dragon"
+        },
+        {
+          "name": "Ichigo Kurosaki",
+          "sub": "Bleach",
+          "char": "Ichigo Kurosaki",
+          "note": "Le Shinigami remplaçant",
+          "img": "/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki"
+        },
+        {
+          "name": "Yoruichi Shihoin",
+          "sub": "Bleach",
+          "char": "Yoruichi Shihoin",
+          "note": "La Déesse de la vitesse",
+          "img": "/api/avatar/img?u=bleach&n=Yoruichi%20Shihoin"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "Kakarot",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "Vegeta",
+          "sub": "Dragon Ball",
+          "char": "Vegeta",
+          "note": "Le Prince des Saiyans",
+          "img": "/api/avatar/img?u=dragonball&n=Vegeta"
+        },
+        {
+          "name": "Sangohan",
+          "sub": "Dragon Ball",
+          "char": "Sangohan",
+          "note": "Great Saiyaman",
+          "img": "/api/avatar/img?u=dragonball&n=Sangohan"
+        },
+        {
+          "name": "Hercule",
+          "sub": "Dragon Ball",
+          "char": "Hercule",
+          "note": "Le Champion du monde",
+          "img": "/api/avatar/img?u=dragonball&n=Hercule"
+        },
+        {
+          "name": "Freezer",
+          "sub": "Dragon Ball",
+          "char": "Freezer",
+          "note": "L’Empereur de l’univers",
+          "img": "/api/avatar/img?u=dragonball&n=Freezer"
+        },
+        {
+          "name": "Broly",
+          "sub": "Dragon Ball",
+          "char": "Broly",
+          "note": "Le Super Saiyan légendaire",
+          "img": "/api/avatar/img?u=dragonball&n=Broly"
+        },
+        {
+          "name": "Muzan Kibutsuji",
+          "sub": "Demon Slayer",
+          "char": "Muzan Kibutsuji",
+          "note": "Le Roi des démons",
+          "img": "/api/avatar/img?u=demonslayer&n=Muzan%20Kibutsuji"
+        },
+        {
+          "name": "Kyojuro Rengoku",
+          "sub": "Demon Slayer",
+          "char": "Kyojuro Rengoku",
+          "note": "Le Pilier de la Flamme",
+          "img": "/api/avatar/img?u=demonslayer&n=Kyojuro%20Rengoku"
+        },
+        {
+          "name": "Tengen Uzui",
+          "sub": "Demon Slayer",
+          "char": "Tengen Uzui",
+          "note": "Le Dieu des festivals",
+          "img": "/api/avatar/img?u=demonslayer&n=Tengen%20Uzui"
+        },
+        {
+          "name": "Mitsuri Kanroji",
+          "sub": "Demon Slayer",
+          "char": "Mitsuri Kanroji",
+          "note": "Le Pilier de l’Amour",
+          "img": "/api/avatar/img?u=demonslayer&n=Mitsuri%20Kanroji"
+        },
+        {
+          "name": "Hisoka Morow",
+          "sub": "Hunter x Hunter",
+          "char": "Hisoka Morow",
+          "note": "Le Magicien",
+          "img": "/api/avatar/img?u=hxh&n=Hisoka%20Morow"
+        },
+        {
+          "name": "Meruem",
+          "sub": "Hunter x Hunter",
+          "char": "Meruem",
+          "note": "Le Roi",
+          "img": "/api/avatar/img?u=hxh&n=Meruem"
+        },
+        {
+          "name": "Livaï Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Livaï Ackerman",
+          "note": "Le Soldat le plus fort de l’humanité",
+          "img": "/api/avatar/img?u=snk&n=Liva%C3%AF%20Ackerman"
+        },
+        {
+          "name": "Scar",
+          "sub": "Fullmetal Alchemist",
+          "char": "Scar",
+          "note": "L’Homme à la cicatrice",
+          "img": "/api/avatar/img?u=fma&n=Scar"
+        },
+        {
+          "name": "Solf J. Kimblee",
+          "sub": "Fullmetal Alchemist",
+          "char": "Solf J. Kimblee",
+          "note": "L’Alchimiste écarlate",
+          "img": "/api/avatar/img?u=fma&n=Solf%20J.%20Kimblee"
+        },
+        {
+          "name": "Van Hohenheim",
+          "sub": "Fullmetal Alchemist",
+          "char": "Van Hohenheim",
+          "note": "Hohenheim de Lumière",
+          "img": "/api/avatar/img?u=fma&n=Van%20Hohenheim"
+        },
+        {
+          "name": "Light Yagami",
+          "sub": "Death Note",
+          "char": "Light Yagami",
+          "note": "Kira",
+          "img": "/api/avatar/img?u=deathnote&n=Light%20Yagami"
+        },
+        {
+          "name": "L Lawliet",
+          "sub": "Death Note",
+          "char": "L Lawliet",
+          "note": "Ryuzaki",
+          "img": "/api/avatar/img?u=deathnote&n=L%20Lawliet"
+        },
+        {
+          "name": "Misa Amane",
+          "sub": "Death Note",
+          "char": "Misa Amane",
+          "note": "Le Second Kira",
+          "img": "/api/avatar/img?u=deathnote&n=Misa%20Amane"
+        },
+        {
+          "name": "Lelouch Lamperouge",
+          "sub": "Code Geass",
+          "char": "Lelouch Lamperouge",
+          "note": "Zero",
+          "img": "/api/avatar/img?u=codegeass&n=Lelouch%20Lamperouge"
+        },
+        {
+          "name": "Milim Nava",
+          "sub": "Tensura",
+          "char": "Milim Nava",
+          "note": "La Destructrice",
+          "img": "/api/avatar/img?u=tensura&n=Milim%20Nava"
+        },
+        {
+          "name": "Saitama",
+          "sub": "One Punch Man",
+          "char": "Saitama",
+          "note": "Le Chauve à la cape",
+          "img": "/api/avatar/img?u=opm&n=Saitama"
+        },
+        {
+          "name": "Genos",
+          "sub": "One Punch Man",
+          "char": "Genos",
+          "note": "Le Cyborg démon",
+          "img": "/api/avatar/img?u=opm&n=Genos"
+        },
+        {
+          "name": "Tatsumaki",
+          "sub": "One Punch Man",
+          "char": "Tatsumaki",
+          "note": "La Tornade de la terreur",
+          "img": "/api/avatar/img?u=opm&n=Tatsumaki"
+        },
+        {
+          "name": "Bang",
+          "sub": "One Punch Man",
+          "char": "Bang",
+          "note": "Croc d’argent",
+          "img": "/api/avatar/img?u=opm&n=Bang"
+        },
+        {
+          "name": "Garou",
+          "sub": "One Punch Man",
+          "char": "Garou",
+          "note": "Le Monstre humain",
+          "img": "/api/avatar/img?u=opm&n=Garou"
+        },
+        {
+          "name": "King",
+          "sub": "One Punch Man",
+          "char": "King",
+          "note": "L’Homme le plus fort du monde",
+          "img": "/api/avatar/img?u=opm&n=King"
+        },
+        {
+          "name": "Joseph Joestar",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Joseph Joestar",
+          "note": "JoJo",
+          "img": "/api/avatar/img?u=jojo&n=Joseph%20Joestar"
+        },
+        {
+          "name": "Saber",
+          "sub": "Fate/stay night",
+          "char": "Saber",
+          "note": "Le Roi des chevaliers",
+          "img": "/api/avatar/img?u=fatestay&n=Saber"
+        },
+        {
+          "name": "Gilgamesh",
+          "sub": "Fate/Zero",
+          "char": "Gilgamesh",
+          "note": "Le Roi des héros",
+          "img": "/api/avatar/img?u=fatezero&n=Gilgamesh"
+        },
+        {
+          "name": "Ainz Ooal Gown",
+          "sub": "Overlord",
+          "char": "Ainz Ooal Gown",
+          "note": "Le Roi sorcier",
+          "img": "/api/avatar/img?u=overlord&n=Ainz%20Ooal%20Gown"
+        },
+        {
+          "name": "Hitori Gotoh",
+          "sub": "Bocchi the Rock!",
+          "char": "Hitori Gotoh",
+          "note": "Bocchi",
+          "img": "/api/avatar/img?u=bocchi&n=Hitori%20Gotoh"
+        },
+        {
+          "name": "Gintoki Sakata",
+          "sub": "Gintama",
+          "char": "Gintoki Sakata",
+          "note": "Le Démon blanc",
+          "img": "/api/avatar/img?u=gintama&n=Gintoki%20Sakata"
+        },
+        {
+          "name": "Aqua",
+          "sub": "Konosuba",
+          "char": "Aqua",
+          "note": "La Déesse inutile",
+          "img": "/api/avatar/img?u=konosuba&n=Aqua"
+        },
+        {
+          "name": "Sung Jinwoo",
+          "sub": "Solo Leveling",
+          "char": "Sung Jinwoo",
+          "note": "Le Chasseur le plus faible de l’humanité",
+          "img": "/api/avatar/img?u=solo&n=Sung%20Jinwoo"
         }
       ],
       "description": "Chaque carte affiche un surnom réellement utilisé dans l’œuvre, et non un surnom inventé pour le tournoi."
@@ -11966,6 +12652,13 @@
           "sub": "Pokémon",
           "img": "/assets/images/chars/pokemon/givrali.webp",
           "char": "Givrali"
+        },
+        {
+          "name": "Ghiaccio",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Ghiaccio",
+          "note": "White Album",
+          "img": "/api/avatar/img?u=jojo&n=Ghiaccio"
         }
       ],
       "description": "Glace, neige et congélation : des personnages qui utilisent réellement ces pouvoirs dans leur œuvre."
@@ -12121,6 +12814,62 @@
           "sub": "Sailor Moon",
           "img": "/assets/images/chars/sailormoon/makoto-kino.webp",
           "char": "Makoto Kino"
+        },
+        {
+          "name": "Zenitsu Agatsuma",
+          "sub": "Demon Slayer",
+          "char": "Zenitsu Agatsuma",
+          "note": "Souffle de la foudre",
+          "img": "/api/avatar/img?u=demonslayer&n=Zenitsu%20Agatsuma"
+        },
+        {
+          "name": "Luxus Draer",
+          "sub": "Fairy Tail",
+          "char": "Luxus Draer",
+          "note": "Chasseur de dragon de la foudre",
+          "img": "/api/avatar/img?u=fairy&n=Luxus%20Draer"
+        },
+        {
+          "name": "Ener",
+          "sub": "One Piece",
+          "char": "Ener",
+          "note": "Goro Goro no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Ener"
+        },
+        {
+          "name": "A",
+          "sub": "Naruto",
+          "char": "A",
+          "note": "Armure de foudre",
+          "img": "/api/avatar/img?u=naruto&n=A"
+        },
+        {
+          "name": "Jigoro Kuwajima",
+          "sub": "Demon Slayer",
+          "char": "Jigoro Kuwajima",
+          "note": "Souffle de la foudre",
+          "img": "/api/avatar/img?u=demonslayer&n=Jigoro%20Kuwajima"
+        },
+        {
+          "name": "Kaigaku",
+          "sub": "Demon Slayer",
+          "char": "Kaigaku",
+          "note": "Souffle de la foudre",
+          "img": "/api/avatar/img?u=demonslayer&n=Kaigaku"
+        },
+        {
+          "name": "Yoruichi Shihoin",
+          "sub": "Bleach",
+          "char": "Yoruichi Shihoin",
+          "note": "Shunkō",
+          "img": "/api/avatar/img?u=bleach&n=Yoruichi%20Shihoin"
+        },
+        {
+          "name": "Nami",
+          "sub": "One Piece",
+          "char": "Nami",
+          "note": "Clima-Tact",
+          "img": "/api/avatar/img?u=onepiece&n=Nami"
         }
       ],
       "description": ""
@@ -15333,6 +16082,27 @@
           "sub": "Fairy Tail",
           "img": "/assets/images/external/qui-c3b4ae076c64a5ef.webp",
           "char": "Nab Lasaro"
+        },
+        {
+          "name": "Roronoa Zoro",
+          "sub": "One Piece",
+          "char": "Roronoa Zoro",
+          "note": "Dort dès qu’il peut",
+          "img": "/api/avatar/img?u=onepiece&n=Roronoa%20Zoro"
+        },
+        {
+          "name": "Kenma Kozume",
+          "sub": "Haikyuu",
+          "char": "Kenma Kozume",
+          "note": "Préfère ses jeux vidéo",
+          "img": "/api/avatar/img?u=haikyuu&n=Kenma%20Kozume"
+        },
+        {
+          "name": "Kazuma Satou",
+          "sub": "Konosuba",
+          "char": "Kazuma Satou",
+          "note": "Le hikikomori",
+          "img": "/api/avatar/img?u=konosuba&n=Kazuma%20Satou"
         }
       ],
       "description": ""
@@ -16360,6 +17130,41 @@
           "sub": "Dr. Stone",
           "img": "/assets/images/external/qui-3e6440a8d184349e.webp",
           "char": "Dr. Xeno"
+        },
+        {
+          "name": "Kenpachi Zaraki",
+          "sub": "Bleach",
+          "char": "Kenpachi Zaraki",
+          "note": "Œil gauche",
+          "img": "/api/avatar/img?u=bleach&n=Kenpachi%20Zaraki"
+        },
+        {
+          "name": "Shuhei Hisagi",
+          "sub": "Bleach",
+          "char": "Shuhei Hisagi",
+          "note": "Trois griffures et le tatouage 69",
+          "img": "/api/avatar/img?u=bleach&n=Shuhei%20Hisagi"
+        },
+        {
+          "name": "Smoker",
+          "sub": "One Piece",
+          "char": "Smoker",
+          "note": "Front",
+          "img": "/api/avatar/img?u=onepiece&n=Smoker"
+        },
+        {
+          "name": "Thorfinn",
+          "sub": "Vinland Saga",
+          "char": "Thorfinn",
+          "note": "Visage et corps",
+          "img": "/api/avatar/img?u=vinland&n=Thorfinn"
+        },
+        {
+          "name": "Livaï Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Livaï Ackerman",
+          "note": "Visage après l’explosion de Zeke",
+          "img": "/api/avatar/img?u=snk&n=Liva%C3%AF%20Ackerman"
         }
       ],
       "description": ""
@@ -17384,6 +18189,4776 @@
         }
       ],
       "description": ""
+    },
+    {
+      "id": "fruit",
+      "title": "Quel est le meilleur fruit du démon ?",
+      "emoji": "🍎",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque carte indique le fruit du démon réellement mangé par le personnage.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Monkey D. Luffy",
+          "sub": "One Piece",
+          "char": "Monkey D. Luffy",
+          "note": "Gomu Gomu no Mi (Hito Hito no Mi, modèle Nika)",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Luffy"
+        },
+        {
+          "name": "Portgas D. Ace",
+          "sub": "One Piece",
+          "char": "Portgas D. Ace",
+          "note": "Mera Mera no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Portgas%20D.%20Ace"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "Gura Gura no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Trafalgar D. Water Law",
+          "sub": "One Piece",
+          "char": "Trafalgar D. Water Law",
+          "note": "Ope Ope no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Trafalgar%20D.%20Water%20Law"
+        },
+        {
+          "name": "Borsalino",
+          "sub": "One Piece",
+          "char": "Borsalino",
+          "note": "Pika Pika no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Borsalino"
+        },
+        {
+          "name": "Sakazuki",
+          "sub": "One Piece",
+          "char": "Sakazuki",
+          "note": "Magu Magu no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Sakazuki"
+        },
+        {
+          "name": "Kuzan",
+          "sub": "One Piece",
+          "char": "Kuzan",
+          "note": "Hie Hie no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Kuzan"
+        },
+        {
+          "name": "Crocodile",
+          "sub": "One Piece",
+          "char": "Crocodile",
+          "note": "Suna Suna no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Crocodile"
+        },
+        {
+          "name": "Ener",
+          "sub": "One Piece",
+          "char": "Ener",
+          "note": "Goro Goro no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Ener"
+        },
+        {
+          "name": "Donquixote Doflamingo",
+          "sub": "One Piece",
+          "char": "Donquixote Doflamingo",
+          "note": "Ito Ito no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Donquixote%20Doflamingo"
+        },
+        {
+          "name": "Marshall D. Teach",
+          "sub": "One Piece",
+          "char": "Marshall D. Teach",
+          "note": "Yami Yami no Mi + Gura Gura no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Marshall%20D.%20Teach"
+        },
+        {
+          "name": "Nico Robin",
+          "sub": "One Piece",
+          "char": "Nico Robin",
+          "note": "Hana Hana no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Nico%20Robin"
+        },
+        {
+          "name": "Tony Tony Chopper",
+          "sub": "One Piece",
+          "char": "Tony Tony Chopper",
+          "note": "Hito Hito no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Tony%20Tony%20Chopper"
+        },
+        {
+          "name": "Brook",
+          "sub": "One Piece",
+          "char": "Brook",
+          "note": "Yomi Yomi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Brook"
+        },
+        {
+          "name": "Boa Hancock",
+          "sub": "One Piece",
+          "char": "Boa Hancock",
+          "note": "Mero Mero no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Boa%20Hancock"
+        },
+        {
+          "name": "Charlotte Katakuri",
+          "sub": "One Piece",
+          "char": "Charlotte Katakuri",
+          "note": "Mochi Mochi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Katakuri"
+        },
+        {
+          "name": "Kaido",
+          "sub": "One Piece",
+          "char": "Kaido",
+          "note": "Uo Uo no Mi, modèle Seiryu",
+          "img": "/api/avatar/img?u=onepiece&n=Kaido"
+        },
+        {
+          "name": "Marco",
+          "sub": "One Piece",
+          "char": "Marco",
+          "note": "Tori Tori no Mi, modèle Phénix",
+          "img": "/api/avatar/img?u=onepiece&n=Marco"
+        },
+        {
+          "name": "Smoker",
+          "sub": "One Piece",
+          "char": "Smoker",
+          "note": "Moku Moku no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Smoker"
+        },
+        {
+          "name": "Baggy",
+          "sub": "One Piece",
+          "char": "Baggy",
+          "note": "Bara Bara no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Baggy"
+        },
+        {
+          "name": "Charlotte Linlin",
+          "sub": "One Piece",
+          "char": "Charlotte Linlin",
+          "note": "Soru Soru no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Linlin"
+        },
+        {
+          "name": "Rob Lucci",
+          "sub": "One Piece",
+          "char": "Rob Lucci",
+          "note": "Neko Neko no Mi, modèle Léopard",
+          "img": "/api/avatar/img?u=onepiece&n=Rob%20Lucci"
+        },
+        {
+          "name": "Bartholomew Kuma",
+          "sub": "One Piece",
+          "char": "Bartholomew Kuma",
+          "note": "Nikyu Nikyu no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Bartholomew%20Kuma"
+        },
+        {
+          "name": "Issho",
+          "sub": "One Piece",
+          "char": "Issho",
+          "note": "Zushi Zushi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Issho"
+        },
+        {
+          "name": "Sabo",
+          "sub": "One Piece",
+          "char": "Sabo",
+          "note": "Mera Mera no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Sabo"
+        },
+        {
+          "name": "Perona",
+          "sub": "One Piece",
+          "char": "Perona",
+          "note": "Horo Horo no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Perona"
+        },
+        {
+          "name": "Gecko Moria",
+          "sub": "One Piece",
+          "char": "Gecko Moria",
+          "note": "Kage Kage no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Gecko%20Moria"
+        },
+        {
+          "name": "Magellan",
+          "sub": "One Piece",
+          "char": "Magellan",
+          "note": "Doku Doku no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Magellan"
+        },
+        {
+          "name": "Emporio Ivankov",
+          "sub": "One Piece",
+          "char": "Emporio Ivankov",
+          "note": "Horu Horu no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Emporio%20Ivankov"
+        },
+        {
+          "name": "Bentham",
+          "sub": "One Piece",
+          "char": "Bentham",
+          "note": "Mane Mane no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Bentham"
+        },
+        {
+          "name": "Eustass Kid",
+          "sub": "One Piece",
+          "char": "Eustass Kid",
+          "note": "Jiki Jiki no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Eustass%20Kid"
+        },
+        {
+          "name": "Yamato",
+          "sub": "One Piece",
+          "char": "Yamato",
+          "note": "Inu Inu no Mi, modèle Okuchi no Makami",
+          "img": "/api/avatar/img?u=onepiece&n=Yamato"
+        },
+        {
+          "name": "Sugar",
+          "sub": "One Piece",
+          "char": "Sugar",
+          "note": "Hobi Hobi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Sugar"
+        },
+        {
+          "name": "Caesar Clown",
+          "sub": "One Piece",
+          "char": "Caesar Clown",
+          "note": "Gasu Gasu no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Caesar%20Clown"
+        },
+        {
+          "name": "Kaku",
+          "sub": "One Piece",
+          "char": "Kaku",
+          "note": "Ushi Ushi no Mi, modèle Girafe",
+          "img": "/api/avatar/img?u=onepiece&n=Kaku"
+        },
+        {
+          "name": "Jewelry Bonney",
+          "sub": "One Piece",
+          "char": "Jewelry Bonney",
+          "note": "Toshi Toshi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Jewelry%20Bonney"
+        },
+        {
+          "name": "Shiryu",
+          "sub": "One Piece",
+          "char": "Shiryu",
+          "note": "Suke Suke no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Shiryu"
+        },
+        {
+          "name": "Vegapunk",
+          "sub": "One Piece",
+          "char": "Vegapunk",
+          "note": "Nomi Nomi no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Vegapunk"
+        },
+        {
+          "name": "Charlotte Smoothie",
+          "sub": "One Piece",
+          "char": "Charlotte Smoothie",
+          "note": "Shibo Shibo no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Smoothie"
+        },
+        {
+          "name": "Basil Hawkins",
+          "sub": "One Piece",
+          "char": "Basil Hawkins",
+          "note": "Wara Wara no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Basil%20Hawkins"
+        },
+        {
+          "name": "X Drake",
+          "sub": "One Piece",
+          "char": "X Drake",
+          "note": "Ryu Ryu no Mi, modèle Allosaure",
+          "img": "/api/avatar/img?u=onepiece&n=X%20Drake"
+        },
+        {
+          "name": "Galdino",
+          "sub": "One Piece",
+          "char": "Galdino",
+          "note": "Doru Doru no Mi",
+          "img": "/api/avatar/img?u=onepiece&n=Galdino"
+        }
+      ]
+    },
+    {
+      "id": "stand",
+      "title": "Quel est le meilleur Stand ?",
+      "emoji": "✨",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque manieur avec le nom de son Stand.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Jotaro Kujo",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Jotaro Kujo",
+          "note": "Star Platinum",
+          "img": "/api/avatar/img?u=jojo&n=Jotaro%20Kujo"
+        },
+        {
+          "name": "Dio Brando",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Dio Brando",
+          "note": "The World",
+          "img": "/api/avatar/img?u=jojo&n=Dio%20Brando"
+        },
+        {
+          "name": "Giorno Giovanna",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Giorno Giovanna",
+          "note": "Gold Experience",
+          "img": "/api/avatar/img?u=jojo&n=Giorno%20Giovanna"
+        },
+        {
+          "name": "Josuke Higashikata",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Josuke Higashikata",
+          "note": "Crazy Diamond",
+          "img": "/api/avatar/img?u=jojo&n=Josuke%20Higashikata"
+        },
+        {
+          "name": "Yoshikage Kira",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Yoshikage Kira",
+          "note": "Killer Queen",
+          "img": "/api/avatar/img?u=jojo&n=Yoshikage%20Kira"
+        },
+        {
+          "name": "Jean Pierre Polnareff",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Jean Pierre Polnareff",
+          "note": "Silver Chariot",
+          "img": "/api/avatar/img?u=jojo&n=Jean%20Pierre%20Polnareff"
+        },
+        {
+          "name": "Noriaki Kakyoin",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Noriaki Kakyoin",
+          "note": "Hierophant Green",
+          "img": "/api/avatar/img?u=jojo&n=Noriaki%20Kakyoin"
+        },
+        {
+          "name": "Muhammad Avdol",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Muhammad Avdol",
+          "note": "Magician’s Red",
+          "img": "/api/avatar/img?u=jojo&n=Muhammad%20Avdol"
+        },
+        {
+          "name": "Bruno Bucciarati",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Bruno Bucciarati",
+          "note": "Sticky Fingers",
+          "img": "/api/avatar/img?u=jojo&n=Bruno%20Bucciarati"
+        },
+        {
+          "name": "Diavolo",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Diavolo",
+          "note": "King Crimson",
+          "img": "/api/avatar/img?u=jojo&n=Diavolo"
+        },
+        {
+          "name": "Jolyne Cujoh",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Jolyne Cujoh",
+          "note": "Stone Free",
+          "img": "/api/avatar/img?u=jojo&n=Jolyne%20Cujoh"
+        },
+        {
+          "name": "Enrico Pucci",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Enrico Pucci",
+          "note": "Whitesnake puis Made in Heaven",
+          "img": "/api/avatar/img?u=jojo&n=Enrico%20Pucci"
+        },
+        {
+          "name": "Rohan Kishibe",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Rohan Kishibe",
+          "note": "Heaven’s Door",
+          "img": "/api/avatar/img?u=jojo&n=Rohan%20Kishibe"
+        },
+        {
+          "name": "Okuyasu Nijimura",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Okuyasu Nijimura",
+          "note": "The Hand",
+          "img": "/api/avatar/img?u=jojo&n=Okuyasu%20Nijimura"
+        },
+        {
+          "name": "Koichi Hirose",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Koichi Hirose",
+          "note": "Echoes",
+          "img": "/api/avatar/img?u=jojo&n=Koichi%20Hirose"
+        },
+        {
+          "name": "Narancia Ghirga",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Narancia Ghirga",
+          "note": "Aerosmith",
+          "img": "/api/avatar/img?u=jojo&n=Narancia%20Ghirga"
+        },
+        {
+          "name": "Guido Mista",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Guido Mista",
+          "note": "Sex Pistols",
+          "img": "/api/avatar/img?u=jojo&n=Guido%20Mista"
+        },
+        {
+          "name": "Leone Abbacchio",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Leone Abbacchio",
+          "note": "Moody Blues",
+          "img": "/api/avatar/img?u=jojo&n=Leone%20Abbacchio"
+        },
+        {
+          "name": "Joseph Joestar",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Joseph Joestar",
+          "note": "Hermit Purple",
+          "img": "/api/avatar/img?u=jojo&n=Joseph%20Joestar"
+        },
+        {
+          "name": "Johnny Joestar",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Johnny Joestar",
+          "note": "Tusk",
+          "img": "/api/avatar/img?u=jojo&n=Johnny%20Joestar"
+        },
+        {
+          "name": "Funny Valentine",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Funny Valentine",
+          "note": "Dirty Deeds Done Dirt Cheap",
+          "img": "/api/avatar/img?u=jojo&n=Funny%20Valentine"
+        },
+        {
+          "name": "Ghiaccio",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Ghiaccio",
+          "note": "White Album",
+          "img": "/api/avatar/img?u=jojo&n=Ghiaccio"
+        },
+        {
+          "name": "Prosciutto",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Prosciutto",
+          "note": "The Grateful Dead",
+          "img": "/api/avatar/img?u=jojo&n=Prosciutto"
+        },
+        {
+          "name": "Iggy",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Iggy",
+          "note": "The Fool",
+          "img": "/api/avatar/img?u=jojo&n=Iggy"
+        },
+        {
+          "name": "Hol Horse",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Hol Horse",
+          "note": "Emperor",
+          "img": "/api/avatar/img?u=jojo&n=Hol%20Horse"
+        },
+        {
+          "name": "Weather Report",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Weather Report",
+          "note": "Weather Report",
+          "img": "/api/avatar/img?u=jojo&n=Weather%20Report"
+        },
+        {
+          "name": "Narciso Anasui",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Narciso Anasui",
+          "note": "Diver Down",
+          "img": "/api/avatar/img?u=jojo&n=Narciso%20Anasui"
+        },
+        {
+          "name": "Pannacotta Fugo",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Pannacotta Fugo",
+          "note": "Purple Haze",
+          "img": "/api/avatar/img?u=jojo&n=Pannacotta%20Fugo"
+        },
+        {
+          "name": "Risotto Nero",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Risotto Nero",
+          "note": "Metallica",
+          "img": "/api/avatar/img?u=jojo&n=Risotto%20Nero"
+        },
+        {
+          "name": "Trish Una",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Trish Una",
+          "note": "Spice Girl",
+          "img": "/api/avatar/img?u=jojo&n=Trish%20Una"
+        },
+        {
+          "name": "Vanilla Ice",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Vanilla Ice",
+          "note": "Cream",
+          "img": "/api/avatar/img?u=jojo&n=Vanilla%20Ice"
+        },
+        {
+          "name": "Ermes Costello",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Ermes Costello",
+          "note": "Kiss",
+          "img": "/api/avatar/img?u=jojo&n=Ermes%20Costello"
+        }
+      ]
+    },
+    {
+      "id": "souffle",
+      "title": "Quel est le meilleur souffle de Demon Slayer ?",
+      "emoji": "🌬️",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque pourfendeur avec son style de respiration.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Tanjiro Kamado",
+          "sub": "Demon Slayer",
+          "char": "Tanjiro Kamado",
+          "note": "Souffle de l’eau et Danse du dieu du feu",
+          "img": "/api/avatar/img?u=demonslayer&n=Tanjiro%20Kamado"
+        },
+        {
+          "name": "Zenitsu Agatsuma",
+          "sub": "Demon Slayer",
+          "char": "Zenitsu Agatsuma",
+          "note": "Souffle de la foudre",
+          "img": "/api/avatar/img?u=demonslayer&n=Zenitsu%20Agatsuma"
+        },
+        {
+          "name": "Inosuke Hashibira",
+          "sub": "Demon Slayer",
+          "char": "Inosuke Hashibira",
+          "note": "Souffle de la bête",
+          "img": "/api/avatar/img?u=demonslayer&n=Inosuke%20Hashibira"
+        },
+        {
+          "name": "Giyu Tomioka",
+          "sub": "Demon Slayer",
+          "char": "Giyu Tomioka",
+          "note": "Souffle de l’eau",
+          "img": "/api/avatar/img?u=demonslayer&n=Giyu%20Tomioka"
+        },
+        {
+          "name": "Kyojuro Rengoku",
+          "sub": "Demon Slayer",
+          "char": "Kyojuro Rengoku",
+          "note": "Souffle de la flamme",
+          "img": "/api/avatar/img?u=demonslayer&n=Kyojuro%20Rengoku"
+        },
+        {
+          "name": "Tengen Uzui",
+          "sub": "Demon Slayer",
+          "char": "Tengen Uzui",
+          "note": "Souffle du son",
+          "img": "/api/avatar/img?u=demonslayer&n=Tengen%20Uzui"
+        },
+        {
+          "name": "Mitsuri Kanroji",
+          "sub": "Demon Slayer",
+          "char": "Mitsuri Kanroji",
+          "note": "Souffle de l’amour",
+          "img": "/api/avatar/img?u=demonslayer&n=Mitsuri%20Kanroji"
+        },
+        {
+          "name": "Muichiro Tokito",
+          "sub": "Demon Slayer",
+          "char": "Muichiro Tokito",
+          "note": "Souffle de la brume",
+          "img": "/api/avatar/img?u=demonslayer&n=Muichiro%20Tokito"
+        },
+        {
+          "name": "Gyomei Himejima",
+          "sub": "Demon Slayer",
+          "char": "Gyomei Himejima",
+          "note": "Souffle de la roche",
+          "img": "/api/avatar/img?u=demonslayer&n=Gyomei%20Himejima"
+        },
+        {
+          "name": "Sanemi Shinazugawa",
+          "sub": "Demon Slayer",
+          "char": "Sanemi Shinazugawa",
+          "note": "Souffle du vent",
+          "img": "/api/avatar/img?u=demonslayer&n=Sanemi%20Shinazugawa"
+        },
+        {
+          "name": "Obanai Iguro",
+          "sub": "Demon Slayer",
+          "char": "Obanai Iguro",
+          "note": "Souffle du serpent",
+          "img": "/api/avatar/img?u=demonslayer&n=Obanai%20Iguro"
+        },
+        {
+          "name": "Shinobu Kocho",
+          "sub": "Demon Slayer",
+          "char": "Shinobu Kocho",
+          "note": "Souffle de l’insecte",
+          "img": "/api/avatar/img?u=demonslayer&n=Shinobu%20Kocho"
+        },
+        {
+          "name": "Kanao Tsuyuri",
+          "sub": "Demon Slayer",
+          "char": "Kanao Tsuyuri",
+          "note": "Souffle de la fleur",
+          "img": "/api/avatar/img?u=demonslayer&n=Kanao%20Tsuyuri"
+        },
+        {
+          "name": "Kanae Kocho",
+          "sub": "Demon Slayer",
+          "char": "Kanae Kocho",
+          "note": "Souffle de la fleur",
+          "img": "/api/avatar/img?u=demonslayer&n=Kanae%20Kocho"
+        },
+        {
+          "name": "Yoriichi Tsugikuni",
+          "sub": "Demon Slayer",
+          "char": "Yoriichi Tsugikuni",
+          "note": "Souffle du soleil, le premier souffle",
+          "img": "/api/avatar/img?u=demonslayer&n=Yoriichi%20Tsugikuni"
+        },
+        {
+          "name": "Kokushibo",
+          "sub": "Demon Slayer",
+          "char": "Kokushibo",
+          "note": "Souffle de la lune",
+          "img": "/api/avatar/img?u=demonslayer&n=Kokushibo"
+        },
+        {
+          "name": "Sakonji Urokodaki",
+          "sub": "Demon Slayer",
+          "char": "Sakonji Urokodaki",
+          "note": "Souffle de l’eau (ancien Pilier)",
+          "img": "/api/avatar/img?u=demonslayer&n=Sakonji%20Urokodaki"
+        },
+        {
+          "name": "Sabito",
+          "sub": "Demon Slayer",
+          "char": "Sabito",
+          "note": "Souffle de l’eau",
+          "img": "/api/avatar/img?u=demonslayer&n=Sabito"
+        },
+        {
+          "name": "Kaigaku",
+          "sub": "Demon Slayer",
+          "char": "Kaigaku",
+          "note": "Souffle de la foudre",
+          "img": "/api/avatar/img?u=demonslayer&n=Kaigaku"
+        },
+        {
+          "name": "Jigoro Kuwajima",
+          "sub": "Demon Slayer",
+          "char": "Jigoro Kuwajima",
+          "note": "Souffle de la foudre (ancien Pilier)",
+          "img": "/api/avatar/img?u=demonslayer&n=Jigoro%20Kuwajima"
+        },
+        {
+          "name": "Makomo",
+          "sub": "Demon Slayer",
+          "char": "Makomo",
+          "note": "Souffle de l’eau",
+          "img": "/api/avatar/img?u=demonslayer&n=Makomo"
+        },
+        {
+          "name": "Shinjuro Rengoku",
+          "sub": "Demon Slayer",
+          "char": "Shinjuro Rengoku",
+          "note": "Souffle de la flamme (ancien Pilier)",
+          "img": "/api/avatar/img?u=demonslayer&n=Shinjuro%20Rengoku"
+        }
+      ]
+    },
+    {
+      "id": "bankai",
+      "title": "Quel est le meilleur Bankai ?",
+      "emoji": "⚔️",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque shinigami avec le nom de son Bankai.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Ichigo Kurosaki",
+          "sub": "Bleach",
+          "char": "Ichigo Kurosaki",
+          "note": "Tensa Zangetsu",
+          "img": "/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki"
+        },
+        {
+          "name": "Byakuya Kuchiki",
+          "sub": "Bleach",
+          "char": "Byakuya Kuchiki",
+          "note": "Senbonzakura Kageyoshi",
+          "img": "/api/avatar/img?u=bleach&n=Byakuya%20Kuchiki"
+        },
+        {
+          "name": "Toshiro Hitsugaya",
+          "sub": "Bleach",
+          "char": "Toshiro Hitsugaya",
+          "note": "Daiguren Hyōrinmaru",
+          "img": "/api/avatar/img?u=bleach&n=Toshiro%20Hitsugaya"
+        },
+        {
+          "name": "Renji Abarai",
+          "sub": "Bleach",
+          "char": "Renji Abarai",
+          "note": "Hihiō Zabimaru puis Sōō Zabimaru",
+          "img": "/api/avatar/img?u=bleach&n=Renji%20Abarai"
+        },
+        {
+          "name": "Kenpachi Zaraki",
+          "sub": "Bleach",
+          "char": "Kenpachi Zaraki",
+          "note": "Bankai sans nom révélé",
+          "img": "/api/avatar/img?u=bleach&n=Kenpachi%20Zaraki"
+        },
+        {
+          "name": "Genryusai Shigekuni Yamamoto",
+          "sub": "Bleach",
+          "char": "Genryusai Shigekuni Yamamoto",
+          "note": "Zanka no Tachi",
+          "img": "/api/avatar/img?u=bleach&n=Genryusai%20Shigekuni%20Yamamoto"
+        },
+        {
+          "name": "Shunsui Kyoraku",
+          "sub": "Bleach",
+          "char": "Shunsui Kyoraku",
+          "note": "Katen Kyōkotsu : Karamatsu Shinjū",
+          "img": "/api/avatar/img?u=bleach&n=Shunsui%20Kyoraku"
+        },
+        {
+          "name": "Soi Fon",
+          "sub": "Bleach",
+          "char": "Soi Fon",
+          "note": "Jakuhō Raikōben",
+          "img": "/api/avatar/img?u=bleach&n=Soi%20Fon"
+        },
+        {
+          "name": "Mayuri Kurotsuchi",
+          "sub": "Bleach",
+          "char": "Mayuri Kurotsuchi",
+          "note": "Konjiki Ashisogi Jizō",
+          "img": "/api/avatar/img?u=bleach&n=Mayuri%20Kurotsuchi"
+        },
+        {
+          "name": "Sajin Komamura",
+          "sub": "Bleach",
+          "char": "Sajin Komamura",
+          "note": "Kokujō Tengen Myō’ō",
+          "img": "/api/avatar/img?u=bleach&n=Sajin%20Komamura"
+        },
+        {
+          "name": "Rukia Kuchiki",
+          "sub": "Bleach",
+          "char": "Rukia Kuchiki",
+          "note": "Hakka no Togame",
+          "img": "/api/avatar/img?u=bleach&n=Rukia%20Kuchiki"
+        },
+        {
+          "name": "Kisuke Urahara",
+          "sub": "Bleach",
+          "char": "Kisuke Urahara",
+          "note": "Kannonbiraki Benihime Aratame",
+          "img": "/api/avatar/img?u=bleach&n=Kisuke%20Urahara"
+        },
+        {
+          "name": "Kensei Muguruma",
+          "sub": "Bleach",
+          "char": "Kensei Muguruma",
+          "note": "Tekken Tachikaze",
+          "img": "/api/avatar/img?u=bleach&n=Kensei%20Muguruma"
+        },
+        {
+          "name": "Rōjūrō Otoribashi",
+          "sub": "Bleach",
+          "char": "Rōjūrō Otoribashi",
+          "note": "Kinshara Butōdan",
+          "img": "/api/avatar/img?u=bleach&n=R%C5%8Dj%C5%ABr%C5%8D%20Otoribashi"
+        },
+        {
+          "name": "Retsu Unohana",
+          "sub": "Bleach",
+          "char": "Retsu Unohana",
+          "note": "Minazuki",
+          "img": "/api/avatar/img?u=bleach&n=Retsu%20Unohana"
+        },
+        {
+          "name": "Ikkaku Madarame",
+          "sub": "Bleach",
+          "char": "Ikkaku Madarame",
+          "note": "Ryūmon Hōzukimaru",
+          "img": "/api/avatar/img?u=bleach&n=Ikkaku%20Madarame"
+        },
+        {
+          "name": "Gin Ichimaru",
+          "sub": "Bleach",
+          "char": "Gin Ichimaru",
+          "note": "Kamishini no Yari",
+          "img": "/api/avatar/img?u=bleach&n=Gin%20Ichimaru"
+        },
+        {
+          "name": "Kaname Tosen",
+          "sub": "Bleach",
+          "char": "Kaname Tosen",
+          "note": "Suzumushi Tsuishiki : Enma Kōrogi",
+          "img": "/api/avatar/img?u=bleach&n=Kaname%20Tosen"
+        },
+        {
+          "name": "Shinji Hirako",
+          "sub": "Bleach",
+          "char": "Shinji Hirako",
+          "note": "Sakanade Sakashima Yokoshima Happō Fusagari",
+          "img": "/api/avatar/img?u=bleach&n=Shinji%20Hirako"
+        }
+      ]
+    },
+    {
+      "id": "alter",
+      "title": "Quel est le meilleur Alter ?",
+      "emoji": "💥",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque héros ou vilain avec son Alter.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Izuku Midoriya",
+          "sub": "My Hero Academia",
+          "char": "Izuku Midoriya",
+          "note": "One For All",
+          "img": "/api/avatar/img?u=mha&n=Izuku%20Midoriya"
+        },
+        {
+          "name": "Katsuki Bakugo",
+          "sub": "My Hero Academia",
+          "char": "Katsuki Bakugo",
+          "note": "Explosion",
+          "img": "/api/avatar/img?u=mha&n=Katsuki%20Bakugo"
+        },
+        {
+          "name": "Shoto Todoroki",
+          "sub": "My Hero Academia",
+          "char": "Shoto Todoroki",
+          "note": "Demi-froid demi-chaud",
+          "img": "/api/avatar/img?u=mha&n=Shoto%20Todoroki"
+        },
+        {
+          "name": "All Might",
+          "sub": "My Hero Academia",
+          "char": "All Might",
+          "note": "One For All",
+          "img": "/api/avatar/img?u=mha&n=All%20Might"
+        },
+        {
+          "name": "Endeavor",
+          "sub": "My Hero Academia",
+          "char": "Endeavor",
+          "note": "Hellflame",
+          "img": "/api/avatar/img?u=mha&n=Endeavor"
+        },
+        {
+          "name": "Hawks",
+          "sub": "My Hero Academia",
+          "char": "Hawks",
+          "note": "Ailes féroces",
+          "img": "/api/avatar/img?u=mha&n=Hawks"
+        },
+        {
+          "name": "Tomura Shigaraki",
+          "sub": "My Hero Academia",
+          "char": "Tomura Shigaraki",
+          "note": "Désintégration",
+          "img": "/api/avatar/img?u=mha&n=Tomura%20Shigaraki"
+        },
+        {
+          "name": "Dabi",
+          "sub": "My Hero Academia",
+          "char": "Dabi",
+          "note": "Flammes bleues",
+          "img": "/api/avatar/img?u=mha&n=Dabi"
+        },
+        {
+          "name": "Himiko Toga",
+          "sub": "My Hero Academia",
+          "char": "Himiko Toga",
+          "note": "Transformation",
+          "img": "/api/avatar/img?u=mha&n=Himiko%20Toga"
+        },
+        {
+          "name": "Ochaco Uraraka",
+          "sub": "My Hero Academia",
+          "char": "Ochaco Uraraka",
+          "note": "Zéro gravité",
+          "img": "/api/avatar/img?u=mha&n=Ochaco%20Uraraka"
+        },
+        {
+          "name": "Fumikage Tokoyami",
+          "sub": "My Hero Academia",
+          "char": "Fumikage Tokoyami",
+          "note": "Dark Shadow",
+          "img": "/api/avatar/img?u=mha&n=Fumikage%20Tokoyami"
+        },
+        {
+          "name": "Eijiro Kirishima",
+          "sub": "My Hero Academia",
+          "char": "Eijiro Kirishima",
+          "note": "Durcissement",
+          "img": "/api/avatar/img?u=mha&n=Eijiro%20Kirishima"
+        },
+        {
+          "name": "Shota Aizawa",
+          "sub": "My Hero Academia",
+          "char": "Shota Aizawa",
+          "note": "Effacement",
+          "img": "/api/avatar/img?u=mha&n=Shota%20Aizawa"
+        },
+        {
+          "name": "Mirio Togata",
+          "sub": "My Hero Academia",
+          "char": "Mirio Togata",
+          "note": "Traversée",
+          "img": "/api/avatar/img?u=mha&n=Mirio%20Togata"
+        },
+        {
+          "name": "Overhaul",
+          "sub": "My Hero Academia",
+          "char": "Overhaul",
+          "note": "Overhaul",
+          "img": "/api/avatar/img?u=mha&n=Overhaul"
+        },
+        {
+          "name": "Tsuyu Asui",
+          "sub": "My Hero Academia",
+          "char": "Tsuyu Asui",
+          "note": "Grenouille",
+          "img": "/api/avatar/img?u=mha&n=Tsuyu%20Asui"
+        },
+        {
+          "name": "Momo Yaoyorozu",
+          "sub": "My Hero Academia",
+          "char": "Momo Yaoyorozu",
+          "note": "Création",
+          "img": "/api/avatar/img?u=mha&n=Momo%20Yaoyorozu"
+        },
+        {
+          "name": "Tenya Iida",
+          "sub": "My Hero Academia",
+          "char": "Tenya Iida",
+          "note": "Moteurs",
+          "img": "/api/avatar/img?u=mha&n=Tenya%20Iida"
+        },
+        {
+          "name": "Denki Kaminari",
+          "sub": "My Hero Academia",
+          "char": "Denki Kaminari",
+          "note": "Électrification",
+          "img": "/api/avatar/img?u=mha&n=Denki%20Kaminari"
+        },
+        {
+          "name": "Hitoshi Shinso",
+          "sub": "My Hero Academia",
+          "char": "Hitoshi Shinso",
+          "note": "Lavage de cerveau",
+          "img": "/api/avatar/img?u=mha&n=Hitoshi%20Shinso"
+        },
+        {
+          "name": "All For One",
+          "sub": "My Hero Academia",
+          "char": "All For One",
+          "note": "All For One",
+          "img": "/api/avatar/img?u=mha&n=All%20For%20One"
+        },
+        {
+          "name": "Mirko",
+          "sub": "My Hero Academia",
+          "char": "Mirko",
+          "note": "Lapin",
+          "img": "/api/avatar/img?u=mha&n=Mirko"
+        },
+        {
+          "name": "Eri",
+          "sub": "My Hero Academia",
+          "char": "Eri",
+          "note": "Rembobinage",
+          "img": "/api/avatar/img?u=mha&n=Eri"
+        },
+        {
+          "name": "Twice",
+          "sub": "My Hero Academia",
+          "char": "Twice",
+          "note": "Doublement",
+          "img": "/api/avatar/img?u=mha&n=Twice"
+        },
+        {
+          "name": "Stain",
+          "sub": "My Hero Academia",
+          "char": "Stain",
+          "note": "Coagulation",
+          "img": "/api/avatar/img?u=mha&n=Stain"
+        },
+        {
+          "name": "Gran Torino",
+          "sub": "My Hero Academia",
+          "char": "Gran Torino",
+          "note": "Jet",
+          "img": "/api/avatar/img?u=mha&n=Gran%20Torino"
+        },
+        {
+          "name": "Kurogiri",
+          "sub": "My Hero Academia",
+          "char": "Kurogiri",
+          "note": "Distorsion",
+          "img": "/api/avatar/img?u=mha&n=Kurogiri"
+        },
+        {
+          "name": "Present Mic",
+          "sub": "My Hero Academia",
+          "char": "Present Mic",
+          "note": "Voix",
+          "img": "/api/avatar/img?u=mha&n=Present%20Mic"
+        },
+        {
+          "name": "Tamaki Amajiki",
+          "sub": "My Hero Academia",
+          "char": "Tamaki Amajiki",
+          "note": "Manifestation",
+          "img": "/api/avatar/img?u=mha&n=Tamaki%20Amajiki"
+        },
+        {
+          "name": "Nejire Hado",
+          "sub": "My Hero Academia",
+          "char": "Nejire Hado",
+          "note": "Ondes",
+          "img": "/api/avatar/img?u=mha&n=Nejire%20Hado"
+        }
+      ]
+    },
+    {
+      "id": "sort",
+      "title": "Quelle est la meilleure technique de Jujutsu Kaisen ?",
+      "emoji": "🌀",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Chaque exorciste ou fléau avec sa technique innée.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Satoru Gojo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Satoru Gojo",
+          "note": "Infini et Six Yeux",
+          "img": "/api/avatar/img?u=jjk&n=Satoru%20Gojo"
+        },
+        {
+          "name": "Ryomen Sukuna",
+          "sub": "Jujutsu Kaisen",
+          "char": "Ryomen Sukuna",
+          "note": "Découpage, Démantèlement et Sanctuaire Démoniaque",
+          "img": "/api/avatar/img?u=jjk&n=Ryomen%20Sukuna"
+        },
+        {
+          "name": "Megumi Fushiguro",
+          "sub": "Jujutsu Kaisen",
+          "char": "Megumi Fushiguro",
+          "note": "Dix Ombres",
+          "img": "/api/avatar/img?u=jjk&n=Megumi%20Fushiguro"
+        },
+        {
+          "name": "Yuji Itadori",
+          "sub": "Jujutsu Kaisen",
+          "char": "Yuji Itadori",
+          "note": "Black Flash et Divergent Fist",
+          "img": "/api/avatar/img?u=jjk&n=Yuji%20Itadori"
+        },
+        {
+          "name": "Nobara Kugisaki",
+          "sub": "Jujutsu Kaisen",
+          "char": "Nobara Kugisaki",
+          "note": "Technique de la poupée de paille",
+          "img": "/api/avatar/img?u=jjk&n=Nobara%20Kugisaki"
+        },
+        {
+          "name": "Aoi Todo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Aoi Todo",
+          "note": "Boogie Woogie",
+          "img": "/api/avatar/img?u=jjk&n=Aoi%20Todo"
+        },
+        {
+          "name": "Kento Nanami",
+          "sub": "Jujutsu Kaisen",
+          "char": "Kento Nanami",
+          "note": "Ratio 7 : 3",
+          "img": "/api/avatar/img?u=jjk&n=Kento%20Nanami"
+        },
+        {
+          "name": "Mahito",
+          "sub": "Jujutsu Kaisen",
+          "char": "Mahito",
+          "note": "Transfiguration de l’âme",
+          "img": "/api/avatar/img?u=jjk&n=Mahito"
+        },
+        {
+          "name": "Suguru Geto",
+          "sub": "Jujutsu Kaisen",
+          "char": "Suguru Geto",
+          "note": "Manipulation des fléaux",
+          "img": "/api/avatar/img?u=jjk&n=Suguru%20Geto"
+        },
+        {
+          "name": "Jogo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Jogo",
+          "note": "Pouvoirs de volcan",
+          "img": "/api/avatar/img?u=jjk&n=Jogo"
+        },
+        {
+          "name": "Hiromi Higuruma",
+          "sub": "Jujutsu Kaisen",
+          "char": "Hiromi Higuruma",
+          "note": "Jugement (Sanctuaire de la sentence)",
+          "img": "/api/avatar/img?u=jjk&n=Hiromi%20Higuruma"
+        },
+        {
+          "name": "Kinji Hakari",
+          "sub": "Jujutsu Kaisen",
+          "char": "Kinji Hakari",
+          "note": "Jackpot",
+          "img": "/api/avatar/img?u=jjk&n=Kinji%20Hakari"
+        },
+        {
+          "name": "Yuta Okkotsu",
+          "sub": "Jujutsu Kaisen",
+          "char": "Yuta Okkotsu",
+          "note": "Copie et Rika",
+          "img": "/api/avatar/img?u=jjk&n=Yuta%20Okkotsu"
+        },
+        {
+          "name": "Toge Inumaki",
+          "sub": "Jujutsu Kaisen",
+          "char": "Toge Inumaki",
+          "note": "Parole maudite",
+          "img": "/api/avatar/img?u=jjk&n=Toge%20Inumaki"
+        },
+        {
+          "name": "Choso",
+          "sub": "Jujutsu Kaisen",
+          "char": "Choso",
+          "note": "Manipulation du sang",
+          "img": "/api/avatar/img?u=jjk&n=Choso"
+        },
+        {
+          "name": "Kenjaku",
+          "sub": "Jujutsu Kaisen",
+          "char": "Kenjaku",
+          "note": "Transfert de cerveau",
+          "img": "/api/avatar/img?u=jjk&n=Kenjaku"
+        },
+        {
+          "name": "Naoya Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Naoya Zenin",
+          "note": "Projection",
+          "img": "/api/avatar/img?u=jjk&n=Naoya%20Zenin"
+        },
+        {
+          "name": "Yuki Tsukumo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Yuki Tsukumo",
+          "note": "Masse stellaire",
+          "img": "/api/avatar/img?u=jjk&n=Yuki%20Tsukumo"
+        },
+        {
+          "name": "Hanami",
+          "sub": "Jujutsu Kaisen",
+          "char": "Hanami",
+          "note": "Plantes maudites",
+          "img": "/api/avatar/img?u=jjk&n=Hanami"
+        },
+        {
+          "name": "Dagon",
+          "sub": "Jujutsu Kaisen",
+          "char": "Dagon",
+          "note": "Horizon du Skandha captivant",
+          "img": "/api/avatar/img?u=jjk&n=Dagon"
+        },
+        {
+          "name": "Maki Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Maki Zenin",
+          "note": "Restriction céleste (aucune énergie occulte)",
+          "img": "/api/avatar/img?u=jjk&n=Maki%20Zenin"
+        },
+        {
+          "name": "Toji Fushiguro",
+          "sub": "Jujutsu Kaisen",
+          "char": "Toji Fushiguro",
+          "note": "Restriction céleste",
+          "img": "/api/avatar/img?u=jjk&n=Toji%20Fushiguro"
+        },
+        {
+          "name": "Mai Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Mai Zenin",
+          "note": "Construction",
+          "img": "/api/avatar/img?u=jjk&n=Mai%20Zenin"
+        },
+        {
+          "name": "Kasumi Miwa",
+          "sub": "Jujutsu Kaisen",
+          "char": "Kasumi Miwa",
+          "note": "Nouvelle Ombre",
+          "img": "/api/avatar/img?u=jjk&n=Kasumi%20Miwa"
+        },
+        {
+          "name": "Panda",
+          "sub": "Jujutsu Kaisen",
+          "char": "Panda",
+          "note": "Trois cœurs",
+          "img": "/api/avatar/img?u=jjk&n=Panda"
+        }
+      ]
+    },
+    {
+      "id": "yeux",
+      "title": "Qui a les yeux les plus iconiques ?",
+      "emoji": "👁️",
+      "kind": "chars",
+      "group": "Pouvoirs",
+      "description": "Pupilles et yeux légendaires, avec leur nom.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Itachi Uchiwa",
+          "sub": "Naruto",
+          "char": "Itachi Uchiwa",
+          "note": "Mangekyō Sharingan",
+          "img": "/api/avatar/img?u=naruto&n=Itachi%20Uchiwa"
+        },
+        {
+          "name": "Sasuke Uchiwa",
+          "sub": "Naruto",
+          "char": "Sasuke Uchiwa",
+          "note": "Rinnegan et Mangekyō Sharingan éternel",
+          "img": "/api/avatar/img?u=naruto&n=Sasuke%20Uchiwa"
+        },
+        {
+          "name": "Nagato",
+          "sub": "Naruto",
+          "char": "Nagato",
+          "note": "Rinnegan",
+          "img": "/api/avatar/img?u=naruto&n=Nagato"
+        },
+        {
+          "name": "Neji Hyūga",
+          "sub": "Naruto",
+          "char": "Neji Hyūga",
+          "note": "Byakugan",
+          "img": "/api/avatar/img?u=naruto&n=Neji%20Hy%C5%ABga"
+        },
+        {
+          "name": "Hinata Hyūga",
+          "sub": "Naruto",
+          "char": "Hinata Hyūga",
+          "note": "Byakugan",
+          "img": "/api/avatar/img?u=naruto&n=Hinata%20Hy%C5%ABga"
+        },
+        {
+          "name": "Madara Uchiwa",
+          "sub": "Naruto",
+          "char": "Madara Uchiwa",
+          "note": "Rinne Sharingan",
+          "img": "/api/avatar/img?u=naruto&n=Madara%20Uchiwa"
+        },
+        {
+          "name": "Kakashi Hatake",
+          "sub": "Naruto",
+          "char": "Kakashi Hatake",
+          "note": "Sharingan (œil d’Obito)",
+          "img": "/api/avatar/img?u=naruto&n=Kakashi%20Hatake"
+        },
+        {
+          "name": "Shisui Uchiwa",
+          "sub": "Naruto",
+          "char": "Shisui Uchiwa",
+          "note": "Kotoamatsukami",
+          "img": "/api/avatar/img?u=naruto&n=Shisui%20Uchiwa"
+        },
+        {
+          "name": "Kaguya Ôtsutsuki",
+          "sub": "Naruto",
+          "char": "Kaguya Ôtsutsuki",
+          "note": "Rinne Sharingan et Byakugan",
+          "img": "/api/avatar/img?u=naruto&n=Kaguya%20%C3%94tsutsuki"
+        },
+        {
+          "name": "Satoru Gojo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Satoru Gojo",
+          "note": "Les Six Yeux",
+          "img": "/api/avatar/img?u=jjk&n=Satoru%20Gojo"
+        },
+        {
+          "name": "Lelouch Lamperouge",
+          "sub": "Code Geass",
+          "char": "Lelouch Lamperouge",
+          "note": "Geass de l’obéissance absolue",
+          "img": "/api/avatar/img?u=codegeass&n=Lelouch%20Lamperouge"
+        },
+        {
+          "name": "Kurapika",
+          "sub": "Hunter x Hunter",
+          "char": "Kurapika",
+          "note": "Yeux écarlates du clan Kuruta",
+          "img": "/api/avatar/img?u=hxh&n=Kurapika"
+        },
+        {
+          "name": "Ken Kaneki",
+          "sub": "Tokyo Ghoul",
+          "char": "Ken Kaneki",
+          "note": "Kakugan (un seul œil)",
+          "img": "/api/avatar/img?u=tokyoghoul&n=Ken%20Kaneki"
+        },
+        {
+          "name": "Ulquiorra Cifer",
+          "sub": "Bleach",
+          "char": "Ulquiorra Cifer",
+          "note": "Yeux verts et larmes peintes",
+          "img": "/api/avatar/img?u=bleach&n=Ulquiorra%20Cifer"
+        },
+        {
+          "name": "Dracule Mihawk",
+          "sub": "One Piece",
+          "char": "Dracule Mihawk",
+          "note": "Œil de faucon",
+          "img": "/api/avatar/img?u=onepiece&n=Dracule%20Mihawk"
+        },
+        {
+          "name": "Kokushibo",
+          "sub": "Demon Slayer",
+          "char": "Kokushibo",
+          "note": "Six yeux de démon",
+          "img": "/api/avatar/img?u=demonslayer&n=Kokushibo"
+        },
+        {
+          "name": "Muzan Kibutsuji",
+          "sub": "Demon Slayer",
+          "char": "Muzan Kibutsuji",
+          "note": "Pupilles de félin rouges",
+          "img": "/api/avatar/img?u=demonslayer&n=Muzan%20Kibutsuji"
+        },
+        {
+          "name": "Doma",
+          "sub": "Demon Slayer",
+          "char": "Doma",
+          "note": "Yeux arc-en-ciel gravés de « Lune supérieure 2 »",
+          "img": "/api/avatar/img?u=demonslayer&n=Doma"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "Yeux de l’Ultra Instinct",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "King Bradley",
+          "sub": "Fullmetal Alchemist",
+          "char": "King Bradley",
+          "note": "Œil ultime de Wrath",
+          "img": "/api/avatar/img?u=fma&n=King%20Bradley"
+        },
+        {
+          "name": "Makima",
+          "sub": "Chainsaw Man",
+          "char": "Makima",
+          "note": "Yeux en spirale",
+          "img": "/api/avatar/img?u=chainsaw&n=Makima"
+        },
+        {
+          "name": "Rei Ayanami",
+          "sub": "Neon Genesis Evangelion",
+          "char": "Rei Ayanami",
+          "note": "Yeux rouges",
+          "img": "/api/avatar/img?u=evangelion&n=Rei%20Ayanami"
+        },
+        {
+          "name": "Rudeus Greyrat",
+          "sub": "Mushoku Tensei",
+          "char": "Rudeus Greyrat",
+          "note": "Œil démoniaque de prévision",
+          "img": "/api/avatar/img?u=mushoku&n=Rudeus%20Greyrat"
+        },
+        {
+          "name": "Alucard",
+          "sub": "Hellsing Ultimate",
+          "char": "Alucard",
+          "note": "Yeux rouges de vampire",
+          "img": "/api/avatar/img?u=hellsing&n=Alucard"
+        },
+        {
+          "name": "Misa Amane",
+          "sub": "Death Note",
+          "char": "Misa Amane",
+          "note": "Yeux de shinigami",
+          "img": "/api/avatar/img?u=deathnote&n=Misa%20Amane"
+        },
+        {
+          "name": "Obito Uchiwa",
+          "sub": "Naruto",
+          "char": "Obito Uchiwa",
+          "note": "Sharingan et Kamui",
+          "img": "/api/avatar/img?u=naruto&n=Obito%20Uchiwa"
+        },
+        {
+          "name": "Yoichi Isagi",
+          "sub": "Blue Lock",
+          "char": "Yoichi Isagi",
+          "note": "Métavision",
+          "img": "/api/avatar/img?u=bluelock&n=Yoichi%20Isagi"
+        }
+      ]
+    },
+    {
+      "id": "arme",
+      "title": "Qui a l’arme la plus iconique ?",
+      "emoji": "🗡️",
+      "kind": "chars",
+      "group": "Combat",
+      "description": "Chaque personnage avec son arme emblématique.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Roronoa Zoro",
+          "sub": "One Piece",
+          "char": "Roronoa Zoro",
+          "note": "Wado Ichimonji, Sandai Kitetsu et Enma",
+          "img": "/api/avatar/img?u=onepiece&n=Roronoa%20Zoro"
+        },
+        {
+          "name": "Ichigo Kurosaki",
+          "sub": "Bleach",
+          "char": "Ichigo Kurosaki",
+          "note": "Zangetsu",
+          "img": "/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki"
+        },
+        {
+          "name": "Guts",
+          "sub": "Berserk",
+          "char": "Guts",
+          "note": "La Dragonslayer",
+          "img": "/api/avatar/img?u=berserk&n=Guts"
+        },
+        {
+          "name": "Livaï Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Livaï Ackerman",
+          "note": "Lames de l’équipement tridimensionnel",
+          "img": "/api/avatar/img?u=snk&n=Liva%C3%AF%20Ackerman"
+        },
+        {
+          "name": "Inuyasha",
+          "sub": "Inuyasha",
+          "char": "Inuyasha",
+          "note": "Tessaiga",
+          "img": "/api/avatar/img?u=inuyasha&n=Inuyasha"
+        },
+        {
+          "name": "Kisame Hoshigaki",
+          "sub": "Naruto",
+          "char": "Kisame Hoshigaki",
+          "note": "Samehada",
+          "img": "/api/avatar/img?u=naruto&n=Kisame%20Hoshigaki"
+        },
+        {
+          "name": "Zabuza Momochi",
+          "sub": "Naruto",
+          "char": "Zabuza Momochi",
+          "note": "Kubikiribôchô",
+          "img": "/api/avatar/img?u=naruto&n=Zabuza%20Momochi"
+        },
+        {
+          "name": "Dracule Mihawk",
+          "sub": "One Piece",
+          "char": "Dracule Mihawk",
+          "note": "Yoru",
+          "img": "/api/avatar/img?u=onepiece&n=Dracule%20Mihawk"
+        },
+        {
+          "name": "Denji",
+          "sub": "Chainsaw Man",
+          "char": "Denji",
+          "note": "Les tronçonneuses de Pochita",
+          "img": "/api/avatar/img?u=chainsaw&n=Denji"
+        },
+        {
+          "name": "Asta",
+          "sub": "Black Clover",
+          "char": "Asta",
+          "note": "Épées anti-magie",
+          "img": "/api/avatar/img?u=clover&n=Asta"
+        },
+        {
+          "name": "Kirito",
+          "sub": "Sword Art Online",
+          "char": "Kirito",
+          "note": "Elucidator et Dark Repulser",
+          "img": "/api/avatar/img?u=sao&n=Kirito"
+        },
+        {
+          "name": "Hidan",
+          "sub": "Naruto",
+          "char": "Hidan",
+          "note": "Faux à trois lames",
+          "img": "/api/avatar/img?u=naruto&n=Hidan"
+        },
+        {
+          "name": "Temari",
+          "sub": "Naruto",
+          "char": "Temari",
+          "note": "Éventail géant",
+          "img": "/api/avatar/img?u=naruto&n=Temari"
+        },
+        {
+          "name": "Tanjiro Kamado",
+          "sub": "Demon Slayer",
+          "char": "Tanjiro Kamado",
+          "note": "Sabre Nichirin noir",
+          "img": "/api/avatar/img?u=demonslayer&n=Tanjiro%20Kamado"
+        },
+        {
+          "name": "Saber",
+          "sub": "Fate/stay night",
+          "char": "Saber",
+          "note": "Excalibur",
+          "img": "/api/avatar/img?u=fatestay&n=Saber"
+        },
+        {
+          "name": "Gilgamesh",
+          "sub": "Fate/Zero",
+          "char": "Gilgamesh",
+          "note": "La Porte de Babylone",
+          "img": "/api/avatar/img?u=fatezero&n=Gilgamesh"
+        },
+        {
+          "name": "Alucard",
+          "sub": "Hellsing Ultimate",
+          "char": "Alucard",
+          "note": "Casull et Jackal",
+          "img": "/api/avatar/img?u=hellsing&n=Alucard"
+        },
+        {
+          "name": "Spike Spiegel",
+          "sub": "Cowboy Bebop",
+          "char": "Spike Spiegel",
+          "note": "Jericho 941",
+          "img": "/api/avatar/img?u=cowboybebop&n=Spike%20Spiegel"
+        },
+        {
+          "name": "Vash the Stampede",
+          "sub": "Trigun",
+          "char": "Vash the Stampede",
+          "note": "Revolver argenté",
+          "img": "/api/avatar/img?u=trigun&n=Vash%20the%20Stampede"
+        },
+        {
+          "name": "Maki Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Maki Zenin",
+          "note": "Nuage Errant (Playful Cloud)",
+          "img": "/api/avatar/img?u=jjk&n=Maki%20Zenin"
+        },
+        {
+          "name": "Toji Fushiguro",
+          "sub": "Jujutsu Kaisen",
+          "char": "Toji Fushiguro",
+          "note": "Lance céleste inversée",
+          "img": "/api/avatar/img?u=jjk&n=Toji%20Fushiguro"
+        },
+        {
+          "name": "Maka Albarn",
+          "sub": "Soul Eater",
+          "char": "Maka Albarn",
+          "note": "Soul, faux démoniaque",
+          "img": "/api/avatar/img?u=souleater&n=Maka%20Albarn"
+        },
+        {
+          "name": "Ryuko Matoi",
+          "sub": "Kill la Kill",
+          "char": "Ryuko Matoi",
+          "note": "Ciseaux-lame",
+          "img": "/api/avatar/img?u=killlakill&n=Ryuko%20Matoi"
+        },
+        {
+          "name": "Kamina",
+          "sub": "Gurren Lagann",
+          "char": "Kamina",
+          "note": "Gurren et son sabre",
+          "img": "/api/avatar/img?u=gurren&n=Kamina"
+        },
+        {
+          "name": "Usopp",
+          "sub": "One Piece",
+          "char": "Usopp",
+          "note": "Kabuto, le lance-pierre",
+          "img": "/api/avatar/img?u=onepiece&n=Usopp"
+        },
+        {
+          "name": "Nami",
+          "sub": "One Piece",
+          "char": "Nami",
+          "note": "Clima-Tact",
+          "img": "/api/avatar/img?u=onepiece&n=Nami"
+        },
+        {
+          "name": "Trunks",
+          "sub": "Dragon Ball",
+          "char": "Trunks",
+          "note": "Épée de Trunks du futur",
+          "img": "/api/avatar/img?u=dragonball&n=Trunks"
+        },
+        {
+          "name": "Kurapika",
+          "sub": "Hunter x Hunter",
+          "char": "Kurapika",
+          "note": "Chaînes",
+          "img": "/api/avatar/img?u=hxh&n=Kurapika"
+        },
+        {
+          "name": "Akame",
+          "sub": "Akame ga Kill",
+          "char": "Akame",
+          "note": "Murasame",
+          "img": "/api/avatar/img?u=akame&n=Akame"
+        },
+        {
+          "name": "Hiei",
+          "sub": "Yu Yu Hakusho",
+          "char": "Hiei",
+          "note": "Épée et Dragon de la flamme noire",
+          "img": "/api/avatar/img?u=yuyuhakusho&n=Hiei"
+        },
+        {
+          "name": "Yato",
+          "sub": "Noragami",
+          "char": "Yato",
+          "note": "Sekki, sa lame",
+          "img": "/api/avatar/img?u=noragami&n=Yato"
+        },
+        {
+          "name": "Rin Okumura",
+          "sub": "Blue Exorcist",
+          "char": "Rin Okumura",
+          "note": "Kurikara",
+          "img": "/api/avatar/img?u=blueexorcist&n=Rin%20Okumura"
+        },
+        {
+          "name": "Meliodas",
+          "sub": "Seven Deadly Sins",
+          "char": "Meliodas",
+          "note": "Lostvayne",
+          "img": "/api/avatar/img?u=sds&n=Meliodas"
+        },
+        {
+          "name": "Erza Scarlet",
+          "sub": "Fairy Tail",
+          "char": "Erza Scarlet",
+          "note": "Armures et épées du rééquipement",
+          "img": "/api/avatar/img?u=fairy&n=Erza%20Scarlet"
+        },
+        {
+          "name": "Atomic Samurai",
+          "sub": "One Punch Man",
+          "char": "Atomic Samurai",
+          "note": "Sabre de l’Atome",
+          "img": "/api/avatar/img?u=opm&n=Atomic%20Samurai"
+        }
+      ]
+    },
+    {
+      "id": "pokelegend",
+      "title": "Quel est le meilleur Pokémon légendaire ?",
+      "emoji": "🌟",
+      "kind": "chars",
+      "group": "Animes & scènes",
+      "description": "Légendaires et fabuleux, avec leur génération.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Mewtwo",
+          "sub": "Pokémon",
+          "char": "Mewtwo",
+          "note": "1re génération",
+          "img": "/api/avatar/img?u=pokemon&n=Mewtwo"
+        },
+        {
+          "name": "Mew",
+          "sub": "Pokémon",
+          "char": "Mew",
+          "note": "1re génération",
+          "img": "/api/avatar/img?u=pokemon&n=Mew"
+        },
+        {
+          "name": "Artikodin",
+          "sub": "Pokémon",
+          "char": "Artikodin",
+          "note": "1re génération",
+          "img": "/api/avatar/img?u=pokemon&n=Artikodin"
+        },
+        {
+          "name": "Électhor",
+          "sub": "Pokémon",
+          "char": "Électhor",
+          "note": "1re génération",
+          "img": "/api/avatar/img?u=pokemon&n=%C3%89lecthor"
+        },
+        {
+          "name": "Sulfura",
+          "sub": "Pokémon",
+          "char": "Sulfura",
+          "note": "1re génération",
+          "img": "/api/avatar/img?u=pokemon&n=Sulfura"
+        },
+        {
+          "name": "Lugia",
+          "sub": "Pokémon",
+          "char": "Lugia",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Lugia"
+        },
+        {
+          "name": "Ho-Oh",
+          "sub": "Pokémon",
+          "char": "Ho-Oh",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Ho-Oh"
+        },
+        {
+          "name": "Suicune",
+          "sub": "Pokémon",
+          "char": "Suicune",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Suicune"
+        },
+        {
+          "name": "Entei",
+          "sub": "Pokémon",
+          "char": "Entei",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Entei"
+        },
+        {
+          "name": "Raikou",
+          "sub": "Pokémon",
+          "char": "Raikou",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Raikou"
+        },
+        {
+          "name": "Celebi",
+          "sub": "Pokémon",
+          "char": "Celebi",
+          "note": "2e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Celebi"
+        },
+        {
+          "name": "Rayquaza",
+          "sub": "Pokémon",
+          "char": "Rayquaza",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Rayquaza"
+        },
+        {
+          "name": "Kyogre",
+          "sub": "Pokémon",
+          "char": "Kyogre",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Kyogre"
+        },
+        {
+          "name": "Groudon",
+          "sub": "Pokémon",
+          "char": "Groudon",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Groudon"
+        },
+        {
+          "name": "Latias",
+          "sub": "Pokémon",
+          "char": "Latias",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Latias"
+        },
+        {
+          "name": "Latios",
+          "sub": "Pokémon",
+          "char": "Latios",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Latios"
+        },
+        {
+          "name": "Deoxys",
+          "sub": "Pokémon",
+          "char": "Deoxys",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Deoxys"
+        },
+        {
+          "name": "Jirachi",
+          "sub": "Pokémon",
+          "char": "Jirachi",
+          "note": "3e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Jirachi"
+        },
+        {
+          "name": "Dialga",
+          "sub": "Pokémon",
+          "char": "Dialga",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Dialga"
+        },
+        {
+          "name": "Palkia",
+          "sub": "Pokémon",
+          "char": "Palkia",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Palkia"
+        },
+        {
+          "name": "Giratina",
+          "sub": "Pokémon",
+          "char": "Giratina",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Giratina"
+        },
+        {
+          "name": "Arceus",
+          "sub": "Pokémon",
+          "char": "Arceus",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Arceus"
+        },
+        {
+          "name": "Darkrai",
+          "sub": "Pokémon",
+          "char": "Darkrai",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Darkrai"
+        },
+        {
+          "name": "Regigigas",
+          "sub": "Pokémon",
+          "char": "Regigigas",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Regigigas"
+        },
+        {
+          "name": "Heatran",
+          "sub": "Pokémon",
+          "char": "Heatran",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Heatran"
+        },
+        {
+          "name": "Cresselia",
+          "sub": "Pokémon",
+          "char": "Cresselia",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Cresselia"
+        },
+        {
+          "name": "Shaymin",
+          "sub": "Pokémon",
+          "char": "Shaymin",
+          "note": "4e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Shaymin"
+        },
+        {
+          "name": "Reshiram",
+          "sub": "Pokémon",
+          "char": "Reshiram",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Reshiram"
+        },
+        {
+          "name": "Zekrom",
+          "sub": "Pokémon",
+          "char": "Zekrom",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Zekrom"
+        },
+        {
+          "name": "Kyurem",
+          "sub": "Pokémon",
+          "char": "Kyurem",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Kyurem"
+        },
+        {
+          "name": "Victini",
+          "sub": "Pokémon",
+          "char": "Victini",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Victini"
+        },
+        {
+          "name": "Genesect",
+          "sub": "Pokémon",
+          "char": "Genesect",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Genesect"
+        },
+        {
+          "name": "Meloetta",
+          "sub": "Pokémon",
+          "char": "Meloetta",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Meloetta"
+        },
+        {
+          "name": "Keldeo",
+          "sub": "Pokémon",
+          "char": "Keldeo",
+          "note": "5e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Keldeo"
+        },
+        {
+          "name": "Xerneas",
+          "sub": "Pokémon",
+          "char": "Xerneas",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Xerneas"
+        },
+        {
+          "name": "Yveltal",
+          "sub": "Pokémon",
+          "char": "Yveltal",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Yveltal"
+        },
+        {
+          "name": "Zygarde",
+          "sub": "Pokémon",
+          "char": "Zygarde",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Zygarde"
+        },
+        {
+          "name": "Diancie",
+          "sub": "Pokémon",
+          "char": "Diancie",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Diancie"
+        },
+        {
+          "name": "Hoopa",
+          "sub": "Pokémon",
+          "char": "Hoopa",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Hoopa"
+        },
+        {
+          "name": "Volcanion",
+          "sub": "Pokémon",
+          "char": "Volcanion",
+          "note": "6e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Volcanion"
+        },
+        {
+          "name": "Solgaleo",
+          "sub": "Pokémon",
+          "char": "Solgaleo",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Solgaleo"
+        },
+        {
+          "name": "Lunala",
+          "sub": "Pokémon",
+          "char": "Lunala",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Lunala"
+        },
+        {
+          "name": "Necrozma",
+          "sub": "Pokémon",
+          "char": "Necrozma",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Necrozma"
+        },
+        {
+          "name": "Marshadow",
+          "sub": "Pokémon",
+          "char": "Marshadow",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Marshadow"
+        },
+        {
+          "name": "Zeraora",
+          "sub": "Pokémon",
+          "char": "Zeraora",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Zeraora"
+        },
+        {
+          "name": "Magearna",
+          "sub": "Pokémon",
+          "char": "Magearna",
+          "note": "7e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Magearna"
+        },
+        {
+          "name": "Zacian",
+          "sub": "Pokémon",
+          "char": "Zacian",
+          "note": "8e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Zacian"
+        },
+        {
+          "name": "Zamazenta",
+          "sub": "Pokémon",
+          "char": "Zamazenta",
+          "note": "8e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Zamazenta"
+        },
+        {
+          "name": "Éthernatos",
+          "sub": "Pokémon",
+          "char": "Éthernatos",
+          "note": "8e génération",
+          "img": "/api/avatar/img?u=pokemon&n=%C3%89thernatos"
+        },
+        {
+          "name": "Sylveroy",
+          "sub": "Pokémon",
+          "char": "Sylveroy",
+          "note": "8e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Sylveroy"
+        },
+        {
+          "name": "Koraidon",
+          "sub": "Pokémon",
+          "char": "Koraidon",
+          "note": "9e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Koraidon"
+        },
+        {
+          "name": "Miraidon",
+          "sub": "Pokémon",
+          "char": "Miraidon",
+          "note": "9e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Miraidon"
+        },
+        {
+          "name": "Terapagos",
+          "sub": "Pokémon",
+          "char": "Terapagos",
+          "note": "9e génération",
+          "img": "/api/avatar/img?u=pokemon&n=Terapagos"
+        }
+      ]
+    },
+    {
+      "id": "starter",
+      "title": "Quel est le meilleur Pokémon de départ ?",
+      "emoji": "🔥",
+      "kind": "chars",
+      "group": "Animes & scènes",
+      "description": "Les starters de chaque génération (et les compagnons Pikachu et Évoli).",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Bulbizarre",
+          "sub": "Pokémon",
+          "char": "Bulbizarre",
+          "note": "Kanto",
+          "img": "/api/avatar/img?u=pokemon&n=Bulbizarre"
+        },
+        {
+          "name": "Salamèche",
+          "sub": "Pokémon",
+          "char": "Salamèche",
+          "note": "Kanto",
+          "img": "/api/avatar/img?u=pokemon&n=Salam%C3%A8che"
+        },
+        {
+          "name": "Carapuce",
+          "sub": "Pokémon",
+          "char": "Carapuce",
+          "note": "Kanto",
+          "img": "/api/avatar/img?u=pokemon&n=Carapuce"
+        },
+        {
+          "name": "Pikachu",
+          "sub": "Pokémon",
+          "char": "Pikachu",
+          "note": "Kanto, compagnon de Sacha",
+          "img": "/api/avatar/img?u=pokemon&n=Pikachu"
+        },
+        {
+          "name": "Évoli",
+          "sub": "Pokémon",
+          "char": "Évoli",
+          "note": "Kanto, compagnon de Let’s Go",
+          "img": "/api/avatar/img?u=pokemon&n=%C3%89voli"
+        },
+        {
+          "name": "Germignon",
+          "sub": "Pokémon",
+          "char": "Germignon",
+          "note": "Johto",
+          "img": "/api/avatar/img?u=pokemon&n=Germignon"
+        },
+        {
+          "name": "Héricendre",
+          "sub": "Pokémon",
+          "char": "Héricendre",
+          "note": "Johto",
+          "img": "/api/avatar/img?u=pokemon&n=H%C3%A9ricendre"
+        },
+        {
+          "name": "Kaiminus",
+          "sub": "Pokémon",
+          "char": "Kaiminus",
+          "note": "Johto",
+          "img": "/api/avatar/img?u=pokemon&n=Kaiminus"
+        },
+        {
+          "name": "Arcko",
+          "sub": "Pokémon",
+          "char": "Arcko",
+          "note": "Hoenn",
+          "img": "/api/avatar/img?u=pokemon&n=Arcko"
+        },
+        {
+          "name": "Poussifeu",
+          "sub": "Pokémon",
+          "char": "Poussifeu",
+          "note": "Hoenn",
+          "img": "/api/avatar/img?u=pokemon&n=Poussifeu"
+        },
+        {
+          "name": "Gobou",
+          "sub": "Pokémon",
+          "char": "Gobou",
+          "note": "Hoenn",
+          "img": "/api/avatar/img?u=pokemon&n=Gobou"
+        },
+        {
+          "name": "Tortipouss",
+          "sub": "Pokémon",
+          "char": "Tortipouss",
+          "note": "Sinnoh",
+          "img": "/api/avatar/img?u=pokemon&n=Tortipouss"
+        },
+        {
+          "name": "Ouisticram",
+          "sub": "Pokémon",
+          "char": "Ouisticram",
+          "note": "Sinnoh",
+          "img": "/api/avatar/img?u=pokemon&n=Ouisticram"
+        },
+        {
+          "name": "Tiplouf",
+          "sub": "Pokémon",
+          "char": "Tiplouf",
+          "note": "Sinnoh",
+          "img": "/api/avatar/img?u=pokemon&n=Tiplouf"
+        },
+        {
+          "name": "Vipélierre",
+          "sub": "Pokémon",
+          "char": "Vipélierre",
+          "note": "Unys",
+          "img": "/api/avatar/img?u=pokemon&n=Vip%C3%A9lierre"
+        },
+        {
+          "name": "Gruikui",
+          "sub": "Pokémon",
+          "char": "Gruikui",
+          "note": "Unys",
+          "img": "/api/avatar/img?u=pokemon&n=Gruikui"
+        },
+        {
+          "name": "Moustillon",
+          "sub": "Pokémon",
+          "char": "Moustillon",
+          "note": "Unys",
+          "img": "/api/avatar/img?u=pokemon&n=Moustillon"
+        },
+        {
+          "name": "Marisson",
+          "sub": "Pokémon",
+          "char": "Marisson",
+          "note": "Kalos",
+          "img": "/api/avatar/img?u=pokemon&n=Marisson"
+        },
+        {
+          "name": "Feunnec",
+          "sub": "Pokémon",
+          "char": "Feunnec",
+          "note": "Kalos",
+          "img": "/api/avatar/img?u=pokemon&n=Feunnec"
+        },
+        {
+          "name": "Grenousse",
+          "sub": "Pokémon",
+          "char": "Grenousse",
+          "note": "Kalos",
+          "img": "/api/avatar/img?u=pokemon&n=Grenousse"
+        },
+        {
+          "name": "Brindibou",
+          "sub": "Pokémon",
+          "char": "Brindibou",
+          "note": "Alola",
+          "img": "/api/avatar/img?u=pokemon&n=Brindibou"
+        },
+        {
+          "name": "Flamiaou",
+          "sub": "Pokémon",
+          "char": "Flamiaou",
+          "note": "Alola",
+          "img": "/api/avatar/img?u=pokemon&n=Flamiaou"
+        },
+        {
+          "name": "Otaquin",
+          "sub": "Pokémon",
+          "char": "Otaquin",
+          "note": "Alola",
+          "img": "/api/avatar/img?u=pokemon&n=Otaquin"
+        },
+        {
+          "name": "Ouistempo",
+          "sub": "Pokémon",
+          "char": "Ouistempo",
+          "note": "Galar",
+          "img": "/api/avatar/img?u=pokemon&n=Ouistempo"
+        },
+        {
+          "name": "Flambino",
+          "sub": "Pokémon",
+          "char": "Flambino",
+          "note": "Galar",
+          "img": "/api/avatar/img?u=pokemon&n=Flambino"
+        },
+        {
+          "name": "Larméléon",
+          "sub": "Pokémon",
+          "char": "Larméléon",
+          "note": "Galar",
+          "img": "/api/avatar/img?u=pokemon&n=Larm%C3%A9l%C3%A9on"
+        },
+        {
+          "name": "Poussacha",
+          "sub": "Pokémon",
+          "char": "Poussacha",
+          "note": "Paldea",
+          "img": "/api/avatar/img?u=pokemon&n=Poussacha"
+        },
+        {
+          "name": "Chochodile",
+          "sub": "Pokémon",
+          "char": "Chochodile",
+          "note": "Paldea",
+          "img": "/api/avatar/img?u=pokemon&n=Chochodile"
+        },
+        {
+          "name": "Coiffeton",
+          "sub": "Pokémon",
+          "char": "Coiffeton",
+          "note": "Paldea",
+          "img": "/api/avatar/img?u=pokemon&n=Coiffeton"
+        },
+        {
+          "name": "Dracaufeu",
+          "sub": "Pokémon",
+          "char": "Dracaufeu",
+          "note": "Évolution finale de Salamèche",
+          "img": "/api/avatar/img?u=pokemon&n=Dracaufeu"
+        },
+        {
+          "name": "Florizarre",
+          "sub": "Pokémon",
+          "char": "Florizarre",
+          "note": "Évolution finale de Bulbizarre",
+          "img": "/api/avatar/img?u=pokemon&n=Florizarre"
+        },
+        {
+          "name": "Tortank",
+          "sub": "Pokémon",
+          "char": "Tortank",
+          "note": "Évolution finale de Carapuce",
+          "img": "/api/avatar/img?u=pokemon&n=Tortank"
+        },
+        {
+          "name": "Amphinobi",
+          "sub": "Pokémon",
+          "char": "Amphinobi",
+          "note": "Évolution finale de Grenousse",
+          "img": "/api/avatar/img?u=pokemon&n=Amphinobi"
+        },
+        {
+          "name": "Braségali",
+          "sub": "Pokémon",
+          "char": "Braségali",
+          "note": "Évolution finale de Poussifeu",
+          "img": "/api/avatar/img?u=pokemon&n=Bras%C3%A9gali"
+        },
+        {
+          "name": "Simiabraz",
+          "sub": "Pokémon",
+          "char": "Simiabraz",
+          "note": "Évolution finale de Ouisticram",
+          "img": "/api/avatar/img?u=pokemon&n=Simiabraz"
+        },
+        {
+          "name": "Laggron",
+          "sub": "Pokémon",
+          "char": "Laggron",
+          "note": "Évolution finale de Gobou",
+          "img": "/api/avatar/img?u=pokemon&n=Laggron"
+        },
+        {
+          "name": "Typhlosion",
+          "sub": "Pokémon",
+          "char": "Typhlosion",
+          "note": "Évolution finale d’Héricendre",
+          "img": "/api/avatar/img?u=pokemon&n=Typhlosion"
+        },
+        {
+          "name": "Félinferno",
+          "sub": "Pokémon",
+          "char": "Félinferno",
+          "note": "Évolution finale de Flamiaou",
+          "img": "/api/avatar/img?u=pokemon&n=F%C3%A9linferno"
+        }
+      ]
+    },
+    {
+      "id": "replique",
+      "title": "Quelle est la réplique la plus culte ?",
+      "emoji": "💬",
+      "kind": "chars",
+      "group": "Animes & scènes",
+      "description": "Chaque carte affiche la réplique culte du personnage.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Naruto Uzumaki",
+          "sub": "Naruto",
+          "char": "Naruto Uzumaki",
+          "note": "« Je ne reviens jamais sur ma parole, c’est ça mon nindô ! »",
+          "img": "/api/avatar/img?u=naruto&n=Naruto%20Uzumaki"
+        },
+        {
+          "name": "Monkey D. Luffy",
+          "sub": "One Piece",
+          "char": "Monkey D. Luffy",
+          "note": "« Je serai le roi des pirates ! »",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Luffy"
+        },
+        {
+          "name": "All Might",
+          "sub": "My Hero Academia",
+          "char": "All Might",
+          "note": "« Plus Ultra ! »",
+          "img": "/api/avatar/img?u=mha&n=All%20Might"
+        },
+        {
+          "name": "Saitama",
+          "sub": "One Punch Man",
+          "char": "Saitama",
+          "note": "« OK. »",
+          "img": "/api/avatar/img?u=opm&n=Saitama"
+        },
+        {
+          "name": "Eren Jäger",
+          "sub": "L'Attaque des Titans",
+          "char": "Eren Jäger",
+          "note": "« Tatakae ! » (Bats-toi !)",
+          "img": "/api/avatar/img?u=snk&n=Eren%20J%C3%A4ger"
+        },
+        {
+          "name": "Kyojuro Rengoku",
+          "sub": "Demon Slayer",
+          "char": "Kyojuro Rengoku",
+          "note": "« Fais brûler ton cœur ! »",
+          "img": "/api/avatar/img?u=demonslayer&n=Kyojuro%20Rengoku"
+        },
+        {
+          "name": "Kamina",
+          "sub": "Gurren Lagann",
+          "char": "Kamina",
+          "note": "« Qui diable crois-tu que je suis ?! »",
+          "img": "/api/avatar/img?u=gurren&n=Kamina"
+        },
+        {
+          "name": "Yami Sukehiro",
+          "sub": "Black Clover",
+          "char": "Yami Sukehiro",
+          "note": "« Dépasse tes limites, ici et maintenant ! »",
+          "img": "/api/avatar/img?u=clover&n=Yami%20Sukehiro"
+        },
+        {
+          "name": "Asta",
+          "sub": "Black Clover",
+          "char": "Asta",
+          "note": "« Ne jamais abandonner, c’est ça ma magie ! »",
+          "img": "/api/avatar/img?u=clover&n=Asta"
+        },
+        {
+          "name": "Lelouch Lamperouge",
+          "sub": "Code Geass",
+          "char": "Lelouch Lamperouge",
+          "note": "« Moi, Lelouch vi Britannia, je te l’ordonne ! »",
+          "img": "/api/avatar/img?u=codegeass&n=Lelouch%20Lamperouge"
+        },
+        {
+          "name": "Light Yagami",
+          "sub": "Death Note",
+          "char": "Light Yagami",
+          "note": "« Je suis la justice ! »",
+          "img": "/api/avatar/img?u=deathnote&n=Light%20Yagami"
+        },
+        {
+          "name": "Natsu Dragneel",
+          "sub": "Fairy Tail",
+          "char": "Natsu Dragneel",
+          "note": "« Je suis tout feu tout flamme ! »",
+          "img": "/api/avatar/img?u=fairy&n=Natsu%20Dragneel"
+        },
+        {
+          "name": "Satoru Gojo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Satoru Gojo",
+          "note": "« Rassure-toi, je suis le plus fort. »",
+          "img": "/api/avatar/img?u=jjk&n=Satoru%20Gojo"
+        },
+        {
+          "name": "Vegeta",
+          "sub": "Dragon Ball",
+          "char": "Vegeta",
+          "note": "« Plus de 8000 ! »",
+          "img": "/api/avatar/img?u=dragonball&n=Vegeta"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "« Salut, c’est Goku ! »",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "Rock Lee",
+          "sub": "Naruto",
+          "char": "Rock Lee",
+          "note": "« La fougue de la jeunesse ! »",
+          "img": "/api/avatar/img?u=naruto&n=Rock%20Lee"
+        },
+        {
+          "name": "Roronoa Zoro",
+          "sub": "One Piece",
+          "char": "Roronoa Zoro",
+          "note": "« Rien… Il ne s’est rien passé. »",
+          "img": "/api/avatar/img?u=onepiece&n=Roronoa%20Zoro"
+        },
+        {
+          "name": "Jotaro Kujo",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Jotaro Kujo",
+          "note": "« Yare yare daze. »",
+          "img": "/api/avatar/img?u=jojo&n=Jotaro%20Kujo"
+        },
+        {
+          "name": "Dio Brando",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Dio Brando",
+          "note": "« ZA WARUDO ! »",
+          "img": "/api/avatar/img?u=jojo&n=Dio%20Brando"
+        },
+        {
+          "name": "Giorno Giovanna",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Giorno Giovanna",
+          "note": "« Moi, Giorno Giovanna, j’ai un rêve. »",
+          "img": "/api/avatar/img?u=jojo&n=Giorno%20Giovanna"
+        },
+        {
+          "name": "Joseph Joestar",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Joseph Joestar",
+          "note": "« Ta prochaine réplique sera… »",
+          "img": "/api/avatar/img?u=jojo&n=Joseph%20Joestar"
+        },
+        {
+          "name": "Rintaro Okabe",
+          "sub": "Steins;Gate",
+          "char": "Rintaro Okabe",
+          "note": "« El Psy Kongroo. »",
+          "img": "/api/avatar/img?u=steinsgate&n=Rintaro%20Okabe"
+        },
+        {
+          "name": "Inosuke Hashibira",
+          "sub": "Demon Slayer",
+          "char": "Inosuke Hashibira",
+          "note": "« Inosuke attaque ! »",
+          "img": "/api/avatar/img?u=demonslayer&n=Inosuke%20Hashibira"
+        },
+        {
+          "name": "Megumin",
+          "sub": "Konosuba",
+          "char": "Megumin",
+          "note": "« EXPLOSION ! »",
+          "img": "/api/avatar/img?u=konosuba&n=Megumin"
+        },
+        {
+          "name": "Kirito",
+          "sub": "Sword Art Online",
+          "char": "Kirito",
+          "note": "« Starburst Stream ! »",
+          "img": "/api/avatar/img?u=sao&n=Kirito"
+        },
+        {
+          "name": "Ryuk",
+          "sub": "Death Note",
+          "char": "Ryuk",
+          "note": "« Les humains sont tellement intéressants. »",
+          "img": "/api/avatar/img?u=deathnote&n=Ryuk"
+        },
+        {
+          "name": "Erwin Smith",
+          "sub": "L'Attaque des Titans",
+          "char": "Erwin Smith",
+          "note": "« Offrez vos cœurs ! »",
+          "img": "/api/avatar/img?u=snk&n=Erwin%20Smith"
+        },
+        {
+          "name": "Itachi Uchiwa",
+          "sub": "Naruto",
+          "char": "Itachi Uchiwa",
+          "note": "« Pardonne-moi Sasuke… ce sera la dernière fois. »",
+          "img": "/api/avatar/img?u=naruto&n=Itachi%20Uchiwa"
+        },
+        {
+          "name": "Madara Uchiwa",
+          "sub": "Naruto",
+          "char": "Madara Uchiwa",
+          "note": "« Réveille-toi à la réalité ! »",
+          "img": "/api/avatar/img?u=naruto&n=Madara%20Uchiwa"
+        },
+        {
+          "name": "Nagato",
+          "sub": "Naruto",
+          "char": "Nagato",
+          "note": "« Ressentez la douleur ! »",
+          "img": "/api/avatar/img?u=naruto&n=Nagato"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "« Le One Piece existe ! »",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Gol D. Roger",
+          "sub": "One Piece",
+          "char": "Gol D. Roger",
+          "note": "« Mon trésor ? Je vous le laisse ! »",
+          "img": "/api/avatar/img?u=onepiece&n=Gol%20D.%20Roger"
+        },
+        {
+          "name": "Portgas D. Ace",
+          "sub": "One Piece",
+          "char": "Portgas D. Ace",
+          "note": "« Merci de m’avoir aimé. »",
+          "img": "/api/avatar/img?u=onepiece&n=Portgas%20D.%20Ace"
+        },
+        {
+          "name": "Meruem",
+          "sub": "Hunter x Hunter",
+          "char": "Meruem",
+          "note": "« Quel est ton nom ? »",
+          "img": "/api/avatar/img?u=hxh&n=Meruem"
+        },
+        {
+          "name": "Edward Elric",
+          "sub": "Fullmetal Alchemist",
+          "char": "Edward Elric",
+          "note": "« Pour obtenir quelque chose, il faut donner quelque chose en échange. »",
+          "img": "/api/avatar/img?u=fma&n=Edward%20Elric"
+        },
+        {
+          "name": "Sosuke Aizen",
+          "sub": "Bleach",
+          "char": "Sosuke Aizen",
+          "note": "« Depuis quand avais-tu l’illusion que… »",
+          "img": "/api/avatar/img?u=bleach&n=Sosuke%20Aizen"
+        },
+        {
+          "name": "Ichigo Kurosaki",
+          "sub": "Bleach",
+          "char": "Ichigo Kurosaki",
+          "note": "« Si je n’arrive pas à les protéger, je n’ai pas le droit de combattre. »",
+          "img": "/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki"
+        },
+        {
+          "name": "Rudeus Greyrat",
+          "sub": "Mushoku Tensei",
+          "char": "Rudeus Greyrat",
+          "note": "« Cette fois, je vivrai sans regrets. »",
+          "img": "/api/avatar/img?u=mushoku&n=Rudeus%20Greyrat"
+        },
+        {
+          "name": "Spike Spiegel",
+          "sub": "Cowboy Bebop",
+          "char": "Spike Spiegel",
+          "note": "« Bang. »",
+          "img": "/api/avatar/img?u=cowboybebop&n=Spike%20Spiegel"
+        },
+        {
+          "name": "Ken Kaneki",
+          "sub": "Tokyo Ghoul",
+          "char": "Ken Kaneki",
+          "note": "« 1000 moins 7 ? »",
+          "img": "/api/avatar/img?u=tokyoghoul&n=Ken%20Kaneki"
+        },
+        {
+          "name": "Freezer",
+          "sub": "Dragon Ball",
+          "char": "Freezer",
+          "note": "« Voici ma forme finale ! »",
+          "img": "/api/avatar/img?u=dragonball&n=Freezer"
+        },
+        {
+          "name": "Gaara",
+          "sub": "Naruto",
+          "char": "Gaara",
+          "note": "« Je n’aime que moi et ne me bats que pour moi. »",
+          "img": "/api/avatar/img?u=naruto&n=Gaara"
+        }
+      ]
+    },
+    {
+      "id": "rapide",
+      "title": "Qui est le plus rapide ?",
+      "emoji": "⚡",
+      "kind": "chars",
+      "group": "Combat",
+      "description": "Les personnages les plus rapides, avec ce qui fait leur vitesse.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Minato Namikaze",
+          "sub": "Naruto",
+          "char": "Minato Namikaze",
+          "note": "Dieu du Vol et l’Éclair jaune",
+          "img": "/api/avatar/img?u=naruto&n=Minato%20Namikaze"
+        },
+        {
+          "name": "Killua Zoldyck",
+          "sub": "Hunter x Hunter",
+          "char": "Killua Zoldyck",
+          "note": "Godspeed",
+          "img": "/api/avatar/img?u=hxh&n=Killua%20Zoldyck"
+        },
+        {
+          "name": "Zenitsu Agatsuma",
+          "sub": "Demon Slayer",
+          "char": "Zenitsu Agatsuma",
+          "note": "Première forme : Éclair foudroyant",
+          "img": "/api/avatar/img?u=demonslayer&n=Zenitsu%20Agatsuma"
+        },
+        {
+          "name": "Borsalino",
+          "sub": "One Piece",
+          "char": "Borsalino",
+          "note": "Vitesse de la lumière",
+          "img": "/api/avatar/img?u=onepiece&n=Borsalino"
+        },
+        {
+          "name": "Yoruichi Shihoin",
+          "sub": "Bleach",
+          "char": "Yoruichi Shihoin",
+          "note": "La Déesse de la vitesse",
+          "img": "/api/avatar/img?u=bleach&n=Yoruichi%20Shihoin"
+        },
+        {
+          "name": "Speed-o'-Sound Sonic",
+          "sub": "One Punch Man",
+          "char": "Speed-o'-Sound Sonic",
+          "note": "Sonic le supersonique",
+          "img": "/api/avatar/img?u=opm&n=Speed-o%27-Sound%20Sonic"
+        },
+        {
+          "name": "A",
+          "sub": "Naruto",
+          "char": "A",
+          "note": "Armure de foudre du Raikage",
+          "img": "/api/avatar/img?u=naruto&n=A"
+        },
+        {
+          "name": "Rock Lee",
+          "sub": "Naruto",
+          "char": "Rock Lee",
+          "note": "Les huit portes",
+          "img": "/api/avatar/img?u=naruto&n=Rock%20Lee"
+        },
+        {
+          "name": "Gaï Maito",
+          "sub": "Naruto",
+          "char": "Gaï Maito",
+          "note": "La huitième porte",
+          "img": "/api/avatar/img?u=naruto&n=Ga%C3%AF%20Maito"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "Transmission instantanée et Ultra Instinct",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "Hit",
+          "sub": "Dragon Ball",
+          "char": "Hit",
+          "note": "Saut temporel",
+          "img": "/api/avatar/img?u=dragonball&n=Hit"
+        },
+        {
+          "name": "Tenya Iida",
+          "sub": "My Hero Academia",
+          "char": "Tenya Iida",
+          "note": "Recipro Burst",
+          "img": "/api/avatar/img?u=mha&n=Tenya%20Iida"
+        },
+        {
+          "name": "Hawks",
+          "sub": "My Hero Academia",
+          "char": "Hawks",
+          "note": "Ailes féroces",
+          "img": "/api/avatar/img?u=mha&n=Hawks"
+        },
+        {
+          "name": "Naoya Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Naoya Zenin",
+          "note": "Projection",
+          "img": "/api/avatar/img?u=jjk&n=Naoya%20Zenin"
+        },
+        {
+          "name": "Tengen Uzui",
+          "sub": "Demon Slayer",
+          "char": "Tengen Uzui",
+          "note": "Le Pilier le plus rapide de son époque",
+          "img": "/api/avatar/img?u=demonslayer&n=Tengen%20Uzui"
+        },
+        {
+          "name": "Byakuya Kuchiki",
+          "sub": "Bleach",
+          "char": "Byakuya Kuchiki",
+          "note": "Shunpo du chef de clan",
+          "img": "/api/avatar/img?u=bleach&n=Byakuya%20Kuchiki"
+        },
+        {
+          "name": "Jet",
+          "sub": "Fairy Tail",
+          "char": "Jet",
+          "note": "Magie de vitesse",
+          "img": "/api/avatar/img?u=fairy&n=Jet"
+        },
+        {
+          "name": "Sung Jinwoo",
+          "sub": "Solo Leveling",
+          "char": "Sung Jinwoo",
+          "note": "Agilité de Monarque",
+          "img": "/api/avatar/img?u=solo&n=Sung%20Jinwoo"
+        },
+        {
+          "name": "Shoyo Hinata",
+          "sub": "Haikyuu",
+          "char": "Shoyo Hinata",
+          "note": "L’attaque éclair",
+          "img": "/api/avatar/img?u=haikyuu&n=Shoyo%20Hinata"
+        },
+        {
+          "name": "Daiki Aomine",
+          "sub": "Kuroko no Basket",
+          "char": "Daiki Aomine",
+          "note": "Le plus rapide de la Génération miracle",
+          "img": "/api/avatar/img?u=kuroko&n=Daiki%20Aomine"
+        },
+        {
+          "name": "Takumi Fujiwara",
+          "sub": "Initial D",
+          "char": "Takumi Fujiwara",
+          "note": "La AE86 dans les descentes",
+          "img": "/api/avatar/img?u=initiald&n=Takumi%20Fujiwara"
+        },
+        {
+          "name": "King Bradley",
+          "sub": "Fullmetal Alchemist",
+          "char": "King Bradley",
+          "note": "Œil ultime",
+          "img": "/api/avatar/img?u=fma&n=King%20Bradley"
+        },
+        {
+          "name": "Monkey D. Luffy",
+          "sub": "One Piece",
+          "char": "Monkey D. Luffy",
+          "note": "Gear Second",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Luffy"
+        },
+        {
+          "name": "Shinra Kusakabe",
+          "sub": "Fire Force",
+          "char": "Shinra Kusakabe",
+          "note": "Pieds du diable",
+          "img": "/api/avatar/img?u=fireforce&n=Shinra%20Kusakabe"
+        },
+        {
+          "name": "Flashy Flash",
+          "sub": "One Punch Man",
+          "char": "Flashy Flash",
+          "note": "Flash l’éclair",
+          "img": "/api/avatar/img?u=opm&n=Flashy%20Flash"
+        }
+      ]
+    },
+    {
+      "id": "costaud",
+      "title": "Qui a la plus grande force physique ?",
+      "emoji": "💪",
+      "kind": "chars",
+      "group": "Combat",
+      "description": "Force brute, sans compter les pouvoirs de pure énergie.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Tsunade",
+          "sub": "Naruto",
+          "char": "Tsunade",
+          "note": "Force surhumaine des Senju",
+          "img": "/api/avatar/img?u=naruto&n=Tsunade"
+        },
+        {
+          "name": "Monkey D. Garp",
+          "sub": "One Piece",
+          "char": "Monkey D. Garp",
+          "note": "Le Héros de la Marine aux poings nus",
+          "img": "/api/avatar/img?u=onepiece&n=Monkey%20D.%20Garp"
+        },
+        {
+          "name": "Saitama",
+          "sub": "One Punch Man",
+          "char": "Saitama",
+          "note": "Un seul coup de poing",
+          "img": "/api/avatar/img?u=opm&n=Saitama"
+        },
+        {
+          "name": "Gaï Maito",
+          "sub": "Naruto",
+          "char": "Gaï Maito",
+          "note": "Les huit portes",
+          "img": "/api/avatar/img?u=naruto&n=Ga%C3%AF%20Maito"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "L’homme le plus fort du monde",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Gyomei Himejima",
+          "sub": "Demon Slayer",
+          "char": "Gyomei Himejima",
+          "note": "Le Pilier le plus fort",
+          "img": "/api/avatar/img?u=demonslayer&n=Gyomei%20Himejima"
+        },
+        {
+          "name": "Kenpachi Zaraki",
+          "sub": "Bleach",
+          "char": "Kenpachi Zaraki",
+          "note": "Force sans limite",
+          "img": "/api/avatar/img?u=bleach&n=Kenpachi%20Zaraki"
+        },
+        {
+          "name": "All Might",
+          "sub": "My Hero Academia",
+          "char": "All Might",
+          "note": "Le Symbole de la paix",
+          "img": "/api/avatar/img?u=mha&n=All%20Might"
+        },
+        {
+          "name": "Escanor",
+          "sub": "Seven Deadly Sins",
+          "char": "Escanor",
+          "note": "The One",
+          "img": "/api/avatar/img?u=sds&n=Escanor"
+        },
+        {
+          "name": "Alex Louis Armstrong",
+          "sub": "Fullmetal Alchemist",
+          "char": "Alex Louis Armstrong",
+          "note": "Alchimie à poings nus",
+          "img": "/api/avatar/img?u=fma&n=Alex%20Louis%20Armstrong"
+        },
+        {
+          "name": "Asta",
+          "sub": "Black Clover",
+          "char": "Asta",
+          "note": "Muscles sans magie",
+          "img": "/api/avatar/img?u=clover&n=Asta"
+        },
+        {
+          "name": "Aoi Todo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Aoi Todo",
+          "note": "Le gorille de Kyoto",
+          "img": "/api/avatar/img?u=jjk&n=Aoi%20Todo"
+        },
+        {
+          "name": "Toji Fushiguro",
+          "sub": "Jujutsu Kaisen",
+          "char": "Toji Fushiguro",
+          "note": "Restriction céleste",
+          "img": "/api/avatar/img?u=jjk&n=Toji%20Fushiguro"
+        },
+        {
+          "name": "Maki Zenin",
+          "sub": "Jujutsu Kaisen",
+          "char": "Maki Zenin",
+          "note": "Restriction céleste",
+          "img": "/api/avatar/img?u=jjk&n=Maki%20Zenin"
+        },
+        {
+          "name": "Livaï Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Livaï Ackerman",
+          "note": "Force des Ackerman",
+          "img": "/api/avatar/img?u=snk&n=Liva%C3%AF%20Ackerman"
+        },
+        {
+          "name": "Mikasa Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Mikasa Ackerman",
+          "note": "Force des Ackerman",
+          "img": "/api/avatar/img?u=snk&n=Mikasa%20Ackerman"
+        },
+        {
+          "name": "Kaido",
+          "sub": "One Piece",
+          "char": "Kaido",
+          "note": "La créature la plus forte du monde",
+          "img": "/api/avatar/img?u=onepiece&n=Kaido"
+        },
+        {
+          "name": "Charlotte Linlin",
+          "sub": "One Piece",
+          "char": "Charlotte Linlin",
+          "note": "Force de Big Mom depuis l’enfance",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Linlin"
+        },
+        {
+          "name": "Broly",
+          "sub": "Dragon Ball",
+          "char": "Broly",
+          "note": "Le Super Saiyan légendaire",
+          "img": "/api/avatar/img?u=dragonball&n=Broly"
+        },
+        {
+          "name": "Uvogin",
+          "sub": "Hunter x Hunter",
+          "char": "Uvogin",
+          "note": "Le Grand Coup",
+          "img": "/api/avatar/img?u=hxh&n=Uvogin"
+        },
+        {
+          "name": "Guts",
+          "sub": "Berserk",
+          "char": "Guts",
+          "note": "Manie la Dragonslayer",
+          "img": "/api/avatar/img?u=berserk&n=Guts"
+        },
+        {
+          "name": "Bang",
+          "sub": "One Punch Man",
+          "char": "Bang",
+          "note": "Poing de l’eau qui coule sur la roche",
+          "img": "/api/avatar/img?u=opm&n=Bang"
+        },
+        {
+          "name": "Garou",
+          "sub": "One Punch Man",
+          "char": "Garou",
+          "note": "Monstre humain",
+          "img": "/api/avatar/img?u=opm&n=Garou"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "Saiyan",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "Jinbei",
+          "sub": "One Piece",
+          "char": "Jinbei",
+          "note": "Karaté des hommes-poissons",
+          "img": "/api/avatar/img?u=onepiece&n=Jinbei"
+        },
+        {
+          "name": "A",
+          "sub": "Naruto",
+          "char": "A",
+          "note": "Le Raikage",
+          "img": "/api/avatar/img?u=naruto&n=A"
+        },
+        {
+          "name": "Mirko",
+          "sub": "My Hero Academia",
+          "char": "Mirko",
+          "note": "Héroïne lapin",
+          "img": "/api/avatar/img?u=mha&n=Mirko"
+        },
+        {
+          "name": "Milim Nava",
+          "sub": "Tensura",
+          "char": "Milim Nava",
+          "note": "Seigneur démon destructrice",
+          "img": "/api/avatar/img?u=tensura&n=Milim%20Nava"
+        },
+        {
+          "name": "Ippo Makunouchi",
+          "sub": "Hajime no Ippo",
+          "char": "Ippo Makunouchi",
+          "note": "Dempsey Roll",
+          "img": "/api/avatar/img?u=ippo&n=Ippo%20Makunouchi"
+        },
+        {
+          "name": "Mamoru Takamura",
+          "sub": "Hajime no Ippo",
+          "char": "Mamoru Takamura",
+          "note": "Champion du monde des poids moyens",
+          "img": "/api/avatar/img?u=ippo&n=Mamoru%20Takamura"
+        }
+      ]
+    },
+    {
+      "id": "traitre",
+      "title": "Qui est le plus grand traître ?",
+      "emoji": "🗡️",
+      "kind": "chars",
+      "group": "Méchants & ombres",
+      "description": "Trahisons réelles de l’histoire : qui a trahi qui.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Sosuke Aizen",
+          "sub": "Bleach",
+          "char": "Sosuke Aizen",
+          "note": "Trahit le Gotei 13",
+          "img": "/api/avatar/img?u=bleach&n=Sosuke%20Aizen"
+        },
+        {
+          "name": "Gin Ichimaru",
+          "sub": "Bleach",
+          "char": "Gin Ichimaru",
+          "note": "Suit Aizen… pour mieux le trahir",
+          "img": "/api/avatar/img?u=bleach&n=Gin%20Ichimaru"
+        },
+        {
+          "name": "Kaname Tosen",
+          "sub": "Bleach",
+          "char": "Kaname Tosen",
+          "note": "Trahit le Gotei 13",
+          "img": "/api/avatar/img?u=bleach&n=Kaname%20Tosen"
+        },
+        {
+          "name": "Reiner Braun",
+          "sub": "L'Attaque des Titans",
+          "char": "Reiner Braun",
+          "note": "Trahit le bataillon d’exploration",
+          "img": "/api/avatar/img?u=snk&n=Reiner%20Braun"
+        },
+        {
+          "name": "Bertolt Hoover",
+          "sub": "L'Attaque des Titans",
+          "char": "Bertolt Hoover",
+          "note": "Trahit le bataillon d’exploration",
+          "img": "/api/avatar/img?u=snk&n=Bertolt%20Hoover"
+        },
+        {
+          "name": "Annie Leonhart",
+          "sub": "L'Attaque des Titans",
+          "char": "Annie Leonhart",
+          "note": "Infiltrée dans les recrues",
+          "img": "/api/avatar/img?u=snk&n=Annie%20Leonhart"
+        },
+        {
+          "name": "Marshall D. Teach",
+          "sub": "One Piece",
+          "char": "Marshall D. Teach",
+          "note": "Trahit Barbe Blanche et tue Thatch",
+          "img": "/api/avatar/img?u=onepiece&n=Marshall%20D.%20Teach"
+        },
+        {
+          "name": "Kabuto Yakushi",
+          "sub": "Naruto",
+          "char": "Kabuto Yakushi",
+          "note": "Espion d’Orochimaru",
+          "img": "/api/avatar/img?u=naruto&n=Kabuto%20Yakushi"
+        },
+        {
+          "name": "Orochimaru",
+          "sub": "Naruto",
+          "char": "Orochimaru",
+          "note": "Trahit Konoha",
+          "img": "/api/avatar/img?u=naruto&n=Orochimaru"
+        },
+        {
+          "name": "Itachi Uchiwa",
+          "sub": "Naruto",
+          "char": "Itachi Uchiwa",
+          "note": "Massacre son clan pour Konoha",
+          "img": "/api/avatar/img?u=naruto&n=Itachi%20Uchiwa"
+        },
+        {
+          "name": "Obito Uchiwa",
+          "sub": "Naruto",
+          "char": "Obito Uchiwa",
+          "note": "Se retourne contre le monde ninja",
+          "img": "/api/avatar/img?u=naruto&n=Obito%20Uchiwa"
+        },
+        {
+          "name": "Sasuke Uchiwa",
+          "sub": "Naruto",
+          "char": "Sasuke Uchiwa",
+          "note": "Quitte Konoha pour Orochimaru",
+          "img": "/api/avatar/img?u=naruto&n=Sasuke%20Uchiwa"
+        },
+        {
+          "name": "Griffith",
+          "sub": "Berserk",
+          "char": "Griffith",
+          "note": "Sacrifie la Troupe du Faucon",
+          "img": "/api/avatar/img?u=berserk&n=Griffith"
+        },
+        {
+          "name": "Kaigaku",
+          "sub": "Demon Slayer",
+          "char": "Kaigaku",
+          "note": "Devient un démon",
+          "img": "/api/avatar/img?u=demonslayer&n=Kaigaku"
+        },
+        {
+          "name": "Suguru Geto",
+          "sub": "Jujutsu Kaisen",
+          "char": "Suguru Geto",
+          "note": "Abandonne les exorcistes",
+          "img": "/api/avatar/img?u=jjk&n=Suguru%20Geto"
+        },
+        {
+          "name": "Hisoka Morow",
+          "sub": "Hunter x Hunter",
+          "char": "Hisoka Morow",
+          "note": "Faux membre de la Brigade fantôme",
+          "img": "/api/avatar/img?u=hxh&n=Hisoka%20Morow"
+        },
+        {
+          "name": "Selim Bradley",
+          "sub": "Fullmetal Alchemist",
+          "char": "Selim Bradley",
+          "note": "Le « fils » de Bradley",
+          "img": "/api/avatar/img?u=fma&n=Selim%20Bradley"
+        },
+        {
+          "name": "Suzaku Kururugi",
+          "sub": "Code Geass",
+          "char": "Suzaku Kururugi",
+          "note": "Livre Lelouch à l’empereur",
+          "img": "/api/avatar/img?u=codegeass&n=Suzaku%20Kururugi"
+        },
+        {
+          "name": "Charlotte Pudding",
+          "sub": "One Piece",
+          "char": "Charlotte Pudding",
+          "note": "Prépare la mort de Sanji au mariage",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Pudding"
+        },
+        {
+          "name": "Nico Robin",
+          "sub": "One Piece",
+          "char": "Nico Robin",
+          "note": "Fausse trahison à Water Seven",
+          "img": "/api/avatar/img?u=onepiece&n=Nico%20Robin"
+        },
+        {
+          "name": "Rob Lucci",
+          "sub": "One Piece",
+          "char": "Rob Lucci",
+          "note": "Agent du CP9 infiltré à Water Seven",
+          "img": "/api/avatar/img?u=onepiece&n=Rob%20Lucci"
+        },
+        {
+          "name": "C-17",
+          "sub": "Dragon Ball",
+          "char": "C-17",
+          "note": "Se retourne contre le Dr Gero",
+          "img": "/api/avatar/img?u=dragonball&n=C-17"
+        },
+        {
+          "name": "Mechamaru",
+          "sub": "Jujutsu Kaisen",
+          "char": "Mechamaru",
+          "note": "Espion de Mahito",
+          "img": "/api/avatar/img?u=jjk&n=Mechamaru"
+        },
+        {
+          "name": "Isabella",
+          "sub": "The Promised Neverland",
+          "char": "Isabella",
+          "note": "La « maman » de la ferme",
+          "img": "/api/avatar/img?u=promised&n=Isabella"
+        },
+        {
+          "name": "Yuga Aoyama",
+          "sub": "My Hero Academia",
+          "char": "Yuga Aoyama",
+          "note": "Taupe d’All For One à Yuei",
+          "img": "/api/avatar/img?u=mha&n=Yuga%20Aoyama"
+        },
+        {
+          "name": "Ultear Milkovich",
+          "sub": "Fairy Tail",
+          "char": "Ultear Milkovich",
+          "note": "Agent double de Grimoire Heart",
+          "img": "/api/avatar/img?u=fairy&n=Ultear%20Milkovich"
+        }
+      ]
+    },
+    {
+      "id": "sacrifice",
+      "title": "Quel est le sacrifice le plus marquant ?",
+      "emoji": "🕊️",
+      "kind": "chars",
+      "group": "Émotions",
+      "description": "Personnages qui ont donné leur vie pour les autres.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Kyojuro Rengoku",
+          "sub": "Demon Slayer",
+          "char": "Kyojuro Rengoku",
+          "note": "Meurt en protégeant les passagers du train de l’Infini",
+          "img": "/api/avatar/img?u=demonslayer&n=Kyojuro%20Rengoku"
+        },
+        {
+          "name": "Jiraiya",
+          "sub": "Naruto",
+          "char": "Jiraiya",
+          "note": "Meurt en révélant le secret de Pain",
+          "img": "/api/avatar/img?u=naruto&n=Jiraiya"
+        },
+        {
+          "name": "Neji Hyūga",
+          "sub": "Naruto",
+          "char": "Neji Hyūga",
+          "note": "Protège Naruto et Hinata",
+          "img": "/api/avatar/img?u=naruto&n=Neji%20Hy%C5%ABga"
+        },
+        {
+          "name": "Itachi Uchiwa",
+          "sub": "Naruto",
+          "char": "Itachi Uchiwa",
+          "note": "Sacrifie tout pour Sasuke et Konoha",
+          "img": "/api/avatar/img?u=naruto&n=Itachi%20Uchiwa"
+        },
+        {
+          "name": "Minato Namikaze",
+          "sub": "Naruto",
+          "char": "Minato Namikaze",
+          "note": "Scelle Kurama en Naruto",
+          "img": "/api/avatar/img?u=naruto&n=Minato%20Namikaze"
+        },
+        {
+          "name": "Kushina Uzumaki",
+          "sub": "Naruto",
+          "char": "Kushina Uzumaki",
+          "note": "Protège Naruto de Kurama",
+          "img": "/api/avatar/img?u=naruto&n=Kushina%20Uzumaki"
+        },
+        {
+          "name": "Asuma Sarutobi",
+          "sub": "Naruto",
+          "char": "Asuma Sarutobi",
+          "note": "Tombe face à Hidan",
+          "img": "/api/avatar/img?u=naruto&n=Asuma%20Sarutobi"
+        },
+        {
+          "name": "Portgas D. Ace",
+          "sub": "One Piece",
+          "char": "Portgas D. Ace",
+          "note": "Protège Luffy à Marineford",
+          "img": "/api/avatar/img?u=onepiece&n=Portgas%20D.%20Ace"
+        },
+        {
+          "name": "Edward Newgate",
+          "sub": "One Piece",
+          "char": "Edward Newgate",
+          "note": "Couvre la fuite de ses fils",
+          "img": "/api/avatar/img?u=onepiece&n=Edward%20Newgate"
+        },
+        {
+          "name": "Kozuki Oden",
+          "sub": "One Piece",
+          "char": "Kozuki Oden",
+          "note": "Bouilli pour sauver ses hommes",
+          "img": "/api/avatar/img?u=onepiece&n=Kozuki%20Oden"
+        },
+        {
+          "name": "Kamina",
+          "sub": "Gurren Lagann",
+          "char": "Kamina",
+          "note": "Montre la voie à Simon",
+          "img": "/api/avatar/img?u=gurren&n=Kamina"
+        },
+        {
+          "name": "Erwin Smith",
+          "sub": "L'Attaque des Titans",
+          "char": "Erwin Smith",
+          "note": "Mène la charge suicide",
+          "img": "/api/avatar/img?u=snk&n=Erwin%20Smith"
+        },
+        {
+          "name": "Hansi Zoe",
+          "sub": "L'Attaque des Titans",
+          "char": "Hansi Zoe",
+          "note": "Retient les titans",
+          "img": "/api/avatar/img?u=snk&n=Hansi%20Zoe"
+        },
+        {
+          "name": "Maes Hughes",
+          "sub": "Fullmetal Alchemist",
+          "char": "Maes Hughes",
+          "note": "Meurt en protégeant le secret",
+          "img": "/api/avatar/img?u=fma&n=Maes%20Hughes"
+        },
+        {
+          "name": "Kento Nanami",
+          "sub": "Jujutsu Kaisen",
+          "char": "Kento Nanami",
+          "note": "Laisse la suite à Yuji",
+          "img": "/api/avatar/img?u=jjk&n=Kento%20Nanami"
+        },
+        {
+          "name": "Satoru Gojo",
+          "sub": "Jujutsu Kaisen",
+          "char": "Satoru Gojo",
+          "note": "Tombe face à Sukuna",
+          "img": "/api/avatar/img?u=jjk&n=Satoru%20Gojo"
+        },
+        {
+          "name": "Isaac Netero",
+          "sub": "Hunter x Hunter",
+          "char": "Isaac Netero",
+          "note": "Utilise la Rose pauvre contre Meruem",
+          "img": "/api/avatar/img?u=hxh&n=Isaac%20Netero"
+        },
+        {
+          "name": "Sangoku",
+          "sub": "Dragon Ball",
+          "char": "Sangoku",
+          "note": "Se sacrifie contre Cell",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoku"
+        },
+        {
+          "name": "Vegeta",
+          "sub": "Dragon Ball",
+          "char": "Vegeta",
+          "note": "Explose pour arrêter Buu",
+          "img": "/api/avatar/img?u=dragonball&n=Vegeta"
+        },
+        {
+          "name": "Piccolo",
+          "sub": "Dragon Ball",
+          "char": "Piccolo",
+          "note": "Protège Gohan de Nappa",
+          "img": "/api/avatar/img?u=dragonball&n=Piccolo"
+        },
+        {
+          "name": "Kanae Kocho",
+          "sub": "Demon Slayer",
+          "char": "Kanae Kocho",
+          "note": "Meurt face à Doma",
+          "img": "/api/avatar/img?u=demonslayer&n=Kanae%20Kocho"
+        },
+        {
+          "name": "Shinobu Kocho",
+          "sub": "Demon Slayer",
+          "char": "Shinobu Kocho",
+          "note": "S’empoisonne pour vaincre Doma",
+          "img": "/api/avatar/img?u=demonslayer&n=Shinobu%20Kocho"
+        },
+        {
+          "name": "Gyomei Himejima",
+          "sub": "Demon Slayer",
+          "char": "Gyomei Himejima",
+          "note": "Combat Muzan jusqu’au bout",
+          "img": "/api/avatar/img?u=demonslayer&n=Gyomei%20Himejima"
+        },
+        {
+          "name": "Lelouch Lamperouge",
+          "sub": "Code Geass",
+          "char": "Lelouch Lamperouge",
+          "note": "Le Zero Requiem",
+          "img": "/api/avatar/img?u=codegeass&n=Lelouch%20Lamperouge"
+        },
+        {
+          "name": "Nagisa Furukawa",
+          "sub": "Clannad",
+          "char": "Nagisa Furukawa",
+          "note": "Meurt en donnant naissance à Ushio",
+          "img": "/api/avatar/img?u=clannad&n=Nagisa%20Furukawa"
+        },
+        {
+          "name": "Tamayo",
+          "sub": "Demon Slayer",
+          "char": "Tamayo",
+          "note": "Empoisonne Muzan au prix de sa vie",
+          "img": "/api/avatar/img?u=demonslayer&n=Tamayo"
+        },
+        {
+          "name": "Pakunoda",
+          "sub": "Hunter x Hunter",
+          "char": "Pakunoda",
+          "note": "Transmet ses souvenirs au prix de sa vie",
+          "img": "/api/avatar/img?u=hxh&n=Pakunoda"
+        }
+      ]
+    },
+    {
+      "id": "boss",
+      "title": "Qui est le meilleur boss final ?",
+      "emoji": "👑",
+      "kind": "chars",
+      "group": "Méchants & ombres",
+      "description": "Les grands méchants affrontés à la fin d’une saga.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Madara Uchiwa",
+          "sub": "Naruto",
+          "char": "Madara Uchiwa",
+          "note": "Guerre ninja",
+          "img": "/api/avatar/img?u=naruto&n=Madara%20Uchiwa"
+        },
+        {
+          "name": "Kaguya Ôtsutsuki",
+          "sub": "Naruto",
+          "char": "Kaguya Ôtsutsuki",
+          "note": "Guerre ninja",
+          "img": "/api/avatar/img?u=naruto&n=Kaguya%20%C3%94tsutsuki"
+        },
+        {
+          "name": "Nagato",
+          "sub": "Naruto",
+          "char": "Nagato",
+          "note": "Arc Pain",
+          "img": "/api/avatar/img?u=naruto&n=Nagato"
+        },
+        {
+          "name": "Sosuke Aizen",
+          "sub": "Bleach",
+          "char": "Sosuke Aizen",
+          "note": "Arc des Arrancars",
+          "img": "/api/avatar/img?u=bleach&n=Sosuke%20Aizen"
+        },
+        {
+          "name": "Yhwach",
+          "sub": "Bleach",
+          "char": "Yhwach",
+          "note": "Guerre sanglante de mille ans",
+          "img": "/api/avatar/img?u=bleach&n=Yhwach"
+        },
+        {
+          "name": "Meruem",
+          "sub": "Hunter x Hunter",
+          "char": "Meruem",
+          "note": "Arc des fourmis chimères",
+          "img": "/api/avatar/img?u=hxh&n=Meruem"
+        },
+        {
+          "name": "Muzan Kibutsuji",
+          "sub": "Demon Slayer",
+          "char": "Muzan Kibutsuji",
+          "note": "Château de l’Infini",
+          "img": "/api/avatar/img?u=demonslayer&n=Muzan%20Kibutsuji"
+        },
+        {
+          "name": "Ryomen Sukuna",
+          "sub": "Jujutsu Kaisen",
+          "char": "Ryomen Sukuna",
+          "note": "Shinjuku",
+          "img": "/api/avatar/img?u=jjk&n=Ryomen%20Sukuna"
+        },
+        {
+          "name": "Freezer",
+          "sub": "Dragon Ball",
+          "char": "Freezer",
+          "note": "Namek",
+          "img": "/api/avatar/img?u=dragonball&n=Freezer"
+        },
+        {
+          "name": "Cell",
+          "sub": "Dragon Ball",
+          "char": "Cell",
+          "note": "Cell Game",
+          "img": "/api/avatar/img?u=dragonball&n=Cell"
+        },
+        {
+          "name": "Majin Boo",
+          "sub": "Dragon Ball",
+          "char": "Majin Boo",
+          "note": "Saga Buu",
+          "img": "/api/avatar/img?u=dragonball&n=Majin%20Boo"
+        },
+        {
+          "name": "Jiren",
+          "sub": "Dragon Ball",
+          "char": "Jiren",
+          "note": "Tournoi du pouvoir",
+          "img": "/api/avatar/img?u=dragonball&n=Jiren"
+        },
+        {
+          "name": "Père",
+          "sub": "Fullmetal Alchemist",
+          "char": "Père",
+          "note": "Le Jour promis",
+          "img": "/api/avatar/img?u=fma&n=P%C3%A8re"
+        },
+        {
+          "name": "Eren Jäger",
+          "sub": "L'Attaque des Titans",
+          "char": "Eren Jäger",
+          "note": "Le Grand Terrassement",
+          "img": "/api/avatar/img?u=snk&n=Eren%20J%C3%A4ger"
+        },
+        {
+          "name": "Tomura Shigaraki",
+          "sub": "My Hero Academia",
+          "char": "Tomura Shigaraki",
+          "note": "Guerre finale",
+          "img": "/api/avatar/img?u=mha&n=Tomura%20Shigaraki"
+        },
+        {
+          "name": "All For One",
+          "sub": "My Hero Academia",
+          "char": "All For One",
+          "note": "Guerre finale",
+          "img": "/api/avatar/img?u=mha&n=All%20For%20One"
+        },
+        {
+          "name": "Kaido",
+          "sub": "One Piece",
+          "char": "Kaido",
+          "note": "Wano",
+          "img": "/api/avatar/img?u=onepiece&n=Kaido"
+        },
+        {
+          "name": "Donquixote Doflamingo",
+          "sub": "One Piece",
+          "char": "Donquixote Doflamingo",
+          "note": "Dressrosa",
+          "img": "/api/avatar/img?u=onepiece&n=Donquixote%20Doflamingo"
+        },
+        {
+          "name": "Charlotte Linlin",
+          "sub": "One Piece",
+          "char": "Charlotte Linlin",
+          "note": "Whole Cake Island",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Linlin"
+        },
+        {
+          "name": "Crocodile",
+          "sub": "One Piece",
+          "char": "Crocodile",
+          "note": "Alabasta",
+          "img": "/api/avatar/img?u=onepiece&n=Crocodile"
+        },
+        {
+          "name": "Ener",
+          "sub": "One Piece",
+          "char": "Ener",
+          "note": "Skypiea",
+          "img": "/api/avatar/img?u=onepiece&n=Ener"
+        },
+        {
+          "name": "Rob Lucci",
+          "sub": "One Piece",
+          "char": "Rob Lucci",
+          "note": "Enies Lobby",
+          "img": "/api/avatar/img?u=onepiece&n=Rob%20Lucci"
+        },
+        {
+          "name": "Arlong",
+          "sub": "One Piece",
+          "char": "Arlong",
+          "note": "Arlong Park",
+          "img": "/api/avatar/img?u=onepiece&n=Arlong"
+        },
+        {
+          "name": "Charles zi Britannia",
+          "sub": "Code Geass",
+          "char": "Charles zi Britannia",
+          "note": "Ragnarök",
+          "img": "/api/avatar/img?u=codegeass&n=Charles%20zi%20Britannia"
+        },
+        {
+          "name": "Light Yagami",
+          "sub": "Death Note",
+          "char": "Light Yagami",
+          "note": "Duel contre L et Near",
+          "img": "/api/avatar/img?u=deathnote&n=Light%20Yagami"
+        },
+        {
+          "name": "Kishou Arima",
+          "sub": "Tokyo Ghoul",
+          "char": "Kishou Arima",
+          "note": "Cochlea",
+          "img": "/api/avatar/img?u=tokyoghoul&n=Kishou%20Arima"
+        },
+        {
+          "name": "Griffith",
+          "sub": "Berserk",
+          "char": "Griffith",
+          "note": "Éclipse",
+          "img": "/api/avatar/img?u=berserk&n=Griffith"
+        },
+        {
+          "name": "Roi Démon",
+          "sub": "Seven Deadly Sins",
+          "char": "Roi Démon",
+          "note": "Saga finale",
+          "img": "/api/avatar/img?u=sds&n=Roi%20D%C3%A9mon"
+        },
+        {
+          "name": "Zeref Dragneel",
+          "sub": "Fairy Tail",
+          "char": "Zeref Dragneel",
+          "note": "Guerre contre Alvarez",
+          "img": "/api/avatar/img?u=fairy&n=Zeref%20Dragneel"
+        },
+        {
+          "name": "Acnologia",
+          "sub": "Fairy Tail",
+          "char": "Acnologia",
+          "note": "Guerre contre Alvarez",
+          "img": "/api/avatar/img?u=fairy&n=Acnologia"
+        },
+        {
+          "name": "Lucius Zogratis",
+          "sub": "Black Clover",
+          "char": "Lucius Zogratis",
+          "note": "Arc final",
+          "img": "/api/avatar/img?u=clover&n=Lucius%20Zogratis"
+        },
+        {
+          "name": "Makima",
+          "sub": "Chainsaw Man",
+          "char": "Makima",
+          "note": "Fin de la première partie",
+          "img": "/api/avatar/img?u=chainsaw&n=Makima"
+        },
+        {
+          "name": "Antares",
+          "sub": "Solo Leveling",
+          "char": "Antares",
+          "note": "Guerre des monarques",
+          "img": "/api/avatar/img?u=solo&n=Antares"
+        },
+        {
+          "name": "Clayman",
+          "sub": "Tensura",
+          "char": "Clayman",
+          "note": "Banquet des seigneurs démons",
+          "img": "/api/avatar/img?u=tensura&n=Clayman"
+        },
+        {
+          "name": "Petelgeuse Romanee-Conti",
+          "sub": "Re:Zero",
+          "char": "Petelgeuse Romanee-Conti",
+          "note": "Arc 3",
+          "img": "/api/avatar/img?u=rezero&n=Petelgeuse%20Romanee-Conti"
+        },
+        {
+          "name": "Boros",
+          "sub": "One Punch Man",
+          "char": "Boros",
+          "note": "Vaisseau des Dark Matter",
+          "img": "/api/avatar/img?u=opm&n=Boros"
+        },
+        {
+          "name": "Orochi",
+          "sub": "One Punch Man",
+          "char": "Orochi",
+          "note": "Association des monstres",
+          "img": "/api/avatar/img?u=opm&n=Orochi"
+        },
+        {
+          "name": "Diavolo",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Diavolo",
+          "note": "Vento Aureo",
+          "img": "/api/avatar/img?u=jojo&n=Diavolo"
+        },
+        {
+          "name": "Enrico Pucci",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Enrico Pucci",
+          "note": "Stone Ocean",
+          "img": "/api/avatar/img?u=jojo&n=Enrico%20Pucci"
+        },
+        {
+          "name": "Yoshikage Kira",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Yoshikage Kira",
+          "note": "Diamond is Unbreakable",
+          "img": "/api/avatar/img?u=jojo&n=Yoshikage%20Kira"
+        },
+        {
+          "name": "Kars",
+          "sub": "JoJo's Bizarre Adventure",
+          "char": "Kars",
+          "note": "Battle Tendency",
+          "img": "/api/avatar/img?u=jojo&n=Kars"
+        }
+      ]
+    },
+    {
+      "id": "brasdroit",
+      "title": "Qui est le meilleur bras droit ?",
+      "emoji": "🤝",
+      "kind": "chars",
+      "group": "Relations",
+      "description": "Fidèles seconds, avec la personne qu’ils servent.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Roronoa Zoro",
+          "sub": "One Piece",
+          "char": "Roronoa Zoro",
+          "note": "Bras droit de Luffy",
+          "img": "/api/avatar/img?u=onepiece&n=Roronoa%20Zoro"
+        },
+        {
+          "name": "Benn Beckman",
+          "sub": "One Piece",
+          "char": "Benn Beckman",
+          "note": "Second de Shanks",
+          "img": "/api/avatar/img?u=onepiece&n=Benn%20Beckman"
+        },
+        {
+          "name": "Marco",
+          "sub": "One Piece",
+          "char": "Marco",
+          "note": "Premier commandant de Barbe Blanche",
+          "img": "/api/avatar/img?u=onepiece&n=Marco"
+        },
+        {
+          "name": "King",
+          "sub": "One Piece",
+          "char": "King",
+          "note": "Bras droit de Kaido",
+          "img": "/api/avatar/img?u=onepiece&n=King"
+        },
+        {
+          "name": "Killer",
+          "sub": "One Piece",
+          "char": "Killer",
+          "note": "Second de Kid",
+          "img": "/api/avatar/img?u=onepiece&n=Killer"
+        },
+        {
+          "name": "Silvers Rayleigh",
+          "sub": "One Piece",
+          "char": "Silvers Rayleigh",
+          "note": "Second de Gol D. Roger",
+          "img": "/api/avatar/img?u=onepiece&n=Silvers%20Rayleigh"
+        },
+        {
+          "name": "Charlotte Katakuri",
+          "sub": "One Piece",
+          "char": "Charlotte Katakuri",
+          "note": "Général de Big Mom",
+          "img": "/api/avatar/img?u=onepiece&n=Charlotte%20Katakuri"
+        },
+        {
+          "name": "Sabo",
+          "sub": "One Piece",
+          "char": "Sabo",
+          "note": "Chef d’état-major de Dragon",
+          "img": "/api/avatar/img?u=onepiece&n=Sabo"
+        },
+        {
+          "name": "Ulquiorra Cifer",
+          "sub": "Bleach",
+          "char": "Ulquiorra Cifer",
+          "note": "Fidèle d’Aizen",
+          "img": "/api/avatar/img?u=bleach&n=Ulquiorra%20Cifer"
+        },
+        {
+          "name": "Gin Ichimaru",
+          "sub": "Bleach",
+          "char": "Gin Ichimaru",
+          "note": "Bras droit d’Aizen",
+          "img": "/api/avatar/img?u=bleach&n=Gin%20Ichimaru"
+        },
+        {
+          "name": "Konan",
+          "sub": "Naruto",
+          "char": "Konan",
+          "note": "Partenaire de Pain",
+          "img": "/api/avatar/img?u=naruto&n=Konan"
+        },
+        {
+          "name": "Shikamaru Nara",
+          "sub": "Naruto",
+          "char": "Shikamaru Nara",
+          "note": "Conseiller du Hokage Naruto",
+          "img": "/api/avatar/img?u=naruto&n=Shikamaru%20Nara"
+        },
+        {
+          "name": "Kisame Hoshigaki",
+          "sub": "Naruto",
+          "char": "Kisame Hoshigaki",
+          "note": "Partenaire d’Itachi",
+          "img": "/api/avatar/img?u=naruto&n=Kisame%20Hoshigaki"
+        },
+        {
+          "name": "Kakuzu",
+          "sub": "Naruto",
+          "char": "Kakuzu",
+          "note": "Partenaire d’Hidan",
+          "img": "/api/avatar/img?u=naruto&n=Kakuzu"
+        },
+        {
+          "name": "Riza Hawkeye",
+          "sub": "Fullmetal Alchemist",
+          "char": "Riza Hawkeye",
+          "note": "Garde du corps de Roy Mustang",
+          "img": "/api/avatar/img?u=fma&n=Riza%20Hawkeye"
+        },
+        {
+          "name": "Diablo",
+          "sub": "Tensura",
+          "char": "Diablo",
+          "note": "Majordome de Rimuru",
+          "img": "/api/avatar/img?u=tensura&n=Diablo"
+        },
+        {
+          "name": "Benimaru",
+          "sub": "Tensura",
+          "char": "Benimaru",
+          "note": "Général de Rimuru",
+          "img": "/api/avatar/img?u=tensura&n=Benimaru"
+        },
+        {
+          "name": "Sebastian Michaelis",
+          "sub": "Black Butler",
+          "char": "Sebastian Michaelis",
+          "note": "Majordome de Ciel",
+          "img": "/api/avatar/img?u=blackbutler&n=Sebastian%20Michaelis"
+        },
+        {
+          "name": "Albedo",
+          "sub": "Overlord",
+          "char": "Albedo",
+          "note": "Superviseur des gardiens d’Ainz",
+          "img": "/api/avatar/img?u=overlord&n=Albedo"
+        },
+        {
+          "name": "Livaï Ackerman",
+          "sub": "L'Attaque des Titans",
+          "char": "Livaï Ackerman",
+          "note": "Bras droit d’Erwin",
+          "img": "/api/avatar/img?u=snk&n=Liva%C3%AF%20Ackerman"
+        },
+        {
+          "name": "Kallen Stadtfeld",
+          "sub": "Code Geass",
+          "char": "Kallen Stadtfeld",
+          "note": "As de Zero",
+          "img": "/api/avatar/img?u=codegeass&n=Kallen%20Stadtfeld"
+        },
+        {
+          "name": "Teru Mikami",
+          "sub": "Death Note",
+          "char": "Teru Mikami",
+          "note": "Bras armé de Kira",
+          "img": "/api/avatar/img?u=deathnote&n=Teru%20Mikami"
+        },
+        {
+          "name": "Uraume",
+          "sub": "Jujutsu Kaisen",
+          "char": "Uraume",
+          "note": "Serviteur de Sukuna",
+          "img": "/api/avatar/img?u=jjk&n=Uraume"
+        },
+        {
+          "name": "Kokushibo",
+          "sub": "Demon Slayer",
+          "char": "Kokushibo",
+          "note": "Lune supérieure n°1 de Muzan",
+          "img": "/api/avatar/img?u=demonslayer&n=Kokushibo"
+        },
+        {
+          "name": "Zarbon",
+          "sub": "Dragon Ball",
+          "char": "Zarbon",
+          "note": "Bras droit de Freezer",
+          "img": "/api/avatar/img?u=dragonball&n=Zarbon"
+        },
+        {
+          "name": "Franky Franklin",
+          "sub": "Spy x Family",
+          "char": "Franky Franklin",
+          "note": "Informateur de Twilight",
+          "img": "/api/avatar/img?u=spyfamily&n=Franky%20Franklin"
+        },
+        {
+          "name": "Kurogiri",
+          "sub": "My Hero Academia",
+          "char": "Kurogiri",
+          "note": "Bras droit de Shigaraki",
+          "img": "/api/avatar/img?u=mha&n=Kurogiri"
+        },
+        {
+          "name": "Igris",
+          "sub": "Solo Leveling",
+          "char": "Igris",
+          "note": "Chevalier de l’ombre de Jin-Woo",
+          "img": "/api/avatar/img?u=solo&n=Igris"
+        },
+        {
+          "name": "Beru",
+          "sub": "Solo Leveling",
+          "char": "Beru",
+          "note": "Fourmi de l’ombre de Jin-Woo",
+          "img": "/api/avatar/img?u=solo&n=Beru"
+        }
+      ]
+    },
+    {
+      "id": "sportif",
+      "title": "Qui est le meilleur sportif ?",
+      "emoji": "🏆",
+      "kind": "chars",
+      "group": "Talents",
+      "description": "Les sportifs d’animes avec leur sport et leur poste.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Shoyo Hinata",
+          "sub": "Haikyuu",
+          "char": "Shoyo Hinata",
+          "note": "Volley, attaquant central",
+          "img": "/api/avatar/img?u=haikyuu&n=Shoyo%20Hinata"
+        },
+        {
+          "name": "Tobio Kageyama",
+          "sub": "Haikyuu",
+          "char": "Tobio Kageyama",
+          "note": "Volley, passeur",
+          "img": "/api/avatar/img?u=haikyuu&n=Tobio%20Kageyama"
+        },
+        {
+          "name": "Toru Oikawa",
+          "sub": "Haikyuu",
+          "char": "Toru Oikawa",
+          "note": "Volley, passeur",
+          "img": "/api/avatar/img?u=haikyuu&n=Toru%20Oikawa"
+        },
+        {
+          "name": "Wakatoshi Ushijima",
+          "sub": "Haikyuu",
+          "char": "Wakatoshi Ushijima",
+          "note": "Volley, attaquant",
+          "img": "/api/avatar/img?u=haikyuu&n=Wakatoshi%20Ushijima"
+        },
+        {
+          "name": "Kotaro Bokuto",
+          "sub": "Haikyuu",
+          "char": "Kotaro Bokuto",
+          "note": "Volley, attaquant",
+          "img": "/api/avatar/img?u=haikyuu&n=Kotaro%20Bokuto"
+        },
+        {
+          "name": "Tetsuro Kuroo",
+          "sub": "Haikyuu",
+          "char": "Tetsuro Kuroo",
+          "note": "Volley, central",
+          "img": "/api/avatar/img?u=haikyuu&n=Tetsuro%20Kuroo"
+        },
+        {
+          "name": "Kenma Kozume",
+          "sub": "Haikyuu",
+          "char": "Kenma Kozume",
+          "note": "Volley, passeur",
+          "img": "/api/avatar/img?u=haikyuu&n=Kenma%20Kozume"
+        },
+        {
+          "name": "Yu Nishinoya",
+          "sub": "Haikyuu",
+          "char": "Yu Nishinoya",
+          "note": "Volley, libéro",
+          "img": "/api/avatar/img?u=haikyuu&n=Yu%20Nishinoya"
+        },
+        {
+          "name": "Kei Tsukishima",
+          "sub": "Haikyuu",
+          "char": "Kei Tsukishima",
+          "note": "Volley, central",
+          "img": "/api/avatar/img?u=haikyuu&n=Kei%20Tsukishima"
+        },
+        {
+          "name": "Tetsuya Kuroko",
+          "sub": "Kuroko no Basket",
+          "char": "Tetsuya Kuroko",
+          "note": "Basket, passeur fantôme",
+          "img": "/api/avatar/img?u=kuroko&n=Tetsuya%20Kuroko"
+        },
+        {
+          "name": "Taiga Kagami",
+          "sub": "Kuroko no Basket",
+          "char": "Taiga Kagami",
+          "note": "Basket",
+          "img": "/api/avatar/img?u=kuroko&n=Taiga%20Kagami"
+        },
+        {
+          "name": "Daiki Aomine",
+          "sub": "Kuroko no Basket",
+          "char": "Daiki Aomine",
+          "note": "Basket",
+          "img": "/api/avatar/img?u=kuroko&n=Daiki%20Aomine"
+        },
+        {
+          "name": "Seijuro Akashi",
+          "sub": "Kuroko no Basket",
+          "char": "Seijuro Akashi",
+          "note": "Basket, meneur",
+          "img": "/api/avatar/img?u=kuroko&n=Seijuro%20Akashi"
+        },
+        {
+          "name": "Ryota Kise",
+          "sub": "Kuroko no Basket",
+          "char": "Ryota Kise",
+          "note": "Basket",
+          "img": "/api/avatar/img?u=kuroko&n=Ryota%20Kise"
+        },
+        {
+          "name": "Shintaro Midorima",
+          "sub": "Kuroko no Basket",
+          "char": "Shintaro Midorima",
+          "note": "Basket, tireur",
+          "img": "/api/avatar/img?u=kuroko&n=Shintaro%20Midorima"
+        },
+        {
+          "name": "Hanamichi Sakuragi",
+          "sub": "Slam Dunk",
+          "char": "Hanamichi Sakuragi",
+          "note": "Basket, rebondeur",
+          "img": "/api/avatar/img?u=slamdunk&n=Hanamichi%20Sakuragi"
+        },
+        {
+          "name": "Kaede Rukawa",
+          "sub": "Slam Dunk",
+          "char": "Kaede Rukawa",
+          "note": "Basket",
+          "img": "/api/avatar/img?u=slamdunk&n=Kaede%20Rukawa"
+        },
+        {
+          "name": "Takenori Akagi",
+          "sub": "Slam Dunk",
+          "char": "Takenori Akagi",
+          "note": "Basket, pivot",
+          "img": "/api/avatar/img?u=slamdunk&n=Takenori%20Akagi"
+        },
+        {
+          "name": "Yoichi Isagi",
+          "sub": "Blue Lock",
+          "char": "Yoichi Isagi",
+          "note": "Football, attaquant",
+          "img": "/api/avatar/img?u=bluelock&n=Yoichi%20Isagi"
+        },
+        {
+          "name": "Rin Itoshi",
+          "sub": "Blue Lock",
+          "char": "Rin Itoshi",
+          "note": "Football, attaquant",
+          "img": "/api/avatar/img?u=bluelock&n=Rin%20Itoshi"
+        },
+        {
+          "name": "Meguru Bachira",
+          "sub": "Blue Lock",
+          "char": "Meguru Bachira",
+          "note": "Football, dribbleur",
+          "img": "/api/avatar/img?u=bluelock&n=Meguru%20Bachira"
+        },
+        {
+          "name": "Seishiro Nagi",
+          "sub": "Blue Lock",
+          "char": "Seishiro Nagi",
+          "note": "Football, contrôle de balle",
+          "img": "/api/avatar/img?u=bluelock&n=Seishiro%20Nagi"
+        },
+        {
+          "name": "Michael Kaiser",
+          "sub": "Blue Lock",
+          "char": "Michael Kaiser",
+          "note": "Football, attaquant",
+          "img": "/api/avatar/img?u=bluelock&n=Michael%20Kaiser"
+        },
+        {
+          "name": "Sae Itoshi",
+          "sub": "Blue Lock",
+          "char": "Sae Itoshi",
+          "note": "Football, milieu",
+          "img": "/api/avatar/img?u=bluelock&n=Sae%20Itoshi"
+        },
+        {
+          "name": "Shoei Barou",
+          "sub": "Blue Lock",
+          "char": "Shoei Barou",
+          "note": "Football, le roi",
+          "img": "/api/avatar/img?u=bluelock&n=Shoei%20Barou"
+        },
+        {
+          "name": "Ippo Makunouchi",
+          "sub": "Hajime no Ippo",
+          "char": "Ippo Makunouchi",
+          "note": "Boxe, poids plume",
+          "img": "/api/avatar/img?u=ippo&n=Ippo%20Makunouchi"
+        },
+        {
+          "name": "Mamoru Takamura",
+          "sub": "Hajime no Ippo",
+          "char": "Mamoru Takamura",
+          "note": "Boxe, poids moyens",
+          "img": "/api/avatar/img?u=ippo&n=Mamoru%20Takamura"
+        },
+        {
+          "name": "Ichiro Miyata",
+          "sub": "Hajime no Ippo",
+          "char": "Ichiro Miyata",
+          "note": "Boxe",
+          "img": "/api/avatar/img?u=ippo&n=Ichiro%20Miyata"
+        },
+        {
+          "name": "Takeshi Sendo",
+          "sub": "Hajime no Ippo",
+          "char": "Takeshi Sendo",
+          "note": "Boxe",
+          "img": "/api/avatar/img?u=ippo&n=Takeshi%20Sendo"
+        },
+        {
+          "name": "Takumi Fujiwara",
+          "sub": "Initial D",
+          "char": "Takumi Fujiwara",
+          "note": "Course automobile, AE86",
+          "img": "/api/avatar/img?u=initiald&n=Takumi%20Fujiwara"
+        },
+        {
+          "name": "Ryosuke Takahashi",
+          "sub": "Initial D",
+          "char": "Ryosuke Takahashi",
+          "note": "Course automobile, FC",
+          "img": "/api/avatar/img?u=initiald&n=Ryosuke%20Takahashi"
+        },
+        {
+          "name": "Keisuke Takahashi",
+          "sub": "Initial D",
+          "char": "Keisuke Takahashi",
+          "note": "Course automobile, FD",
+          "img": "/api/avatar/img?u=initiald&n=Keisuke%20Takahashi"
+        },
+        {
+          "name": "Kanata Rivington",
+          "sub": "MF Ghost",
+          "char": "Kanata Rivington",
+          "note": "Course automobile, MFG",
+          "img": "/api/avatar/img?u=mfghost&n=Kanata%20Rivington"
+        },
+        {
+          "name": "Tyson Granger",
+          "sub": "Beyblade",
+          "char": "Tyson Granger",
+          "note": "Beyblade, Dragoon",
+          "img": "/api/avatar/img?u=beyblade&n=Tyson%20Granger"
+        },
+        {
+          "name": "Iori Kitahara",
+          "sub": "Grand Blue",
+          "char": "Iori Kitahara",
+          "note": "Plongée",
+          "img": "/api/avatar/img?u=grandblue&n=Iori%20Kitahara"
+        }
+      ]
+    },
+    {
+      "id": "mignon",
+      "title": "Qui est le plus mignon ?",
+      "emoji": "🧸",
+      "kind": "chars",
+      "group": "Humour",
+      "description": "Les personnages les plus adorables.",
+      "unit": "persos",
+      "items": [
+        {
+          "name": "Anya Forger",
+          "sub": "Spy x Family",
+          "char": "Anya Forger",
+          "note": "Waku waku !",
+          "img": "/api/avatar/img?u=spyfamily&n=Anya%20Forger"
+        },
+        {
+          "name": "Nezuko Kamado",
+          "sub": "Demon Slayer",
+          "char": "Nezuko Kamado",
+          "note": "Le bambou dans la bouche",
+          "img": "/api/avatar/img?u=demonslayer&n=Nezuko%20Kamado"
+        },
+        {
+          "name": "Tony Tony Chopper",
+          "sub": "One Piece",
+          "char": "Tony Tony Chopper",
+          "note": "« Ça ne me fait pas plaisir, abruti ! »",
+          "img": "/api/avatar/img?u=onepiece&n=Tony%20Tony%20Chopper"
+        },
+        {
+          "name": "Pikachu",
+          "sub": "Pokémon",
+          "char": "Pikachu",
+          "note": "Le compagnon de Sacha",
+          "img": "/api/avatar/img?u=pokemon&n=Pikachu"
+        },
+        {
+          "name": "Happy",
+          "sub": "Fairy Tail",
+          "char": "Happy",
+          "note": "« Aye ! »",
+          "img": "/api/avatar/img?u=fairy&n=Happy"
+        },
+        {
+          "name": "Eri",
+          "sub": "My Hero Academia",
+          "char": "Eri",
+          "note": "La petite fille au rembobinage",
+          "img": "/api/avatar/img?u=mha&n=Eri"
+        },
+        {
+          "name": "Hitori Gotoh",
+          "sub": "Bocchi the Rock!",
+          "char": "Hitori Gotoh",
+          "note": "La guitariste timide",
+          "img": "/api/avatar/img?u=bocchi&n=Hitori%20Gotoh"
+        },
+        {
+          "name": "Maomao",
+          "sub": "The Apothecary Diaries",
+          "char": "Maomao",
+          "note": "L’apothicaire",
+          "img": "/api/avatar/img?u=apothecary&n=Maomao"
+        },
+        {
+          "name": "Frieren",
+          "sub": "Frieren",
+          "char": "Frieren",
+          "note": "Elfe qui collectionne les sorts inutiles",
+          "img": "/api/avatar/img?u=frieren&n=Frieren"
+        },
+        {
+          "name": "Rem",
+          "sub": "Re:Zero",
+          "char": "Rem",
+          "note": "Servante dévouée",
+          "img": "/api/avatar/img?u=rezero&n=Rem"
+        },
+        {
+          "name": "Megumin",
+          "sub": "Konosuba",
+          "char": "Megumin",
+          "note": "Une explosion par jour",
+          "img": "/api/avatar/img?u=konosuba&n=Megumin"
+        },
+        {
+          "name": "Pochita",
+          "sub": "Chainsaw Man",
+          "char": "Pochita",
+          "note": "Le démon tronçonneuse",
+          "img": "/api/avatar/img?u=chainsaw&n=Pochita"
+        },
+        {
+          "name": "Nanachi",
+          "sub": "Made in Abyss",
+          "char": "Nanachi",
+          "note": "Le lapin de l’Abysse",
+          "img": "/api/avatar/img?u=madeinabyss&n=Nanachi"
+        },
+        {
+          "name": "Évoli",
+          "sub": "Pokémon",
+          "char": "Évoli",
+          "note": "Le Pokémon évolutif",
+          "img": "/api/avatar/img?u=pokemon&n=%C3%89voli"
+        },
+        {
+          "name": "Wendy Marvell",
+          "sub": "Fairy Tail",
+          "char": "Wendy Marvell",
+          "note": "Chasseuse de dragon céleste",
+          "img": "/api/avatar/img?u=fairy&n=Wendy%20Marvell"
+        },
+        {
+          "name": "Hawk",
+          "sub": "Seven Deadly Sins",
+          "char": "Hawk",
+          "note": "Le cochon capitaine des restes",
+          "img": "/api/avatar/img?u=sds&n=Hawk"
+        },
+        {
+          "name": "Sangoten",
+          "sub": "Dragon Ball",
+          "char": "Sangoten",
+          "note": "Le petit Saiyan",
+          "img": "/api/avatar/img?u=dragonball&n=Sangoten"
+        },
+        {
+          "name": "Konohamaru Sarutobi",
+          "sub": "Naruto",
+          "char": "Konohamaru Sarutobi",
+          "note": "Le petit-fils du Troisième",
+          "img": "/api/avatar/img?u=naruto&n=Konohamaru%20Sarutobi"
+        },
+        {
+          "name": "Sakura Kinomoto",
+          "sub": "Cardcaptor Sakura",
+          "char": "Sakura Kinomoto",
+          "note": "Chasseuse de cartes",
+          "img": "/api/avatar/img?u=cardcaptor&n=Sakura%20Kinomoto"
+        },
+        {
+          "name": "Chika Fujiwara",
+          "sub": "Kaguya-sama",
+          "char": "Chika Fujiwara",
+          "note": "La danse de Chika",
+          "img": "/api/avatar/img?u=kaguya&n=Chika%20Fujiwara"
+        },
+        {
+          "name": "Marin Kitagawa",
+          "sub": "My Dress-Up Darling",
+          "char": "Marin Kitagawa",
+          "note": "Passionnée de cosplay",
+          "img": "/api/avatar/img?u=dressup&n=Marin%20Kitagawa"
+        },
+        {
+          "name": "Chisato Nishikigi",
+          "sub": "Lycoris Recoil",
+          "char": "Chisato Nishikigi",
+          "note": "Lycoris souriante",
+          "img": "/api/avatar/img?u=lycoris&n=Chisato%20Nishikigi"
+        },
+        {
+          "name": "Rimuru Tempest",
+          "sub": "Tensura",
+          "char": "Rimuru Tempest",
+          "note": "Le slime",
+          "img": "/api/avatar/img?u=tensura&n=Rimuru%20Tempest"
+        },
+        {
+          "name": "Shiro",
+          "sub": "No Game No Life",
+          "char": "Shiro",
+          "note": "La petite génie",
+          "img": "/api/avatar/img?u=nogamenolife&n=Shiro"
+        },
+        {
+          "name": "Bojji",
+          "sub": "Ranking of Kings",
+          "char": "Bojji",
+          "note": "Le petit prince",
+          "img": "/api/avatar/img?u=rankingkings&n=Bojji"
+        },
+        {
+          "name": "Kage",
+          "sub": "Ranking of Kings",
+          "char": "Kage",
+          "note": "L’ombre fidèle",
+          "img": "/api/avatar/img?u=rankingkings&n=Kage"
+        },
+        {
+          "name": "Yuzuriha",
+          "sub": "Hell's Paradise",
+          "char": "Yuzuriha",
+          "note": "Kunoichi espiègle",
+          "img": "/api/avatar/img?u=hellsparadise&n=Yuzuriha"
+        },
+        {
+          "name": "Marcille Donato",
+          "sub": "Dungeon Meshi",
+          "char": "Marcille Donato",
+          "note": "Elfe magicienne",
+          "img": "/api/avatar/img?u=dungeonmeshi&n=Marcille%20Donato"
+        },
+        {
+          "name": "Ichigo Momomiya",
+          "sub": "Tokyo Mew Mew",
+          "char": "Ichigo Momomiya",
+          "note": "Mew Ichigo",
+          "img": "/api/avatar/img?u=tokyomewmew&n=Ichigo%20Momomiya"
+        },
+        {
+          "name": "Chibiusa",
+          "sub": "Sailor Moon",
+          "char": "Chibiusa",
+          "note": "Sailor Chibi Moon",
+          "img": "/api/avatar/img?u=sailormoon&n=Chibiusa"
+        },
+        {
+          "name": "Carue",
+          "sub": "One Piece",
+          "char": "Carue",
+          "note": "Le canard de Vivi",
+          "img": "/api/avatar/img?u=onepiece&n=Carue"
+        },
+        {
+          "name": "Ein",
+          "sub": "Cowboy Bebop",
+          "char": "Ein",
+          "note": "Le corgi génial",
+          "img": "/api/avatar/img?u=cowboybebop&n=Ein"
+        }
+      ]
+    },
+    {
+      "id": "couple",
+      "title": "Quel est le meilleur couple ?",
+      "emoji": "💞",
+      "kind": "duos",
+      "group": "Relations",
+      "description": "Couples officiels de l’histoire.",
+      "unit": "couples",
+      "items": [
+        {
+          "name": "Naruto Uzumaki & Hinata Hyūga",
+          "sub": "Naruto",
+          "imgs": [
+            "/api/avatar/img?u=naruto&n=Naruto%20Uzumaki",
+            "/api/avatar/img?u=naruto&n=Hinata%20Hy%C5%ABga"
+          ]
+        },
+        {
+          "name": "Sasuke Uchiwa & Sakura Haruno",
+          "sub": "Naruto",
+          "imgs": [
+            "/api/avatar/img?u=naruto&n=Sasuke%20Uchiwa",
+            "/api/avatar/img?u=naruto&n=Sakura%20Haruno"
+          ]
+        },
+        {
+          "name": "Minato Namikaze & Kushina Uzumaki",
+          "sub": "Naruto",
+          "imgs": [
+            "/api/avatar/img?u=naruto&n=Minato%20Namikaze",
+            "/api/avatar/img?u=naruto&n=Kushina%20Uzumaki"
+          ]
+        },
+        {
+          "name": "Shikamaru Nara & Temari",
+          "sub": "Naruto",
+          "imgs": [
+            "/api/avatar/img?u=naruto&n=Shikamaru%20Nara",
+            "/api/avatar/img?u=naruto&n=Temari"
+          ]
+        },
+        {
+          "name": "Asuma Sarutobi & Kurenai Yūhi",
+          "sub": "Naruto",
+          "imgs": [
+            "/api/avatar/img?u=naruto&n=Asuma%20Sarutobi",
+            "/api/avatar/img?u=naruto&n=Kurenai%20Y%C5%ABhi"
+          ]
+        },
+        {
+          "name": "Ichigo Kurosaki & Orihime Inoue",
+          "sub": "Bleach",
+          "imgs": [
+            "/api/avatar/img?u=bleach&n=Ichigo%20Kurosaki",
+            "/api/avatar/img?u=bleach&n=Orihime%20Inoue"
+          ]
+        },
+        {
+          "name": "Renji Abarai & Rukia Kuchiki",
+          "sub": "Bleach",
+          "imgs": [
+            "/api/avatar/img?u=bleach&n=Renji%20Abarai",
+            "/api/avatar/img?u=bleach&n=Rukia%20Kuchiki"
+          ]
+        },
+        {
+          "name": "Sangoku & Chi-Chi",
+          "sub": "Dragon Ball",
+          "imgs": [
+            "/api/avatar/img?u=dragonball&n=Sangoku",
+            "/api/avatar/img?u=dragonball&n=Chi-Chi"
+          ]
+        },
+        {
+          "name": "Vegeta & Bulma",
+          "sub": "Dragon Ball",
+          "imgs": [
+            "/api/avatar/img?u=dragonball&n=Vegeta",
+            "/api/avatar/img?u=dragonball&n=Bulma"
+          ]
+        },
+        {
+          "name": "Krilin & C-18",
+          "sub": "Dragon Ball",
+          "imgs": [
+            "/api/avatar/img?u=dragonball&n=Krilin",
+            "/api/avatar/img?u=dragonball&n=C-18"
+          ]
+        },
+        {
+          "name": "Sangohan & Videl",
+          "sub": "Dragon Ball",
+          "imgs": [
+            "/api/avatar/img?u=dragonball&n=Sangohan",
+            "/api/avatar/img?u=dragonball&n=Videl"
+          ]
+        },
+        {
+          "name": "Tanjiro Kamado & Kanao Tsuyuri",
+          "sub": "Demon Slayer",
+          "imgs": [
+            "/api/avatar/img?u=demonslayer&n=Tanjiro%20Kamado",
+            "/api/avatar/img?u=demonslayer&n=Kanao%20Tsuyuri"
+          ]
+        },
+        {
+          "name": "Mitsuri Kanroji & Obanai Iguro",
+          "sub": "Demon Slayer",
+          "imgs": [
+            "/api/avatar/img?u=demonslayer&n=Mitsuri%20Kanroji",
+            "/api/avatar/img?u=demonslayer&n=Obanai%20Iguro"
+          ]
+        },
+        {
+          "name": "Tengen Uzui & Makio",
+          "sub": "Demon Slayer",
+          "imgs": [
+            "/api/avatar/img?u=demonslayer&n=Tengen%20Uzui",
+            "/api/avatar/img?u=demonslayer&n=Makio"
+          ]
+        },
+        {
+          "name": "Kirito & Asuna Yuuki",
+          "sub": "Sword Art Online",
+          "imgs": [
+            "/api/avatar/img?u=sao&n=Kirito",
+            "/api/avatar/img?u=sao&n=Asuna%20Yuuki"
+          ]
+        },
+        {
+          "name": "Gray Fullbuster & Juvia Lockser",
+          "sub": "Fairy Tail",
+          "imgs": [
+            "/api/avatar/img?u=fairy&n=Gray%20Fullbuster",
+            "/api/avatar/img?u=fairy&n=Juvia%20Lockser"
+          ]
+        },
+        {
+          "name": "Loid Forger & Yor Forger",
+          "sub": "Spy x Family",
+          "imgs": [
+            "/api/avatar/img?u=spyfamily&n=Loid%20Forger",
+            "/api/avatar/img?u=spyfamily&n=Yor%20Forger"
+          ]
+        },
+        {
+          "name": "Kaguya Shinomiya & Miyuki Shirogane",
+          "sub": "Kaguya-sama",
+          "imgs": [
+            "/api/avatar/img?u=kaguya&n=Kaguya%20Shinomiya",
+            "/api/avatar/img?u=kaguya&n=Miyuki%20Shirogane"
+          ]
+        },
+        {
+          "name": "Ryuuji Takasu & Taiga Aisaka",
+          "sub": "Toradora!",
+          "imgs": [
+            "/api/avatar/img?u=toradora&n=Ryuuji%20Takasu",
+            "/api/avatar/img?u=toradora&n=Taiga%20Aisaka"
+          ]
+        },
+        {
+          "name": "Edward Elric & Winry Rockbell",
+          "sub": "Fullmetal Alchemist",
+          "imgs": [
+            "/api/avatar/img?u=fma&n=Edward%20Elric",
+            "/api/avatar/img?u=fma&n=Winry%20Rockbell"
+          ]
+        },
+        {
+          "name": "Inuyasha & Kagome Higurashi",
+          "sub": "Inuyasha",
+          "imgs": [
+            "/api/avatar/img?u=inuyasha&n=Inuyasha",
+            "/api/avatar/img?u=inuyasha&n=Kagome%20Higurashi"
+          ]
+        },
+        {
+          "name": "Usagi Tsukino & Mamoru Chiba",
+          "sub": "Sailor Moon",
+          "imgs": [
+            "/api/avatar/img?u=sailormoon&n=Usagi%20Tsukino",
+            "/api/avatar/img?u=sailormoon&n=Mamoru%20Chiba"
+          ]
+        },
+        {
+          "name": "Kyoko Hori & Izumi Miyamura",
+          "sub": "Horimiya",
+          "imgs": [
+            "/api/avatar/img?u=horimiya&n=Kyoko%20Hori",
+            "/api/avatar/img?u=horimiya&n=Izumi%20Miyamura"
+          ]
+        },
+        {
+          "name": "Tomoya Okazaki & Nagisa Furukawa",
+          "sub": "Clannad",
+          "imgs": [
+            "/api/avatar/img?u=clannad&n=Tomoya%20Okazaki",
+            "/api/avatar/img?u=clannad&n=Nagisa%20Furukawa"
+          ]
+        },
+        {
+          "name": "Meliodas & Elizabeth Liones",
+          "sub": "Seven Deadly Sins",
+          "imgs": [
+            "/api/avatar/img?u=sds&n=Meliodas",
+            "/api/avatar/img?u=sds&n=Elizabeth%20Liones"
+          ]
+        },
+        {
+          "name": "King & Diane",
+          "sub": "Seven Deadly Sins",
+          "imgs": [
+            "/api/avatar/img?u=sds&n=King",
+            "/api/avatar/img?u=sds&n=Diane"
+          ]
+        },
+        {
+          "name": "Ban & Elaine",
+          "sub": "Seven Deadly Sins",
+          "imgs": [
+            "/api/avatar/img?u=sds&n=Ban",
+            "/api/avatar/img?u=sds&n=Elaine"
+          ]
+        },
+        {
+          "name": "Rintaro Okabe & Kurisu Makise",
+          "sub": "Steins;Gate",
+          "imgs": [
+            "/api/avatar/img?u=steinsgate&n=Rintaro%20Okabe",
+            "/api/avatar/img?u=steinsgate&n=Kurisu%20Makise"
+          ]
+        },
+        {
+          "name": "Rudeus Greyrat & Sylphiette",
+          "sub": "Mushoku Tensei",
+          "imgs": [
+            "/api/avatar/img?u=mushoku&n=Rudeus%20Greyrat",
+            "/api/avatar/img?u=mushoku&n=Sylphiette"
+          ]
+        },
+        {
+          "name": "Kozuki Oden & Kozuki Toki",
+          "sub": "One Piece",
+          "imgs": [
+            "/api/avatar/img?u=onepiece&n=Kozuki%20Oden",
+            "/api/avatar/img?u=onepiece&n=Kozuki%20Toki"
+          ]
+        },
+        {
+          "name": "Jonathan Joestar & Erina Pendleton",
+          "sub": "JoJo's Bizarre Adventure",
+          "imgs": [
+            "/api/avatar/img?u=jojo&n=Jonathan%20Joestar",
+            "/api/avatar/img?u=jojo&n=Erina%20Pendleton"
+          ]
+        },
+        {
+          "name": "Joseph Joestar & Suzi Q",
+          "sub": "JoJo's Bizarre Adventure",
+          "imgs": [
+            "/api/avatar/img?u=jojo&n=Joseph%20Joestar",
+            "/api/avatar/img?u=jojo&n=Suzi%20Q"
+          ]
+        },
+        {
+          "name": "Taiki Inomata & Chinatsu Kano",
+          "sub": "Blue Box",
+          "imgs": [
+            "/api/avatar/img?u=bluebox&n=Taiki%20Inomata",
+            "/api/avatar/img?u=bluebox&n=Chinatsu%20Kano"
+          ]
+        },
+        {
+          "name": "Ko Yamori & Nazuna Nanakusa",
+          "sub": "Call of the Night",
+          "imgs": [
+            "/api/avatar/img?u=callnight&n=Ko%20Yamori",
+            "/api/avatar/img?u=callnight&n=Nazuna%20Nanakusa"
+          ]
+        },
+        {
+          "name": "Sakuta Azusagawa & Mai Sakurajima",
+          "sub": "Rascal Does Not Dream",
+          "imgs": [
+            "/api/avatar/img?u=rascal&n=Sakuta%20Azusagawa",
+            "/api/avatar/img?u=rascal&n=Mai%20Sakurajima"
+          ]
+        }
+      ]
     }
   ]
 }
