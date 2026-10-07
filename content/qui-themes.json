@@ -363,13 +363,13 @@
         {
           "name": "Dr. Xeno",
           "sub": "Dr. Stone",
-          "img": "/assets/images/qui/3e6440a8d184349e.webp",
+          "img": "/assets/images/external/qui-3e6440a8d184349e.webp",
           "char": "Dr. Xeno"
         },
         {
           "name": "Hiroshi Agasa",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/2c07f0d196a3d84e.webp",
+          "img": "/assets/images/external/qui-2c07f0d196a3d84e.webp",
           "char": "Hiroshi Agasa"
         },
         {
@@ -2723,42 +2723,42 @@
         {
           "name": "Capone Bege",
           "sub": "One Piece",
-          "img": "/assets/images/qui/63801652ac1048ff.webp",
+          "img": "/assets/images/external/qui-63801652ac1048ff.webp",
           "char": "Capone Bege",
           "note": "Père de Capone Pez"
         },
         {
           "name": "Macao Conbolt",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/5dbabcb9ff9dd90f.webp",
+          "img": "/assets/images/external/qui-5dbabcb9ff9dd90f.webp",
           "char": "Macao Conbolt",
           "note": "Père de Romeo"
         },
         {
           "name": "Alzack Connell",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/b1bea4ac7f3064dc.webp",
+          "img": "/assets/images/external/qui-b1bea4ac7f3064dc.webp",
           "char": "Alzack Connell",
           "note": "Père d’Asuka"
         },
         {
           "name": "Nefertari Cobra",
           "sub": "One Piece",
-          "img": "/assets/images/qui/1d10d401c7b45606.webp",
+          "img": "/assets/images/external/qui-1d10d401c7b45606.webp",
           "char": "Nefertari Cobra",
           "note": "Père de Vivi"
         },
         {
           "name": "Kyros",
           "sub": "One Piece",
-          "img": "/assets/images/qui/bf9f33001d8c73e5.webp",
+          "img": "/assets/images/external/qui-bf9f33001d8c73e5.webp",
           "char": "Kyros",
           "note": "Père de Rebecca"
         },
         {
           "name": "Gildarts Clive",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/fb3bf69a743c88ae.webp",
+          "img": "/assets/images/external/qui-fb3bf69a743c88ae.webp",
           "char": "Gildarts Clive",
           "note": "Père de Cana"
         }
@@ -2958,35 +2958,35 @@
         {
           "name": "Azami Nakiri",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/2de9e1b737d2f2b0.webp",
+          "img": "/assets/images/external/qui-2de9e1b737d2f2b0.webp",
           "char": "Azami Nakiri",
           "note": "Père d’Erina"
         },
         {
           "name": "Jiemma",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/909d7b52d8241fff.webp",
+          "img": "/assets/images/external/qui-909d7b52d8241fff.webp",
           "char": "Jiemma",
           "note": "Père de Minerva"
         },
         {
           "name": "Jude Heartfilia",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/e0e231359c9bfabc.webp",
+          "img": "/assets/images/external/qui-e0e231359c9bfabc.webp",
           "char": "Jude Heartfilia",
           "note": "Père de Lucy"
         },
         {
           "name": "Ivan Dreyar",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/7adabbef33606535.webp",
+          "img": "/assets/images/external/qui-7adabbef33606535.webp",
           "char": "Ivan Dreyar",
           "note": "Père de Laxus"
         },
         {
           "name": "Donovan Desmond",
           "sub": "Spy x Family",
-          "img": "/assets/images/qui/0e6fba3113000590.webp",
+          "img": "/assets/images/external/qui-0e6fba3113000590.webp",
           "char": "Donovan Desmond",
           "note": "Père de Demetrius et Damian"
         },
@@ -4653,7 +4653,7 @@
         {
           "name": "Meliodas",
           "sub": "Seven Deadly Sins",
-          "img": "/assets/images/qui/b9c5ab9d3810a394.webp",
+          "img": "/assets/images/external/qui-b9c5ab9d3810a394.webp",
           "char": "Meliodas",
           "note": "Grand frère de Zeldris"
         },
@@ -4667,7 +4667,7 @@
         {
           "name": "Tobirama Senju",
           "sub": "Naruto",
-          "img": "/assets/images/qui/f5f257a4d8c087a4.webp",
+          "img": "/assets/images/external/qui-f5f257a4d8c087a4.webp",
           "char": "Tobirama Senju",
           "note": "Grand frère d’Itama et Kawarama"
         },
@@ -4885,7 +4885,7 @@
         {
           "name": "Sting Eucliffe",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/fbe8a0a9f9f5e9ef.webp",
+          "img": "/assets/images/external/qui-fbe8a0a9f9f5e9ef.webp",
           "char": "Sting Eucliffe"
         }
       ],
@@ -5560,7 +5560,7 @@
         {
           "name": "Megumi Fushiguro",
           "sub": "Jujutsu Kaisen",
-          "img": "/assets/images/qui/0d1d63f87390fee2.webp",
+          "img": "/assets/images/external/qui-0d1d63f87390fee2.webp",
           "char": "Megumi Fushiguro"
         },
         {
@@ -5578,7 +5578,7 @@
         {
           "name": "Tobio Kageyama",
           "sub": "Haikyuu!!",
-          "img": "/assets/images/qui/95ef17fe14981f91.webp",
+          "img": "/assets/images/external/qui-95ef17fe14981f91.webp",
           "char": "Tobio Kageyama"
         }
       ],
@@ -8529,7 +8529,7 @@
           "name": "Kaiju No. 9",
           "sub": "Kaiju No. 8",
           "media": "anime",
-          "img": "/assets/images/qui/8a187a8e8f8d40a7.webp"
+          "img": "/assets/images/external/qui-8a187a8e8f8d40a7.webp"
         },
         {
           "name": "Easton Enrollment",
@@ -10027,14 +10027,14 @@
         {
           "name": "Mikoto Uchiwa",
           "sub": "Naruto",
-          "img": "/assets/images/qui/8472b4236bccd221.webp",
+          "img": "/assets/images/external/qui-8472b4236bccd221.webp",
           "char": "Mikoto Uchiwa",
           "note": "Mère d’Itachi et Sasuke"
         },
         {
           "name": "Kurenai Yuhi",
           "sub": "Naruto",
-          "img": "/assets/images/qui/921c019480d491c2.webp",
+          "img": "/assets/images/external/qui-921c019480d491c2.webp",
           "char": "Kurenai Yuhi",
           "note": "Mère de Mirai"
         },
@@ -10062,7 +10062,7 @@
         {
           "name": "Sara Rockbell",
           "sub": "Fullmetal Alchemist",
-          "img": "/assets/images/qui/95524279865bf3af.webp",
+          "img": "/assets/images/external/qui-95524279865bf3af.webp",
           "char": "Sara Rockbell",
           "note": "Mère de Winry"
         },
@@ -10076,42 +10076,42 @@
         {
           "name": "Vinsmoke Sora",
           "sub": "One Piece",
-          "img": "/assets/images/qui/20162dbdc4e53ea4.webp",
+          "img": "/assets/images/external/qui-20162dbdc4e53ea4.webp",
           "char": "Vinsmoke Sora",
           "note": "Mère de Sanji et de ses frères et sœur"
         },
         {
           "name": "Portgas D. Rouge",
           "sub": "One Piece",
-          "img": "/assets/images/qui/2ba5a0da57c5f472.webp",
+          "img": "/assets/images/external/qui-2ba5a0da57c5f472.webp",
           "char": "Portgas D. Rouge",
           "note": "Mère d’Ace"
         },
         {
           "name": "Nico Olvia",
           "sub": "One Piece",
-          "img": "/assets/images/qui/10848c5f794937a8.webp",
+          "img": "/assets/images/external/qui-10848c5f794937a8.webp",
           "char": "Nico Olvia",
           "note": "Mère de Robin"
         },
         {
           "name": "Otohime",
           "sub": "One Piece",
-          "img": "/assets/images/qui/820dc0e52bf764fc.webp",
+          "img": "/assets/images/external/qui-820dc0e52bf764fc.webp",
           "char": "Otohime",
           "note": "Mère de Shirahoshi et de ses frères"
         },
         {
           "name": "Kozuki Toki",
           "sub": "One Piece",
-          "img": "/assets/images/qui/2cff5f1da9313b55.webp",
+          "img": "/assets/images/external/qui-2cff5f1da9313b55.webp",
           "char": "Kozuki Toki",
           "note": "Mère de Momonosuke et Hiyori"
         },
         {
           "name": "Scarlett",
           "sub": "One Piece",
-          "img": "/assets/images/qui/807c9fb7c939e225.webp",
+          "img": "/assets/images/external/qui-807c9fb7c939e225.webp",
           "char": "Scarlett",
           "note": "Mère de Rebecca"
         },
@@ -10139,7 +10139,7 @@
         {
           "name": "Layla Heartfilia",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/de46ddff5c30193d.webp",
+          "img": "/assets/images/external/qui-de46ddff5c30193d.webp",
           "char": "Layla Heartfilia",
           "note": "Mère de Lucy"
         },
@@ -10262,7 +10262,7 @@
         {
           "name": "Nojiko",
           "sub": "One Piece",
-          "img": "/assets/images/qui/2d56f2721da836d0.webp",
+          "img": "/assets/images/external/qui-2d56f2721da836d0.webp",
           "char": "Nojiko",
           "note": "Grande sœur adoptive de Nami"
         },
@@ -10276,21 +10276,21 @@
         {
           "name": "Charlotte Brulee",
           "sub": "One Piece",
-          "img": "/assets/images/qui/5bfb3c230c2ceae3.webp",
+          "img": "/assets/images/external/qui-5bfb3c230c2ceae3.webp",
           "char": "Charlotte Brulee",
           "note": "Grande sœur de plusieurs enfants Charlotte"
         },
         {
           "name": "Ulti",
           "sub": "One Piece",
-          "img": "/assets/images/qui/08f745b2b7af9f1f.webp",
+          "img": "/assets/images/external/qui-08f745b2b7af9f1f.webp",
           "char": "Ulti",
           "note": "Grande sœur de Page One"
         },
         {
           "name": "Kukaku Shiba",
           "sub": "Bleach",
-          "img": "/assets/images/qui/d7c3e27d85cb97db.webp",
+          "img": "/assets/images/external/qui-d7c3e27d85cb97db.webp",
           "char": "Kukaku Shiba",
           "note": "Grande sœur de Ganju"
         },
@@ -10311,7 +10311,7 @@
         {
           "name": "Tsumiki Fushiguro",
           "sub": "Jujutsu Kaisen",
-          "img": "/assets/images/qui/7ed7c9e680585768.webp",
+          "img": "/assets/images/external/qui-7ed7c9e680585768.webp",
           "char": "Tsumiki Fushiguro",
           "note": "Grande sœur par alliance de Megumi"
         },
@@ -10332,7 +10332,7 @@
         {
           "name": "Hana Inuzuka",
           "sub": "Naruto",
-          "img": "/assets/images/qui/3087720fcea5f8f8.webp",
+          "img": "/assets/images/external/qui-3087720fcea5f8f8.webp",
           "char": "Hana Inuzuka",
           "note": "Grande sœur de Kiba"
         },
@@ -10374,14 +10374,14 @@
         {
           "name": "Iris Midgar",
           "sub": "The Eminence in Shadow",
-          "img": "/assets/images/qui/d0cc5a0410e5d3bc.webp",
+          "img": "/assets/images/external/qui-d0cc5a0410e5d3bc.webp",
           "char": "Iris Midgar",
           "note": "Grande sœur d’Alexia"
         },
         {
           "name": "Ichika Nakano",
           "sub": "The Quintessential Quintuplets",
-          "img": "/assets/images/qui/35c4b2193280ebff.webp",
+          "img": "/assets/images/external/qui-35c4b2193280ebff.webp",
           "char": "Ichika Nakano",
           "note": "Aînée des quintuplées Nakano"
         }
@@ -11474,31 +11474,31 @@
         {
           "name": "Yasopp",
           "sub": "One Piece",
-          "img": "/assets/images/qui/88e4133a4418e577.webp",
+          "img": "/assets/images/external/qui-88e4133a4418e577.webp",
           "char": "Yasopp"
         },
         {
           "name": "Van Augur",
           "sub": "One Piece",
-          "img": "/assets/images/qui/08fb03574fe0bffd.webp",
+          "img": "/assets/images/external/qui-08fb03574fe0bffd.webp",
           "char": "Van Augur"
         },
         {
           "name": "Benn Beckman",
           "sub": "One Piece",
-          "img": "/assets/images/qui/ce2bbbdffea401e2.webp",
+          "img": "/assets/images/external/qui-ce2bbbdffea401e2.webp",
           "char": "Benn Beckman"
         },
         {
           "name": "Izo",
           "sub": "One Piece",
-          "img": "/assets/images/qui/a3b3052b62548974.webp",
+          "img": "/assets/images/external/qui-a3b3052b62548974.webp",
           "char": "Izo"
         },
         {
           "name": "Capone Bege",
           "sub": "One Piece",
-          "img": "/assets/images/qui/63801652ac1048ff.webp",
+          "img": "/assets/images/external/qui-63801652ac1048ff.webp",
           "char": "Capone Bege"
         },
         {
@@ -11510,7 +11510,7 @@
         {
           "name": "Rei Furuya",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/df0291b3d7a4b9e5.webp",
+          "img": "/assets/images/external/qui-df0291b3d7a4b9e5.webp",
           "char": "Rei Furuya"
         },
         {
@@ -11540,13 +11540,13 @@
         {
           "name": "Alzack Connell",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/b1bea4ac7f3064dc.webp",
+          "img": "/assets/images/external/qui-b1bea4ac7f3064dc.webp",
           "char": "Alzack Connell"
         },
         {
           "name": "Bisca Connell",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/3503bf90de89f1a0.webp",
+          "img": "/assets/images/external/qui-3503bf90de89f1a0.webp",
           "char": "Bisca Connell"
         },
         {
@@ -11558,7 +11558,7 @@
         {
           "name": "Stanley Snyder",
           "sub": "Dr. Stone",
-          "img": "/assets/images/qui/c6e414e051a30cfe.webp",
+          "img": "/assets/images/external/qui-c6e414e051a30cfe.webp",
           "char": "Stanley Snyder"
         },
         {
@@ -11576,7 +11576,7 @@
         {
           "name": "Pitohui",
           "sub": "Sword Art Online",
-          "img": "/assets/images/qui/b549f0e5e082e1f7.webp",
+          "img": "/assets/images/external/qui-b549f0e5e082e1f7.webp",
           "char": "Pitohui"
         },
         {
@@ -11725,37 +11725,37 @@
         {
           "name": "Igneel",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/212254a6522a02ee.webp",
+          "img": "/assets/images/external/qui-212254a6522a02ee.webp",
           "char": "Igneel"
         },
         {
           "name": "Atlas Flame",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/47115886ed57e471.webp",
+          "img": "/assets/images/external/qui-47115886ed57e471.webp",
           "char": "Atlas Flame"
         },
         {
           "name": "Zancrow",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/e70cc15e3543c37b.webp",
+          "img": "/assets/images/external/qui-e70cc15e3543c37b.webp",
           "char": "Zancrow"
         },
         {
           "name": "Macao Conbolt",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/5dbabcb9ff9dd90f.webp",
+          "img": "/assets/images/external/qui-5dbabcb9ff9dd90f.webp",
           "char": "Macao Conbolt"
         },
         {
           "name": "Romeo Conbolt",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/3237d74abdf6c166.webp",
+          "img": "/assets/images/external/qui-3237d74abdf6c166.webp",
           "char": "Romeo Conbolt"
         },
         {
           "name": "Totomaru",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/5bdae0129f1d1ed9.webp",
+          "img": "/assets/images/external/qui-5bdae0129f1d1ed9.webp",
           "char": "Totomaru"
         },
         {
@@ -11809,7 +11809,7 @@
         {
           "name": "Hiei",
           "sub": "Yu Yu Hakusho",
-          "img": "/assets/images/qui/ad747031ac531a48.webp",
+          "img": "/assets/images/external/qui-ad747031ac531a48.webp",
           "char": "Hiei"
         }
       ],
@@ -11880,31 +11880,31 @@
         {
           "name": "Ur",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/72bebcbbcfe6069e.webp",
+          "img": "/assets/images/external/qui-72bebcbbcfe6069e.webp",
           "char": "Ur"
         },
         {
           "name": "Silver Fullbuster",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/3907bd177f83176e.webp",
+          "img": "/assets/images/external/qui-3907bd177f83176e.webp",
           "char": "Silver Fullbuster"
         },
         {
           "name": "Invel Yura",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/846f828084f77d2f.webp",
+          "img": "/assets/images/external/qui-846f828084f77d2f.webp",
           "char": "Invel Yura"
         },
         {
           "name": "Eve Tearm",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/5f8d588ffe870764.webp",
+          "img": "/assets/images/external/qui-5f8d588ffe870764.webp",
           "char": "Eve Tearm"
         },
         {
           "name": "Monet",
           "sub": "One Piece",
-          "img": "/assets/images/qui/a015f53ed0e9e14c.webp",
+          "img": "/assets/images/external/qui-a015f53ed0e9e14c.webp",
           "char": "Monet"
         },
         {
@@ -12047,19 +12047,19 @@
         {
           "name": "A (Quatrième Raikage)",
           "sub": "Naruto",
-          "img": "/assets/images/qui/57b4272cf3d87344.webp",
+          "img": "/assets/images/external/qui-57b4272cf3d87344.webp",
           "char": "A (Quatrième Raikage)"
         },
         {
           "name": "Ameyuri Ringo",
           "sub": "Naruto",
-          "img": "/assets/images/qui/86631dbbeed7478d.webp",
+          "img": "/assets/images/external/qui-86631dbbeed7478d.webp",
           "char": "Ameyuri Ringo"
         },
         {
           "name": "Orga Nanagear",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/41833d5e360f21a0.webp",
+          "img": "/assets/images/external/qui-41833d5e360f21a0.webp",
           "char": "Orga Nanagear"
         },
         {
@@ -12077,7 +12077,7 @@
         {
           "name": "Vinsmoke Niji",
           "sub": "One Piece",
-          "img": "/assets/images/qui/68f15458419d1df7.webp",
+          "img": "/assets/images/external/qui-68f15458419d1df7.webp",
           "char": "Vinsmoke Niji"
         },
         {
@@ -12238,19 +12238,19 @@
         {
           "name": "Kureha",
           "sub": "One Piece",
-          "img": "/assets/images/qui/443d50d9359c3a78.webp",
+          "img": "/assets/images/external/qui-443d50d9359c3a78.webp",
           "char": "Kureha"
         },
         {
           "name": "Crocus",
           "sub": "One Piece",
-          "img": "/assets/images/qui/b7271321b0d0d267.webp",
+          "img": "/assets/images/external/qui-b7271321b0d0d267.webp",
           "char": "Crocus"
         },
         {
           "name": "Mansherry",
           "sub": "One Piece",
-          "img": "/assets/images/qui/31a95f236a5833ba.webp",
+          "img": "/assets/images/external/qui-31a95f236a5833ba.webp",
           "char": "Mansherry"
         },
         {
@@ -12268,7 +12268,7 @@
         {
           "name": "Knox",
           "sub": "Fullmetal Alchemist",
-          "img": "/assets/images/qui/7062d81be0a41272.webp",
+          "img": "/assets/images/external/qui-7062d81be0a41272.webp",
           "char": "Knox"
         },
         {
@@ -12286,13 +12286,13 @@
         {
           "name": "Sherria Blendy",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/c832f8f3e0d7ea73.webp",
+          "img": "/assets/images/external/qui-c832f8f3e0d7ea73.webp",
           "char": "Sherria Blendy"
         },
         {
           "name": "Porlyusica",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/73b7507be483d56c.webp",
+          "img": "/assets/images/external/qui-73b7507be483d56c.webp",
           "char": "Porlyusica"
         },
         {
@@ -12310,7 +12310,7 @@
         {
           "name": "Elizabeth Liones",
           "sub": "Seven Deadly Sins",
-          "img": "/assets/images/qui/f11e0efc771f9760.webp",
+          "img": "/assets/images/external/qui-f11e0efc771f9760.webp",
           "char": "Elizabeth Liones"
         },
         {
@@ -12405,19 +12405,19 @@
         {
           "name": "Ryo Kurokiba",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/b5ff21a7e03a2a27.webp",
+          "img": "/assets/images/external/qui-b5ff21a7e03a2a27.webp",
           "char": "Ryo Kurokiba"
         },
         {
           "name": "Hisako Arato",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/b1a73e3d132de5a1.webp",
+          "img": "/assets/images/external/qui-b1a73e3d132de5a1.webp",
           "char": "Hisako Arato"
         },
         {
           "name": "Isami Aldini",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/94bff6114dd827b3.webp",
+          "img": "/assets/images/external/qui-94bff6114dd827b3.webp",
           "char": "Isami Aldini"
         },
         {
@@ -12429,7 +12429,7 @@
         {
           "name": "Rindo Kobayashi",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/7b8f34bd406f0568.webp",
+          "img": "/assets/images/external/qui-7b8f34bd406f0568.webp",
           "char": "Rindo Kobayashi"
         },
         {
@@ -12441,37 +12441,37 @@
         {
           "name": "Azami Nakiri",
           "sub": "Food Wars!",
-          "img": "/assets/images/qui/2de9e1b737d2f2b0.webp",
+          "img": "/assets/images/external/qui-2de9e1b737d2f2b0.webp",
           "char": "Azami Nakiri"
         },
         {
           "name": "Francois",
           "sub": "Dr. Stone",
-          "img": "/assets/images/qui/648cd9b9f0b7cf33.webp",
+          "img": "/assets/images/external/qui-648cd9b9f0b7cf33.webp",
           "char": "Francois"
         },
         {
           "name": "Patty",
           "sub": "One Piece",
-          "img": "/assets/images/qui/33c05659f832fbaf.webp",
+          "img": "/assets/images/external/qui-33c05659f832fbaf.webp",
           "char": "Patty"
         },
         {
           "name": "Carne",
           "sub": "One Piece",
-          "img": "/assets/images/qui/7d537cbf9a911eb8.webp",
+          "img": "/assets/images/external/qui-7d537cbf9a911eb8.webp",
           "char": "Carne"
         },
         {
           "name": "Thatch",
           "sub": "One Piece",
-          "img": "/assets/images/qui/867fad38adc5e7a4.webp",
+          "img": "/assets/images/external/qui-867fad38adc5e7a4.webp",
           "char": "Thatch"
         },
         {
           "name": "Streusen",
           "sub": "One Piece",
-          "img": "/assets/images/qui/9a3db3111159b573.webp",
+          "img": "/assets/images/external/qui-9a3db3111159b573.webp",
           "char": "Streusen"
         },
         {
@@ -12489,7 +12489,7 @@
         {
           "name": "Rikido Sato",
           "sub": "My Hero Academia",
-          "img": "/assets/images/qui/1f98fe13a65e1a0f.webp",
+          "img": "/assets/images/external/qui-1f98fe13a65e1a0f.webp",
           "char": "Rikido Sato"
         },
         {
@@ -12602,7 +12602,7 @@
         {
           "name": "Hiroshi Agasa",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/2c07f0d196a3d84e.webp",
+          "img": "/assets/images/external/qui-2c07f0d196a3d84e.webp",
           "char": "Hiroshi Agasa"
         },
         {
@@ -12614,7 +12614,7 @@
         {
           "name": "Dr. Xeno",
           "sub": "Dr. Stone",
-          "img": "/assets/images/qui/3e6440a8d184349e.webp",
+          "img": "/assets/images/external/qui-3e6440a8d184349e.webp",
           "char": "Dr. Xeno"
         },
         {
@@ -12632,7 +12632,7 @@
         {
           "name": "Maho Hiyajo",
           "sub": "Steins;Gate",
-          "img": "/assets/images/qui/5ff969cba1a8fcec.webp",
+          "img": "/assets/images/external/qui-5ff969cba1a8fcec.webp",
           "char": "Maho Hiyajo"
         },
         {
@@ -12644,7 +12644,7 @@
         {
           "name": "Queen",
           "sub": "One Piece",
-          "img": "/assets/images/qui/153f6e435589b1c8.webp",
+          "img": "/assets/images/external/qui-153f6e435589b1c8.webp",
           "char": "Queen"
         },
         {
@@ -12668,13 +12668,13 @@
         {
           "name": "Amado Sanzu",
           "sub": "Naruto",
-          "img": "/assets/images/qui/ab28f8494e40e41e.webp",
+          "img": "/assets/images/external/qui-ab28f8494e40e41e.webp",
           "char": "Amado Sanzu"
         },
         {
           "name": "Katasuke Tono",
           "sub": "Naruto",
-          "img": "/assets/images/qui/bf417f2954f36089.webp",
+          "img": "/assets/images/external/qui-bf417f2954f36089.webp",
           "char": "Katasuke Tono"
         },
         {
@@ -12686,43 +12686,43 @@
         {
           "name": "Szayelaporro Granz",
           "sub": "Bleach",
-          "img": "/assets/images/qui/bd1f6441bd18b6a2.webp",
+          "img": "/assets/images/external/qui-bd1f6441bd18b6a2.webp",
           "char": "Szayelaporro Granz"
         },
         {
           "name": "Akihiro Kanou",
           "sub": "Tokyo Ghoul",
-          "img": "/assets/images/qui/923b2ad19c694045.webp",
+          "img": "/assets/images/external/qui-923b2ad19c694045.webp",
           "char": "Akihiro Kanou"
         },
         {
           "name": "Dr. Hogback",
           "sub": "One Piece",
-          "img": "/assets/images/qui/7ce802f6c774e06d.webp",
+          "img": "/assets/images/external/qui-7ce802f6c774e06d.webp",
           "char": "Dr. Hogback"
         },
         {
           "name": "Dr. Indigo",
           "sub": "One Piece",
-          "img": "/assets/images/qui/bb9b27a5d743438b.webp",
+          "img": "/assets/images/external/qui-bb9b27a5d743438b.webp",
           "char": "Dr. Indigo"
         },
         {
           "name": "Docteur Hedo",
           "sub": "Dragon Ball",
-          "img": "/assets/images/qui/cb27fe2d24ce073a.webp",
+          "img": "/assets/images/external/qui-cb27fe2d24ce073a.webp",
           "char": "Docteur Hedo"
         },
         {
           "name": "Docteur Brief",
           "sub": "Dragon Ball",
-          "img": "/assets/images/qui/bd422bfc69840d7c.webp",
+          "img": "/assets/images/external/qui-bd422bfc69840d7c.webp",
           "char": "Docteur Brief"
         },
         {
           "name": "Docteur Mu",
           "sub": "Dragon Ball",
-          "img": "/assets/images/qui/3822de4ee18714e1.webp",
+          "img": "/assets/images/external/qui-3822de4ee18714e1.webp",
           "char": "Docteur Mu"
         },
         {
@@ -12847,7 +12847,7 @@
         {
           "name": "Anko Uguisu",
           "sub": "Call of the Night",
-          "img": "/assets/images/qui/406fd0cae82a1338.webp",
+          "img": "/assets/images/external/qui-406fd0cae82a1338.webp",
           "char": "Anko Uguisu"
         },
         {
@@ -12901,7 +12901,7 @@
         {
           "name": "Rei Furuya",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/df0291b3d7a4b9e5.webp",
+          "img": "/assets/images/external/qui-df0291b3d7a4b9e5.webp",
           "char": "Rei Furuya"
         },
         {
@@ -13068,7 +13068,7 @@
         {
           "name": "Black Zetsu",
           "sub": "Naruto",
-          "img": "/assets/images/qui/047dfbde4ef6677d.webp",
+          "img": "/assets/images/external/qui-047dfbde4ef6677d.webp",
           "char": "Black Zetsu"
         },
         {
@@ -13516,7 +13516,7 @@
         {
           "name": "Kaiju No. 9",
           "sub": "Kaiju No. 8",
-          "img": "/assets/images/qui/8a187a8e8f8d40a7.webp",
+          "img": "/assets/images/external/qui-8a187a8e8f8d40a7.webp",
           "char": "Kaiju No. 9"
         },
         {
@@ -14668,7 +14668,7 @@
         {
           "name": "Nagato",
           "sub": "Naruto",
-          "img": "/assets/images/qui/6f01513da464dd20.webp",
+          "img": "/assets/images/external/qui-6f01513da464dd20.webp",
           "char": "Nagato"
         },
         {
@@ -14704,7 +14704,7 @@
         {
           "name": "Hiei",
           "sub": "Yu Yu Hakusho",
-          "img": "/assets/images/qui/ad747031ac531a48.webp",
+          "img": "/assets/images/external/qui-ad747031ac531a48.webp",
           "char": "Hiei"
         },
         {
@@ -14758,13 +14758,13 @@
         {
           "name": "La Brava",
           "sub": "My Hero Academia",
-          "img": "/assets/images/qui/275795cfc4292344.webp",
+          "img": "/assets/images/external/qui-275795cfc4292344.webp",
           "char": "La Brava"
         },
         {
           "name": "Rogue Cheney",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/a29598747cc2f41a.webp",
+          "img": "/assets/images/external/qui-a29598747cc2f41a.webp",
           "char": "Rogue Cheney"
         }
       ],
@@ -15259,19 +15259,19 @@
         {
           "name": "Saiko Yonebayashi",
           "sub": "Tokyo Ghoul",
-          "img": "/assets/images/qui/9fd3ba0ab8ae2a1e.webp",
+          "img": "/assets/images/external/qui-9fd3ba0ab8ae2a1e.webp",
           "char": "Saiko Yonebayashi"
         },
         {
           "name": "Dino",
           "sub": "Moi, quand je me réincarne en Slime",
-          "img": "/assets/images/qui/6fb86a981cf3ed05.webp",
+          "img": "/assets/images/external/qui-6fb86a981cf3ed05.webp",
           "char": "Dino"
         },
         {
           "name": "Sekhmet",
           "sub": "Re:Zero",
-          "img": "/assets/images/qui/adc9decad9e11d9e.webp",
+          "img": "/assets/images/external/qui-adc9decad9e11d9e.webp",
           "char": "Sekhmet"
         },
         {
@@ -15331,7 +15331,7 @@
         {
           "name": "Nab Lasaro",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/c3b4ae076c64a5ef.webp",
+          "img": "/assets/images/external/qui-c3b4ae076c64a5ef.webp",
           "char": "Nab Lasaro"
         }
       ],
@@ -15462,25 +15462,25 @@
         {
           "name": "Dr. Hogback",
           "sub": "One Piece",
-          "img": "/assets/images/qui/7ce802f6c774e06d.webp",
+          "img": "/assets/images/external/qui-7ce802f6c774e06d.webp",
           "char": "Dr. Hogback"
         },
         {
           "name": "Jaguar D. Saul",
           "sub": "One Piece",
-          "img": "/assets/images/qui/d1ab566273e331a8.webp",
+          "img": "/assets/images/external/qui-d1ab566273e331a8.webp",
           "char": "Jaguar D. Saul"
         },
         {
           "name": "Pica",
           "sub": "One Piece",
-          "img": "/assets/images/qui/8c618fa5f1b78a71.webp",
+          "img": "/assets/images/external/qui-8c618fa5f1b78a71.webp",
           "char": "Pica"
         },
         {
           "name": "Trebol",
           "sub": "One Piece",
-          "img": "/assets/images/qui/4c7f456b5451a91f.webp",
+          "img": "/assets/images/external/qui-4c7f456b5451a91f.webp",
           "char": "Trebol"
         },
         {
@@ -15492,13 +15492,13 @@
         {
           "name": "Brogy",
           "sub": "One Piece",
-          "img": "/assets/images/qui/7532d79e47e7b5ad.webp",
+          "img": "/assets/images/external/qui-7532d79e47e7b5ad.webp",
           "char": "Brogy"
         },
         {
           "name": "Dorry",
           "sub": "One Piece",
-          "img": "/assets/images/qui/61b358f764f62a2e.webp",
+          "img": "/assets/images/external/qui-61b358f764f62a2e.webp",
           "char": "Dorry"
         },
         {
@@ -15707,7 +15707,7 @@
         {
           "name": "Benn Beckman",
           "sub": "One Piece",
-          "img": "/assets/images/qui/ce2bbbdffea401e2.webp",
+          "img": "/assets/images/external/qui-ce2bbbdffea401e2.webp",
           "char": "Benn Beckman"
         },
         {
@@ -15940,7 +15940,7 @@
         {
           "name": "Rei Furuya",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/df0291b3d7a4b9e5.webp",
+          "img": "/assets/images/external/qui-df0291b3d7a4b9e5.webp",
           "char": "Rei Furuya"
         },
         {
@@ -16167,7 +16167,7 @@
         {
           "name": "Noriaki Kakyoin",
           "sub": "JoJo’s Bizarre Adventure",
-          "img": "/assets/images/qui/882f2815076d27f0.webp",
+          "img": "/assets/images/external/qui-882f2815076d27f0.webp",
           "char": "Noriaki Kakyoin"
         },
         {
@@ -16352,13 +16352,13 @@
         {
           "name": "Capone Bege",
           "sub": "One Piece",
-          "img": "/assets/images/qui/63801652ac1048ff.webp",
+          "img": "/assets/images/external/qui-63801652ac1048ff.webp",
           "char": "Capone Bege"
         },
         {
           "name": "Dr. Xeno",
           "sub": "Dr. Stone",
-          "img": "/assets/images/qui/3e6440a8d184349e.webp",
+          "img": "/assets/images/external/qui-3e6440a8d184349e.webp",
           "char": "Dr. Xeno"
         }
       ],
@@ -16447,7 +16447,7 @@
         {
           "name": "Kaname Tosen",
           "sub": "Bleach",
-          "img": "/assets/images/qui/5bbc140729f83bc9.webp",
+          "img": "/assets/images/external/qui-5bbc140729f83bc9.webp",
           "char": "Kaname Tosen"
         },
         {
@@ -16471,31 +16471,31 @@
         {
           "name": "Kensei Muguruma",
           "sub": "Bleach",
-          "img": "/assets/images/qui/bd016b023e59c91c.webp",
+          "img": "/assets/images/external/qui-bd016b023e59c91c.webp",
           "char": "Kensei Muguruma"
         },
         {
           "name": "Hachigen Ushoda",
           "sub": "Bleach",
-          "img": "/assets/images/qui/21a219158c67e741.webp",
+          "img": "/assets/images/external/qui-21a219158c67e741.webp",
           "char": "Hachigen Ushoda"
         },
         {
           "name": "Lisa Yadomaru",
           "sub": "Bleach",
-          "img": "/assets/images/qui/d10ed89336589ad4.webp",
+          "img": "/assets/images/external/qui-d10ed89336589ad4.webp",
           "char": "Lisa Yadomaru"
         },
         {
           "name": "Love Aikawa",
           "sub": "Bleach",
-          "img": "/assets/images/qui/16784bac8daa4313.webp",
+          "img": "/assets/images/external/qui-16784bac8daa4313.webp",
           "char": "Love Aikawa"
         },
         {
           "name": "Mashiro Kuna",
           "sub": "Bleach",
-          "img": "/assets/images/qui/71978bfccfb1e4af.webp",
+          "img": "/assets/images/external/qui-71978bfccfb1e4af.webp",
           "char": "Mashiro Kuna"
         },
         {
@@ -16507,7 +16507,7 @@
         {
           "name": "King (One Piece)",
           "sub": "One Piece",
-          "img": "/assets/images/qui/02ee8ce92dfac314.webp",
+          "img": "/assets/images/external/qui-02ee8ce92dfac314.webp",
           "char": "King (One Piece)"
         },
         {
@@ -16549,13 +16549,13 @@
         {
           "name": "Death Gun",
           "sub": "Sword Art Online",
-          "img": "/assets/images/qui/aa17feca0409dbe4.webp",
+          "img": "/assets/images/external/qui-aa17feca0409dbe4.webp",
           "char": "Death Gun"
         },
         {
           "name": "Mr. Compress",
           "sub": "My Hero Academia",
-          "img": "/assets/images/qui/549977f4af059f48.webp",
+          "img": "/assets/images/external/qui-549977f4af059f48.webp",
           "char": "Mr. Compress"
         },
         {
@@ -17265,7 +17265,7 @@
         {
           "name": "Rei Furuya",
           "sub": "Detective Conan",
-          "img": "/assets/images/qui/df0291b3d7a4b9e5.webp",
+          "img": "/assets/images/external/qui-df0291b3d7a4b9e5.webp",
           "char": "Rei Furuya"
         },
         {
@@ -17295,61 +17295,61 @@
         {
           "name": "Stussy",
           "sub": "One Piece",
-          "img": "/assets/images/qui/a051c06fbd979eb6.webp",
+          "img": "/assets/images/external/qui-a051c06fbd979eb6.webp",
           "char": "Stussy"
         },
         {
           "name": "X Drake",
           "sub": "One Piece",
-          "img": "/assets/images/qui/f2294cad8d8893cf.webp",
+          "img": "/assets/images/external/qui-f2294cad8d8893cf.webp",
           "char": "X Drake"
         },
         {
           "name": "Kanjuro",
           "sub": "One Piece",
-          "img": "/assets/images/qui/17c216d6cdc1d20f.webp",
+          "img": "/assets/images/external/qui-17c216d6cdc1d20f.webp",
           "char": "Kanjuro"
         },
         {
           "name": "Vergo",
           "sub": "One Piece",
-          "img": "/assets/images/qui/ff4e2c2153415c50.webp",
+          "img": "/assets/images/external/qui-ff4e2c2153415c50.webp",
           "char": "Vergo"
         },
         {
           "name": "Blueno",
           "sub": "One Piece",
-          "img": "/assets/images/qui/a9ca7176ea88a647.webp",
+          "img": "/assets/images/external/qui-a9ca7176ea88a647.webp",
           "char": "Blueno"
         },
         {
           "name": "Kaku",
           "sub": "One Piece",
-          "img": "/assets/images/qui/560b88d6be08c191.webp",
+          "img": "/assets/images/external/qui-560b88d6be08c191.webp",
           "char": "Kaku"
         },
         {
           "name": "Fukurou",
           "sub": "One Piece",
-          "img": "/assets/images/qui/37b181083098e743.webp",
+          "img": "/assets/images/external/qui-37b181083098e743.webp",
           "char": "Fukurou"
         },
         {
           "name": "Jabra",
           "sub": "One Piece",
-          "img": "/assets/images/qui/4a88b0316b8f9b7e.webp",
+          "img": "/assets/images/external/qui-4a88b0316b8f9b7e.webp",
           "char": "Jabra"
         },
         {
           "name": "Kumadori",
           "sub": "One Piece",
-          "img": "/assets/images/qui/3847894815fc21fd.webp",
+          "img": "/assets/images/external/qui-3847894815fc21fd.webp",
           "char": "Kumadori"
         },
         {
           "name": "Mest Gryder",
           "sub": "Fairy Tail",
-          "img": "/assets/images/qui/f36b000d6bc45706.webp",
+          "img": "/assets/images/external/qui-f36b000d6bc45706.webp",
           "char": "Mest Gryder"
         },
         {

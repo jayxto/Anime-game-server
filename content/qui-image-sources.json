@@ -2,733 +2,733 @@
   "images": [
     {
       "character": "Mikoto Uchiwa",
-      "path": "assets/images/qui/8472b4236bccd221.webp",
+      "path": "assets/images/external/qui-8472b4236bccd221.webp",
       "source": "https://myanimelist.net/character/21122/Mikoto_Uchiha",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/103949.jpg"
     },
     {
       "character": "Vinsmoke Sora",
-      "path": "assets/images/qui/20162dbdc4e53ea4.webp",
+      "path": "assets/images/external/qui-20162dbdc4e53ea4.webp",
       "source": "https://myanimelist.net/character/158276/Sora_Vinsmoke",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/357405.jpg"
     },
     {
       "character": "Portgas D. Rouge",
-      "path": "assets/images/qui/2ba5a0da57c5f472.webp",
+      "path": "assets/images/external/qui-2ba5a0da57c5f472.webp",
       "source": "https://myanimelist.net/character/23831/Rouge_Portgas_D",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/96173.jpg"
     },
     {
       "character": "Nico Olvia",
-      "path": "assets/images/qui/10848c5f794937a8.webp",
+      "path": "assets/images/external/qui-10848c5f794937a8.webp",
       "source": "https://myanimelist.net/character/21613/Olvia_Nico",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/4/50693.jpg"
     },
     {
       "character": "Otohime",
-      "path": "assets/images/qui/820dc0e52bf764fc.webp",
+      "path": "assets/images/external/qui-820dc0e52bf764fc.webp",
       "source": "https://myanimelist.net/character/41922/Otohime",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/162487.jpg"
     },
     {
       "character": "Kozuki Toki",
-      "path": "assets/images/qui/2cff5f1da9313b55.webp",
+      "path": "assets/images/external/qui-2cff5f1da9313b55.webp",
       "source": "https://myanimelist.net/character/166846/Toki_Kozuki",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/4/486930.jpg"
     },
     {
       "character": "Scarlett",
-      "path": "assets/images/qui/807c9fb7c939e225.webp",
+      "path": "assets/images/external/qui-807c9fb7c939e225.webp",
       "source": "https://myanimelist.net/character/108583/Scarlett",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/337237.jpg"
     },
     {
       "character": "Nojiko",
-      "path": "assets/images/qui/2d56f2721da836d0.webp",
+      "path": "assets/images/external/qui-2d56f2721da836d0.webp",
       "source": "https://myanimelist.net/character/4888/Nojiko",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/350918.jpg"
     },
     {
       "character": "Charlotte Brulee",
-      "path": "assets/images/qui/5bfb3c230c2ceae3.webp",
+      "path": "assets/images/external/qui-5bfb3c230c2ceae3.webp",
       "source": "https://myanimelist.net/character/152902",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/335021.jpg"
     },
     {
       "character": "Ulti",
-      "path": "assets/images/qui/08f745b2b7af9f1f.webp",
+      "path": "assets/images/external/qui-08f745b2b7af9f1f.webp",
       "source": "https://myanimelist.net/character/182032/Ulti",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/453421.jpg"
     },
     {
       "character": "Iris Midgar",
-      "path": "assets/images/qui/d0cc5a0410e5d3bc.webp",
+      "path": "assets/images/external/qui-d0cc5a0410e5d3bc.webp",
       "source": "https://myanimelist.net/character/194201/Iris_Midgar",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/511626.jpg"
     },
     {
       "character": "Yasopp",
-      "path": "assets/images/qui/88e4133a4418e577.webp",
+      "path": "assets/images/external/qui-88e4133a4418e577.webp",
       "source": "https://myanimelist.net/character/9562/Yasopp",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/50188.jpg"
     },
     {
       "character": "Van Augur",
-      "path": "assets/images/qui/08fb03574fe0bffd.webp",
+      "path": "assets/images/external/qui-08fb03574fe0bffd.webp",
       "source": "https://myanimelist.net/character/9325/Augur_Van",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/110985.jpg"
     },
     {
       "character": "Izo",
-      "path": "assets/images/qui/a3b3052b62548974.webp",
+      "path": "assets/images/external/qui-a3b3052b62548974.webp",
       "source": "https://myanimelist.net/character/35286/Izou",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/100243.jpg"
     },
     {
       "character": "Capone Bege",
-      "path": "assets/images/qui/63801652ac1048ff.webp",
+      "path": "assets/images/external/qui-63801652ac1048ff.webp",
       "source": "https://myanimelist.net/character/20292/Bege_Capone",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/9/146047.jpg"
     },
     {
       "character": "Rei Furuya",
-      "path": "assets/images/qui/df0291b3d7a4b9e5.webp",
+      "path": "assets/images/external/qui-df0291b3d7a4b9e5.webp",
       "source": "https://myanimelist.net/character/62041/Tooru_Amuro",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/244969.jpg"
     },
     {
       "character": "Alzack Connell",
-      "path": "assets/images/qui/b1bea4ac7f3064dc.webp",
+      "path": "assets/images/external/qui-b1bea4ac7f3064dc.webp",
       "source": "https://myanimelist.net/character/28546/Alzack_Connell",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/83753.jpg"
     },
     {
       "character": "Bisca Connell",
-      "path": "assets/images/qui/3503bf90de89f1a0.webp",
+      "path": "assets/images/external/qui-3503bf90de89f1a0.webp",
       "source": "https://myanimelist.net/character/28548/Bisca_Mulan",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/97916.jpg"
     },
     {
       "character": "Stanley Snyder",
-      "path": "assets/images/qui/c6e414e051a30cfe.webp",
+      "path": "assets/images/external/qui-c6e414e051a30cfe.webp",
       "source": "https://myanimelist.net/character/183369/Stanley_Snyder",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/598881.jpg"
     },
     {
       "character": "Atlas Flame",
-      "path": "assets/images/qui/47115886ed57e471.webp",
+      "path": "assets/images/external/qui-47115886ed57e471.webp",
       "source": "https://myanimelist.net/character/86285/Atlas_Flame",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/255121.jpg"
     },
     {
       "character": "Zancrow",
-      "path": "assets/images/qui/e70cc15e3543c37b.webp",
+      "path": "assets/images/external/qui-e70cc15e3543c37b.webp",
       "source": "https://myanimelist.net/character/39044/Zancrow",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/143417.jpg"
     },
     {
       "character": "Macao Conbolt",
-      "path": "assets/images/qui/5dbabcb9ff9dd90f.webp",
+      "path": "assets/images/external/qui-5dbabcb9ff9dd90f.webp",
       "source": "https://myanimelist.net/character/31146/Macao_Conbolt",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/82980.jpg"
     },
     {
       "character": "Romeo Conbolt",
-      "path": "assets/images/qui/3237d74abdf6c166.webp",
+      "path": "assets/images/external/qui-3237d74abdf6c166.webp",
       "source": "https://myanimelist.net/character/31143/Romeo_Conbolt",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/82978.jpg"
     },
     {
       "character": "Totomaru",
-      "path": "assets/images/qui/5bdae0129f1d1ed9.webp",
+      "path": "assets/images/external/qui-5bdae0129f1d1ed9.webp",
       "source": "https://myanimelist.net/character/9718/Totomaru",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/84142.jpg"
     },
     {
       "character": "Ur",
-      "path": "assets/images/qui/72bebcbbcfe6069e.webp",
+      "path": "assets/images/external/qui-72bebcbbcfe6069e.webp",
       "source": "https://myanimelist.net/character/8293/Ul",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/75938.jpg"
     },
     {
       "character": "Silver Fullbuster",
-      "path": "assets/images/qui/3907bd177f83176e.webp",
+      "path": "assets/images/external/qui-3907bd177f83176e.webp",
       "source": "https://myanimelist.net/character/102901/Silver",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/349830.jpg"
     },
     {
       "character": "Invel Yura",
-      "path": "assets/images/qui/846f828084f77d2f.webp",
+      "path": "assets/images/external/qui-846f828084f77d2f.webp",
       "source": "https://myanimelist.net/character/142732/Invel_Yura",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/16/371056.jpg"
     },
     {
       "character": "Eve Tearm",
-      "path": "assets/images/qui/5f8d588ffe870764.webp",
+      "path": "assets/images/external/qui-5f8d588ffe870764.webp",
       "source": "https://myanimelist.net/character/36718/Eve_Tilm",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/192579.jpg"
     },
     {
       "character": "Monet",
-      "path": "assets/images/qui/a015f53ed0e9e14c.webp",
+      "path": "assets/images/external/qui-a015f53ed0e9e14c.webp",
       "source": "https://myanimelist.net/character/59641/Monet",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/235837.jpg"
     },
     {
       "character": "Ameyuri Ringo",
-      "path": "assets/images/qui/86631dbbeed7478d.webp",
+      "path": "assets/images/external/qui-86631dbbeed7478d.webp",
       "source": "https://myanimelist.net/character/64459/Ameyuri_Ringo",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/225361.jpg"
     },
     {
       "character": "Orga Nanagear",
-      "path": "assets/images/qui/41833d5e360f21a0.webp",
+      "path": "assets/images/external/qui-41833d5e360f21a0.webp",
       "source": "https://myanimelist.net/character/60017/Orga_Nanagear",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/369992.jpg"
     },
     {
       "character": "Vinsmoke Niji",
-      "path": "assets/images/qui/68f15458419d1df7.webp",
+      "path": "assets/images/external/qui-68f15458419d1df7.webp",
       "source": "https://myanimelist.net/character/146917/Niji_Vinsmoke",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/340286.jpg"
     },
     {
       "character": "Kureha",
-      "path": "assets/images/qui/443d50d9359c3a78.webp",
+      "path": "assets/images/external/qui-443d50d9359c3a78.webp",
       "source": "https://myanimelist.net/character/4393/Kureha",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/50719.jpg"
     },
     {
       "character": "Crocus",
-      "path": "assets/images/qui/b7271321b0d0d267.webp",
+      "path": "assets/images/external/qui-b7271321b0d0d267.webp",
       "source": "https://myanimelist.net/character/21366/Crocus",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/49770.jpg"
     },
     {
       "character": "Mansherry",
-      "path": "assets/images/qui/31a95f236a5833ba.webp",
+      "path": "assets/images/external/qui-31a95f236a5833ba.webp",
       "source": "https://myanimelist.net/character/134539/Mansherry",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/324536.jpg"
     },
     {
       "character": "Knox",
-      "path": "assets/images/qui/7062d81be0a41272.webp",
+      "path": "assets/images/external/qui-7062d81be0a41272.webp",
       "source": "https://myanimelist.net/character/27028/Dr_Knox",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/69691.jpg"
     },
     {
       "character": "Sherria Blendy",
-      "path": "assets/images/qui/c832f8f3e0d7ea73.webp",
+      "path": "assets/images/external/qui-c832f8f3e0d7ea73.webp",
       "source": "https://myanimelist.net/character/29118/Sherry_Blendy",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/76041.jpg"
     },
     {
       "character": "Porlyusica",
-      "path": "assets/images/qui/73b7507be483d56c.webp",
+      "path": "assets/images/external/qui-73b7507be483d56c.webp",
       "source": "https://myanimelist.net/character/31192/Porlyusica",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/84211.jpg"
     },
     {
       "character": "Ryo Kurokiba",
-      "path": "assets/images/qui/b5ff21a7e03a2a27.webp",
+      "path": "assets/images/external/qui-b5ff21a7e03a2a27.webp",
       "source": "https://myanimelist.net/character/97835/Ryou_Kurokiba",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/286012.jpg"
     },
     {
       "character": "Hisako Arato",
-      "path": "assets/images/qui/b1a73e3d132de5a1.webp",
+      "path": "assets/images/external/qui-b1a73e3d132de5a1.webp",
       "source": "https://myanimelist.net/character/96899/Hisako_Arato",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/290070.jpg"
     },
     {
       "character": "Isami Aldini",
-      "path": "assets/images/qui/94bff6114dd827b3.webp",
+      "path": "assets/images/external/qui-94bff6114dd827b3.webp",
       "source": "https://myanimelist.net/character/85785/Isami_Aldini",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/9/248543.jpg"
     },
     {
       "character": "Rindo Kobayashi",
-      "path": "assets/images/qui/7b8f34bd406f0568.webp",
+      "path": "assets/images/external/qui-7b8f34bd406f0568.webp",
       "source": "https://myanimelist.net/character/129046/Rindou_Kobayashi",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/292948.jpg"
     },
     {
       "character": "Azami Nakiri",
-      "path": "assets/images/qui/2de9e1b737d2f2b0.webp",
+      "path": "assets/images/external/qui-2de9e1b737d2f2b0.webp",
       "source": "https://myanimelist.net/character/133118/Azami_Nakiri",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/291387.jpg"
     },
     {
       "character": "Francois",
-      "path": "assets/images/qui/648cd9b9f0b7cf33.webp",
+      "path": "assets/images/external/qui-648cd9b9f0b7cf33.webp",
       "source": "https://myanimelist.net/character/178697/Francois",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/444186.jpg"
     },
     {
       "character": "Carne",
-      "path": "assets/images/qui/7d537cbf9a911eb8.webp",
+      "path": "assets/images/external/qui-7d537cbf9a911eb8.webp",
       "source": "https://myanimelist.net/character/9322/Carne",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/49511.jpg"
     },
     {
       "character": "Thatch",
-      "path": "assets/images/qui/867fad38adc5e7a4.webp",
+      "path": "assets/images/external/qui-867fad38adc5e7a4.webp",
       "source": "https://myanimelist.net/character/21560/Thatch",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/100260.jpg"
     },
     {
       "character": "Streusen",
-      "path": "assets/images/qui/9a3db3111159b573.webp",
+      "path": "assets/images/external/qui-9a3db3111159b573.webp",
       "source": "https://myanimelist.net/character/158910/Streusen",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/357400.jpg"
     },
     {
       "character": "Rikido Sato",
-      "path": "assets/images/qui/1f98fe13a65e1a0f.webp",
+      "path": "assets/images/external/qui-1f98fe13a65e1a0f.webp",
       "source": "https://myanimelist.net/character/138885/Rikidou_Satou",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/16/301040.jpg"
     },
     {
       "character": "Hiroshi Agasa",
-      "path": "assets/images/qui/2c07f0d196a3d84e.webp",
+      "path": "assets/images/external/qui-2c07f0d196a3d84e.webp",
       "source": "https://myanimelist.net/character/4162/Hiroshi_Agasa",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/146131.jpg"
     },
     {
       "character": "Dr. Xeno",
-      "path": "assets/images/qui/3e6440a8d184349e.webp",
+      "path": "assets/images/external/qui-3e6440a8d184349e.webp",
       "source": "https://myanimelist.net/character/190289/Dr_Xeno",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/598846.jpg"
     },
     {
       "character": "Amado Sanzu",
-      "path": "assets/images/qui/ab28f8494e40e41e.webp",
+      "path": "assets/images/external/qui-ab28f8494e40e41e.webp",
       "source": "https://myanimelist.net/character/196875/Amado_Sanzu",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/16/455846.jpg"
     },
     {
       "character": "Katasuke Tono",
-      "path": "assets/images/qui/bf417f2954f36089.webp",
+      "path": "assets/images/external/qui-bf417f2954f36089.webp",
       "source": "https://myanimelist.net/character/136919/Katasuke_Toono",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/330449.jpg"
     },
     {
       "character": "Dr. Hogback",
-      "path": "assets/images/qui/7ce802f6c774e06d.webp",
+      "path": "assets/images/external/qui-7ce802f6c774e06d.webp",
       "source": "https://myanimelist.net/character/7455/Hogback",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/50257.jpg"
     },
     {
       "character": "Dr. Indigo",
-      "path": "assets/images/qui/bb9b27a5d743438b.webp",
+      "path": "assets/images/external/qui-bb9b27a5d743438b.webp",
       "source": "https://myanimelist.net/character/32881/Indigo",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/88942.jpg"
     },
     {
       "character": "Docteur Hedo",
-      "path": "assets/images/qui/cb27fe2d24ce073a.webp",
+      "path": "assets/images/external/qui-cb27fe2d24ce073a.webp",
       "source": "https://myanimelist.net/character/212191/Dr_Hedo",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/496556.jpg"
     },
     {
       "character": "Docteur Brief",
-      "path": "assets/images/qui/bd422bfc69840d7c.webp",
+      "path": "assets/images/external/qui-bd422bfc69840d7c.webp",
       "source": "https://myanimelist.net/character/2103/Dr_Briefs",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/16/357827.jpg"
     },
     {
       "character": "Docteur Mu",
-      "path": "assets/images/qui/3822de4ee18714e1.webp",
+      "path": "assets/images/external/qui-3822de4ee18714e1.webp",
       "source": "https://myanimelist.net/character/9778/Dr_Myuu",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/3/428051.jpg"
     },
     {
       "character": "Black Zetsu",
-      "path": "assets/images/qui/047dfbde4ef6677d.webp",
+      "path": "assets/images/external/qui-047dfbde4ef6677d.webp",
       "source": "https://myanimelist.net/character/3150/Zetsu",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/76260.jpg"
     },
     {
       "character": "Kaiju No. 9",
-      "path": "assets/images/qui/8a187a8e8f8d40a7.webp",
+      "path": "assets/images/external/qui-8a187a8e8f8d40a7.webp",
       "source": "https://myanimelist.net/character/188340/Kaijuu_No_9",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/600704.jpg"
     },
     {
       "character": "La Brava",
-      "path": "assets/images/qui/275795cfc4292344.webp",
+      "path": "assets/images/external/qui-275795cfc4292344.webp",
       "source": "https://myanimelist.net/character/160912/Manami_Aiba",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/355690.jpg"
     },
     {
       "character": "Nab Lasaro",
-      "path": "assets/images/qui/c3b4ae076c64a5ef.webp",
+      "path": "assets/images/external/qui-c3b4ae076c64a5ef.webp",
       "source": "https://myanimelist.net/character/31154/Nab_Lasaro",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/82986.jpg"
     },
     {
       "character": "Jaguar D. Saul",
-      "path": "assets/images/qui/d1ab566273e331a8.webp",
+      "path": "assets/images/external/qui-d1ab566273e331a8.webp",
       "source": "https://myanimelist.net/character/20330/Saul_Jaguar_D",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/384781.jpg"
     },
     {
       "character": "Pica",
-      "path": "assets/images/qui/8c618fa5f1b78a71.webp",
+      "path": "assets/images/external/qui-8c618fa5f1b78a71.webp",
       "source": "https://myanimelist.net/character/100121/Pica",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/278183.jpg"
     },
     {
       "character": "Trebol",
-      "path": "assets/images/qui/4c7f456b5451a91f.webp",
+      "path": "assets/images/external/qui-4c7f456b5451a91f.webp",
       "source": "https://myanimelist.net/character/100123/Trebol",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/4/237209.jpg"
     },
     {
       "character": "Brogy",
-      "path": "assets/images/qui/7532d79e47e7b5ad.webp",
+      "path": "assets/images/external/qui-7532d79e47e7b5ad.webp",
       "source": "https://myanimelist.net/character/5421/Brogy",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/596879.jpg"
     },
     {
       "character": "Dorry",
-      "path": "assets/images/qui/61b358f764f62a2e.webp",
+      "path": "assets/images/external/qui-61b358f764f62a2e.webp",
       "source": "https://myanimelist.net/character/5420/Dorry",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/596880.jpg"
     },
     {
       "character": "Kensei Muguruma",
-      "path": "assets/images/qui/bd016b023e59c91c.webp",
+      "path": "assets/images/external/qui-bd016b023e59c91c.webp",
       "source": "https://myanimelist.net/character/2344/Kensei_Muguruma",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/45938.jpg"
     },
     {
       "character": "Hachigen Ushoda",
-      "path": "assets/images/qui/21a219158c67e741.webp",
+      "path": "assets/images/external/qui-21a219158c67e741.webp",
       "source": "https://myanimelist.net/character/2345/Hachigen_Ushouda",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/94494.jpg"
     },
     {
       "character": "Lisa Yadomaru",
-      "path": "assets/images/qui/d10ed89336589ad4.webp",
+      "path": "assets/images/external/qui-d10ed89336589ad4.webp",
       "source": "https://myanimelist.net/character/2343/Lisa_Yadoumaru",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/45939.jpg"
     },
     {
       "character": "Love Aikawa",
-      "path": "assets/images/qui/16784bac8daa4313.webp",
+      "path": "assets/images/external/qui-16784bac8daa4313.webp",
       "source": "https://myanimelist.net/character/2340/Love_Aikawa",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/4/57259.jpg"
     },
     {
       "character": "Mashiro Kuna",
-      "path": "assets/images/qui/71978bfccfb1e4af.webp",
+      "path": "assets/images/external/qui-71978bfccfb1e4af.webp",
       "source": "https://myanimelist.net/character/2342/Mashiro_Kuna",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/45940.jpg"
     },
     {
       "character": "Stussy",
-      "path": "assets/images/qui/a051c06fbd979eb6.webp",
+      "path": "assets/images/external/qui-a051c06fbd979eb6.webp",
       "source": "https://myanimelist.net/character/158480/Stussy",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/359975.jpg"
     },
     {
       "character": "X Drake",
-      "path": "assets/images/qui/f2294cad8d8893cf.webp",
+      "path": "assets/images/external/qui-f2294cad8d8893cf.webp",
       "source": "https://myanimelist.net/character/20289/Drake_X",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/146041.jpg"
     },
     {
       "character": "Kanjuro",
-      "path": "assets/images/qui/17c216d6cdc1d20f.webp",
+      "path": "assets/images/external/qui-17c216d6cdc1d20f.webp",
       "source": "https://myanimelist.net/character/101171/Kanjuurou_Kurozumi",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/9/304235.jpg"
     },
     {
       "character": "Vergo",
-      "path": "assets/images/qui/ff4e2c2153415c50.webp",
+      "path": "assets/images/external/qui-ff4e2c2153415c50.webp",
       "source": "https://myanimelist.net/character/67347/Vergo",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/235831.jpg"
     },
     {
       "character": "Blueno",
-      "path": "assets/images/qui/a9ca7176ea88a647.webp",
+      "path": "assets/images/external/qui-a9ca7176ea88a647.webp",
       "source": "https://myanimelist.net/character/11394/Blueno",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/54171.jpg"
     },
     {
       "character": "Kaku",
-      "path": "assets/images/qui/560b88d6be08c191.webp",
+      "path": "assets/images/external/qui-560b88d6be08c191.webp",
       "source": "https://myanimelist.net/character/6183/Kaku",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/51463.jpg"
     },
     {
       "character": "Fukurou",
-      "path": "assets/images/qui/37b181083098e743.webp",
+      "path": "assets/images/external/qui-37b181083098e743.webp",
       "source": "https://myanimelist.net/character/11396/Fukurou",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/76424.jpg"
     },
     {
       "character": "Jabra",
-      "path": "assets/images/qui/4a88b0316b8f9b7e.webp",
+      "path": "assets/images/external/qui-4a88b0316b8f9b7e.webp",
       "source": "https://myanimelist.net/character/11400/Jabra",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/71510.jpg"
     },
     {
       "character": "Kumadori",
-      "path": "assets/images/qui/3847894815fc21fd.webp",
+      "path": "assets/images/external/qui-3847894815fc21fd.webp",
       "source": "https://myanimelist.net/character/4784/Kumadori",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/16/71511.jpg"
     },
     {
       "character": "Mest Gryder",
-      "path": "assets/images/qui/f36b000d6bc45706.webp",
+      "path": "assets/images/external/qui-f36b000d6bc45706.webp",
       "source": "https://myanimelist.net/character/36907/Doranbalt",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/255133.jpg"
     },
     {
       "character": "Kurenai Yuhi",
-      "path": "assets/images/qui/921c019480d491c2.webp",
+      "path": "assets/images/external/qui-921c019480d491c2.webp",
       "source": "https://myanimelist.net/character/4773/Kurenai_Yuuhi",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/103797.jpg"
     },
     {
       "character": "Sara Rockbell",
-      "path": "assets/images/qui/95524279865bf3af.webp",
+      "path": "assets/images/external/qui-95524279865bf3af.webp",
       "source": "https://myanimelist.net/character/260678/Sarah_Rockbell",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/571619.jpg"
     },
     {
       "character": "Layla Heartfilia",
-      "path": "assets/images/qui/de46ddff5c30193d.webp",
+      "path": "assets/images/external/qui-de46ddff5c30193d.webp",
       "source": "https://myanimelist.net/character/37965/Layla_Heartfilia",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/189228.jpg"
     },
     {
       "character": "Kukaku Shiba",
-      "path": "assets/images/qui/d7c3e27d85cb97db.webp",
+      "path": "assets/images/external/qui-d7c3e27d85cb97db.webp",
       "source": "https://myanimelist.net/character/1090/Kuukaku_Shiba",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/3/33245.jpg"
     },
     {
       "character": "Tsumiki Fushiguro",
-      "path": "assets/images/qui/7ed7c9e680585768.webp",
+      "path": "assets/images/external/qui-7ed7c9e680585768.webp",
       "source": "https://myanimelist.net/character/189233/Tsumiki_Fushiguro",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/437005.jpg"
     },
     {
       "character": "Hana Inuzuka",
-      "path": "assets/images/qui/3087720fcea5f8f8.webp",
+      "path": "assets/images/external/qui-3087720fcea5f8f8.webp",
       "source": "https://myanimelist.net/character/15073/Hana_Inuzuka",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/166499.jpg"
     },
     {
       "character": "Ichika Nakano",
-      "path": "assets/images/qui/35c4b2193280ebff.webp",
+      "path": "assets/images/external/qui-35c4b2193280ebff.webp",
       "source": "https://myanimelist.net/character/161470/Ichika_Nakano",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/436646.jpg"
     },
     {
       "character": "Benn Beckman",
-      "path": "assets/images/qui/ce2bbbdffea401e2.webp",
+      "path": "assets/images/external/qui-ce2bbbdffea401e2.webp",
       "source": "https://myanimelist.net/character/4882/Beckman_Benn",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/110987.jpg"
     },
     {
       "character": "Pitohui",
-      "path": "assets/images/qui/b549f0e5e082e1f7.webp",
+      "path": "assets/images/external/qui-b549f0e5e082e1f7.webp",
       "source": "https://myanimelist.net/character/120783/Pitohui",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/7/564112.jpg"
     },
     {
       "character": "Igneel",
-      "path": "assets/images/qui/212254a6522a02ee.webp",
+      "path": "assets/images/external/qui-212254a6522a02ee.webp",
       "source": "https://myanimelist.net/character/40157/Igneel",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/369326.jpg"
     },
     {
       "character": "Hiei",
-      "path": "assets/images/qui/ad747031ac531a48.webp",
+      "path": "assets/images/external/qui-ad747031ac531a48.webp",
       "source": "https://myanimelist.net/character/732/Hiei",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/76077.jpg"
     },
     {
       "character": "A (Quatrième Raikage)",
-      "path": "assets/images/qui/57b4272cf3d87344.webp",
+      "path": "assets/images/external/qui-57b4272cf3d87344.webp",
       "source": "https://myanimelist.net/character/22894/A",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/112222.jpg"
     },
     {
       "character": "Elizabeth Liones",
-      "path": "assets/images/qui/f11e0efc771f9760.webp",
+      "path": "assets/images/external/qui-f11e0efc771f9760.webp",
       "source": "https://myanimelist.net/character/72923/Elizabeth_Liones",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/11/255449.jpg"
     },
     {
       "character": "Patty",
-      "path": "assets/images/qui/33c05659f832fbaf.webp",
+      "path": "assets/images/external/qui-33c05659f832fbaf.webp",
       "source": "https://myanimelist.net/character/21218/Patty",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/49473.jpg"
     },
     {
       "character": "Maho Hiyajo",
-      "path": "assets/images/qui/5ff969cba1a8fcec.webp",
+      "path": "assets/images/external/qui-5ff969cba1a8fcec.webp",
       "source": "https://myanimelist.net/character/83419/Maho_Hiyajou",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/340197.jpg"
     },
     {
       "character": "Queen",
-      "path": "assets/images/qui/153f6e435589b1c8.webp",
+      "path": "assets/images/external/qui-153f6e435589b1c8.webp",
       "source": "https://myanimelist.net/character/166844/Queen",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/401501.jpg"
     },
     {
       "character": "Szayelaporro Granz",
-      "path": "assets/images/qui/bd1f6441bd18b6a2.webp",
+      "path": "assets/images/external/qui-bd1f6441bd18b6a2.webp",
       "source": "https://myanimelist.net/character/3211/Szayel_Aporro_Grantz",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/529322.jpg"
     },
     {
       "character": "Akihiro Kanou",
-      "path": "assets/images/qui/923b2ad19c694045.webp",
+      "path": "assets/images/external/qui-923b2ad19c694045.webp",
       "source": "https://myanimelist.net/character/113891/Akihiro_Kanou",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/9/339852.jpg"
     },
     {
       "character": "Anko Uguisu",
-      "path": "assets/images/qui/406fd0cae82a1338.webp",
+      "path": "assets/images/external/qui-406fd0cae82a1338.webp",
       "source": "https://myanimelist.net/character/182976/Anko_Uguisu",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/489556.jpg"
     },
     {
       "character": "Nagato",
-      "path": "assets/images/qui/6f01513da464dd20.webp",
+      "path": "assets/images/external/qui-6f01513da464dd20.webp",
       "source": "https://myanimelist.net/character/3180/Pain",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/8/73473.jpg"
     },
     {
       "character": "Saiko Yonebayashi",
-      "path": "assets/images/qui/9fd3ba0ab8ae2a1e.webp",
+      "path": "assets/images/external/qui-9fd3ba0ab8ae2a1e.webp",
       "source": "https://myanimelist.net/character/116441/Saiko_Yonebayashi",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/515033.jpg"
     },
     {
       "character": "Dino",
-      "path": "assets/images/qui/6fb86a981cf3ed05.webp",
+      "path": "assets/images/external/qui-6fb86a981cf3ed05.webp",
       "source": "https://myanimelist.net/character/202293/Dino",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/637783.jpg"
     },
     {
       "character": "Sekhmet",
-      "path": "assets/images/qui/adc9decad9e11d9e.webp",
+      "path": "assets/images/external/qui-adc9decad9e11d9e.webp",
       "source": "https://myanimelist.net/character/149519/Sekhmet",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/326230.jpg"
     },
     {
       "character": "Noriaki Kakyoin",
-      "path": "assets/images/qui/882f2815076d27f0.webp",
+      "path": "assets/images/external/qui-882f2815076d27f0.webp",
       "source": "https://myanimelist.net/character/8945/Noriaki_Kakyouin",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/345565.jpg"
     },
     {
       "character": "Kaname Tosen",
-      "path": "assets/images/qui/5bbc140729f83bc9.webp",
+      "path": "assets/images/external/qui-5bbc140729f83bc9.webp",
       "source": "https://myanimelist.net/character/1085/Kaname_Tousen",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/33249.jpg"
     },
     {
       "character": "King (One Piece)",
-      "path": "assets/images/qui/02ee8ce92dfac314.webp",
+      "path": "assets/images/external/qui-02ee8ce92dfac314.webp",
       "source": "https://myanimelist.net/character/166842/King",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/15/401447.jpg"
     },
     {
       "character": "Tobio Kageyama",
-      "path": "assets/images/qui/95ef17fe14981f91.webp",
+      "path": "assets/images/external/qui-95ef17fe14981f91.webp",
       "source": "https://myanimelist.net/character/64771/Tobio_Kageyama",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/417874.jpg"
     },
     {
       "character": "Tobirama Senju",
-      "path": "assets/images/qui/f5f257a4d8c087a4.webp",
+      "path": "assets/images/external/qui-f5f257a4d8c087a4.webp",
       "source": "https://myanimelist.net/character/12465/Tobirama_Senju",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/293367.jpg"
     },
     {
       "character": "Nefertari Cobra",
-      "path": "assets/images/qui/1d10d401c7b45606.webp",
+      "path": "assets/images/external/qui-1d10d401c7b45606.webp",
       "source": "https://myanimelist.net/character/9344/Cobra_Nefertari",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/49518.jpg"
     },
     {
       "character": "Kyros",
-      "path": "assets/images/qui/bf9f33001d8c73e5.webp",
+      "path": "assets/images/external/qui-bf9f33001d8c73e5.webp",
       "source": "https://myanimelist.net/character/100461/Kyros",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/274449.jpg"
     },
     {
       "character": "Gildarts Clive",
-      "path": "assets/images/qui/fb3bf69a743c88ae.webp",
+      "path": "assets/images/external/qui-fb3bf69a743c88ae.webp",
       "source": "https://myanimelist.net/character/29502/Gildarts_Clive",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/13/196483.jpg"
     },
     {
       "character": "Jiemma",
-      "path": "assets/images/qui/909d7b52d8241fff.webp",
+      "path": "assets/images/external/qui-909d7b52d8241fff.webp",
       "source": "https://myanimelist.net/character/72041/Jiemma",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/192559.jpg"
     },
     {
       "character": "Jude Heartfilia",
-      "path": "assets/images/qui/e0e231359c9bfabc.webp",
+      "path": "assets/images/external/qui-e0e231359c9bfabc.webp",
       "source": "https://myanimelist.net/character/36685/Jude_Heartfilia",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/99622.jpg"
     },
     {
       "character": "Ivan Dreyar",
-      "path": "assets/images/qui/7adabbef33606535.webp",
+      "path": "assets/images/external/qui-7adabbef33606535.webp",
       "source": "https://myanimelist.net/character/36554/Ivan_Dreyar",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/14/99348.jpg"
     },
     {
       "character": "Donovan Desmond",
-      "path": "assets/images/qui/0e6fba3113000590.webp",
+      "path": "assets/images/external/qui-0e6fba3113000590.webp",
       "source": "https://myanimelist.net/character/177508/Donovan_Desmond",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/467200.jpg"
     },
     {
       "character": "Rogue Cheney",
-      "path": "assets/images/qui/a29598747cc2f41a.webp",
+      "path": "assets/images/external/qui-a29598747cc2f41a.webp",
       "source": "https://myanimelist.net/character/51153/Rogue_Cheney",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/5/189194.jpg"
     },
     {
       "character": "Sting Eucliffe",
-      "path": "assets/images/qui/fbe8a0a9f9f5e9ef.webp",
+      "path": "assets/images/external/qui-fbe8a0a9f9f5e9ef.webp",
       "source": "https://myanimelist.net/character/51171/Sting_Eucliffe",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/6/210003.jpg"
     },
     {
       "character": "Death Gun",
-      "path": "assets/images/qui/aa17feca0409dbe4.webp",
+      "path": "assets/images/external/qui-aa17feca0409dbe4.webp",
       "source": "https://myanimelist.net/character/70685/Shouichi_Shinkawa",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/260425.jpg"
     },
     {
       "character": "Mr. Compress",
-      "path": "assets/images/qui/549977f4af059f48.webp",
+      "path": "assets/images/external/qui-549977f4af059f48.webp",
       "source": "https://myanimelist.net/character/153884/Atsuhiro_Sako",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/10/362578.jpg"
     },
     {
       "character": "Meliodas",
-      "path": "assets/images/qui/b9c5ab9d3810a394.webp",
+      "path": "assets/images/external/qui-b9c5ab9d3810a394.webp",
       "source": "https://myanimelist.net/character/72921/Meliodas",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/2/255447.jpg"
     },
     {
       "character": "Megumi Fushiguro",
-      "path": "assets/images/qui/0d1d63f87390fee2.webp",
+      "path": "assets/images/external/qui-0d1d63f87390fee2.webp",
       "source": "https://myanimelist.net/character/164470/Megumi_Fushiguro",
       "sourceImage": "https://cdn.myanimelist.net/images/characters/12/621887.jpg"
     }
