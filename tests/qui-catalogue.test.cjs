@@ -6,7 +6,7 @@ const {themes}=require('../content/qui-themes.json'),byId=Object.fromEntries(the
 test('catalogue: unique IDs and candidates, playable ballots, local portraits',()=>{
  assert.equal(themes.length,64);assert.equal(new Set(themes.map(t=>t.id)).size,themes.length);
  const media=new Set(['arc','anime','shonen','isekai','transformation','ost','combat']);
- for(const t of themes){assert.ok(t.items.length>=8,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
+ for(const t of themes){assert.ok(t.items.length>=24,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
  for(const i of t.items){assert.ok(i.name&&i.sub,t.id);if(media.has(t.id))continue;for(const u of i.imgs||[i.img]){
  assert.match(u,/^\/assets\/images\//,`${t.id}: ${i.name}`);
  const p=u.replace(/^\/assets\/images\/chars\//,'music/char-images/').replace(/^\//,'');
