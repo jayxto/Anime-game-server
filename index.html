@@ -8509,6 +8509,25 @@ body.ag-game-page #app-root > #mode,
                 const duo = document.createElement('div'); duo.className = 'bb-duoimg';
                 it0.imgs.slice(0, 2).forEach(u => { const im = document.createElement('img'); im.src = '/api/img?u=' + encodeURIComponent(u); im.alt = ''; im.onload = () => card.classList.remove('noimg'); duo.appendChild(im); });
                 card.insertBefore(duo, cap);
+                if (bb.source === 'qt:couple' || bb.source === 'qt:duo') {
+                    // A saved couple/duo picture replaces the two individual
+                    // portraits only inside this battle entry.
+                    itemImage(bb.source, it0, 'high').then(src => {
+                        if (!src || !card.isConnected) return;
+                        const group = document.createElement('img');
+                        group.alt = name;
+                        group.loading = 'eager';
+                        group.decoding = 'async';
+                        group.onload = () => {
+                            if (!card.isConnected || !duo.isConnected) return;
+                            duo.replaceWith(group);
+                            card.classList.remove('noimg');
+                        };
+                        group.onerror = () => group.remove();
+                        group.src = src;
+                        card.insertBefore(group, cap);
+                    });
+                }
             } else itemImage(bb.source, it0, 'high').then(src => {
                 if (!src) return;
                 const im = document.createElement('img'); im.src = src; im.alt = name;
@@ -15930,7 +15949,9 @@ async function loadHallOfFame(){
             if (x.themeSource) {
                 // AG_QAP_ADMIN_URL_EDIT_V8 — QAP cards are real editable admin entries.
                 card.querySelector('.ag-charcard-copy>small').textContent = x.sub || x.anime;
-                card.querySelector('.ag-charmsg').textContent = 'URL modifiable • sauvegarde persistante';
+                card.querySelector('.ag-charmsg').textContent = (x.themeSource === 'qt:couple' || x.themeSource === 'qt:duo')
+                    ? 'Image indépendante du couple/duo • les portraits ne changent pas'
+                    : 'URL modifiable • sauvegarde persistante';
                 const qapUrlInput = card.querySelector('[data-url]');
                 if (qapUrlInput) qapUrlInput.readOnly = false;
                 const qapSaveButton = card.querySelector('[data-save]');
