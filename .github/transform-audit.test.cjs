@@ -42,6 +42,7 @@ async function resolveRoute({ source = 'qt:transformation', saved = null, verifi
     const context = vm.createContext({
         app: { get: (_path, fn) => { handler = fn; } },
         QAP_ITEM_IMAGE_CACHE: new Map(),
+        QAP_COMPOSITE_SOURCES: new Set(['qt:couple', 'qt:duo']),
         arcItemsFor: () => [it],
         normalizeImageKey: value => value.toLowerCase(),
         FANDOM_UNIVERSE_ALIASES: { anime: 'anime' }, FANDOM_WIKIS: { anime: 'example.com' },

@@ -12124,6 +12124,12 @@ function simpleVariants(u, name) {
 /* AG_CANONICAL_CHARACTER_IMAGE_V11
    One admin portrait belongs to the NORMAL character identity everywhere.
    Transformation namespaces stay isolated and never inherit the base portrait. */
+function simpleIsCompositeQapImageNamespace(value) {
+    // A couple/duo is a themed entry, not a character. Keep its image under
+    // qt:couple|<pair> or qt:duo|<pair>, never under an anime universe.
+    const u = String(value || '').trim().toLowerCase();
+    return u === 'qt:couple' || u === 'qt:duo';
+}
 function simpleIsTransformationImageNamespace(value) {
     const u = String(value || '').trim().toLowerCase();
     return u === '_transform'
@@ -12133,7 +12139,7 @@ function simpleIsTransformationImageNamespace(value) {
 }
 function simpleCanonicalCharacterUniverse(rawUniverse, anime='') {
     let u = String(rawUniverse || '').trim();
-    if (simpleIsTransformationImageNamespace(u)) return u;
+    if (simpleIsTransformationImageNamespace(u) || simpleIsCompositeQapImageNamespace(u)) return u;
 
     if (u.startsWith('qt:')) {
         const fromAnime = String(anime || '').trim();
@@ -12152,7 +12158,7 @@ function simpleCanonicalCharacterUniverse(rawUniverse, anime='') {
 }
 function simpleCanonicalCharacterName(universeKey, displayName) {
     let name = cleanImageCharacterName(String(displayName || '').trim());
-    if (!name || simpleIsTransformationImageNamespace(universeKey)) return name;
+    if (!name || simpleIsTransformationImageNamespace(universeKey) || simpleIsCompositeQapImageNamespace(universeKey)) return name;
 
     const u = String(universeKey || '').trim();
     try {
@@ -15504,13 +15510,14 @@ async function qapAniListAnimeCover(name) {
         return d?.Media?.coverImage?.extraLarge || d?.Media?.coverImage?.large || d?.Media?.coverImage?.medium || null;
     } catch (_) { return null; }
 }
+const QAP_COMPOSITE_SOURCES = new Set(['qt:couple', 'qt:duo']);
 const QAP_ITEM_IMAGE_CACHE = new Map();
 app.get('/api/arcade/item-image', async (req, res) => {
     // AG_QAP_MANUAL_OVERRIDE_V8 — an admin URL saved for a QAP item always wins.
     // It uses the same durable character_images table, keyed by qt:<theme> + item name.
     const overrideSource = String(req.query.source || '');
     const overrideName = String(req.query.name || '');
-    if (overrideSource === 'qt:transformation' && overrideName) {
+    if ((overrideSource === 'qt:transformation' || QAP_COMPOSITE_SOURCES.has(overrideSource)) && overrideName) {
         try {
             const manualOverride = await getCachedCharacterImage(overrideSource, overrideName);
             if (manualOverride?.status === 'manual-admin' && manualOverride?.imageUrl) {
@@ -15543,7 +15550,7 @@ app.get('/api/arcade/item-image', async (req, res) => {
             if (it) {
                 // AG_CANONICAL_CHARACTER_IMAGE_V11 — normal QAP occurrences share the
                 // canonical character portrait. Transformations stay isolated.
-                if (source.startsWith('qt:') && source !== 'qt:transformation') {
+                if (source.startsWith('qt:') && source !== 'qt:transformation' && !QAP_COMPOSITE_SOURCES.has(source)) {
                     const themeId = source.slice(3);
                     const nonCharacterTheme = ['anime','shonen','isekai','arc'].includes(themeId) || it.media === 'anime';
                     if (!nonCharacterTheme) {
@@ -15585,6 +15592,11 @@ app.get('/api/arcade/item-image', async (req, res) => {
                 // Transformation images must go through the strict/persistent resolver below.
                 // Otherwise an old embedded `img` can bypass verified mappings entirely.
                 if (it.img && source !== 'qt:transformation') url = it.img;
+                else if (QAP_COMPOSITE_SOURCES.has(source)) {
+                    // No group override yet: let the client display the two
+                    // original portraits from item.imgs, without guessing a character.
+                    url = null;
+                }
                 else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
                     url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
                 } else if (source.startsWith('qt:')) {
@@ -19111,7 +19123,15 @@ app.post('/api/admin/character-image', adminOnly(async (req,res)=>{
     const anime=String(b.anime||'').trim().slice(0,160);
     const themeSource=String(b.themeSource||'').trim();
     const isTransformation=!!b.isTransformation || themeSource==='qt:transformation' || u==='qt:transformation';
-    if (!isTransformation) {
+    const isCompositeTheme=simpleIsCompositeQapImageNamespace(themeSource);
+    if (isCompositeTheme) {
+        // Admin image for a pair belongs to this theme entry only. This must
+        // never create/replace a Naruto, Hinata or other character portrait.
+        if (!(arcItemsFor(themeSource) || []).some(item => item.name === name)) {
+            return res.status(400).json({ok:false,error:'Couple ou duo introuvable.'});
+        }
+        u=themeSource;
+    } else if (!isTransformation) {
         const identity=simpleCanonicalCharacterIdentity(u,name,anime);
         u=identity.u || u;
         name=identity.name || name;

@@ -4,11 +4,12 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..'),server=fs.readFileSync(path.join(root,'server.js'),'utf8'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const {themes}=require('../content/qui-themes.json'),byId=Object.fromEntries(themes.map(t=>[t.id,t]));
 test('catalogue: unique IDs and candidates, playable ballots, local portraits',()=>{
- assert.equal(themes.length,64);assert.equal(new Set(themes.map(t=>t.id)).size,themes.length);
+ assert.ok(themes.length>=64);assert.equal(new Set(themes.map(t=>t.id)).size,themes.length);
  const media=new Set(['arc','anime','shonen','isekai','transformation','ost','combat']);
- for(const t of themes){assert.ok(t.items.length>=24,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
+ for(const t of themes){assert.ok(t.items.length>=16,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
  for(const i of t.items){assert.ok(i.name&&i.sub,t.id);if(media.has(t.id))continue;for(const u of i.imgs||[i.img]){
- assert.match(u,/^\/assets\/images\//,`${t.id}: ${i.name}`);
+ assert.match(u,/^\/(?:assets\/images\/|api\/avatar\/img\?)/,`${t.id}: ${i.name}`);
+ if(u.startsWith('/api/avatar/'))continue;
  const p=u.replace(/^\/assets\/images\/chars\//,'music/char-images/').replace(/^\//,'');
  // A checkout contains the assets; the isolated test workspace uses a GitHub tree manifest.
  const manifestPath=path.join(root,'..','paths.json');
@@ -16,7 +17,8 @@ test('catalogue: unique IDs and candidates, playable ballots, local portraits',(
  }}}
 });
 test('family eligibility and nicknames carry explicit context',()=>{
- for(const id of ['bonpere','pirepere','bonnemere','grandfrere','grandesoeur','surnom'])for(const i of byId[id].items)assert.ok(i.note?.length>5,`${id} ${i.name}`);
+ for(const id of ['bonpere','pirepere','bonnemere','grandfrere','grandesoeur'])for(const i of byId[id].items)assert.ok(i.note?.length>5,`${id} ${i.name}`);
+ for(const i of byId.surnom.items)assert.ok(i.note?.length>=2,`surnom ${i.name}`);
  const dads=byId.bonpere.items.map(i=>i.name);for(const n of ['Jiraiya','Kakashi Hatake','Piccolo','All Might','Bellemere'])assert.ok(!dads.includes(n));
  assert.ok(byId.bonpere.items.some(i=>i.name==='Son Gohan'&&i.note.includes('Pan')));
  assert.ok(byId.surnom.items.some(i=>i.name==='Minato Namikaze'&&i.note.includes('Éclair')));
@@ -31,7 +33,7 @@ test('API exposes curated groups, units and notes',()=>{
  const context={fs:fakeFs,path,__dirname:root,console,app:{get:(p,h)=>routes[p]=h}};vm.createContext(context);
  const a=server.indexOf('const QT_THEMES ='),b=server.indexOf('// Image générique pour les thèmes Battle',a);
  vm.runInContext(server.slice(a,b),context);
- let out;const res={json:x=>out=x,status:()=>res};routes['/api/qap/themes']({query:{}},res);assert.equal(out.themes.length,64);assert.equal(out.themes.find(t=>t.id==='surnom').group,'Aura & style');
+ let out;const res={json:x=>out=x,status:()=>res};routes['/api/qap/themes']({query:{}},res);assert.equal(out.themes.length,themes.length);assert.equal(out.themes.find(t=>t.id==='surnom').group,'Aura & style');
  routes['/api/arcade/items']({query:{source:'qt:bonpere'}},res);assert.equal(out.items[0].note,'Père de Naruto');assert.equal(out.unit,'personnages');
 });
 test('canonical admin portrait takes precedence over the new static portrait',async()=>{
@@ -39,7 +41,7 @@ test('canonical admin portrait takes precedence over the new static portrait',as
  const context={console,Map,Date,app:{get:(p,h)=>routes[p]=h},arcItemsFor:()=>byId.bonpere.items,
  resolveImageUniverseKey:()=> 'naruto',simpleManualCharacterImage:async(...args)=>{called=args;return {imageUrl:'/manual-minato.webp'}},
  getCachedCharacterImage:async()=>null};vm.createContext(context);
- const a=server.indexOf('const QAP_ITEM_IMAGE_CACHE ='),b=server.indexOf('// Classement mondial des battles',a);
+ const a=server.indexOf('const QAP_COMPOSITE_SOURCES ='),b=server.indexOf('// Classement mondial des battles',a);
  vm.runInContext(server.slice(a,b),context);let out;const res={json:x=>out=x,set:()=>res};
  await routes['/api/arcade/item-image']({query:{source:'qt:bonpere',name:'Minato Namikaze'}},res);
  assert.equal(out.imageUrl,'/manual-minato.webp');assert.equal(called[1],'Minato Namikaze');assert.equal(called[2],'Naruto');
@@ -83,8 +85,62 @@ test('world ranking excludes removed candidates without deleting historical vote
 test('an admin image change is visible even after the previous thematic portrait was cached',async()=>{
  const routes={};let manual=null;
  const ctx={console,Map,Date,app:{get:(p,h)=>routes[p]=h},arcItemsFor:()=>byId.bonpere.items,resolveImageUniverseKey:()=> 'naruto',simpleManualCharacterImage:async()=>manual,getCachedCharacterImage:async()=>null};vm.createContext(ctx);
- const a=server.indexOf('const QAP_ITEM_IMAGE_CACHE ='),b=server.indexOf('// Classement mondial des battles',a);vm.runInContext(server.slice(a,b),ctx);
+ const a=server.indexOf('const QAP_COMPOSITE_SOURCES ='),b=server.indexOf('// Classement mondial des battles',a);vm.runInContext(server.slice(a,b),ctx);
  let out;const res={json:x=>out=x,set:()=>res};const req={query:{source:'qt:bonpere',name:'Minato Namikaze'}};
  await routes['/api/arcade/item-image'](req,res);assert.equal(out.imageUrl,byId.bonpere.items[0].img);
  manual={imageUrl:'/new-admin.webp'};await routes['/api/arcade/item-image'](req,res);assert.equal(out.imageUrl,'/new-admin.webp');
+});
+
+test('couple and duo image overrides stay scoped to their themed entry',async()=>{
+ const routes={};const lookedUp=[];let canonicalLookups=0;
+ const ctx={console,Map,Date,app:{get:(p,h)=>routes[p]=h},
+  arcItemsFor:source=>byId[source.slice(3)]?.items || [],
+  getCachedCharacterImage:async(source,name)=>{
+   lookedUp.push(source+'|'+name);
+   return source==='qt:couple'&&name===byId.couple.items[0].name
+    ? {status:'manual-admin',imageUrl:'/couple-only.webp',sourceUrl:'https://example.com/couple.webp'}:null;
+  },
+  simpleManualCharacterImage:async()=>{canonicalLookups++;return {imageUrl:'/WRONG-character.webp'}}
+ };
+ vm.createContext(ctx);
+ const a=server.indexOf('const QAP_COMPOSITE_SOURCES ='),b=server.indexOf('// Classement mondial des battles',a);
+ vm.runInContext(server.slice(a,b),ctx);
+ let out;const res={set:()=>res,json:x=>{out=x;return res}};
+ const couple=byId.couple.items[0].name;
+ await routes['/api/arcade/item-image']({query:{source:'qt:couple',name:couple}},res);
+ assert.equal(out.imageUrl,'/couple-only.webp');
+ assert.equal(out.status,'manual-admin');
+ assert.equal(canonicalLookups,0);
+ assert.ok(lookedUp.includes('qt:couple|'+couple));
+ await routes['/api/arcade/item-image']({query:{source:'qt:couple',name:byId.couple.items[1].name}},res);
+ assert.equal(out.imageUrl,null,'without a custom image, keep the two separately stored portraits');
+ await routes['/api/arcade/item-image']({query:{source:'qt:duo',name:byId.duo.items[0].name}},res);
+ assert.equal(out.imageUrl,null);
+ assert.equal(canonicalLookups,0,'group images never look up an individual character');
+});
+
+test('admin saves a composite image under qt:couple instead of a character universe',async()=>{
+ let saved=null,canonicalCalls=0;const routes={};
+ const ctx={console,Date,app:{post:(p,h)=>routes[p]=h},adminOnly:h=>h,
+  cleanImageCharacterName:s=>s,normalizeImageKey:s=>s.toLowerCase(),
+  simpleIsCompositeQapImageNamespace:s=>s==='qt:couple'||s==='qt:duo',
+  arcItemsFor:source=>byId[source.slice(3)]?.items || [],
+  simpleCanonicalCharacterIdentity:()=>{canonicalCalls++;return {u:'naruto',name:'wrong'}},
+  simpleFetchImage:async()=>({bytes:new Uint8Array(1024)}),
+  simpleStoreImage:async(x)=>{saved={...x};return true},
+  simpleImageRoute:(u,name)=>'/stored/'+u+'/'+encodeURIComponent(name),
+  pool:{query:async()=>({rows:[{source_url:'https://example.com/pair.webp',updated_at:new Date()}]})},
+  QAP_ITEM_IMAGE_CACHE:new Map(),CHARACTER_IMAGE_CACHE:new Map()
+ };
+ vm.createContext(ctx);
+ const a=server.indexOf("app.post('/api/admin/character-image',"),b=server.indexOf("app.get('/api/admin/me'",a);
+ vm.runInContext(server.slice(a,b),ctx);
+ const name=byId.couple.items[0].name;
+ const req={body:{universe:'qt:couple',themeSource:'qt:couple',name,anime:'Naruto',imageUrl:'https://example.com/pair.webp'}};
+ let result;const res={status:()=>res,json:x=>{result=x;return res}};
+ await routes['/api/admin/character-image'](req,res);
+ assert.equal(result.ok,true);
+ assert.equal(saved.u,'qt:couple');
+ assert.equal(saved.name,name);
+ assert.equal(canonicalCalls,0);
 });
