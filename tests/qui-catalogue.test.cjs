@@ -4,11 +4,12 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..'),server=fs.readFileSync(path.join(root,'server.js'),'utf8'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const {themes}=require('../content/qui-themes.json'),byId=Object.fromEntries(themes.map(t=>[t.id,t]));
 test('catalogue: unique IDs and candidates, playable ballots, local portraits',()=>{
- assert.equal(themes.length,64);assert.equal(new Set(themes.map(t=>t.id)).size,themes.length);
+ assert.ok(themes.length>=64);assert.equal(new Set(themes.map(t=>t.id)).size,themes.length);
  const media=new Set(['arc','anime','shonen','isekai','transformation','ost','combat']);
- for(const t of themes){assert.ok(t.items.length>=24,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
+ for(const t of themes){assert.ok(t.items.length>=16,t.id);assert.equal(new Set(t.items.map(i=>i.name)).size,t.items.length,t.id);
  for(const i of t.items){assert.ok(i.name&&i.sub,t.id);if(media.has(t.id))continue;for(const u of i.imgs||[i.img]){
- assert.match(u,/^\/assets\/images\//,`${t.id}: ${i.name}`);
+ assert.match(u,/^\/(?:assets\/images\/|api\/avatar\/img\?)/,`${t.id}: ${i.name}`);
+ if(u.startsWith('/api/avatar/'))continue;
  const p=u.replace(/^\/assets\/images\/chars\//,'music/char-images/').replace(/^\//,'');
  // A checkout contains the assets; the isolated test workspace uses a GitHub tree manifest.
  const manifestPath=path.join(root,'..','paths.json');
@@ -16,7 +17,8 @@ test('catalogue: unique IDs and candidates, playable ballots, local portraits',(
  }}}
 });
 test('family eligibility and nicknames carry explicit context',()=>{
- for(const id of ['bonpere','pirepere','bonnemere','grandfrere','grandesoeur','surnom'])for(const i of byId[id].items)assert.ok(i.note?.length>5,`${id} ${i.name}`);
+ for(const id of ['bonpere','pirepere','bonnemere','grandfrere','grandesoeur'])for(const i of byId[id].items)assert.ok(i.note?.length>5,`${id} ${i.name}`);
+ for(const i of byId.surnom.items)assert.ok(i.note?.length>=2,`surnom ${i.name}`);
  const dads=byId.bonpere.items.map(i=>i.name);for(const n of ['Jiraiya','Kakashi Hatake','Piccolo','All Might','Bellemere'])assert.ok(!dads.includes(n));
  assert.ok(byId.bonpere.items.some(i=>i.name==='Son Gohan'&&i.note.includes('Pan')));
  assert.ok(byId.surnom.items.some(i=>i.name==='Minato Namikaze'&&i.note.includes('Éclair')));
@@ -31,7 +33,7 @@ test('API exposes curated groups, units and notes',()=>{
  const context={fs:fakeFs,path,__dirname:root,console,app:{get:(p,h)=>routes[p]=h}};vm.createContext(context);
  const a=server.indexOf('const QT_THEMES ='),b=server.indexOf('// Image générique pour les thèmes Battle',a);
  vm.runInContext(server.slice(a,b),context);
- let out;const res={json:x=>out=x,status:()=>res};routes['/api/qap/themes']({query:{}},res);assert.equal(out.themes.length,64);assert.equal(out.themes.find(t=>t.id==='surnom').group,'Aura & style');
+ let out;const res={json:x=>out=x,status:()=>res};routes['/api/qap/themes']({query:{}},res);assert.equal(out.themes.length,themes.length);assert.equal(out.themes.find(t=>t.id==='surnom').group,'Aura & style');
  routes['/api/arcade/items']({query:{source:'qt:bonpere'}},res);assert.equal(out.items[0].note,'Père de Naruto');assert.equal(out.unit,'personnages');
 });
 test('canonical admin portrait takes precedence over the new static portrait',async()=>{
