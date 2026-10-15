@@ -48,7 +48,7 @@ async function json(base,path,method='GET',body=null,token=null){
  let d;try{d=await r.json()}catch(_){d=null}
  return {status:r.status,data:d};
 }
-test('Real ephemeral server: APIs, login, authorization, Undercover sockets and guest recovery', {timeout:165000}, async()=>{
+test('Real ephemeral server: APIs, login, authorization, Undercover sockets and guest recovery', {timeout:270000}, async()=>{
  const p=await randomPort(),base='http://127.0.0.1:'+p;
  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'ag-smoke-'));
  const db=path.join(tmp,'db');
@@ -127,6 +127,46 @@ test('Real ephemeral server: APIs, login, authorization, Undercover sockets and 
   const b2=await openGuest(base,bName,bToken);sockets.push(b2);
   const resumed=waitEvent(b2,'resume_gameplay',r=>r.code===roomCode);
   b2.emit('rejoin_room',{roomCode});await resumed;
+
+  // Multiple independent real multiplayer sessions: verify every main game boots.
+  async function smokeMode(mode,subMode,event,playerCount=2){
+   const id='S'+crypto.randomBytes(2).toString('hex').slice(0,3).toUpperCase();
+   const players=[];
+   for(let n=0;n<playerCount;n++){
+    const p=await openGuest(base,'Smoke'+mode.slice(0,5)+n+crypto.randomBytes(2).toString('hex'),random());
+    sockets.push(p);players.push(p);
+   }
+   let ready=waitEvent(players[0],'update_room',r=>r.code===id&&r.players.length===1);
+   players[0].emit('join_room',{roomCode:id,mode,subMode});await ready;
+   for(let n=1;n<players.length;n++){
+    ready=waitEvent(players[0],'update_room',r=>r.code===id&&r.players.length===n+1);
+    players[n].emit('join_room',{roomCode:id,mode,subMode});await ready;
+   }
+   const launched=waitEvent(players[0],event,()=>true,25000);
+   players[0].emit('start_game',id);
+   const stage=await launched;
+   assert.ok(stage,'No initial state for '+mode);
+   return {stage,id,players};
+  }
+  for(const [mode,sub,event,count] of [
+   ['enchere','naruto','enchere_state',2],
+   ['enchereaveugle','naruto','enchereaveugle_state',2],
+   ['connexion','', 'connexion_state',2],
+   ['rollandgaros','naruto','rg_state',2],
+   ['quote','naruto','quote_state',1],
+   ['dle','naruto','dle_state',1],
+   ['blindtest','', 'bt_state',2],
+   ['arcade','emoji','arc_state',2]
+  ]){
+   await smokeMode(mode,sub,event,count);
+  }
+  const note=await smokeMode('note','','prompt_theme_choice',3);
+  const chosen=note.players.find(p=>p.id===note.stage.themeMasterId);
+  assert.ok(chosen,'Randomly selected theme master must exist');
+  const noteStarted=waitEvent(note.players[0],'launch_reveal',r=>r.code===note.id);
+  chosen.emit('submit_custom_theme',{roomCode:note.id,theme:'Personnages intelligents'});
+  await noteStarted;
+
  }finally{
   sockets.forEach(s=>{try{s.disconnect()}catch(_){}});
   child.kill('SIGTERM');
