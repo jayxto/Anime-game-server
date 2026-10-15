@@ -156,7 +156,18 @@ test('Real ephemeral server: APIs, login, authorization, Undercover sockets and 
    ['quote','naruto','quote_state',1],
    ['dle','naruto','dle_state',1],
    ['blindtest','', 'bt_state',2],
-   ['arcade','emoji','arc_state',2]
+   ['draw','','draw_state',2],
+   ['guess','','guess_state',2],
+   ['chaine','all','chaine_state',2],
+   ['loupgarou','','lg_state',4],
+   ['undercover','hardcore','launch_reveal',3],
+   ['arcade','emoji','arc_state',2],
+   ['arcade','pixel:naruto','arc_state',2],
+   ['arcade','silhouette:naruto','arc_state',2],
+   ['arcade','quatre','arc_state',2],
+   ['arcade','mapguess','arc_state',2],
+   ['arcade','fusion:naruto','arc_state',2],
+   ['arcade','scene','arc_state',2]
   ]){
    await smokeMode(mode,sub,event,count);
   }
