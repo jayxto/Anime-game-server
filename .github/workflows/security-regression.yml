@@ -1,0 +1,42 @@
+name: Full security and game regression suite
+on:
+  pull_request:
+    paths:
+      - 'server.js'
+      - 'index.html'
+      - 'tests/**'
+      - '.github/transform-audit.test.cjs'
+      - '.github/workflows/security-regression.yml'
+  push:
+    branches:
+      - 'fix/security-multiplayer-regressions-20261015'
+      - main
+    paths:
+      - 'server.js'
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/security-regression.yml'
+permissions:
+  contents: read
+jobs:
+  security-and-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Parse server
+        run: node --check server.js
+      - name: Test security, HTML, modes and theme image isolation
+        run: node --test tests/security-regression.test.cjs tests/qui-catalogue.test.cjs .github/transform-audit.test.cjs
+      - name: Install server and socket dependencies
+        run: npm ci --ignore-scripts=false --no-audit --no-fund
+      - name: Live HTTP and Socket.IO smoke test using isolated local database
+        run: node --test tests/live-smoke.test.cjs
+      - name: Verify transformations across universes
+        run: |
+          python3 .github/audit_transform_remaining.py
+          python3 .github/audit_transform_remaining_v2.py
+          python3 .github/audit_transform_remaining_v3.py

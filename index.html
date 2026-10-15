@@ -4086,6 +4086,7 @@ body.ag-game-page #app-root > #mode,
             timeout: 20000
         });
         let currentRoomCode = "";
+        let currentRoomHostId = null;
         let currentThemeMasterId = "";
 
         function switchTab(tabId) {
@@ -4107,7 +4108,14 @@ body.ag-game-page #app-root > #mode,
         }
 
         function connectSocketAsGuest(pseudo) {
-            socket.auth = { guest: true, pseudo };
+            // Preuve privée liée à cet onglet, conservée lors d'un rechargement.
+            const key = 'ag_guest_identity_v1';
+            let guestIdentity = sessionStorage.getItem(key);
+            if (!/^[a-f0-9]{32}$/.test(guestIdentity || '')) {
+                guestIdentity = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('');
+                sessionStorage.setItem(key, guestIdentity);
+            }
+            socket.auth = { guest: true, pseudo, guestIdentity };
             socket.connect();
         }
 
@@ -4278,6 +4286,7 @@ body.ag-game-page #app-root > #mode,
 
         // Quitter vraiment le salon : le serveur nous retire, on ne sera plus ramené dedans
         function leaveRoom() {
+            currentRoomHostId = null;
             if (typeof btStopAudio === 'function') btStopAudio();
             if (currentRoomCode) socket.emit('leave_room', { roomCode: currentRoomCode });
             currentRoomCode = '';
@@ -4818,6 +4827,7 @@ body.ag-game-page #app-root > #mode,
 
         socket.on('update_room', (room) => {
             // Sécurité : un état de jeu ne doit pas être rendu comme un salon d'attente.
+            if (room && room.code === currentRoomCode) currentRoomHostId = room.host;
             if (room.status && room.status !== 'waiting') return;
             // Salon quitté (ou un autre salon) : on ne s'y fait plus ramener
             if (!currentRoomCode || (room.code && room.code !== currentRoomCode)) return;
@@ -5304,6 +5314,9 @@ body.ag-game-page #app-root > #mode,
             updateGameplayUI(room);
         });
 
+        function agSafeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+        }
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             
@@ -5321,7 +5334,7 @@ body.ag-game-page #app-root > #mode,
             room.players.forEach((p, idx) => {
                 if (!p.isAlive) return;
                 let status = p.clue ? `💬 "${p.clue}"` : (idx === room.currentTurnIndex ? "En train d'écrire..." : "En attente");
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--text-muted)">${agSafeHtml(status)}</span></li>`;
             });
 
             const me = room.players.find(p => p.id === socket.id);
@@ -5348,7 +5361,7 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--accent-yellow)">💬 "${agSafeHtml(p.clue || 'Aucun')}"</span></li>`;
             });
 
             document.getElementById('end-clues-options').style.display = 'flex';
@@ -5363,7 +5376,7 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--accent-yellow)">💬 "${agSafeHtml(p.clue || 'Aucun')}"</span></li>`;
             });
 
             document.getElementById('end-clues-options-undercover').style.display = 'flex';
@@ -5408,12 +5421,12 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
+                let clueText = p.clue ? `💬 "${agSafeHtml(p.clue)}"` : "Aucun indice";
                 
                 if (p.id !== socket.id && me && me.isAlive) {
                     list.innerHTML += `<li data-pid="${p.id}">
                         <div>
-                            <strong>${p.name}</strong><br>
+                            <strong>${agSafeHtml(p.name)}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
                         </div>
                         <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
@@ -5421,7 +5434,7 @@ body.ag-game-page #app-root > #mode,
                 } else {
                     list.innerHTML += `<li data-pid="${p.id}">
                         <div>
-                            <strong>${p.name} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
+                            <strong>${agSafeHtml(p.name)} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
                         </div>
                         <span style="color:var(--text-muted); font-size:0.85rem;">${!me.isAlive ? 'Éliminé' : 'Toi'}</span>
@@ -5475,7 +5488,7 @@ body.ag-game-page #app-root > #mode,
             let resultMessage = "";
             if (data.eliminatedPlayer) {
                 let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
-                resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
+                resultMessage += `Joueur éliminé : <strong>${agSafeHtml(data.eliminatedPlayer.name)}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote « Pas d'imposteur » validé.<br><br>`;
             }
@@ -5498,7 +5511,7 @@ body.ag-game-page #app-root > #mode,
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
                 let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
                 let secretTxt = (p.secretData && data.gameOver) ? ` (${p.secretData})` : ''; // le mot n'est dévoilé qu'en fin de partie
-                list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}${roleText}${agSafeHtml(secretTxt)}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
 
@@ -5812,6 +5825,11 @@ body.ag-game-page #app-root > #mode,
         let returningToWaitingRoom = false;
 
         function backToMenu() {
+            if (currentRoomCode && currentRoomHostId && currentRoomHostId !== socket.id) {
+                if (typeof toast === 'function') toast("Seul l'hôte peut renvoyer le salon en salle d'attente. Utilise « Quitter » pour partir.", 'var(--accent-yellow)');
+                else alert("Seul l'hôte peut renvoyer le salon en salle d'attente.");
+                return;
+            }
             arcStopMedia();
             if (typeof btStopAudio === 'function') btStopAudio();
             if (!currentRoomCode) {
