@@ -5421,12 +5421,12 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                let clueText = p.clue ? `💬 "${p.clue}"` : "Aucun indice";
+                let clueText = p.clue ? `💬 "${agSafeHtml(p.clue)}"` : "Aucun indice";
                 
                 if (p.id !== socket.id && me && me.isAlive) {
                     list.innerHTML += `<li data-pid="${p.id}">
                         <div>
-                            <strong>${p.name}</strong><br>
+                            <strong>${agSafeHtml(p.name)}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
                         </div>
                         <button class="btn-action" style="width: auto; margin:0; padding:6px 12px; background:var(--accent-pink);" onclick="castVote('${p.id}')">Voter</button>
@@ -5434,7 +5434,7 @@ body.ag-game-page #app-root > #mode,
                 } else {
                     list.innerHTML += `<li data-pid="${p.id}">
                         <div>
-                            <strong>${p.name} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
+                            <strong>${agSafeHtml(p.name)} ${p.id === socket.id ? '(Toi)' : ''}</strong><br>
                             <span style="color:var(--accent-yellow); font-size:0.85rem;">${clueText}</span>
                         </div>
                         <span style="color:var(--text-muted); font-size:0.85rem;">${!me.isAlive ? 'Éliminé' : 'Toi'}</span>
