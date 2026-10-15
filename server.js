@@ -220,7 +220,7 @@ const io = new Server(server, {
 app.use(express.json({ verify: (req, res, buf) => { if (req.originalUrl && req.originalUrl.startsWith('/api/stripe/')) req.rawBody = buf; } }));
 // Fichiers du serveur jamais servis au public (code source, config)
 app.use((req, res, next) => {
-    if (/^\/(server\.js|package(-lock)?\.json|\.env|\.git|node_modules)(\/|$)/i.test(req.path)) return res.status(404).end();
+    if (/^\/(server\.js|db-backup\.js|restore-backup\.js|package(-lock)?\.json|\.env|\.git|\.github|node_modules|tests)(\/|$)/i.test(req.path)) return res.status(404).end();
     next();
 });
 // La page d'accueil est servie par la route « / » plus bas (balises Google ajoutées à la volée)
@@ -252,7 +252,8 @@ app.get('/api/music-tracks', (req, res) => {
 // La base vit en dehors de Render (Neon / Supabase / etc.) via DATABASE_URL,
 // donc les comptes et le rating survivent aux redéploiements et aux mises en veille.
 
-const JWT_SECRET = process.env.JWT_SECRET || 'change-this-secret-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || require('crypto').randomBytes(32).toString('hex');
+if (!process.env.JWT_SECRET) console.warn('[SÉCURITÉ] JWT_SECRET absent : sessions invalidées à chaque redémarrage. Configure une clé persistante secrète sur Render.');
 const JWT_EXPIRES_IN = '30d';
 
 if (!process.env.DATABASE_URL) {
@@ -1775,7 +1776,8 @@ io.use(async (socket, next) => {
     // Mode invité : pas de compte, pas de persistance, pas de ranked (userId reste null partout)
     if (auth.guest) {
         const pseudo = String(auth.pseudo || '').trim().slice(0, 20);
-        if (!pseudo) return next(new Error('unauthorized'));
+        const guestIdentity = String(auth.guestIdentity || '');
+        if (!pseudo || !/^[a-f0-9]{32}$/.test(guestIdentity)) return next(new Error('unauthorized'));
 
         socket.user = {
             id: null,
@@ -1785,7 +1787,8 @@ io.use(async (socket, next) => {
             wins: 0,
             losses: 0,
             rank: null,
-            isGuest: true
+            isGuest: true,
+            guestIdentity
         };
         return next();
     }
@@ -10207,6 +10210,7 @@ app.get('/api/dle-targets', (req, res) => {
 
 app.post('/api/dle-import-fandom-profile', express.json({limit:'250kb'}), async (req, res) => {
     try {
+        if (!(await isAdmin(req))) return res.status(403).json({ok:false,error:'admin_required'});
         const universeKey = String(req.body?.universeKey || '').trim();
         const name = String(req.body?.name || '').trim();
         const base = DLE_UNIVERSES[universeKey];
@@ -10252,6 +10256,7 @@ app.post('/api/dle-import-fandom-profile', express.json({limit:'250kb'}), async 
 
 app.post('/api/character-image-cache', express.json({limit:'50kb'}), async (req, res) => {
     try {
+        if (!(await isAdmin(req))) return res.status(403).json({ok:false,error:'admin_required'});
         const universeKey = resolveImageUniverseKey(req.body?.universeKey || req.body?.universe || '');
         const name = String(req.body?.name || '').trim();
         const imageUrl = String(req.body?.imageUrl || '').trim();
@@ -10849,7 +10854,7 @@ io.on('connection', (socket) => {
         // Même compte déjà dans ce salon sous un ancien identifiant (téléphone reconnecté, onglet rouvert…) :
         // on reprend SA place au lieu de créer un doublon.
         const memeCompte = room.players.find(p => p.id !== socket.id &&
-            ((socket.user.id && p.userId === socket.user.id) || (!socket.user.id && p.name === socket.user.pseudo)));
+            ((socket.user.id && p.userId === socket.user.id) || (socket.user.isGuest && p.__guestIdentity === socket.user.guestIdentity)));
         if (memeCompte) {
             if (room.status !== 'waiting') {
                 socket.emit('force_rejoin', { roomCode });
@@ -10894,6 +10899,10 @@ io.on('connection', (socket) => {
                 secretData: '',
                 clue: ''
             });
+            // Secret non énumérable : ne doit jamais partir dans les payloads Socket.IO.
+            if (socket.user.isGuest) Object.defineProperty(room.players[room.players.length - 1], '__guestIdentity', {
+                value: socket.user.guestIdentity, writable: true, configurable: true
+            });
         }
 
         if (!room.players.some(p => p.id === room.host)) {
@@ -10924,6 +10933,7 @@ io.on('connection', (socket) => {
             room.status = 'choosing_theme';
             room.pendingFreshStart = true; // premier lancement : on tire de nouvelles notes
             const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+            room.themeMasterId = themeMasterId;
             io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
         } else if (room.mode === 'rollandgaros') {
             startRollandGaros(room, roomCode);
@@ -10964,9 +10974,11 @@ io.on('connection', (socket) => {
 
     socket.on('submit_custom_theme', ({ roomCode, theme }) => {
         const room = rooms[roomCode];
-        if (!room) return;
+        if (!room || room.status !== 'choosing_theme' || (room.themeMasterId !== socket.id && room.host !== socket.id)) return;
 
-        room.currentTheme = theme;
+        room.currentTheme = String(theme || '').trim().slice(0, 100);
+        if (!room.currentTheme) return;
+        room.themeMasterId = null;
         io.to(roomCode).emit('theme_chosen', room);
 
         if (room.mode === 'note' && !room.pendingFreshStart) {
@@ -11244,8 +11256,8 @@ io.on('connection', (socket) => {
         if (!room) return;
 
         const currentPlayer = room.players[room.currentTurnIndex];
-        if (currentPlayer && currentPlayer.id === socket.id) {
-            currentPlayer.clue = clue;
+        if (room.status === 'gameplay' && currentPlayer && currentPlayer.id === socket.id && currentPlayer.isAlive) {
+            currentPlayer.clue = String(clue || '').trim().slice(0, 200);
 
             let nextIndex = room.currentTurnIndex + 1;
             while (nextIndex < room.players.length && !room.players[nextIndex].isAlive) {
@@ -11268,7 +11280,7 @@ io.on('connection', (socket) => {
 
     socket.on('restart_clues_undercover', ({ roomCode }) => {
         const room = rooms[roomCode];
-        if (!room) return;
+        if (!room || room.mode !== 'undercover' || room.status !== 'end_clues' || !room.players.some(p => p.id === socket.id && p.isAlive)) return;
         
         room.players.forEach(p => p.clue = '');
         room.currentTurnIndex = Math.max(0, room.players.findIndex(p => p.isAlive));
@@ -11278,17 +11290,18 @@ io.on('connection', (socket) => {
 
     socket.on('change_theme_mid_game', ({ roomCode }) => {
         const room = rooms[roomCode];
-        if (!room) return;
+        if (!room || room.mode !== 'note' || room.status !== 'end_clues' || !room.players.some(p => p.id === socket.id && p.isAlive)) return;
 
         room.status = 'choosing_theme';
         room.pendingFreshStart = false; // on change juste le thème, pas les notes/rôles
         const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+        room.themeMasterId = themeMasterId;
         io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
     });
 
     socket.on('force_start_voting', ({ roomCode }) => {
         const room = rooms[roomCode];
-        if (!room) return;
+        if (!room || room.status !== 'end_clues' || !room.players.some(p => p.id === socket.id && p.isAlive)) return;
 
         room.status = 'voting';
         room.votes = {};
@@ -11322,15 +11335,10 @@ io.on('connection', (socket) => {
             voteCounts[target] = (voteCounts[target] || 0) + 1;
         });
 
-        let highestVotes = 0;
-        let eliminatedTargetId = null;
-
-        for (const [target, count] of Object.entries(voteCounts)) {
-            if (count > highestVotes) {
-                highestVotes = count;
-                eliminatedTargetId = target;
-            }
-        }
+        const highestVotes = Math.max(0, ...Object.values(voteCounts));
+        // Une égalité ne doit éliminer personne, quel que soit l'ordre des votes.
+        const leaders = Object.keys(voteCounts).filter(target => voteCounts[target] === highestVotes);
+        const eliminatedTargetId = highestVotes > 0 && leaders.length === 1 ? leaders[0] : null;
 
         let eliminatedPlayer = null;
         if (eliminatedTargetId && eliminatedTargetId !== 'no_impostor' && eliminatedTargetId !== 'pass') {
@@ -11541,7 +11549,7 @@ io.on('connection', (socket) => {
 
     socket.on('next_step_game', async (roomCode) => {
         const room = rooms[roomCode];
-        if (!room) return;
+        if (!room || room.host !== socket.id) return;
 
         if (room.mode === 'arcade') {
             if (room.host !== socket.id) return;
@@ -11599,13 +11607,14 @@ io.on('connection', (socket) => {
             room.currentTurnIndex = 0;
             room.players.forEach(p => p.clue = '');
             const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+            room.themeMasterId = themeMasterId;
             io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
         }
     });
 
     socket.on('back_to_menu', (roomCode) => {
         const room = rooms[roomCode];
-        if (room) {
+        if (room && room.host === socket.id) {
             if (rgTimers[roomCode]) {
                 clearInterval(rgTimers[roomCode]);
                 delete rgTimers[roomCode];
@@ -11650,7 +11659,7 @@ io.on('connection', (socket) => {
         // qu'il soit déjà marqué "déconnecté" : le téléphone revient souvent AVANT que le serveur ait
         // remarqué la coupure, et c'est ce qui renvoyait au menu.
         const memeJoueur = p => (socket.user.id && p.userId === socket.user.id) ||
-                                (!socket.user.id && p.name === socket.user.pseudo);
+                                (socket.user.isGuest && !!socket.user.guestIdentity && p.__guestIdentity === socket.user.guestIdentity);
         const ancien = room.players.find(p => p.disconnected && memeJoueur(p))
                     || room.players.find(p => memeJoueur(p));
 
@@ -11736,7 +11745,7 @@ io.on('connection', (socket) => {
         } else if (room.status === 'voting') {
             socket.emit('start_voting', room);
         } else if (room.status === 'choosing_theme') {
-            socket.emit('prompt_theme_choice', { room, themeMasterId: room.players[0].id });
+            socket.emit('prompt_theme_choice', { room, themeMasterId: room.themeMasterId || room.host });
         } else {
             socket.emit('resume_gameplay', room);
         }
@@ -11922,6 +11931,7 @@ function retirerJoueurDuSalon(room, roomCode, socketId) {
 
             if (room.status === 'choosing_theme') {
                 const themeMasterId = room.players[Math.floor(Math.random() * room.players.length)].id;
+                room.themeMasterId = themeMasterId;
                 io.to(roomCode).emit('prompt_theme_choice', { room, themeMasterId });
                 return;
             }
@@ -22912,7 +22922,7 @@ io.on('connection', socket => {
     socket.on('hub2_sync', sync);
     socket.on('back_to_menu', roomCode => {
         const room = rooms[roomCode];
-        if (!room || (!room.chaine && !room.lg && !room.uq)) return;
+        if (!room || room.host !== socket.id || (!room.chaine && !room.lg && !room.uq)) return;
         chaineStop(roomCode); lgStop(roomCode); uqStop(roomCode);
         io.to(roomCode).emit('hub2_closed');
     });
