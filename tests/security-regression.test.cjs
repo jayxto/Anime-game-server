@@ -134,3 +134,75 @@ test('State-mutating moderation is enabled, JWT secrets never use a known defaul
   assert.match(source,/room\.host !== socket\.id/);
   assert.match(source,/if \(!room \|\| room\.host !== socket\.id \|\| \(!room\.chaine/);
 });
+
+test('Invalid room codes are rejected before a Socket.IO room is joined', () => {
+  const rejects = [];
+  let joined = 0;
+  const fn = captureSocketHandler('join_room')({
+    rooms: {}, roomKicked: {},
+    socket: {
+      join: () => { joined++; },
+      emit: (event, payload) => rejects.push({ event, payload })
+    }
+  });
+  for (const roomCode of ['__proto__', 'constructor', '', 'A', 'ABCDE', null, 42, 'A<script>']) {
+    fn({ roomCode, mode: 'undercover', subMode: 'normal' });
+  }
+  assert.equal(joined, 0);
+  assert.equal(rejects.length, 8);
+  assert.ok(rejects.every(x => x.event === 'game_error'));
+});
+
+test('Each player can vote once and cannot replace the ballot later', () => {
+  const room = {
+    status: 'voting', mode: 'undercover', subMode: 'normal',
+    players: [{ id: 'player-1', isAlive: true }, { id: 'player-2', isAlive: true }, { id: 'player-3', isAlive: true }],
+    votes: {}
+  };
+  const emitted = [];
+  const fn = captureSocketHandler('cast_vote')({
+    rooms: { ABCD: room },
+    io: { to: () => ({ emit: (event, payload) => emitted.push({event,payload}) }) }
+  });
+  fn({ roomCode: 'ABCD', targetId: 'player-2' });
+  fn({ roomCode: 'ABCD', targetId: 'player-3' });
+  assert.equal(room.votes['player-1'], 'player-2');
+  assert.equal(emitted.filter(x => x.event === 'vote_progress').length, 1);
+});
+
+test('Self-vote and special no-impostor vote outside Hardcore are rejected', () => {
+  const room = {
+    status: 'voting', mode: 'undercover', subMode: 'normal',
+    players: [{ id: 'player-1', isAlive: true }, { id: 'player-2', isAlive: true }],
+    votes: {}
+  };
+  const fn = captureSocketHandler('cast_vote')({ rooms: { ABCD: room } });
+  fn({ roomCode: 'ABCD', targetId: 'player-1' });
+  fn({ roomCode: 'ABCD', targetId: 'no_impostor' });
+  assert.deepEqual(Object.keys(room.votes), []);
+  room.subMode = 'hardcore';
+  fn({ roomCode: 'ABCD', targetId: 'no_impostor' });
+  assert.equal(room.votes['player-1'], 'no_impostor');
+});
+
+test('JWT_SECRET must be configured explicitly when NODE_ENV is production', () => {
+  const start = source.indexOf('const JWT_SECRET =');
+  const end = source.indexOf('const JWT_EXPIRES_IN', start);
+  assert.ok(start >= 0 && end > start);
+  const expr = source.slice(start, end);
+  assert.throws(
+    () => vm.runInNewContext(expr, { process: {env: {NODE_ENV:'production'}}, require, console }),
+    /JWT_SECRET/
+  );
+  assert.doesNotThrow(
+    () => vm.runInNewContext(expr, { process: {env: {NODE_ENV:'production',JWT_SECRET:'test-only-secret'}}, require, console })
+  );
+});
+
+test('More multiplayer player-name displays escape special HTML characters', () => {
+  assert.match(html, /list\.innerHTML \+= \`<li><span>\$\{agSafeHtml\(p\.name\)\}/);
+  const rg = html.slice(html.indexOf('function renderRgState('), html.indexOf('function renderEnchereState('));
+  const conn = html.slice(html.indexOf('function renderConnexionState('), html.indexOf('function sendChatMessage('));
+  assert.ok(rg.includes('agSafeHtml(p.name)'));
+  assert.ok(conn.includes('agSafeHtml(p.name)'));
+});
