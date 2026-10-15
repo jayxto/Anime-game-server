@@ -4107,7 +4107,14 @@ body.ag-game-page #app-root > #mode,
         }
 
         function connectSocketAsGuest(pseudo) {
-            socket.auth = { guest: true, pseudo };
+            // Preuve privée liée à cet onglet, conservée lors d'un rechargement.
+            const key = 'ag_guest_identity_v1';
+            let guestIdentity = sessionStorage.getItem(key);
+            if (!/^[a-f0-9]{32}$/.test(guestIdentity || '')) {
+                guestIdentity = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('');
+                sessionStorage.setItem(key, guestIdentity);
+            }
+            socket.auth = { guest: true, pseudo, guestIdentity };
             socket.connect();
         }
 
@@ -5304,6 +5311,9 @@ body.ag-game-page #app-root > #mode,
             updateGameplayUI(room);
         });
 
+        function agSafeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+        }
         function updateGameplayUI(room) {
             document.getElementById('game-phase-title').innerText = "Tour de parole";
             
@@ -5321,7 +5331,7 @@ body.ag-game-page #app-root > #mode,
             room.players.forEach((p, idx) => {
                 if (!p.isAlive) return;
                 let status = p.clue ? `💬 "${p.clue}"` : (idx === room.currentTurnIndex ? "En train d'écrire..." : "En attente");
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--text-muted)">${status}</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--text-muted)">${agSafeHtml(status)}</span></li>`;
             });
 
             const me = room.players.find(p => p.id === socket.id);
@@ -5348,7 +5358,7 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--accent-yellow)">💬 "${agSafeHtml(p.clue || 'Aucun')}"</span></li>`;
             });
 
             document.getElementById('end-clues-options').style.display = 'flex';
@@ -5363,7 +5373,7 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = "";
             room.players.forEach(p => {
                 if (!p.isAlive) return;
-                list.innerHTML += `<li><span>${p.name}</span> <span style="color:var(--accent-yellow)">💬 "${p.clue || 'Aucun'}"</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}</span> <span style="color:var(--accent-yellow)">💬 "${agSafeHtml(p.clue || 'Aucun')}"</span></li>`;
             });
 
             document.getElementById('end-clues-options-undercover').style.display = 'flex';
@@ -5475,7 +5485,7 @@ body.ag-game-page #app-root > #mode,
             let resultMessage = "";
             if (data.eliminatedPlayer) {
                 let roleInfo = data.eliminatedPlayer.isImpostor ? "<span style='color:var(--accent-pink)'>C'était un IMPOSTEUR !</span>" : "<span style='color:#00ff88'>C'était un Innocent !</span>";
-                resultMessage += `Joueur éliminé : <strong>${data.eliminatedPlayer.name}</strong> (${roleInfo})<br><br>`;
+                resultMessage += `Joueur éliminé : <strong>${agSafeHtml(data.eliminatedPlayer.name)}</strong> (${roleInfo})<br><br>`;
             } else {
                 resultMessage += `Égalité ou vote « Pas d'imposteur » validé.<br><br>`;
             }
@@ -5498,7 +5508,7 @@ body.ag-game-page #app-root > #mode,
                 let statusText = p.isAlive ? "En vie" : "Éliminé";
                 let roleText = data.gameOver ? (p.isImpostor ? " [IMPOSTEUR]" : " [CIVIL]") : "";
                 let secretTxt = (p.secretData && data.gameOver) ? ` (${p.secretData})` : ''; // le mot n'est dévoilé qu'en fin de partie
-                list.innerHTML += `<li><span>${p.name}${roleText}${secretTxt}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}${roleText}${agSafeHtml(secretTxt)}</span> <span style="color:${statusColor}">${statusText}</span></li>`;
             });
         });
 
