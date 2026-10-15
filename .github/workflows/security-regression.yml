@@ -31,6 +31,10 @@ jobs:
         run: node --check server.js
       - name: Test security, HTML, modes and theme image isolation
         run: node --test tests/security-regression.test.cjs tests/qui-catalogue.test.cjs .github/transform-audit.test.cjs
+      - name: Install server and socket dependencies
+        run: npm ci --ignore-scripts=false --no-audit --no-fund
+      - name: Live HTTP and Socket.IO smoke test using isolated local database
+        run: node --test tests/live-smoke.test.cjs
       - name: Verify transformations across universes
         run: |
           python3 .github/audit_transform_remaining.py
