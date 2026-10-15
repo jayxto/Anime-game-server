@@ -1693,8 +1693,8 @@ app.post('/api/register', async (req, res) => {
     const cleanPseudo = String(pseudo).trim();
     const cleanEmail = String(email).trim().toLowerCase();
 
-    if (cleanPseudo.length < 3 || cleanPseudo.length > 20) {
-        return res.status(400).json({ error: 'Le pseudo doit faire entre 3 et 20 caractères.' });
+    if (cleanPseudo.length < 3 || cleanPseudo.length > 20 || !/^[\p{L}\p{M}\p{N}_ -]+$/u.test(cleanPseudo)) {
+        return res.status(400).json({ error: 'Pseudo invalide : utilise lettres, chiffres, espaces, tirets ou underscores (3 à 20 caractères).' });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
         return res.status(400).json({ error: 'Email invalide.' });
@@ -1777,7 +1777,7 @@ io.use(async (socket, next) => {
     if (auth.guest) {
         const pseudo = String(auth.pseudo || '').trim().slice(0, 20);
         const guestIdentity = String(auth.guestIdentity || '');
-        if (!pseudo || !/^[a-f0-9]{32}$/.test(guestIdentity)) return next(new Error('unauthorized'));
+        if (!pseudo || !/^[\p{L}\p{M}\p{N}_ -]+$/u.test(pseudo) || !/^[a-f0-9]{32}$/.test(guestIdentity)) return next(new Error('unauthorized'));
 
         socket.user = {
             id: null,
@@ -10976,7 +10976,7 @@ io.on('connection', (socket) => {
         const room = rooms[roomCode];
         if (!room || room.status !== 'choosing_theme' || (room.themeMasterId !== socket.id && room.host !== socket.id)) return;
 
-        room.currentTheme = String(theme || '').trim().slice(0, 100);
+        room.currentTheme = String(theme || '').trim().replace(/[<>]/g, '').slice(0, 100);
         if (!room.currentTheme) return;
         room.themeMasterId = null;
         io.to(roomCode).emit('theme_chosen', room);
@@ -11240,7 +11240,7 @@ io.on('connection', (socket) => {
         const player = room.players.find(p => p.id === socket.id);
         if (!player) return; // seuls les joueurs du salon peuvent écrire
 
-        const clean = String(message || '').trim().slice(0, 300);
+        const clean = String(message || '').trim().replace(/[<>]/g, '').slice(0, 300);
         if (!clean) return;
 
         io.to(roomCode).emit('chat_message', {
@@ -11257,7 +11257,7 @@ io.on('connection', (socket) => {
 
         const currentPlayer = room.players[room.currentTurnIndex];
         if (room.status === 'gameplay' && currentPlayer && currentPlayer.id === socket.id && currentPlayer.isAlive) {
-            currentPlayer.clue = String(clue || '').trim().slice(0, 200);
+            currentPlayer.clue = String(clue || '').trim().replace(/[<>]/g, '').slice(0, 200);
 
             let nextIndex = room.currentTurnIndex + 1;
             while (nextIndex < room.players.length && !room.players[nextIndex].isAlive) {
@@ -11679,6 +11679,7 @@ io.on('connection', (socket) => {
         delete ancien.disconnected;
         delete ancien.disconnectedAt;
         if (room.host === ancienId) room.host = socket.id;
+        if (room.themeMasterId === ancienId) room.themeMasterId = socket.id;
 
         // Report de l'ancien identifiant vers le nouveau dans toutes les structures de jeu
         const remap = (obj) => {
