@@ -4086,6 +4086,7 @@ body.ag-game-page #app-root > #mode,
             timeout: 20000
         });
         let currentRoomCode = "";
+        let currentRoomHostId = null;
         let currentThemeMasterId = "";
 
         function switchTab(tabId) {
@@ -4285,6 +4286,7 @@ body.ag-game-page #app-root > #mode,
 
         // Quitter vraiment le salon : le serveur nous retire, on ne sera plus ramené dedans
         function leaveRoom() {
+            currentRoomHostId = null;
             if (typeof btStopAudio === 'function') btStopAudio();
             if (currentRoomCode) socket.emit('leave_room', { roomCode: currentRoomCode });
             currentRoomCode = '';
@@ -4825,6 +4827,7 @@ body.ag-game-page #app-root > #mode,
 
         socket.on('update_room', (room) => {
             // Sécurité : un état de jeu ne doit pas être rendu comme un salon d'attente.
+            if (room && room.code === currentRoomCode) currentRoomHostId = room.host;
             if (room.status && room.status !== 'waiting') return;
             // Salon quitté (ou un autre salon) : on ne s'y fait plus ramener
             if (!currentRoomCode || (room.code && room.code !== currentRoomCode)) return;
@@ -5822,6 +5825,11 @@ body.ag-game-page #app-root > #mode,
         let returningToWaitingRoom = false;
 
         function backToMenu() {
+            if (currentRoomCode && currentRoomHostId && currentRoomHostId !== socket.id) {
+                if (typeof toast === 'function') toast("Seul l'hôte peut renvoyer le salon en salle d'attente. Utilise « Quitter » pour partir.", 'var(--accent-yellow)');
+                else alert("Seul l'hôte peut renvoyer le salon en salle d'attente.");
+                return;
+            }
             arcStopMedia();
             if (typeof btStopAudio === 'function') btStopAudio();
             if (!currentRoomCode) {
