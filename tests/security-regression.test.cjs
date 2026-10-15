@@ -176,7 +176,7 @@ test('Self-vote and special no-impostor vote outside Hardcore are rejected', () 
     players: [{ id: 'player-1', isAlive: true }, { id: 'player-2', isAlive: true }],
     votes: {}
   };
-  const fn = captureSocketHandler('cast_vote')({ rooms: { ABCD: room } });
+  const fn = captureSocketHandler('cast_vote')({ rooms: { ABCD: room }, io: { to: () => ({ emit: () => {} }) } });
   fn({ roomCode: 'ABCD', targetId: 'player-1' });
   fn({ roomCode: 'ABCD', targetId: 'no_impostor' });
   assert.deepEqual(Object.keys(room.votes), []);
