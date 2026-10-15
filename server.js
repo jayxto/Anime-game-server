@@ -252,8 +252,11 @@ app.get('/api/music-tracks', (req, res) => {
 // La base vit en dehors de Render (Neon / Supabase / etc.) via DATABASE_URL,
 // donc les comptes et le rating survivent aux redéploiements et aux mises en veille.
 
-const JWT_SECRET = process.env.JWT_SECRET || require('crypto').randomBytes(32).toString('hex');
-if (!process.env.JWT_SECRET) console.warn('[SÉCURITÉ] JWT_SECRET absent : sessions invalidées à chaque redémarrage. Configure une clé persistante secrète sur Render.');
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+    if (process.env.NODE_ENV === 'production') throw new Error('[SÉCURITÉ] JWT_SECRET obligatoire en production : définis-le sur Render.');
+    console.warn('[SÉCURITÉ] JWT_SECRET absent : clé éphémère réservée au développement.');
+    return require('crypto').randomBytes(32).toString('hex');
+})();
 const JWT_EXPIRES_IN = '30d';
 
 if (!process.env.DATABASE_URL) {
@@ -10828,6 +10831,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('join_room', ({ roomCode, mode, subMode }) => {
+        // Les salons du client sont des codes alphanumériques de 4 caractères.
+        // Refuser les clés spéciales d'Object.prototype et les codes arbitraires.
+        if (typeof roomCode !== 'string' || !/^[A-Z0-9]{4}$/.test(roomCode)) {
+            socket.emit('game_error', { message: 'Code de salon invalide (4 lettres ou chiffres).' });
+            return;
+        }
         if (rooms[roomCode] && roomKicked[roomCode] && roomKicked[roomCode].has(kickKey(socket))) {
             socket.emit('kicked', { roomCode, message: "L'hôte t'a exclu de ce salon." });
             return;
@@ -11320,6 +11329,9 @@ io.on('connection', (socket) => {
             if (!target || target.isAlive === false) return;
         }
         room.votes = room.votes || {};
+        if (Object.prototype.hasOwnProperty.call(room.votes, socket.id)) return; // un seul vote par manche
+        if (targetId === socket.id) return; // l'interface ne permet pas de voter pour soi
+        if (targetId === 'no_impostor' && !(room.mode === 'undercover' && room.subMode === 'hardcore')) return;
         room.votes[socket.id] = targetId;
         io.to(roomCode).emit('vote_progress', { voted: Object.keys(room.votes).length, total: room.players.filter(p => p.isAlive).length, voterId: socket.id });
 

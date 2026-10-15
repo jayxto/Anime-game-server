@@ -6103,7 +6103,7 @@ body.ag-game-page #app-root > #mode,
                     ? '💀 Éliminé'
                     : '❤️'.repeat(Math.max(lives, 0)) + '🖤'.repeat(Math.max(2 - lives, 0));
                 let status = p.rgAlive === false ? "" : (idx === rg.turnIndex ? "✏️ En train de chercher…" : "En attente");
-                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> <span style="color:var(--text-muted)">${hearts}${status ? ' · ' + status : ''}</span></li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}${p.id === socket.id ? ' (Toi)' : ''}</span> <span style="color:var(--text-muted)">${hearts}${agSafeHtml(status ? ' · ' + status : '')}</span></li>`;
             });
 
             document.getElementById('rg-end-buttons').style.display = 'none';
@@ -6365,7 +6365,7 @@ body.ag-game-page #app-root > #mode,
             list.innerHTML = '';
             room.players.forEach(p => {
                 const status = p.hasSubmitted ? '<span style="color:#00ff88">✓ A écrit</span>' : '<span style="color:var(--text-muted)">✏️ Réfléchit…</span>';
-                list.innerHTML += `<li><span>${p.name}${p.id === socket.id ? ' (Toi)' : ''}</span> ${status}</li>`;
+                list.innerHTML += `<li><span>${agSafeHtml(p.name)}${p.id === socket.id ? ' (Toi)' : ''}</span> ${status}</li>`;
             });
 
             const histDiv = document.getElementById('cx-history');
