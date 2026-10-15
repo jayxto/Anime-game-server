@@ -15211,7 +15211,7 @@ io.on('connection', socket => {
 
     socket.on('back_to_menu', roomCode => {
         const room = rooms[roomCode];
-        if (room && room.mode === 'arcade') arcStop(roomCode);
+        if (room && room.mode === 'arcade' && room.host === socket.id) arcStop(roomCode);
     });
 
     socket.on('arc_choice', ({ roomCode, choice } = {}) => {
