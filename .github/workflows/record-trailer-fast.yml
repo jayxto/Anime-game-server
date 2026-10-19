@@ -29,6 +29,11 @@ jobs:
           cd .github/demo-capture
           npm install --no-audit --no-fund playwright
           npx playwright install --with-deps chromium
+      - name: Installer FFmpeg pour generer les extraits MP4
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          command -v ffmpeg
       - name: Restreindre le passage aux meilleurs plans reels
         run: |
           python3 - <<'PY'
