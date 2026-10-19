@@ -15,10 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Tester acces HTTP direct au jeu
+      - name: Tester HTTP et inspecter la vraie page de connexion
         run: |
           set +e
-          echo "TEST API HTTPS anime-game-server.onrender.com"
-          curl -IL -sS -o /dev/null --max-time 30 -w 'http_code=%{http_code} time_total=%{time_total}s\n' https://anime-game-server.onrender.com/
-          echo "TEST JS Socket.IO"
-          curl -IL -sS -o /dev/null --max-time 30 -w 'http_code=%{http_code} time_total=%{time_total}s\n' https://anime-game-server.onrender.com/socket.io/socket.io.js
+          curl -IL -sS -o /dev/null --max-time 25 -w 'homepage=%{http_code}\n' https://anime-game-server.onrender.com/
+          curl -IL -sS -o /dev/null --max-time 25 -w 'socketjs=%{http_code}\n' https://anime-game-server.onrender.com/socket.io/socket.io.js
+          curl -LfsS --max-time 25 https://anime-game-server.onrender.com/ -o /tmp/live-site.html
+          echo "HTML bytes: $(wc -c < /tmp/live-site.html)"
+          echo 'Page TITLE and guest/login identifiers:'
+          grep -Eoin '<title[^>]*>[^<]*|jouer en invit[^<]{0,100}|guest-pseudo|auth-screen|app-root|href=[^ >]{0,80}' /tmp/live-site.html | head -40
+          echo 'First 500 characters:'
+          head -c 500 /tmp/live-site.html
+          echo
