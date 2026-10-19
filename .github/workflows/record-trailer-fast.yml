@@ -56,3 +56,4 @@ jobs:
             gameplay-output/*.png
           retention-days: 7
           if-no-files-found: warn
+# Correction : navigateur francais et acces invite independant du libelle
