@@ -1,0 +1,47 @@
+name: Filmer le vrai site Anime Game
+
+on:
+  push:
+    branches:
+      - capture-real-gameplay-20261019
+    paths:
+      - '.github/demo-capture/**'
+      - '.github/workflows/record-real-gameplay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vrai-gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Recuperer seulement les scripts de capture
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/demo-capture
+            .github/workflows/record-real-gameplay.yml
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installer un navigateur Chromium
+        run: |
+          cd .github/demo-capture
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Enregistrer tous les modes accessibles sur le vrai site
+        run: node .github/demo-capture/capture.mjs
+        env:
+          GAME_URL: https://anime-game-server.onrender.com
+          CAPTURE_OUTPUT: gameplay-output
+      - name: Publier les extraits reels et le bilan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Anime-Game-vraies-captures
+          path: gameplay-output/
+          retention-days: 7
+          if-no-files-found: warn
