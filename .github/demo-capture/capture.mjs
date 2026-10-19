@@ -42,7 +42,7 @@ const res=await pg.goto(BASE,{waitUntil:'domcontentloaded',timeout:100000});
 if(!res||res.status()>=400)throw Error('HTTP '+(res&&res.status()));
 await pg.locator('#auth-screen').waitFor({timeout:40000});
 if(await pg.locator('#auth-screen').isVisible()){
-await pg.locator('a').filter({hasText:'Jouer en invité'}).first().click();
+await pg.evaluate(()=>toggleGuestMode());
 await pg.locator('#guest-pseudo').fill(('Capture'+tag).slice(0,20));
 await pg.locator('#guest-fields button').click();
 }
@@ -50,14 +50,14 @@ await pg.waitForFunction(()=>typeof socket!=='undefined'&&socket.connected,{time
 await pause(1000);
 }
 async function helper(browser,code,n){
-const ctx=await browser.newContext({viewport:{width:1100,height:720}});
+const ctx=await browser.newContext({viewport:{width:1100,height:720},locale:'fr-FR'});
 const pg=await ctx.newPage();
 try{await guest(pg,'invite'+n);await pg.evaluate(c=>{document.getElementById('join-code-input').value=c;joinRoomByCode()},code);await pause(900);return ctx}
 catch(e){await ctx.close();throw e}
 }
 async function one(browser,spec,i){
 const id=String(i+1).padStart(2,'0')+'-'+slug(spec.name);
-const ctx=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:OUT+'/raw',size:{width:1280,height:720}},deviceScaleFactor:1});
+const ctx=await browser.newContext({viewport:{width:1280,height:720},locale:'fr-FR',recordVideo:{dir:OUT+'/raw',size:{width:1280,height:720}},deviceScaleFactor:1});
 const pg=await ctx.newPage();
 pg.on('dialog',d=>d.dismiss().catch(()=>{}));
 let guests=[],code='',state='Non filme',error='',valid=false;
