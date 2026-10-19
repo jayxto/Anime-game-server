@@ -1,0 +1,58 @@
+name: Trailer rapide vraies images Anime Game
+
+on:
+  push:
+    branches:
+      - capture-real-gameplay-20261019
+    paths:
+      - '.github/workflows/record-trailer-fast.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trailer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/demo-capture
+            .github/workflows/record-trailer-fast.yml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installer Playwright Chromium
+        run: |
+          cd .github/demo-capture
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Restreindre le passage aux meilleurs plans reels
+        run: |
+          python3 - <<'PY'
+          p = '.github/demo-capture/capture.mjs'
+          s = open(p).read()
+          original = 'for(let i=0;i<specs.length;i++)await one(browser,specs[i],i)'
+          chosen = 'for(const i of [0,1,9,10,11,12,29,32,39])await one(browser,specs[i],i)'
+          assert original in s, 'capture script unexpectedly changed'
+          open(p, 'w').write(s.replace(original, chosen))
+          PY
+      - name: Filmer un premier vrai trailer sans voix
+        run: node .github/demo-capture/capture.mjs
+        env:
+          GAME_URL: https://anime-game-server.onrender.com
+          CAPTURE_OUTPUT: gameplay-output
+      - name: Mettre video et preuves a disposition
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Anime-Game-trailer-reel-sans-voix
+          path: |
+            gameplay-output/ANIME-GAME-VRAIES-CAPTURES-SANS-VOIX.mp4
+            gameplay-output/BILAN.txt
+            gameplay-output/rapport.json
+            gameplay-output/*.png
+          retention-days: 7
+          if-no-files-found: warn
