@@ -1,0 +1,24 @@
+name: Verifier acces Reel Anime Game
+
+on:
+  push:
+    branches:
+      - capture-real-gameplay-20261019
+    paths:
+      - '.github/workflows/probe-anime-game-live.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verifier-acces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Tester acces HTTP direct au jeu
+        run: |
+          set +e
+          echo "TEST API HTTPS anime-game-server.onrender.com"
+          curl -IL -sS -o /dev/null --max-time 30 -w 'http_code=%{http_code} time_total=%{time_total}s\n' https://anime-game-server.onrender.com/
+          echo "TEST JS Socket.IO"
+          curl -IL -sS -o /dev/null --max-time 30 -w 'http_code=%{http_code} time_total=%{time_total}s\n' https://anime-game-server.onrender.com/socket.io/socket.io.js
