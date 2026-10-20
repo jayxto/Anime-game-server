@@ -53,10 +53,10 @@ async function play(mode,sub,n=2){
    const el=document.getElementById(id);return el&&getComputedStyle(el).display!=='none';
   }).join(',');
  });
- console.log('UI '+mode+': '+(panel||'salon attente'));await nap(1300);
+ console.log('UI '+mode+': '+(panel||'salon attente'));await nap(1300);if(!panel)throw Error('Partie non lancée : écran de salon seulement');
 }
 async function mini(game){
- await leave();await main.evaluate(g=>openArcadeGame(g),game);await nap(700);
+ await leave();await main.evaluate(g=>g==='tournoi'?createRoom('arcade','tournoi'):openArcadeGame(g),game);await nap(700);
  const roomCode=await main.evaluate(()=>currentRoomCode);
  if(!roomCode){
   await main.evaluate(()=>{
@@ -66,7 +66,7 @@ async function mini(game){
  }
  await main.locator('#waiting-room').waitFor({state:'visible',timeout:14000});
  const code=await main.evaluate(()=>currentRoomCode);
- await joinOthers(code,2);await nap(700);await main.evaluate(()=>startGame());await nap(3000);
+ await joinOthers(code,2);await nap(700);await main.evaluate(()=>startGame());await nap(3000);if(!(await main.locator('#arcade-room').isVisible()))throw Error('Mini-jeu resté en salon');
 }
 (async()=>{
  try{
@@ -91,8 +91,8 @@ async function mini(game){
   }
   await film('Salons publics',async()=>{await main.evaluate(()=>{switchTab('mode');goToMenuSelection();togglePublicRooms(true)});await nap(2200);await main.evaluate(()=>togglePublicRooms(false));});
   const modes=[
-   ['Undercover normal','undercover','normal',2],['Undercover hardcore','undercover','hardcore',2],
-   ['Devine la note','note','normal',2],['Blind Test','blindtest','normal',2],
+   ['Undercover normal','undercover','normal',3],['Undercover hardcore','undercover','hardcore',3],
+   ['Devine la note','note','normal',3],['Blind Test','blindtest','normal',2],
    ['Citations','quote','naruto',2],['Loup-garou','loupgarou','all',4],
    ['Devine le perso','guess','all',2],['Dessine le perso','draw','all',2],
    ['Chaîne de persos','chaine','naruto',2],['AnimeDLE','dle','naruto',2],
