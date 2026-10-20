@@ -23,6 +23,8 @@ jobs:
           mkdir -p "$RUNNER_TEMP/ag-playwright"
           npm install --prefix "$RUNNER_TEMP/ag-playwright" --no-save --no-audit playwright@1.56.1
           "$RUNNER_TEMP/ag-playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Install FFmpeg for MP4 delivery
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Record the real live website
         env:
           NODE_PATH: ${{ runner.temp }}/ag-playwright/node_modules
