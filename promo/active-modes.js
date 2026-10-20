@@ -5,8 +5,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms)),SITE='https://anime-game-server
 const data={group:GROUP,scenes:[]};
 (async()=>{
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
-const ctx=await browser.newContext({viewport:{width:1280,height:720},locale:'fr-FR',recordVideo:{dir:OUT,size:{width:1280,height:720}}});
-const page=await ctx.newPage();page.setDefaultTimeout(6500);
+let ctx=await browser.newContext({viewport:{width:1280,height:720},locale:'fr-FR',recordVideo:{dir:OUT,size:{width:1280,height:720}}});
+let page=await ctx.newPage();page.setDefaultTimeout(6500);
 let guests=[];page.on('pageerror',e=>console.log('PAGEERROR',e.message.slice(0,150)));
 async function click(p,sel){let a=p.locator(sel).first();if(!await a.isVisible().catch(()=>false))return false;await a.click({timeout:6000,noWaitAfter:true});return true}
 async function joinGuest(p,name){
@@ -153,10 +153,15 @@ try{
   modes=await page.evaluate(()=>[...new Map([...document.querySelectorAll('button[onclick^="openArcadeGame"]')].map(e=>[e.getAttribute('onclick'),[(e.innerText||'').replace(/\s+/g,' ').slice(0,65),e.getAttribute('onclick')]])).values()]);
  }else modes=classic;
  console.log('FOUND_MODES',GROUP,JSON.stringify(modes));
- for(const [name,onclick] of modes){
+ await page.close();await ctx.close();
+ for(let ix=0;ix<modes.length;ix++){
+  const [name,onclick]=modes[ix];
   let scene={name,onclick,offset:Date.now(),started:false};
   try{
-   await freshMenu();
+   ctx=await browser.newContext({viewport:{width:1280,height:720},locale:'fr-FR',recordVideo:{dir:OUT,size:{width:1280,height:720}}});
+   page=await ctx.newPage();page.setDefaultTimeout(6500);
+   await joinGuest(page,'AGStreamer'+GROUP+ix);
+   await click(page,'#music-collapse-btn');
    // Some arcade buttons are hidden behind See all
    if(GROUP==='arcade')await click(page,'.arc-menu-refactor-toggle').catch(()=>{});
    const elem=page.locator('button[onclick]').filter({visible:true});
@@ -169,14 +174,21 @@ try{
    }
   }catch(e){scene.error=e.message.slice(0,150);console.log('MODE_ERROR',name,scene.error);await page.screenshot({path:OUT+'/error_'+String(data.scenes.length).padStart(2,'0')+'.png'}).catch(()=>{});}
   scene.duration=+((Date.now()-scene.offset)/1000).toFixed(1);
+  try{
+   const v=page.video();
+   await page.close().catch(()=>{});
+   await ctx.close().catch(()=>{});
+   scene.file='game_'+String(ix).padStart(2,'0')+'.webm';
+   if(v)await v.saveAs(OUT+'/'+scene.file);
+  }catch(e){scene.videoError=e.message.slice(0,120);}
   data.scenes.push(scene);fs.writeFileSync(OUT+'/metadata.json',JSON.stringify(data,null,2));
   console.log('DONE_MODE',name,scene.started,scene.duration,scene.error||'',scene.gameText?.slice(0,95));
  }
 } finally {
  fs.writeFileSync(OUT+'/metadata.json',JSON.stringify(data,null,2));
- const video=page.video();await page.close().catch(()=>{});
- try{fs.copyFileSync(await video.path(),OUT+'/Anime_Game_'+GROUP+'_live.webm')}catch(e){console.log('VIDEOERROR',e.message)}
- await ctx.close().catch(()=>{});for(const g of guests)await g?.ctx.close().catch(()=>{});
+ await page.close().catch(()=>{});
+ await ctx.close().catch(()=>{});
+ for(const g of guests)await g?.ctx.close().catch(()=>{});
  await browser.close().catch(()=>{});
  console.log('FINISHED',GROUP,data.scenes.length,data.scenes.filter(x=>x.started).length,data.scenes.filter(x=>x.error).length);
 }
