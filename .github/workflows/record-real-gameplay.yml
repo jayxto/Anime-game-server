@@ -1,0 +1,43 @@
+name: Record real Anime Game gameplay (branch-only)
+on:
+  push:
+    branches:
+      - video/real-gameplay-capture-20261020
+    paths:
+      - tests/record-real-gameplay.cjs
+      - .github/workflows/record-real-gameplay.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright browser (no app dependency changes)
+        run: |
+          mkdir -p /tmp/ag-capture
+          npm install --prefix /tmp/ag-capture --no-save --no-package-lock playwright@1.55.0
+          /tmp/ag-capture/node_modules/.bin/playwright install --with-deps chromium
+      - name: Film actual gameplay from the public Render site with two guests
+        env:
+          NODE_PATH: /tmp/ag-capture/node_modules
+          GAME_URL: https://anime-game-server.onrender.com
+          CAPTURE_OUT: capture-artifacts
+        run: |
+          node --check tests/record-real-gameplay.cjs
+          node tests/record-real-gameplay.cjs
+      - name: Video + screenshots + factual mode report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-game-real-browser-footage
+          path: capture-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
