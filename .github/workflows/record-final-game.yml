@@ -4,6 +4,7 @@ on:
     branches: [streamer-gameplay-presentation-2026]
     paths:
       - '.github/workflows/record-final-game.yml'
+      - 'promo/record-final.js'
 jobs:
   record:
     runs-on: ubuntu-latest
