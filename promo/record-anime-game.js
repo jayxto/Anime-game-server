@@ -56,9 +56,9 @@ try{
   await sleep(1200);
  });
  await scene('ENTREE_INVITE',async()=>{
-  if(await page.locator('#guest-pseudo').count()===0)
+  if(!await page.locator('#guest-pseudo').isVisible().catch(()=>false))
      await page.locator('a').filter({hasText:/Play as guest|Jouer en invité/i}).first().click({timeout:4500});
-  await page.locator('#guest-pseudo').fill('DemoGame',{timeout:4500});
+  await page.locator('#guest-pseudo').fill('DemoGame',{timeout:10000});
   await page.locator('button[onclick*="playAsGuest"]').first().click({timeout:7000,noWaitAfter:true});
   await sleep(5000);
   await inspect('guest');
