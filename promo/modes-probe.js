@@ -20,7 +20,7 @@ async function snapshot(name){
 }
 try{
  await page.goto('https://anime-game-server.onrender.com/',{waitUntil:'domcontentloaded',timeout:100000});
- await page.locator('a').filter({hasText:/Play as guest/i}).click();
+ await page.locator('a').filter({hasText:/Play as guest|Jouer en invité|Continuer en invité/i}).click();
  await page.locator('#guest-pseudo').fill('StreamerGameplayA');
  await page.locator('button[onclick*="playAsGuest"]').click({noWaitAfter:true});
  await page.locator('.ag-dash-nav-btn').first().waitFor({state:'visible',timeout:22000});
