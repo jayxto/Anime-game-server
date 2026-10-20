@@ -1,0 +1,27 @@
+name: Probe Anime Game lobby
+on:
+  push:
+    branches: [streamer-gameplay-presentation-2026]
+    paths:
+      - '.github/workflows/streamer-main-probe.yml'
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: streamer-gameplay-presentation-2026
+          sparse-checkout: |
+            promo
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1 && npx playwright install chromium --with-deps
+      - run: node promo/probe-main.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anime-game-main-menu
+          path: promo/main-output/
+          if-no-files-found: warn
