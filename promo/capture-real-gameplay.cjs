@@ -32,8 +32,8 @@ async function clickNav(label){
   note('navigation',label+' '+ok);
   if(ok)await shot('site-'+label,1800);
 }
-async function doAction(name, js){
-  try {await page.evaluate(js);await shot(name,1600);return true}
+async function doAction(name, js, arg){
+  try {await page.evaluate(js,arg);await shot(name,1600);return true}
   catch(e){note('action_error',name+': '+e.message);return false}
 }
 async function guestLogin(p,pseudo) {
@@ -44,7 +44,7 @@ async function guestLogin(p,pseudo) {
   await p.waitForFunction(() => typeof socket !== 'undefined' && socket.connected, null, {timeout:25000}).catch(()=>{});
 }
 async function lobby(mode,submode){
-  const good=await doAction('mode-'+mode+'-'+submode,({mode,submode})=>createRoom(mode,submode));
+  const good=await doAction('mode-'+mode+'-'+submode,({mode,submode})=>createRoom(mode,submode),{mode,submode});
   if(!good)return;
   await page.locator('#waiting-room').waitFor({state:'visible',timeout:11000}).catch(()=>{});
   await shot('salon-'+mode+'-'+submode,1900);
