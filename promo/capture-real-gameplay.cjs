@@ -44,6 +44,7 @@ async function guestLogin(p,pseudo) {
   await p.waitForFunction(() => typeof socket !== 'undefined' && socket.connected, null, {timeout:25000}).catch(()=>{});
 }
 async function lobby(mode,submode){
+  await page.evaluate(()=>{document.querySelectorAll('.v7-modal').forEach(e=>e.remove());if(currentRoomCode)leaveRoom();goToMenuSelection()}).catch(()=>{});
   const good=await doAction('mode-'+mode+'-'+submode,({mode,submode})=>createRoom(mode,submode),{mode,submode});
   if(!good)return;
   await page.locator('#waiting-room').waitFor({state:'visible',timeout:11000}).catch(()=>{});
@@ -90,7 +91,7 @@ async function main(){
     for(const s of ['home','play','collection','shop','deck','trade','clan','friends','leaderboard','quests','museum','settings'])
       await clickNav(s);
     await clickNav('play');
-    await page.evaluate(()=>{const e=document.querySelector('#menu-selection');if(e)e.scrollTop=0;window.scrollTo(0,0)}).catch(()=>{});
+    await page.evaluate(()=>{document.querySelectorAll('.v7-modal').forEach(e=>e.remove());const e=document.querySelector('#menu-selection');if(e)e.scrollTop=0;window.scrollTo(0,0)}).catch(()=>{});
     await shot('02-liste-modes',1100);
 
     // Capture REAL mode-selection screens without starting public games.
@@ -115,13 +116,21 @@ async function main(){
       ['anime-dle',()=>openUniverseSelection('dle')],
       ['bingo',()=>openBingoSetup()],
       ['party-mix',()=>openPartyMixSelection()],
-      ['quiz-communaute',()=>openQuizBrowser()]
+      ['quiz-communaute',()=>openQuizBrowser()],
+      ['chaine-de-persos',()=>openUniverseSelection('chaine')],
+      ['loup-garou',()=>createRoom('loupgarou','all')],
+      ['devine-le-perso',()=>createRoom('guess','all')],
+      ['dessine-le-perso',()=>openUniverseSelection('draw')],
+      ['rolland-garos',()=>openUniverseSelection('rollandgaros')],
+      ['encheres',()=>openUniverseSelection('enchere')],
+      ['encheres-aveugles',()=>openUniverseSelection('enchereaveugle')],
+      ['plus-ou-moins',()=>openArcadeGame('popularite')]
     ];
     for(const [name,act] of selections){
-      await page.evaluate(()=>{if(typeof goToMenuSelection==='function')goToMenuSelection()}).catch(()=>{});
+      await page.evaluate(()=>{document.querySelectorAll('.v7-modal').forEach(e=>e.remove());if(currentRoomCode&&typeof leaveRoom==='function')leaveRoom();if(typeof goToMenuSelection==='function')goToMenuSelection()}).catch(()=>{});
       await doAction('selection-'+name,act);
     }
-    await page.evaluate(()=>goToMenuSelection()).catch(()=>{});
+    await page.evaluate(()=>{document.querySelectorAll('.v7-modal').forEach(e=>e.remove());if(currentRoomCode)leaveRoom();goToMenuSelection()}).catch(()=>{});
     otherContext=await browser.newContext({viewport:{width:1000,height:700}});
     otherPage=await otherContext.newPage();
     await otherPage.goto(URL,{waitUntil:'domcontentloaded',timeout:100000});
