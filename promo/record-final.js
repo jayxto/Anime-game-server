@@ -17,17 +17,25 @@ async function nav(name){
  await node.click({timeout:5000});await sleep(1150);
 }
 async function clickEco(name){
- const buttons=p.locator('button');
- let hits=[];
- for(let i=0,n=Math.min(250,await buttons.count());i<n;i++){
-  const e=buttons.nth(i);
-  if(!await e.isVisible().catch(()=>false))continue;
-  const txt=(await e.innerText().catch(()=>'' )).replace(/\s+/g,' ').trim();
-  if(txt.length<24 && new RegExp('(?:^|\\s)'+name+'$','i').test(txt))hits.push({el:e,text:txt});
- }
- console.log('ECON_CHOICE',name,hits.map(x=>x.text).join('|'));
- if(!hits.length)return false;
- await hits[0].el.click({timeout:5000});return true;
+ const info=await p.evaluate((name)=>{
+  const nodes=[...document.querySelectorAll('*')].filter(e=>{
+   const r=e.getBoundingClientRect(),s=getComputedStyle(e);
+   if(r.top<95||r.top>225||r.left<210||r.left>1260||r.width<16||r.width>200||r.height>100||s.display==='none'||s.visibility==='hidden')return false;
+   const v=(e.innerText||'').replace(/\s+/g,' ').trim();
+   return v.length>0&&v.length<=25&&(v.toLocaleLowerCase('fr').endsWith(name.toLocaleLowerCase('fr')));
+  });
+  nodes.sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length);
+  const el=nodes[0];
+  if(!el)return null;
+  const target=el.closest('button,[role="tab"],[onclick]')||el;
+  target.setAttribute('data-promo-click','1');
+  return {text:(el.innerText||'').slice(0,45),tag:target.tagName,cls:String(target.className).slice(0,65)};
+ },name);
+ console.log('ECON_CHOICE',name,JSON.stringify(info));
+ if(!info)return false;
+ await p.locator('[data-promo-click="1"]').first().click({timeout:5000});
+ await p.locator('[data-promo-click="1"]').first().evaluate(e=>e.removeAttribute('data-promo-click')).catch(()=>{});
+ return true;
 }
 async function scroll(y){await p.mouse.move(655,480);await p.mouse.wheel(0,y);await sleep(1000)}
 async function snap(name){await p.screenshot({path:OUT+'/'+name+'.png'}).catch(()=>{})}
