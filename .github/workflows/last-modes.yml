@@ -1,0 +1,26 @@
+name: Probe final six Anime Game modes
+on:
+  push:
+    branches: [streamer-gameplay-presentation-2026]
+    paths:
+      - '.github/workflows/last-modes.yml'
+jobs:
+  last:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: streamer-gameplay-presentation-2026
+          sparse-checkout: |
+            promo
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-save playwright@1.56.1 && npx playwright install chromium --with-deps
+      - run: timeout 440s node promo/last-modes.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anime-game-last-six-mode-tests
+          path: promo/last-output/
+          if-no-files-found: warn
