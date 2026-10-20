@@ -30,6 +30,18 @@ async function reset(p){
   await sleep(360);
  }catch(e){console.log('RESET_WARN',e.message.slice(0,80))}
 }
+async function freshMenu(){
+ await page.goto(SITE,{waitUntil:'domcontentloaded',timeout:90000});
+ await sleep(350);
+ if(await page.locator('a').filter({hasText:/Play as guest|Jouer en invité/i}).first().isVisible().catch(()=>false)){
+  await page.locator('a').filter({hasText:/Play as guest|Jouer en invité/i}).first().click({timeout:8000});
+  await page.locator('#guest-pseudo').fill('AGStreamer'+GROUP);
+  await click(page,'button[onclick*="playAsGuest"]');
+  await page.locator('.ag-dash-nav-btn').first().waitFor({state:'visible',timeout:17000});
+ }
+ await page.locator('.ag-dash-nav-btn').filter({hasText:/JOUER/}).first().click({timeout:5000}).catch(()=>{});
+ await sleep(470);
+}
 async function chooseWizard(){
  for(let z=0;z<4;z++){
   await sleep(400);
@@ -144,7 +156,7 @@ try{
  for(const [name,onclick] of modes){
   let scene={name,onclick,offset:Date.now(),started:false};
   try{
-   await reset(page);
+   await freshMenu();
    // Some arcade buttons are hidden behind See all
    if(GROUP==='arcade')await click(page,'.arc-menu-refactor-toggle').catch(()=>{});
    const elem=page.locator('button[onclick]').filter({visible:true});
