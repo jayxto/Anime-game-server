@@ -14,7 +14,7 @@ const scene=async (name,fn)=>{
 };
 async function nav(name){
  const node=p.locator('.ag-dash-nav-btn').filter({hasText:new RegExp(name,'i')}).first();
- await node.click({timeout:5000});await sleep(1150);
+ await node.click({timeout:5000});await sleep(850); await p.mouse.move(655,450); await p.mouse.wheel(0,-2600); await sleep(450);
 }
 async function clickEco(name){
  const info=await p.evaluate((name)=>{
