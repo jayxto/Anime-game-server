@@ -1,0 +1,38 @@
+name: Record authentic Anime Game footage
+on:
+  push:
+    branches:
+      - promo/real-gameplay-video-20261020
+    paths:
+      - promo/capture-real-gameplay.cjs
+      - .github/workflows/record-real-gameplay.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-recording:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Chromium recorder
+        run: |
+          mkdir -p "$RUNNER_TEMP/ag-playwright"
+          npm install --prefix "$RUNNER_TEMP/ag-playwright" --no-save --no-audit playwright@1.56.1
+          "$RUNNER_TEMP/ag-playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Record the real live website
+        env:
+          NODE_PATH: ${{ runner.temp }}/ag-playwright/node_modules
+          ANIME_GAME_URL: https://anime-game-server.onrender.com/
+        run: node promo/capture-real-gameplay.cjs
+      - name: Upload real footage and diagnostic screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-game-real-footage
+          path: promo/recordings/
+          if-no-files-found: warn
+          retention-days: 14
