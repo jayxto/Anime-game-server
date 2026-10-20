@@ -4,6 +4,7 @@ on:
     branches: [streamer-gameplay-presentation-2026]
     paths:
       - '.github/workflows/modes-probe.yml'
+      - 'promo/modes-probe.js'
 jobs:
   probe:
     runs-on: ubuntu-latest
