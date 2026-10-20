@@ -1,0 +1,44 @@
+name: Capture genuine Anime Game gameplay
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/record-gameplay.cjs'
+      - '.github/workflows/record-gameplay.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install real browser
+        run: |
+          cd .github/scripts
+          npm install --no-save --ignore-scripts playwright
+          npx playwright install --with-deps chromium
+      - name: Capture live gameplay as test guests
+        run: node .github/scripts/record-gameplay.cjs
+        env:
+          CAPTURE_DIR: captures
+          GAME_URL: https://anime-game-server.onrender.com
+      - name: Convert real capture to MP4
+        if: always()
+        run: |
+          if [ -f captures/Anime-Game-capture-reelle.webm ]; then
+            ffmpeg -hide_banner -loglevel error -y -i captures/Anime-Game-capture-reelle.webm -c:v libx264 -preset fast -crf 27 -pix_fmt yuv420p -an -movflags +faststart captures/Anime-Game-capture-reelle.mp4
+          fi
+      - name: Upload authentic recordings and scene report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: anime-game-vraies-captures
+          path: |
+            captures/Anime-Game-capture-reelle.mp4
+            captures/capture-report.json
+          retention-days: 7
+          if-no-files-found: warn
