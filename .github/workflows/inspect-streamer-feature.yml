@@ -1,0 +1,31 @@
+name: Inspect Anime Game streamer feature labels
+on:
+  push:
+    branches: [streamer-gameplay-presentation-2026]
+    paths:
+      - '.github/workflows/inspect-streamer-feature.yml'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            index.html
+            server.js
+          sparse-checkout-cone-mode: false
+      - name: Locate live streamer interface in HTML and JS
+        run: |
+          python3 - <<'PY'
+          import re
+          s=open('index.html',encoding='utf8').read()
+          lines=s.splitlines()
+          pat=re.compile(r'streamer|stream mode|mode.stream|overlay|tiktok|twitch|obs|youtube.live|live.?chat',re.I)
+          for i,line in enumerate(lines):
+              if pat.search(line):
+                  a=max(0,i-1); b=min(len(lines),i+2)
+                  print('LINE',i+1, ' | '.join(lines[a:b]).replace('  ',' ')[:500])
+          print('TOTAL',len(lines))
+          PY
