@@ -38,7 +38,7 @@ try{
  for(const f of visible){
    if(/email|mail/i.test(f.id+' '+f.type+' '+f.placeholder+' '+f.name))await page.locator('#'+f.id).fill(email).catch(()=>{});
    if(/pass|mot de passe/i.test(f.id+' '+f.type+' '+f.placeholder+' '+f.name))await page.locator('#'+f.id).fill(pass).catch(()=>{});
-   if(/pseudo|user|name|nom/i.test(f.id+' '+f.placeholder+' '+f.name)&&!/email/i.test(f.id))await page.locator('#'+f.id).fill('AnimeVideoDemo').catch(()=>{});
+   if(/pseudo|user|name|nom/i.test(f.id+' '+f.placeholder+' '+f.name)&&!/email/i.test(f.id))await page.locator('#'+f.id).fill('AGCardFilm'+String(Date.now()).slice(-8)).catch(()=>{});
  }
  await snap('02_register_form');
  await page.locator('#auth-submit-btn').click({timeout:7000,noWaitAfter:true});
