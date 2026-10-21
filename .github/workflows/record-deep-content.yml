@@ -1,0 +1,27 @@
+name: Record Anime Game card binder and streamer controls
+on:
+  push:
+    branches: [streamer-gameplay-presentation-2026]
+    paths:
+      - '.github/workflows/record-deep-content.yml'
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: streamer-gameplay-presentation-2026
+          sparse-checkout: |
+            promo
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.56.1 && npx playwright install chromium --with-deps
+      - run: timeout 250s node promo/record-deep-content.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: anime-game-deep-collection-streamer
+          path: promo/deep-content-output/
+          if-no-files-found: warn
