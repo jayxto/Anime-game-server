@@ -43,9 +43,9 @@ async function clickTitle(name){
  const r=await p.evaluate(name=>{
  let els=[...document.querySelectorAll('body *')].filter(e=>{
   const a=(e.innerText||'').replace(/\s+/g,' ').trim();
-  return a===name && e.getBoundingClientRect().width>0 && getComputedStyle(e).visibility!=='hidden' && getComputedStyle(e).display!=='none';
+  return a.includes(name) && a.length<=80 && e.getBoundingClientRect().width>0 && getComputedStyle(e).visibility!=='hidden' && getComputedStyle(e).display!=='none';
  });
- els.sort((a,b)=>a.querySelectorAll('*').length-b.querySelectorAll('*').length);
+ els.sort((a,b)=>((a.innerText||'').length-(b.innerText||'').length)||a.querySelectorAll('*').length-b.querySelectorAll('*').length);
  let e=els[0];
  if(!e)return {clicked:false,found:0};
  let target=e.closest('button,a,[onclick],[role="button"]')||e.parentElement||e;
