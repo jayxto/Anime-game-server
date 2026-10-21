@@ -21,10 +21,11 @@ async function tile(text){
  console.log('TILE',text,r);await sleep(1100);return !!r;
 }
 async function nav(section){
+ await page.goto('https://anime-game-server.onrender.com/',{waitUntil:'domcontentloaded',timeout:80000});
+ await page.locator('.ag-dash-nav-btn').first().waitFor({state:'visible',timeout:12500});
  let target=page.locator('.ag-dash-nav-btn').filter({hasText:new RegExp(section,'i')}).first();
- if(await target.isVisible().catch(()=>false))await target.click({timeout:6000});
- else if(await page.locator('#btn-collection').isVisible().catch(()=>false))await page.locator('#btn-collection').click();
- await sleep(700);
+ await target.click({timeout:5500});
+ await sleep(730);
 }
 try{
  await page.goto('https://anime-game-server.onrender.com/',{waitUntil:'domcontentloaded',timeout:100000});
@@ -48,8 +49,10 @@ try{
  await nav('COLLECTION');await snap('04_collection');
  await tile('Mystery Box');await snap('05_mystery_box');
  let btns=await page.locator('button:visible').allTextContents();console.log('AFTER_MYSTERY_BUTTONS',btns.filter(Boolean).slice(-50));
- const claim=page.locator('button:visible').filter({hasText:/Ouvrir|Récupérer|Gratuit|Réclamer|Obtenir/i}).first();
- if(await claim.isVisible().catch(()=>false)){console.log('CLAIM_BUTTON',await claim.innerText());await claim.click({timeout:5000,noWaitAfter:true}).catch(()=>{});await sleep(1800);await snap('06_mystery_open');}
+ const reveal=page.locator('button:visible').filter({hasText:/Tout révéler/i}).first();
+ if(await reveal.isVisible().catch(()=>false)){await reveal.click({timeout:6000,noWaitAfter:true});await sleep(1600);await snap('06_mystery_open');}
+ const close=page.locator('button:visible').filter({hasText:/Fermer|Terminer|Continuer/i}).last();
+ if(await close.isVisible().catch(()=>false)){await close.click({timeout:5000,noWaitAfter:true}).catch(()=>{});await sleep(600);}
  await nav('COLLECTION');await tile('Classeur');await snap('07_classeur');
  await nav('COLLECTION');await tile('Albums secrets');await snap('08_secret_albums');
  await nav('COLLECTION');await tile('Fusions');await snap('09_fusions');
