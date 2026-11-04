@@ -113,9 +113,12 @@ test('couple and duo image overrides stay scoped to their themed entry',async()=
  assert.equal(canonicalLookups,0);
  assert.ok(lookedUp.includes('qt:couple|'+couple));
  await routes['/api/arcade/item-image']({query:{source:'qt:couple',name:byId.couple.items[1].name}},res);
- assert.equal(out.imageUrl,null,'without a custom image, keep the two separately stored portraits');
+ assert.equal(out.imageUrl,byId.couple.items[1].group||null,'without an admin image, use the curated group photo');
  await routes['/api/arcade/item-image']({query:{source:'qt:duo',name:byId.duo.items[0].name}},res);
- assert.equal(out.imageUrl,null);
+ assert.equal(out.imageUrl,byId.duo.items[0].group||null);
+ const noGroup=byId.duo.items.find(i=>!i.group);
+ if(noGroup){await routes['/api/arcade/item-image']({query:{source:'qt:duo',name:noGroup.name}},res);
+ assert.equal(out.imageUrl,null,'without any group photo, keep the two separately stored portraits');}
  assert.equal(canonicalLookups,0,'group images never look up an individual character');
 });
 

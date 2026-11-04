@@ -15604,9 +15604,10 @@ app.get('/api/arcade/item-image', async (req, res) => {
                 // Otherwise an old embedded `img` can bypass verified mappings entirely.
                 if (it.img && source !== 'qt:transformation') url = it.img;
                 else if (QAP_COMPOSITE_SOURCES.has(source)) {
-                    // No group override yet: let the client display the two
-                    // original portraits from item.imgs, without guessing a character.
-                    url = null;
+                    // No admin override: use the curated group photo (both characters
+                    // together) from the catalogue. Without one, the client displays
+                    // the two original portraits from item.imgs, without guessing a character.
+                    url = it.group || null;
                 }
                 else if (source.startsWith('qt:') && (it.media === 'anime' || ['anime','shonen','isekai','arc'].includes(source.slice(3)))) {
                     url = await qapAniListAnimeCover(it.sub && source.endsWith(':arc') ? it.sub : it.name);
