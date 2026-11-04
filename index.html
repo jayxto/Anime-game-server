@@ -7858,6 +7858,36 @@ body.ag-game-page #app-root > #mode,
                     .finally(() => { itemImgRunning--; itemImagePump(); });
             }
         }
+        // Duo / couple : la photo de groupe enregistrée par l'admin (les deux persos ensemble)
+        // remplace les deux portraits côte à côte, partout où le duo est affiché
+        // (cartes, boutique, album, échanges, decks, tier lists). Les portraits solo ne changent pas.
+        // Il suffit de mettre data-duo-src="qt:duo|qt:couple" et data-duo-name sur le conteneur.
+        const DUO_GROUP_IMG = {};
+        function duoGroupImg(source, name) {
+            const k = source + '|' + name;
+            if (!DUO_GROUP_IMG[k]) DUO_GROUP_IMG[k] = fetch(`/api/arcade/item-image?source=${encodeURIComponent(source)}&name=${encodeURIComponent(name)}`)
+                .then(r => r.json()).catch(() => null)
+                .then(d => (d && d.imageUrl ? '/api/img?u=' + encodeURIComponent(d.imageUrl) : null));
+            return DUO_GROUP_IMG[k];
+        }
+        function duoGroupApply(box) {
+            if (box.dataset.duoDone) return;
+            box.dataset.duoDone = '1';
+            duoGroupImg(box.dataset.duoSrc, box.dataset.duoName).then(src => {
+                if (!src || !box.isConnected) return;
+                const im = new Image();
+                im.alt = box.dataset.duoName; im.className = 'duo-group'; im.decoding = 'async';
+                im.onload = () => { if (box.isConnected) { box.replaceChildren(im); box.classList.add('has-group'); } };
+                im.src = src;
+            });
+        }
+        new MutationObserver(muts => {
+            for (const m of muts) for (const n of m.addedNodes) {
+                if (n.nodeType !== 1) continue;
+                if (n.matches('[data-duo-name]')) duoGroupApply(n);
+                n.querySelectorAll('[data-duo-name]').forEach(duoGroupApply);
+            }
+        }).observe(document.documentElement, { childList: true, subtree: true });
         async function loadItems(source) {
             const r = await fetch(source === 'openings' ? '/api/arcade/openings' : '/api/arcade/items?source=' + encodeURIComponent(source));
             const d = await r.json();
@@ -8159,6 +8189,7 @@ body.ag-game-page #app-root > #mode,
             }
             if (it.imgs) { // duo / combat : deux images côte à côte
                 const duo = document.createElement('div'); duo.className = 'tl-duo';
+                if (tl.source === 'qt:duo' || tl.source === 'qt:couple') { duo.dataset.duoSrc = tl.source; duo.dataset.duoName = it.name; }
                 it.imgs.forEach(u => { const im = document.createElement('img'); im.src = '/api/img?u=' + encodeURIComponent(u); im.alt = ''; im.loading = 'lazy'; duo.appendChild(im); });
                 el.insertBefore(duo, cap); el.classList.remove('noimg');
             } else itemImage(tl.source, it).then(src => {
@@ -11971,7 +12002,7 @@ body.ag-game-page #app-root > #mode,
                 );
             const sel = selected != null ? selected : (trd.session && trd.session.me.card ? trdId(trd.session.me.card) : '');
             g.innerHTML = (f.length > 100 ? `<p class="tl-hint" style="grid-column:1/-1;">${f.length} cartes : utilise la recherche ou le filtre (100 premières affichées)</p>` : '') + f.slice(0, 100).map(c => {
-                const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
+                const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo" data-duo-src="qt:duo" data-duo-name="${hubEsc(c.name)}">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${hubEsc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
                 return `<button class="trd-mini r-${c.rarity}${c.finish ? ' f-' + c.finish : ''}${sel === trdId(c) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[c.finish] || '#fff'}" onclick="tradeSelect(${JSON.stringify(trdId(c)).replace(/"/g, '&quot;')})">${img}${c.finish ? `<span class="tm-fin">${TRD_FIN[c.finish]}</span>` : ''}<b>${hubEsc(c.name)}</b><small class="trd-rar">${RAR_LABEL[c.rarity] || (c.rarity === 'collector' ? '⭐ Collector' : c.rarity)}${c.shiny ? ' ✨' : ''}${c.n > 1 ? ' • x' + c.n : ''}</small><small>${hubEsc(c.anime)}</small></button>`;
             }).join('') || '<p class="tl-hint">Aucune carte.</p>';
         }
@@ -14111,6 +14142,8 @@ body.ag-game-page #app-root > #mode,
         .tcard .tc-duo{display:flex;width:100%;height:100%;}
         .tcard .tc-duo img{width:50%;height:100%;object-fit:cover;object-position:top;}
         .tcard .tc-duo img+img{border-left:2px solid #00e5a0;}
+        /* photo de groupe d'un duo/couple : une seule image, les deux persos ensemble */
+        .tc-duo.has-group img.duo-group,.tm-duo.has-group img.duo-group,.tl-duo.has-group img.duo-group{width:100%;height:100%;object-fit:cover;object-position:top;border:0;}
         /* --- finitions --- */
         /* AG_MORE_FINISHES_V1 */
         .tcard.f-crystal{border-color:#9be7ff;box-shadow:0 0 14px rgba(155,231,255,.7);}
@@ -14393,7 +14426,7 @@ body.ag-game-page #app-root > #mode,
                 const fin = c.finish || (ex && ex.f) || null, ser = c.serial || (ex && ex.ser) || null;
                 if (key) CARD_CACHE[key] = Object.assign({}, c, { key, finish: fin, serial: ser });
                 const imgs = c.imgs && c.imgs.length === 2
-                    ? `<div class="tc-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`).join('')}</div>`
+                    ? `<div class="tc-duo" data-duo-src="qt:duo" data-duo-name="${esc(c.name)}">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`).join('')}</div>`
                     : `<img src="${esc(c.img)}" alt="" loading="lazy" decoding="async" onerror="this.style.opacity=.15">`;
                 const first = String(c.name).split(/[ &]/)[0];
                 const cfr = key && window.CARD_FRAMES_ON ? window.CARD_FRAMES_ON[key] : null;
@@ -14737,7 +14770,7 @@ body.ag-game-page #app-root > #mode,
                 cardPager('dk-pg1', dk.page, pages, go); cardPager('dk-pg2', dk.page, pages, go);
                 box.innerHTML = list.slice((dk.page - 1) * per, dk.page * per).map(c => {
                     const full = dk.cards.find(x => x.key === c.key) || c, fin = full.finish;
-                    const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
+                    const img = c.imgs && c.imgs.length === 2 ? `<span class="tm-duo" data-duo-src="qt:duo" data-duo-name="${v7esc(c.name)}">${c.imgs.map(u => `<img src="/api/img?u=${encodeURIComponent(u)}" alt="" loading="lazy">`).join('')}</span>` : `<img src="${v7esc(c.img)}" alt="" loading="lazy" onerror="this.style.opacity=.15">`;
                     return `<button class="trd-mini r-${c.rarity}${fin ? ' f-' + fin : ''}${dk.keys.includes(c.key) ? ' on' : ''}" style="--fc:${(window.FIN_COL || {})[fin] || '#fff'}" onclick="deckToggle(${JSON.stringify(c.key).replace(/"/g, '&quot;')})">${img}${fin ? `<span class="tm-fin">${FLAB[fin]}</span>` : ''}<b>${v7esc(c.name)}</b><small>${RAR_LABEL[c.rarity] || c.rarity}${c.shiny ? ' ✨' : ''} • +${bonusOf(full)} %</small></button>`;
                 }).join('') || '<p class="tl-hint">Aucune carte ne correspond.</p>';
             };
